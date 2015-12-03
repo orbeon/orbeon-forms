@@ -41,14 +41,13 @@
 }
 
 // icon-info from Bootstrap sprites.less
-.help-icon {
+.help-icon(@path) {
     display: inline-block;
     width: 14px;
     height: 14px;
-    .ie7-restore-right-whitespace();
     line-height: 14px;
     vertical-align: text-top;
-    background-image: url(bootstrap/img/glyphicons-halflings.png);
+    background-image: url("@{path}bootstrap/img/glyphicons-halflings.png");
     background-repeat: no-repeat;
     background-position: -120px -96px;
 }

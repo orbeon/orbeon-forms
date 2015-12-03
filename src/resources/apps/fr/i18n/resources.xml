@@ -88,6 +88,7 @@
                 <move-down>Move Down</move-down>
                 <remove>Remove</remove>
                 <menu>Menu</menu>
+                <add-another>Add Another</add-another>
             </grid>
             <date-time>
                 <year>Year</year>
@@ -386,6 +387,7 @@
                 <move-down>Déplacer vers le bas</move-down>
                 <remove>Supprimer</remove>
                 <menu>Menu</menu>
+                <add-another>Ajouter une ligne</add-another>
             </grid>
             <date-time>
                 <year>Année</year>
@@ -688,6 +690,7 @@
                 <move-down>Mover Debajo</move-down>
                 <remove>Remover</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>Año</year>
@@ -976,6 +979,7 @@
                 <move-down todo="true">[Move Down]</move-down>
                 <remove todo="true">[Remove]</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year todo="true">Year</year>
@@ -1263,6 +1267,7 @@
                 <move-down todo="true">[Move Down]</move-down>
                 <remove todo="true">[Remove]</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year todo="true">Year</year>
@@ -1547,6 +1552,7 @@
                 <move-down>Sposta in giù</move-down>
                 <remove>Rimuovi</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>Anno</year>
@@ -1844,6 +1850,7 @@
                 <move-down>Nach unten verschieben</move-down>
                 <remove>Löschen</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>Jahr</year>
@@ -2141,6 +2148,7 @@
                 <move-down>Siirrä alas</move-down>
                 <remove>Poista</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>Vuosi</year>
@@ -2438,6 +2446,7 @@
                 <move-down>Flytta ned</move-down>
                 <remove>Ta bort</remove>
                 <menu>Meny</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>År</year>
@@ -2735,6 +2744,7 @@
                 <move-down>Omlaag</move-down>
                 <remove>Verwijderen</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>Jaar</year>
@@ -3032,6 +3042,7 @@
                 <move-down>Move para Baixo</move-down>
                 <remove>Remove</remove>
                 <menu todo="true">Menu</menu>
+                <add-another todo="true">[Add Another]</add-another>
             </grid>
             <date-time>
                 <year>Ano</year>

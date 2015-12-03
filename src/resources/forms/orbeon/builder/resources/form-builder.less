@@ -598,10 +598,10 @@ body {
         border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
     }
 
-    .fb-grid-td { border: 1px solid transparent }
+    .fb-grid-td { border: 1px solid transparent }                                       // So that we can show the grid border on hover changing the border size
 
     // Editable grids
-    .fr-view .fr-grid.fr-editable {
+    .fr-view .xbl-fr-grid .fr-grid.fr-editable {
 
         &.fr-norepeat {                                                                                             // For non-repeat grid (`table` to override collapse in FR.less)
             border-collapse: collapse;

@@ -36,6 +36,10 @@
 
     <xbl:binding id="fr-grid-binding" element="fr|grid" xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/grid/grid.css"/>
+        </xbl:resources>
+
         <xbl:handlers>
             <xbl:handler event="fr-remove fr-move-up fr-move-down fr-insert-above fr-insert-below" phase="target">
                 <xf:dispatch name="{event('xxf:type')}" targetid="repeat-group" xxf:repeat-indexes="{event('row')}"/>
@@ -102,6 +106,11 @@
                 <xsl:variable name="repeat-expression"        select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
                 <xsl:variable name="repeat-expression-suffix" select="if ($is-content-repeat) then '/*' else ''"/>
 
+                <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>
+
+                <xsl:variable name="left-column"              select="$is-repeat and $appearance = 'full' and not($readonly)"/>
+                <xsl:variable name="right-column"             select="false()"/>
+
                 <xsl:template match="/*">
 
                     <!-- Root element -->
@@ -158,6 +167,43 @@
                             <xf:var name="max">
                                 <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
                             </xf:var>
+
+                            <xf:action event="DOMActivate" observer="fr-grid-add">
+                                <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
+                                <xf:insert
+                                    context="$repeat-context"
+                                    ref="$repeat-sequence"
+                                    origin="$repeat-template"
+                                    at="$p"
+                                    xxf:defaults="{$apply-defaults}"/>
+                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
+                                <!-- Let the outside world know -->
+                                <xf:dispatch targetid="fr-grid-binding" name="fr-iteration-added"/>
+                            </xf:action>
+
+                            <xf:action event="DOMActivate" observer="fr-grid-add-bottom">
+                                <xf:var name="p" value="count($repeat-sequence)"/>
+                                <xf:insert
+                                    context="$repeat-context"
+                                    ref="$repeat-sequence"
+                                    origin="$repeat-template"
+                                    xxf:defaults="{$apply-defaults}"/>
+                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf5"/>
+                                <!-- Let the outside world know -->
+                                <xf:dispatch targetid="fr-grid-binding" name="fr-iteration-added"/>
+                            </xf:action>
+
+                            <xf:action event="DOMActivate" observer="fr-grid-remove-bottom">
+                                <xf:var name="p" value="count($repeat-sequence)"/>
+                                <xf:delete
+                                    ref="$repeat-sequence[last()]"/>
+                                <!-- HACK: Specify id so that action id remains stable in Form Builder -->
+                                <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf6"/>
+                                <!-- Let the outside world know -->
+                                <xf:dispatch targetid="fr-grid-binding" name="fr-iteration-removed"/>
+                            </xf:action>
                         </xsl:if>
 
                         <!-- Group to control visibility of the whole table.
@@ -172,12 +218,18 @@
                                 </xsl:otherwise>
                             </xsl:choose>
 
+                            <xsl:if test="$is-repeat">
+                                <xf:var
+                                    name="can-add"
+                                    value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
+                            </xsl:if>
+
                             <!-- Grid table -->
                             <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
                                               (: Control name might not be available (unclear why normalize-space() is needed) :)
                                               for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
                                               if ($is-repeat)
-                                                    then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
+                                                    then ('table', 'table-bordered'[$appearance = 'full'], 'table-condensed', 'fr-repeat', 'fr-repeat-table',
                                                           if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
                                                     else 'fr-norepeat',
                                               if ($is-editable)
@@ -185,37 +237,30 @@
                                                     else ()}">
                                 <!-- Colgroup to make column sizing with CSS easier -->
                                 <xh:colgroup>
-                                    <xsl:if test="$is-repeat and not($readonly)">
-                                        <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]"/>
+                                    <xsl:if test="$left-column">
+                                        <xh:col class="fr-repeat-column-left" xxf:control="true" ref=".[not($view-mode)]"/>
                                     </xsl:if>
                                     <xsl:for-each select="$grid-rows[1]/*:td">
                                         <xh:col class="fr-grid-col-{position()}"/>
                                     </xsl:for-each>
+                                    <xsl:if test="right-column">
+                                        <xh:col class="fr-repeat-column-right" xxf:control="true" ref=".[not($view-mode)]"/>
+                                    </xsl:if>
                                 </xh:colgroup>
                                 <!-- If repeat, add buttons and headers-->
                                 <xsl:if test="$is-repeat">
                                     <xh:thead>
-                                        <xf:var name="can-add"
-                                                value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
                                         <!-- Row with column headers -->
                                         <xh:tr class="fr-grid-master-row">
-                                            <xsl:if test="not($readonly)">
-                                                <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref=".[not($view-mode)]">
-                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" id="fr-grid-add" tabindex="-1">
+                                            <xsl:if test="$left-column">
+                                                <xh:th class="fr-repeat-column fr-repeat-column-left" xxf:control="true" ref=".[not($view-mode)]">
+                                                    <xf:trigger
+                                                        appearance="minimal"
+                                                        ref="$repeat-context[$can-add]"
+                                                        id="fr-grid-add"
+                                                        tabindex="-1"
+                                                        xxf:title="{{xxf:r('components.grid.add-another', '|fr-fr-resources|')}}">
                                                         <xf:label><xh:i class="icon-plus-sign"/></xf:label>
-                                                        <xf:action event="DOMActivate">
-                                                            <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
-                                                            <xf:insert
-                                                                context="$repeat-context"
-                                                                ref="$repeat-sequence"
-                                                                origin="$repeat-template"
-                                                                at="$p"
-                                                                xxf:defaults="{$apply-defaults}"/>
-                                                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
-                                                            <!-- Let the outside world know -->
-                                                            <xf:dispatch targetid="fr-grid-binding" name="fr-iteration-added"/>
-                                                        </xf:action>
                                                     </xf:trigger>
                                                     <xf:group ref="$repeat-context[not($can-add)]">
                                                         <xh:i class="icon-plus-sign disabled"/>
@@ -274,6 +319,9 @@
                                                     </xsl:if>
                                                 </xh:th>
                                             </xsl:for-each>
+                                            <xsl:if test="$right-column">
+                                                <xh:th class="fr-repeat-column fr-repeat-column-right" xxf:control="true" ref=".[not($view-mode)]"/>
+                                            </xsl:if>
                                         </xh:tr>
                                         <!-- Optional row(s) shown before the repeated rows -->
                                         <!--<xsl:for-each select="fr:header">-->
@@ -300,8 +348,17 @@
                                                         <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
                                                     </xf:var>
 
+                                                    <xf:var
+                                                        name="can-remove"
+                                                        value="
+                                                            $remove-constraint and
+                                                            not($frozen) and
+                                                            $min castable as xs:integer and
+                                                            count($repeat-sequence) gt xs:integer($min)"
+                                                    />
+
                                                     <xf:var name="can-classes" value="
-                                                            'can-remove'      [$remove-constraint and not($frozen) and $min castable as xs:integer and count($repeat-sequence) gt xs:integer($min)],
+                                                            'can-remove'      [$can-remove],
                                                             'can-move-up'     [$repeat-position gt {$freeze} + 1],
                                                             'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
                                                             'can-insert-above'[$can-add and not($frozen)],
@@ -444,6 +501,29 @@
                                     <!--</xh:tfoot>-->
                                 <!--</xsl:if>-->
                             </xh:table>
+
+                            <xsl:if test="$is-repeat and $appearance = 'minimal' and not($readonly)">
+                                <xf:group ref=".[not($view-mode)]" class="fr-grid-bottom-buttons">
+                                    <xf:trigger appearance="minimal" id="fr-grid-add-bottom" ref="$repeat-context[$can-add]">
+                                        <xf:label value="xxf:r('components.grid.add-another', '|fr-fr-resources|')"/>
+                                    </xf:trigger>
+
+                                    <!-- NOTE: Don't apply remove constraint: in this mode it's always possible to remove the last row. -->
+                                    <!-- TODO: not($frozen) and -->
+                                    <xf:var
+                                        name="can-remove"
+                                        value="
+                                            $min castable as xs:integer and
+                                            count($repeat-sequence) gt xs:integer($min)"
+                                    />
+
+                                    <!-- Show only if can remove -->
+                                    <xf:trigger appearance="minimal" id="fr-grid-remove-bottom" ref="$repeat-context[$can-remove]">
+                                        <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
+                                    </xf:trigger>
+                                </xf:group>
+                            </xsl:if>
+
                         </xf:group>
                     </xf:group>
                 </xsl:template>
@@ -468,8 +548,8 @@
                         </xsl:choose>
 
                         <!-- Repeat buttons/menu -->
-                        <xsl:if test="$is-repeat and not($readonly) and $static-row-pos = 1">
-                            <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
+                        <xsl:if test="$left-column and $static-row-pos = 1">
+                            <xh:td class="fr-repeat-column-left" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
                                 <xh:div class="dropdown">
                                     <xh:button
                                         class="btn btn-mini fr-grid-dropdown-button"
@@ -484,6 +564,28 @@
                         <xsl:apply-templates select="*" mode="grid-content">
                             <xsl:with-param name="static-row-pos" tunnel="yes" select="count(preceding::*:tr) + 1"/>
                         </xsl:apply-templates>
+
+                        <!-- Repeat buttons/menu -->
+                        <xsl:if test="$right-column and $static-row-pos = 1">
+                            <xh:td class="fr-repeat-column-right" rowspan="{$static-row-count}" xxf:control="true" ref=".[not($view-mode)]">
+                                <xf:trigger
+                                    appearance="minimal"
+                                    ref="$repeat-context[$can-remove]"
+                                    id="fr-grid-remove"
+                                    tabindex="-1"
+                                    xxf:title="{{xxf:r('components.grid.remove', '|fr-fr-resources|')}}">
+
+                                    <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                    <xf:dispatch
+                                        event="DOMActivate"
+                                        name="fr-remove"
+                                        targetid="repeat-group"/>
+                                </xf:trigger>
+                                <xf:group ref="$repeat-context[not($can-remove)]">
+                                    <xh:i class="icon-minus-sign disabled"/>
+                                </xf:group>
+                            </xh:td>
+                        </xsl:if>
                     </xh:tr>
                 </xsl:template>
 

@@ -60,11 +60,11 @@ body {
 }
 .orbeon .fr-section-title.hover {
   background-color: #f1f1f1;
-  background-image: -moz-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#dddddd));
-  background-image: -webkit-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -o-linear-gradient(top, #ffffff, #dddddd);
-  background-image: linear-gradient(to bottom, #ffffff, #dddddd);
+  background-image: -moz-linear-gradient(top, white, #dddddd);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#dddddd));
+  background-image: -webkit-linear-gradient(top, white, #dddddd);
+  background-image: -o-linear-gradient(top, white, #dddddd);
+  background-image: linear-gradient(to bottom, white, #dddddd);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffdddddd', GradientType=0);
 }
@@ -168,11 +168,11 @@ body {
 }
 .orbeon .fb-toolbox .fb-toolbox-inside .fb-tools .fb-tool .xforms-trigger button:hover {
   background-color: #f1f1f1;
-  background-image: -moz-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#dddddd));
-  background-image: -webkit-linear-gradient(top, #ffffff, #dddddd);
-  background-image: -o-linear-gradient(top, #ffffff, #dddddd);
-  background-image: linear-gradient(to bottom, #ffffff, #dddddd);
+  background-image: -moz-linear-gradient(top, white, #dddddd);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#dddddd));
+  background-image: -webkit-linear-gradient(top, white, #dddddd);
+  background-image: -o-linear-gradient(top, white, #dddddd);
+  background-image: linear-gradient(to bottom, white, #dddddd);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffdddddd', GradientType=0);
 }
@@ -272,7 +272,7 @@ body {
   clear: both;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid > * {
-  background-color: #ffffff;
+  background-color: white;
 }
 .orbeon .fb-dialog-itemsets .xbl-fr-grid table.fr-grid {
   table-layout: auto;
@@ -378,7 +378,7 @@ body {
   padding: 0;
 }
 .orbeon .fb-dialog-control-details .tab-pane > * {
-  background-color: #ffffff;
+  background-color: white;
 }
 .orbeon .fb-dialog-control-details label[class~=radio] img,
 .orbeon .fb-dialog-control-details label[class~=checkbox] img {
@@ -645,41 +645,41 @@ body {
 .orbeon .fb-grid-td {
   border: 1px solid transparent;
 }
-.orbeon .fr-view .fr-grid.fr-editable.fr-norepeat {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable.fr-norepeat {
   border-collapse: collapse;
 }
-.orbeon .fr-view .fr-grid.fr-editable.fr-norepeat:hover .fb-grid-td {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable.fr-norepeat:hover .fb-grid-td {
   border: 1px solid #ddeeff;
 }
-.orbeon .fr-view .fr-grid.fr-editable .fb-grid-tr {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fb-grid-tr {
   height: 60px;
 }
-.orbeon .fr-view .fr-grid.fr-editable .xforms-label:hover,
-.orbeon .fr-view .fr-grid.fr-editable .xforms-hint:hover,
-.orbeon .fr-view .fr-grid.fr-editable .btn span:hover,
-.orbeon .fr-view .fr-grid.fr-editable .xforms-text .xforms-output-output:hover {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .xforms-label:hover,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .xforms-hint:hover,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .btn span:hover,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .xforms-text .xforms-output-output:hover {
   background-color: #eeeeee;
 }
-.orbeon .fr-view .fr-grid.fr-editable .xforms-text .xforms-output-output {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .xforms-text .xforms-output-output {
   min-height: 50px;
   display: block;
 }
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label,
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint,
-.orbeon .fr-view .fr-grid.fr-editable .fb-grid-th .xforms-label,
-.orbeon .fr-view .fr-grid.fr-editable .fb-grid-th .xforms-hint {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content .xforms-label,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content .xforms-hint,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fb-grid-th .xforms-label,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fb-grid-th .xforms-hint {
   min-height: 20px;
 }
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content {
   padding-left: 32px;
   padding-right: 32px;
 }
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content > .fb-upload {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content > .fb-upload {
   display: block;
   margin-bottom: 32px;
 }
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label input,
-.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint input {
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content .xforms-label input,
+.orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content .xforms-hint input {
   width: 100%;
 }
 .orbeon #fr-view .fr-grid.fr-editable .xforms-hint.xforms-disabled {

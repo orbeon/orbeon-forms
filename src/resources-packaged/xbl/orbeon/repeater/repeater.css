@@ -1,23 +1,35 @@
-.orbeon .fr-repeat .fr-repeater-add i {
-  margin-left: 4px;
-  margin-right: 5px;
-}
-.orbeon .fr-repeat .fr-repeat-iteration {
-  margin-top: 10px;
+.orbeon .xbl-fr-repeater .fr-repeat-iteration {
   border-bottom: 1px solid #ddddee;
 }
-.orbeon .fr-repeat .fr-repeat-menu {
+.orbeon .xbl-fr-repeater .fr-repeat-menu {
   width: 22px;
   float: left;
-  padding: 0 4px 0 0;
+  padding: 5px 4px 0 0;
 }
-.orbeon .fr-repeat .fr-repeat-content {
+.orbeon .xbl-fr-repeater .fr-repeat-content {
   padding-left: 26px;
 }
-.orbeon .fr-repeat .fr-repeat-content > .xbl-fr-section > div > h2 > .fr-section-label {
+.orbeon .xbl-fr-repeater .fr-repeat-content > .xbl-fr-section > div > h2 > .fr-section-label {
   padding-left: 0;
   background-image: none;
 }
-.orbeon .fr-repeat .fr-repeat-content > .xbl-fr-section > div > div > .fr-section-content {
+.orbeon .xbl-fr-repeater .fr-repeat-content > .xbl-fr-section > div > div > .fr-section-content {
   padding-left: 0;
+}
+.orbeon .xbl-fr-repeater.xforms-repeater-appearance-minimal .fr-repeat-content {
+  padding-left: 16px;
+}
+.orbeon .xbl-fr-repeater .fr-repeater-top-buttons {
+  display: block;
+}
+.orbeon .xbl-fr-repeater .fr-repeater-top-buttons .xforms-trigger i {
+  margin-left: 4px;
+  margin-right: 5px;
+}
+.orbeon .xbl-fr-repeater .fr-repeater-bottom-buttons {
+  display: block;
+  margin-top: 10px;
+}
+.orbeon .xbl-fr-repeater .fr-repeater-bottom-buttons .xforms-trigger {
+  margin-right: 1em;
 }

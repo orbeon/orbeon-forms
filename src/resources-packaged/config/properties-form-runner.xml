@@ -304,4 +304,7 @@
     <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                     value="false"/>
     <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"               value="true"/>
 
+    <property as="xs:string"   name="oxf.xforms.xbl.fr.section.repeat.appearance.*.*"           value=""/>
+    <property as="xs:string"   name="oxf.xforms.xbl.fr.grid.repeat.appearance.*.*"              value=""/>
+
 </properties>

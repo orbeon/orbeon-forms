@@ -31,8 +31,8 @@
     <!-- Import components -->
     <xsl:import href="view.xsl"/>
     <xsl:import href="buttons.xsl"/>
-    <xsl:import href="section.xsl"/><!-- pass global section properties to fr:section -->
-    <xsl:import href="legacy-repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
+    <xsl:import href="section-and-grid.xsl"/> <!-- pass properties -->
+    <xsl:import href="legacy-repeat.xsl"/>    <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
     <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
@@ -87,6 +87,16 @@
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
     <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))" as="xs:boolean"/>
+
+    <xsl:variable
+        name="section-repeat-appearance"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.repeat.appearance', $app, $form), '.'))[normalize-space()]"
+        as="xs:string?"/>
+
+    <xsl:variable
+        name="grid-repeat-appearance"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.repeat.appearance', $app, $form), '.'))[normalize-space()]"
+        as="xs:string?"/>
 
     <xsl:template match="/xh:html">
         <!-- Handle document language -->

@@ -13,30 +13,29 @@
 @import (reference) "../../../../resources/apps/fr/style/form-runner-common";
 
 .orbeon {
-    .fr-repeat {
-
-        .fr-repeater-add i {
-            margin-left: 4px;
-            margin-right: 5px;
-        }
+    .xbl-fr-repeater {
 
         .fr-repeat-iteration {
-            margin-top: 10px;
             border-bottom: 1px solid @frBorderColor;
         }
 
         .fr-repeat-menu {
             width: 22px;
             float:left;
-            padding: 0 4px 0 0;
+            padding: 5px 4px 0 0;
         }
 
-        .xforms-repeat-selected-item-1, .xforms-repeat-selected-item-2, .xforms-repeat-selected-item-3, .xforms-repeat-selected-item-4 {
+        .xforms-repeat-selected-item-1,
+        .xforms-repeat-selected-item-2,
+        .xforms-repeat-selected-item-3,
+        .xforms-repeat-selected-item-4 {
             &.fr-repeat-iteration {
             }
         }
 
         .fr-repeat-content {
+
+            // If there a menu, increase the padding
             padding-left: 26px;
 
             // Fixup directly nested section
@@ -51,6 +50,31 @@
                 > div > .fr-section-content {
                     padding-left: 0;
                 }
+            }
+        }
+
+        // If there is no menu, don't increase the padding
+        &.xforms-repeater-appearance-minimal .fr-repeat-content {
+            padding-left: 16px;
+        }
+
+        .fr-repeater-top-buttons {
+
+            display: block;
+
+            .xforms-trigger i {
+                margin-left: 4px;
+                margin-right: 5px;
+            }
+        }
+
+        .fr-repeater-bottom-buttons {
+
+            display: block;
+            margin-top: 10px;
+
+            .xforms-trigger {
+                margin-right: 1em;
             }
         }
     }

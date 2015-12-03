@@ -4,17 +4,6 @@
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
 }
-.help-icon {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url(bootstrap/img/glyphicons-halflings.png);
-  background-repeat: no-repeat;
-  background-position: -120px -96px;
-}
 .narrow-td {
   width: 1px;
 }

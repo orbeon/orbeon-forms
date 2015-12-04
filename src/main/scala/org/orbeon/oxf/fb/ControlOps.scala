@@ -13,24 +13,23 @@
  */
 package org.orbeon.oxf.fb
 
-import annotation.tailrec
-import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.oxf.xforms.analysis.model.Model
-import Model._
-import org.orbeon.oxf.xml.NamespaceMapping
-
-import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsControl}
-import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import collection.mutable
-import org.orbeon.saxon.value.StringValue
-import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
+import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.XML._
+
+import scala.annotation.tailrec
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 /*
  * Form Builder: operations on controls.

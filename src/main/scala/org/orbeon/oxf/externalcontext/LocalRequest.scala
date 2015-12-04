@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.externalcontext
 
+import java.{util ⇒ ju}
+
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.http.{Headers, EmptyInputStream, StreamedContent}
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.servlet.ServletExternalContext
-import org.orbeon.oxf.util.ScalaUtils.{appendStartingSlash, combineValues, decodeSimpleQuery}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import ScalaUtils._
-import java.{util ⇒ ju}
 
 // Request used for local (within Orbeon Forms) requests.
 //
@@ -190,7 +190,7 @@ class LocalRequest(
 
   def getNativeRequest                        = incomingRequest.getNativeRequest  // should not have mainstream uses; see RequestDispatcherSubmission, and cookies forwarding
   def getPathTranslated                       = incomingRequest.getPathTranslated // should really not be called
-  
+
   // Client and server are preserved, assuming all those relate to knowledge about the  URL rewriting and/or
   def getProtocol                             = incomingRequest.getProtocol
   def getServerPort                           = incomingRequest.getServerPort

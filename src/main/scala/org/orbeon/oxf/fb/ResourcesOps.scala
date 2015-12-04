@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
-import org.apache.commons.lang3.StringUtils._
-import org.orbeon.oxf.util.ScalaUtils._
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.XML._
 
 trait ResourcesOps extends BaseOps {
 

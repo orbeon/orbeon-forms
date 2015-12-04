@@ -272,6 +272,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
      * Return all XFormsInstance objects for this model, in the order they appear in the model.
      */
     public List<XFormsInstance> getInstances() {
+        // TODO: Some instances can be uninitialized during model construction. Callers should test for that,
+        // or we should filter by non-null instances.
         return instances;
     }
 
@@ -291,8 +293,9 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         // NOTE: We shouldn't even be called if the parent control is not relevant.
         if (container.isRelevant()) {
-            for (final XFormsInstance currentInstance: instances) {
-                if (currentInstance.documentInfo().isSameNodeInfo(documentInfo))
+            // NOTE: Some instances can be uninitialized during model construction so test for null.
+            for (final XFormsInstance currentInstance : instances) {
+                if (currentInstance != null && currentInstance.documentInfo().isSameNodeInfo(documentInfo))
                     return currentInstance;
             }
         }

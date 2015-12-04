@@ -59,11 +59,9 @@
 
     <xsl:variable name="has-noscript-link" select="p:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="is-noscript-table" select="not(not(p:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
-    <xsl:variable name="is-noscript-section-collapse" select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="min-toc" select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
     <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="is-ajax-section-collapse" select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="hide-logo" select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-footer" select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))" as="xs:boolean?"/>
@@ -74,11 +72,8 @@
     <xsl:variable name="custom-js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
     <xsl:variable name="inner-buttons" select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))" as="xs:string*"/>
     <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="captcha-type" as="xs:string"  select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
     <xsl:variable name="has-captcha"  as="xs:boolean" select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"/>
-
-    <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"        as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
@@ -87,6 +82,56 @@
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
     <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))" as="xs:boolean"/>
+
+    <!-- fr:section and fr:grid configuration -->
+    <xsl:variable
+        name="is-ajax-section-animate"
+        select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-fr-section-animate"
+        select="not($is-noscript) and not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.')) = false())"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-animate-sections"
+        select="$is-ajax-section-animate and $is-fr-section-animate"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-noscript-section-collapse"
+        select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-ajax-section-collapse"
+        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-fr-section-collapse"
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapse', $app, $form), '.')) = false())"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-fr-section-noscript-collapse"
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.noscript.collapse', $app, $form), '.')) = false())"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-section-collapse"
+        select="
+            (
+                not($is-noscript)             and
+                $is-ajax-section-collapse     and
+                $is-fr-section-collapse
+            ) or (
+                $is-noscript                  and
+                $is-noscript-section-collapse and
+                $is-fr-section-noscript-collapse
+            )"
+        as="xs:boolean"/>
 
     <xsl:variable
         name="section-repeat-appearance"

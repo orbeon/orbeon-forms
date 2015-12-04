@@ -229,7 +229,7 @@ body.orbeon {
 }
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label {
   display: block;
-  padding-left: 20px;
+  padding-left: 10px;
   height: 100%;
   overflow: hidden;
   font-size: 18px;
@@ -241,6 +241,9 @@ body.orbeon {
   min-height: 36px;
   overflow: hidden;
 }
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label output {
+  cursor: default;
+}
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label label {
   font-size: 18px;
   line-height: 36px;
@@ -248,6 +251,7 @@ body.orbeon {
 }
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+  padding-left: 20px;
   background-repeat: no-repeat;
   background-position: 5px 15px;
   cursor: pointer;

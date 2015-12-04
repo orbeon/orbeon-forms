@@ -233,15 +233,15 @@ body.orbeon { background-color: @frBackground }
         .fr-section-title {
 
             .fr-section-label {
-                display: block;                                 // So the line expands all the way to the right
-                padding-left: @frSectionTitleLeftPadding;
+                display: block;                 // So the line expands all the way to the right
+                padding-left: 10px;
                 // NOTE: Was meant to make title take space even when empty, but this doesn't seem to work. However,
                 // removing this breaks multi-line titles. Need a better solution probably.
                 height: 100%;
-                overflow: hidden;           // Avoid wrapping under help image for long title
+                overflow: hidden;               // Avoid wrapping under help image for long title
                 font-size: @frSectionTitleHeight;
 
-                // Case of collapsable section
+                // Case of collapsible section
                 a {
                     text-decoration: none;
                     color: @frHeaderColor;      // Don't use the default styling for anchors
@@ -249,6 +249,11 @@ body.orbeon { background-color: @frBackground }
                     display: block;             // - So it extends all the way to the right
                     min-height: @frSectionTitleLineHeight;
                     overflow: hidden;           // For correct positioning of click interceptor; see issue #636
+                }
+
+                // Case of non-collapsible section
+                output {
+                    cursor: default;
                 }
 
                 // Override default label styles
@@ -259,6 +264,7 @@ body.orbeon { background-color: @frBackground }
                 }
 
                 &.fr-section-open, &.fr-section-closed {
+                    padding-left: @frSectionTitleLeftPadding;
                     background-repeat: no-repeat;
                     background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
                                                                                                              // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close

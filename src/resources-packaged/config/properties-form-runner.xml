@@ -92,9 +92,6 @@
     </property>
 
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.noscript.section.collapse.*.*"                value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.ajax.section.collapse.*.*"                    value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.*.*"                     value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.*.*"                             value="true"/>
     <!-- TOC disabled by default -->
     <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/>
@@ -301,10 +298,14 @@
     -->
     <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
 
-    <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                     value="false"/>
-    <property as="xs:boolean"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"               value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="true"/>
 
-    <property as="xs:string"   name="oxf.xforms.xbl.fr.section.repeat.appearance.*.*"           value=""/>
-    <property as="xs:string"   name="oxf.xforms.xbl.fr.grid.repeat.appearance.*.*"              value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.animate.*.*"                      value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.collapse.*.*"                     value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.noscript.collapse.*.*"            value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.repeat.appearance.*.*"            value=""/>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.repeat.appearance.*.*"               value=""/>
 
 </properties>

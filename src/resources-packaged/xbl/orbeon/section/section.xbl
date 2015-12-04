@@ -99,11 +99,10 @@
                                                 </xf:trigger>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xf:trigger appearance="minimal" class="fr-section-label" ref="'readonly'">
+                                                <xf:output appearance="minimal" class="fr-section-label" value="xxf:label('fr-section')">
                                                     <xf:help  value="xxf:help('fr-section')" />
-                                                    <xf:label value="xxf:label('fr-section')"/>
                                                     <xf:hint  value="xxf:hint('fr-section')" />
-                                                </xf:trigger>
+                                                </xf:output>
                                             </xsl:otherwise>
                                         </xsl:choose>
 

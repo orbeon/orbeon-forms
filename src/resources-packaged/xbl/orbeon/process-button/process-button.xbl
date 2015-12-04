@@ -18,6 +18,7 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
+         xmlns:p="http://www.orbeon.com/oxf/pipeline"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
     <xbl:binding id="fr-process-button" element="fr|process-button" xxbl:container="span" xxbl:mode="binding">
@@ -36,9 +37,15 @@
                                    'collapse-all', 'expand-all', 'home', 'summary', 'new', 'close', 'clear', 'validate',
                                    'wizard-prev', 'wizard-next', 'test', 'publish', 'edit', 'review'))"/>
 
-            <xf:trigger
+            <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
+            <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
+            <xf:var name="loading-indicator-property"
+                    value="string-join(('oxf.fr.detail.loading-indicator', $button-name, $app, $form), '.')"/>
+            <xf:var name="show-loading-indicator"
+                    value="(xxf:property($loading-indicator-property), false())[1]"/>
+            <fr:ladda-button
+                    loading-indicator="{$show-loading-indicator}"
                     ref="xxf:binding('fr-process-button')"
-                    xbl:attr="appearance"
                     class="fr-{$button-name}-button {if ($modal) then 'xforms-trigger-appearance-modal' else ''}">
                 <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
                 <!-- Run process action within context item of xxf:instance('fr-form-instance'). This is not the full
@@ -48,7 +55,7 @@
                 <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                     xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
                 </xf:action>
-            </xf:trigger>
+            </fr:ladda-button>
         </xbl:template>
     </xbl:binding>
 

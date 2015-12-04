@@ -107,6 +107,7 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
         refresh summary clear pdf save-final review
     </property>
+    <property as="xs:boolean" name="oxf.fr.detail.loading-indicator.save-final.*.*"             value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/>

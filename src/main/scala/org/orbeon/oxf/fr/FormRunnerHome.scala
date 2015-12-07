@@ -177,7 +177,8 @@ trait FormRunnerHome {
     form             : String,
     username         : String,
     password         : String,
-    forceAttachments : Boolean
+    forceAttachments : Boolean,
+    formVersion      : String
   ): Unit =
     putWithAttachments(
       data              = xhtml.root,
@@ -189,7 +190,7 @@ trait FormRunnerHome {
       forceAttachments  = forceAttachments,
       username          = nonEmptyOrNone(username),
       password          = nonEmptyOrNone(password),
-      formVersion       = Some("next")
+      formVersion       = nonEmptyOrNone(formVersion)
     )
 
   // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object

@@ -12,31 +12,24 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <!-- NOTE: This is a Form Builder feature, but the Home and Summary pages depend on it. -->
-<xf:model id="fb-permissions-model"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:saxon="http://saxon.sf.net/"
-        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+<xf:model
+    id="fb-permissions-model"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
-    <!-- Model initialization -->
     <xf:action event="xforms-model-construct-done">
 
-        <xf:var
-            name="fb-roles"
-            value="     if (doc-available('oxf:/config/form-builder-permissions.xml')) then doc('oxf:/config/form-builder-permissions.xml')
-                   else if (doc-available('oxf:/config/form-runner-roles.xml'))        then doc('oxf:/config/form-runner-roles.xml')
-                   else ()"/>
+        <xf:insert
+            ref="instance('fb-permissions')"
+            origin="fbf:formBuilderPermissionsForCurrentUserAsXML(fbf:formBuilderPermissionsConfiguration())"/>
 
-        <xf:action if="exists($fb-roles)">
+        <xf:message level="xxf:log-debug">
+            ORBEON FORM BUILDER ROLES DEBUG INFORMATION:
+            Resulting permissions: <xf:output value="saxon:serialize(instance('fb-permissions'), 'xml')"/>
+        </xf:message>
 
-            <xf:insert ref="instance('fb-permissions')" origin="fbf:formBuilderPermissionsAsXML($fb-roles)"/>
-
-            <xf:message level="xxf:log-debug">
-                ORBEON FORM BUILDER ROLES DEBUG INFORMATION:
-                Resulting permissions: <xf:output value="saxon:serialize(instance('fb-permissions'), 'xml')"/>
-            </xf:message>
-        </xf:action>
     </xf:action>
 
     <xf:instance id="fb-permissions">
@@ -50,7 +43,7 @@
             <app name="foo">
                 <form name="*"/>
             </app>
-            Or: 
+            Or:
             <app name="*">
                 <form name="*"/>
             </app>

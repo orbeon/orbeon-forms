@@ -139,7 +139,7 @@ trait FormRunnerPermissions {
     // We only need one wrapper; create it when we encounter the first <form>
     var wrapperOpt: Option[DocumentWrapper] = None
 
-    val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.fbRoles, orbeonRoles)
+    val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.formBuilderPermissionsConfiguration, orbeonRoles)
 
     formsEls.flatMap { formEl ⇒
 
@@ -153,7 +153,7 @@ trait FormRunnerPermissions {
       val appName  = formEl.elemValue("application-name")
       val formName = formEl.elemValue("form-name")
       val isAdmin  = {
-        def canAccessEverything = fbPermissions.isDefinedAt("*")
+        def canAccessEverything = fbPermissions.contains("*")
         def canAccessAppForm = {
           val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
           formsUserCanAccess.contains("*") || formsUserCanAccess.contains(formName)

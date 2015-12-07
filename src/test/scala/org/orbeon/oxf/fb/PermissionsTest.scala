@@ -34,33 +34,35 @@ class PermissionsTest extends DocumentTestBase with AssertionsForJUnit {
         <role name="bar-baz2-role"      app="bar"        form="baz2"/>
       </roles>
 
+    val frRolesOpt = Some(frRoles)
+
     // Test inclusion of form that is always permitted
     val always = Map("app-always" → Set("form-always"))
 
-    assert(formBuilderPermissions(frRoles, Set("some", "other"))                         === always)
-    assert(formBuilderPermissions(frRoles, Set("all-foo-forms-role"))                    === always + ("foo" → Set("*")))
-    assert(formBuilderPermissions(frRoles, Set("bar-baz-role"))                          === always + ("bar" → Set("baz")))
-    assert(formBuilderPermissions(frRoles, Set("all-foo-forms-role", "bar-baz-role"))    === always + ("foo" → Set("*")) + ("bar" → Set("baz")))
+    assert(formBuilderPermissions(frRolesOpt, Set("some", "other"))                         === always)
+    assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role"))                    === always + ("foo" → Set("*")))
+    assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role"))                          === always + ("bar" → Set("baz")))
+    assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "bar-baz-role"))    === always + ("foo" → Set("*")) + ("bar" → Set("baz")))
 
     // Test match for all roles
     val all = Map("*" → Set("*"))
 
-    assert(formBuilderPermissions(frRoles, Set("all-forms-role"))                        === all)
-    assert(formBuilderPermissions(frRoles, Set("all-forms-role", "some", "other"))       === all)
-    assert(formBuilderPermissions(frRoles, Set("all-forms-role", "all-foo-forms-role"))  === all)
-    assert(formBuilderPermissions(frRoles, Set("all-forms-role", "bar-baz-role"))        === all)
+    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role"))                        === all)
+    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "some", "other"))       === all)
+    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "all-foo-forms-role"))  === all)
+    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "bar-baz-role"))        === all)
 
     // Combine roles with wildcard and specific app
-    assert(formBuilderPermissions(frRoles, Set("all-foo-forms-role", "foo-baz-role"))    === always + ("foo" → Set("*")))
+    assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "foo-baz-role"))    === always + ("foo" → Set("*")))
 
     // Different baz forms
-    assert(formBuilderPermissions(frRoles, Set("foo-baz-role", "bar-baz-role"))          === always + ("foo" → Set("baz")) + ("bar" → Set("baz")))
+    assert(formBuilderPermissions(frRolesOpt, Set("foo-baz-role", "bar-baz-role"))          === always + ("foo" → Set("baz")) + ("bar" → Set("baz")))
 
     // Multiple forms per app
-    assert(formBuilderPermissions(frRoles, Set("bar-baz-role", "bar-baz2-role"))         === always + ("bar" → Set("baz", "baz2")))
+    assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role", "bar-baz2-role"))         === always + ("bar" → Set("baz", "baz2")))
 
     // Empty roles
-    val emptyRoles: NodeInfo = <roles/>
+    val emptyRoles = Some(<roles/>: NodeInfo)
     assert(formBuilderPermissions(emptyRoles, Set("some")) === Map())
   }
 }

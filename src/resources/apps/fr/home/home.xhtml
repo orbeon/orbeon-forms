@@ -375,20 +375,20 @@
                                                     (
                                                        xxf:call-xpl(
                                                             'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                                                            (
-                                                                'data',
-                                                                'bindings'
-                                                            ),
-                                                            (
-                                                                xxf:call-xpl(
-                                                                    'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                            'data',
+                                                            xxf:call-xpl(
+                                                                'oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                                (
                                                                     'data',
-                                                                    instance('fr-form'),
-                                                                    'data'
+                                                                    'bindings'
                                                                 ),
-                                                                instance('fr-components')
+                                                                (
+                                                                    instance('fr-form'),
+                                                                    instance('fr-components')
+                                                                ),
+                                                                'data'
                                                             ),
-                                                            'data`'
+                                                            'data'
                                                         ),
                                                         instance('fr-components')
                                                     ),

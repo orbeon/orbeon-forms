@@ -35,44 +35,54 @@
         <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
 
-            <!-- Initialize remote servers information -->
-            <xf:action event="xforms-model-construct-done" if="version:isPE()">
+            <xf:action event="xforms-model-construct-done">
+
+                <!-- Initialize remote servers information only if user is logged in and has at least one matching role -->
+                <xf:var
+                    name="has-any-matching-roles"
+                    value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
                 <xf:var
-                    name="remote-servers"
-                    value="frf:remoteServersXPath()"/>
+                    name="initialize-remotes"
+                    value="version:isPE() and $has-any-matching-roles"/>
 
-                <!-- Set the available remote server label/URL when present. If we only have one item, it is
-                     just one URL. If we have two or more, it's one label, one URL, etc. -->
-                <xf:action iterate="1 to ((count($remote-servers) + 1) idiv 2)">
-                    <xf:var name="p" value="."/>
-                    <xf:insert
-                        context="instance()/remote-servers"
-                        ref="*"
-                        origin="
-                            xxf:element(
-                                'remote-server',
-                                (
-                                    xxf:element('label',    if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 1] else ''),
-                                    xxf:element('url',      if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 2] else $remote-servers[1]),
-                                    xxf:element('username', ''),
-                                    xxf:element('password', '')
+                <xf:action if="$initialize-remotes">
+                    <xf:var
+                        name="remote-servers"
+                        value="frf:remoteServersXPath()"/>
+
+                    <!-- Set the available remote server label/URL when present. If we only have one item, it is
+                         just one URL. If we have two or more, it's one label, one URL, etc. -->
+                    <xf:action iterate="1 to ((count($remote-servers) + 1) idiv 2)">
+                        <xf:var name="p" value="."/>
+                        <xf:insert
+                            context="instance()/remote-servers"
+                            ref="*"
+                            origin="
+                                xxf:element(
+                                    'remote-server',
+                                    (
+                                        xxf:element('label',    if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 1] else ''),
+                                        xxf:element('url',      if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 2] else $remote-servers[1]),
+                                        xxf:element('username', ''),
+                                        xxf:element('password', '')
+                                    )
                                 )
-                            )
-                        "
-                    />
+                            "
+                        />
+                    </xf:action>
+
+                    <!-- Set the current remote server (the first one) -->
+                    <xf:setvalue
+                        ref="instance()/current-remote-server"
+                        value="if (exists($remote-servers)) then 1 else 0"/>
+
                 </xf:action>
-
-                <!-- Set the current remote server (the first one) -->
-                <xf:setvalue
-                    ref="instance()/current-remote-server"
-                    value="if (exists($remote-servers)) then 1 else 0"/>
-
-            </xf:action>
-            <xf:action event="xforms-model-construct-done" if="not(version:isPE())">
-                <xf:setvalue
-                    ref="instance()/current-remote-server"
-                    value="0"/>
+                <xf:action if="not($initialize-remotes)">
+                    <xf:setvalue
+                        ref="instance()/current-remote-server"
+                        value="0"/>
+                </xf:action>
             </xf:action>
 
             <!-- Entry point -->

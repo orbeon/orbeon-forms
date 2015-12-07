@@ -120,7 +120,7 @@
             </xf:action>
 
             <xf:instance id="fr-form-instance">
-                <ui>
+                <i>
                     <selection/>
 
                     <error/>
@@ -166,7 +166,9 @@
                         -->
                     </remote-servers>
 
-                </ui>
+                    <form-definition-version/>
+
+                </i>
             </xf:instance>
 
             <xf:var name="selection"                value="xxf:split(selection)"/>
@@ -302,11 +304,11 @@
 
             <!-- Response to process event -->
             <xf:action
-                    event="
-                        local-publish   local-unpublish
-                        remote-publish  remote-unpublish
-                        local-to-remote remote-to-local
-                        local-upgrade   remote-upgrade">
+                event="
+                    local-publish   local-unpublish
+                    remote-publish  remote-unpublish
+                    local-to-remote remote-to-local
+                    local-upgrade   remote-upgrade">
 
                 <xf:var name="local-read"          value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade')"/>
                 <xf:var name="local-write"         value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade')"/>
@@ -334,6 +336,17 @@
                     </xf:send>
 
                     <xf:action if="instance()/error = ''">
+
+                        <!-- See https://github.com/orbeon/orbeon-forms/issues/2453 -->
+                        <xf:var
+                            name="form-definition-version"
+                            value="
+                                if ($upgrade) then
+                                    normalize-space((instance()/form-definition-version[normalize-space()], '1')[1])
+                                else
+                                    'next'"
+                        />
+
                         <xf:action if="$toggle-to-publish or $toggle-to-unpublish">
                             <xf:var
                                 name="metadata"
@@ -408,7 +421,8 @@
                                     $form,
                                     if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username else (),
                                     if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password else (),
-                                    $force-attachments
+                                    $force-attachments,
+                                    $form-definition-version
                                 )
                         </xf:action>
                     </xf:action>
@@ -430,7 +444,14 @@
                 xxf:username="{event('username')}"
                 xxf:password="{event('password')}"
                 replace="instance"
-                instance="fr-form"/>
+                instance="fr-form">
+
+                <xf:setvalue
+                    event="xforms-submit-done"
+                    ref="instance()/form-definition-version"
+                    value="event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value"/>
+
+            </xf:submission>
 
             <!-- Components (see also Form Builder model.xml) -->
             <!-- NOTE: Bother caching as we invalidate all instances first, and then we might go through many libraries,

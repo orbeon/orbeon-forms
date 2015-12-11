@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
+import scala.util.control.Breaks
 import scala.xml._
 
 object SchemaGenerator {
@@ -85,7 +86,7 @@ object SchemaGenerator {
 
     // Returns control corresponding to a bind, with a given name (e.g. *:grid)
     def findControlNodeForBind(bind: NodeInfo, controlName: Test): Option[NodeInfo] = {
-      val bindId: String = bind \@ "id"
+      val bindId = bind.id
       bind.rootElement \\ controlName find (_.attValue("bind") == bindId)
     }
 
@@ -97,8 +98,8 @@ object SchemaGenerator {
     object Bind {
       def unapply(bind: NodeInfo): Option[BindInfo] = {
 
-        // Try and find a repeat control matching the current bind
-        val repeatControl = Stream("*:grid", "*:section")
+        // Lazily find a repeat control matching the current bind
+        val repeatControl = Iterator("*:grid", "*:section")
           .flatMap(findControlNodeForBind(bind, _))
           .find(FormRunner.isRepeat)
           .toList

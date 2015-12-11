@@ -17,15 +17,16 @@ import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xforms.control.controls.{XFormsSelectControl, XFormsSelect1Control}
-import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.control.controls.{XFormsSelect1Control, XFormsSelectControl}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
+
 import scala.xml._
-import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 
 object SchemaGenerator {
 
@@ -95,7 +96,12 @@ object SchemaGenerator {
 
     object Bind {
       def unapply(bind: NodeInfo): Option[BindInfo] = {
-        val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter FormRunner.isRepeat toList
+
+        // Try and find a repeat control matching the current bind
+        val repeatControl = Stream("*:grid", "*:section")
+          .flatMap(findControlNodeForBind(bind, _))
+          .find(FormRunner.isRepeat)
+          .toList
 
         // NOTE: Don't support deprecated xf:validation elements, as they were not in a release. But support
         // xf:relevant, xf:required, and xf:type.
@@ -124,9 +130,9 @@ object SchemaGenerator {
           maybeRequired = maybeRequired,
           hasRelevant   = hasRelevant,
           elemType      = elemType,
-          repeated      = repeatGridNode nonEmpty,
-          min           = repeatGridNode /@ "min",
-          max           = repeatGridNode /@ "max"
+          repeated      = repeatControl nonEmpty,
+          min           = repeatControl /@ "min",
+          max           = repeatControl /@ "max"
         ))
       }
     }

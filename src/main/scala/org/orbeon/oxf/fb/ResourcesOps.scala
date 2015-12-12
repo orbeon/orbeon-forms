@@ -254,5 +254,5 @@ trait ResourcesOps extends BaseOps {
 
   def hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String) =
     findResourceHoldersWithLangUseDoc(inDoc, controlName) forall
-    { case (_, holder) ⇒ isBlank(holder child lhha stringValue) }
+    { case (_, holder) ⇒ StringUtils.isBlank(holder child lhha stringValue) }
 }

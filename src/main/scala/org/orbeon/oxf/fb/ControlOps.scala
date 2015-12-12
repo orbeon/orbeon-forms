@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -493,7 +494,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Set the control help and add/remove help element and placeholders as needed
   def setControlHelp(controlName: String,  value: String) = {
 
-    setControlResource(controlName, "help", trimToEmpty(value))
+    setControlResource(controlName, "help", StringUtils.trimToEmpty(value))
 
     val inDoc = getFormDoc
 

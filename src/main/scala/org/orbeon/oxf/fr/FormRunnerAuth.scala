@@ -33,7 +33,8 @@ object FormRunnerAuth {
   val AllHeaderNamesLower = Set(OrbeonUsernameHeaderName, OrbeonGroupHeaderName, OrbeonRolesHeaderName)
 
   private object Private {
-    val PropertyPrefix = "oxf.fr.authentication."
+    val UserGroupRolesSessionKey            = "org.orbeon.auth.user-group-roles"
+    val PropertyPrefix                      = "oxf.fr.authentication."
 
     val MethodPropertyName                  = PropertyPrefix + "method"
     val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
@@ -50,17 +51,24 @@ object FormRunnerAuth {
       def getRemoteUser(): String
       def isUserInRole(role: String): Boolean
     }
+    type Session = {
+      def getAttribute(name: String): AnyRef
+      def setAttribute(name: String, value: AnyRef): Unit
+    }
   }
 
   import Private._
 
   def properties: PropertySet = Properties.instance.getPropertySet
 
+  type UserGroupRoles = (Option[String], Option[String], Option[Array[String]])
+
   // Get the username and roles from the request, based on the Form Runner configuration.
   def getUserGroupRoles(
-    userRoles : UserRoles,
-    getHeader : String ⇒ Option[Array[String]]
-  ): (Option[String], Option[String], Option[Array[String]]) = {
+    userRoles  : UserRoles,
+    sessionOpt : Option[Session],
+    getHeader  : String ⇒ Option[Array[String]]
+  ): UserGroupRoles = {
 
     val propertySet = properties
     propertySet.getString(MethodPropertyName, "container") match {
@@ -70,32 +78,56 @@ object FormRunnerAuth {
         val username    = Option(userRoles.getRemoteUser)
         val rolesString = propertySet.getString(ContainerRolesPropertyName)
 
-        if (rolesString eq null) {
-          (username, None, None)
-        } else {
+        val containerUserGroupRoles =
+          if (rolesString eq null) {
+            (username, None, None)
+          } else {
 
-          // Wrap exceptions as Liferay throws if the role is not available instead of returning false
-          def isUserInRole(role: String) =
-            try userRoles.isUserInRole(role)
-            catch { case NonFatal(_) ⇒ false}
+            // Wrap exceptions as Liferay throws if the role is not available instead of returning false
+            def isUserInRole(role: String) =
+              try userRoles.isUserInRole(role)
+              catch { case NonFatal(_) ⇒ false}
 
-          val rolesSplit =
-            propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
+            val rolesSplit =
+              propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
-          val rolesArray =
-            for {
-              role ← rolesString split rolesSplit
-              if isUserInRole(role)
-            } yield
-              role
+            val rolesArray =
+              for {
+                role ← rolesString split rolesSplit
+                if isUserInRole(role)
+              } yield
+                role
 
-          val roles = rolesArray match {
-            case Array() ⇒ None
-            case array   ⇒ Some(array)
+            val roles = rolesArray match {
+              case Array() ⇒ None
+              case array   ⇒ Some(array)
+            }
+
+            (username, rolesArray.headOption, roles)
           }
 
-          (username, rolesArray.headOption, roles)
+        sessionOpt match {
+
+          // Nothing we can do with the session if none is available
+          case None ⇒ containerUserGroupRoles
+
+          case Some(session) ⇒
+            containerUserGroupRoles match {
+
+              // Container doesn't know about the user, see if we had stored something in the session
+              case (None, None, None) ⇒
+                Option(session.getAttribute(UserGroupRolesSessionKey).asInstanceOf[UserGroupRoles]) match {
+                  case None ⇒ (None, None, None)
+                  case Some(sessionUserGroupRoles) ⇒ sessionUserGroupRoles
+                }
+
+              // Remember what the container told us, in case we need it later
+              case _ ⇒
+                session.setAttribute(UserGroupRolesSessionKey, containerUserGroupRoles)
+                containerUserGroupRoles
+            }
         }
+
 
       case "header" ⇒
 
@@ -146,11 +178,12 @@ object FormRunnerAuth {
   }
 
   def getUserGroupRolesAsHeaders(
-    userRoles : UserRoles,
-    getHeader : String ⇒ Option[Array[String]]
+    userRoles  : UserRoles,
+    sessionOpt : Option[Session],
+    getHeader  : String ⇒ Option[Array[String]]
   ): List[(String, Array[String])] = {
 
-    val (usernameOpt, groupOpt, rolesOpt) = getUserGroupRoles(userRoles, getHeader)
+    val (usernameOpt, groupOpt, rolesOpt) = getUserGroupRoles(userRoles, sessionOpt, getHeader)
 
     def headersAsList =
       (usernameOpt.toList map (OrbeonUsernameHeaderName → Array(_))) :::

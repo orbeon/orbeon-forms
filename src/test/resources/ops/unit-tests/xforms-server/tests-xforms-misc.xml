@@ -420,9 +420,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="id123">existing value</xxf:control>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

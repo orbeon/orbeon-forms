@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import Names._
@@ -350,6 +351,8 @@ trait ContainerOps extends ControlOps {
   def createTemplateContentFromBindName(inDoc: NodeInfo, bindName: String, bindings: Seq[NodeInfo]): Option[NodeInfo] =
     findBindByName(inDoc, bindName) map (createTemplateContentFromBind(_, bindings))
 
+  private val AttributeRe = "@(.+)".r
+
   // Create an instance template based on a hierarchy of binds rooted at the given bind
   // This checks each control binding in case the control specifies a custom data holder.
   def createTemplateContentFromBind(bind: NodeInfo, bindings: Seq[NodeInfo]): NodeInfo = {
@@ -357,10 +360,18 @@ trait ContainerOps extends ControlOps {
     val inDoc       = bind.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
 
-    def holderForBind(bind: NodeInfo, topLevel: Boolean): NodeInfo = {
+    def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
 
       val controlName    = getBindNameOrEmpty(bind)
       val controlElemOpt = findControlByName(inDoc, controlName)
+
+      // Handle non-standard cases, see https://github.com/orbeon/orbeon-forms/issues/2470
+      def fromNonStandardRef =
+        bind attValueOpt "ref" match {
+          case Some(AttributeRe(att)) ⇒ Some(Some(attributeInfo(att)))
+          case Some(".")              ⇒ Some(None)
+          case _                      ⇒ None
+        }
 
       def fromBinding =
         for {
@@ -368,59 +379,63 @@ trait ContainerOps extends ControlOps {
           appearances = controlElem attTokens APPEARANCE_QNAME
           descriptor  ← findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
           binding     ← descriptor.binding
-        } yield
-          FormBuilder.newDataHolder(controlName, binding)
+        } yield {
+          Some(FormBuilder.newDataHolder(controlName, binding))
+        }
 
       def fromPlainControlName =
-        elementInfo(controlName)
+        Some(Some(elementInfo(controlName)))
 
-      val elementTemplate = fromBinding getOrElse fromPlainControlName
+      val elementTemplateOpt = fromNonStandardRef orElse fromBinding orElse fromPlainControlName flatten
 
-      val iterationCount = {
+      elementTemplateOpt foreach { elementTemplate ⇒
 
-        // If the current control is a repeated fr:grid or fr:section with the attribute set, find the first occurrence
-        // in the data of this  repeat, and use its concrete initial number of iterations to update the template. We
-        // can imagine other values for the attribute in the future, maybe an integer value (`0`, `1`, ...) setting
-        // the initial number of iterations.
-        // See https://github.com/orbeon/orbeon-forms/issues/2379
-        def useInitialIterations(controlElem: NodeInfo) =
-          ! topLevel && isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
+        val iterationCount = {
 
-        controlElemOpt match {
-          case Some(controlElem) if useInitialIterations(controlElem) ⇒
+          // If the current control is a repeated fr:grid or fr:section with the attribute set, find the first occurrence
+          // in the data of this  repeat, and use its concrete initial number of iterations to update the template. We
+          // can imagine other values for the attribute in the future, maybe an integer value (`0`, `1`, ...) setting
+          // the initial number of iterations.
+          // See https://github.com/orbeon/orbeon-forms/issues/2379
+          def useInitialIterations(controlElem: NodeInfo) =
+            ! topLevel && isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
 
-            val firstDataHolder   = findDataHolders(inDoc, controlName) take 1
-            val iterationsHolders = firstDataHolder / *
+          controlElemOpt match {
+            case Some(controlElem) if useInitialIterations(controlElem) ⇒
 
-            iterationsHolders.size
+              val firstDataHolder   = findDataHolders(inDoc, controlName) take 1
+              val iterationsHolders = firstDataHolder / *
 
-          case _ ⇒
-            1
+              iterationsHolders.size
+
+            case _ ⇒
+              1
+          }
+        }
+
+        // Recursively insert elements in the template
+        if (iterationCount > 0) {
+
+          // If iterationCount > 1, we just duplicate the children `iterationCount` times. In practice, this means
+          // multiple iteration elements:
+          //
+          // <repeated-section-2-iteration>
+          //   ...
+          // </repeated-section-2-iteration>
+          // <repeated-section-2-iteration>
+          //   ...
+          // </repeated-section-2-iteration>
+          val nested         = bind / "*:bind" flatMap (holderForBind(_, topLevel = false))
+          val repeatedNested = (1 to iterationCount) flatMap (_ ⇒ nested)
+
+          insert(into = elementTemplate, origin = repeatedNested)
         }
       }
 
-      // Recursively insert elements in the template
-      if (iterationCount > 0) {
-
-        // If iterationCount > 1, we just duplicate the children `iterationCount` times. In practice, this means
-        // multiple iteration elements:
-        //
-        // <repeated-section-2-iteration>
-        //   ...
-        // </repeated-section-2-iteration>
-        // <repeated-section-2-iteration>
-        //   ...
-        // </repeated-section-2-iteration>
-        val nested         = bind / "*:bind" map (holderForBind(_, topLevel = false))
-        val repeatedNested = (1 to iterationCount) flatMap (_ ⇒ nested)
-
-        insert(into = elementTemplate, origin = repeatedNested)
-      }
-
-      elementTemplate
+      elementTemplateOpt
     }
 
-    holderForBind(bind, topLevel = true)
+    holderForBind(bind, topLevel = true) getOrElse (throw new IllegalStateException)
   }
 
   // Make sure all template instances reflect the current bind structure

@@ -131,15 +131,18 @@ object DataMigration {
               origin     = elementInfo(repeatName, Nil),
               doDispatch = false
             )
-          case _ ⇒
-            val iterationContent = iterations map (_ / Node toList) // force
+          case iterations ⇒
 
+            val contentForEachIteration =
+              iterations map (iteration ⇒ (iteration /@ @*) ++ (iteration / Node) toList) // force
+
+            delete(iterations.head /@ @*,   doDispatch = false)
             delete(iterations.head / Node, doDispatch = false)
             delete(iterations.tail,        doDispatch = false)
 
             insert(
               into       = iterations.head,
-              origin     = iterationContent map (elementInfo(iterationName, _)),
+              origin     = contentForEachIteration map (elementInfo(iterationName, _)),
               doDispatch = false
             )
         }
@@ -158,11 +161,12 @@ object DataMigration {
         assert(iterations.tail.isEmpty)
         val container = iterations.head
 
-        val iterationContent = (container / * toList) map (_ / Node toList) // force
+        val contentForEachIteration =
+          (container / * toList) map (iteration ⇒ (iteration /@ @*) ++ (iteration / Node) toList) // force
 
         insert(
           after      = container,
-          origin     = iterationContent map (elementInfo(container.name, _)),
+          origin     = contentForEachIteration map (elementInfo(container.name, _)),
           doDispatch = false
         )
 

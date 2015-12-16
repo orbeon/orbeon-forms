@@ -152,7 +152,8 @@ class ControlsComparator(
   ): Unit = {
     // Force a change for controls whose values changed in the request
     // Q: Do we need a distinction between new iteration AND control just becoming relevant?
-    if (control2.supportAjaxUpdates && ! control2.equalsExternal(control1Opt.orNull))
+    if (control2.supportAjaxUpdates &&
+        (valueChangeControlIds(control2.effectiveId) || ! control2.equalsExternal(control1Opt.orNull)))
       control2.outputAjaxDiff(
         new XMLReceiverHelper(receiver),
         control1Opt.orNull,

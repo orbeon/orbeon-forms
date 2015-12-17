@@ -20,8 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.events.{XFormsFocusEvent, XXFormsDialogOpenEvent}
+import org.orbeon.oxf.xforms.event.events.{XFormsFocusEvent, XXFormsDialogCloseEvent, XXFormsDialogOpenEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -37,9 +36,9 @@ private case class XXFormsDialogControlLocal(
 
 // Represents an extension xxf:dialog control
 class XXFormsDialogControl(
-  container   : XBLContainer, 
-  parent      : XFormsControl, 
-  element     : Element, 
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
   effectiveId : String
 ) extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
 
@@ -64,7 +63,7 @@ class XXFormsDialogControl(
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
 
     super.onCreate(restoreState, state)
-    
+
     state match {
       case Some(ControlState(_, _, keyValues)) ⇒
         setLocal(XXFormsDialogControlLocal(
@@ -95,9 +94,8 @@ class XXFormsDialogControl(
 
   override def performTargetAction(event: XFormsEvent): Unit = {
     super.performTargetAction(event)
-    event.name match {
-      case XXFORMS_DIALOG_OPEN ⇒
-        val dialogOpenEvent = event.asInstanceOf[XXFormsDialogOpenEvent]
+    event match {
+      case dialogOpenEvent: XXFormsDialogOpenEvent ⇒
 
         val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
         localForUpdate.visible             = true
@@ -106,7 +104,9 @@ class XXFormsDialogControl(
 
         containingDocument.getControls.markDirtySinceLastRequest(true)
         containingDocument.getControls.doPartialRefresh(this)
-      case XXFORMS_DIALOG_CLOSE ⇒
+
+      case _: XXFormsDialogCloseEvent ⇒
+
         val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
         localForUpdate.visible             = false
         localForUpdate.neighborControlId   = None
@@ -114,18 +114,19 @@ class XXFormsDialogControl(
 
         containingDocument.getControls.markDirtySinceLastRequest(false)
         containingDocument.getControls.doPartialRefresh(this)
+
       case _ ⇒
     }
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = {
-    event.name match {
-      case XXFORMS_DIALOG_OPEN ⇒
+    event match {
+      case _: XXFormsDialogOpenEvent ⇒
         // If dialog is closed and the focus is within the dialog, remove the focus
         // NOTE: Ideally, we should get back to the control that had focus before the dialog opened if possible.
         if (isVisible && ! Focus.isFocusWithinContainer(this))
           Dispatch.dispatchEvent(new XFormsFocusEvent(this, false))
-      case XXFORMS_DIALOG_CLOSE ⇒
+      case _: XXFormsDialogCloseEvent ⇒
         // If dialog is open and the focus has not been set within the dialog, attempt to set the focus within
         if (! isVisible && Focus.isFocusWithinContainer(this))
           Focus.removeFocus(containingDocument)
@@ -150,14 +151,14 @@ class XXFormsDialogControl(
   override def equalsExternal(other: XFormsControl): Boolean = {
     if (other == null)
       return false
-    
+
     // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
     // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
-    
+
     val otherDialog = other.asInstanceOf[XXFormsDialogControl]
     if (otherDialog.wasVisible != isVisible)
       return false
-    
+
     super.equalsExternal(other)
   }
 
@@ -179,10 +180,10 @@ class XXFormsDialogControl(
       // 2015-04-01: Unsure if note above still makes sense.
       val otherDialog = other.asInstanceOf[XXFormsDialogControl]
       var doOutputElement = false
-      
+
       val atts = new AttributesImpl
       atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
-      
+
       val visible = isVisible
       if (isNewlyVisibleSubtree || visible != otherDialog.wasVisible) {
         atts.addAttribute("", "visibility", "visibility", CDATA, if (visible) "visible" else "hidden")

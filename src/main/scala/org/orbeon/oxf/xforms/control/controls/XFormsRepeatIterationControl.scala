@@ -112,6 +112,5 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     val contextStack = container.getContextStack
     contextStack.setBinding(parentContext)
     contextStack.pushIteration(iterationIndex)
-    contextStack.getCurrentBindingContext
   }
 }

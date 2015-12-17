@@ -106,6 +106,7 @@ object FormRunnerAuth {
             (username, rolesArray.headOption, roles)
           }
 
+        // See https://github.com/orbeon/orbeon-forms/issues/2464
         sessionOpt match {
 
           // Nothing we can do with the session if none is available
@@ -127,7 +128,6 @@ object FormRunnerAuth {
                 containerUserGroupRoles
             }
         }
-
 
       case "header" ⇒
 

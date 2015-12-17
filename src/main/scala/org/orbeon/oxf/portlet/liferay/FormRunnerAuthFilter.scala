@@ -79,9 +79,9 @@ object FormRunnerAuthFilter {
   def wrapWithOrbeonAuthHeaders[T <: PortletRequest](req: T): T = {
 
     val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(
-      userRoles = req,
+      userRoles  = req,
       sessionOpt = None,
-      getHeader = name ⇒
+      getHeader  = name ⇒
         req.getProperties(name).asScala.toArray match {
           case Array() ⇒ None
           case array   ⇒ Some(array)

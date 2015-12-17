@@ -2169,23 +2169,29 @@
                             <values><value>1</value><value>2</value><value>3</value><value>4</value></values>
                         </xf:instance>
                         <xf:bind ref="instance('instance-3')/value[position() != last()]" relevant="false()"/>
-
+                    </xf:model>
+                    <xf:model id="events-model">
                         <!-- TEST: Events to gather -->
                         <xf:instance id="events">
                             <events/>
                         </xf:instance>
-
                     </xf:model>
                 </xh:head>
                 <xh:body>
                     <xf:group id="my-group">
-                        <xf:insert ev:event="xforms-enabled"
-                                       context="instance('events')" ref="*"
-                                       origin="xxf:element('event',
-                                                (xxf:attribute('observer', event('xxf:observerid')),
-                                                 xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
-                                                 ))"/>
+                        <xf:insert
+                            ev:event="xforms-enabled"
+                            context="xxf:instance('events')"
+                            ref="*"
+                            origin="
+                                xxf:element(
+                                    'event',
+                                    (
+                                        xxf:attribute('observer', event('xxf:observerid')),
+                                        xxf:attribute('type',     event('xxf:type')),
+                                        xxf:attribute('target',   event('xxf:targetid'))
+                                    )
+                                )"/>
 
                         <!-- Repeat has iterations so is relevant -->
                         <xf:repeat ref="value" id="my-repeat-1a"/>
@@ -2197,23 +2203,38 @@
                         <xf:repeat ref="instance('instance-3')/value" id="my-repeat-3">
                             <!-- Test handler with ev:target="#observer" -->
                             <!-- NOTE: Since 2012-05-18, the observer is (again) the repeat object -->
-                            <xf:insert ev:event="xforms-enabled" ev:target="#observer"
-                                       context="instance('events')" ref="*"
-                                       origin="xxf:element('event',
-                                                (xxf:attribute('observer', event('xxf:observerid')),
-                                                 xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
-                                                 ))"/>
+                            <xf:insert
+                                ev:event="xforms-enabled"
+                                ev:target="#observer"
+                                context="xxf:instance('events')"
+                                ref="*"
+                                origin="
+                                    xxf:element(
+                                        'event',
+                                        (
+                                            xxf:attribute('observer', event('xxf:observerid')),
+                                            xxf:attribute('type',     event('xxf:type')),
+                                            xxf:attribute('target',   event('xxf:targetid'))
+                                        )
+                                    )"/>
                         </xf:repeat>
 
                         <!-- Test handler with ev:observer and ev:target -->
-                        <xf:insert ev:event="xforms-enabled" ev:observer="my-repeat-3" ev:target="my-repeat-3"
-                                       context="instance('events')" ref="*"
-                                       origin="xxf:element('event',
-                                                (xxf:attribute('observer', event('xxf:observerid')),
-                                                 xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
-                                                 ))"/>
+                        <xf:insert
+                            ev:event="xforms-enabled"
+                            ev:observer="my-repeat-3"
+                            ev:target="my-repeat-3"
+                            context="xxf:instance('events')"
+                            ref="*"
+                            origin="
+                                xxf:element(
+                                    'event',
+                                    (
+                                        xxf:attribute('observer', event('xxf:observerid')),
+                                        xxf:attribute('type',     event('xxf:type')),
+                                        xxf:attribute('target',   event('xxf:targetid'))
+                                    )
+                                )"/>
 
                         <!-- Group and nested repeat are non-relevant -->
                         <xf:group id="my-group-2" ref="()">
@@ -2228,7 +2249,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="events" model-id="model">
+                            <instance id="events" model-id="events-model">
                                 <events>
                                     <event observer="my-group" type="xforms-enabled" target="my-group"/>
                                     <event observer="my-group" type="xforms-enabled" target="my-repeat-1a"/>

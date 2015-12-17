@@ -237,6 +237,12 @@ class XFormsInstance(
         // Only update controls within same scope as modified instance
         // NOTE: This can clearly break with e.g. xxf:instance()
         // NOTE: the control may be non-relevant
+
+        // See https://github.com/orbeon/orbeon-forms/issues/2473
+        // If a control is bound using a `bind` and the binds haven't been rebuilt, bind resolution can fail.
+        // See also https://github.com/orbeon/orbeon-forms/issues/2474
+        model.doRebuild()
+
         newRepeatControl.updateSequenceForInsertDelete(insertedNodes)
       }
     }

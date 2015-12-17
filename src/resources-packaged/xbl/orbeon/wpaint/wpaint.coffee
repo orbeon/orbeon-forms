@@ -55,7 +55,7 @@ YAHOO.xbl.fr.WPaint.prototype =
                 # tabindex="-1" allows div to have the focus, used to send change on blur
                 @wpaintElC = $('<div class="fr-wpaint-container-c" tabindex="-1"/>')
                 @wpaintElB.append(@wpaintElC)
-                @wpaintElC.blur(=> @blur())
+                @wpaintElC.on('focusout', => @blur())
                 @wpaintElC.css('width',  @imageEl.width()  + 'px')
                 @wpaintElC.css('height', @imageEl.height() + 'px')
                 annotation = @annotationEl.attr('src')
@@ -71,7 +71,8 @@ YAHOO.xbl.fr.WPaint.prototype =
         @wpaintElC.focus()
 
     # When looses focus, send drawing to the server right away (incremental)
-    blur: -> @_sendAnnotationToServer()
+    blur: ->
+        @_sendAnnotationToServer()
 
     _imgIsEmpty: (imgEl) ->
         imgSrc = imgEl.attr('src')

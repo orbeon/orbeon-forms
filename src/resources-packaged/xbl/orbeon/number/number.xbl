@@ -95,7 +95,9 @@
                         <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/>
 
                         <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
-                        <!--<xsl:copy-of select="xxbl:parameter(., 'picture')"/>-->
+
+                        <xsl:copy-of select="xxbl:parameter(., 'round-when-formatting')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'round-when-storing')"/>
 
                         <xf:var
                             name="picture-string"
@@ -134,12 +136,14 @@
                             value="
                                 if (string($binding) castable as xs:decimal) then
                                     if (
-                                        string-length(
-                                            substring-after(
-                                                string(xs:decimal($binding)),
-                                                '.'
-                                            )
-                                        ) gt xs:integer($digits-after-decimal)
+                                        not(string($round-when-formatting) = 'true') and (
+                                            string-length(
+                                                substring-after(
+                                                    string(xs:decimal($binding)),
+                                                    '.'
+                                                )
+                                            ) gt xs:integer($digits-after-decimal)
+                                        )
                                     ) then
                                         translate(
                                             string($binding),
@@ -180,7 +184,22 @@
                                     ref="."
                                     class="xbl-fr-number-xforms-input xforms-hidden"
                                     xxf:format="$formatted"
-                                    xxf:unformat="translate(translate(., $grouping-separator, ''), $decimal-separator, '.')">
+                                    xxf:unformat="
+                                        for $clean in
+                                            translate(
+                                                translate(
+                                                    .,
+                                                    $grouping-separator,
+                                                    ''
+                                                ),
+                                                $decimal-separator,
+                                                '.'
+                                            )
+                                        return
+                                            if (string($round-when-storing) = 'true' and $clean castable as xs:decimal) then
+                                                round-half-to-even(xs:decimal($clean), xs:integer($digits-after-decimal))
+                                            else
+                                                $clean">
                                 <xxf:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxf:script>
                                 <xxf:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxf:script>
                             </xf:input>

@@ -148,12 +148,16 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.decimal-separator"           value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.grouping-separator"          value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-formatting"       value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-storing"          value="false"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"          value="0"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-formatting"         value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-storing"            value="false"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.fusion-charts.uri-to-swf"             value=""/>
 

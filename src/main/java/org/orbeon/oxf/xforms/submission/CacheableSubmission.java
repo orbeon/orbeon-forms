@@ -132,7 +132,6 @@ public class CacheableSubmission extends BaseSubmission {
 
                                             // For now support caching local portlet, request dispatcher, and regular submissions
                                             final Submission[] submissions = new Submission[] {
-                                                new LocalPortletSubmission(submission()),
                                                 new RequestDispatcherSubmission(submission()),
                                                 new RegularSubmission(submission())
                                             };

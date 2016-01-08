@@ -349,7 +349,7 @@
     </xsl:template>
 
     <xsl:template match="fr:goto-content">
-        <xf:group model="fr-form-model" ref=".[property('xxf:noscript')]">
+        <xf:group model="fr-form-model" class="{{if (property('xxf:noscript')) then '' else 'xforms-hidden'}}">
             <!-- Group to scope variables -->
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->

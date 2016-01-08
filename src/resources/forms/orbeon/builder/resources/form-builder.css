@@ -787,23 +787,6 @@ body {
   padding: 0;
   display: inline;
 }
-.orbeon .fb-navbar .container .nav {
-  position: absolute;
-  left: auto;
-  right: 0;
-  top: 0;
-}
-.orbeon .fb-navbar .container .nav li {
-  line-height: 40px;
-}
-.orbeon .fb-navbar .container .nav li a {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-.orbeon .fb-navbar .container .nav li .fr-language-choice {
-  margin-left: 15px;
-  font-size: inherit;
-}
 .orbeon .fb-main .navbar {
   margin-top: 0;
 }

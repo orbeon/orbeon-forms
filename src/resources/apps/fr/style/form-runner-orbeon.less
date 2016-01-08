@@ -118,7 +118,7 @@ body.orbeon { background-color: @frBackground }
 
     // Navbar
     .navbar {
-        .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+        .fr-language-choice .fr-link-select1, .fr-noscript-choice, .fr-goto-content {
             color: @navbarLinkColorActive;
             font-size: 85%;
             text-align: right;
@@ -134,10 +134,14 @@ body.orbeon { background-color: @frBackground }
         }
 
         &.navbar-inverse {
-            .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+            .fr-language-choice .fr-link-select1, .fr-noscript-choice, .fr-goto-content {
                 color: @frNavBarTextColor;
                 a, button.btn-link { color: @navbarInverseLinkColor }
             }
+        }
+
+        .fr-language-choice .dropdown-menu {
+            min-width: 0;
         }
     }
 

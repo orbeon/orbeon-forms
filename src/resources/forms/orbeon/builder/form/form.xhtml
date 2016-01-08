@@ -66,7 +66,7 @@
                 <xh:div class="container">
                     <xh:img src="/apps/fr/style/orbeon-navbar-logo.png" alt=""/>
                     <xh:h1 class="brand">Form Builder</xh:h1>
-                    <xh:ul class="nav">
+                    <xh:ul class="nav pull-right">
                         <xh:li>
                             <xh:a tabindex="-1" href="http://doc.orbeon.com/form-builder/" target="_blank">Form Builder User Guide</xh:a>
                         </xh:li>
@@ -201,7 +201,7 @@
 
                             <!-- Language selector -->
                             <xh:div class="fr-language-choice">
-                                <fr:link-select1 id="fb-resources-language-select" ref="$fb-lang">
+                                <xf:select1 id="fb-resources-language-select" ref="$fb-lang" appearance="bootstrap">
                                     <xf:itemset ref="$resources/resource">
                                         <xf:label value="xxf:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
                                         <xf:value ref="@xml:lang"/>
@@ -215,7 +215,7 @@
                                         <xf:refresh/>
                                     </xf:action>
 
-                                </fr:link-select1>
+                                </xf:select1>
                             </xh:div>
                         </xh:div>
                     </xh:div>

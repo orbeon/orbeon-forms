@@ -100,17 +100,17 @@ body.orbeon {
   width: 100%;
   color: #6E6E6E;
 }
-.orbeon .navbar .fr-language-choice,
+.orbeon .navbar .fr-language-choice .fr-link-select1,
 .orbeon .navbar .fr-noscript-choice,
 .orbeon .navbar .fr-goto-content {
   color: #555555;
   font-size: 85%;
   text-align: right;
 }
-.orbeon .navbar .fr-language-choice a,
+.orbeon .navbar .fr-language-choice .fr-link-select1 a,
 .orbeon .navbar .fr-noscript-choice a,
 .orbeon .navbar .fr-goto-content a,
-.orbeon .navbar .fr-language-choice button.btn-link,
+.orbeon .navbar .fr-language-choice .fr-link-select1 button.btn-link,
 .orbeon .navbar .fr-noscript-choice button.btn-link,
 .orbeon .navbar .fr-goto-content button.btn-link {
   color: #777777;
@@ -123,18 +123,21 @@ body.orbeon {
 .orbeon .navbar .fr-goto-content {
   float: left;
 }
-.orbeon .navbar.navbar-inverse .fr-language-choice,
+.orbeon .navbar.navbar-inverse .fr-language-choice .fr-link-select1,
 .orbeon .navbar.navbar-inverse .fr-noscript-choice,
 .orbeon .navbar.navbar-inverse .fr-goto-content {
   color: #bbbbbb;
 }
-.orbeon .navbar.navbar-inverse .fr-language-choice a,
+.orbeon .navbar.navbar-inverse .fr-language-choice .fr-link-select1 a,
 .orbeon .navbar.navbar-inverse .fr-noscript-choice a,
 .orbeon .navbar.navbar-inverse .fr-goto-content a,
-.orbeon .navbar.navbar-inverse .fr-language-choice button.btn-link,
+.orbeon .navbar.navbar-inverse .fr-language-choice .fr-link-select1 button.btn-link,
 .orbeon .navbar.navbar-inverse .fr-noscript-choice button.btn-link,
 .orbeon .navbar.navbar-inverse .fr-goto-content button.btn-link {
   color: #999999;
+}
+.orbeon .navbar .fr-language-choice .dropdown-menu {
+  min-width: 0;
 }
 .orbeon .fr-mode-new .xforms-required .xforms-label,
 .orbeon .fr-mode-edit .xforms-required .xforms-label,

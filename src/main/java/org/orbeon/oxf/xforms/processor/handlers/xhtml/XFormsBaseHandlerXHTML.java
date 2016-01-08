@@ -251,8 +251,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         final AttributesImpl staticLHHAAttributes = Dom4jUtils.getSAXAttributes(lhhaAnalysis.element());
 
         final boolean isLabel = lhhaType == LHHAC.LABEL;
-        final boolean isHelp = lhhaType == LHHAC.HELP;
-        final boolean isHint = lhhaType == LHHAC.HINT;
+        final boolean isHelp  = lhhaType == LHHAC.HELP;
+        final boolean isHint  = lhhaType == LHHAC.HINT;
         final boolean isAlert = lhhaType == LHHAC.ALERT;
 
         if (staticLHHAAttributes != null || isAlert) {

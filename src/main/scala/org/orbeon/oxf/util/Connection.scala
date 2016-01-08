@@ -148,7 +148,7 @@ class Connection(
         val (effectiveConnectionURL, client) =
           internalPath match {
             case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
-            case _                  ⇒ (urlString, PropertiesApacheHttpClient)
+            case _                  ⇒ (urlString,    PropertiesApacheHttpClient)
           }
 
         val response =

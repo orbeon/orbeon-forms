@@ -52,12 +52,12 @@
                 }
             }
 
-            this.prefixElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-prefix", null, this.container)[0];
-            this.prefix = Document.getValue(this.prefixElement.id);
-            this.decimalSeparatorElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-decimal-separator", null, this.container)[0];
-            this.decimalSeparator = Document.getValue(this.decimalSeparatorElement.id);
+            this.prefixElement            = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-prefix", null, this.container)[0];
+            this.prefix                   = Document.getValue(this.prefixElement.id);
+            this.decimalSeparatorElement  = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-decimal-separator", null, this.container)[0];
+            this.decimalSeparator         = Document.getValue(this.decimalSeparatorElement.id);
             this.groupingSeparatorElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-grouping-separator", null, this.container)[0];
-            this.groupingSeparator = Document.getValue(this.groupingSeparatorElement.id);
+            this.groupingSeparator        = Document.getValue(this.groupingSeparatorElement.id);
 
             // Register listener
             YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.onFocus, this, true);

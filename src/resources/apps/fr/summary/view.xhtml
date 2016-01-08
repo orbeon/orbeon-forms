@@ -634,6 +634,11 @@
                                     </xh:tr>
                                 </xh:thead>
                                 <xh:tbody>
+
+                                    <xf:var
+                                        name="datelang"
+                                        value="(xxf:lang()[frf:hasXPathNumberer(.)], 'en')[1]"/>
+
                                     <xf:repeat ref="1 to count(document)" id="documents-repeat"><!-- iterate over positions so that repeat iterations are not recreated  -->
                                         <!-- 1-based position in the current page -->
                                         <xf:var name="position" value="position()"/>
@@ -704,10 +709,10 @@
                                                             for $v in adjust-dateTime-to-timezone(xs:dateTime($document/@created[. castable as xs:dateTime]))
                                                                 return
                                                                     if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
                                                                     else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
-                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
+                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
 
                                                     <xh:td class="fr-summary-created">
                                                         <xf:group ref=".[$edit-view != '']">
@@ -728,10 +733,10 @@
                                                             for $v in adjust-dateTime-to-timezone(xs:dateTime($document/@last-modified[. castable as xs:dateTime]))
                                                                 return
                                                                     if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, $datelang, (), ())
                                                                     else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
-                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
+                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
 
                                                     <xh:td class="fr-summary-modified">
                                                         <xf:group ref=".[$edit-view != '']">
@@ -787,7 +792,7 @@
                                                                                         format-date(
                                                                                             xs:date($raw),
                                                                                             $fr-resources/summary/formats/date,
-                                                                                            xxf:lang(),
+                                                                                            $datelang,
                                                                                             (),
                                                                                             ()
                                                                                         )
@@ -798,7 +803,7 @@
                                                                                         format-time(
                                                                                             xs:time($raw),
                                                                                             $fr-resources/summary/formats/time,
-                                                                                            xxf:lang(),
+                                                                                            $datelang,
                                                                                             (),
                                                                                             ()
                                                                                         )
@@ -809,7 +814,7 @@
                                                                                         format-dateTime(
                                                                                             xs:dateTime($raw),
                                                                                             $fr-resources/summary/formats/dateTime,
-                                                                                            xxf:lang(),
+                                                                                            $datelang,
                                                                                             (),
                                                                                             ()
                                                                                         )

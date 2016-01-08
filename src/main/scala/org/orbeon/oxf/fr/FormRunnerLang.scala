@@ -16,6 +16,8 @@ package org.orbeon.oxf.fr
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
+import org.orbeon.saxon.instruct.NumberInstruction
+import org.orbeon.saxon.number.Numberer
 import org.orbeon.saxon.om.{NodeInfo, Item}
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
@@ -143,4 +145,8 @@ trait FormRunnerLang {
         case item: Item ⇒ item.getStringValue
         case other ⇒ other.toString
       }
+
+  // Whether there is a Saxon XPath numberer for the given language
+  def hasXPathNumberer(lang: String) =
+    NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lang)
 }

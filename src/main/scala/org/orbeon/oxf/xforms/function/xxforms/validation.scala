@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
@@ -79,7 +80,7 @@ object ValidationFunction {
       XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI
     ).asJava)
 
-  def analyzeKnownConstraint(xpathString: String)(implicit logger: IndentedLogger): Option[(String, String)] = {
+  def analyzeKnownConstraint(xpathString: String)(implicit logger: IndentedLogger): Option[(String, Option[String])] = {
 
     def tryCompile =
       Try(
@@ -96,9 +97,10 @@ object ValidationFunction {
     def analyze(expr: Expression) =
       expr match {
         case e: ValidationFunction ⇒
-          e.arguments.head match {
-            case l: Literal ⇒ Some(e.propertyName → l.getValue.getStringValue)
-            case other      ⇒ None
+          e.arguments.headOption match {
+            case Some(l: Literal) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
+            case None             ⇒ Some(e.propertyName → None)
+            case other            ⇒ None
           }
         case other ⇒
           None
@@ -127,4 +129,14 @@ class MinLengthValidation extends ValidationFunction {
     case Some(constraint) ⇒ org.orbeon.saxon.value.StringValue.getStringLength(value) >= constraint
     case None             ⇒ true
   }
+}
+
+class NonNegativeValidation extends ValidationFunction {
+
+  val propertyName = "non-negative"
+
+  // Instead of trying to convert the value to a number and checking the sign, just check whether it starts with
+  // a "minus" sign. This should cover the useful cases, shouldn't it? Including integer, decimal, and floating point.
+  def evaluate(value: String, constraintOpt: Option[Long]) =
+    ! StringUtils.stripToEmpty(value).startsWith("-")
 }

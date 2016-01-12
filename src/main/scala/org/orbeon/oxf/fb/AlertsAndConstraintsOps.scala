@@ -485,7 +485,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         default-alert={alert.isEmpty.toString}>
         <constraint
           expression={if (analyzed.isEmpty) expression else ""}
-          argument={analyzed map (_._2) getOrElse ""}
+          argument={analyzed flatMap (_._2) getOrElse ""}
         />
         {alertOrPlaceholder(alert, forLang)}
       </validation>
@@ -507,7 +507,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val constraintExpressionOpt = validationElem attValue "type" match {
         case "formula"      ⇒ normalizedAttOpt("expression")
-        case validationName ⇒ normalizedAttOpt("argument") map (arg ⇒ s"xxf:$validationName($arg)")
+        case validationName ⇒ Some(s"xxf:$validationName(${normalizedAttOpt("argument") getOrElse ""})")
       }
 
       constraintExpressionOpt map { expr ⇒

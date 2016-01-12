@@ -238,5 +238,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Fun("min-length", classOf[MinLengthValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
+
+    Fun("non-negative", classOf[NonNegativeValidation], op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
   }
 }

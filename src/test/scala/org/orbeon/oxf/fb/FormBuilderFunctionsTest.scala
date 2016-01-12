@@ -510,12 +510,13 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
-    assert(Some("max-length" → "5") === analyzeKnownConstraint("xxf:max-length(5)")(Logger))
-    assert(Some("min-length" → "5") === analyzeKnownConstraint("xxf:min-length(5)")(Logger))
-    assert(Some("min-length" → "5") === analyzeKnownConstraint("xxf:min-length('5')")(Logger))
-    assert(Some("min-length" → "5") === analyzeKnownConstraint("(xxf:min-length(5))")(Logger))
-    assert(None                     === analyzeKnownConstraint("xxf:min-length(foo)")(Logger))
-    assert(None                     === analyzeKnownConstraint("xxf:foobar(5)")(Logger))
+    assert(Some("max-length"   → Some("5")) === analyzeKnownConstraint("xxf:max-length(5)")(Logger))
+    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length(5)")(Logger))
+    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length('5')")(Logger))
+    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("(xxf:min-length(5))")(Logger))
+    assert(Some("non-negative" → None)      === analyzeKnownConstraint("(xxf:non-negative())")(Logger))
+    assert(None                             === analyzeKnownConstraint("xxf:min-length(foo)")(Logger))
+    assert(None                             === analyzeKnownConstraint("xxf:foobar(5)")(Logger))
 
   }
 

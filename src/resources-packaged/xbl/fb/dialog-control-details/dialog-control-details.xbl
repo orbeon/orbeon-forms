@@ -370,9 +370,11 @@
                         <xf:bind
                             ref="constraint/@argument"
                             type="xf:integer"
-                            required="not($type = ('required', 'datatype', 'formula'))"
+                            calculate="if ($type = ('required', 'datatype', 'formula', 'non-negative')) then '' else ."
+                            readonly="false()"
+                            required="not($type = ('required', 'datatype', 'formula', 'non-negative'))"
                             constraint=". ge 0"
-                            relevant="not($type = ('required', 'datatype', 'formula'))"/>
+                            relevant="not($type = ('required', 'datatype', 'formula', 'non-negative'))"/>
 
                         <xf:bind
                             ref="required"

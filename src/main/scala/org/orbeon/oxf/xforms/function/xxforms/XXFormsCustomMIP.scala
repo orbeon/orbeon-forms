@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model
  */
 class XXFormsCustomMIP extends XXFormsMIPFunction {
 
-  override def evaluateItem(xpathContext: XPathContext) =
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
     argument(0).iterate(xpathContext).next() match {
       case nodeInfo: NodeInfo ⇒
         // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames

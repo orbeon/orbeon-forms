@@ -76,7 +76,7 @@ abstract class XFormsFunction extends SystemFunction {
   def getContainingDocument(implicit xpathContext: XPathContext) =
     Option(context) map (_.container.getContainingDocument) orNull
 
-  def setProperty(name: String, value: Any) =
+  def setProperty(name: String, value: Option[String]) =
     context.setProperty(name, value)
 
   protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
@@ -215,12 +215,12 @@ object XFormsFunction {
 
     def containingDocument = container.containingDocument
 
-    private var _properties: Option[m.Map[String, Any]] = None
+    private var _properties: Option[m.Map[String, Option[String]]] = None
     def properties = _properties
 
-    def setProperty(name: String, value: Any) = {
+    def setProperty(name: String, value: Option[String]) = {
       if (_properties.isEmpty)
-        _properties = Some(m.Map.empty[String, Any])
+        _properties = Some(m.Map.empty[String, Option[String]])
       _properties foreach (_ += name → value)
     }
   }

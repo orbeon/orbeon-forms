@@ -185,9 +185,8 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
       functionContext.properties foreach { propertiesMap ⇒
         propertiesMap foreach {
-          case (name, Some(l: Long)) ⇒ bindNode.setCustom(name, l.toString)
-          case (name, None)          ⇒ bindNode.clearCustom(name)
-          case _ ⇒
+          case (name, Some(s)) ⇒ bindNode.setCustom(name, s)
+          case (name, None)    ⇒ bindNode.clearCustom(name)
         }
       }
 

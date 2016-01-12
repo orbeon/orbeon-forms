@@ -39,7 +39,9 @@ trait ValidationFunction extends XFormsFunction with FunctionSupport {
     val valueOpt      = Option(xpathContext.getContextItem) map (_.getStringValue)
     val constraintOpt = longArgumentOpt(0)
 
-    setProperty(propertyName, constraintOpt)
+    val propertyStringOpt = constraintOpt map (_.toString) orElse Some("true")
+
+    setProperty(propertyName, propertyStringOpt)
 
     valueOpt match {
       case Some(item) ⇒ evaluate(item, constraintOpt)

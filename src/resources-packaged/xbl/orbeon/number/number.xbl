@@ -212,6 +212,13 @@
                                     id="html-input"
                                     class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
                                     type="text"
+                                    step="any"
+                                    pattern="{{
+                                        if (xs:integer($digits-after-decimal) = 0 and xxf:custom-mip($binding, 'non-negative') = 'true') then
+                                            '[0-9]*'
+                                        else
+                                            ''
+                                    }}"
                                     xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength"/>
                                 <xf:group class="add-on" ref=".[$suffix]"><xf:output value="$suffix"/></xf:group>
                             </xh:span>

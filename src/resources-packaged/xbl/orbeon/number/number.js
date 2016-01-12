@@ -59,16 +59,33 @@
             this.groupingSeparatorElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-grouping-separator", null, this.container)[0];
             this.groupingSeparator        = Document.getValue(this.groupingSeparatorElement.id);
 
-            // Register listener
-            YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.onFocus, this, true);
-            YAHOO.util.Event.addBlurListener(this.visibleInputElement, this.onBlur, this, true);
-            $(this.visibleInputElement).on('keypress', _.bind(function(e) {
-                if (e.which == 13) this.sendValueToServer();
-            }, this));
-        },
+            // Register listeners
 
-        onFocus: function() {
-            this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
+            // Switch the input type after cleaning up the value for edition
+            $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
+                this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
+                $(this.visibleInputElement).attr('type', 'number');
+            }, this));
+
+            // Restore input type, send the value to the server, and updates value after server response
+            $(this.visibleInputElement).on('blur', _.bind(function(e) {
+                $(this.visibleInputElement).attr('type', 'text');
+
+                this.sendValueToServer();
+                var formId = $(this.container).parents('form').attr('id');
+
+                // Always update visible value with XForms value
+                // - relying just value change event from server is not enough
+                // - value change not dispatched if server value hasn't changed
+                // - if visible changed, but XForms hasn't, we still need to show XForms value
+                // - see: https://github.com/orbeon/orbeon-forms/issues/1026
+                AS.nextAjaxResponse(formId).then(_.bind(this.updateWithServerValue, this));
+            }, this));
+
+            $(this.visibleInputElement).on('keypress', _.bind(function(e) {
+                if (e.which == 13)
+                    this.sendValueToServer();
+            }, this));
         },
 
         setFocus: function() {
@@ -78,18 +95,6 @@
         sendValueToServer: function() {
             var newValue = this.visibleInputElement.value;
             Document.setValue(this.xformsInputElement.id, newValue);
-        },
-
-        onBlur: function() {
-            this.sendValueToServer();
-            var formId = $(this.container).parents('form').attr('id');
-
-            // Always update visible value with XForms value
-            // - relying just value change event from server is not enough
-            // - value change not dispatched if server value hasn't changed
-            // - if visible changed, but XForms hasn't, we still need to show XForms value
-            // - see: https://github.com/orbeon/orbeon-forms/issues/1026
-            AS.nextAjaxResponse(formId).then(_.bind(this.updateWithServerValue, this));
         },
 
         numberToEditString: function(number) {

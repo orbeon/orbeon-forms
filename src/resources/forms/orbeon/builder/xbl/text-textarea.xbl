@@ -16,7 +16,7 @@
 
     <xbl:binding id="fb-textarea" element="xf|textarea">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Text Area</display-name>
+            <display-name lang="en">Plain Text Area</display-name>
             <display-name lang="es">Texto Extendido</display-name>
             <display-name lang="fi">Tekstialue</display-name>
             <display-name lang="fr">Zone de texte</display-name>

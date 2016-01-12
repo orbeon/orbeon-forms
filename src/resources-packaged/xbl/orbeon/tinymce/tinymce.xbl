@@ -30,7 +30,7 @@
     <xbl:script src="/xbl/orbeon/tinymce/tinymce-config.js"/>
     <xbl:binding id="fr-tinymce" element="fr|tinymce" xxbl:mode="lhha binding value focus" xxf:external-events="fr-set-client-value">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
-            <display-name lang="en">Formatted Text</display-name>
+            <display-name lang="en">Formatted Text Area</display-name>
             <display-name lang="es">Texto con Formato</display-name>
             <display-name lang="fi">Muotoiltu teksti</display-name>
             <display-name lang="fr">Texte formatté</display-name>

@@ -63,13 +63,22 @@
 
             // Switch the input type after cleaning up the value for edition
             $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
+
                 this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
-                $(this.visibleInputElement).attr('type', 'number');
+
+                // With Firefox, changing the type synchronously interferes with the focus
+                window.setTimeout(_.bind(function() {
+                    $(this.visibleInputElement).attr('type', 'number');
+                }, this), 0);
             }, this));
 
             // Restore input type, send the value to the server, and updates value after server response
             $(this.visibleInputElement).on('blur', _.bind(function(e) {
-                $(this.visibleInputElement).attr('type', 'text');
+
+                // With Firefox, changing the type synchronously interferes with the focus
+                window.setTimeout(_.bind(function() {
+                    $(this.visibleInputElement).attr('type', 'text');
+                }, this), 0);
 
                 this.sendValueToServer();
                 var formId = $(this.container).parents('form').attr('id');

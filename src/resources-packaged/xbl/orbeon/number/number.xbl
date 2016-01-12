@@ -217,7 +217,7 @@
                                         if (xs:integer($digits-after-decimal) = 0 and xxf:custom-mip($binding, 'non-negative') = 'true') then
                                             '[0-9]*'
                                         else
-                                            ''
+                                            '.*'
                                     }}"
                                     xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength"/>
                                 <xf:group class="add-on" ref=".[$suffix]"><xf:output value="$suffix"/></xf:group>

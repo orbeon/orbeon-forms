@@ -204,8 +204,18 @@
                                 <xxf:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxf:script>
                             </xf:input>
 
-                            <!-- Visible HTML input -->
-                            <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid.xforms-visited -->
+                            <!--
+                                Visible HTML input
+
+                                - `.xforms-input-input`: so the border gets highlighted when the container gets `.xforms-invalid.xforms-visited`
+                                - `step="any"`: so that even for numbers with decimal digits, increments/decrements are by 1
+                                - `pattern`: triggers the numeric keypad on iOS
+                                - `maxlength`:
+                                    - not natively supported for `type="number"`, but when JavaScript support is enabled, the attribute can be read to enforce
+                                      a maximum number of allowed characters to type (https://github.com/orbeon/orbeon-forms/issues/2486)
+                                    - if a `maxlength` or `xxf:maxlength` is placed on the bound element, that takes precedence
+                                - `min`: makes control natively invalid as the user types, if the value cannot be negative
+                            -->
                             <xh:span class="fr-width-10em {{(if ($prefix) then 'input-prepend' else (), if ($suffix) then 'input-append' else ())}}">
                                 <xf:group class="add-on" ref=".[$prefix]"><xf:output value="$prefix"/></xf:group>
                                 <xh:input
@@ -219,7 +229,14 @@
                                         else
                                             '.*'
                                     }}"
-                                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength"/>
+                                    min="{{
+                                        if (xxf:custom-mip($binding, 'non-negative') = 'true') then
+                                            '0'
+                                        else
+                                            ''
+                                    }}"
+                                    maxlength="{{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}}"
+                                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength"/>
                                 <xf:group class="add-on" ref=".[$suffix]"><xf:output value="$suffix"/></xf:group>
                             </xh:span>
                         </xf:group>

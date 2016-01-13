@@ -387,7 +387,10 @@
                 <item id="formula">Formula</item>
                 <item id="max-length">Has Maximum Length</item>
                 <item id="min-length">Has Minimum Length</item>
-                <item id="non-negative">Is Not Negative</item>
+                <item id="positive">Is Positive</item>
+                <item id="non-negative">Is Positive or Zero</item>
+                <item id="non-positive">Negative or Zero</item>
+                <item id="negative">Is Negative</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -1273,7 +1276,10 @@
                 <item id="formula">Formule</item>
                 <item id="max-length">A longueur maximale</item>
                 <item id="min-length">A longueur minimale</item>
-                <item id="non-negative">N'est pas négatif</item>
+                <item id="positive">Est positif</item>
+                <item id="non-negative">Est positif ou zéro</item>
+                <item id="non-positive">Est négatif ou zéro</item>
+                <item id="negative">Est négatif</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -2162,7 +2168,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -3049,7 +3058,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -3937,7 +3949,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -4817,7 +4832,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -5700,7 +5718,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -6581,7 +6602,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -7469,7 +7493,10 @@
                 <item id="formula" todo="true">[Formula]</item>
                 <item id="max-length" todo="true">[Has Maximum Length]</item>
                 <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -8356,7 +8383,10 @@
                 <item id="formula">Formel</item>
                 <item id="max-length">Har största längd</item>
                 <item id="min-length">Har minsta längd</item>
-                <item id="non-negative" todo="true">[Is Not Negative]</item>
+                <item id="positive" todo="true">[Is Positive]</item>
+                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="non-positive" todo="true">[Negative or Zero]</item>
+                <item id="negative" todo="true">[Is Negative]</item>
             </constraint>
             <formula>
                 <label>Formel</label>

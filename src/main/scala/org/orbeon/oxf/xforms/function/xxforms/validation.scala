@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
@@ -137,8 +136,54 @@ class NonNegativeValidation extends ValidationFunction {
 
   val propertyName = "non-negative"
 
-  // Instead of trying to convert the value to a number and checking the sign, just check whether it starts with
-  // a "minus" sign. This should cover the useful cases, shouldn't it? Including integer, decimal, and floating point.
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    ! StringUtils.stripToEmpty(value).startsWith("-")
+    NumericValidation.signum(value) != -1
+}
+
+class NegativeValidation extends ValidationFunction {
+
+  val propertyName = "negative"
+
+  def evaluate(value: String, constraintOpt: Option[Long]) =
+    NumericValidation.signum(value) == -1
+}
+
+class NonPositiveValidation extends ValidationFunction {
+
+  val propertyName = "non-positive"
+
+  def evaluate(value: String, constraintOpt: Option[Long]) =
+    NumericValidation.signum(value) != 1
+}
+
+class PositiveValidation extends ValidationFunction {
+
+  val propertyName = "positive"
+
+  def evaluate(value: String, constraintOpt: Option[Long]) =
+    NumericValidation.signum(value) == 1
+}
+
+object NumericValidation {
+
+  def signum(value: String): Int = parseAsLongDoubleOrBigDecimal(value) match {
+    case v: Long       ⇒ v.signum
+    case v: Double     ⇒ v.signum
+    case v: BigDecimal ⇒ v.signum
+    case _             ⇒ throw new IllegalStateException
+  }
+
+  // Return Long | Double | BigDecimal
+  def parseAsLongDoubleOrBigDecimal(value: String): Any =
+    try {
+      value.toLong
+    } catch {
+      case e: NumberFormatException ⇒
+        try {
+          value.toDouble
+        } catch {
+          case e: NumberFormatException ⇒
+            BigDecimal(value)
+        }
+    }
 }

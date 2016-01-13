@@ -334,6 +334,10 @@
 
                 <xf:bind ref="appearances/@selection" readonly="count(../appearance) le 1"/>
 
+                <xf:var
+                    name="noargs-constraints"
+                    value="('required', 'datatype', 'formula', 'non-negative', 'negative', 'non-positive', 'positive')"/>
+
                 <xf:bind ref="validations">
 
                     <!-- NOTE: There can be at most one required validation for now -->
@@ -370,11 +374,11 @@
                         <xf:bind
                             ref="constraint/@argument"
                             type="xf:integer"
-                            calculate="if ($type = ('required', 'datatype', 'formula', 'non-negative')) then '' else ."
+                            calculate="if ($type = $noargs-constraints) then '' else ."
                             readonly="false()"
-                            required="not($type = ('required', 'datatype', 'formula', 'non-negative'))"
+                            required="not($type = $noargs-constraints)"
                             constraint=". ge 0"
-                            relevant="not($type = ('required', 'datatype', 'formula', 'non-negative'))"/>
+                            relevant="not($type = $noargs-constraints)"/>
 
                         <xf:bind
                             ref="required"

@@ -515,6 +515,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length('5')")(Logger))
     assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("(xxf:min-length(5))")(Logger))
     assert(Some("non-negative" → None)      === analyzeKnownConstraint("(xxf:non-negative())")(Logger))
+    assert(Some("negative"     → None)      === analyzeKnownConstraint("(xxf:negative())")(Logger))
+    assert(Some("non-positive" → None)      === analyzeKnownConstraint("(xxf:non-positive())")(Logger))
+    assert(Some("positive"     → None)      === analyzeKnownConstraint("(xxf:positive())")(Logger))
     assert(None                             === analyzeKnownConstraint("xxf:min-length(foo)")(Logger))
     assert(None                             === analyzeKnownConstraint("xxf:foobar(5)")(Logger))
 

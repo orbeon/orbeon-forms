@@ -580,9 +580,10 @@
                         <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-36"/>
                         <xxf:control id="my-currency≡xf-38" class="add-on"/>
                         <xxf:control id="my-currency≡xf-39">$</xxf:control>
-                        <xxf:control id="my-currency≡xf-40" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-41" relevant="false"/>
+                        <xxf:attribute for="my-currency≡html-input" name="pattern"/>
+                        <xxf:control id="my-currency≡xf-41" class="add-on" relevant="false"/>
                         <xxf:control id="my-currency≡xf-42" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-43" relevant="false"/>
                     </xxf:control-values>
                     <xxf:script name="xf_01d33a0f45056a1c82a2217322761ac96dcf3673" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>

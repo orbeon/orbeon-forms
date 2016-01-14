@@ -50,9 +50,11 @@
     </appender>
 
     <!-- XForms engine activity, see http://wiki.orbeon.com/forms/doc/developer-guide/xforms-logging -->
-    <!--<category name="org.orbeon.oxf.xforms.processor.XFormsServer">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
+    <!--
+    <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
+        <priority value="debug"/>
+    </category>
+    -->
 
     <!-- To enable logging for any of the sub-systems below, copy that section outside of the comment block -->
     <!--
@@ -63,7 +65,7 @@
     <category name="org.orbeon.auth">
         <priority value="debug"/>
     </category>
-    
+
     <category name="org.orbeon.xforms.analysis.calculate">
         <priority value="debug"/>
     </category>

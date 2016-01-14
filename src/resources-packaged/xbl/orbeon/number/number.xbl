@@ -210,7 +210,12 @@
 
                                 - `.xforms-input-input`: so the border gets highlighted when the container gets `.xforms-invalid.xforms-visited`
                                 - `step="any"`: so that even for numbers with decimal digits, increments/decrements are by 1
-                                - `pattern`: triggers the numeric keypad on iOS
+                                - `pattern`:
+                                    - triggers the numeric keypad on iOS when needed
+                                    - use `fraction-digits` common constraint instead of `$digits-after-decimal`, because what matters to select
+                                      the keypad is that the *expected* format be a non-negative integer, while `$digits-after-decimal` is used
+                                      for formatting only
+                                    - also tests on the `integer` datatype, which is the same as `fraction-digits = 0`
                                 - `maxlength`:
                                     - not natively supported for `type="number"`, but when JavaScript support is enabled, the attribute can be read to enforce
                                       a maximum number of allowed characters to type (https://github.com/orbeon/orbeon-forms/issues/2486)
@@ -225,7 +230,13 @@
                                     type="text"
                                     step="any"
                                     pattern="{{
-                                        if (xs:integer($digits-after-decimal) = 0 and xxf:custom-mip($binding, 'non-negative') = 'true') then
+                                        if (
+                                            (
+                                                local-name-from-QName(xxf:type($binding)) = 'integer' or
+                                                xs:integer(xxf:custom-mip($binding, 'fraction-digits')[. castable as xs:integer]) = 0
+                                            ) and
+                                                xxf:custom-mip($binding, 'non-negative') = 'true'
+                                        ) then
                                             '[0-9]*'
                                         else
                                             '.*'

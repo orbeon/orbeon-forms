@@ -243,5 +243,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Fun("negative",     classOf[NegativeValidation],    op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
     Fun("non-positive", classOf[NonPositiveValidation], op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
     Fun("positive",     classOf[PositiveValidation],    op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
+
+    Fun("fraction-digits", classOf[MaxFractionDigitsValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
+    )
   }
 }

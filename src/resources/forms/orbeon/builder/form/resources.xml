@@ -391,6 +391,7 @@
                 <item id="non-negative">Is Positive or Zero</item>
                 <item id="non-positive">Negative or Zero</item>
                 <item id="negative">Is Negative</item>
+                <item id="fraction-digits">Maximum Fractional Digits</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -1280,6 +1281,7 @@
                 <item id="non-negative">Est positif ou zéro</item>
                 <item id="non-positive">Est négatif ou zéro</item>
                 <item id="negative">Est négatif</item>
+                <item id="fraction-digits">Maximum chiffres fractionnaires </item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -2172,6 +2174,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -3062,6 +3065,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -3953,6 +3957,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -4836,6 +4841,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -5722,6 +5728,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -6606,6 +6613,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -7497,6 +7505,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -8387,6 +8396,7 @@
                 <item id="non-negative" todo="true">[Is Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Is Negative]</item>
+                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
                 <label>Formel</label>

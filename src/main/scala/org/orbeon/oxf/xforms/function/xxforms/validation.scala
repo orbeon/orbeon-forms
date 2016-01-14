@@ -187,3 +187,38 @@ object NumericValidation {
         }
     }
 }
+
+class MaxFractionDigitsValidation extends ValidationFunction {
+
+  val propertyName = "fraction-digits"
+
+  // Operate at the lexical level
+  def countDigitsAfterDecimalSeparator(value: String) = {
+
+    var beforeDecimalSeparator      = true
+    var digitsAfterDecimalSeparator = 0
+    var trailingZeros               = 0
+
+    for (c ← value) {
+      if (beforeDecimalSeparator) {
+        if (c == '.')
+          beforeDecimalSeparator = false
+      } else {
+        if (c == '0')
+          trailingZeros += 1
+        else
+          trailingZeros = 0
+
+        if ('0' <= c && c <= '9')
+          digitsAfterDecimalSeparator += 1
+      }
+    }
+
+    digitsAfterDecimalSeparator - trailingZeros
+  }
+
+  def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
+    case Some(constraint) ⇒ countDigitsAfterDecimalSeparator(value) <= constraint
+    case None             ⇒ true
+  }
+}

@@ -2779,7 +2779,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     ORBEON.xforms.Globals.currentFocusControlElement = control;
 
                     // Dispatch xxforms-blur event if we're not going to another XForms control (see issue #619)
-                    var relatedTarget = event.relatedTarget || document.activeElement;
+                    // Firefox doesn't support relatedTarget, so use the Firefox-only explicitOriginalTarget,
+                    // see https://twitter.com/avernet/status/687392116193030144.
+                    var relatedTarget = event.relatedTarget ||
+                        event.originalEvent.explicitOriginalTarget ||
+                        document.activeElement;
                     var relatedControl = ORBEON.xforms.Events._findAncestorFocusableControl(relatedTarget);
                     if (relatedControl == null) {
                         ORBEON.xforms.Globals.currentFocusControlId = null;

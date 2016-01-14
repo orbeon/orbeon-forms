@@ -30,7 +30,8 @@
             id="fr-number"
             element="
                 fr|number,
-                xf|input:xxf-type('xs:decimal')"
+                xf|input:xxf-type('xs:decimal'),
+                xf|input:xxf-type('xs:integer')"
             xxbl:mode="lhha binding value focus"
             xxbl:label-for="html-input">
 

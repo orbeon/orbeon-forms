@@ -44,7 +44,7 @@
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>
             <templates>
-                <bind type="xf:decimal"/>
+                <bind type="xf:decimal" constraint="xxf:fraction-digits(2)"/>
                 <view>
                     <fr:currency>
                         <xf:label ref=""/>

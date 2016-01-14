@@ -563,7 +563,7 @@
                                                 <!-- Only keep reasonable types -->
                                                 <xf:var
                                                     name="supported"
-                                                    value="'string', 'double', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email',
+                                                    value="'string', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email',
                                                           builtin-type/string()"/><!-- add supported type only if already present in the data -->
                                                 <xf:select1 ref="builtin-type">
                                                     <!-- Only show label if there is a schema -->

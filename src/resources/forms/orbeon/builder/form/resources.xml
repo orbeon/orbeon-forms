@@ -385,12 +385,12 @@
             </required>
             <constraint>
                 <item id="formula">Formula</item>
-                <item id="max-length">Has Maximum Length</item>
-                <item id="min-length">Has Minimum Length</item>
-                <item id="positive">Is Positive</item>
-                <item id="non-negative">Is Positive or Zero</item>
+                <item id="max-length">Maximum Length</item>
+                <item id="min-length">Minimum Length</item>
+                <item id="positive">Positive</item>
+                <item id="non-negative">Positive or Zero</item>
                 <item id="non-positive">Negative or Zero</item>
-                <item id="negative">Is Negative</item>
+                <item id="negative">Negative</item>
                 <item id="fraction-digits">Maximum Fractional Digits</item>
             </constraint>
             <formula>
@@ -1275,12 +1275,12 @@
             </required>
             <constraint>
                 <item id="formula">Formule</item>
-                <item id="max-length">A longueur maximale</item>
-                <item id="min-length">A longueur minimale</item>
-                <item id="positive">Est positif</item>
-                <item id="non-negative">Est positif ou zéro</item>
-                <item id="non-positive">Est négatif ou zéro</item>
-                <item id="negative">Est négatif</item>
+                <item id="max-length">Longueur maximale</item>
+                <item id="min-length">Longueur minimale</item>
+                <item id="positive">Positif</item>
+                <item id="non-negative">Positif ou zéro</item>
+                <item id="non-positive">Négatif ou zéro</item>
+                <item id="negative">Négatif</item>
                 <item id="fraction-digits">Maximum chiffres fractionnaires </item>
             </constraint>
             <formula>
@@ -2168,12 +2168,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -3059,12 +3059,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -3951,12 +3951,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -4835,12 +4835,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -5722,12 +5722,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -6607,12 +6607,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -7499,12 +7499,12 @@
             </required>
             <constraint>
                 <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Has Maximum Length]</item>
-                <item id="min-length" todo="true">[Has Minimum Length]</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="max-length" todo="true">[Maximum Length]</item>
+                <item id="min-length" todo="true">[Minimum Length]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>
@@ -8392,10 +8392,10 @@
                 <item id="formula">Formel</item>
                 <item id="max-length">Har största längd</item>
                 <item id="min-length">Har minsta längd</item>
-                <item id="positive" todo="true">[Is Positive]</item>
-                <item id="non-negative" todo="true">[Is Positive or Zero]</item>
+                <item id="positive" todo="true">[Positive]</item>
+                <item id="non-negative" todo="true">[Positive or Zero]</item>
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Is Negative]</item>
+                <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
             </constraint>
             <formula>

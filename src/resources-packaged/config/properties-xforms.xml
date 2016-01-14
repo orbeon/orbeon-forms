@@ -32,14 +32,25 @@
         * Data:     analysis-xbl-tree submission-body model-serialized-instance server-body html-static-state
      -->
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug">
-        document model submission control event action analysis server html process
+        document
+        model
+        submission
+        control
+        event
+        action
+        analysis
+        server
+        html
+        process
     </property>
     <!--
         Error logging:
 
         * Data: submission-error-body server-body
     -->
-    <property as="xs:NMTOKENS" name="oxf.xforms.logging.error"                          value="submission-error-body"/>
+    <property as="xs:NMTOKENS" name="oxf.xforms.logging.error">
+        submission-error-body
+    </property>
 
     <!-- Debug properties -->
     <property as="xs:boolean" name="oxf.xforms.debug.log-xpath-analysis"                value="false"/>

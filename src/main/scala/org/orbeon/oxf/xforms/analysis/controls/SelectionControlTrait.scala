@@ -36,10 +36,36 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
   // Try to figure out if we have dynamic items. This attempts to cover all cases, including
   // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
-  // don't check things like event handlers. Also check for AVTs ion @class and @style.
-  val hasStaticItemset = ! XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPath.GlobalConfiguration).wrap(element),
-      "exists((xf:choices | xf:item | xf:itemset)/(., .//xf:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
-      XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData, null).asInstanceOf[Boolean]
+  // don't check things like event handlers. Also check for AVTs.
+  val hasStaticItemset =
+    ! XPathCache.evaluateSingle(
+      new DocumentWrapper(
+        element.getDocument,
+        null,
+        XPath.GlobalConfiguration
+      ).wrap(element),
+      """
+        exists(
+          (xf:choices | xf:item | xf:itemset)/
+          descendant-or-self::*[
+            @ref     or
+            @nodeset or
+            @bind    or
+            @value   or
+            @*[
+              contains(., '{')
+            ]
+          ]
+        )
+      """,
+      XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+      null,
+      null,
+      null,
+      null,
+      locationData,
+      null
+    ).asInstanceOf[Boolean]
 
   val isNorefresh      = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
   val mustEncodeValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map (_.toBoolean)
@@ -173,18 +199,18 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
       private var currentContainer: ItemContainer = result
 
       def startElement(element: Element): Unit = {
-        
+
         def findNestedLHHValue(qName: QName, required: Boolean) = {
           val nestedElementOpt = Option(element.element(qName))
 
           if (required && nestedElementOpt.isEmpty)
             throw new ValidationException(s"${XFORMS_ITEM_QNAME.getQualifiedName} must contain an ${qName.getQualifiedName} element.", ElementAnalysis.createLocationData(element))
 
-          nestedElementOpt flatMap { nestedElement ⇒ 
+          nestedElementOpt flatMap { nestedElement ⇒
             val containsHTML = Array(false)
-                
+
             val valueOpt = Option(StringUtils.trimToNull(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML)))
-            
+
             if (required)
               Some(LHHAValue(valueOpt getOrElse "", containsHTML(0)))
             else
@@ -204,7 +230,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
               val valueElement = element.element(XFORMS_VALUE_QNAME)
               if (valueElement eq null)
                 throw new ValidationException("xf:item must contain an xf:value element.", ElementAnalysis.createLocationData(element))
-              
+
               StringUtils.defaultString(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null))
             }
 

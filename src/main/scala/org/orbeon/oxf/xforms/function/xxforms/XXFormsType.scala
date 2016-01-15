@@ -23,7 +23,7 @@ import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 class XXFormsType extends XXFormsMIPFunction with FunctionSupport {
 
   override def evaluateItem(xpathContext: XPathContext): QNameValue =
-    itemArgumentOrContextOpt(0) match {
+    itemArgumentOrContextOpt(0)(xpathContext) match {
       case Some(atomicValue: AtomicValue) ⇒
         atomicValue.getItemType(null) match {
           case atomicType: BuiltInAtomicType ⇒

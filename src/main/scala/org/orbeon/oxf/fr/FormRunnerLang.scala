@@ -147,6 +147,7 @@ trait FormRunnerLang {
       }
 
   // Whether there is a Saxon XPath numberer for the given language
+  //@XPathFunction
   def hasXPathNumberer(lang: String) =
     NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lang)
 }

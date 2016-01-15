@@ -335,8 +335,32 @@
                 <xf:bind ref="appearances/@selection" readonly="count(../appearance) le 1"/>
 
                 <xf:var
+                    name="string-constraints"
+                    value="'max-length', 'min-length', 'length', 'pattern'"/>
+
+                <xf:var
+                    name="noargs-integer-constraints"
+                    value="'non-negative', 'negative', 'non-positive', 'positive'"/>
+
+                <xf:var
+                    name="min-max-constraints"
+                    value="'max-inclusive', 'max-exclusive', 'min-inclusive', 'min-exclusive'"/>
+
+                <xf:var
+                    name="integer-constraints"
+                    value="$noargs-integer-constraints, 'total-digits', 'pattern', $min-max-constraints"/>
+
+                <xf:var
+                    name="decimal-constraints"
+                    value="$integer-constraints, 'fraction-digits'"/>
+
+                <xf:var
+                    name="date-constraints"
+                    value="$min-max-constraints"/>
+
+                <xf:var
                     name="noargs-constraints"
-                    value="('required', 'datatype', 'formula', 'non-negative', 'negative', 'non-positive', 'positive')"/>
+                    value="'required', 'datatype', 'formula', $noargs-integer-constraints"/>
 
                 <xf:bind ref="validations">
 
@@ -408,6 +432,10 @@
                     <!-- Figure out schema prefix if any -->
                     <xf:var name="schema"        value="fbf:findSchemaOrEmpty($form)"       as="xs:string?"/>
                     <xf:var name="schema-prefix" value="fbf:findSchemaPrefixOrEmpty($form)" as="xs:string?"/>
+
+                    <xf:var
+                        name="builtin-type"
+                        value="$i/validations/validation[@type = 'datatype']/builtin-type/string()"/>
 
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
@@ -510,7 +538,29 @@
                             <fr:grid id="validations-grid" ref="validation" origin="instance('validation-constraint-template')" repeat="true" freeze="2">
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:select1 ref="@type" appearance="minimal">
+
+                                        <xf:var
+                                            name="validation-type"
+                                            value="@type"/>
+
+                                        <xf:var
+                                            name="allowed-constraints"
+                                            value="
+                                                'formula',
+                                                (
+                                                    if ($builtin-type = ('string', 'email')) then
+                                                        $string-constraints
+                                                    else if ($builtin-type = 'integer') then
+                                                        $integer-constraints
+                                                    else if ($builtin-type = 'decimal') then
+                                                        $decimal-constraints
+                                                    else
+                                                        ()
+                                                ),
+                                                $validation-type/string()
+                                        "/>
+
+                                        <xf:select1 ref="$validation-type" appearance="minimal">
                                             <xf:label ref="$resources/dialog-control-details/validation-type/label"/>
                                             <xf:itemset ref=".[. = 'required']">
                                                 <xf:label ref="$resources/dialog-control-details/required/label"/>
@@ -520,7 +570,7 @@
                                                 <xf:label ref="$resources/dialog-control-details/types/label"/>
                                                 <xf:value>datatype</xf:value>
                                             </xf:itemset>
-                                            <xf:itemset ref="$resources/dialog-control-details/constraint/item">
+                                            <xf:itemset ref="$resources/dialog-control-details/constraint/item[@id = $allowed-constraints]">
                                                 <xf:label ref="."/>
                                                 <xf:value ref="@id"/>
                                             </xf:itemset>
@@ -560,11 +610,14 @@
 
                                             <!-- Built-in type -->
                                             <xf:group ref=".[@type = 'datatype']">
-                                                <!-- Only keep reasonable types -->
+                                                <!--
+                                                    - only keep "reasonable" types
+                                                    - add supported type only if already present in the data
+                                                -->
                                                 <xf:var
                                                     name="supported"
-                                                    value="'string', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email',
-                                                          builtin-type/string()"/><!-- add supported type only if already present in the data -->
+                                                    value="'string', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
+
                                                 <xf:select1 ref="builtin-type">
                                                     <!-- Only show label if there is a schema -->
                                                     <xf:label ref="$resources/dialog-control-details/builtin-type/label[exists($schema)]"/>
@@ -598,6 +651,7 @@
                                                 </fr:dropdown-select1>
                                             </xf:group>
 
+                                            <!-- Formula or common constraint argument -->
                                             <xf:group ref=".[not(@type = ('required', 'datatype'))]">
                                                 <xf:textarea ref="constraint/@expression">
                                                     <xf:label class="xforms-hidden" appearance="minimal" ref="$resources/dialog-control-details/formula/label"/>

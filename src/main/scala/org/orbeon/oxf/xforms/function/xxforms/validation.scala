@@ -166,25 +166,17 @@ class PositiveValidation extends ValidationFunction {
 
 object NumericValidation {
 
-  def signum(value: String): Int = parseAsLongDoubleOrBigDecimal(value) match {
-    case v: Long       ⇒ v.signum
-    case v: Double     ⇒ v.signum
-    case v: BigDecimal ⇒ v.signum
-    case _             ⇒ throw new IllegalStateException
+  def signum(value: String): Int = parseAsLongOrBigDecimal(value) match {
+    case Left(long)        ⇒ long.signum
+    case Right(bigDecimal) ⇒ bigDecimal.signum
   }
 
-  // Return Long | Double | BigDecimal
-  def parseAsLongDoubleOrBigDecimal(value: String): Any =
+  def parseAsLongOrBigDecimal(value: String): Either[Long, BigDecimal] =
     try {
-      value.toLong
+      Left(value.toLong)
     } catch {
       case e: NumberFormatException ⇒
-        try {
-          value.toDouble
-        } catch {
-          case e: NumberFormatException ⇒
-            BigDecimal(value)
-        }
+        Right(BigDecimal(value))
     }
 }
 

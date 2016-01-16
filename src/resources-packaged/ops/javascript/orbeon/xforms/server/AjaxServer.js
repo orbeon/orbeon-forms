@@ -708,8 +708,9 @@
             } else {
                 // Regular Ajax response
 
-                // On IE, don't rely on the browser's XML parsing, as it doesn't preserve white spaces
-                if (o.responseText && $.browser.msie)
+                // For IE, don't rely on the browser's XML parsing, as IE8 and IE9 doesn't preserve white spaces (but IE10+ does)
+                // See https://github.com/orbeon/orbeon-forms/issues/682
+                if (o.responseText && _.isObject(window.ActiveXObject))
                     responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
             }
 

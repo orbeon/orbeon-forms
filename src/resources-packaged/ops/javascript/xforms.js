@@ -2877,9 +2877,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         keydown: function (event) {
 
-            // On IE prevent default behavior when the esc key is pressed, which otherwise would reset all the form fields
-            // See https://github.com/orbeon/orbeon-forms/issues/131
-            if ($.browser.msie && event.keyCode == 27)
+            // Prevent default behavior when the esc key is pressed, which would otherwise reset all the form fields on IE,
+            // up to IE11 included. See https://github.com/orbeon/orbeon-forms/issues/131
+            if (event.keyCode == 27)
                 YAHOO.util.Event.preventDefault(event);
 
             var target = YAHOO.util.Event.getTarget(event);

@@ -63,7 +63,7 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
 
-    withElement(handlerContext.findXHTMLPrefix, XHTML_NAMESPACE_URI, "output", containerAttributes) {
+    withElement("output", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       if (isConcreteControl) {
         val mediatypeValue = attributes.getValue("mediatype")
         val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
@@ -97,7 +97,7 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
     // Handle accessibility attributes on <div>
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
 
-    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "div", containerAttributes) {
+    withElement("div", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       if (isConcreteControl) {
         val mediatypeValue = attributes.getValue("mediatype")
         val htmlValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
@@ -141,7 +141,7 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
     if (control != null)
       control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
-    element(xhtmlPrefix, XHTML_NAMESPACE_URI, "img", containerAttributes)
+    element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
   }
 
   // Don't use @for as we are not pointing to an HTML control
@@ -236,7 +236,7 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
       val aAttributes = anchorAttributes
       XFormsBaseHandler.handleAccessibilityAttributes(attributes, aAttributes)
 
-      withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "a", aAttributes) {
+      withElement("a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
         val labelValue             = Option(control) map (_.getLabel) orNull
         val mustOutputHTMLFragment = Option(control) exists (_.isHTMLLabel)
         XFormsBaseHandlerXHTML.outputLabelText(xmlReceiver, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment)

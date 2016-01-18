@@ -33,19 +33,19 @@ import scala.collection.JavaConverters._
 import scala.util.control.Breaks
 
 class ControlsComparator(
-  document              : XFormsContainingDocument, 
-  valueChangeControlIds : collection.Set[String], 
+  document              : XFormsContainingDocument,
+  valueChangeControlIds : collection.Set[String],
   isTestMode            : Boolean
 ) extends XMLReceiverSupport {
 
   // For Java callers
   def this(
-    containingDocument    : XFormsContainingDocument, 
-    valueChangeControlIds : ju.Set[String], 
+    containingDocument    : XFormsContainingDocument,
+    valueChangeControlIds : ju.Set[String],
     isTestMode            : Boolean
   ) = this(
-    containingDocument, 
-    Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String], 
+    containingDocument,
+    Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String],
     isTestMode
   )
 
@@ -60,7 +60,7 @@ class ControlsComparator(
     None)(
     receiver
   )
-  
+
   private val FullUpdateThreshold = document.getAjaxFullUpdateThreshold
 
   private val breaks = new Breaks
@@ -105,7 +105,7 @@ class ControlsComparator(
                 assert(fullUpdateBuffer.isEmpty, "xxf:dynamic within full update is not supported")
 
                 def replay(r: XMLReceiver) =
-                  element("", XXFORMS_NAMESPACE_URI, "dynamic", List("id" → c.effectiveId))(r)
+                  element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" → c.effectiveId))(r)
 
                 processFullUpdateForContent(c, replay)
                 true
@@ -227,7 +227,7 @@ class ControlsComparator(
     def setupController = {
 
       implicit val controller = new ElementHandlerController
- 
+
       import XHTMLOutput.register
 
       XHTMLBodyHandler.registerHandlers(controller, document)
@@ -288,7 +288,12 @@ class ControlsComparator(
     }
 
     // Setup everything and replay
-    withElement("xxf", XXFORMS_NAMESPACE_URI, "inner-html", List("id" → namespaceId(document, control.effectiveId))) {
+    withElement(
+      "inner-html",
+      prefix = "xxf",
+      uri    = XXFORMS_NAMESPACE_URI,
+      atts   = List("id" → namespaceId(document, control.effectiveId))
+    ) {
       val controller = setupController
       setupOutputPipeline(controller)
 
@@ -313,8 +318,11 @@ class ControlsComparator(
 
       val (templateId, parentIndexes) = repeatDetails(control.effectiveId)
 
-      element("xxf", XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-        List(
+      element(
+        "delete-repeat-elements",
+        prefix = "xxf",
+        uri    = XXFORMS_NAMESPACE_URI,
+        atts   = List(
           "id"             → namespaceId(document, templateId),
           "parent-indexes" → parentIndexes,
           "count"          → count.toString
@@ -332,8 +340,11 @@ class ControlsComparator(
 
       val (_, parentIndexes) = repeatDetails(control.effectiveId)
 
-      element("xxf", XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-        List(
+      element(
+        "copy-repeat-template",
+        prefix = "xxf",
+        uri    = XXFORMS_NAMESPACE_URI,
+        atts   = List(
           "id"             → namespaceId(document, control.prefixedId), // templates are global
           "parent-indexes" → parentIndexes,
           "start-suffix"   → startSuffix.toString,

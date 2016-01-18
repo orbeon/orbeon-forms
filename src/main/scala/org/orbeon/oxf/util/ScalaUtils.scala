@@ -249,6 +249,7 @@ object ScalaUtils extends PathOps {
     }
 
   implicit class TraversableLikeOps[A, Repr](val t: TraversableLike[A, Repr]) extends AnyVal {
+
     def groupByKeepOrder[K](f: A ⇒ K)(implicit cbf: CanBuildFrom[Nothing, A, Repr]): List[(K, Repr)] = {
       val m = mutable.LinkedHashMap.empty[K, mutable.Builder[A, Repr]]
       for (elem ← t) {
@@ -261,6 +262,21 @@ object ScalaUtils extends PathOps {
         b += ((k, v.result()))
 
       b.result()
+    }
+
+    def keepDistinctBy[K, U](key: A ⇒ K, by: A ⇒ U): List[U] = {
+      val result = mutable.ListBuffer[U]()
+      val seen   = mutable.Set[K]()
+
+      for (x ← t) {
+        val k = key(x)
+        if (! seen(k)) {
+          result += by(x)
+          seen += k
+        }
+      }
+
+      result.to[List]
     }
   }
 

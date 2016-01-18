@@ -44,10 +44,11 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
       containingDocument.getControlByEffectiveId(effectiveId) match {
         case control: XXFormsDynamicControl ⇒
           // Output new scripts upon update if any
+          // NOTE: Not implemented as of 2016-01-18.
           if (! containingDocument.isInitializing && control.newScripts.nonEmpty) {
             implicit val helper = new XMLReceiverHelper(contentHandler)
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-            XHTMLHeadHandler.outputScripts(control.newScripts map (script ⇒ script.clientName → script.body))
+            XHTMLHeadHandler.outputScripts(control.newScripts)
             helper.endElement()
             control.clearNewScripts()
           }
@@ -73,7 +74,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
   def processShadowTree(controller: ElementHandlerController, shadowTree: SAXStore): Unit = {
     controller.startBody()
 
-    // Replay content of body   
+    // Replay content of body
     shadowTree.replay(new ForwardingXMLReceiver(controller) {
 
       setForward(false)

@@ -22,7 +22,6 @@ import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.webapp.SessionExpiredException;
-import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -687,9 +686,9 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output scripts
                 {
-                    final List<XFormsContainingDocument.Script> scripts = containingDocument.getScriptsToRun();
+                    final List<ScriptInvocation> scripts = containingDocument.getScriptsToRun();
                     if (scripts.size() > 0) {
-                        outputScriptsInfo(ch, containingDocument, scripts);
+                        XFormsServerBase.outputScriptInvocations(containingDocument, scripts, ch.getXmlReceiver());
                     }
                 }
 
@@ -819,17 +818,6 @@ public class XFormsServer extends ProcessorImpl {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
                         new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new", "show-progress", load.isShowProgress() ? null : "false" });
             }
-        }
-    }
-
-    public static void outputScriptsInfo(XMLReceiverHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Script> scripts) {
-        for (XFormsContainingDocument.Script script: scripts) {
-            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
-                    new String[]{
-                            "name", script.functionName,
-                            "target-id", XFormsUtils.namespaceId(containingDocument, script.targetEffectiveId),
-                            "observer-id", XFormsUtils.namespaceId(containingDocument, script.observerEffectiveId)
-                    });
         }
     }
 

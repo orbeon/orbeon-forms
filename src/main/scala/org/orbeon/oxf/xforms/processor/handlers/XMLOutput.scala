@@ -54,7 +54,7 @@ object XMLOutput extends XMLReceiverSupport {
 
   def writeTextOrHTML(name: String, value: String, html: Boolean)(implicit xmlReceiver: XMLReceiver): Unit =
     if (html)
-      withElement(name, List("html" → true.toString)) {
+      withElement(name, atts = List("html" → true.toString)) {
         XFormsUtils.streamHTMLFragment(xmlReceiver, value, null, "")
       }
     else
@@ -86,7 +86,7 @@ object XMLOutput extends XMLReceiverSupport {
       implicit val _xmlReceiver = xmlReceiver
       element(
         "mips",
-        List(
+        atts = List(
           "readonly" → c.isReadonly.toString,
           "required" → c.isRequired.toString,
           "valid"    → c.isValid.toString
@@ -124,7 +124,7 @@ object XMLOutput extends XMLReceiverSupport {
         c.getItemset.allItemsIterator foreach {
           case item @ Item(_, _, _, value, atts) ⇒
             val attsList = atts map { case (k, v) ⇒ k.uriQualifiedName → v }
-            withElement("item", List("value" → value) ++ attsList) {
+            withElement("item", atts = List("value" → value) ++ attsList) {
               item.iterateLHHA foreach { case (name, lhha) ⇒
                 writeTextOrHTML(name, lhha.label, lhha.isHTML)
               }
@@ -141,13 +141,13 @@ object XMLOutput extends XMLReceiverSupport {
   def matchRepeat(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
     case c: XFormsRepeatControl if c.isRelevant ⇒
       implicit val _xmlReceiver = xmlReceiver
-      element("repeat", List("index" → c.getIndex.toString))
+      element("repeat", atts = List("index" → c.getIndex.toString))
   }
 
   def matchSwitchCase(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
     case c: XFormsSwitchControl if c.isRelevant ⇒
       implicit val _xmlReceiver = xmlReceiver
-      element("switch", List("selected" → (c.selectedCase map (_.getId) orNull)))
+      element("switch", atts = List("selected" → (c.selectedCase map (_.getId) orNull)))
   }
 
   def matchFileMetadata(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
@@ -157,7 +157,7 @@ object XMLOutput extends XMLReceiverSupport {
       val properties = c.iterateProperties collect { case (k, Some(v)) ⇒ k → v } toList
 
       if (properties.nonEmpty)
-        element("file-metadata", properties)
+        element("file-metadata", atts = properties)
   }
 
   def matchDialog(c: XFormsControl, xmlReceiver: XMLReceiver): Unit = c collect {
@@ -205,7 +205,7 @@ object XMLOutput extends XMLReceiverSupport {
           case (name, value) if name.getNamespaceURI == "" ⇒ name.getName → value
         }
 
-      withElement("control", baseAttributes ++ mediatypeAttribute ++ extensionAttributes) {
+      withElement("control", atts = baseAttributes ++ mediatypeAttribute ++ extensionAttributes) {
         Matchers foreach (_.apply(c, xmlReceiver))
       }
   }

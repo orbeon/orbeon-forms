@@ -33,7 +33,6 @@ import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XINCLUDE_URI}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
-import scala.StringBuilder
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
@@ -256,12 +255,12 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // combine all static and dynamic properties
     val clientProperties = staticProperties ++ dynamicProperties
 
-    if (clientProperties nonEmpty) {
+    if (clientProperties.nonEmpty) {
 
       val sb = new StringBuilder
 
       for ((propertyName, propertyValue) ← clientProperties) {
-        if (sb isEmpty) {
+        if (sb.isEmpty) {
           // First iteration
           sb append "var opsXFormsProperties = {"
           helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
@@ -293,7 +292,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     val uniqueClientScripts = containingDocument.getStaticOps.uniqueClientScripts
 
     val errorsToShow      = containingDocument.getServerErrors.asScala
-    val scriptsToRun      = containingDocument.getScriptsToRun.asScala
+    val scriptInvocations      = containingDocument.getScriptsToRun.asScala
     val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
     val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
 
@@ -321,7 +320,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
     val mustRunAnyScripts =
       errorsToShow.nonEmpty       ||
-      scriptsToRun.nonEmpty       ||
+      scriptInvocations.nonEmpty       ||
       focusElementIdOpt.isDefined ||
       messagesToRun.nonEmpty      ||
       dialogsToOpen.nonEmpty      ||
@@ -339,12 +338,18 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         // NOTE: The order of xxf:script vs. javascript: loads should be preserved. It is not currently.
 
         // Initial xxf:script executions if present
-        for (script ← scriptsToRun) {
-          val name     = script.functionName
+        for (script ← scriptInvocations) {
+          val name     = script.script.shared.clientName
           val target   = namespaceId(containingDocument, script.targetEffectiveId)
           val observer = namespaceId(containingDocument, script.observerEffectiveId)
 
-          sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer");"""
+          val paramsString =
+          if (script.paramValues.nonEmpty)
+            script.paramValues map ('"' + escapeJavaScript(_) + '"') mkString (",", ",", "")
+          else
+            ""
+
+          sb append s"""ORBEON.xforms.server.Server.callUserScript("$name","$target","$observer"$paramsString);"""
         }
 
         // javascript: loads
@@ -542,10 +547,17 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
 object XHTMLHeadHandler {
 
-  def outputScripts(scripts: Iterable[(String, String)])(implicit helper: XMLReceiverHelper) =
-    for ((clientName, body) ← scripts) {
-      helper.text("\nfunction " + clientName + "(event) {\n")
-      helper.text(body)
+  def outputScripts(shareableScripts: Iterable[ShareableScript])(implicit helper: XMLReceiverHelper) =
+    for (shareableScript ← shareableScripts) {
+
+      val paramsString =
+        if (shareableScript.paramNames.nonEmpty)
+          shareableScript.paramNames mkString (",", ",", "")
+        else
+          ""
+
+      helper.text(s"\nfunction ${shareableScript.clientName}(event$paramsString) {\n")
+      helper.text(shareableScript.body)
       helper.text("}\n")
     }
 

@@ -29,10 +29,14 @@ trait XMLReceiverSupport {
     result
   }
 
-  def withElement[T](localName: String, atts: Seq[(String, String)] = Nil)(body: ⇒ T)(implicit receiver: XMLReceiver): T =
-    withElement(prefix = "", uri = "", localName, atts)(body)
-
-  def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes)(body: ⇒ T)(implicit receiver: XMLReceiver): T = {
+  def withElement[T](
+    localName : String,
+    prefix    : String = "",
+    uri       : String = "",
+    atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES)(
+    body      : ⇒ T)(implicit
+    receiver  : XMLReceiver
+  ): T = {
     val qName = XMLUtils.buildQName(prefix, localName)
     receiver.startElement(uri, localName, qName, atts)
     val result = body
@@ -40,9 +44,17 @@ trait XMLReceiverSupport {
     result
   }
 
-  def element(localName: String, atts: Seq[(String, String)] = Nil, text: String = "")(implicit receiver: XMLReceiver) =
-    withElement(prefix = "", uri = "", localName, atts) {
-      support.text(text)
+  def element(
+    localName : String,
+    prefix    : String = "",
+    uri       : String = "",
+    atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES,
+    text      : String = "")(implicit
+    receiver  : XMLReceiver
+  ): Unit =
+    withElement(localName, prefix, uri, atts) {
+      if (text.nonEmpty)
+        support.text(text)
     }
 
   def text(text: String)(implicit receiver: XMLReceiver) =
@@ -50,9 +62,6 @@ trait XMLReceiverSupport {
       val chars = text.toCharArray
       receiver.characters(chars, 0, chars.length)
     }
-
-  def element(prefix: String, uri: String, localName: String, atts: Attributes)(implicit receiver: XMLReceiver) =
-    withElement(prefix, uri, localName, atts) {}
 
   def addAttributes(attributesImpl: AttributesImpl, atts: Seq[(String, String)]): Unit =
     atts foreach {

@@ -193,7 +193,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
         // Output static read-only value
         if (isRelevantControl) {
           val atts = List("class" → "xforms-field")
-          withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", atts) {
+          withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = atts) {
             val outputValue = inputControl.getReadonlyValue
             if (outputValue ne null)
               xmlReceiver.characters(outputValue.toCharArray, 0, outputValue.length)

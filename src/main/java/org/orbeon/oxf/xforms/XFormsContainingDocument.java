@@ -98,7 +98,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     private boolean gotSubmissionRedirect;
     private List<Message> messagesToRun;
     private List<Load> loadsToRun;
-    private List<Script> scriptsToRun;
+    private List<ScriptInvocation> scriptsToRun;
     private String helpEffectiveControlId;
     private List<DelayedEvent> delayedEvents;
     private List<ServerError> serverErrors;
@@ -349,7 +349,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     public boolean isDirtySinceLastRequest() {
         return xformsControls.isDirtySinceLastRequest();
     }
-    
+
     /**
      * Return the static state of this document.
      */
@@ -422,7 +422,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         this.scriptsToRun = null;
         this.helpEffectiveControlId = null;
         this.delayedEvents = null;
-        
+
         this.serverErrors = null;
 
         clearRequestStats();
@@ -629,37 +629,33 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         }
     }
 
-    public void addScriptToRun(org.orbeon.oxf.xforms.Script script, XFormsEvent event, XFormsEventObserver eventObserver) {
+    public void addScriptToRun(StaticScript staticScript, XFormsEvent event, XFormsEventObserver eventObserver, scala.collection.immutable.List<String> paramValues) {
 
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger().logWarning("", "xxf:script will be ignored because two-pass submission started", "script id", script.prefixedId());
+            indentedLogger().logWarning("", "xxf:script will be ignored because two-pass submission started", "script id", staticScript.prefixedId());
             return;
         }
 
         // Warn that scripts won't run in noscript mode (duh)
         if (noscript())
-            indentedLogger().logWarning("noscript", "script won't run in noscript mode", "script id", script.prefixedId());
+            indentedLogger().logWarning("noscript", "script won't run in noscript mode", "script id", staticScript.prefixedId());
 
         if (scriptsToRun == null)
-            scriptsToRun = new ArrayList<Script>();
-        scriptsToRun.add(new Script(script.clientName(), event, eventObserver));
+            scriptsToRun = new ArrayList<ScriptInvocation>();
+
+        scriptsToRun.add(
+            ScriptInvocation.apply(
+                staticScript,
+                event.targetObject().getEffectiveId(),
+                eventObserver.getEffectiveId(),
+                paramValues
+            )
+        );
     }
 
-    public static class Script {
-        public final String functionName;
-        public final String targetEffectiveId;
-        public final String observerEffectiveId;
-
-        public Script(String functionName, XFormsEvent event, XFormsEventObserver eventObserver) {
-            this.functionName = functionName;
-            this.targetEffectiveId = event.targetObject().getEffectiveId();
-            this.observerEffectiveId = eventObserver.getEffectiveId();
-        }
-    }
-
-    public List<Script> getScriptsToRun() {
+    public List<ScriptInvocation> getScriptsToRun() {
         if (scriptsToRun != null)
             return scriptsToRun;
         else
@@ -756,7 +752,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             return null;
         }
     }
-    
+
     public void addServerError(ServerError serverError) {
         final int maxErrors = getShowMaxRecoverableErrors();
         if (maxErrors > 0) {
@@ -767,7 +763,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
                 serverErrors.add(serverError);
         }
     }
-    
+
     public List<ServerError> getServerErrors() {
         return serverErrors != null ? serverErrors : Collections.<ServerError>emptyList();
     }

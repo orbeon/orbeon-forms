@@ -64,8 +64,8 @@ trait PartGlobalOps {
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
 
   // Client-side resources
-  def scripts: Map[String, Script]
-  def uniqueClientScripts: Seq[(String, String)]
+  def scripts: Map[String, StaticScript]
+  def uniqueClientScripts: List[ShareableScript]
 
   // Functions derived from getControlAnalysis
   def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))

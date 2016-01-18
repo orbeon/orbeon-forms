@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.event.{XFormsEvents, EventHandlerImpl, EventHandler}
-import org.orbeon.oxf.xforms.script.ServerScript
-import org.orbeon.oxf.xforms.{Script, XFormsConstants}
+import org.orbeon.oxf.xforms.{ShareableScript, StaticScript, XFormsConstants}
+import org.orbeon.oxf.xml.Dom4j
 
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
@@ -27,14 +27,14 @@ trait PartEventHandlerAnalysis {
   private[PartEventHandlerAnalysis] var _keypressHandlers: List[EventHandler] = List()
 
   // Scripts
-  private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, Script] = Map()
+  private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
   def scripts = _scriptsByPrefixedId
-  private[PartEventHandlerAnalysis] var _uniqueClientScripts: Seq[(String, String)] = Seq()
+  private[PartEventHandlerAnalysis] var _uniqueClientScripts: List[ShareableScript] = Nil
   def uniqueClientScripts = _uniqueClientScripts
 
   // Register new event handlers
   def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]): Unit = {
-    
+
     val tuples =
       for {
         handler ← eventHandlers
@@ -61,32 +61,48 @@ trait PartEventHandlerAnalysis {
     // Gather all keypress handlers
     _keypressHandlers ++= eventHandlers filter (_.eventNames(XFormsEvents.KEYPRESS))
 
-    // Gather all scripts in deterministic order
-    def makeScript(eventHandlerImpl: ElementAnalysis) = {
-      val element = eventHandlerImpl.element
-      val isClient = element.attributeValue("runat") != "server"
+    gatherScripts()
+  }
 
-      val make = if (isClient) new Script(_, _, _, _) else new ServerScript(_, _, _, _)
-      make(eventHandlerImpl.prefixedId, isClient, element.attributeValue("type"), element.getStringValue)
+  private def gatherScripts(): Unit = {
+
+    def extractStaticScript(analysis: ElementAnalysis) = {
+
+      val elem     = analysis.element
+      val isClient = elem.attributeValue("runat") != "server"
+
+      if (! isClient)
+        throw new NotImplementedError(s"""`runat="server"` is not supported""")
+
+      val params =
+        Dom4j.elements(elem, "param") map (p ⇒ p.attributeValue("name") → p.attributeValue("value")) // Xxx QName
+
+      val body =
+        if (params.nonEmpty)
+          Dom4j.elements(elem, "body").headOption map (_.getStringValue) getOrElse "" // Xxx QName
+        else
+          elem.getStringValue
+
+      StaticScript(
+        analysis.prefixedId,
+        elem.attributeValue("type"),
+        body,
+        params.to[List]
+      )
     }
 
-    val scriptMappings = {
-      val scriptHandlers = controlTypes.get("script").toSeq flatMap (_.values)
-      scriptHandlers map makeScript
+    val allScriptsInDocOrder = {
+      val scriptHandlers = controlTypes.get("script").to[List] flatMap (_.values)
+      scriptHandlers map extractStaticScript
     }
 
-    // Index scripts by prefixed id
-    _scriptsByPrefixedId ++= scriptMappings map
-      { case script ⇒ script.prefixedId → script }
+    _scriptsByPrefixedId ++=
+      allScriptsInDocOrder map { case script ⇒ script.prefixedId → script }
 
     // Keep only one script body for a given digest
-    val distinctNames = scriptMappings collect
-      { case script if script.isClient ⇒ script.clientName → script.digest } distinct
-
-    val scriptBodiesByDigest = scriptMappings map { case script ⇒ script.digest → script.body } toMap
-
-    _uniqueClientScripts ++= distinctNames map
-      { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) }
+    import org.orbeon.oxf.util.ScalaUtils._
+    _uniqueClientScripts ++=
+      allScriptsInDocOrder.keepDistinctBy(_.shared.digest, _.shared)
   }
 
   // Deregister the given handler
@@ -114,7 +130,7 @@ trait PartEventHandlerAnalysis {
   /**
    * Returns whether there is any event handler registered anywhere in the controls for the given event name.
    */
-  def hasHandlerForEvent(eventName: String): Boolean = hasHandlerForEvent(eventName, true)
+  def hasHandlerForEvent(eventName: String): Boolean = hasHandlerForEvent(eventName, includeAllEvents = true)
 
   /**
    * Whether there is any event handler registered anywhere in the controls for the given event name.

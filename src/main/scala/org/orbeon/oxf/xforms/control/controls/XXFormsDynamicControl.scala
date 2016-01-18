@@ -73,9 +73,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   // New scripts created during an update (not functional as of 2012-04-19)
   // NOTE: This should instead be accumulated at the level of the request.
-  private var _newScripts: Seq[Script] = Seq()
+  private var _newScripts: scala.collection.immutable.Seq[ShareableScript] = Nil
   def newScripts = _newScripts
-  def clearNewScripts() = _newScripts = Seq()
+  def clearNewScripts() = _newScripts = Nil
 
   // TODO: This might blow if the control is non-relevant
   override def bindingContextForChild =

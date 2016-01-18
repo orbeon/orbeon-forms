@@ -374,6 +374,11 @@
                                 <attribute name="name"/>
                                 <attribute name="target-id"/>
                                 <attribute name="observer-id"/>
+                                <zeroOrMore>
+                                    <element name="xxf:param">
+                                        <data type="string"/>
+                                    </element>
+                                </zeroOrMore>
                             </element>
                         </zeroOrMore>
                         <optional>

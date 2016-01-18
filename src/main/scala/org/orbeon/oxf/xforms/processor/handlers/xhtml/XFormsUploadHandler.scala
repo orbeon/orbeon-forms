@@ -45,7 +45,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
     val xhtmlPrefix         = handlerContext.findXHTMLPrefix
 
     // Enclosing xhtml:span
-    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", containerAttributes) {
+    withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
 
       // xhtml:input unless static readonly
       if (! XFormsBaseHandler.isStaticReadonly(control)) {
@@ -71,20 +71,20 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
           (_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
 
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
-        element(xhtmlPrefix, XHTML_NAMESPACE_URI, "input", reusableAttributes)
+        element("input", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
       }
 
       // Nested xhtml:span for xforms-upload-info
       reusableAttributes.clear()
       reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-info")
-      withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", reusableAttributes) {
+      withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
 
         // Metadata
         def outputSpan(name: String, value: XFormsUploadControl ⇒ Option[String]) = {
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-" + name)
 
-          withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "span", reusableAttributes) {
+          withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
             uploadControl flatMap value foreach
               { v ⇒ receiver.characters(v.toCharArray, 0, v.length) }
           }
@@ -100,7 +100,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
         reusableAttributes.addAttribute("", "src",   "src",   XMLReceiverHelper.CDATA, "/ops/images/xforms/remove.gif")
         reusableAttributes.addAttribute("", "alt",   "alt",   XMLReceiverHelper.CDATA, "Remove File")
 
-        element(xhtmlPrefix, XHTML_NAMESPACE_URI, "img", reusableAttributes)
+        element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
       }
     }
   }

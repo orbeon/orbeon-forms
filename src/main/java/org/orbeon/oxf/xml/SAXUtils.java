@@ -27,7 +27,57 @@ import java.util.Set;
 
 public class SAXUtils {
 
-    public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
+    public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl() {
+        @Override
+        public void clear() {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setAttributes(Attributes attributes) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void addAttribute(String s, String s1, String s2, String s3, String s4) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setAttribute(int i, String s, String s1, String s2, String s3, String s4) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void removeAttribute(int i) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setURI(int i, String s) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setLocalName(int i, String s) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setQName(int i, String s) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setType(int i, String s) {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void setValue(int i, String s) {
+            throw new IllegalStateException();
+        }
+    };
 
     private SAXUtils() {}
 

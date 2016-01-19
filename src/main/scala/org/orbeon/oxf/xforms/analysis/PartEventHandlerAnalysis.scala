@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.event.{XFormsEvents, EventHandlerImpl, EventHandler}
-import org.orbeon.oxf.xforms.{ShareableScript, StaticScript, XFormsConstants}
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl, XFormsEvents}
+import org.orbeon.oxf.xforms.{ShareableScript, StaticScript}
 import org.orbeon.oxf.xml.Dom4j
 
 // Part analysis: event handlers information
@@ -75,11 +76,11 @@ trait PartEventHandlerAnalysis {
         throw new NotImplementedError(s"""`runat="server"` is not supported""")
 
       val params =
-        Dom4j.elements(elem, "param") map (p ⇒ p.attributeValue("name") → p.attributeValue("value")) // Xxx QName
+        Dom4j.elements(elem, XXFORMS_PARAM_QNAME) map (p ⇒ p.attributeValue("name") → p.attributeValue("value"))
 
       val body =
         if (params.nonEmpty)
-          Dom4j.elements(elem, "body").headOption map (_.getStringValue) getOrElse "" // Xxx QName
+          Dom4j.elements(elem, XXFORMS_BODY_QNAME).headOption map (_.getStringValue) getOrElse ""
         else
           elem.getStringValue
 
@@ -136,5 +137,5 @@ trait PartEventHandlerAnalysis {
    * Whether there is any event handler registered anywhere in the controls for the given event name.
    */
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean =
-    includeAllEvents && _eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS) || _eventNames.contains(eventName)
+    includeAllEvents && _eventNames.contains(XXFORMS_ALL_EVENTS) || _eventNames.contains(eventName)
 }

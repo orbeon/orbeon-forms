@@ -256,6 +256,9 @@ public class XFormsConstants {
     public static final QName XXFORMS_SERVER_EVENTS_QNAME = new QName("server-events", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_FILES_QNAME = new QName("files", XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_PARAM_QNAME = new QName("param", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_BODY_QNAME  = new QName("body", XXFORMS_NAMESPACE);
+
     public static final QName XFORMS_MODEL_QNAME = new QName("model", XFORMS_NAMESPACE);
     public static final QName XFORMS_INSTANCE_QNAME = new QName("instance", XFORMS_NAMESPACE);
     public static final QName XFORMS_SUBMISSION_QNAME = new QName("submission", XFORMS_NAMESPACE);

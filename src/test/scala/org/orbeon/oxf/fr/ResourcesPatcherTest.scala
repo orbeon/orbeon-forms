@@ -138,7 +138,7 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
             val leftChildren  = left  / *
             val rightChildren = right / *
 
-            val duplicates = findDuplicates(leftChildren map (_.name)) filterNot AllowedDuplicateNames
+            val duplicates = (leftChildren map (_.name)).findDuplicates filterNot AllowedDuplicateNames
 
             assert(
               duplicates.isEmpty,

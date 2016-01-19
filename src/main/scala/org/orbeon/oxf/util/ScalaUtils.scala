@@ -116,19 +116,6 @@ object ScalaUtils extends PathOps {
     result map { case (k, v) ⇒ k → v.result } toList
   }
 
-  // Return duplicate values in the order in which they appear
-  // A duplicate value is returned only once
-  def findDuplicates[T](t: Traversable[T]): List[T] = {
-    val result = mutable.LinkedHashSet[T]()
-    val seen   = mutable.HashSet[T]()
-    for (x ← t) {
-      if (seen(x))
-        result += x
-      else
-        seen += x
-    }
-    result.to[List]
-  }
 
   // If the string is null or empty, return None, otherwise return Some(trimmed value)
   def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
@@ -276,6 +263,20 @@ object ScalaUtils extends PathOps {
         }
       }
 
+      result.to[List]
+    }
+
+    // Return duplicate values in the order in which they appear
+    // A duplicate value is returned only once
+    def findDuplicates: List[A] = {
+      val result = mutable.LinkedHashSet[A]()
+      val seen   = mutable.HashSet[A]()
+      for (x ← t) {
+        if (seen(x))
+          result += x
+        else
+          seen += x
+      }
       result.to[List]
     }
   }

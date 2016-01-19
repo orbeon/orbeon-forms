@@ -149,11 +149,6 @@
                  xml:lang="{{xxf:instance('fr-language-instance')}}">
             <xsl:apply-templates select="@*"/>
 
-            <!-- Scope variable with Form Runner resources -->
-            <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
-            <!-- Scope form resources -->
-            <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
-
             <!-- Title from the current form's metadata -->
             <xf:var
                 name="title-from-metadata"
@@ -303,6 +298,16 @@
             <xf:dispatch ev:event="fr-collapse-all" iterate="{$section-ids-sequence}" name="fr-collapse" targetid="{{.}}"/>
             <xf:dispatch ev:event="fr-expand-all"   iterate="{$section-ids-sequence}" name="fr-expand"   targetid="{{.}}"/>
         </xf:model>
+        <!-- This model handles document persistence -->
+        <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles i18n resources -->
+        <!-- Placed:
+               - After  fr-persistence-model,    as it needs the list of available form languages
+               - Before fr-form-model,           as that model needs the language set.
+               - Before fr-error-summary-model,  as on language change resources need to update
+                                                 before the error summary, which uses the resources,
+                                                 see https://github.com/orbeon/orbeon-forms/issues/2505-->
+        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles global error summary information -->
         <xf:model id="fr-error-summary-model">
             <xf:instance id="fr-error-summary-instance" xxf:expose-xpath-types="true">
@@ -345,12 +350,6 @@
                 <xf:dispatch name="fr-update-lang" targetid="error-summary-control-bottom"/>
             </xf:action>
         </xf:model>
-        <!-- This model handles document persistence -->
-        <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>
-        <!-- This model handles i18n resources -->
-        <!-- NOTE: Place after fr-persistence-model, as it needs the list of available form languages, but before
-             fr-form-model, as that model needs the language set. -->
-        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
 
         <xf:model id="fr-pdf-model">
             <!-- Open PDF for the current form data (dispatch of the event done from pdf-instant-view.xpl) -->
@@ -376,6 +375,15 @@
             <xsl:if test="not(@id)">
                 <xsl:attribute name="id" select="'fr-form-model'"/>
             </xsl:if>
+
+            <!-- Scope variables for resources -->
+            <xf:var
+                name="fr-resources"
+                value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"
+                as="element(resource)?"/>
+            <xf:var name="form-resources"
+                    value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"
+                    as="element(resource)?"/>
 
             <!-- Focus on the first control supporting input on load. Place this before custom model content. Form
                  Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to

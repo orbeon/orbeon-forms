@@ -707,7 +707,7 @@
                                 }}.{{
                                     $button-name
                                 }}">
-                            <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
+                            <xf:label mediatype="text/html" model="fr-form-model" value="$fr-resources/buttons/*[name() = $button-name]"/>
                         </fr:href-button>
 
                     </xf:repeat>

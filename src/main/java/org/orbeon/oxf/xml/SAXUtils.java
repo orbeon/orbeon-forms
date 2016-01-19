@@ -27,55 +27,66 @@ import java.util.Set;
 
 public class SAXUtils {
 
-    public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl() {
+    public static final Attributes EMPTY_ATTRIBUTES = new Attributes() {
+
         @Override
-        public void clear() {
-            throw new IllegalStateException();
+        public int getLength() {
+            return 0;
         }
 
         @Override
-        public void setAttributes(Attributes attributes) {
-            throw new IllegalStateException();
+        public String getURI(int i) {
+            return null;
         }
 
         @Override
-        public void addAttribute(String s, String s1, String s2, String s3, String s4) {
-            throw new IllegalStateException();
+        public String getLocalName(int i) {
+            return null;
         }
 
         @Override
-        public void setAttribute(int i, String s, String s1, String s2, String s3, String s4) {
-            throw new IllegalStateException();
+        public String getQName(int i) {
+            return null;
         }
 
         @Override
-        public void removeAttribute(int i) {
-            throw new IllegalStateException();
+        public String getType(int i) {
+            return null;
         }
 
         @Override
-        public void setURI(int i, String s) {
-            throw new IllegalStateException();
+        public String getValue(int i) {
+            return null;
         }
 
         @Override
-        public void setLocalName(int i, String s) {
-            throw new IllegalStateException();
+        public int getIndex(String s, String s1) {
+            return -1;
         }
 
         @Override
-        public void setQName(int i, String s) {
-            throw new IllegalStateException();
+        public int getIndex(String s) {
+            return -1;
         }
 
         @Override
-        public void setType(int i, String s) {
-            throw new IllegalStateException();
+        public String getType(String s, String s1) {
+            return null;
         }
 
         @Override
-        public void setValue(int i, String s) {
-            throw new IllegalStateException();
+        public String getType(String s) {
+            return null;
+        }
+
+        @Override
+        public String getValue(String s, String s1) {
+            return null;
+        }
+
+        @Override
+        public String getValue(String s) {
+            return null;
         }
     };
 

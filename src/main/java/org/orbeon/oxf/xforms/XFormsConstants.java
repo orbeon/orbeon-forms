@@ -53,8 +53,9 @@ public class XFormsConstants {
         ALLOWED_XXFORMS_ELEMENTS.add("text");
         ALLOWED_XXFORMS_ELEMENTS.add("context");
         ALLOWED_XXFORMS_ELEMENTS.add("size");//xf:upload/xxf:size
-
         ALLOWED_XXFORMS_ELEMENTS.add("dynamic");
+        ALLOWED_XXFORMS_ELEMENTS.add("param");
+        ALLOWED_XXFORMS_ELEMENTS.add("body");
 
         ALLOWED_EXFORMS_ELEMENTS.add("variable");
 

@@ -48,7 +48,13 @@
         var observer = getElement(observerId);
         var event = { "target" : targetElement };
         var theFunction = eval(functionName);
-        theFunction.call(observer, event);
+
+        // Arguments to the function:
+        // - First is always `event`
+        // - After that come custom arguments passed with <xxf:param> in <xxf:script>
+        var args = [event].concat(_.rest(arguments, 3));
+
+        theFunction.apply(observer, args);
     };
 
 })();

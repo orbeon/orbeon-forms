@@ -1976,7 +1976,12 @@
                                 var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
                                 var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
                                 var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
-                                ORBEON.xforms.server.Server.callUserScript(functionName, targetId, observerId);
+                                var paramElements = childrenWithLocalName(scriptElement, "param");
+                                var paramValues = _.map(paramElements, function(paramElement) {
+                                        return $(paramElement).text();
+                                    })
+                                args = [functionName, targetId, observerId].concat(paramValues);
+                                ORBEON.xforms.server.Server.callUserScript.apply(null, args);
                                 break;
                             }
 

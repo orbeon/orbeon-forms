@@ -25,7 +25,7 @@
         <xf:model xxf:ajax.update.full.threshold="1">
             <xf:instance id="instance">
                 <instance>
-                    <code readonly="true"/>
+                    <code readonly="true">initial</code>
                 </instance>
             </xf:instance>
             <xf:instance id="xbl" src="oxf:/forms/orbeon/controls/service/countries.xml"/>
@@ -47,5 +47,6 @@
             <xf:label>Toggle readonly</xf:label>
             <xf:setvalue ev:event="DOMActivate" ref="code/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
         </xf:trigger>
+        <xf:output value="code"/>
     </xh:body>
 </xh:html>

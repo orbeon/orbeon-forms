@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -26,7 +26,6 @@
 
         init: function() {
             var form = ORBEON.xforms.Controls.getForm(this.container);
-            this.textarea = YD.getElementsByClassName("xforms-textarea", null, this.container)[0];
             var inner = YD.getElementsByClassName("xbl-fr-code-mirror-editor-inner", null, this.container)[0];
             this.editor = CodeMirror(inner, {
                 mode: "xml",
@@ -39,7 +38,6 @@
         },
 
         enabled: function() {
-            this.editor.setValue(Document.getValue(this.textarea));
             this.editor.setOption("readOnly", YD.hasClass(this.container, "xforms-readonly") ? 'nocursor' : false);
         },
 
@@ -49,7 +47,11 @@
             this.hasFocus = false;
             if (this.userChangedSinceLastBlur) {
                 YD.addClass(this.container, "xforms-visited");
-                Document.setValue(this.textarea, this.editor.getValue());
+                Document.dispatchEvent({
+                    targetId: this.container.id,
+                    eventName: 'fr-value-changed',
+                    properties: { value: this.editor.getValue() }
+                });
                 this.userChangedSinceLastBlur = false;
             }
         },
@@ -63,14 +65,15 @@
         // https://github.com/orbeon/orbeon-forms/issues/1841
         xformsReadonly: function() { this.editor.setOption("readOnly", 'true'); },
         xformsReadwrite: function() { this.editor.setOption("readOnly", false); },
-        xformsValueChanged: function() {
+        xformsValue: function(uriEncodedSource) {
+            var newSource = decodeURIComponent(uriEncodedSource);
             var doUpdate =
                 // As a shortcut, don't update the control if the user is typing in it
                 ! this.hasFocus &&
                 // Don't update if the new value is the same as the current one, as doing so resets the editor position
-                Document.getValue(this.textarea) != this.editor.getValue();
+                newSource != this.editor.getValue();
             if (doUpdate) {
-                this.editor.setValue(Document.getValue(this.textarea));
+                this.editor.setValue(newSource);
             }
         }
     };

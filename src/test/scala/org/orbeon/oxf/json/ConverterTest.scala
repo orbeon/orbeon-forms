@@ -41,19 +41,19 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
   val XFormsJsonToXml = List[(String, Elem)](
     """ {"given": "Mark", "family": "Smith"} """ →
       <json type="object">
-          <given type="string">Mark</given>
-          <family type="string">Smith</family>
+          <given>Mark</given>
+          <family>Smith</family>
       </json>,
     """ {"name": "Mark", "age": 21} """ →
-      <json type="object"><name type="string">Mark</name><age type="number">21</age></json>,
+      <json type="object"><name>Mark</name><age type="number">21</age></json>,
     """ {"selected": true} """ →
       <json type="object"><selected type="boolean">true</selected></json>,
     """ {"cities": ["Amsterdam", "Paris", "London"]} """ →
       <json type="object">
         <cities type="array">
-          <_ type="string">Amsterdam</_>
-          <_ type="string">Paris</_>
-          <_ type="string">London</_>
+          <_>Amsterdam</_>
+          <_>Paris</_>
+          <_>London</_>
         </cities>
       </json>,
     """ {"load": [0.31, 0.33, 0.32]} """ →
@@ -66,40 +66,42 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
       </json>,
     """ {"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}} """ →
       <json type="object">
-        <father type="object"><given type="string">Mark</given><family type="string">Smith</family></father>
-        <mother type="object"><given type="string">Mary</given><family type="string">Smith</family></mother>
+        <father type="object"><given>Mark</given><family>Smith</family></father>
+        <mother type="object"><given>Mary</given><family>Smith</family></mother>
       </json>,
     """ {"p": null} """ →
       <json type="object"><p type="null"/></json>,
     """ {"p": ""} """ →
-      <json type="object"><p type="string"/></json>,
+      <json type="object"><p/></json>,
     """ {"p": []} """ →
       <json type="object"><p type="array"/></json>,
+    """ {"p": {}} """ →
+      <json type="object"><p type="object"/></json>,
     """ {"$v": 0} """ →
       <json type="object"><_v name="$v" type="number">0</_v></json>,
     """ {"1": "one"} """ →
-      <json type="object"><_1 name="1" type="string">one</_1></json>,
+      <json type="object"><_1 name="1">one</_1></json>,
     """ 3 """ →
       <json type="number">3</json>,
     """ "Disconnected" """ →
-      <json type="string">Disconnected</json>,
+      <json>Disconnected</json>,
     """ ["red", "green", "blue"] """ →
       <json type="array">
-        <_ type="string">red</_>
-        <_ type="string">green</_>
-        <_ type="string">blue</_>
+        <_>red</_>
+        <_>green</_>
+        <_>blue</_>
       </json>,
     """ {"g": [["a", "b", "c"], ["d", "e"]]} """ →
       <json type="object">
         <g type="array">
           <_ type="array">
-            <_ type="string">a</_>
-            <_ type="string">b</_>
-            <_ type="string">c</_>
+            <_>a</_>
+            <_>b</_>
+            <_>c</_>
           </_>
           <_ type="array">
-            <_ type="string">d</_>
-            <_ type="string">e</_>
+            <_>d</_>
+            <_>e</_>
           </_>
         </g>
       </json>,
@@ -108,7 +110,7 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
     """ [] """ →
       <json type="array"/>,
     """ "" """ →
-      <json type="string"/>
+      <json/>
   )
 
   val AdditionalJsonToXml = List[(String, Elem)](
@@ -134,11 +136,11 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
       </json>,
     """ ["red", 42, true, { "foo": "bar"}, []] """ →
       <json type="array">
-        <_ type="string">red</_>
+        <_>red</_>
         <_ type="number">42</_>
         <_ type="boolean">true</_>
         <_ type="object">
-          <foo type="string">bar</foo>
+          <foo>bar</foo>
         </_>
         <_ type="array"/>
       </json>,
@@ -146,7 +148,7 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
       <json type="object">
         <___ name="&lt; &lt;" type="array">
           <_ type="array">
-            <_ type="string">1 2 3</_>
+            <_>1 2 3</_>
           </_>
           <_ type="object">
             <_ type="number">6</_>

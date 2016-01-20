@@ -63,7 +63,7 @@ protected trait JsonToXmlAlgorithm {
     def processValue(jsValue: JsValue): Unit =
       jsValue match {
         case JsString(v) ⇒
-          addAttribute(rcv, Symbols.Type, Symbols.String)
+          // Don't add `type="string"` since it's the default
           text(rcv, escapeString(v))
         case JsNumber(v) ⇒
           addAttribute(rcv, Symbols.Type, Symbols.Number)

@@ -23,7 +23,7 @@
 package org.orbeon.oxf.json
 
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.SaxonUtils.makeNCName
 import spray.json._
 
 import scala.language.postfixOps
@@ -77,7 +77,7 @@ protected trait JsonToXmlAlgorithm {
           addAttribute(rcv, Symbols.Type, Symbols.Object)
           fields foreach { case (name, value) ⇒
 
-            val ncName  = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
+            val ncName  = makeNCName(name, keepFirstIfPossible = true)
             val nameAtt = ncName != name list (Symbols.Name → escapeString(name))
 
             withElement(ncName, nameAtt) {

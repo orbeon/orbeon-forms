@@ -137,6 +137,14 @@
   margin-bottom: .5em;
   border-bottom: 2px solid #ddddee;
 }
+.orbeon input[type=number]::-webkit-inner-spin-button,
+.orbeon input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.orbeon input[type=number] {
+  -moz-appearance: textfield;
+}
 .orbeon .fr-language-choice,
 .orbeon .fr-noscript-choice,
 .orbeon .fr-goto-content,

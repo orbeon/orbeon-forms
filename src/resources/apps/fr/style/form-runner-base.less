@@ -165,6 +165,16 @@
         border-bottom: 2px solid @frBorderColor;
     }
 
+    // We don't like the "spinners" to increment/decrement numbers
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
     // ***** General Layout ********************************************************************************************
 
     // Language and mode selectors

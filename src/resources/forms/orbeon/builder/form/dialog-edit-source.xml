@@ -25,7 +25,8 @@
 
       id="fb-source-editor-dialog" level="modal" close="true" draggable="true" model="fb-source-editor-model" class="xxforms-set-height">
 
-    <xf:label ref="$form-resources/dialog-edit-source/label"/>
+    <xf:label model="fr-form-model" ref="$form-resources/dialog-edit-source/label"/>
+    <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xh:div class="fb-dialog-remaining-height">
         <fr:code-mirror ref="source">
@@ -71,7 +72,6 @@
         <xf:instance id="fb-source-editor-instance">
             <source-editor>
                 <source/>
-                <save-trigger/>
             </source-editor>
         </xf:instance>
 

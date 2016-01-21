@@ -25,7 +25,8 @@
 
       id="fb-pdf-upload-dialog" level="modal" close="true" draggable="true" model="fb-pdf-upload-model">
 
-    <xf:label ref="$form-resources/dialog-upload-pdf/label"/>
+    <xf:label model="fr-form-model" ref="$form-resources/dialog-upload-pdf/label"/>
+    <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xh:div>
         <xh:div class="fr-dialog-message">

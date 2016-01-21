@@ -24,7 +24,8 @@
 
       id="fb-service-dialog" level="modal" close="true" draggable="true" model="fb-service-model">
 
-    <xf:label ref="$form-resources/dialog-http-services/label"/>
+    <xf:label model="fr-form-model" ref="$form-resources/dialog-http-services/label"/>
+    <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xf:var name="instance" value="instance('fb-submission-editor-instance')"/>
     <xh:div class="fr-grid">

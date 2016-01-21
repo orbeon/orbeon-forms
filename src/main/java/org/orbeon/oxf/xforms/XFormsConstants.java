@@ -216,6 +216,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_TITLE_QNAME = new QName("title", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ALT_QNAME = new QName("alt", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MAXLENGTH_QNAME = new QName("maxlength", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_PATTERN_QNAME = new QName("pattern", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_COLS_QNAME = new QName("cols", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ROWS_QNAME = new QName("rows", XXFORMS_NAMESPACE);

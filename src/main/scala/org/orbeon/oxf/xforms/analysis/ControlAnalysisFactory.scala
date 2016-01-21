@@ -33,8 +33,15 @@ object ControlAnalysisFactory {
 
   private val TriggerExternalEvents = Set(XFORMS_FOCUS, XXFORMS_BLUR, XFORMS_HELP, DOM_ACTIVATE, XXFORMS_VALUE_OR_ACTIVATE)
   private val ValueExternalEvents   = TriggerExternalEvents + XXFORMS_VALUE
+
   // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
-  private val UploadExternalEvents  = Set(XFORMS_SELECT, XXFORMS_UPLOAD_START, XXFORMS_UPLOAD_PROGRESS, XXFORMS_UPLOAD_CANCEL, XXFORMS_UPLOAD_ERROR)
+  private val UploadExternalEvents  = Set(
+    XFORMS_SELECT,
+    XXFORMS_UPLOAD_START,
+    XXFORMS_UPLOAD_PROGRESS,
+    XXFORMS_UPLOAD_CANCEL,
+    XXFORMS_UPLOAD_ERROR
+  )
 
   abstract class ValueControl(
     staticStateContext : StaticStateContext,
@@ -125,7 +132,11 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
-    override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
+    override protected val allowedExtensionAttributes = Set(
+      XXFORMS_SIZE_QNAME,
+      XXFORMS_MAXLENGTH_QNAME,
+      XXFORMS_AUTOCOMPLETE_QNAME
+    )
   }
 
   class TextareaControl(
@@ -135,7 +146,11 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
-    override protected val allowedExtensionAttributes = Set(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
+    override protected val allowedExtensionAttributes = Set(
+      XXFORMS_MAXLENGTH_QNAME,
+      XXFORMS_COLS_QNAME,
+      XXFORMS_ROWS_QNAME
+    )
   }
 
   class SwitchControl(

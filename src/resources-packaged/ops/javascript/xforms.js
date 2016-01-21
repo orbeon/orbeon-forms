@@ -4304,8 +4304,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          * @return {void}
          */
         remove: function (id) {
-            this._idToControl[id] = null;
-            this._idToValue[id] = null;
+            delete this._idToControl[id];
         },
 
         /**
@@ -4314,12 +4313,16 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          * @return {void}
          */
         purgeExpired: function () {
-            _.each(_.keys(this._idToControl), function (id) {
+            _.each(_.keys(this._idToControl), _.bind(function (id) {
                 if (!YAHOO.util.Dom.inDocument(this._idToControl[id]))
                     this.remove(id);
-            })
+            }, this));
         }
     };
+
+    ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
+        ORBEON.xforms.ServerValueStore.purgeExpired();
+    });
 
     YAHOO.util.DDM.mode = YAHOO.util.DDM.INTERSECT;
     // Commented so text doesn't get selected as we D&D on the page. But this causes an issue as we can't select

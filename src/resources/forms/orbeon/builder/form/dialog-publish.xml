@@ -22,7 +22,8 @@
 
       id="fb-publish-dialog" level="modal" close="true" draggable="true" model="fb-publish-model" class="fb-publish-dialog">
 
-    <xf:label ref="$form-resources/dialog-publish/label"/>
+    <xf:label model="fr-form-model" ref="$form-resources/dialog-publish/label"/>
+    <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xf:action event="xxforms-dialog-open">
         <xf:setvalue ref="instance()/app"                   value="event('app')"/>

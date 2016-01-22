@@ -354,7 +354,7 @@
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->
                 <xh:a class="fr-goto-content" href="#{{if (counts/@error gt 0) then 'fr-errors' else 'fr-form'}}">
-                    <xf:output value="$fr-resources/summary/labels/goto-content"/>
+                    <xf:output model="fr-form-model" value="$fr-resources/summary/labels/goto-content"/>
                 </xh:a>
             </xf:group>
         </xf:group>
@@ -553,11 +553,11 @@
             </xf:group>
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert = 0]" class="fr-validity-icon">
                 <!-- Form has no error or warning messages -->
-                <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
+                <xf:group model="fr-form-model"><xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/></xf:group>
             </xf:group>
             <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
                 <!-- Data is dirty -->
-                <xh:i class="icon-hdd" title="{{$fr-resources/errors/unsaved}}"/>
+                <xf:group model="fr-form-model"><xh:i class="icon-hdd" title="{{$fr-resources/errors/unsaved}}"/></xf:group>
             </xf:group>
         </xf:group>
     </xsl:template>

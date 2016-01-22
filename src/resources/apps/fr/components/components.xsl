@@ -172,6 +172,7 @@
             <!-- Form title based on metadata or HTML title -->
             <xf:var
                 name="title"
+                model="fr-form-model"
                 value="string(($title-from-metadata, $title-from-output, '{replace(xh:head/xh:title, '''', '''''')}', $fr-resources/untitled-form)[normalize-space()][1])"/>
 
             <xsl:apply-templates select="node()"/>
@@ -189,6 +190,7 @@
 
                 <!-- Display localized errors count and form title -->
                 <xf:output
+                    model="fr-form-model"
                     value="xxf:format-message(
                                $fr-resources/errors/form-title,
                                (

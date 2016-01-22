@@ -22,7 +22,8 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         id="fr-submission-result-dialog" level="modal" close="false" draggable="true" class="fr-dialog fr-submission-result-dialog" model="fr-submission-result-model">
 
-    <xf:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
+    <xf:label model="fr-form-model" ref="$fr-resources/detail/messages/submit-dialog-title"/>
+    <xf:var   model="fr-form-model" name="fr-resources" value="$fr-resources"/>
 
     <xh:div>
         <xf:var

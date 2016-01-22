@@ -9,13 +9,6 @@
 .orbeon .xbl-fr-repeater .fr-repeat-content {
   padding-left: 26px;
 }
-.orbeon .xbl-fr-repeater .fr-repeat-content > .xbl-fr-section > div > h2 > .fr-section-label {
-  padding-left: 0;
-  background-image: none;
-}
-.orbeon .xbl-fr-repeater .fr-repeat-content > .xbl-fr-section > div > div > .fr-section-content {
-  padding-left: 0;
-}
 .orbeon .xbl-fr-repeater.xforms-repeater-appearance-minimal .fr-repeat-content {
   padding-left: 16px;
 }

@@ -146,6 +146,7 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.*.*"                                value="true"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-tiff.*.*"                               value="false"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-xml.*.*"                                value="true"/>
+    <property as="xs:string"  name="oxf.fr.email.attach-files.*.*"                              value="all"/>
 
     <!-- Configuration of built-in forms -->
     <!-- Be specific, as user might change the default persistence layer -->

@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
@@ -22,24 +23,24 @@ trait FormRunnerEmail {
 
   // Given a form body and instance data:
   //
-  // - find all controls with the given class name
+  // - find all controls with the given conjunction of class names
   // - for each control, find the associated bind
   // - return all data holders in the instance data to which the bind would apply
   //
   // The use case is, for example, to find all data holders pointed to by controls with the class
-  // `fr-email-recipient`.
+  // `fr-email-recipient` and, optionally, `fr-email-attachment`.
   //
   //@XPathFunction
   def searchHoldersForClassTopLevelOnly(
-    body      : NodeInfo,
-    data      : NodeInfo,
-    className : String
+    body       : NodeInfo,
+    data       : NodeInfo,
+    classNames : String
   ): SequenceIterator =
     searchHolderInDoc(
       controls    = body descendant * filter IsControl,
       inDoc       = body,
       contextItem = data.rootElement,
-      className   = className
+      classNames  = classNames
     )
 
   // Given a form head, form body and instance data:
@@ -48,19 +49,19 @@ trait FormRunnerEmail {
   // - for each section
   //   - determine the associated data holder in instance data
   //   - find the inline binding associated with the section template
-  //   - find all controls with the given class name in the section template
+  //   - find all controls with the given conjunction of class names in the section template
   //   - for each control, find the associated bind in the section template
   //   - return all data holders in the instance data to which the bind would apply
   //
   // The use case is, for example, to find all data holders pointed to by controls with the class
-  // `fr-email-recipient` which appear within section templates.
+  // `fr-email-recipient` and, optionally, `fr-email-attachment`, which appear within section templates.
   //
   //@XPathFunction
   def searchHoldersForClassUseSectionTemplates(
-    head      : NodeInfo,
-    body      : NodeInfo,
-    data      : NodeInfo,
-    className : String
+    head       : NodeInfo,
+    body       : NodeInfo,
+    data       : NodeInfo,
+    classNames : String
   ): SequenceIterator =
     for {
       section       ← findSectionsWithTemplates(body)
@@ -71,7 +72,7 @@ trait FormRunnerEmail {
         controls    = binding.rootElement / XBLTemplateTest descendant * filter IsControl,
         inDoc       = binding,
         contextItem = sectionHolder,
-        className   = className
+        classNames  = classNames
       )
     } yield
       holder
@@ -80,16 +81,21 @@ trait FormRunnerEmail {
     controls    : Seq[NodeInfo],
     inDoc       : NodeInfo,
     contextItem : NodeInfo,
-    className   : String
-  ): Seq[NodeInfo] =
+    classNames  : String
+  ): Seq[NodeInfo] = {
+
+    val classNamesList = ScalaUtils.split[List](classNames)
+
     for {
-      control       ← controls
-      if control.attClasses(className)
-      bindId        ← control /@ "bind" map (_.stringValue)
-      bindName      ← controlNameFromIdOpt(bindId).toList
-      holder        ← findDataHoldersInDocument(inDoc, bindName, contextItem)
+      control        ← controls
+      controlClasses = control.attClasses
+      if classNamesList forall controlClasses.contains
+      bindId         ← control /@ "bind" map (_.stringValue)
+      bindName       ← controlNameFromIdOpt(bindId).toList
+      holder         ← findDataHoldersInDocument(inDoc, bindName, contextItem)
     } yield
       holder
+  }
 
   private def bindingForSection(head: NodeInfo, section: NodeInfo) = {
     val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)

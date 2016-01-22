@@ -89,21 +89,49 @@
                 <xsl:variable name="data"  select="/*"                   as="element()"/>
                 <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xh:html)"/>
 
-                <xsl:variable
-                    name="attachment-holders"
-                    as="element()*"
-                    select="
-                        frf:searchHoldersForClassTopLevelOnly($xhtml/xh:body, $data, 'fr-attachment'),
-                        frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-attachment')
-                    "
-                />
+                <!-- App and form -->
+                <xsl:variable name="app"  select="doc('input:parameters')/*/app"  as="xs:string"/>
+                <xsl:variable name="form" select="doc('input:parameters')/*/form" as="xs:string"/>
 
-                <xsl:for-each select="$attachment-holders[normalize-space() != '']">
-                    <attachment filename="{@filename}" mediatype="{@mediatype}">
-                        <!-- URL may be absolute or already point to persistence layer -->
-                        <xsl:value-of select="p:rewrite-service-uri(normalize-space(), true())"/>
-                    </attachment>
-                </xsl:for-each>
+                <xsl:variable
+                    name="attach-files"
+                    select="(p:property(string-join(('oxf.fr.email.attach-files', $app, $form), '.')), 'all')[1]"
+                    as="xs:string"/>
+
+                <xsl:if test="$attach-files != 'none'">
+
+                    <xsl:variable
+                        name="search-classes"
+                        select="
+                            string-join(
+                                (
+                                    'fr-attachment',
+                                    if ($attach-files = 'selected') then
+                                        'fr-email-attachment'
+                                    else
+                                        ()
+                                ),
+                                ' '
+                            )"
+                        as="xs:string"/>
+
+                    <xsl:variable
+                        name="attachment-holders"
+                        as="element()*"
+                        select="
+                            frf:searchHoldersForClassTopLevelOnly($xhtml/xh:body, $data, $search-classes),
+                            frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, $search-classes)
+                        "
+                    />
+
+                    <xsl:for-each select="$attachment-holders[normalize-space() != '']">
+                        <attachment filename="{@filename}" mediatype="{@mediatype}">
+                            <!-- URL may be absolute or already point to persistence layer -->
+                            <xsl:value-of select="p:rewrite-service-uri(normalize-space(), true())"/>
+                        </attachment>
+                    </xsl:for-each>
+
+                </xsl:if>
             </attachments>
         </p:input>
         <p:output name="data" id="attachments"/>

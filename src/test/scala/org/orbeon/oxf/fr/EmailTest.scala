@@ -44,9 +44,10 @@ class EmailTest extends DocumentTestBase with AssertionsForJUnit {
     locally {
 
       val expectedForClassName = List(
-        "fr-email-recipient" → List("info+toplevel@orbeon.com"),
-        "fr-email-subject"   → List(),
-        "fr-attachment"      → List("attachment-13.bin", "attachment-14.bin")
+        "fr-email-recipient"                → List("info+toplevel@orbeon.com"),
+        "fr-email-subject"                  → List(),
+        "fr-attachment"                     → List("attachment-13.bin", "attachment-14.bin"),
+        "fr-attachment fr-email-attachment" → List("attachment-14.bin")
       )
 
       def valuesForClassName(className: String) =
@@ -65,9 +66,10 @@ class EmailTest extends DocumentTestBase with AssertionsForJUnit {
     locally {
 
       val expectedForClassName = List(
-        "fr-email-recipient" → List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"),
-        "fr-email-subject"   → List("Abc", "Def", "Ghi"),
-        "fr-attachment"      → List("attachment-10.bin", "attachment-11.bin")
+        "fr-email-recipient"                → List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"),
+        "fr-email-subject"                  → List("Abc", "Def", "Ghi"),
+        "fr-attachment"                     → List("attachment-10.bin", "attachment-11.bin"),
+        "fr-attachment fr-email-attachment" → List("attachment-11.bin")
       )
 
       def valuesForClassName(className: String) =

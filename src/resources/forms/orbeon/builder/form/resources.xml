@@ -292,6 +292,10 @@
                     <label>Show in Email Subject</label>
                     <value>fr-email-subject</value>
                 </item>
+                <item>
+                    <label>Include as Email Attachment</label>
+                    <value>fr-email-attachment</value>
+                </item>
             </options>
             <control-appearance>
                 <label>Control Appearance</label>
@@ -1181,6 +1185,10 @@
                 <item>
                     <label>Utiliser comme sujet d'email</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Inclure à l'email comme fichier joint</label>
+                    <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>
@@ -2074,6 +2082,10 @@
                     <label>Vis i epostemne</label>
                     <value>fr-email-subject</value>
                 </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
+                </item>
             </options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -2965,6 +2977,10 @@
                 <item>
                     <label>Показывать в теме письма</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>
@@ -3858,6 +3874,10 @@
                     <label>Mostra in oggetto</label>
                     <value>fr-email-subject</value>
                 </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
+                </item>
             </options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -4741,6 +4761,10 @@
                 <item>
                     <label>In E-Mail-Betreff anzeigen</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>
@@ -5629,6 +5653,10 @@
                     <label>Näytä sähköpostin aiheena</label>
                     <value>fr-email-subject</value>
                 </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
+                </item>
             </options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -6513,6 +6541,10 @@
                 <item>
                     <label>Mostrar en Asunto del EMail</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>
@@ -7406,6 +7438,10 @@
                     <label>Mostrar no assunto do email</label>
                     <value>fr-email-subject</value>
                 </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
+                </item>
             </options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
@@ -8296,6 +8332,10 @@
                 <item>
                     <label>Visa i ärenderaden för mejl</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label todo="true">[Include as Email Attachment]</label>
+                    <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>

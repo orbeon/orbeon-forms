@@ -242,7 +242,7 @@
                         <xxf:control id="my-tabview≡output3">42</xxf:control>
                         <xxf:control id="my-tabview≡output4">42</xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
+                    <xxf:script name="xf_723b3546dedd73c5a9253d34adce2089f0bcea93" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -325,7 +325,7 @@
                         <xxf:control id="my-tabview≡xf-46">My label 7</xxf:control>
                         <xxf:control id="my-tabview≡fr-tabview-content" class="yui-content"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
+                    <xxf:script name="xf_723b3546dedd73c5a9253d34adce2089f0bcea93" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -585,7 +585,7 @@
                         <xxf:control id="my-currency≡xf-42" relevant="false"/>
                         <xxf:control id="my-currency≡xf-43" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_01d33a0f45056a1c82a2217322761ac96dcf3673" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
+                    <xxf:script name="xf_efdc0056b6438f9c969545432feab52728756c34" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>
@@ -644,7 +644,7 @@
                         <xxf:control id="my-autocomplete≡external-value" class="fr-autocomplete-external-value">One</xxf:control>
                         <xxf:attribute for="my-autocomplete≡external-value" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:script name="xf_586bd855f1f823eb047ce1f64fc89bcd15e36a85" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
+                    <xxf:script name="xf_d4f6ea393e77ed5e81903deb659f91bb70adae1a" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
                     <xxf:focus control-id="my-autocomplete≡search"/>
                 </xxf:action>
             </xxf:event-response>

@@ -30,7 +30,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, ListenersTrait}
 import Dispatch.EventListener
 import org.orbeon.saxon.om._
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.{SaxonUtils, NamespaceMapping}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 
@@ -159,19 +159,19 @@ object InstanceMirror {
     (_, outerNode, siblingIndexOpt) ⇒
 
       findOuterInstanceDetails(container, outerNode, siblingIndexOpt.isEmpty) flatMap {
-        case InstanceDetails(instanceId, referenceNode, namespaces) ⇒
+        case InstanceDetails(instanceId, referenceNode, _) ⇒
           // This is a change to an instance
 
           // Find path rooted at wrapper
           val innerPath = {
-            val pathToWrapper   = Navigator.getPath(referenceNode)
+            val pathToWrapper   = SaxonUtils.buildNodePathHandleNamespaces(referenceNode)
             val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
 
             assert(pathToOuterNode.startsWith(pathToWrapper))
 
             if (pathToWrapper == "/")
               Seq("", "*") ++ (pathToOuterNode split '/' drop 2) mkString "/"
-            else  if (pathToOuterNode.size > pathToWrapper.size)
+            else if (pathToOuterNode.size > pathToWrapper.size)
               Seq("", "*") ++ (pathToOuterNode.substring(pathToWrapper.size) split '/' drop 2) mkString "/"
             else
               "/"
@@ -181,7 +181,7 @@ object InstanceMirror {
           container.findInstance(instanceId) match {
             case Some(innerInstance) ⇒
               // Find destination path in instance
-              evalOne(innerInstance.documentInfo, innerPath, namespaces) match {
+              evalOne(innerInstance.documentInfo, innerPath, NamespaceMapping.EMPTY_MAPPING) match {
                 case newNode: VirtualNode ⇒ Some(innerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
               }
@@ -196,17 +196,18 @@ object InstanceMirror {
   private def getNodePath(node: NodeInfo, siblingIndexOpt: Option[Int]) = {
     siblingIndexOpt match {
       case Some(siblingIndex) if node.getNodeKind != ATTRIBUTE_NODE ⇒
-        Navigator.getPath(node.getParent) + s"/node()[${siblingIndex + 1}]"
+        SaxonUtils.buildNodePathHandleNamespaces(node.getParent) + s"/node()[${siblingIndex + 1}]"
       case _ ⇒
-        Navigator.getPath(node)
+        SaxonUtils.buildNodePathHandleNamespaces(node)
     }
   }
 
   // Find the outer node in an inline instance from a node in an inner instance
   def toOuterInstanceNodeDynamic(
-      outerInstance: XFormsInstance,
-      outerDoc: DocumentInfo,
-      partAnalysis: PartAnalysis): NodeMatcher = {
+      outerInstance : XFormsInstance,
+      outerDoc      : DocumentInfo,
+      partAnalysis  : PartAnalysis
+  ): NodeMatcher = {
 
     (innerInstance, innerNode, siblingIndexOpt) ⇒
 
@@ -225,17 +226,8 @@ object InstanceMirror {
 
               val path = dropStartingSlash(getNodePath(innerNode, siblingIndexOpt))
 
-              // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
-              // xf:instance. This is not general enough. It stems from the use of getPath, which loses
-              // namespace mappings.
-              val namespaces =
-                partAnalysis.getNamespaceMapping(
-                  partAnalysis.startScope.fullPrefix,
-                  instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
-                )
-
               // Find destination node in inline instance in original doc
-              evalOne(instanceWrapper, path, namespaces) match {
+              evalOne(instanceWrapper, path, NamespaceMapping.EMPTY_MAPPING) match {
                 case newNode: VirtualNode ⇒ Some(outerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
               }
@@ -245,28 +237,24 @@ object InstanceMirror {
   }
 
   def toOuterInstanceNodeXBL(
-      outerInstance: XFormsInstance,
-      outerNode: NodeInfo,
-      partAnalysis: PartAnalysis): NodeMatcher = {
+    outerInstance : XFormsInstance,
+    outerNode     : NodeInfo,
+    partAnalysis  : PartAnalysis
+  ): NodeMatcher = {
 
     (_, innerNode, siblingIndexOpt) ⇒
 
       // The path to the inner node looks like /a/b[i1]/c[i2], where "a" is the root element. The outer element is
       // allowed to have another name. So we create a relative path starting at /a, which can be applied to the
       // outer element.
-      val relativePath  = getNodePath(innerNode, siblingIndexOpt) split '/' drop 2 mkString "/"
+      val relativePath = getNodePath(innerNode, siblingIndexOpt) split '/' drop 2 mkString "/"
 
       if (relativePath.isEmpty)
         // The root element
         Some(outerInstance, outerNode)
       else {
-        // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
-        // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
-        // mappings.
-        val namespaces = outerInstance.instance.namespaceMapping
-
         // Apply path to find node in outer instance
-        Option(evalOne(outerNode, relativePath, namespaces)) collect {
+        Option(evalOne(outerNode, relativePath, NamespaceMapping.EMPTY_MAPPING)) collect {
           case newNode: NodeInfo ⇒ outerInstance → newNode
         }
       }

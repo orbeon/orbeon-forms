@@ -20,15 +20,15 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel}
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, Navigator, NodeInfo}
+import org.orbeon.oxf.xforms.XFormsModel
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
 
   def dataNodeHash(node: NodeInfo) =
-    SecureUtils.hmacString(Navigator.getPath(node), "hex")
+    SecureUtils.hmacString(SaxonUtils.buildNodePathHandleNamespaces(node), "hex")
 
   def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
     processGETConnection(model, resolvedURL) { is ⇒

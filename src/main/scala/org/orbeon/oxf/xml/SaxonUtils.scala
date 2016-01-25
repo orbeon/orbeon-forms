@@ -14,8 +14,10 @@
 package org.orbeon.oxf.xml
 
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.Expression
-import org.orbeon.saxon.om.{Item, Name10Checker, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om._
+import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.value.{AtomicValue, StringValue, Value}
 import org.orbeon.scaxon.XML
 
@@ -103,4 +105,74 @@ object SaxonUtils {
       // Saxon type hierarchy is closed (Item = NodeInfo | AtomicValue)
       case _                                   ⇒ throw new IllegalStateException
     }
+
+  // Adapted from Saxon, but build paths with namespace information as needed
+  def buildNodePathHandleNamespaces(node: NodeInfo): String = {
+
+    def findNodePosition(node: NodeInfo): Int = {
+
+      val nodeTestForSameNode =
+        node.getFingerprint match {
+          case -1 ⇒ NodeKindTest.makeNodeKindTest(node.getNodeKind)
+          case _  ⇒ new NameTest(node)
+        }
+
+      val precedingAxis =
+        node.iterateAxis(Axis.PRECEDING_SIBLING, nodeTestForSameNode)
+
+      var i: Int = 1
+      while (precedingAxis.next ne null) {
+        i += 1
+      }
+      i
+    }
+
+    def buildPrefix(parent: NodeInfo) = {
+      val pre = buildNodePathHandleNamespaces(parent)
+      if (pre == "/") "" else pre
+    }
+
+    def buildNameTest(node: NodeInfo) =
+      if (node.getURI == "")
+        node.getLocalPart
+      else
+        s"*:${node.getLocalPart}[namespace-uri() = '${node.getURI}']"
+
+    if (node ne null) {
+      val parent = node.getParent
+      node.getNodeKind match {
+        case Type.DOCUMENT ⇒
+          "/"
+        case Type.ELEMENT ⇒
+          if (parent eq null) {
+            buildNameTest(node)
+          } else {
+            val pre = buildNodePathHandleNamespaces(parent)
+            if (pre == "/") {
+              '/' + buildNameTest(node)
+            } else {
+              pre + '/' + buildNameTest(node) + '[' + findNodePosition(node) + ']'
+            }
+          }
+        case Type.ATTRIBUTE ⇒
+          buildNodePathHandleNamespaces(parent) + "/@" + buildNameTest(node)
+        case Type.TEXT ⇒
+          buildPrefix(parent) + "/text()[" + findNodePosition(node) + ']'
+        case Type.COMMENT ⇒
+          buildPrefix(parent) + "/comment()[" + findNodePosition(node) + ']'
+        case Type.PROCESSING_INSTRUCTION ⇒
+          buildPrefix(parent) + "/processing-instruction()[" + findNodePosition(node) + ']'
+        case Type.NAMESPACE ⇒
+          var test = node.getLocalPart
+          if (test.isEmpty) {
+            test = "*[not(local-name()]"
+          }
+          buildNodePathHandleNamespaces(parent) + "/namespace::" + test
+        case _ ⇒
+          ""
+      }
+    } else {
+      ""
+    }
+  }
 }

@@ -13,13 +13,13 @@
 -->
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
-    
+
     <title>Orbeon Forms Bookcast</title>
     <subtitle>An Orbeon Forms tutorial example</subtitle>
     <updated><xsl:value-of select="current-dateTime()"/></updated>
     <id>http://www.orbeon.com/ops/xforms-bookcast/</id>
     <link href="http://www.orbeon.com/"/>
-    <generator uri="http://www.orbeon.com/ops/xforms-bookcast/" version="1.0">Orbeon Forms Bookcast</generator>
+    <generator uri="http://demo.orbeon.com/orbeon/xforms-bookcast/" version="1.0">Orbeon Forms Bookcast</generator>
 
     <xsl:for-each select="/books/book">
         <entry>

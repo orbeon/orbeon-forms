@@ -65,7 +65,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
 
   def getCharacterEncoding = null
 
-  def getNamespacePrefix = ""
+  def getNamespacePrefix = rewriter.getNamespacePrefix
 
   def getOutputStream: OutputStream = {
     if (_byteStream eq null)

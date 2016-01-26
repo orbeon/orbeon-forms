@@ -31,11 +31,11 @@
             <!-- Set repeat appearance if available and needed -->
             <xsl:if
                 test="
-                    frf:isRepeat(.)                    and
-                    empty(@appearance)                 and
-                    exists($section-repeat-appearance) and
-                    $section-repeat-appearance != 'full'">
-                <xsl:attribute name="appearance" select="$section-repeat-appearance"/>
+                    frf:isRepeat(.)             and
+                    empty(@appearance)          and
+                    exists($section-appearance) and
+                    $section-appearance != 'full'">
+                <xsl:attribute name="appearance" select="$section-appearance"/>
             </xsl:if>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()"/>
@@ -47,10 +47,10 @@
             <!-- Set repeat appearance if available and needed -->
             <xsl:if
                 test="
-                    empty(@appearance)              and
-                    exists($grid-repeat-appearance) and
-                    $grid-repeat-appearance != 'full'">
-                <xsl:attribute name="appearance" select="$grid-repeat-appearance"/>
+                    empty(@appearance)       and
+                    exists($grid-appearance) and
+                    $grid-appearance != 'full'">
+                <xsl:attribute name="appearance" select="$grid-appearance"/>
             </xsl:if>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()"/>

@@ -134,13 +134,13 @@
         as="xs:boolean"/>
 
     <xsl:variable
-        name="section-repeat-appearance"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.section.repeat.appearance', $app, $form), '.'))[normalize-space()]"
+        name="section-appearance"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.appearance', $app, $form), '.'))[normalize-space()]"
         as="xs:string?"/>
 
     <xsl:variable
-        name="grid-repeat-appearance"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.repeat.appearance', $app, $form), '.'))[normalize-space()]"
+        name="grid-appearance"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'))[normalize-space()]"
         as="xs:string?"/>
 
     <xsl:template match="/xh:html">

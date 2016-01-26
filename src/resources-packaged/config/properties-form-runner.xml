@@ -305,8 +305,8 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.animate.*.*"                      value="true"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.collapsible.*.*"                  value="true"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.noscript.collapsible.*.*"         value="true"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.repeat.appearance.*.*"            value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.*.*"                   value=""/>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.repeat.appearance.*.*"               value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                      value=""/>
 
 </properties>

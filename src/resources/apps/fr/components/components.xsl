@@ -110,26 +110,26 @@
         as="xs:boolean"/>
 
     <xsl:variable
-        name="is-fr-section-collapse"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapse', $app, $form), '.')) = false())"
+        name="is-fr-section-collapsible"
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapsible', $app, $form), '.')) = false())"
         as="xs:boolean"/>
 
     <xsl:variable
-        name="is-fr-section-noscript-collapse"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.noscript.collapse', $app, $form), '.')) = false())"
+        name="is-fr-section-noscript-collapsible"
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.noscript.collapsible', $app, $form), '.')) = false())"
         as="xs:boolean"/>
 
     <xsl:variable
-        name="is-section-collapse"
+        name="is-section-collapsible"
         select="
             (
                 not($is-noscript)             and
                 $is-ajax-section-collapse     and
-                $is-fr-section-collapse
+                $is-fr-section-collapsible
             ) or (
                 $is-noscript                  and
                 $is-noscript-section-collapse and
-                $is-fr-section-noscript-collapse
+                $is-fr-section-noscript-collapsible
             )"
         as="xs:boolean"/>
 

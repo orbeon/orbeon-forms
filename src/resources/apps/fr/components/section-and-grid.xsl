@@ -22,8 +22,8 @@
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <xsl:template match="xh:body//fr:section | xbl:binding/xbl:template//fr:section">
         <xsl:copy>
-            <xsl:if test="empty(@collapse)">
-                <xsl:attribute name="collapse" select="$is-section-collapse"/>
+            <xsl:if test="empty(@collapse) and empty(@collapsible)">
+                <xsl:attribute name="collapsible" select="$is-section-collapsible"/>
             </xsl:if>
             <xsl:if test="empty(@animate) ">
                 <xsl:attribute name="animate"  select="$is-animate-sections"/>

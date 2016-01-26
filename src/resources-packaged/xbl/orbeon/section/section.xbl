@@ -46,7 +46,7 @@
                     <!-- Section configuration -->
                     <xsl:variable name="editable"          select="exists(@edit-ref)"/>
                     <xsl:variable name="ancestor-sections" select="count(ancestor::fr:section)"/><!-- TODO -->
-                    <xsl:variable name="collapse"          select="not(@collapse = 'false')"/>
+                    <xsl:variable name="collapsible"       select="not(@collapsible = 'false' or @collapse = 'false')"/>
                     <xsl:variable name="animate"           select="not(@animate = 'false')"/>
                     <xsl:variable name="readonly"          select="@readonly = 'true'"/>
                     <xsl:variable name="is-repeat"         select="fbf:isRepeat(.)"/>
@@ -84,14 +84,14 @@
                                              return () if the switch is not yet initialized. In that case, it means we
                                              are just becoming relevant, so use the value of $initially-open. -->
                                         <xf:var name="open" value="(for $switch in case('switch') return $switch = 'case-open', $initially-open)[1]"/>
-                                        <xsl:if test="$collapse">
+                                        <xsl:if test="$collapsible">
                                             <!-- Handle DOMActivate event to open/close the switches -->
                                             <xf:toggle ev:event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>
                                         </xsl:if>
 
                                         <!-- Actual section title -->
                                         <xsl:choose>
-                                            <xsl:when test="$collapse">
+                                            <xsl:when test="$collapsible">
                                                 <xf:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'open' else 'closed'}}">
                                                     <xf:label value="xxf:label('fr-section')"/>
                                                     <xf:help  value="xxf:help('fr-section')"/>

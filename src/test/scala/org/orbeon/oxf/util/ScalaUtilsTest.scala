@@ -120,7 +120,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
   }
 
-  @Test def testNonEmptyOrNone(): Unit = {
+  @Test def testTrimAllToOpt(): Unit = {
     assert(None        === "".trimAllToOpt)
     assert(None        === "  ".trimAllToOpt)
     assert(Some("foo") === "foo".trimAllToOpt)

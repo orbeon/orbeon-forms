@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
-import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * XForms instance() function.
@@ -33,7 +33,7 @@ class Instance extends XFormsFunction with FunctionSupport {
     // document element node) is returned for the default instance in the model that contains the current context
     // node."
 
-    val instanceId = stringArgumentOpt(0) flatMap nonEmptyOrNone
+    val instanceId = stringArgumentOpt(0) flatMap trimAllToOpt
 
     // Get model and instance with given id for that model only
 

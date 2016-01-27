@@ -132,7 +132,7 @@ object FormRunnerAuth {
       case "header" ⇒
 
         val headerPropertyName =
-          nonEmptyOrNone(propertySet.getString(HeaderRolesPropertyNamePropertyName))
+          propertySet.getString(HeaderRolesPropertyNamePropertyName).trimAllToOpt
 
         def headerOption(name: String) =
           Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))

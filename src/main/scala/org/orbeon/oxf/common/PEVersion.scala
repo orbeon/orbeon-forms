@@ -162,9 +162,9 @@ private object PEVersion {
       val email              = select("email")
       val issued             = select("issued")
 
-      val versionOpt         = nonEmptyOrNone(select("version"))
-      val expirationOpt      = nonEmptyOrNone(select("expiration"))       map parseISODateOrDateTime
-      val subscriptionEndOpt = nonEmptyOrNone(select("subscription-end")) map parseISODateOrDateTime
+      val versionOpt         = select("version").trimAllToOpt
+      val expirationOpt      = select("expiration").trimAllToOpt       map parseISODateOrDateTime
+      val subscriptionEndOpt = select("subscription-end").trimAllToOpt map parseISODateOrDateTime
 
       LicenseInfo(VersionNumber, licensor, licensee, organization, email, issued, versionOpt, expirationOpt, subscriptionEndOpt)
     }

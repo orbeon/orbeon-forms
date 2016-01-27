@@ -72,7 +72,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
               val configElem = readInputAsDOM4J(pipelineContext, input).getRootElement
 
               def elemValue(elem: DOM4JElement) =
-                Option(elem) map (_.getStringValue) flatMap nonEmptyOrNone
+                Option(elem) map (_.getStringValue) flatMap trimAllToOpt
 
               def floatValue(elem: DOM4JElement) =
                 elemValue(elem) map (_.toFloat)

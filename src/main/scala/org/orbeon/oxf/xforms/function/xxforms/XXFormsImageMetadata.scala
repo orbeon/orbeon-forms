@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import java.io.{InputStream, ByteArrayInputStream}
+import java.io.{ByteArrayInputStream, InputStream}
+
 import org.apache.commons.codec.binary.Base64
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ImageMetadata._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{ImageMetadata, NetUtils}
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
-import ImageMetadata._
 
 class XXFormsImageMetadata extends XFormsFunction with FunctionSupport {
 
@@ -30,7 +31,7 @@ class XXFormsImageMetadata extends XFormsFunction with FunctionSupport {
     implicit val ctx = xpathContext
 
     def argumentAsString =
-      nonEmptyOrNone(itemsArgumentOpt(0).get.next().getStringValue)
+      itemsArgumentOpt(0).get.next().getStringValue.trimAllToOpt
 
     def createStream(content: String) =
       if (NetUtils.urlHasProtocol(content))

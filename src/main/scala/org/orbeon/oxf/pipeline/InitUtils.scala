@@ -13,31 +13,28 @@
  */
 package org.orbeon.oxf.pipeline
 
-import collection.JavaConverters._
 import java.util.{Enumeration ⇒ JEnumeration}
 import javax.servlet.ServletContext
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpSession
+import javax.servlet.http.{HttpServletRequest, HttpSession}
+
 import org.apache.log4j.Logger
-import org.dom4j.Document
-import org.dom4j.Element
+import org.dom4j.{Document, Element}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition
+import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
-import org.orbeon.oxf.util.AttributesToMap
-import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
-import org.orbeon.oxf.webapp.{WebAppContext, HttpStatusCodeException, WebAppExternalContext}
+import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.{HttpStatusCodeException, WebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 object InitUtils {
@@ -71,7 +68,7 @@ object InitUtils {
     val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
 
     if (logger.isInfoEnabled)
-      nonEmptyOrNone(externalContext.getStartLoggerString) foreach logger.info
+      externalContext.getStartLoggerString.trimAllToOpt foreach logger.info
 
     // Set ExternalContext into PipelineContext
     pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
@@ -126,8 +123,8 @@ object InitUtils {
     for ((inputName, value) ← processorDefinition.getEntries.asScala) {
 
       import DOMGenerator._
-      import ProcessorImpl.OUTPUT_DATA
       import PipelineUtils._
+      import ProcessorImpl.OUTPUT_DATA
 
       def connectInput(file: Option[String], create: (String, Long, String) ⇒ DOMGenerator) =
         connect(create("init input", ZeroValidity, file getOrElse DefaultContext), OUTPUT_DATA, processor, inputName)

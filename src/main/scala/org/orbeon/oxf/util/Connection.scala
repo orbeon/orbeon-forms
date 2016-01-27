@@ -464,7 +464,7 @@ object Connection extends Logging {
   }
 
   private def valueAs[T[_]](value: String)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] =
-    nonEmptyOrNone(value) map (split[T](_)) getOrElse cbf().result()
+    value.trimAllToOpt map (split[T](_)) getOrElse cbf().result()
 
   // Get a Set of header names to forward from the configuration properties
   def headersToForwardFromProperty: Set[String] =
@@ -472,7 +472,7 @@ object Connection extends Logging {
       valueAs[Set](getPropertyHandleCustom(LegacyXFormsHttpForwardHeadersProperty))
 
   def jHeadersToForward =
-    nonEmptyOrNone(headersToForwardFromProperty mkString " ").orNull
+    (headersToForwardFromProperty mkString " ").trimAllToNull
 
   // Get a List of cookie names to forward from the configuration properties
   def cookiesToForwardFromProperty: List[String] =

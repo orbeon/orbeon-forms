@@ -169,7 +169,7 @@ object XFormsModelSubmissionBase {
   import XFormsSubmissionUtils._
 
   def defaultSerialization(xformsMethod: String): Option[String] =
-    nonEmptyOrNone(xformsMethod) collect {
+    xformsMethod.trimAllToOpt collect {
       case "multipart-post"                             ⇒ "multipart/related"
       case "form-data-post"                             ⇒ "multipart/form-data"
       case "urlencoded-post"                            ⇒ "application/x-www-form-urlencoded"
@@ -178,7 +178,7 @@ object XFormsModelSubmissionBase {
     }
 
   def requestedSerialization(xformsSerialization: String, xformsMethod: String) =
-    nonEmptyOrNone(xformsSerialization) orElse defaultSerialization(xformsMethod)
+    xformsSerialization.trimAllToOpt orElse defaultSerialization(xformsMethod)
 
   def getRequestedSerializationOrNull(xformsSerialization: String, xformsMethod: String) =
     requestedSerialization(xformsSerialization, xformsMethod).orNull

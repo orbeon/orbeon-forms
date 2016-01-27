@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import collection.JavaConverters._
+import javax.portlet._
+
 import com.liferay.portal.kernel.language.LanguageUtil
 import com.liferay.portal.model.User
-import javax.portlet._
 import org.orbeon.oxf.util.ScalaUtils._
+
+import scala.collection.JavaConverters._
 
 object LiferaySupport {
 
@@ -44,5 +46,5 @@ object LiferaySupport {
       name → value
 
   def languageHeader(request: PortletRequest) =
-    nonEmptyOrNone(LanguageUtil.getLanguageId(request)) map ("Orbeon-Liferay-Language" →)
+    LanguageUtil.getLanguageId(request).trimAllToOpt map ("Orbeon-Liferay-Language" →)
 }

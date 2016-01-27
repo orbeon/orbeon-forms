@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
@@ -23,7 +24,6 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import XMLNames._
 
 trait FormRunnerBaseOps {
 
@@ -207,11 +207,11 @@ trait FormRunnerBaseOps {
       val params = parametersInstance.rootElement
 
       FormRunnerParams(
-        app         = params \ "app",
-        form        = params \ "form",
-        formVersion = params \ "form-version",
-        document    = nonEmptyOrNone(params \ "document"),
-        mode        = params \ "mode"
+        app         = params elemValue "app",
+        form        = params elemValue "form",
+        formVersion = params elemValue "form-version",
+        document    = params elemValue "document" trimAllToOpt,
+        mode        = params elemValue "mode"
       )
     }
   }

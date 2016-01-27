@@ -17,7 +17,7 @@ import java.util.concurrent.Semaphore
 import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 
-import org.orbeon.oxf.logging.{MinimalRequest, LifecycleLogger}
+import org.orbeon.oxf.logging.{LifecycleLogger, MinimalRequest}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.slf4j.LoggerFactory
 
@@ -54,8 +54,8 @@ class LimiterFilter extends Filter {
     val settings =
       FilterSettings(
         new Semaphore(limit, true),
-        (nonEmptyOrNone(config.getInitParameter("include")) getOrElse "$.").r,
-        (nonEmptyOrNone(config.getInitParameter("exclude")) getOrElse "$.").r
+        (config.getInitParameter("include").trimAllToOpt getOrElse "$.").r,
+        (config.getInitParameter("exclude").trimAllToOpt getOrElse "$.").r
       )
 
     info(s"configuring: $settings")
@@ -99,7 +99,7 @@ class LimiterFilter extends Filter {
   private def desiredParallelism(param: String ⇒ String) = {
 
     def stringParamWithDefault(name: String, default: String) =
-      nonEmptyOrNone(param(name)) getOrElse default
+      param(name).trimAllToOpt getOrElse default
 
     def getInt(name: String, default: String) =
       stringParamWithDefault(name, default) match {

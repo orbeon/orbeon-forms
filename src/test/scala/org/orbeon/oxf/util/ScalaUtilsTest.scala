@@ -121,10 +121,10 @@ class ScalaUtilsTest extends AssertionsForJUnit {
   }
 
   @Test def testNonEmptyOrNone(): Unit = {
-    assert(None        === nonEmptyOrNone(""))
-    assert(None        === nonEmptyOrNone("  "))
-    assert(Some("foo") === nonEmptyOrNone("foo"))
-    assert(Some("foo") === nonEmptyOrNone("  foo  "))
+    assert(None        === "".trimAllToOpt)
+    assert(None        === "  ".trimAllToOpt)
+    assert(Some("foo") === "foo".trimAllToOpt)
+    assert(Some("foo") === "  foo  ".trimAllToOpt)
   }
 
   @Test def testBooleanOption(): Unit = {

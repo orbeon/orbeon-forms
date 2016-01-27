@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.oxf.util.ScalaUtils._
 import spray.json._
-import ScalaUtils.nonEmptyOrNone
+
 import scala.util.control.NonFatal
 
 // Factory for a string replacement function configured by a JSON map.
@@ -26,7 +27,7 @@ object StringReplacer extends Logging {
   // Read a filter configuration and return a filter function
   // If there was an error processing the configuration, log and return
   def apply(json: String)(implicit logger: IndentedLogger): String ⇒ String = {
-    val mapping = nonEmptyOrNone(json) match {
+    val mapping = json.trimAllToOpt match {
       case Some(nonEmptyJSON) ⇒
         try
           nonEmptyJSON.parseJson match {

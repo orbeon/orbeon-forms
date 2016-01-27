@@ -415,7 +415,7 @@ trait GridOps extends ContainerOps {
   // - non-positive integer value → None
   // - positive integer value     → Some(int: String)
   // - any other value            → Some("{expression}")
-  def minMaxForAttribute(s: String) = nonEmptyOrNone(s) flatMap { value ⇒
+  def minMaxForAttribute(s: String) = s.trimAllToOpt flatMap { value ⇒
     try {
       val int = value.toInt
       int > 0 option int.toString

@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML
-import XML._
 import org.orbeon.oxf.fr.FormRunner._
-import scala.util.control.NonFatal
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
+
+import scala.util.control.NonFatal
 
 trait PublishOps {
 
@@ -40,7 +40,7 @@ trait PublishOps {
           // Using "next" for attachments works as attachments are saved first, and the persistence layer
           // uses the latest version of the published forms (not attachments) to figure what the next
           // version is
-          formVersion       = nonEmptyOrNone(formVersion)
+          formVersion       = formVersion.trimAllToOpt
         )
       setvalue(instanceRoot("fb-publish-instance").get / "published-attachments", beforeURLs.size.toString)
       setvalue(instanceRoot("fb-publish-instance").get / "published-version",     publishedVersion.toString)

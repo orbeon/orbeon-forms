@@ -26,5 +26,5 @@ object RunMode {
 
   // Return the web app's run mode
   def getRunMode(contextParams: Map[String, String]) =
-    contextParams.get(RunModeProperty) flatMap nonEmptyOrNone getOrElse DefaultRunMode
+    contextParams.get(RunModeProperty) flatMap trimAllToOpt getOrElse DefaultRunMode
 }

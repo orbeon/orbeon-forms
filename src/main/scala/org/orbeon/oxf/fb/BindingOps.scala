@@ -119,7 +119,7 @@ trait BindingOps {
           def fromLang  = elems find (_.attValue("lang") == lang)
           def fromFirst = elems.headOption
 
-          fromLang orElse fromFirst map (_.stringValue) flatMap nonEmptyOrNone
+          fromLang orElse fromFirst map (_.stringValue) flatMap trimAllToOpt
         }
 
         val displayNames = metadata / "*:display-name"

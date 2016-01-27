@@ -71,7 +71,7 @@ object Mediatypes {
       def resultAsList = buffer.result()
 
       private def extensionFromPattern(pattern: String) =
-        nonEmptyOrNone(pattern.toLowerCase) flatMap findExtension getOrElse ""
+        pattern.toLowerCase.trimAllToOpt flatMap findExtension getOrElse ""
 
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
         localname match {

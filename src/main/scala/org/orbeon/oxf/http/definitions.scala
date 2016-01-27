@@ -113,16 +113,16 @@ object HttpClientSettings {
   def apply(param: String ⇒ String): HttpClientSettings = {
 
     def booleanParamWithDefault(name: String, default: Boolean) =
-      nonEmptyOrNone(param(name)) map (_ == "true") getOrElse default
+      param(name).trimAllToOpt map (_ == "true") getOrElse default
 
     def intParam(name: String) =
-      nonEmptyOrNone(param(name)) map (_.toInt)
+      param(name).trimAllToOpt map (_.toInt)
 
     def intParamWithDefault(name: String, default: Int) =
       intParam(name) getOrElse default
 
     def stringParam(name: String) =
-      nonEmptyOrNone(param(name))
+      param(name).trimAllToOpt
 
     def stringParamWithDefault(name: String, default: String) =
       stringParam(name) getOrElse default
@@ -181,9 +181,9 @@ object Credentials {
   def apply(username: String, password: String, preemptiveAuth: String, domain: String): Credentials =
     Credentials(
       username.trimAllToEmpty,
-      nonEmptyOrNone(password),
-      ! (nonEmptyOrNone(preemptiveAuth) contains "false"),
-      nonEmptyOrNone(domain)
+      password.trimAllToOpt,
+      ! (preemptiveAuth.trimAllToOpt contains "false"),
+      domain.trimAllToOpt
     )
 }
 

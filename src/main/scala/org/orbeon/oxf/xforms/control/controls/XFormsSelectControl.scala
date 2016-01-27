@@ -125,12 +125,12 @@ object XFormsSelectControl {
     (newlySelectedValues, newlyDeselectedValues, newInstanceValue)
   }
 
-  private def valueAsLinkedSet(s: String) = nonEmptyOrNone(s) match {
+  private def valueAsLinkedSet(s: String) = s.trimAllToOpt match {
     case Some(list) ⇒ mutable.LinkedHashSet(list split """\s+""": _*)
     case None ⇒ Set[String]()
   }
 
-  private def valueAsSet(s: String) = nonEmptyOrNone(s) match {
+  private def valueAsSet(s: String) = s.trimAllToOpt match {
     case Some(list) ⇒ list split """\s+""" toSet
     case None ⇒ Set[String]()
   }

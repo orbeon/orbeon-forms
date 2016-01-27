@@ -32,7 +32,7 @@ object URLFactory {
     createURL(null.asInstanceOf[URL], spec)
 
   def createURL(context: String, spec: String): URL =
-    createURL(nonEmptyOrNone(context) map createURL orNull, spec)
+    createURL(context.trimAllToOpt map createURL orNull, spec)
 
   def createURL(context: URL, spec: String): URL = protocol(context, spec) match {
     case "http" | "https"       ⇒ new URL(context, spec, HTTP)

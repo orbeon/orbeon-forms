@@ -13,25 +13,24 @@
  */
 package org.orbeon.oxf.processor.serializer
 
-import BinaryTextXMLReceiver._
 import java.io._
+
 import org.apache.commons.lang3.StringUtils.isNotBlank
-import org.dom4j.Namespace
-import org.dom4j.QName
+import org.dom4j.{Namespace, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.util.Base64XMLReceiver
-import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.util.NetUtils.{getContentTypeMediaType, getContentTypeCharset}
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
-import org.orbeon.oxf.util.TextXMLReceiver
+import org.orbeon.oxf.pipeline.api.ExternalContext.Response
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
+import org.orbeon.oxf.util.NetUtils.{getContentTypeCharset, getContentTypeMediaType}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{Base64XMLReceiver, DateUtils, TextXMLReceiver}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiver, XMLReceiverAdapter}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter, XMLUtils}
 import org.orbeon.scaxon.XML
 import org.xml.sax.Attributes
-import collection.mutable
+
+import scala.collection.mutable
 
 /**
  * ContentHandler able to serialize text or binary documents to an output stream.
@@ -75,10 +74,10 @@ class BinaryTextXMLReceiver(
       if (response ne null) Left(response) else Right(outputStream),
       closeStream,
       forceContentType,
-      nonEmptyOrNone(requestedContentType),
+      requestedContentType.trimAllToOpt,
       ignoreDocumentContentType,
       forceEncoding,
-      nonEmptyOrNone(requestedEncoding),
+      requestedEncoding.trimAllToOpt,
       ignoreDocumentEncoding
     )
 
@@ -117,13 +116,13 @@ class BinaryTextXMLReceiver(
       response foreach { response ⇒
 
         // This will override caching settings which may have taken place before
-        nonEmptyOrNone(attributes.getValue(Headers.LastModifiedLower)) foreach
+        attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
           (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
 
-        nonEmptyOrNone(attributes.getValue("filename")) foreach
+        attributes.getValue("filename").trimAllToOpt foreach
           (fileName ⇒ response.setHeader("Content-Disposition", "attachment; filename=" + fileName))
 
-        nonEmptyOrNone(attributes.getValue("status-code")) foreach
+        attributes.getValue("status-code").trimAllToOpt foreach
           (statusCode ⇒ response.setStatus(statusCode.toInt))
       }
 

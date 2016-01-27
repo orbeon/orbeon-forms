@@ -118,10 +118,6 @@ object ScalaUtils extends PathOps {
     result map { case (k, v) ⇒ k → v.result } toList
   }
 
-
-  // If the string is null or empty, return None, otherwise return Some(trimmed value)
-  def nonEmptyOrNone(s: String) = Option(s) map trimAllToEmpty filterNot (_.isEmpty)
-
   // Extensions on Boolean
   implicit class BooleanWrapper(val b: Boolean) extends AnyVal {
     def option[A](a: ⇒ A)   = if (b) Option(a)   else None
@@ -327,6 +323,7 @@ object ScalaUtils extends PathOps {
   // Mainly for Java callers
   def trimAllToEmpty(s: String) = s.trimAllToEmpty
   def trimAllToNull(s: String)  = s.trimAllToNull
+  def trimAllToOpt(s: String)   = s.trimAllToOpt
 
   implicit class CodePointsOps(val s: String) extends AnyVal {
 

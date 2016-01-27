@@ -218,8 +218,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   ): Unit =
     if (findControlByName(inDoc, oldControlName) exists controlRequiresNestedIterationElement) {
 
-      val oldName = nonEmptyOrNone(oldChildElementNameOrBlank) getOrElse defaultIterationName(oldControlName)
-      val newName = nonEmptyOrNone(newChildElementNameOrBlank) getOrElse defaultIterationName(newControlName)
+      val oldName = oldChildElementNameOrBlank.trimAllToOpt getOrElse defaultIterationName(oldControlName)
+      val newName = newChildElementNameOrBlank.trimAllToOpt getOrElse defaultIterationName(newControlName)
 
       if (oldName != newName) {
         findDataHolders(inDoc, oldName) foreach (rename(_, newName))
@@ -383,7 +383,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       def mustRemoveAttribute(value: String) =
         isTypeString(value) || isRequiredFalse(value)
 
-      nonEmptyOrNone(mipValue) match {
+      mipValue.trimAllToOpt match {
         case Some(normalizedMipValue) if ! mustRemoveAttribute(normalizedMipValue) ⇒
           ensureAttribute(bind, mipAttQName, normalizedMipValue)
         case _ ⇒

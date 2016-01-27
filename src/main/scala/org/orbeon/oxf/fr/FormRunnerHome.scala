@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash => _, _}
+import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash ⇒ _, _}
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.StringReplacer._
@@ -188,9 +188,9 @@ trait FormRunnerHome {
       filename          = "form.xhtml",
       commonQueryString = "",
       forceAttachments  = forceAttachments,
-      username          = nonEmptyOrNone(username),
-      password          = nonEmptyOrNone(password),
-      formVersion       = nonEmptyOrNone(formVersion)
+      username          = username.trimAllToOpt,
+      password          = password.trimAllToOpt,
+      formVersion       = formVersion.trimAllToOpt
     )
 
   // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
@@ -294,7 +294,7 @@ object FormRunnerHome {
             def stringValueOrThrow(v: JsValue) = (
               collectByErasedType[JsString](v)
               map       (_.value)
-              flatMap   nonEmptyOrNone
+              flatMap   trimAllToOpt
               getOrElse (throw new IllegalArgumentException)
             )
 
@@ -319,7 +319,7 @@ object FormRunnerHome {
 
   private def remoteServerFromCompatibilityProperty: Option[String] = (
     Option(properties.getStringOrURIAsString("oxf.fr.production-server-uri"))
-    flatMap nonEmptyOrNone
+    flatMap trimAllToOpt
     map     dropTrailingSlash
   )
 }

@@ -374,7 +374,7 @@ trait FormRunnerActions {
         formRunnerProperty(property)
       }
 
-      fromParams orElse fromProperties map evaluateValueTemplate flatMap nonEmptyOrNone get
+      fromParams orElse fromProperties map evaluateValueTemplate flatMap trimAllToOpt get
     } flatMap
       tryNavigateTo
 
@@ -398,7 +398,7 @@ trait FormRunnerActions {
 
       val format = (
         paramByName(params, "format")
-        flatMap   nonEmptyOrNone
+        flatMap   trimAllToOpt
         filter    SupportedRenderFormats
         getOrElse "pdf"
       )
@@ -434,7 +434,7 @@ trait FormRunnerActions {
     topLevelInstance(PersistenceModel, s"fr-$mode-url-instance") map (_.rootElement)
 
   def pdfOrTiffPathOpt(mode: String) =
-    pdfTiffPathInstanceRootElementOpt(mode) map (_.stringValue) flatMap nonEmptyOrNone
+    pdfTiffPathInstanceRootElementOpt(mode) map (_.stringValue) flatMap trimAllToOpt
 
   def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[Any] =
     Try {
@@ -450,7 +450,7 @@ trait FormRunnerActions {
 
             val response = topLevelInstance(FormModel, "fr-send-submission-response").get
 
-            nonEmptyOrNone(response.rootElement.stringValue) foreach { path ⇒
+            response.rootElement.stringValue.trimAllToOpt foreach { path ⇒
               setvalue(pdfTiffPathInstanceRootElementOpt(format).to[List], path)
             }
           }
@@ -461,7 +461,7 @@ trait FormRunnerActions {
 
   def requestedLangParams(params: ActionParams): List[(String, String)] = (
     paramByName(params, "lang")
-    flatMap   nonEmptyOrNone
+    flatMap   trimAllToOpt
     map       (lang ⇒ List("fr-remember-language" → "false", "fr-language" → lang))
     getOrElse Nil
   )

@@ -13,24 +13,22 @@
  */
 package org.orbeon.oxf.processor
 
-import EmailProcessor._
-import org.orbeon.oxf.http.Headers
-import collection.JavaConverters._
 import java.io._
 import java.util.{Properties ⇒ JProperties}
-import javax.activation.DataHandler
-import javax.activation.DataSource
+import javax.activation.{DataHandler, DataSource}
 import javax.mail.Message.RecipientType
 import javax.mail._
 import javax.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
+
 import org.apache.commons.fileupload.FileItem
-import org.dom4j.{Node, Document, Element}
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.common.ValidationException
+import org.dom4j.{Document, Element, Node}
+import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.EmailProcessor._
 import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
 import org.orbeon.oxf.properties.PropertySet
@@ -40,6 +38,8 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j._
 import org.xml.sax._
+
+import scala.collection.JavaConverters._
 
 /**
  * This processor allows sending emails. It supports multipart messages and inline as well as out-of-line attachments.
@@ -70,7 +70,7 @@ class EmailProcessor extends ProcessorImpl {
     // Set SMTP host
     val properties = new JProperties
     val host =
-      nonEmptyOrNone(propertySet.getString(TestSMTPHost))  orElse
+      propertySet.getString(TestSMTPHost).trimAllToOpt  orElse
       valueFromElementOrProperty(messageElement, SMTPHost) getOrElse
       (throw new OXFException("Could not find SMTP host in configuration or in properties"))
 
@@ -88,7 +88,7 @@ class EmailProcessor extends ProcessorImpl {
 
             (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
           case None ⇒
-            (nonEmptyOrNone(propertySet.getString(Username)), nonEmptyOrNone(propertySet.getString(Password)))
+            (propertySet.getString(Username).trimAllToOpt, propertySet.getString(Password).trimAllToOpt)
         }
       }
 
@@ -176,7 +176,7 @@ class EmailProcessor extends ProcessorImpl {
     message.addFrom(createAddresses(messageElement.element("from")))
 
     // Set To
-    nonEmptyOrNone(propertySet.getString(TestTo)) match {
+    propertySet.getString(TestTo).trimAllToOpt match {
       case Some(testTo) ⇒
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))
       case None ⇒
@@ -364,12 +364,12 @@ object EmailProcessor {
   val DEFAULT_CHARACTER_ENCODING = "utf-8"
 
   // Get Some(trimmed value of the element) or None if the element is null
-  def optionalValueTrim(e: Element) = nonEmptyOrNone(Option(e) map(_.getStringValue) orNull)
+  def optionalValueTrim(e: Element) = (Option(e) map(_.getStringValue) orNull).trimAllToOpt
 
   // First try to get the value from a child element, then from the properties
   def valueFromElementOrProperty(e: Element, name: String)(implicit propertySet: PropertySet) =
     optionalValueTrim(e.element(name)) orElse
-    nonEmptyOrNone(propertySet.getString(name))
+    propertySet.getString(name).trimAllToOpt
 
   // Read a text or binary document and return it as a FileItem
   def handleStreamedPartContent(pipelineContext: PipelineContext, source: SAXSource): FileItem = {

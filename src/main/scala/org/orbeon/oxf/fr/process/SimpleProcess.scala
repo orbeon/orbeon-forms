@@ -81,7 +81,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
 
     def booleanPropertySet(name: String) = booleanFormRunnerProperty(name)
-    def stringPropertySet (name: String) = formRunnerProperty(name) flatMap nonEmptyOrNone isDefined
+    def stringPropertySet (name: String) = formRunnerProperty(name) flatMap trimAllToOpt isDefined
 
     buttonName match {
       case "workflow-send" ⇒

@@ -2,7 +2,8 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath, ScalaUtils}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
@@ -161,7 +162,7 @@ class StaticBind(
     def fromNestedElement =
       for {
         e           ← Dom4j.elements(element, XFORMS_TYPE_QNAME) // <xf:type>
-        value       ← ScalaUtils.nonEmptyOrNone(e.getText)       // text literal (doesn't support @value)
+        value       ← e.getText.trimAllToOpt                     // text literal (doesn't support @value)
       } yield
         new TypeMIP(getElementId(e), value)
 

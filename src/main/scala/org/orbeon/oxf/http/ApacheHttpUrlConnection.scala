@@ -50,7 +50,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
       _httpResponse = {
 
         def credentialsFromURL(url: URL) = {
-          nonEmptyOrNone(url.getUserInfo) flatMap { userInfo ⇒
+          url.getUserInfo.trimAllToOpt flatMap { userInfo ⇒
             // Set username and optional password specified on URL
             val separatorPosition = userInfo.indexOf(":")
 
@@ -63,8 +63,8 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
             // If the username/password contain special character, those characters will be encoded, since
             // we are getting this from a URL. Now do the decoding.
 
-            val usernameOpt = nonEmptyOrNone(username) map (URLDecoder.decode(_, "utf-8"))
-            val passwordOpt = nonEmptyOrNone(password) map (URLDecoder.decode(_, "utf-8"))
+            val usernameOpt = username.trimAllToOpt map (URLDecoder.decode(_, "utf-8"))
+            val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, "utf-8"))
 
             usernameOpt map { username ⇒
               Credentials(username, passwordOpt, preemptiveAuth = true, None)

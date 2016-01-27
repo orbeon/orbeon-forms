@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunner.FormRunnerParams
-import org.orbeon.saxon.functions.EscapeURI
-
-import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
+
+import org.orbeon.oxf.fr.FormRunner.{FormRunnerParams, _}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.URLFinder
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
+import org.orbeon.oxf.xforms.function.xxforms.{XXFormsPropertiesStartsWith, XXFormsProperty}
+import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
 
 trait FormRunnerPDF {
 
@@ -72,13 +72,13 @@ trait FormRunnerPDF {
     }
 
     def findControlName(e: NodeInfo) =
-      nonEmptyOrNone(getStaticIdFromId(e.id)) flatMap FormRunner.controlNameFromIdOpt
+      getStaticIdFromId(e.id).trimAllToOpt flatMap FormRunner.controlNameFromIdOpt
 
     def ancestorContainers(e: NodeInfo) =
       control ancestor * filter isContainer reverse
 
     def suffixAsList(id: String) =
-      nonEmptyOrNone(getEffectiveIdSuffix(id)).toList
+      getEffectiveIdSuffix(id).trimAllToOpt.toList
 
     // This only makes sense if we are passed a control with a name
     findControlName(control) map { controlName ⇒
@@ -97,8 +97,8 @@ trait FormRunnerPDF {
   //@XPathFunction
   def filenameOrNull(format: String): String = (
     formRunnerProperty(s"oxf.fr.detail.$format.filename")(FormRunnerParams())
-    flatMap nonEmptyOrNone
-    flatMap (expr ⇒ nonEmptyOrNone(process.SimpleProcess.evaluateString(expr)))
+    flatMap trimAllToOpt
+    flatMap (expr ⇒ process.SimpleProcess.evaluateString(expr).trimAllToOpt)
     map     (EscapeURI.escape(_, "-_.~").toString)
     orNull
   )

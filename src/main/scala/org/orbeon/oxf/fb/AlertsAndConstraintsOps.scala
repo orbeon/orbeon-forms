@@ -99,7 +99,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       case v: DatatypeValidation ⇒ v
     } foreach { v ⇒
 
-      v.renameControlIfNeeded(inDoc, controlName, nonEmptyOrNone(newAppearance))
+      v.renameControlIfNeeded(inDoc, controlName, newAppearance.trimAllToOpt)
 
       writeValidations(
         inDoc,
@@ -153,7 +153,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val nestedValidations =
           validations flatMap { case Validation(idOpt, level, value, _) ⇒
 
-            nonEmptyOrNone(value) match {
+            value.trimAllToOpt match {
               case Some(nonEmptyValue) ⇒
 
                 val prefix = mipElemQName.getNamespaceURI match {
@@ -300,13 +300,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def fromXML(validationElem: NodeInfo, newIds: Iterator[String]): Option[RequiredValidation] = {
       require(validationElem /@ "type" === Required.name)
 
-      val validationIdOpt = nonEmptyOrNone(validationElem.id) orElse Some(newIds.next())
+      val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
       val required        = validationElem / Required.name stringValue
 
       Some(
         RequiredValidation(
           validationIdOpt,
-          xpathOptToEither(nonEmptyOrNone(required)),
+          xpathOptToEither(required.trimAllToOpt),
           AlertDetails.fromValidationXML(validationElem, validationIdOpt)
         )
       )
@@ -417,15 +417,15 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ): Option[DatatypeValidation] = {
       require(validationElem /@ "type" === "datatype")
 
-      val validationIdOpt = nonEmptyOrNone(validationElem.id) orElse Some(newIds.next())
+      val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
 
       val datatype = {
 
         val bind = findBindByName(inDoc, controlName).get
 
-        val builtinTypeStringOpt = nonEmptyOrNone(validationElem elemValue "builtin-type")
-        val builtinTypeRequired  = nonEmptyOrNone(validationElem elemValue "builtin-type-required") contains "true"
-        val schemaTypeOpt        = nonEmptyOrNone(validationElem elemValue "schema-type")
+        val builtinTypeStringOpt = (validationElem elemValue "builtin-type").trimAllToOpt
+        val builtinTypeRequired  = (validationElem elemValue "builtin-type-required").trimAllToOpt contains "true"
+        val schemaTypeOpt        = (validationElem elemValue "schema-type").trimAllToOpt
 
         def builtinTypeQName: (QName, Boolean) = {
 
@@ -503,7 +503,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def fromXML(validationElem: NodeInfo, newIds: Iterator[String]) = {
 
       def normalizedAttOpt(attName: String) =
-        (validationElem child Constraint.name attValue attName headOption) flatMap nonEmptyOrNone
+        (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
 
       val constraintExpressionOpt = validationElem attValue "type" match {
         case "formula"      ⇒ normalizedAttOpt("expression")
@@ -513,7 +513,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       constraintExpressionOpt map { expr ⇒
 
         val level           = Validation.levelFromXML(validationElem)
-        val validationIdOpt = nonEmptyOrNone(validationElem.id) orElse Some(newIds.next())
+        val validationIdOpt = validationElem.id.trimAllToOpt orElse Some(newIds.next())
 
         ConstraintValidation(
           validationIdOpt,
@@ -646,8 +646,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def fromElement(e: NodeInfo) = {
       val id = e.id
       (
-        nonEmptyOrNone(id),
-        nonEmptyOrNone(e attValue LEVEL_QNAME) map LevelByName getOrElse ErrorLevel,
+        id.trimAllToOpt,
+        (e attValue LEVEL_QNAME).trimAllToOpt map LevelByName getOrElse ErrorLevel,
         if (mip == Type) e.stringValue else e attValue VALUE_QNAME,
         findAlertForId(id)
       )

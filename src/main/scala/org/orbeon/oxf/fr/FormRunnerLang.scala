@@ -118,10 +118,10 @@ trait FormRunnerLang {
     def fromRequest = request.getFirstParamAsString(LanguageParam)         map cleanLanguage
     def fromSession = stringFromSession(request, LanguageParam)
 
-    nonEmptyOrNone(requestedLang) orElse
-      fromHeader                  orElse
-      fromRequest                 orElse
-      fromSession                 orElse
+    requestedLang.trimAllToOpt orElse
+      fromHeader               orElse
+      fromRequest              orElse
+      fromSession              orElse
       Some(getDefaultLang(appForm))
   }
 

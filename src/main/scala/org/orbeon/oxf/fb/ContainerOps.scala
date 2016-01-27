@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.Names._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -20,10 +21,8 @@ import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import Names._
 
 trait ContainerOps extends ControlOps {
 
@@ -45,7 +44,7 @@ trait ContainerOps extends ControlOps {
       (_ == element)
 
   def getInitialIterationsAttribute(controlElem: NodeInfo) =
-    controlElem attValueOpt InitialIterations flatMap nonEmptyOrNone
+    controlElem attValueOpt InitialIterations flatMap trimAllToOpt
 
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
@@ -224,7 +223,7 @@ trait ContainerOps extends ControlOps {
       val minOpt = minMaxForAttribute(min)
       val maxOpt = minMaxForAttribute(max)
 
-      val initialIterationsOpt = nonEmptyOrNone(initialIterations)
+      val initialIterationsOpt = initialIterations.trimAllToOpt
 
       // Update control attributes first
       // A missing or invalid min/max value is taken as the default value: 0 for min, none for max. In both cases, we
@@ -239,7 +238,7 @@ trait ContainerOps extends ControlOps {
       if (! wasRepeat && repeat) {
         // Insert new bind and template
 
-        val iterationName = nonEmptyOrNone(iterationNameOrEmpty) getOrElse defaultIterationName(controlName)
+        val iterationName = iterationNameOrEmpty.trimAllToOpt getOrElse defaultIterationName(controlName)
 
         // Make sure there are no nested binds
         val oldNestedBinds = findBindByName(inDoc, controlName).toList / *

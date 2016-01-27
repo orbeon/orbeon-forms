@@ -19,12 +19,14 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -32,7 +34,10 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -42,7 +47,7 @@ import java.util.Map;
  * Utilities for XForms submission processing.
  */
 public class XFormsSubmissionUtils {
-    
+
     public static String getActualHttpMethod(String methodAttribute) {
         final String actualMethod;
         if (isPost(methodAttribute)) {
@@ -195,7 +200,7 @@ public class XFormsSubmissionUtils {
                             if (XMLConstants.XS_ANYURI_QNAME.equals(nodeType)) {
                                 // Interpret value as xs:anyURI
 
-                                if (InstanceData.getValid(element) && value.trim().length() > 0) {
+                                if (InstanceData.getValid(element) && ScalaUtils.trimAllToEmpty(value).length() > 0) {
                                     // Value is valid as per xs:anyURI
                                     // Don't close the stream here, as it will get read later when the MultipartEntity
                                     // we create here is written to an output stream
@@ -209,7 +214,7 @@ public class XFormsSubmissionUtils {
                             } else if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
                                 // Interpret value as xs:base64Binary
 
-                                if (InstanceData.getValid(element) && value.trim().length() > 0) {
+                                if (InstanceData.getValid(element) && ScalaUtils.trimAllToEmpty(value).length() > 0) {
                                     // Value is valid as per xs:base64Binary
                                     addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element, null);
                                 } else {

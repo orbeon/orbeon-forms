@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
@@ -53,8 +54,8 @@ public class XFormsItemUtils {
         if (controlValue != null) {
             if (isMultiple) {
                 // Trim for select only
-                controlValue = controlValue.trim();
-                itemValue = itemValue.trim();// TODO: maybe this should be trimmed in the itemset in the first place
+                controlValue = ScalaUtils.trimAllToEmpty(controlValue);
+                itemValue = ScalaUtils.trimAllToEmpty(itemValue);// TODO: maybe this should be trimmed in the itemset in the first place
                 if ("".equals(controlValue)) {
                     // Special case of empty string: check the item that has empty string if any
                     if ("".equals(itemValue)) {
@@ -279,9 +280,9 @@ public class XFormsItemUtils {
                 final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, defaultToHTML, containsHTML);
 
                 if (required) {
-                    return new LHHAValue(StringUtils.trimToEmpty(label), containsHTML[0]);
+                    return new LHHAValue(ScalaUtils.trimAllToEmpty(label), containsHTML[0]);
                 } else {
-                    final String labelOrNull = StringUtils.trimToNull(label);
+                    final String labelOrNull = ScalaUtils.trimAllToNull(label);
                     return labelOrNull != null ? new LHHAValue(labelOrNull, containsHTML[0]) : null;
                 }
             }

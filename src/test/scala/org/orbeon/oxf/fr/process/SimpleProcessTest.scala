@@ -14,15 +14,17 @@
 package org.orbeon.oxf.fr.process
 
 import org.junit.Test
-import ProcessParser._
-import org.scalatest.junit.AssertionsForJUnit
-import org.parboiled.errors.ParsingException
-import scala.util.{Success, Try}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, ScalaUtils}
 import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.value.BooleanValue
+import org.parboiled.errors.ParsingException
+import org.scalatest.junit.AssertionsForJUnit
+
 import scala.collection.mutable.ListBuffer
+import scala.util.{Success, Try}
 
 class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
@@ -66,7 +68,7 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
     }
   }
 
-  def normalize(s: String) = "(" + s.trim + ")"
+  def normalize(s: String) = "(" + s.trimAllToEmpty + ")"
 
   @Test def serialization(): Unit = {
 

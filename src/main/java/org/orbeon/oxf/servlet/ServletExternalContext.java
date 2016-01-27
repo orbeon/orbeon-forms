@@ -76,7 +76,7 @@ public class ServletExternalContext implements ExternalContext  {
         for (final String header : StringUtils.split(value, ';')) {
             final String[] parts = StringUtils.split(header, ':');
             if (parts.length == 2) {
-                result.put(parts[0].trim(), parts[1].trim());
+                result.put(ScalaUtils.trimAllToEmpty(parts[0]), ScalaUtils.trimAllToEmpty(parts[1]));
             }
         }
 

@@ -13,18 +13,20 @@
  */
 package org.orbeon.oxf.xforms.processor
 
+import javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
+
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.servlet.ServletExternalContext.DEFAULT_HEADER_ENCODING
-import org.orbeon.oxf.util.{NetUtils, Multipart}
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
-import org.orbeon.scaxon.XML
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.orbeon.oxf.util.{Multipart, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
-import javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
+import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.scaxon.XML
 
 class Upload extends ProcessorImpl {
   override def createOutput(name: String) =
@@ -50,8 +52,8 @@ class Upload extends ProcessorImpl {
                     name="xxforms-upload-done"
                     source-control-id={name}
                     file={sessionURL}
-                    filename={fileItem.getName.trim}
-                    content-type={StringUtils.trimToEmpty(fileItem.getContentType)}
+                    filename={fileItem.getName.trimAllToEmpty}
+                    content-type={fileItem.getContentType.trimAllToEmpty}
                     content-length={size.toString}/>
               }</xxf:events>
 

@@ -13,20 +13,26 @@
  */
 package org.orbeon.oxf.transformer.xupdate;
 
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.QName;
 import org.jaxen.NamespaceContext;
 import org.jaxen.SimpleNamespaceContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.statement.*;
-import org.orbeon.oxf.transformer.xupdate.statement.Attribute;
 import org.orbeon.oxf.transformer.xupdate.statement.Error;
-import org.orbeon.oxf.transformer.xupdate.statement.Namespace;
-import org.orbeon.oxf.transformer.xupdate.statement.Text;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 
 import javax.xml.transform.sax.TemplatesHandler;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class TemplatesHandlerImpl extends LocationSAXContentHandler implements TemplatesHandler  {
 
@@ -47,8 +53,8 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
         for (Iterator i = nodes.iterator(); i.hasNext();) {
             Node node = (Node) i.next();
             if (node.getNodeType() == Node.TEXT_NODE) {
-                if (! "".equals(node.getText().trim()))
-                    statements.add(new Text(node.getText().trim()));
+                if (! "".equals(ScalaUtils.trimAllToEmpty(node.getText())))
+                    statements.add(new Text(ScalaUtils.trimAllToEmpty(node.getText())));
             } else if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
                 NamespaceContext namespaceContext = new SimpleNamespaceContext(Dom4jUtils.getNamespaceContext(element));

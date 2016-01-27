@@ -214,7 +214,7 @@ trait FormRunnerPersistence {
     for {
       holder        ← data \\ Node
       if isAttribute(holder) || isElement(holder) && ! hasChildElement(holder)
-      beforeURL     = holder.stringValue.trim
+      beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)
       if isUploaded ||
         isAttachmentURLFor(fromBasePath, beforeURL) && ! isAttachmentURLFor(toBasePath, beforeURL) ||

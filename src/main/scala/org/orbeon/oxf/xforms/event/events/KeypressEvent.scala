@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.event.{EventHandler, XFormsEvent, XFormsEventTarget}
 import org.apache.commons.lang3.StringUtils._
-import XFormsEvent._
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.{EventHandler, XFormsEvent, XFormsEventTarget}
 
 class KeypressEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(KEYPRESS, target, KeypressEvent.filter(properties), bubbles = true, cancelable = false) {
@@ -46,7 +47,7 @@ object KeypressEvent {
   private def filter(properties: PropertyGetter) = new PropertyGetter {
     def isDefinedAt(name: String) = properties.isDefinedAt(name)
     def apply(name: String) = name match {
-      case ModifiersProperty ⇒ properties(name) collect { case value: String if isNotBlank(value) ⇒ value.trim }
+      case ModifiersProperty ⇒ properties(name) collect { case value: String if isNotBlank(value) ⇒ value.trimAllToEmpty }
       case TextProperty      ⇒ properties(name) collect { case value: String if isNotEmpty(value) ⇒ value } // allow for e.g. " "
       case _                 ⇒ properties(name)
     }

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import org.dom4j.{Element, QName}
 import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
@@ -305,7 +306,7 @@ object EventHandlerImpl extends Logging {
 
   // Append space-separated suffix indexes to existing indexes
   def appendSuffixes(first: Array[Int], second: String) =
-    first ++ (second.trim split """\s+""" map (_.toInt))
+    first ++ (second.trimAllToEmpty split """\s+""" map (_.toInt))
 
   // Given a static handler, and concrete observer and target, try to find the concrete handler
   def resolveHandler(
@@ -339,7 +340,7 @@ object EventHandlerImpl extends Logging {
         )
         None
       }
-    
+
     resolvedObject map (_.asInstanceOf[XFormsEventHandler])
   }
 }

@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xml
 
-import java.util.{List => JList, Map => JMap}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 
-import org.apache.commons.lang3.StringUtils._
+import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.dom4j._
+import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.value.Whitespace
@@ -52,7 +53,7 @@ object Dom4j {
    * compare namespace nodes in a much better way, without some kind of schema information.
    */
   def compareDocumentsIgnoreNamespacesInScope(left: Document, right: Document) = {
-    val normalizeText = trimToEmpty _
+    val normalizeText = ScalaUtils.trimAllToEmpty _
     compareTwoNodes(normalizeTextNodes(createCopy(left.getRootElement)), normalizeTextNodes(createCopy(right.getRootElement)))(normalizeText)
   }
 

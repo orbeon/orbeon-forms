@@ -16,9 +16,9 @@ package org.orbeon.oxf.util;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
@@ -104,7 +104,7 @@ public class URLRewriterUtils {
         } else {
             // Property specified
             try {
-                final URI baseURI = new URI(baseURIProperty.trim());
+                final URI baseURI = new URI(ScalaUtils.trimAllToEmpty(baseURIProperty));
                 // NOTE: Force absolute URL to be returned in this case anyway
                 return rewriteURL(baseURI.getScheme() != null ? baseURI.getScheme() : request.getScheme(),
                         baseURI.getHost() != null ? baseURI.getHost() : request.getServerName(),
@@ -385,7 +385,7 @@ public class URLRewriterUtils {
 
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
-        return StringUtils.isBlank(propertyString) ? null : propertyString.trim();
+        return StringUtils.isBlank(propertyString) ? null : ScalaUtils.trimAllToEmpty(propertyString);
     }
 
     // Return the version string either in clear or encoded with HMAC depending on configuration
@@ -428,16 +428,16 @@ public class URLRewriterUtils {
             this.pattern = Pattern.compile(regexp);
         }
     }
-    
+
     public static boolean isVersionedURL(String absolutePathNoContext, List<URLRewriterUtils.PathMatcher> pathMatchers) {
         for (final URLRewriterUtils.PathMatcher pathMatcher : pathMatchers) {
             if (RegexpMatcher.jMatchResult(pathMatcher.pattern, absolutePathNoContext).matches())
                 return true;
         }
-        
+
         return false;
     }
-    
+
     public static List<URLRewriterUtils.PathMatcher> getPathMatchers() {
         final List<URLRewriterUtils.PathMatcher> pathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PathMatchers());
         return (pathMatchers != null) ? pathMatchers : URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;

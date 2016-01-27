@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.pipeline.InitUtils
-import collection.JavaConverters._
+import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
+import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+
+import scala.collection.JavaConverters._
 
 // Orbeon web app initialization
 object Orbeon {
@@ -57,12 +58,10 @@ object Orbeon {
 
       // Try to replace the run mode variable so we can write "oxf:/config/properties-${oxf.run-mode}.xml"
       val rawPropertiesURL =
-        StringUtils.trimToNull(
-          context.initParameters.getOrElse(
-            PropertiesProperty,
-            throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")
-          )
-        )
+        context.initParameters.getOrElse(
+          PropertiesProperty,
+          throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")
+        ).trimAllToNull
 
       val runMode = RunMode.getRunMode(context.initParameters)
       logger.info("Using run mode: " + runMode)

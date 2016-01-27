@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.junit.Test;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -94,7 +95,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         assertNotNull(result);
         assertEquals(1, result.size());
         Element resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(XFormsUtils.getElementId(resultElement).trim().length() > 0);
+        assertTrue(ScalaUtils.trimAllToEmpty(XFormsUtils.getElementId(resultElement)).length() > 0);
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxf:attribute for "span" with correct name
@@ -113,7 +114,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         assertNotNull(result);
         assertEquals(1, result.size());
         resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(XFormsUtils.getElementId(resultElement).trim().length() > 0);
+        assertTrue(ScalaUtils.trimAllToEmpty(XFormsUtils.getElementId(resultElement)).length() > 0);
         assertEquals("style", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
     }
 }

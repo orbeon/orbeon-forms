@@ -197,4 +197,32 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     for ((in, out) ← expected)
       assert(out === truncateWithEllipsisTupled(in))
   }
+
+  @Test def testTrim(): Unit = {
+
+    val zeroWidthSpaces   = "\u200b\u200c\u200d\ufeff" // last one is the BOM
+    val nonBreakingSpaces = "\u00A0\u2007\u202F"
+    val otherSpaces       = "\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000"
+    val isoControls       = new String(Array((0x00 to 0x1f) ++ (0x7f to 0x9f) map (_.toChar): _*))
+
+    val allToTrim         = zeroWidthSpaces + nonBreakingSpaces + otherSpaces + isoControls
+
+    // NOTE: All spaces and control characters are in the BMP and cannot collide with surrogates. We we are not testing much here.
+    val rareChineseChar1 = "\ud860\udee2" // '(Cant.) an elevator (from the British 'lift')'
+    val rareChineseChar2 = "\ud84a\udf43" // '(Cant.) to touch; to bump into; to take, get, receive; to lightly support something with the hand'
+    val funnyCharsString = allToTrim + rareChineseChar1 + allToTrim + rareChineseChar2 + allToTrim
+
+    val expected = Seq(
+      ""               → "",
+      (null: String)   → "",
+      "  "             → "",
+      "\t"             → "",
+      "  a b c  "      → "a b c",
+      allToTrim        → "",
+      funnyCharsString → (rareChineseChar1 + allToTrim + rareChineseChar2)
+    )
+
+    for ((in, out) ← expected)
+      assert(out === in.trimAllToEmpty)
+  }
 }

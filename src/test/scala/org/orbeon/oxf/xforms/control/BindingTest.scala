@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
 import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
 
 class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -76,7 +77,7 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 
     initialNameValues foreach { case (name, value) ⇒
       assert(isRelevant(name))
-      assert(getValueControl(name).getValue.trim === value)
+      assert(getValueControl(name).getValue.trimAllToEmpty === value)
     }
 
     assert(! isRelevant("complex-input"))

@@ -17,6 +17,7 @@ import org.dom4j.InvalidXPathException;
 import org.jaxen.*;
 import org.jaxen.dom.DOMXPath;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.w3c.dom.Node;
 
 import java.util.*;
@@ -108,7 +109,7 @@ public class XPathUtils {
         String result = selectStringValue(node, expr, Collections.EMPTY_MAP);
         if (result == null)
             return null;
-        result = result.trim();
+        result = ScalaUtils.trimAllToEmpty(result);
         if ("".equals(result))
             return null;
         return result;
@@ -118,7 +119,7 @@ public class XPathUtils {
         String result = selectStringValue(node, expr, Collections.EMPTY_MAP, null, null);
         if (result == null)
             return null;
-        result = result.trim();
+        result = ScalaUtils.trimAllToEmpty(result);
         if ("".equals(result))
             return null;
         return result;

@@ -19,6 +19,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -93,7 +94,7 @@ public class PropertyStore {
                 final String value; {
                     final String valueFromAttribute = propertyElement.attributeValue("value");
                     if (valueFromAttribute == null)
-                        value = propertyElement.getText().trim(); // trim as attributes are normalized
+                        value = ScalaUtils.trimAllToEmpty(propertyElement.getText()); // trim as attributes are normalized
                     else
                         value = valueFromAttribute;
                 }

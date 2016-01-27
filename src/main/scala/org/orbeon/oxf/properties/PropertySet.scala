@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.properties
 
-import org.apache.commons.lang3.StringUtils
-import org.dom4j.Element
-import org.dom4j.QName
+import java.lang.{Boolean ⇒ JBoolean, Integer ⇒ JInteger}
+import java.net.URI
+import java.util.{Date ⇒ JDate, List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet}
+
+import org.dom4j.{Element, QName}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.ScalaUtils.{BooleanWrapper, CodePointsOps, split}
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import java.net.URI
-import java.util.{List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet, Date ⇒ JDate}
-import java.lang.{Boolean ⇒ JBoolean, Integer ⇒ JInteger}
-import collection.JavaConverters._
-import collection.mutable
-import org.orbeon.oxf.util.ScalaUtils.{split, BooleanWrapper}
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
 
@@ -209,8 +209,8 @@ class PropertySet {
 
   def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
     getObject(name) match {
-      case p: String ⇒ if (allowEmpty) StringUtils.trimToEmpty(p) else StringUtils.trimToNull(p)
-      case p: URI    ⇒ if (allowEmpty) StringUtils.trimToEmpty(p.toString) else StringUtils.trimToNull(p.toString)
+      case p: String ⇒ if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
+      case p: URI    ⇒ if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
       case null      ⇒ null
       case _         ⇒ throw new OXFException("Invalid attribute type requested for property '" + name + "': expected " + XMLConstants.XS_STRING_QNAME.getQualifiedName + " or " + XMLConstants.XS_ANYURI_QNAME.getQualifiedName)
     }
@@ -219,7 +219,7 @@ class PropertySet {
     Option(getStringOrURIAsString(name, allowEmpty)) getOrElse default
 
   def getString(name: String): String =
-    StringUtils.trimToNull(getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String])
+    getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToNull
 
   def getNmtokens(name: String): JSet[String] =
     getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[JSet[String]]

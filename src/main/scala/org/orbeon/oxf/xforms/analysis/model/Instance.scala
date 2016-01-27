@@ -13,23 +13,23 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import org.dom4j.{Document, Element, QName}
+import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.http.Credentials
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.{XPath, Logging, NetUtils}
-import org.orbeon.oxf.xforms._
-import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
-import org.orbeon.oxf.xforms.model.InstanceDataOps
-import xbl.Scope
-import XFormsConstants._
-import org.dom4j.{Document, QName, Element}
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
-import org.orbeon.oxf.common.{ValidationException, Version}
-import org.orbeon.oxf.xml.{TransformerUtils, Dom4j}
-import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
-import org.orbeon.saxon.om.DocumentInfo
-import collection.JavaConverters._
-import org.orbeon.saxon.dom4j.{DocumentWrapper, TypedDocumentWrapper}
+import org.orbeon.oxf.util.ScalaUtils.{CodePointsOps, stringOptionToSet}
+import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.model.InstanceDataOps
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
+import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
+import org.orbeon.saxon.dom4j.{DocumentWrapper, TypedDocumentWrapper}
+import org.orbeon.saxon.om.DocumentInfo
+
+import scala.collection.JavaConverters._
 
 /**
  * Static analysis of an XForms instance.
@@ -104,8 +104,8 @@ trait InstanceMetadata {
   def partExposeXPathTypes: Boolean
   def extendedLocationData: ExtendedLocationData
 
-  import Instance._
   import ElementAnalysis._
+  import Instance._
 
   val readonly = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
   val cache = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
@@ -157,7 +157,7 @@ trait InstanceMetadata {
     throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
   private def getAttributeEncode(qName: QName) =
-    Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trim, true))
+    Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trimAllToEmpty, true))
 
   private def src = getAttributeEncode(SRC_QNAME)
   private def resource = getAttributeEncode(RESOURCE_QNAME)

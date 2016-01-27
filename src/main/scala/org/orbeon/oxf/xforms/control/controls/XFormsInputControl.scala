@@ -17,7 +17,9 @@ import java.util.{Calendar, GregorianCalendar}
 
 import org.dom4j.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
@@ -42,6 +44,8 @@ class XFormsInputControl(
 ) extends XFormsSingleNodeControl(container, parent, element, id)
   with XFormsValueControl
   with FocusableTrait {
+
+  override type Control <: InputControl
 
   private def format   = Option(staticControl) flatMap (_.format)
   private def unformat = Option(staticControl) flatMap (_.unformat)
@@ -108,13 +112,13 @@ class XFormsInputControl(
 
     getBuiltinTypeName match {
       case "boolean"                ⇒ normalizeBooleanString(externalValue)
-      case "date"     if isNoscript ⇒ parseForNoscript(DateParsePatterns, externalValue.trim, dayMonth)
-      case "time"     if isNoscript ⇒ parseForNoscript(TimeParsePatterns, externalValue.trim, dayMonth)
+      case "date"     if isNoscript ⇒ parseForNoscript(DateParsePatterns, externalValue.trimAllToEmpty, dayMonth)
+      case "time"     if isNoscript ⇒ parseForNoscript(TimeParsePatterns, externalValue.trimAllToEmpty, dayMonth)
       case "dateTime" if isNoscript ⇒
         // Split into date and time parts
         // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
-        val datePart = getDateTimeDatePart(externalValue.trim, REPEAT_SEPARATOR)
-        val timePart = getDateTimeTimePart(externalValue.trim, REPEAT_SEPARATOR)
+        val datePart = getDateTimeDatePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
+        val timePart = getDateTimeTimePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
         if (datePart.nonEmpty || timePart.nonEmpty)
           // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
           parseForNoscript(DateParsePatterns, datePart, dayMonth) + 'T' + parseForNoscript(TimeParsePatterns, timePart, dayMonth)
@@ -247,7 +251,7 @@ object XFormsInputControl {
     if (separatorIndex == -1)
       value
     else
-      value.substring(0, separatorIndex).trim
+      value.substring(0, separatorIndex).trimAllToEmpty
   }
 
   private def getDateTimeTimePart(value: String, separator: Char) = {
@@ -255,7 +259,7 @@ object XFormsInputControl {
     if (separatorIndex == -1)
       ""
     else
-      value.substring(separatorIndex + 1).trim
+      value.substring(separatorIndex + 1).trimAllToEmpty
   }
 
   private def parseForNoscript(patterns: Seq[ParsePattern], value: String, dayMonth: Boolean): String = {

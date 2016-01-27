@@ -48,6 +48,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
 import org.orbeon.oxf.xforms.schema.SchemaDependencies;
@@ -505,7 +506,7 @@ public class XFormsModelSchemaValidator {
                 }
             case Acceptor.STRING_PROHIBITED:
                 {
-                    final String trimmed = text.trim();
+                    final String trimmed = ScalaUtils.trimAllToEmpty(text);
                     if (trimmed.length() > 0) {
                         if (isReportErrors) {
                             addSchemaError(element, stringRef.str);

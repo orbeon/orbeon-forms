@@ -276,19 +276,19 @@ public class NetUtils {
         // Parse parameters
         final Map<String, String> parameters = new HashMap<String, String>();
         while (st.hasMoreTokens()) {
-            final String parameter = st.nextToken().trim();
+            final String parameter = ScalaUtils.trimAllToEmpty(st.nextToken());
             final int equalIndex = parameter.indexOf('=');
             if (equalIndex == -1)
                 continue;
-            final String name = parameter.substring(0, equalIndex).trim();
-            final String value = parameter.substring(equalIndex + 1).trim();
+            final String name = ScalaUtils.trimAllToEmpty(parameter.substring(0, equalIndex));
+            final String value = ScalaUtils.trimAllToEmpty(parameter.substring(equalIndex + 1));
             parameters.put(name, value);
         }
         return parameters;
     }
 
     public static String getContentTypeMediaType(String contentType) {
-        contentType = StringUtils.trimToNull(contentType);
+        contentType = ScalaUtils.trimAllToNull(contentType);
         if (contentType == null)
             return null;
 
@@ -296,7 +296,7 @@ public class NetUtils {
         if (semicolonIndex == -1)
             return contentType;
 
-        final String mediatype = StringUtils.trimToNull(contentType.substring(0, semicolonIndex));
+        final String mediatype = ScalaUtils.trimAllToNull(contentType.substring(0, semicolonIndex));
         if (mediatype == null || mediatype.equalsIgnoreCase("content/unknown"))
             return null;
         else
@@ -803,7 +803,7 @@ public class NetUtils {
         // however, their use is highly discouraged (unless they are encoded by %20).".
 
         // We assume that we never want leading or trailing spaces. You can use %20 if you really want this.
-        uriString = uriString.trim();
+        uriString = ScalaUtils.trimAllToEmpty(uriString);
 
         // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.
         // * the control characters #x0 to #x1F and #x7F to #x9F

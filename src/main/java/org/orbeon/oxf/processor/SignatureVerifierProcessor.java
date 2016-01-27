@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
@@ -61,7 +61,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
 
                     final Document data = readInputAsDOM4J(context, INPUT_DATA);
                     final Node sigDataNode = data.selectSingleNode("/signed-data/data/*");
-                    final String sig = StringUtils.trimToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
+                    final String sig = ScalaUtils.trimAllToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
 
                     sigDataNode.detach();
                     final Document sigData = new NonLazyUserDataDocument();

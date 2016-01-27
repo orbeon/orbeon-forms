@@ -18,11 +18,11 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.sql.interpreters.*;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -141,7 +141,7 @@ public class SQLProcessor extends ProcessorImpl {
                         private boolean endTextSequence(Element element, Text previousText) {
                             if (previousText != null) {
                                 String value = previousText.getText();
-                                if (value == null || value.trim().equals("")) {
+                                if (value == null || ScalaUtils.trimAllToEmpty(value).equals("")) {
                                     element.remove(previousText);
                                     return true;
                                 }
@@ -598,7 +598,7 @@ public class SQLProcessor extends ProcessorImpl {
             if (currentHandler == null) {
                 // Output only if the string is non-blank [FIXME: Incorrect white space handling!]
 //                String s = new String(chars, start, length);
-//                if (!s.trim().equals(""))
+//                if (!ScalaUtils.trimAllToEmpty(s).equals(""))
                 super.characters(chars, start, length);
             } else {
                 super.characters(chars, start, length);

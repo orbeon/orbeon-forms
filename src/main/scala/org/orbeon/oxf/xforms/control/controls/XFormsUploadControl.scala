@@ -143,8 +143,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
     // Clean values
-    val newValue = StringUtils.trimToEmpty(rawNewValue)
-    val oldValue = StringUtils.trimToEmpty(getValue)
+    val newValue = rawNewValue.trimAllToEmpty
+    val oldValue = getValue.trimAllToEmpty
     try {
       // Only process if the new value is different from the old one
       val valueToStore =

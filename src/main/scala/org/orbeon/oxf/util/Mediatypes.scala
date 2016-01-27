@@ -86,7 +86,7 @@ object Mediatypes {
 
       override def endElement(uri: String, localname: String, qName: String): Unit = {
         localname match {
-          case NameElement     ⇒ name = builder.toString.trim
+          case NameElement     ⇒ name = builder.toString.trimAllToEmpty
           case PatternElement  ⇒ buffer += Mapping(extensionFromPattern(builder.toString), name.toLowerCase)
           case MimeTypeElement ⇒ name = null
           case _               ⇒

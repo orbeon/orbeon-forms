@@ -372,7 +372,7 @@ object XML {
     def attTokens(attName: QName)  = stringOptionToSet(Some(attValue(attName)))
     def attClasses = attTokens("class")
     def id = attValue("id")
-    def hasId = att("id").nonEmpty && attValue("id").trim != ""
+    def hasId = att("id").nonEmpty && attValue("id").trimAllToEmpty != ""
 
     def attValueOpt(attName: String) = /@(attName) match {
       case Seq() ⇒ None

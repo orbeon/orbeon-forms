@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.util
 
-import collection.generic.CanBuildFrom
-import java.io.{Writer, Reader, OutputStream, InputStream}
-import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
+import java.io.{InputStream, OutputStream, Reader, Writer}
+
 import org.apache.log4j.Logger
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
-import reflect.ClassTag
+
+import scala.collection.generic.CanBuildFrom
 import scala.collection.{TraversableLike, mutable}
+import scala.language.{implicitConversions, reflectiveCalls}
+import scala.reflect.ClassTag
 import scala.util.control.NonFatal
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 abstract class Function1Adapter[-T1, +R] extends (T1 ⇒ R)
 
@@ -118,7 +120,7 @@ object ScalaUtils extends PathOps {
 
 
   // If the string is null or empty, return None, otherwise return Some(trimmed value)
-  def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
+  def nonEmptyOrNone(s: String) = Option(s) map trimAllToEmpty filterNot (_.isEmpty)
 
   // Extensions on Boolean
   implicit class BooleanWrapper(val b: Boolean) extends AnyVal {
@@ -322,8 +324,63 @@ object ScalaUtils extends PathOps {
       pf.isDefinedAt(a) option pf(a)
   }
 
+  // Mainly for Java callers
+  def trimAllToEmpty(s: String) = s.trimAllToEmpty
+  def trimAllToNull(s: String)  = s.trimAllToNull
+
   implicit class CodePointsOps(val s: String) extends AnyVal {
+
     def iterateCodePoints: Iterator[Int] = new CodePointsIterator(s)
+
+    private def isNonBreakingSpace(c: Int) =
+      c == '\u00A0' || c == '\u2007' || c == '\u202F'
+
+    private def isZeroWidthChar(c: Int) =
+      c == '\u200b' || c == '\u200c' || c == '\u200d' || c == '\ufeff'
+
+    def trimAllToEmpty = trimControlAndAllWhitespaceToEmptyCP
+
+    def trimAllToOpt: Option[String] = {
+      val trimmed = trimAllToEmpty
+      trimmed.nonEmpty option trimmed
+    }
+
+    def trimAllToNull: String = {
+      val trimmed = trimAllToEmpty
+      if (trimmed.isEmpty) null else trimmed
+    }
+
+    def trimControlAndAllWhitespaceToEmptyCP =
+      trimToEmptyCP(c ⇒ Character.isWhitespace(c) || isNonBreakingSpace(c) || isZeroWidthChar(c) || Character.isISOControl(c))
+
+    // Trim the string according to a matching function
+    // This checks for Unicode code points, unlike String.trim() or StringUtils.trim(). When matching on spaces
+    // and control characters, this is not strictly necessary since they are in the BMP and cannot collide with
+    // surrogates. But in the general case it is more correct to test on code points.
+    def trimToEmptyCP(matches: Int ⇒ Boolean) =
+      if ((s eq null) || s.isEmpty) {
+        ""
+      } else {
+
+        val it = s.iterateCodePoints
+
+        var prefix = 0
+
+        it takeWhile matches foreach { c ⇒
+          prefix += Character.charCount(c)
+        }
+
+        var suffix = 0
+
+        it foreach { c ⇒
+          if (matches(c))
+            suffix += Character.charCount(c)
+          else
+            suffix = 0
+        }
+
+        s.substring(prefix, s.size - suffix)
+      }
   }
 
   private class CodePointsIterator(val s: String) extends Iterator[Int] {

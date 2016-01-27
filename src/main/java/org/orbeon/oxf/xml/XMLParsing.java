@@ -20,19 +20,25 @@ import orbeon.apache.xerces.xni.parser.XMLInputSource;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.SequenceReader;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
 import org.xml.sax.*;
 
 import javax.xml.parsers.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XMLParsing {
 
@@ -244,7 +250,7 @@ public class XMLParsing {
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
     public static void stringToSAX(String xml, String systemId, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
-        if (xml.trim().equals("")) {
+        if (ScalaUtils.trimAllToEmpty(xml).equals("")) {
             try {
                 xmlReceiver.startDocument();
                 xmlReceiver.endDocument();
@@ -332,7 +338,7 @@ public class XMLParsing {
     public static boolean isWellFormedXML(String xmlString) {
 
         // Empty string is never well-formed XML
-        if (xmlString.trim().length() == 0)
+        if (ScalaUtils.trimAllToEmpty(xmlString).length() == 0)
             return false;
 
         try {

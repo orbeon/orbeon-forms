@@ -494,7 +494,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Set the control help and add/remove help element and placeholders as needed
   def setControlHelp(controlName: String,  value: String) = {
 
-    setControlResource(controlName, "help", StringUtils.trimToEmpty(value))
+    setControlResource(controlName, "help", value.trimAllToEmpty)
 
     val inDoc = getFormDoc
 

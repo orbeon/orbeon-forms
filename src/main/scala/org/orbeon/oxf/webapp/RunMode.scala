@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util.ScalaUtils._
 
 object RunMode {
 
@@ -26,5 +26,5 @@ object RunMode {
 
   // Return the web app's run mode
   def getRunMode(contextParams: Map[String, String]) =
-    Option(StringUtils.trimToNull(contextParams.get(RunModeProperty).orNull)) getOrElse DefaultRunMode
+    contextParams.get(RunModeProperty) flatMap nonEmptyOrNone getOrElse DefaultRunMode
 }

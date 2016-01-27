@@ -16,14 +16,15 @@ package org.orbeon.oxf.processor.converter;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.SAXUtils;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.saxrewrite.DocumentRootState;
 import org.orbeon.oxf.xml.saxrewrite.FragmentRootState;
 import org.orbeon.oxf.xml.saxrewrite.State;
@@ -265,7 +266,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         final StringBuilder sb = new StringBuilder(archiveAttribute.length() * 2);
                         boolean first = true;
                         while (st.hasMoreTokens()) {
-                            final String currentArchive = st.nextToken().trim();
+                            final String currentArchive = ScalaUtils.trimAllToEmpty(st.nextToken());
                             final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
                             if (!first) {
                                 sb.append(' ');
@@ -312,7 +313,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     final StringBuilder sb = new StringBuilder(archiveAttribute.length() * 2);
                     boolean first = true;
                     while (st.hasMoreTokens()) {
-                        final String currentArchive = st.nextToken().trim();
+                        final String currentArchive = ScalaUtils.trimAllToEmpty(st.nextToken());
                         final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
                         if (!first) {
                             sb.append(' ');
@@ -340,22 +341,22 @@ abstract class AbstractRewrite extends ProcessorImpl {
         	final boolean inObject = fObjectParent.size() >= 2 && fObjectParent.get(fObjectParent.size() - 2).booleanValue();
         	done :
     		if (inObject && "param".equals(lnam)) {
-    			
+
     			final String nameAttribute = atts.getValue("", "name");
     			final String valueAttribute = atts.getValue("", "value");
-    			
+
     			if (nameAttribute == null || valueAttribute == null) break done;
-    			
+
     			ret = this;
     			final AttributesImpl newAtts = SAXUtils.getAttributesFromDefaultNamespace(atts);
-    			
-    			if ("archive".equals(nameAttribute.trim()))
+
+    			if ("archive".equals(ScalaUtils.trimAllToEmpty(nameAttribute)))
     			{
     				final StringTokenizer st = new StringTokenizer(valueAttribute, ",");
     				final StringBuilder sb = new StringBuilder(valueAttribute.length() * 2);
     				boolean first = true;
     				while (st.hasMoreTokens()) {
-    					final String currentArchive = st.nextToken().trim();
+    					final String currentArchive = ScalaUtils.trimAllToEmpty(st.nextToken());
     					final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
     					if (!first) {
     						sb.append(' ');
@@ -366,12 +367,12 @@ abstract class AbstractRewrite extends ProcessorImpl {
     				final int idx = newAtts.getIndex("", "value");
     				newAtts.setValue(idx, sb.toString());
     			}
-    			
+
     			xmlReceiver.startElement(ns, lnam, qnam, newAtts);
     		}
         	return ret;
         }
-        
+
         /**
          * Handler for {http://www.w3.org/1999/xhtml}a.  Assumes namespace test has already
          * happened.  Implements :
@@ -656,7 +657,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          */
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
         	fObjectParent.add(Boolean.valueOf(OBJECT_ELT.equals(lnam) && XMLConstants.XHTML_NAMESPACE_URI.equals(ns)));
-        	
+
             final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
             final String noRewriteValue = atts.getValue(noRewriteIndex);
             State ret = null;
@@ -708,7 +709,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                     ret = handleEltWithResource("frame", SRC_ATT, ns, lnam, qnam, atts);
                     if (ret != null) break done;
-                    
+
                     ret = handleEltWithResource("iframe", SRC_ATT, ns, lnam, qnam, atts);
                     if (ret != null) break done;
 
@@ -732,7 +733,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                     ret = handleParam(ns, lnam, qnam, atts);
                     if (ret != null) break done;
-                    
+
                     // Not valid in HTML, but useful for e.g. Dojo contentPane
                     ret = handleEltWithResource("div", HREF_ATT, ns, lnam, qnam, atts);
                     if (ret != null) break done;

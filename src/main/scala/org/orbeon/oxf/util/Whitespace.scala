@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.util
 
-import collection.mutable
 import org.orbeon.css.CSSSelectorParser
-import org.xml.sax.Attributes
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.xml.sax.Attributes
+
+import scala.collection.mutable
 
 object Whitespace  {
 
@@ -26,7 +28,7 @@ object Whitespace  {
   case object Preserve  extends Policy { val name = "preserve"  }
   case object Normalize extends Policy { val name = "normalize" } // like XML Schema's collapse and XPath's normalize-space()
   case object Collapse  extends Policy { val name = "collapse"  } // collapse sequences of multiple whitespace characters to a single space
-  
+
   val AllPolicies = List(Preserve, Normalize, Collapse)
 
   // Only support a small subset of selectors for now
@@ -36,7 +38,7 @@ object Whitespace  {
   case class ElementAttributeValueMatcher(name: (String, String), attName: String, attValue: String, negate: Boolean) extends Matcher
 
   type PolicyMatcher = (Policy, (String, String), Attributes, Option[(String, String)]) ⇒ Policy
-  
+
   private class PolicyMatcherImpl(val matchers: List[(Matcher, Policy)]) extends PolicyMatcher {
 
     // Index matchers for efficiency
@@ -97,10 +99,10 @@ object Whitespace  {
   private def policyMatcherFromProperties(base: Option[PolicyMatcherImpl], scope: String): PolicyMatcherImpl = {
 
     val propertySet = Properties.instance.getPropertySet
-    
+
     def whitespacePropertyDontAssociate(scope: String, policy: String) = (
       Option(propertySet.getProperty(scope + '.' + policy))
-      map (property ⇒ property.namespaces → property.value.toString.trim)
+      map (property ⇒ property.namespaces → property.value.toString.trimAllToEmpty)
     )
 
     // NOTE: Not ideal if no whitespace property is present, there won't be any caching associated with properties.

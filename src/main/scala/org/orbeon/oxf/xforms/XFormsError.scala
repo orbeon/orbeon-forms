@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms
 
 import java.util.{List ⇒ JList}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.webapp.HttpStatusCode
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -54,10 +54,10 @@ object ServerError {
       Some(root.getClass.getName)
     )
   }
-  
+
   def apply(message: String, location : Option[LocationData], classOpt : Option[String] = None): ServerError =
     ServerError(
-      StringUtils.trimToEmpty(message),
+      message.trimAllToEmpty,
       location flatMap (l ⇒ Option(l.getSystemID)),
       location map     (_.getLine) filter (_ >= 0),
       location map     (_.getCol)  filter (_ >= 0),
@@ -80,13 +80,13 @@ object ServerError {
   // NOTE: A similar concatenation logic is in AjaxServer.js
   def getDetailsAsUserMessage(error: ServerError) =
     error.message :: collectList(error, description) mkString " "
-  
+
   def errorsAsHTMLElem(errors: TraversableOnce[ServerError]) =
     <ul>{
       for (error ← errors)
         yield <li>{XMLUtils.escapeXMLMinimal(ServerError.getDetailsAsUserMessage(error))}</li>
     }</ul>
-  
+
   def errorsAsXHTMLElem(errors: TraversableOnce[ServerError]) =
     <ul xmlns="http://www.w3.org/1999/xhtml">{
       for (error ← errors)
@@ -148,7 +148,7 @@ object XFormsError {
         case _                                    ⇒ false
       }
 
-    if (container.getPartAnalysis.isTopLevel           &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic. 
+    if (container.getPartAnalysis.isTopLevel           &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
       container.getContainingDocument.isInitializing &&
       causesContainFatalError) {
       throw new OXFException(t)

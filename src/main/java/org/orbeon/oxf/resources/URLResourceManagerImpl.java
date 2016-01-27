@@ -17,8 +17,12 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.ScalaUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,7 +46,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
         if (root == null)
             throw new OXFException("Property " + URLResourceManagerFactory.BASE_URL + " must be set.");
         // Clean-up URL
-        root = root.trim();
+        root = ScalaUtils.trimAllToEmpty(root);
         if (!root.endsWith("/"))
             root = root + "/";
 

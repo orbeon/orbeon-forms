@@ -180,7 +180,7 @@ case class Credentials(username: String, password: Option[String], preemptiveAut
 object Credentials {
   def apply(username: String, password: String, preemptiveAuth: String, domain: String): Credentials =
     Credentials(
-      username.trim,
+      username.trimAllToEmpty,
       nonEmptyOrNone(password),
       ! (nonEmptyOrNone(preemptiveAuth) contains "false"),
       nonEmptyOrNone(domain)

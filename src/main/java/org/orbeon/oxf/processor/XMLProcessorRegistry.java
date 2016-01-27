@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -162,9 +163,9 @@ public class XMLProcessorRegistry extends ProcessorImpl {
     public static String extractProcessorURI(Element processorElement) {
         // [BACKWARD COMPATIBILITY] Extract URI
         String uri = XPathUtils.selectStringValueNormalize(processorElement, "@uri");
-        if (uri == null || uri.trim().length() == 0)
+        if (uri == null || ScalaUtils.trimAllToEmpty(uri).length() == 0)
             return null;
         else
-            return uri.trim();
+            return ScalaUtils.trimAllToEmpty(uri);
     }
 }

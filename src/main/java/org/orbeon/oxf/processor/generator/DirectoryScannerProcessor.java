@@ -29,11 +29,12 @@ import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
+import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -94,7 +95,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         final Document configNode = readInputAsDOM4J(context, input);
                         final Config config = new Config();
 
-                        final String baseDirectoryURLString = XPathUtils.selectStringValueNormalize(configNode, "/config/base-directory").trim();
+                        final String baseDirectoryURLString = ScalaUtils.trimAllToEmpty(XPathUtils.selectStringValueNormalize(configNode, "/config/base-directory"));
 
                         // Use location data if present so that relative URLs can be supported
                         final LocationData locationData = getLocationData();

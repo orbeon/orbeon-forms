@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
 
 // Poor man's CSS selector parser. See XBLTransformerTest for the supported subset of CSS.
 // TODO: handle [att], [att=val], [att~=val], [att|=val]
@@ -29,7 +30,7 @@ object CSSParser {
       if (! firstSelector)
         sb append '|'
 
-      val pathsElements = StringUtils.split(selector.trim, ' ')
+      val pathsElements = StringUtils.split(selector.trimAllToEmpty, ' ')
       var firstElement = true
       var wasChildAxis = false
       for (pathElement ← pathsElements) {
@@ -38,7 +39,7 @@ object CSSParser {
           if (Set(":root", "*:root")(pathElement))
             sb append "."
           else
-            sb append pathElement.replace('|', ':').trim
+            sb append pathElement.replace('|', ':').trimAllToEmpty
           false
         }
 

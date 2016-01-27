@@ -13,21 +13,22 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import collection.JavaConverters._
 import org.apache.commons.lang3.StringUtils
-import org.dom4j.{QName, Text, Element}
+import org.dom4j.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.{XPath, ScalaUtils, XPathCache}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{ScalaUtils, XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.control.LHHAValue
-import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, XFormsItemUtils}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import ScalaUtils._
+
+import scala.collection.JavaConverters._
 
 trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait with ChildrenLHHAItemsetsAndActionsTrait {
 
@@ -209,7 +210,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
           nestedElementOpt flatMap { nestedElement ⇒
             val containsHTML = Array(false)
 
-            val valueOpt = Option(StringUtils.trimToNull(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML)))
+            val valueOpt = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML).trimAllToOpt
 
             if (required)
               Some(LHHAValue(valueOpt getOrElse "", containsHTML(0)))

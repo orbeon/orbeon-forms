@@ -880,6 +880,7 @@
             <include name="yui/button/button.js"/>
             <include name="yui/container/container.js"/>
             <include name="yui/connection/connection.js"/>
+            <include name="yui/calendar/calendar.js"/>
             <include name="yui/treeview/treeview.js"/>
             <include name="yui/examples/treeview/assets/js/TaskNode.js"/>
             <include name="yui/examples/treeview/assets/js/CheckOnClickNode.js"/>

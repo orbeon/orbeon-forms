@@ -137,7 +137,7 @@ class NonNegativeValidation extends ValidationFunction {
   val propertyName = "non-negative"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.signum(value) != -1
+    NumericValidation.trySignum(value) map (_ != -1) getOrElse false
 }
 
 class NegativeValidation extends ValidationFunction {
@@ -145,7 +145,7 @@ class NegativeValidation extends ValidationFunction {
   val propertyName = "negative"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.signum(value) == -1
+    NumericValidation.trySignum(value) map (_ == -1) getOrElse false
 }
 
 class NonPositiveValidation extends ValidationFunction {
@@ -153,7 +153,7 @@ class NonPositiveValidation extends ValidationFunction {
   val propertyName = "non-positive"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.signum(value) != 1
+    NumericValidation.trySignum(value) map (_ != 1) getOrElse false
 }
 
 class PositiveValidation extends ValidationFunction {
@@ -161,23 +161,24 @@ class PositiveValidation extends ValidationFunction {
   val propertyName = "positive"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.signum(value) == 1
+    NumericValidation.trySignum(value) map (_ == 1) getOrElse false
 }
 
 object NumericValidation {
 
-  def signum(value: String): Int = parseAsLongOrBigDecimal(value) match {
+  def trySignum(value: String): Try[Int] = tryParseAsLongOrBigDecimal(value) map {
     case Left(long)        ⇒ long.signum
     case Right(bigDecimal) ⇒ bigDecimal.signum
   }
 
-  def parseAsLongOrBigDecimal(value: String): Either[Long, BigDecimal] =
+  def tryParseAsLongOrBigDecimal(value: String): Try[Either[Long, BigDecimal]] = Try {
     try {
       Left(value.toLong)
     } catch {
       case e: NumberFormatException ⇒
         Right(BigDecimal(value))
     }
+  }
 }
 
 class MaxFractionDigitsValidation extends ValidationFunction {

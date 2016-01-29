@@ -30,8 +30,7 @@ import scala.collection.mutable
 //
 // Used by:
 //
-// - Connection, for internal quests
-// - LocalPortletSubmission
+// - InternalHttpClient
 // - RequestDispatcherSubmission
 //
 class LocalRequest(

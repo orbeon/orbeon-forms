@@ -150,6 +150,6 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 }
 
 object OrbeonPortlet {
-  // As of 2012-05-08, used only by LocalPortletSubmission to get access to ProcessorService
+  // As of 2016-01-28, used only by InternalHttpClient
   val currentPortlet = new DynamicVariable[OrbeonPortlet]
 }

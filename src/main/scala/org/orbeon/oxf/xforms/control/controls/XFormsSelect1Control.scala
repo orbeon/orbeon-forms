@@ -14,33 +14,41 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.common.OrbeonLocationException
+import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
-import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
+import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.helpers.AttributesImpl
-import collection.mutable
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
+
+import scala.collection.mutable
 import scala.util.control.NonFatal
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 
 /**
  * Represents an xf:select1 control.
  */
-class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-    extends XFormsSingleNodeControl(container, parent, element, id)
-    with XFormsValueControl
-    with FocusableTrait {
+class XFormsSelect1Control(
+  container : XBLContainer,
+  parent    : XFormsControl,
+  element   : Element,
+  id        : String
+) extends XFormsSingleNodeControl(
+  container,
+  parent,
+  element,
+  id
+) with XFormsValueControl
+  with FocusableTrait {
 
   import XFormsSelect1Control._
 
@@ -116,26 +124,48 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     // Find what got selected/deselected
     val (selectEvents, deselectEvents) = gatherEvents(externalValue, existingValue)
 
-    // Dispatch xforms-deselect events
     for (currentEvent ← deselectEvents)
       Dispatch.dispatchEvent(currentEvent)
 
-    if (selectEvents.nonEmpty) {
-      // Select events must be sent after all xforms-deselect events
-      for (currentEvent ← selectEvents)
-        Dispatch.dispatchEvent(currentEvent)
+    for (currentEvent ← selectEvents)
+      Dispatch.dispatchEvent(currentEvent)
 
-      // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
-      // we are a closed selection then we do NOT store the value in instance.
-      selectEvents(0).itemValue
-    } else
-      existingValue
+    None
   }
 
-  private def gatherEvents(newExternalValue: String, existingValue: String) = {
+  override def performDefaultAction(event: XFormsEvent): Unit = {
+    event match {
+      case select: XFormsSelectEvent ⇒
+        boundNode match {
+          case Some(boundNode) ⇒
+            DataModel.jSetValueIfChanged(
+              containingDocument = containingDocument,
+              eventTarget        = this,
+              locationData       = getLocationData,
+              nodeInfo           = boundNode,
+              valueToSet         = select.itemValue,
+              source             = "client",
+              isCalculate        = false
+            )
+          case None ⇒
+            // Q: Can this happen?
+            throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
+        }
+      case _ ⇒
+    }
+    super.performDefaultAction(event)
+  }
 
-    val selectEvents   = mutable.Buffer[XFormsSelectEvent]()
-    val deselectEvents = mutable.Buffer[XFormsDeselectEvent]()
+  // For XFormsSelectControl
+  // We should *not* use inheritance this way here!
+  protected def valueControlPerformDefaultAction(event: XFormsEvent): Unit = {
+    super.performDefaultAction(event)
+  }
+
+  private def gatherEvents(newExternalValue: String, existingValue: String): (List[XFormsSelectEvent], List[XFormsDeselectEvent]) = {
+
+    val selectEvents   = mutable.ListBuffer[XFormsSelectEvent]()
+    val deselectEvents = mutable.ListBuffer[XFormsDeselectEvent]()
 
     for (currentItem ← getItemset.allItemsIterator) {
       val currentItemValue = currentItem.value
@@ -150,7 +180,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         deselectEvents += new XFormsDeselectEvent(this, currentItemValue)
     }
 
-    (selectEvents, deselectEvents)
+    (selectEvents.toList, deselectEvents.toList)
   }
 
   override def getBackCopy: AnyRef = {
@@ -243,7 +273,7 @@ object XFormsSelect1Control {
       // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
       containingDocument.getStaticOps.getSelect1Analysis(prefixedId).staticItemset orNull
     }
-  
+
   def mustEncodeValues(containingDocument: XFormsContainingDocument, control: SelectionControlTrait) =
     control.mustEncodeValues getOrElse containingDocument.encodeItemValues
 }

@@ -14,23 +14,33 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
-import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
+import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset.Item
+import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import collection.mutable
-import collection.{Set ⇒ CSet}
+
+import scala.collection.{Set ⇒ CSet, mutable}
 
 /**
  * Represents an xf:select control.
  *
  * xf:select represents items as a list of space-separated tokens.
  */
-class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-    extends XFormsSelect1Control(container, parent, element, id) {
+class XFormsSelectControl(
+  container : XBLContainer,
+  parent    : XFormsControl,
+  element   : Element,
+  id        : String
+) extends XFormsSelect1Control(
+  container,
+  parent,
+  element,
+  id
+) {
 
   import XFormsSelectControl._
 
@@ -57,18 +67,20 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
       mutable.LinkedHashSet(getItemset.allItemsIterator filter matches map (_.value) toList: _*)
     }
 
-    val (newlySelectedValues, newlyDeselectedValues, newInstanceValue) =
+    val (newlySelectedValues, newlyDeselectedValues, _) =
       updateSelection(existingValues, itemsetValues, incomingValuesFiltered)
 
-    // Dispatch xforms-deselect events
-    for (value ← newlySelectedValues)
-      Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
-
-    // Select events must be sent after all xforms-deselect events
+    // 2016-01-29: Switching order of event dispatch as `xf:select1` does it this way and XForms 1.1 says: "Newly
+    // selected items receive the event xforms-select immediately after all newly deselected items receive the
+    // event xforms-deselect."
     for (value ← newlyDeselectedValues)
       Dispatch.dispatchEvent(new XFormsDeselectEvent(this, value))
 
-    newInstanceValue mkString " "
+    for (value ← newlySelectedValues)
+      Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
+
+    // Value is updated via `xforms-select`/`xforms-deselect` events
+    None
   }
 
   override def markDirtyImpl(): Unit = {
@@ -111,11 +123,56 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
 
     setExternalValue(updatedValue)
   }
+
+  override def performDefaultAction(event: XFormsEvent): Unit = {
+    event match {
+      case deselect: XFormsDeselectEvent ⇒
+        boundNode match {
+          case Some(boundNode) ⇒
+            DataModel.jSetValueIfChanged(
+              containingDocument = containingDocument,
+              eventTarget        = this,
+              locationData       = getLocationData,
+              nodeInfo           = boundNode,
+              valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) - deselect.itemValue) mkString " ",
+              source             = "client",
+              isCalculate        = false
+            )
+          case None ⇒
+            // Q: Can this happen?
+            throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
+        }
+      case select: XFormsSelectEvent ⇒
+        boundNode match {
+          case Some(boundNode) ⇒
+            DataModel.jSetValueIfChanged(
+              containingDocument = containingDocument,
+              eventTarget        = this,
+              locationData       = getLocationData,
+              nodeInfo           = boundNode,
+              valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) + select.itemValue) mkString " ",
+              source             = "client",
+              isCalculate        = false
+            )
+          case None ⇒
+            // Q: Can this happen?
+            throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
+        }
+      case _ ⇒
+    }
+    // Make sure not to call the method of XFormsSelect1Control
+    // We should *not* use inheritance this way here!
+    super.valueControlPerformDefaultAction(event)
+  }
 }
 
 object XFormsSelectControl {
-  // Compute a new item selection
-  def updateSelection(existingValues: CSet[String], itemsetValues: CSet[String], incomingValuesFiltered: CSet[String]) = {
+
+  def updateSelection(
+    existingValues         : CSet[String],
+    itemsetValues          : CSet[String],
+    incomingValuesFiltered : CSet[String]
+  ) = {
 
     val newlySelectedValues   = incomingValuesFiltered -- existingValues
     val newlyDeselectedValues = itemsetValues -- incomingValuesFiltered intersect existingValues

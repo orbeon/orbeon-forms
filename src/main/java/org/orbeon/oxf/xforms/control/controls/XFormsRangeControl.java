@@ -55,8 +55,8 @@ public class XFormsRangeControl extends XFormsValueControlBase {
     }
 
     @Override
-    public String translateExternalValue(String externalValue) {
-        return convertFromExternalValue(externalValue);
+    public scala.Option<String> translateExternalValue(String externalValue) {
+        return scala.Option.apply(convertFromExternalValue(externalValue));
     }
 
     private String convertFromExternalValue(String externalValue) {

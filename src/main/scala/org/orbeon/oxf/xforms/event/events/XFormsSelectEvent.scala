@@ -18,8 +18,16 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 
-class XFormsSelectEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsUIEvent(XFORMS_SELECT, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = false) {
+class XFormsSelectEvent(
+  target     : XFormsEventTarget,
+  properties : PropertyGetter
+) extends XFormsUIEvent(
+  XFORMS_SELECT,
+  target.asInstanceOf[XFormsControl],
+  properties,
+  bubbles    = true,
+  cancelable = false
+) {
 
   import XFormsSelectEvent._
 

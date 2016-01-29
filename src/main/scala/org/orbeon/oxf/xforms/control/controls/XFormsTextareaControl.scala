@@ -37,7 +37,7 @@ class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, elem
    * For textareas with mediatype="text/html", we first clean the HTML with TagSoup, and then transform it with
    * a stylesheet that removes all unknown or dangerous content.
    */
-  override def translateExternalValue(externalValue: String): String = {
+  override def translateExternalValue(externalValue: String) = {
 
     def sanitizeForMediatype(s: String) =
       if (XFormsControl.isHTMLMediatype(this)) {
@@ -70,8 +70,7 @@ class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, elem
       } else
         s
 
-
     // Replacement-based input sanitation
-    containingDocument.getStaticState.sanitizeInput(sanitizeForMediatype(externalValue))
+    Option(containingDocument.getStaticState.sanitizeInput(sanitizeForMediatype(externalValue)))
   }
 }

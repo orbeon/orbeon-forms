@@ -114,7 +114,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   def storeExternalValue(externalValue: String) = doStoreExternalValue(externalValue)
 
   // Subclasses can override this to translate the incoming external value
-  def translateExternalValue(externalValue: String) = externalValue
+  def translateExternalValue(externalValue: String): Option[String] = Option(externalValue)
 
   // Set the external value into the instance
   final def doStoreExternalValue(externalValue: String): Unit = {
@@ -125,17 +125,17 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     if (! boundItem.isInstanceOf[NodeInfo])// this should not happen
       throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
 
-    val translatedValue = translateExternalValue(externalValue)
-
-    DataModel.jSetValueIfChanged(
-      containingDocument = containingDocument,
-      eventTarget        = this,
-      locationData       = getLocationData,
-      nodeInfo           = boundItem.asInstanceOf[NodeInfo],
-      valueToSet         = translatedValue,
-      source             = "client",
-      isCalculate        = false
-    )
+    translateExternalValue(externalValue) foreach { translatedValue ⇒
+      DataModel.jSetValueIfChanged(
+        containingDocument = containingDocument,
+        eventTarget        = this,
+        locationData       = getLocationData,
+        nodeInfo           = boundItem.asInstanceOf[NodeInfo],
+        valueToSet         = translatedValue,
+        source             = "client",
+        isCalculate        = false
+      )
+    }
 
     // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
     // the controls as dirty, and they will be evaluated when necessary later.

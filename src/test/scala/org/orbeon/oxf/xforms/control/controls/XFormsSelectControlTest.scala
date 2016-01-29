@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import XFormsSelectControl.updateSelection
 import org.junit.Test
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl.updateSelection
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.scalatest.junit.AssertionsForJUnit
 
-class XFormsSelectControlTest extends AssertionsForJUnit {
+class XFormsSelectControlTest extends DocumentTestBase with AssertionsForJUnit{
+
   @Test def updateSelect(): Unit = {
 
     locally {
@@ -64,5 +67,51 @@ class XFormsSelectControlTest extends AssertionsForJUnit {
       assert(Set() == newlyDeselectedValues)
       assert(Set("a", "b", "c", "d", "e") == newInstanceValue)
     }
+  }
+
+  // See https://github.com/orbeon/orbeon-forms/issues/2517
+  @Test def testSelectDeselectEventsIssue2517(): Unit = {
+
+    this setupDocument
+      <xh:html
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
+        <xh:head>
+          <xf:model id="model" xxf:encrypt-item-values="false">
+            <xf:instance id="instance" xxf:exclude-result-prefixes="#all">
+              <instance/>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <xf:select ref="." appearance="full" id="select">
+            <xf:item>
+                <xf:label>Do you have children?</xf:label>
+                <xf:value>true</xf:value>
+            </xf:item>
+            <xf:setvalue
+                event="xforms-select"
+                ref="."
+                value="true()"/>
+            <xf:setvalue
+                event="xforms-deselect"
+                ref="."
+                value="false()"/>
+          </xf:select>
+        </xh:body>
+      </xh:html>
+
+    assert("" === getControlValue("select"))
+
+    setControlValue("select", "true")
+    assert("true" === getControlValue("select"))
+
+    setControlValue("select", "")
+    assert("false" === getControlValue("select"))
+
+    setControlValue("select", "true")
+    assert("true" === getControlValue("select"))
   }
 }

@@ -110,27 +110,29 @@ class XFormsInputControl(
     // Whether the day precedes the month in dates
     def dayMonth = containingDocument.getDateFormatInput.startsWith("[D")
 
-    getBuiltinTypeName match {
-      case "boolean"                ⇒ normalizeBooleanString(externalValue)
-      case "date"     if isNoscript ⇒ parseForNoscript(DateParsePatterns, externalValue.trimAllToEmpty, dayMonth)
-      case "time"     if isNoscript ⇒ parseForNoscript(TimeParsePatterns, externalValue.trimAllToEmpty, dayMonth)
-      case "dateTime" if isNoscript ⇒
-        // Split into date and time parts
-        // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
-        val datePart = getDateTimeDatePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
-        val timePart = getDateTimeTimePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
-        if (datePart.nonEmpty || timePart.nonEmpty)
-          // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
-          parseForNoscript(DateParsePatterns, datePart, dayMonth) + 'T' + parseForNoscript(TimeParsePatterns, timePart, dayMonth)
-        else
-          // Special case of empty parts
-          ""
-      case "string" | null ⇒
-        // Replacement-based input sanitation for string type only
-        containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
-      case _ ⇒
-        unformatTransform(externalValue)
-    }
+    Option(
+      getBuiltinTypeName match {
+        case "boolean"                ⇒ normalizeBooleanString(externalValue)
+        case "date"     if isNoscript ⇒ parseForNoscript(DateParsePatterns, externalValue.trimAllToEmpty, dayMonth)
+        case "time"     if isNoscript ⇒ parseForNoscript(TimeParsePatterns, externalValue.trimAllToEmpty, dayMonth)
+        case "dateTime" if isNoscript ⇒
+          // Split into date and time parts
+          // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
+          val datePart = getDateTimeDatePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
+          val timePart = getDateTimeTimePart(externalValue.trimAllToEmpty, REPEAT_SEPARATOR)
+          if (datePart.nonEmpty || timePart.nonEmpty)
+            // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
+            parseForNoscript(DateParsePatterns, datePart, dayMonth) + 'T' + parseForNoscript(TimeParsePatterns, timePart, dayMonth)
+          else
+            // Special case of empty parts
+            ""
+        case "string" | null ⇒
+          // Replacement-based input sanitation for string type only
+          containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
+        case _ ⇒
+          unformatTransform(externalValue)
+      }
+    )
   }
 
   // Convenience method for handler: return the value of the first input field.

@@ -27,11 +27,11 @@ import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.JavaConverters._
 
 class PortletEmbeddingContext(
-    context       : PortletContext,
-    request       : PortletRequest,
-    response      : PortletResponse,
-    val httpClient: HttpClient)
-  extends EmbeddingContext {
+  context        : PortletContext,
+  request        : PortletRequest,
+  response       : PortletResponse,
+  val httpClient : HttpClient
+) extends EmbeddingContext {
 
   private val session = request.getPortletSession(true) ensuring (_ ne null)
 
@@ -43,16 +43,16 @@ class PortletEmbeddingContext(
 }
 
 class PortletEmbeddingContextWithResponse(
-    context   : PortletContext,
-    request   : PortletRequest,
-    response  : MimeResponse,
-    httpClient: HttpClient)
-  extends PortletEmbeddingContext(
-    context,
-    request,
-    response,
-    httpClient)
-  with EmbeddingContextWithResponse {
+  context    : PortletContext,
+  request    : PortletRequest,
+  response   : MimeResponse,
+  httpClient : HttpClient
+) extends PortletEmbeddingContext(
+  context,
+  request,
+  response,
+  httpClient
+) with EmbeddingContextWithResponse {
 
   def writer                     = response.getWriter
   def outputStream               = response.getPortletOutputStream
@@ -76,7 +76,12 @@ trait BufferedPortlet {
   // Immutable response with parameters
   case class ResponseWithParameters(response: BufferedContentOrRedirect, parameters: Map[String, List[String]])
 
-  def bufferedRender(request: RenderRequest, response: RenderResponse, render: ⇒ StreamedContentOrRedirect)(implicit ctx: EmbeddingContextWithResponse): Unit =
+  def bufferedRender(
+    request  : RenderRequest,
+    response : RenderResponse,
+    render   : ⇒ StreamedContentOrRedirect)(implicit
+    ctx      : EmbeddingContextWithResponse
+  ): Unit =
     getStoredResponseWithParameters match {
       case Some(ResponseWithParameters(content: BufferedContent, parameters)) if toScalaMap(request.getParameterMap) == parameters ⇒
         // The result of an action with the current parameters is available
@@ -96,7 +101,12 @@ trait BufferedPortlet {
         }
     }
 
-  def bufferedProcessAction(request: ActionRequest, response: ActionResponse, action: ⇒ StreamedContentOrRedirect)(implicit ctx: EmbeddingContext): Unit = {
+  def bufferedProcessAction(
+    request  : ActionRequest,
+    response : ActionResponse,
+    action   : ⇒ StreamedContentOrRedirect)(implicit
+    ctx      : EmbeddingContext
+  ): Unit = {
     // Make sure the previously cached output is cleared, if there is any. We keep the result of only one action.
     clearResponseWithParameters()
 
@@ -141,10 +151,10 @@ trait BufferedPortlet {
   }
 
   private def writeResponseWithParameters(
-    request        : RenderRequest,
-    response       : RenderResponse,
-    responseContent: Content)(
-    implicit ctx   : EmbeddingContextWithResponse
+    request         : RenderRequest,
+    response        : RenderResponse,
+    responseContent : Content)(implicit
+    ctx             : EmbeddingContextWithResponse
   ): Unit = {
     // Set title and content type
     responseContent.title orElse Option(title(request)) foreach response.setTitle

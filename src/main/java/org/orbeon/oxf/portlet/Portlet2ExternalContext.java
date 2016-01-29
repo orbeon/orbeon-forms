@@ -544,7 +544,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) {
             if (isCommitted())
                 throw new IllegalStateException("Cannot call sendRedirect if response is already committed.");
-            this.redirectLocation= location;
+            this.redirectLocation = location;
             this.redirectIsExitPortal = isExitPortal;
         }
 

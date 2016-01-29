@@ -36,9 +36,12 @@ object LiferayURL {
       splitQuery(encodedURL) match {
         case (path, Some(query)) ⇒
           val parameters = decodeSimpleQuery(query)
-          parameters collect { case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) ⇒ resourceId } headOption match {
+          parameters collect {
+            case (ResourceIdParameter, resourceId) if resourceId.contains(URLBaseMagic) ⇒ resourceId
+          } headOption match {
             case Some(resourceId) ⇒
-              val updated = (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)
+              val updated =
+                (parameters filterNot (_._1 == ResourceIdParameter)) :+ (ResourceIdParameter → resourceId)
               NetUtils.appendQueryString(path, encodeSimpleQuery(updated))
             case None ⇒
               encodedURL
@@ -59,7 +62,12 @@ object LiferayURL {
       moveMagicResourceId(url.toString)
     }
 
-    def createPortletURL(url: PortletURL, portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) = {
+    def createPortletURL(
+      url                  : PortletURL,
+      portletMode          : Option[String],
+      windowState          : Option[String],
+      navigationParameters : ju.Map[String, Array[String]]
+    ) = {
       portletMode foreach (v ⇒ url.setPortletMode(new PortletMode(v)))
       windowState foreach (v ⇒ url.setWindowState(new WindowState(v)))
       url.setParameters(navigationParameters)

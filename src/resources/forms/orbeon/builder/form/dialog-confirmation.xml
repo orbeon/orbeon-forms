@@ -22,8 +22,9 @@
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-confirmation-dialog" level="modal" close="false" draggable="true" model="fb-confirmation-model">
-    
-    <xf:label ref="$form-resources/dialog-confirmation/label"/>
+
+    <xf:label model="fr-form-model" ref="$form-resources/dialog-confirmation/label"/>
+    <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xh:div>
         <xh:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="Question" class="fr-dialog-icon"/>

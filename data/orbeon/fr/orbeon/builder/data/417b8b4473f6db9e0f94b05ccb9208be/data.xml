@@ -39,7 +39,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <checkboxes>cat bird</checkboxes>
                         <single-list>cat</single-list>
                         <multiple-list>cat bird</multiple-list>
-                        <boolean>false</boolean>
+                        <yesno-input>false</yesno-input>
+                        <checkbox-input>false</checkbox-input>
+                        <boolean-input>false</boolean-input>
+
                         <dynamic-data-dropdown itemset-empty="false"/>
                         <autocomplete label="United States">us</autocomplete>
                         <autocomplete-result/>
@@ -99,9 +102,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="single-list-bind" ref="single-list" type="xf:string" name="single-list"/>
                     <xf:bind id="multiple-list-bind" ref="multiple-list" name="multiple-list"/>
                     <xf:bind id="autocomplete-bind" ref="autocomplete" name="autocomplete"/>
-                    <xf:bind id="boolean-bind" ref="boolean" type="xf:boolean" name="boolean"/>
                     <xf:bind name="dynamic-data-dropdown" id="dynamic-data-dropdown-bind" ref="dynamic-data-dropdown" type="xf:string"/>
                     <xf:bind name="autocomplete-result" id="autocomplete-result-bind" ref="autocomplete-result" relevant="normalize-space($autocomplete)" calculate="$autocomplete"/>
+                    <xf:bind id="boolean-input-bind" ref="boolean-input" type="xf:boolean"
+                             name="boolean-input"/>
+                    <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
+                    <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
+                             name="checkbox-input"/>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
@@ -285,10 +292,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </multiple-list>
-                        <boolean>
-                            <label>Boolean Input</label>
+                        <yesno-input>
+                            <label>Yes/No Answer</label>
+                            <hint/>
+                        </yesno-input>
+                        <checkbox-input>
+                            <label>Single Checkbox</label>
                             <hint>An input which captures "true" or "false"</hint>
-                        </boolean>
+                        </checkbox-input>
+                        <boolean-input>
+                            <label>Boolean Input (deprecated)</label>
+                            <hint>An input which captures "true" or "false"</hint>
+                        </boolean-input>
+
                         <dynamic-data-dropdown>
                             <label>Dynamic Data Dropdown</label>
                             <hint/>
@@ -519,10 +535,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </multiple-list>
-                        <boolean>
-                            <label>Boolean Input</label>
-                            <hint>An input which captures "true" or "false"</hint>
-                        </boolean>
+                        <yesno-input>
+                            <label>Réponse oui/non</label>
+                            <hint>Un champ qui capture "true" ou "false"</hint>
+                        </yesno-input>
+                        <checkbox-input>
+                            <label>Case à cocher unique</label>
+                            <hint>Un champ qui capture "true" ou "false"</hint>
+                        </checkbox-input>
+                        <boolean-input>
+                            <label>Champ booléen (déprécié)</label>
+                            <hint>Un champ qui capture "true" ou "false"</hint>
+                        </boolean-input>
+
                         <dynamic-data-dropdown>
                             <label>Dynamic Data Dropdown</label>
                             <hint/>
@@ -835,9 +860,30 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:select>
                             </xh:td>
                             <xh:td>
-                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="boolean-bind" id="boolean-control">
-                                    <xf:label ref="$form-resources/boolean/label"/>
-                                    <xf:hint ref="$form-resources/boolean/hint"/>
+
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <fr:yesno-input bind="yesno-input-bind" id="yesno-input-control">
+                                    <xf:label ref="$form-resources/yesno-input/label"/>
+                                    <xf:hint ref="$form-resources/yesno-input/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:yesno-input>
+                            </xh:td>
+                            <xh:td>
+                                <fr:checkbox-input bind="checkbox-input-bind" id="checkbox-input-control">
+                                    <xf:label ref="$form-resources/checkbox-input/label"/>
+                                    <xf:hint ref="$form-resources/checkbox-input/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:checkbox-input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="boolean-input-bind"
+                                          id="boolean-input-control">
+                                    <xf:label ref="$form-resources/boolean-input/label"/>
+                                    <xf:hint ref="$form-resources/boolean-input/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>
                         </xh:tr>

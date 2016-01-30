@@ -80,6 +80,8 @@
                 <open-section>Show Section</open-section>
                 <close-section>Hide Section</close-section>
                 <section-name>Section Name</section-name>
+                <yes>Yes</yes>
+                <no>No</no>
             </labels>
             <grid>
                 <insert-above>Insert Above</insert-above>
@@ -379,6 +381,8 @@
                 <open-section>Montrer section</open-section>
                 <close-section>Cacher section</close-section>
                 <section-name>Nom de la section</section-name>
+                <yes>Oui</yes>
+                <no>Non</no>
             </labels>
             <grid>
                 <insert-above>Insérer dessus</insert-above>
@@ -682,6 +686,8 @@
                 <open-section>Mostrar Sección</open-section>
                 <close-section>Ocultar Sección</close-section>
                 <section-name>Nombre de Sección</section-name>
+                <yes>Sí</yes>
+                <no>No</no>
             </labels>
             <grid>
                 <insert-above>Insertar Arriba</insert-above>
@@ -971,6 +977,8 @@
                 <open-section>Åpne seksjon</open-section>
                 <close-section>Lukk seksjon</close-section>
                 <section-name>Seksjonsnavn</section-name>
+                <yes todo="true">[Yes]</yes>
+                <no todo="true">[No]</no>
             </labels>
             <grid>
                 <insert-above todo="true">[Insert Above]</insert-above>
@@ -1259,6 +1267,8 @@
                 <open-section>Показать раздел</open-section>
                 <close-section>Свернуть раздел</close-section>
                 <section-name>Название раздела</section-name>
+                <yes todo="true">[Yes]</yes>
+                <no todo="true">[No]</no>
             </labels>
             <grid>
                 <insert-above todo="true">[Insert Above]</insert-above>
@@ -1544,6 +1554,8 @@
                 <open-section>Mostra sezione</open-section>
                 <close-section>Nascondi sezione</close-section>
                 <section-name>Nome della sezione</section-name>
+                <yes>Sì</yes>
+                <no>No</no>
             </labels>
             <grid>
                 <insert-above>Inserisci sopra</insert-above>
@@ -1842,6 +1854,8 @@
                 <open-section>Abschnitt einblenden</open-section>
                 <close-section>Abschnitt ausblenden</close-section>
                 <section-name>Abschnittsname</section-name>
+                <yes>Ja</yes>
+                <no>Nein</no>
             </labels>
             <grid>
                 <insert-above>Darüber einfügen</insert-above>
@@ -2140,6 +2154,8 @@
                 <open-section>Näytä lohko</open-section>
                 <close-section>Piilota lohko</close-section>
                 <section-name>Lohkon nimi</section-name>
+                <yes todo="true">[Yes]</yes>
+                <no todo="true">[No]</no>
             </labels>
             <grid>
                 <insert-above>Liitä ylle</insert-above>
@@ -2438,6 +2454,8 @@
                 <open-section>Visa sektion</open-section>
                 <close-section>Dölj sektion</close-section>
                 <section-name>Sektionsnamn</section-name>
+                <yes>Ja</yes>
+                <no>Nej</no>
             </labels>
             <grid>
                 <insert-above>Infoga ovanför</insert-above>
@@ -2736,6 +2754,8 @@
                 <open-section>Sectie tonen</open-section>
                 <close-section>Sectie verbergen</close-section>
                 <section-name>Sectienaam</section-name>
+                <yes todo="true">[Yes]</yes>
+                <no todo="true">[No]</no>
             </labels>
             <grid>
                 <insert-above>Boven invoegen</insert-above>
@@ -3034,6 +3054,8 @@
                 <open-section>Mostra Secção</open-section>
                 <close-section>Esconde Secção</close-section>
                 <section-name>Nome da Secção</section-name>
+                <yes todo="true">[Yes]</yes>
+                <no todo="true">[No]</no>
             </labels>
             <grid>
                 <insert-above>Insere em Cima</insert-above>

@@ -189,7 +189,7 @@
         fr:character-counter
         fr:bootstrap-select1
         fr:boolean-input
-        fr:yesno
+        fr:yesno-input
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->

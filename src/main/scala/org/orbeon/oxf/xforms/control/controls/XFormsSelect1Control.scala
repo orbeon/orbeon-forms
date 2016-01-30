@@ -144,7 +144,7 @@ class XFormsSelect1Control(
               locationData       = getLocationData,
               nodeInfo           = boundNode,
               valueToSet         = select.itemValue,
-              source             = "client",
+              source             = "select",
               isCalculate        = false
             )
           case None ⇒

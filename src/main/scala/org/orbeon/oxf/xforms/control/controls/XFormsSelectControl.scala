@@ -135,7 +135,7 @@ class XFormsSelectControl(
               locationData       = getLocationData,
               nodeInfo           = boundNode,
               valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) - deselect.itemValue) mkString " ",
-              source             = "client",
+              source             = "deselect",
               isCalculate        = false
             )
           case None ⇒
@@ -151,7 +151,7 @@ class XFormsSelectControl(
               locationData       = getLocationData,
               nodeInfo           = boundNode,
               valueToSet         = (valueAsLinkedSet(DataModel.getValue(boundNode)) + select.itemValue) mkString " ",
-              source             = "client",
+              source             = "select",
               isCalculate        = false
             )
           case None ⇒

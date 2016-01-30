@@ -115,8 +115,7 @@ object ControlAnalysisFactory {
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
-       with WhitespaceTrait {
+  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_SIZE_QNAME,
       XXFORMS_TITLE_QNAME,
@@ -132,8 +131,7 @@ object ControlAnalysisFactory {
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
-       with WhitespaceTrait {
+  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_SIZE_QNAME,
       XXFORMS_MAXLENGTH_QNAME,
@@ -147,8 +145,7 @@ object ControlAnalysisFactory {
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
-       with WhitespaceTrait {
+  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_MAXLENGTH_QNAME,
       XXFORMS_COLS_QNAME,

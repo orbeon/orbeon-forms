@@ -50,10 +50,10 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
-     with ValueTrait
-     with ChildrenBuilderTrait
-     with ChildrenLHHAAndActionsTrait
-     with FormatTrait
+       with ValueTrait
+       with ChildrenBuilderTrait
+       with ChildrenLHHAAndActionsTrait
+       with FormatTrait
 
   class InputValueControl(
     staticStateContext : StaticStateContext,
@@ -62,7 +62,7 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends ValueControl(staticStateContext, element, parent, preceding, scope)
-     with RequiredSingleNode {
+       with RequiredSingleNode {
     override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
     override val externalEvents = externalEventsDef
   }
@@ -74,7 +74,7 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
-     with SelectionControlTrait {
+       with SelectionControlTrait {
     override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) + XXFORMS_TITLE_QNAME
   }
 
@@ -85,10 +85,10 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends CoreControl(staticStateContext, element, parent, preceding, scope)
-     with OptionalSingleNode
-     with TriggerAppearanceTrait
-     with ChildrenBuilderTrait
-     with ChildrenLHHAAndActionsTrait {
+       with OptionalSingleNode
+       with TriggerAppearanceTrait
+       with ChildrenBuilderTrait
+       with ChildrenLHHAAndActionsTrait {
     override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
     override val externalEvents              = externalEventsDef
 
@@ -115,7 +115,8 @@ object ControlAnalysisFactory {
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
+       with WhitespaceTrait {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_SIZE_QNAME,
       XXFORMS_TITLE_QNAME,
@@ -131,7 +132,8 @@ object ControlAnalysisFactory {
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
+       with WhitespaceTrait {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_SIZE_QNAME,
       XXFORMS_MAXLENGTH_QNAME,
@@ -145,7 +147,8 @@ object ControlAnalysisFactory {
     parent             : Option[ElementAnalysis],
     preceding          : Option[ElementAnalysis],
     scope              : Scope
-  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+  ) extends InputValueControl(staticStateContext, element, parent, preceding, scope)
+       with WhitespaceTrait {
     override protected val allowedExtensionAttributes = Set(
       XXFORMS_MAXLENGTH_QNAME,
       XXFORMS_COLS_QNAME,
@@ -160,10 +163,10 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-     with OptionalSingleNode
-     with StaticLHHASupport
-     with ChildrenBuilderTrait
-     with AppearanceTrait {
+       with OptionalSingleNode
+       with StaticLHHASupport
+       with ChildrenBuilderTrait
+       with AppearanceTrait {
 
     val caseref = Option(element.attributeValue(CASEREF_QNAME))
 
@@ -178,9 +181,9 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-     with OptionalSingleNode
-     with StaticLHHASupport
-     with ChildrenBuilderTrait {
+       with OptionalSingleNode
+       with StaticLHHASupport
+       with ChildrenBuilderTrait {
 
     val selected        = Option(element.attributeValue(SELECTED_QNAME))
     val valueExpression = Option(element.attributeValue(VALUE_QNAME))
@@ -212,9 +215,9 @@ object ControlAnalysisFactory {
     preceding          : Option[ElementAnalysis],
     scope              : Scope
   ) extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-     with OptionalSingleNode
-     with StaticLHHASupport
-     with ChildrenBuilderTrait {
+       with OptionalSingleNode
+       with StaticLHHASupport
+       with ChildrenBuilderTrait {
 
     // Extension attributes depend on the name of the element
     override protected val allowedExtensionAttributes =

@@ -18,9 +18,10 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext}
+import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.saxon.value._
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -137,7 +138,7 @@ class NonNegativeValidation extends ValidationFunction {
   val propertyName = "non-negative"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.trySignum(value) map (_ != -1) getOrElse false
+    NumericValidation.trySignum(value) exists (_ != -1)
 }
 
 class NegativeValidation extends ValidationFunction {
@@ -145,7 +146,7 @@ class NegativeValidation extends ValidationFunction {
   val propertyName = "negative"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.trySignum(value) map (_ == -1) getOrElse false
+    NumericValidation.trySignum(value) contains -1
 }
 
 class NonPositiveValidation extends ValidationFunction {
@@ -153,7 +154,7 @@ class NonPositiveValidation extends ValidationFunction {
   val propertyName = "non-positive"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.trySignum(value) map (_ != 1) getOrElse false
+    NumericValidation.trySignum(value) exists (_ != 1)
 }
 
 class PositiveValidation extends ValidationFunction {
@@ -161,24 +162,33 @@ class PositiveValidation extends ValidationFunction {
   val propertyName = "positive"
 
   def evaluate(value: String, constraintOpt: Option[Long]) =
-    NumericValidation.trySignum(value) map (_ == 1) getOrElse false
+    NumericValidation.trySignum(value) contains 1
 }
 
 object NumericValidation {
 
-  def trySignum(value: String): Try[Int] = tryParseAsLongOrBigDecimal(value) map {
+  def trySignum(value: String): Option[Int] = tryParseAsLongOrBigDecimal(value) map {
     case Left(long)        ⇒ long.signum
     case Right(bigDecimal) ⇒ bigDecimal.signum
   }
 
-  def tryParseAsLongOrBigDecimal(value: String): Try[Either[Long, BigDecimal]] = Try {
-    try {
-      Left(value.toLong)
-    } catch {
-      case e: NumberFormatException ⇒
-        Right(BigDecimal(value))
+  // Don't use Long.parseLong or similar as they throw exceptions, and we can have invalid data in many cases.
+  // With this:
+  //
+  // - "small" integers (15 or 16 digits?) don't throw if invalid
+  // - "large" integers throw if invalid (Saxon uses `Long.parseLong` and `new BigInteger`)
+  // - decimals don't throw if invalid (Saxon uses a regex to validate first)
+  //   - NOTE: Since Saxon 9.2, Saxon does throw instead! Handle this when upgrading to Saxon >= 9.2.
+  def tryParseAsLongOrBigDecimal(value: String): Option[Either[Long, BigDecimal]] =
+    IntegerValue.stringToInteger(value) match {
+      case v: Int64Value        ⇒ Some(Left(v.longValue))
+      case v: BigIntegerValue   ⇒ Some(Right(v.asDecimal))
+      case v: ValidationFailure ⇒
+          DecimalValue.makeDecimalValue(value, true) match {
+            case v: DecimalValue      ⇒ Some(Right(v.getDecimalValue))
+            case v: ValidationFailure ⇒ None
+          }
     }
-  }
 }
 
 class MaxFractionDigitsValidation extends ValidationFunction {

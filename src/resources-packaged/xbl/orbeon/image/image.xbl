@@ -40,7 +40,7 @@
                 <bind type="xf:anyURI"/>
                 <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
                 <view>
-                     <fr:image id="" ref="">
+                     <fr:image id="" ref="" class="fr-static-attachment">
                         <xf:label ref=""/>
                         <xf:help ref=""/>
                         <xf:alert ref=""/>

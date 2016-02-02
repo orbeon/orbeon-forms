@@ -58,11 +58,15 @@
 
                         <xsl:if test="$editable">
                             <!-- Variables for design time -->
-                            <xf:var name="fb-section" value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
+                            <xf:var name="fb-section"        value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
                             <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then fbf:sectionCanDoClasses($fb-section) else ()"/>
                         </xsl:if>
 
-                        <xf:var name="view-mode" value="xxf:readonly(xxf:component-context()) or xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                        <xf:var
+                            name="view-mode"
+                            value="
+                                xxf:readonly(xxf:component-context()) or
+                                xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
                         <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
@@ -121,7 +125,10 @@
                                         <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
-                                                    <fr:repeater ref="*" xbl:attr="template origin min max remove-constraint apply-defaults appearance">
+                                                    <fr:repeater
+                                                        ref="*"
+                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance">
+
                                                         <!-- Forward iteration events -->
                                                         <xf:action
                                                             event="fr-iteration-added fr-iteration-removed"

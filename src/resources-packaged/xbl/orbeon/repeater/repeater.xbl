@@ -16,18 +16,18 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:script src="/xbl/orbeon/repeater/repeater.js"/>
 
-    <xbl:binding id="fr-repeater-binding" element="fr|repeater" xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
+    <xbl:binding
+        id="fr-repeater-binding"
+        element="fr|repeater"
+        xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/repeater/repeater.css"/>
@@ -277,12 +277,15 @@
                                             <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
                                         </xf:var>
 
-                                        <xf:var name="can-classes" value="
+                                        <xf:var
+                                            name="can-classes"
+                                            value="
                                                 'can-remove'      [$remove-constraint and not($frozen) and $min castable as xs:integer and count($repeat-sequence) gt xs:integer($min)],
                                                 'can-move-up'     [$repeat-position gt {$freeze} + 1],
                                                 'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
                                                 'can-insert-above'[$can-add and not($frozen)],
-                                                'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"/>
+                                                'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"
+                                        />
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xf:var name="can-classes"/>

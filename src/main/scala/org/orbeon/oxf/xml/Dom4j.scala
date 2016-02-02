@@ -24,7 +24,7 @@ import org.orbeon.saxon.value.Whitespace
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.collection.mutable.Buffer
+import scala.collection.mutable
 import scala.xml.{Elem, XML}
 
 object Dom4j {
@@ -116,7 +116,7 @@ object Dom4j {
   def elements(e: Element, name: String): Seq[Element] = Dom4jUtils.elements(e, name).asScala
 
   // Return the element's content as a mutable buffer
-  def content(e: Element): Buffer[Node] = e.content.asInstanceOf[JList[Node]].asScala
+  def content(e: Element): mutable.Buffer[Node] = e.content.asInstanceOf[JList[Node]].asScala
 
   // Return an element's attributes
   def attributes(e: Element): Seq[Attribute] = Dom4jUtils.attributes(e).asScala
@@ -139,10 +139,9 @@ object Dom4j {
       if (qNames.hasNext) {
         val qName = qNames.next()
         val existing = Dom4j.elements(parent, qName)
+
         val existingOrNew =
-          if (existing.nonEmpty)
-            existing(0)
-          else {
+          existing.headOption getOrElse {
             val newElement = Dom4jUtils.createElement(qName)
             parent.add(newElement)
             newElement
@@ -155,9 +154,9 @@ object Dom4j {
     insertIfNeeded(root, path.iterator)
   }
 
-  implicit def elemToDocument(e: Elem)    = Dom4jUtils.readDom4j(e.toString)
-  implicit def elemToElement(e: Elem)     = Dom4jUtils.readDom4j(e.toString).getRootElement
-  implicit def elementToElem(e: Element)  = XML.loadString(Dom4jUtils.domToString(e))
+  implicit def elemToDocument(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
+  implicit def elemToElement(e: Elem): Element   = Dom4jUtils.readDom4j(e.toString).getRootElement
+  implicit def elementToElem(e: Element): Elem   = XML.loadString(Dom4jUtils.domToString(e))
 
   // TODO: There is probably a better way to write these conversions
   implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]): Seq[Element] = seq map elemToElement toList

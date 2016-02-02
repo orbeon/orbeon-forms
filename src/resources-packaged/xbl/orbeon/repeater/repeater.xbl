@@ -83,6 +83,7 @@
                 <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
 
                 <xsl:variable name="appearance"         select="($root/@appearance, 'full')[1]"/>
+                <xsl:variable name="remove-at-bottom"   select="false()"/>
 
                 <xsl:template match="/*">
 
@@ -288,10 +289,16 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
 
-                                <xh:div>
-                                    <xsl:attribute name="class" select="string-join((@class, 'fr-repeat-iteration', '{$can-classes}'), ' ')"/>
-                                    <xsl:attribute name="id">fr-repeat-iteration</xsl:attribute>
+                                <xh:div id="fr-repeat-iteration">
+                                    <xsl:attribute name="class" select="@class, 'fr-repeat-iteration', '{$can-classes}'"/>
                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                        <!-- Scope var in outer scope so content can handle remove availability -->
+                                        <xf:var name="fr-repeater-can-remove">
+                                            <xxf:value
+                                                xxbl:scope="inner"
+                                                value="'can-remove' = xxf:split(xxf:avt-value('fr-repeat-iteration', 'class'))"/>
+                                        </xf:var>
+                                        <!-- Content of the repeat iteration -->
                                         <xsl:apply-templates select="*"/>
                                     </xf:group>
                                 </xh:div>
@@ -304,19 +311,21 @@
                                     <xf:label value="xxf:r('components.grid.add-another', '|fr-fr-resources|')"/>
                                 </xf:trigger>
 
-                                <!-- NOTE: Don't apply remove constraint: in this mode it's always possible to remove the last row. -->
-                                <!-- TODO: not($frozen) and -->
-                                <xf:var
-                                    name="can-remove"
-                                    value="
-                                        $min castable as xs:integer and
-                                        count($repeat-sequence) gt xs:integer($min)"
-                                />
+                                <xsl:if test="$remove-at-bottom">
+                                    <!-- NOTE: Don't apply remove constraint: in this mode it's always possible to remove the last row. -->
+                                    <!-- TODO: not($frozen) and -->
+                                    <xf:var
+                                        name="can-remove"
+                                        value="
+                                            $min castable as xs:integer and
+                                            count($repeat-sequence) gt xs:integer($min)"
+                                    />
 
-                                <!-- Show only if can remove -->
-                                <xf:trigger appearance="minimal" id="fr-repeater-remove-bottom" ref="$repeat-context[$can-remove]">
-                                    <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
-                                </xf:trigger>
+                                    <!-- Show only if can remove -->
+                                    <xf:trigger appearance="minimal" id="fr-repeater-remove-bottom" ref="$repeat-context[$can-remove]">
+                                        <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
+                                    </xf:trigger>
+                                </xsl:if>
                             </xf:group>
                         </xsl:if>
                     </xh:div>

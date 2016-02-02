@@ -61,6 +61,12 @@ ORBEON.jQuery(function() {
         return false;
     }
 
+    function removeIteration(e) {
+        currentRepeaterId = repeaterId(e);
+        currentRepeaterIteration = repeaterIteration(e);
+        actionFunction('remove')(e);
+    }
+
     // Handle keyboard events that arrive on our button and delegate the to the Bootstrap menu button
     function delegateKeyEventToBootstrapButton(e) {
         moveMenu(e);
@@ -101,6 +107,7 @@ ORBEON.jQuery(function() {
     if (globalMenu) {
         // Click on our own button moves and shows the menu
         $(document).on('click.orbeon.repeater',   '.fr-repeater-dropdown-button', moveAndShowMenu);
+        $(document).on('click.orbeon.repeater',   '.fr-repeater-remove-button',   removeIteration);
         $(document).on('keydown.orbeon.repeater', '.fr-repeater-dropdown-button', delegateKeyEventToBootstrapButton);
 
         // Listeners for all menu actions

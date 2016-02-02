@@ -109,7 +109,8 @@
                 <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>
 
                 <xsl:variable name="left-column"              select="$is-repeat and $appearance = 'full' and not($readonly)"/>
-                <xsl:variable name="right-column"             select="false()"/>
+                <xsl:variable name="right-column"             select="$is-repeat and $appearance = 'minimal' and not($readonly)"/>
+                <xsl:variable name="remove-at-bottom"         select="false()"/>
 
                 <xsl:template match="/*">
 
@@ -508,19 +509,21 @@
                                         <xf:label value="xxf:r('components.grid.add-another', '|fr-fr-resources|')"/>
                                     </xf:trigger>
 
-                                    <!-- NOTE: Don't apply remove constraint: in this mode it's always possible to remove the last row. -->
-                                    <!-- TODO: not($frozen) and -->
-                                    <xf:var
-                                        name="can-remove"
-                                        value="
-                                            $min castable as xs:integer and
-                                            count($repeat-sequence) gt xs:integer($min)"
-                                    />
+                                    <xsl:if test="$remove-at-bottom">
+                                        <!-- NOTE: Don't apply remove constraint: in this mode it's always possible to remove the last row (until `$min`). -->
+                                        <!-- TODO: not($frozen) -->
+                                        <xf:var
+                                            name="can-remove"
+                                            value="
+                                                $min castable as xs:integer and
+                                                count($repeat-sequence) gt xs:integer($min)"
+                                        />
 
-                                    <!-- Show only if can remove -->
-                                    <xf:trigger appearance="minimal" id="fr-grid-remove-bottom" ref="$repeat-context[$can-remove]">
-                                        <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
-                                    </xf:trigger>
+                                        <!-- Show only if can remove -->
+                                        <xf:trigger appearance="minimal" id="fr-grid-remove-bottom" ref="$repeat-context[$can-remove]">
+                                            <xf:label value="xxf:r('components.grid.remove', '|fr-fr-resources|')"/>
+                                        </xf:trigger>
+                                    </xsl:if>
                                 </xf:group>
                             </xsl:if>
 

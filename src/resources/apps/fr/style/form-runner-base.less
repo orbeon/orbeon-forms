@@ -299,6 +299,21 @@
             padding-top: 10px;                                              // At the top/bottom of a section, less space
             padding-bottom: 10px;
         }
+
+        &.xforms-section-appearance-minimal {
+            .fr-repeat-iteration {
+                display: table-row;
+                &> .fr-repeat-content {
+                    padding-left: 0;
+                    display: table-cell;
+                }
+                &> .fr-section-right-column {
+                    display: table-cell;
+                    vertical-align: bottom;
+                    padding-bottom: 10px;
+                }
+            }
+        }
     }
 
 

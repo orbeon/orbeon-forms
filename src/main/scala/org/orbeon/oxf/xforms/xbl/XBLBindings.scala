@@ -319,11 +319,11 @@ class XBLBindings(
 
           // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
           XBLTransformer.transform(
-            shadowTreeDocument,
-            boundElement,
-            abstractBinding.modeHandlers,
-            abstractBinding.modeLHHA,
-            abstractBinding.supportAVTs
+            shadowTreeDocument    = shadowTreeDocument,
+            boundElement          = boundElement,
+            excludeNestedHandlers = abstractBinding.modeHandlers,
+            excludeNestedLHHA     = abstractBinding.modeLHHA,
+            supportAVTs           = abstractBinding.supportAVTs
           )
         }
     }

@@ -165,7 +165,9 @@ public class XBLTransformer {
                             final QName valueQName = Dom4jUtils.extractTextValueQName(element, currentValue, true);
                             if (!valueQName.getNamespaceURI().equals(XFormsConstants.XBL_NAMESPACE_URI)) {
                                  // This is not xbl:text, copy the attribute
-                                setAttribute(resultingNodes, valueQName, boundElement.attributeValue(valueQName), boundElement);
+                                final String attributeValue = boundElement.attributeValue(valueQName);
+                                if (attributeValue != null)
+                                    setAttribute(resultingNodes, valueQName, attributeValue, boundElement);
                             } else {
                                 // This is xbl:text
                                 // "The xbl:text value cannot occur by itself in the list"
@@ -318,7 +320,7 @@ public class XBLTransformer {
             }
 
             private void setAttribute(List<Node> nodes, QName attributeQName, String attributeValue, Element namespaceElement) {
-                if (nodes != null && nodes.size() > 0) {
+                if (attributeValue != null && nodes != null && nodes.size() > 0) {
                     for (final Node node: nodes) {
                         if (node instanceof Element) {
                             final Element element = ((Element) node);
@@ -331,7 +333,7 @@ public class XBLTransformer {
             }
 
             private void setText(List<Node> nodes, String value) {
-                if (nodes != null && nodes.size() > 0) {
+                if (value != null && nodes != null && nodes.size() > 0) {
                     for (final Node node: nodes) {
                         if (node instanceof Element) {
                             node.setText(value);

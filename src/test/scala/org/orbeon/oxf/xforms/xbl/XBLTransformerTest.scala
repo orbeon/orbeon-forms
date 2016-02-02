@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
+import org.orbeon.oxf.test.XMLSupport
+import org.scalatest.junit.AssertionsForJUnit
 
-class XBLTransformerTest extends AssertionsForJUnit {
+class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
 
   @Test def testCSSToXPath(): Unit = {
 
@@ -37,5 +38,30 @@ class XBLTransformerTest extends AssertionsForJUnit {
 
     for ((css, xpath) ← expected)
       assert(xpath === CSSParser.toXPath(css))
+  }
+
+  @Test def testIssue2519(): Unit = {
+
+    import org.orbeon.scaxon.XML._
+
+    val data = List(
+      (<bound bar="baz"/>, <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="baz"/></root>),
+      (<bound bar="baz"/>, <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="baz"/></root>),
+      (<bound/>          , <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="default"/></root>),
+      (<bound/>          , <root><elem xbl:attr="bar=bar" bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="default"/></root>)
+    )
+
+    for ((bound, shadow, expected) ← data) {
+      assertXMLDocumentsIgnoreNamespacesInScope(
+        elemToDom4j(expected),
+        XBLTransformer.transform(
+          shadowTreeDocument    = elemToDom4j(shadow),
+          boundElement          = elemToDom4jElem(bound),
+          excludeNestedHandlers = false,
+          excludeNestedLHHA     = false,
+          supportAVTs           = true
+        )
+      )
+    }
   }
 }

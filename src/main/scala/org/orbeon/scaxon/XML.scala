@@ -585,13 +585,14 @@ object XML {
 
   implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 
-  // UNSAFE
-  def unwrapElement(nodeInfo: NodeInfo): Element =
+  def unsafeUnwrapElement(nodeInfo: NodeInfo): Element =
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
 
-  // UNSAFE
-  def unwrapDocument(nodeInfo: NodeInfo): Document =
+  def unsafeUnwrapDocument(nodeInfo: NodeInfo): Document =
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
+
+  def unsafeUnwrapAttribute(nodeInfo: NodeInfo): Attribute =
+    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Attribute]
 
   def elemToSAX(e: Elem, xmlReceiver: XMLReceiver) =
     XMLParsing.stringToSAX(e.toString, "", xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, true)

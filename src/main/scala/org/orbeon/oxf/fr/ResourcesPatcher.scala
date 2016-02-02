@@ -87,7 +87,7 @@ object ResourcesPatcher {
     }
 
     def resourceElementsForLang(lang: String) =
-      eval(resourcesElement, s"resource[@xml:lang = '$lang']").asInstanceOf[Seq[NodeInfo]] map unwrapElement
+      eval(resourcesElement, s"resource[@xml:lang = '$lang']").asInstanceOf[Seq[NodeInfo]] map unsafeUnwrapElement
 
     // Update or create elements and set values
     for {

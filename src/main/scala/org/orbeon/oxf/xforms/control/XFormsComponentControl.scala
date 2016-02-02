@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, XFormsInstance}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.VirtualNode
-import org.orbeon.scaxon.XML.unwrapElement
+import org.orbeon.scaxon.XML.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
 import org.xml.sax.helpers.AttributesImpl
 
@@ -247,7 +247,7 @@ class XFormsComponentControl(
       // Create new doc rooted at reference node
       val doc =
         Instance.extractDocument(
-          element               = unwrapElement(referenceNode.get),
+          element               = unsafeUnwrapElement(referenceNode.get),
           excludeResultPrefixes = Set(),
           readonly              = false,
           exposeXPathTypes      = mirrorInstance.exposeXPathTypes,

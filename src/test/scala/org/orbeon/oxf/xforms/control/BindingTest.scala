@@ -65,7 +65,7 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
     }
 
     // Check relevance and reading control bindings
-    this setupDocument unwrapElement(xmlDoc.rootElement).getDocument
+    this setupDocument unsafeUnwrapElement(xmlDoc.rootElement).getDocument
 
     val initialNameValues = Seq(
       "element-input"     → "42",

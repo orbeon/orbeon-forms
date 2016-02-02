@@ -394,7 +394,7 @@ object XXFormsDynamicControl {
       node ancestorOrSelf (XF → "bind") ancestor (XF → "model") headOption
 
     modelOption map { modelNode ⇒
-      val modelElement = unwrapElement(modelNode)
+      val modelElement = unsafeUnwrapElement(modelNode)
       XFormsUtils.getElementId(modelElement) → modelElement
     }
   }
@@ -417,7 +417,7 @@ object XXFormsDynamicControl {
           prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
           binding ← partAnalysis.getBinding(prefixedId)
         } yield
-          prefixedId → unwrapElement(ancestor)
+          prefixedId → unsafeUnwrapElement(ancestor)
 
       all.headOption
     }

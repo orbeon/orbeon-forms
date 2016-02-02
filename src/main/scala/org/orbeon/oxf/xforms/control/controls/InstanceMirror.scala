@@ -116,7 +116,7 @@ object InstanceMirror {
 
         def namespaces = {
           val partAnalysis = container.partAnalysis
-          partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, unwrapElement(instanceWrapper))
+          partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, unsafeUnwrapElement(instanceWrapper))
         }
 
         InstanceDetails(instanceId, instanceWrapper, namespaces)
@@ -143,7 +143,7 @@ object InstanceMirror {
 
     val inScope = ancestors intersect Seq(referenceNode) nonEmpty
 
-    def namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(referenceNode)))
+    def namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unsafeUnwrapElement(referenceNode)))
 
     inScope option InstanceDetails(innerInstance.getId, referenceNode.getParent.asInstanceOf[VirtualNode], namespaces)
   }

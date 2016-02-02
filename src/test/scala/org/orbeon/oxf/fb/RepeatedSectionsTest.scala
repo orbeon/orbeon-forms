@@ -53,7 +53,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
       }
 
       // Rename section
@@ -83,7 +83,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
       }
 
       // Custom iteration element name
@@ -112,7 +112,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
       }
 
       // Change min/max
@@ -167,7 +167,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
       }
 
       // Disable repeat
@@ -194,7 +194,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
             </form>
           )
 
-        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unwrapElement(formInstanceRoot(doc)))
+        assertXMLElementsIgnoreNamespacesInScopeCollapse(expected.getRootElement, unsafeUnwrapElement(formInstanceRoot(doc)))
 
         assert("0" === getNormalizedMin(doc, "foo"))
         assert(None === getNormalizedMax(doc, "foo"))
@@ -205,7 +205,7 @@ class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with
     withActionAndFBDoc(Doc) { doc ⇒
 
       def templateRootElementFor(name: String) =
-        unwrapElement(findTemplateInstance(doc, name).get / * head)
+        unsafeUnwrapElement(findTemplateInstance(doc, name).get / * head)
 
       // Enable repeat
       locally {

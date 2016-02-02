@@ -452,7 +452,7 @@ trait XFormsInstanceIndex {
     if (idIndex ne null) {
       if (currentNode.getNodeKind == ATTRIBUTE_NODE && currentNode.getLocalPart == "id")
         // Don't use updateIndexForDelete, because formerNode.getParent will fail
-        removeId(formerNode.stringValue, unwrapElement(currentNode.getParent))
+        removeId(formerNode.stringValue, unsafeUnwrapElement(currentNode.getParent))
       else if (currentNode.getNodeKind == ELEMENT_NODE)
         updateIndexForDelete(Seq(formerNode))
 
@@ -462,7 +462,7 @@ trait XFormsInstanceIndex {
   def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent) =
     if ((idIndex ne null) && valueChangeEvent.node.getLocalPart == "id") {
 
-      val parentElement = unwrapElement(valueChangeEvent.node.getParent)
+      val parentElement = unsafeUnwrapElement(valueChangeEvent.node.getParent)
 
       removeId(valueChangeEvent.oldValue, parentElement)
       addId(valueChangeEvent.newValue, parentElement)
@@ -475,7 +475,7 @@ trait XFormsInstanceIndex {
       start descendantOrSelf * att "id"
 
   private def mappingsInSubtree(start: NodeInfo) =
-    idsInSubtree(start) map (id ⇒ id.getStringValue → unwrapElement(id.getParent))
+    idsInSubtree(start) map (id ⇒ id.getStringValue → unsafeUnwrapElement(id.getParent))
 
   private def removeId(id: String, parentElement: Element) = {
     idIndex.get(id) match {

@@ -198,7 +198,7 @@ object XFormsError {
 
       // Write out result using XInclude semantics
       // NOTE: Parent namespace information is not passed here, and that is probably not right
-      TransformerUtils.writeDom4j(unwrapElement(template.rootElement),
+      TransformerUtils.writeDom4j(unsafeUnwrapElement(template.rootElement),
         new EmbeddedDocumentXMLReceiver(new XIncludeReceiver(null, helper.getXmlReceiver, null, null)))
     }
   }

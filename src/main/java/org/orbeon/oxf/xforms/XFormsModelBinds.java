@@ -480,7 +480,7 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
                     if (namespaceNodeInfo != null && namespaceNodeInfo.getNodeKind() == Node.ELEMENT_NODE) {
                         // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
-                        final Element namespaceElement = XML.unwrapElement(namespaceNodeInfo);
+                        final Element namespaceElement = XML.unsafeUnwrapElement(namespaceNodeInfo);
                         final NamespaceMapping namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement));
                         typeValid = isOptionalAndEmpty || XPath.isXPath2Expression(nodeValue, namespaceMapping, staticBind.locationData(), indentedLogger);
                     } else {

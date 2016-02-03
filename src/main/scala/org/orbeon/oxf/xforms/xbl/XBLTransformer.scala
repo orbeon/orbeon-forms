@@ -84,8 +84,9 @@ object XBLTransformer {
                 node match {
                   case _: Namespace ⇒
                     // don't copy over namespace nodes
-                  case elem: Element if ! mustFilterOut(elem) ⇒
-                    clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
+                  case elem: Element ⇒
+                    if (! mustFilterOut(elem))
+                      clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(elem))
                   case node ⇒
                     clonedContent.add(Dom4jUtils.createCopy(node))
                 }

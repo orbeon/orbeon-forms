@@ -74,10 +74,10 @@
                         </xf:item>
                     </xf:select1>
 
-                    <xf:input ref="is-soap">
+                    <fr:checkbox-input ref="is-soap">
                         <xf:label ref="$form-resources/dialog-http-services/soap-submission/label"/>
                         <xf:hint ref="$form-resources/dialog-http-services/soap-submission/hint"/>
-                    </xf:input>
+                    </fr:checkbox-input>
 
                     <xf:group ref=".[string(is-soap) = 'true']">
                         <xf:input ref="soap-action" incremental="true">
@@ -86,10 +86,10 @@
                         </xf:input>
                     </xf:group>
 
-                    <xf:input ref="is-auth">
+                    <fr:checkbox-input ref="is-auth">
                         <xf:label ref="$form-resources/dialog-http-services/http-authentication/label"/>
                         <xf:hint ref="$form-resources/dialog-http-services/http-authentication/hint"/>
-                    </xf:input>
+                    </fr:checkbox-input>
 
                     <xf:group ref=".[string(is-auth) = 'true']">
                         <xf:input ref="username" incremental="true">

@@ -253,10 +253,10 @@
                                     </xf:textarea>
 
                                     <!-- Is singleton? -->
-                                    <xf:input ref="singleton[$is-form-settings]" id="fb-singleton-input">
+                                    <fr:checkbox-input ref="singleton[$is-form-settings]" id="fb-singleton-input">
                                         <xf:label ref="$resources/singleton/label"/>
                                         <xf:hint ref="$resources/singleton/hint"/>
-                                    </xf:input>
+                                    </fr:checkbox-input>
 
                                 </xh:div>
                             </fr:tab>

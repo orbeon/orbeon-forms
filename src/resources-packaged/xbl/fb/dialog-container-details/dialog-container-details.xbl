@@ -292,7 +292,7 @@
                                 <xh:tr>
                                     <xh:td>
                                         <!-- Repeat -->
-                                        <xf:input ref="is-repeat">
+                                        <fr:checkbox-input ref="is-repeat">
                                             <xf:label ref="$resources/dialog-container-details/repeat/label"/>
                                             <xf:hint  ref="$resources/dialog-container-details/repeat/hint"/>
 
@@ -306,20 +306,20 @@
                                                 <xf:setvalue ref="$i/initial-iterations"       value="true()"/>
                                             </xf:action>
 
-                                        </xf:input>
+                                        </fr:checkbox-input>
                                     </xh:td>
                                 </xh:tr>
                                 <xf:group ref=".[is-repeat = true()]">
                                     <xh:tr>
                                         <xh:td colspan="1">
-                                            <xf:input ref="apply-defaults">
+                                            <fr:checkbox-input ref="apply-defaults">
                                                 <xf:label ref="$resources/dialog-container-details/apply-defaults/label"/>
-                                            </xf:input>
+                                            </fr:checkbox-input>
                                         </xh:td>
                                         <xh:td colspan="1">
-                                            <xf:input ref="initial-iterations">
+                                            <fr:checkbox-input ref="initial-iterations">
                                                 <xf:label ref="$resources/dialog-container-details/initial-iterations/label"/>
-                                            </xf:input>
+                                            </fr:checkbox-input>
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>
@@ -374,7 +374,7 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <xf:input ref="is-custom-iteration-name">
+                                            <fr:checkbox-input ref="is-custom-iteration-name">
                                                 <xf:label ref="$resources/dialog-container-details/custom-iteration-name/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-details/custom-iteration-name/hint"/>
 
@@ -382,7 +382,7 @@
                                                 <xf:action event="xforms-value-changed">
                                                     <xf:setvalue ref="$i/custom-iteration-name" value="''"/>
                                                 </xf:action>
-                                            </xf:input>
+                                            </fr:checkbox-input>
                                         </xh:td>
                                         <xh:td>
                                             <xf:input ref="custom-iteration-name[$i/is-custom-iteration-name = true()]" incremental="true" >

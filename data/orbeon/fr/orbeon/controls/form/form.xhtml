@@ -39,10 +39,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <checkboxes>cat bird</checkboxes>
                         <single-list>cat</single-list>
                         <multiple-list>cat bird</multiple-list>
+                        <open-select1>Pistachio</open-select1>
                         <yesno-input>false</yesno-input>
                         <checkbox-input>false</checkbox-input>
                         <boolean-input>false</boolean-input>
-
                         <dynamic-data-dropdown itemset-empty="false"/>
                         <autocomplete label="United States">us</autocomplete>
                         <autocomplete-result/>
@@ -109,6 +109,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                     <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
                              name="checkbox-input"/>
+                    <xf:bind id="open-select1-bind" ref="open-select1" name="open-select1" required="true()"/>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
@@ -292,6 +293,25 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </multiple-list>
+                        <open-select1>
+                            <label>Ice Cream Flavor</label>
+                            <hint/>
+                            <item>
+                                <label>Chocolate</label>
+
+                                <value>chocolate</value>
+                            </item>
+                            <item>
+                                <label>Vanilla</label>
+
+                                <value>vanilla</value>
+                            </item>
+                            <item>
+                                <label>Strawberry</label>
+
+                                <value>strawberry</value>
+                            </item>
+                        </open-select1>
                         <yesno-input>
                             <label>Yes/No Answer</label>
                             <hint/>
@@ -304,7 +324,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Boolean Input (deprecated)</label>
                             <hint>An input which captures "true" or "false"</hint>
                         </boolean-input>
-
                         <dynamic-data-dropdown>
                             <label>Dynamic Data Dropdown</label>
                             <hint/>
@@ -535,6 +554,25 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </multiple-list>
+                        <open-select1>
+                            <label>Arome de glace</label>
+                            <hint/>
+                            <item>
+                                <label>Chocolat</label>
+
+                                <value>chocolate</value>
+                            </item>
+                            <item>
+                                <label>Vanille</label>
+
+                                <value>vanilla</value>
+                            </item>
+                            <item>
+                                <label>Fraise</label>
+
+                                <value>strawberry</value>
+                            </item>
+                        </open-select1>
                         <yesno-input>
                             <label>Réponse oui/non</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
@@ -547,7 +585,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Champ booléen (déprécié)</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
                         </boolean-input>
-
                         <dynamic-data-dropdown>
                             <label>Dynamic Data Dropdown</label>
                             <hint/>
@@ -979,7 +1016,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:select>
                             </xh:td>
                             <xh:td>
+                                <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-select1-control"
+                                                 bind="open-select1-bind">
+                                    <xf:label ref="$form-resources/open-select1/label"/>
+                                    <xf:hint ref="$form-resources/open-select1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
+
+                                    <xf:itemset ref="$form-resources/open-select1/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </fr:open-select1>
                             </xh:td>
                         </xh:tr>
                         <xh:tr>

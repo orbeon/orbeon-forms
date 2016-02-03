@@ -21,7 +21,7 @@ class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
 
   @Test def testCSSToXPath(): Unit = {
 
-    val expected = Seq(
+    val data = List(
       "foo|a"                                     → "descendant-or-self::foo:a",
       "foo|a foo|b"                               → "descendant-or-self::foo:a//foo:b",
       "foo|a foo|b, bar|a bar|b"                  → "descendant-or-self::foo:a//foo:b|descendant-or-self::bar:a//bar:b",
@@ -36,7 +36,7 @@ class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
       // ":root :root foo|a"                         → "current()//current()//foo:a"
     )
 
-    for ((css, xpath) ← expected)
+    for ((css, xpath) ← data)
       assert(xpath === CSSParser.toXPath(css))
   }
 

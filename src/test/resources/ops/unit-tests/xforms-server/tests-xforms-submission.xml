@@ -1759,5 +1759,74 @@ az4K</document>
         </output>
     </test>
 
+    <test description="JSON: application/json converts JSON to and from XML" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="json-source-instance">
+                            <json>{"father": {"given": "Mark", "family": "Smith"}, "mother": {"given": "Mary", "family": "Smith"}}</json>
+                        </xf:instance>
+                        <xf:instance id="xml-result-instance">
+                            <dummy/>
+                        </xf:instance>
+                        <xf:instance id="json-result-instance">
+                            <json/>
+                        </xf:instance>
+                        <xf:submission
+                            ref="instance('json-source-instance')"
+                            id="send-json-submission"
+                            serialization="text/plain"
+                            mediatype="application/json"
+                            method="post"
+                            action="echo:"
+                            replace="instance"
+                            instance="xml-result-instance"/>
+                        <xf:submission
+                            ref="instance('xml-result-instance')"
+                            id="send-xml-submission"
+                            serialization="application/json"
+                            method="post"
+                            action="echo:"
+                            replace="text"
+                            targetref="instance('json-result-instance')"/>
+
+                        <xf:send event="xforms-model-construct-done" submission="send-json-submission"/>
+                        <xf:send event="xforms-model-construct-done" submission="send-xml-submission"/>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xml-result-instance" model-id="model">
+                                <json type="object">
+                                    <father type="object">
+                                        <given>Mark</given>
+                                        <family>Smith</family>
+                                    </father>
+                                    <mother type="object">
+                                        <given>Mary</given>
+                                        <family>Smith</family>
+                                    </mother>
+                                </json>
+                            </instance>
+                            <instance id="json-result-instance" model-id="model">
+                                <json>{"father":{"given":"Mark","family":"Smith"},"mother":{"given":"Mary","family":"Smith"}}</json>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 
 </group>

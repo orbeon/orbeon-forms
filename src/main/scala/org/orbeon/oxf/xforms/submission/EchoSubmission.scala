@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream
 
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult}
-import org.orbeon.oxf.xml.XMLUtils
 
 /**
  * Test submission which just echoes the incoming document.
@@ -26,14 +25,13 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
   def getType = "echo"
 
-  // Match for replace="instance|none|all" and the submission resource starts with "test:" or "echo:"
   def isMatch(
     p : XFormsModelSubmission#SubmissionParameters,
     p2: XFormsModelSubmission#SecondPassParameters,
     sp: SerializationParameters
-  ) =
-    (p.isReplaceInstance || p.isReplaceNone || p.isReplaceAll) &&
-      (p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:"))
+  ) = {
+    p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:")
+  }
 
   def connect(
     p : XFormsModelSubmission#SubmissionParameters,

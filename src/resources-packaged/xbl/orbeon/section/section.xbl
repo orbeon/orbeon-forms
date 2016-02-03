@@ -14,19 +14,19 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
-    <xbl:binding id="fr-section" element="fr|section" xxf:external-events="fb-set-current-section fb-update-section-label" xxbl:mode="binding lhha custom-lhha">
+    <xbl:binding
+        id="fr-section"
+        element="fr|section"
+        xxf:external-events="fb-set-current-section fb-update-section-label"
+        xxbl:mode="binding lhha custom-lhha">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/section/section.css"/>
@@ -95,7 +95,7 @@
                                         <xf:var name="open" value="(for $switch in case('switch') return $switch = 'case-open', $initially-open)[1]"/>
                                         <xsl:if test="$collapsible">
                                             <!-- Handle DOMActivate event to open/close the switches -->
-                                            <xf:toggle ev:event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>
+                                            <xf:toggle event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>
                                         </xsl:if>
 
                                         <!-- Actual section title -->
@@ -126,7 +126,10 @@
                                     <xf:case id="case-closed" selected="{{not($initially-open)}}"/>
                                     <!-- Open section -->
                                     <xf:case id="case-open" selected="{{$initially-open}}">
-                                        <xf:group class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}" xxbl:scope="outer" xxf:element="div">
+                                        <xf:group
+                                            class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}"
+                                            xxbl:scope="outer"
+                                            xxf:element="div">
                                             <xsl:choose>
                                                 <xsl:when test="$is-repeat">
                                                     <fr:repeater

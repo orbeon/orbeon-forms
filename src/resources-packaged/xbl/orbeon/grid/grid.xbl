@@ -16,12 +16,10 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
 
@@ -34,7 +32,10 @@
 
     <xbl:script src="/xbl/orbeon/grid/grid.js"/>
 
-    <xbl:binding id="fr-grid-binding" element="fr|grid" xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
+    <xbl:binding
+        id="fr-grid-binding"
+        element="fr|grid"
+        xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-remove">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/grid/grid.css"/>
@@ -222,20 +223,35 @@
                             <xsl:if test="$is-repeat">
                                 <xf:var
                                     name="can-add"
-                                    value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
+                                    value="
+                                        $max = ('none', 'unbounded') or (
+                                            $max castable as xs:integer and
+                                            count($repeat-sequence) lt xs:integer($max)
+                                        )"
+                                />
                             </xsl:if>
 
                             <!-- Grid table -->
-                            <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
+                            <xh:table class="{'fr-grid',
+                                              concat('fr-grid-', $static-col-count),
                                               (: Control name might not be available (unclear why normalize-space() is needed) :)
                                               for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
-                                              if ($is-repeat)
-                                                    then ('table', 'table-bordered'[$appearance = 'full'], 'table-condensed', 'fr-repeat', 'fr-repeat-table',
-                                                          if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
-                                                    else 'fr-norepeat',
-                                              if ($is-editable)
-                                                    then fbf:gridCanDoClasses(@id)
-                                                    else ()}">
+                                              if ($is-repeat) then (
+                                                  'table',
+                                                  'table-bordered'[$appearance = 'full'],
+                                                  'table-condensed',
+                                                  'fr-repeat',
+                                                  'fr-repeat-table',
+                                                  if ($static-row-count le 1) then
+                                                      'fr-repeat-single-row'
+                                                  else
+                                                      'fr-repeat-multiple-rows'
+                                              ) else
+                                                  'fr-norepeat',
+                                              if ($is-editable) then
+                                                  fbf:gridCanDoClasses(@id)
+                                              else
+                                                  ()}">
                                 <!-- Colgroup to make column sizing with CSS easier -->
                                 <xh:colgroup>
                                     <xsl:if test="$left-column">
@@ -307,7 +323,10 @@
                                                                `required="true()"`, the result is constant. But we don't
                                                                have a good solution for that.
                                                         -->
-                                                        <xf:var xxbl:scope="outer" name="control-binding" context="({$repeat-expression}){$repeat-expression-suffix}">
+                                                        <xf:var
+                                                            xxbl:scope="outer"
+                                                            name="control-binding"
+                                                            context="({$repeat-expression}){$repeat-expression-suffix}">
                                                             <xxf:value value=".">
                                                                 <xsl:apply-templates select="$control/(@bind, @model, @context, @ref)"/>
                                                             </xxf:value>
@@ -358,12 +377,15 @@
                                                             count($repeat-sequence) gt xs:integer($min)"
                                                     />
 
-                                                    <xf:var name="can-classes" value="
+                                                    <xf:var
+                                                        name="can-classes"
+                                                        value="
                                                             'can-remove'      [$can-remove],
                                                             'can-move-up'     [$repeat-position gt {$freeze} + 1],
                                                             'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
                                                             'can-insert-above'[$can-add and not($frozen)],
-                                                            'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"/>
+                                                            'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"
+                                                    />
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <xf:var name="can-classes"/>
@@ -408,7 +430,10 @@
                                                             <xf:delete ref="$source"/>
 
                                                             <!-- Let the outside world know -->
-                                                            <xf:dispatch if="event('xxf:type') = 'fr-remove'" targetid="fr-grid-binding" name="fr-iteration-removed"/>
+                                                            <xf:dispatch
+                                                                if="event('xxf:type') = 'fr-remove'"
+                                                                targetid="fr-grid-binding"
+                                                                name="fr-iteration-removed"/>
 
                                                             <!-- NOTES:
 
@@ -510,7 +535,7 @@
                                     </xf:trigger>
 
                                     <xsl:if test="$remove-at-bottom">
-                                        <!-- NOTE: Don't apply remove constraint: in this mode it's always possible to remove the last row (until `$min`). -->
+                                        <!-- NOTE: Don't apply remove constraint: in this mode last row can always be removed (until `$min`). -->
                                         <!-- TODO: not($frozen) -->
                                         <xf:var
                                             name="can-remove"
@@ -542,11 +567,11 @@
                                 <xsl:copy-of select="@class"/>
                             </xsl:when>
                             <xsl:when test="$is-repeat and $static-row-pos = 1">
-                                <xsl:attribute name="class" select="string-join(('fb-grid-tr', @class, '{$can-classes}'), ' ')"/>
+                                <xsl:attribute name="class" select="'fb-grid-tr', @class, '{$can-classes}'"/>
                                 <xsl:attribute name="id">fr-tr</xsl:attribute>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:attribute name="class" select="string-join(('fb-grid-tr', @class), ' ')"/>
+                                <xsl:attribute name="class" select="'fb-grid-tr', @class"/>
                             </xsl:otherwise>
                         </xsl:choose>
 
@@ -626,7 +651,10 @@
                                     <xsl:variable name="content">
                                         <xsl:for-each select="$controls">
                                             <xsl:copy>
-                                                <xsl:attribute name="class" select="string-join((@class, concat('fr-grid-', $static-row-pos, '-', $static-col-pos)), ' ')"/>
+                                                <xsl:attribute
+                                                    name="class"
+                                                    select="@class, concat('fr-grid-', $static-row-pos, '-', $static-col-pos)"
+                                                />
                                                 <xsl:copy-of select="@* except @class | node()"/>
                                             </xsl:copy>
                                         </xsl:for-each>
@@ -647,7 +675,8 @@
                             <xsl:otherwise>
                                 <xsl:attribute name="xxf:control">true</xsl:attribute>
 
-                                <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
+                                <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or
+                                     the upload button. -->
                                 <xh:div class="fr-grid-content{
                                         '{if (exists($control) and fbf:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}'}">
                                     <!-- Optimization: don't generate a group for empty cells -->
@@ -667,7 +696,12 @@
                                                     select="if (fr:text/@mediatype = 'text/html') then 'fb-text-is-html'  else ()"/>
                                                 <xsl:attribute
                                                     name="class"
-                                                    select="string-join((@class, $label-mediatype-class, $hint-mediatype-class, $text-mediatype-class ), ' ')"/>
+                                                    select="
+                                                        @class,
+                                                        $label-mediatype-class,
+                                                        $hint-mediatype-class,
+                                                        $text-mediatype-class"
+                                                />
                                                 <xsl:copy-of select="@* except @class | node()"/>
                                             </xsl:copy>
                                         </xf:group>
@@ -691,11 +725,13 @@
                     <xsl:param name="th-td"       as="xs:string"/> <!-- Either 'th' or 'td' -->
                     <xsl:param name="input-class" as="attribute(class)?"/>
                     <xsl:variable name="fb-selected-avt">{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:variable>
-                    <xsl:variable name="classes" select="(
+                    <xsl:variable
+                        name="classes"
+                        select="
                             if (exists($input-class))           then '{$class-value}'                        else (),
                             if ($is-editable)                   then concat('fb-grid-', $th-td)              else (),
-                            if ($is-editable and $th-td = 'td') then ($fb-selected-avt, 'xforms-activable')  else ()
-                        )"/>
+                            if ($is-editable and $th-td = 'td') then ($fb-selected-avt, 'xforms-activable')  else ()"
+                    />
                     <xsl:if test="exists($classes)"><xsl:attribute name="class" select="$classes"/></xsl:if>
                 </xsl:function>
 

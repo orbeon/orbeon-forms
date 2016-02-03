@@ -28,6 +28,10 @@
 
     <xbl:binding id="fr-section" element="fr|section" xxf:external-events="fb-set-current-section fb-update-section-label" xxbl:mode="binding lhha custom-lhha">
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/section/section.css"/>
+        </xbl:resources>
+
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
                 <xf:toggle case="case-open"/>

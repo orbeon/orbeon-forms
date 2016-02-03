@@ -45,16 +45,6 @@
   display: block;
   margin: 0 0 0 .5em;
 }
-.orbeon .xforms-noscript .fr-section-title .fr-section-label button.btn-link {
-  color: #555555;
-  font-size: inherit;
-}
-.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help {
-  display: inline;
-}
-.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help-anchor {
-  display: none;
-}
 .orbeon .xforms-noscript .xforms-help-panel {
   display: block;
   width: auto;
@@ -239,47 +229,6 @@
   border-top: 2px solid #ddddee;
   clear: both;
 }
-.orbeon .xbl-fr-section {
-  display: block;
-}
-.orbeon .xbl-fr-section .fr-section-title .xforms-help {
-  float: left;
-  margin-top: 11px;
-  margin-right: 5px;
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url("bootstrap/img/glyphicons-halflings.png");
-  background-repeat: no-repeat;
-  background-position: -120px -96px;
-}
-.orbeon .xbl-fr-section .fr-section-open-close img {
-  margin-right: 0;
-}
-.orbeon .xbl-fr-section .fr-section-open-close {
-  padding: 0 7px 0 7px;
-}
-.orbeon .xbl-fr-section .fr-section-content {
-  display: block;
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.orbeon .xbl-fr-section.xforms-section-appearance-minimal .fr-repeat-iteration {
-  display: table-row;
-}
-.orbeon .xbl-fr-section.xforms-section-appearance-minimal .fr-repeat-iteration > .fr-repeat-content {
-  padding-left: 0;
-  display: table-cell;
-}
-.orbeon .xbl-fr-section.xforms-section-appearance-minimal .fr-repeat-iteration > .fr-section-right-column {
-  display: table-cell;
-  vertical-align: bottom;
-  padding-bottom: 10px;
-}
 .orbeon .fr-captcha {
   display: block;
   padding: 0;
@@ -387,11 +336,6 @@
 .orbeon .xforms-form .fr-mode-email .xforms-alert {
   display: none;
 }
-.orbeon .xforms-form .fr-mode-view .fr-section-title img,
-.orbeon .xforms-form .fr-mode-pdf .fr-section-title img,
-.orbeon .xforms-form .fr-mode-email .fr-section-title img {
-  display: none;
-}
 .orbeon .xforms-form .fr-mode-view .fr-grid-content .xforms-control,
 .orbeon .xforms-form .fr-mode-pdf .fr-grid-content .xforms-control,
 .orbeon .xforms-form .fr-mode-email .fr-grid-content .xforms-control,
@@ -427,7 +371,6 @@
   .orbeon #xforms-form .xforms-upload-remove,
   .orbeon #xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
   .orbeon #xforms-form .xforms-help,
-  .orbeon #xforms-form .fr-section-title .xforms-help,
   .orbeon #xforms-form .xforms-hint,
   .orbeon #xforms-form .fr-buttons {
     display: none;

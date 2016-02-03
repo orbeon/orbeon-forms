@@ -227,44 +227,6 @@ body.orbeon {
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
 }
-.orbeon .xbl-fr-section {
-  background-color: white;
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label {
-  display: block;
-  padding-left: 10px;
-  height: 100%;
-  overflow: hidden;
-  font-size: 18px;
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label a {
-  text-decoration: none;
-  color: #555555;
-  display: block;
-  min-height: 36px;
-  overflow: hidden;
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label output {
-  cursor: default;
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label label {
-  font-size: 18px;
-  line-height: 36px;
-  margin-bottom: 0;
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
-  padding-left: 20px;
-  background-repeat: no-repeat;
-  background-position: 5px 15px;
-  cursor: pointer;
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open {
-  background-image: url(arrow-down.png);
-}
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
-  background-image: url(arrow-right.png);
-}
 .orbeon .xforms-static,
 .orbeon .fr-static {
   min-height: 1em;
@@ -470,19 +432,6 @@ body.orbeon {
   }
   .orbeon h2 {
     border-bottom: 1px solid #e3e3e3;
-    color: black;
-  }
-  .orbeon .xbl-fr-section .fr-section-title {
-    background: none;
-  }
-  .orbeon .xbl-fr-section .fr-section-title .fr-section-label {
-    padding-left: 0;
-  }
-  .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
-  .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
-    background-image: none;
-  }
-  .orbeon .xbl-fr-section .fr-section-title .fr-section-label a {
     color: black;
   }
   .orbeon .navbar {

@@ -229,62 +229,6 @@ body.orbeon { background-color: @frBackground }
         }
     }
 
-    // Section
-    .xbl-fr-section {
-
-        background-color: white;
-
-        .fr-section-title {
-
-            .fr-section-label {
-                display: block;                 // So the line expands all the way to the right
-                padding-left: 10px;
-                // NOTE: Was meant to make title take space even when empty, but this doesn't seem to work. However,
-                // removing this breaks multi-line titles. Need a better solution probably.
-                height: 100%;
-                overflow: hidden;               // Avoid wrapping under help image for long title
-                font-size: @frSectionTitleHeight;
-
-                // Case of collapsible section
-                a {
-                    text-decoration: none;
-                    color: @frHeaderColor;      // Don't use the default styling for anchors
-                                                // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
-                    display: block;             // - So it extends all the way to the right
-                    min-height: @frSectionTitleLineHeight;
-                    overflow: hidden;           // For correct positioning of click interceptor; see issue #636
-                }
-
-                // Case of non-collapsible section
-                output {
-                    cursor: default;
-                }
-
-                // Override default label styles
-                label {
-                    font-size: @frSectionTitleHeight;
-                    line-height: @frSectionTitleLineHeight;
-                    margin-bottom: 0;
-                }
-
-                &.fr-section-open, &.fr-section-closed {
-                    padding-left: @frSectionTitleLeftPadding;
-                    background-repeat: no-repeat;
-                    background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
-                                                                                                             // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
-                                                                                                             // to be aligned on the first line, not the middle of the section area
-                    cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
-                }
-                &.fr-section-open {
-                    background-image: url(arrow-down.png);
-                }
-                &.fr-section-closed {
-                    background-image: url(arrow-right.png);
-                }
-            }
-        }
-    }
-
     // Add background to static read-only fields and special output fields
     .xforms-static, .fr-static { min-height: 1em }
 
@@ -414,23 +358,6 @@ body.orbeon { background-color: @frBackground }
         h2 {
             border-bottom: 1px solid darken(@wellBackground, 7%);
             color: black;
-        }
-
-        // Sections
-        .xbl-fr-section {
-            .fr-section-title {
-                background: none;
-                .fr-section-label {
-                    padding-left: 0;            // remove padding as we don't have section arrows
-                    &.fr-section-open, &.fr-section-closed {
-                        background-image: none; // remove section arrows
-                    }
-
-                    a {
-                        color: black;
-                    }
-                }
-            }
         }
 
         // Navbar

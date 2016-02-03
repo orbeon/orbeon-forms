@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import spray.json._
 
 import scala.language.postfixOps
+import scala.util.Try
 
 //
 // Functions to convert XML to JSON following the XForms 2.0 specification.
@@ -59,17 +60,28 @@ protected trait XmlToJsonAlgorithm {
     def typeOpt (elem: XmlElem) = attValueOpt(elem, Symbols.Type)
     def elemName(elem: XmlElem) = attValueOpt(elem, Symbols.Name) map unescapeString getOrElse localname(elem)
 
+    def jsNullIfBlank(s: String, typ: String, convert: String ⇒ JsValue) =
+      s.trimAllToOpt map { trimmed ⇒
+        Try(convert(trimmed)) getOrElse {
+          if (strict)
+            throwError(s"""unable to parse $typ "$trimmed"""")
+          else
+            JsNull
+        }
+      } getOrElse
+        JsNull
+
     def throwError(s: String) =
       throw new IllegalArgumentException(s)
 
     def processElement(elem: XmlElem): JsValue =
       typeOpt(elem) match {
         case Some(Symbols.String) | None ⇒ JsString(unescapeString(stringValue(elem)))
-        case Some(Symbols.Number)        ⇒ JsNumber(stringValue(elem))
-        case Some(Symbols.Boolean)       ⇒ JsBoolean(stringValue(elem).toBoolean)
+        case Some(Symbols.Number)        ⇒ jsNullIfBlank(stringValue(elem), "number",  v ⇒ JsNumber(v))
+        case Some(Symbols.Boolean)       ⇒ jsNullIfBlank(stringValue(elem), "boolean", v ⇒ JsBoolean(v.toBoolean))
         case Some(Symbols.Null)          ⇒ JsNull
         case Some(Symbols.Object)        ⇒ JsObject(childrenElem(elem) map (elem ⇒ elemName(elem) → processElement(elem)) toMap)
-        case Some(Symbols.Array)         ⇒ JsArray(childrenElem(elem) map processElement toVector)
+        case Some(Symbols.Array)         ⇒ JsArray(childrenElem(elem)  map processElement toVector)
         case Some(other)                 ⇒
           if (strict)
             throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")

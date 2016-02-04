@@ -142,6 +142,11 @@
                     <xf:filename ref="@filename"/>
                     <xf:mediatype ref="@mediatype"/>
                     <xxf:size ref="@size"/>
+
+                    <!-- Clear annotation when the image is cleared -->
+                    <xf:setvalue event="xforms-value-changed"
+                                 if=". = ''"
+                                 ref="../annotation"/>
                 </xf:upload>
 
             </xf:group>

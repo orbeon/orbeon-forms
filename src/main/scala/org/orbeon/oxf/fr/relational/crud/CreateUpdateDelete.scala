@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
-import org.xml.sax.InputSource
+import org.xml.sax.{Attributes, InputSource}
 
 object RequestReader {
 
@@ -88,11 +88,18 @@ object RequestReader {
 
       val metadataWriter = new StringBuilderWriter()
 
-      // MAYBE: strip enclosing namespaces; remove description; truncate long titles
+      // Remove <description> and <migration>, which we don't need, and can easily get us above the 4000 characters limit
+      // https://github.com/orbeon/orbeon-forms/issues/2385
+      val descriptionMigrationFilter = new ElementFilterXMLReceiver(newIdentityReceiver(metadataWriter)) {
+        override protected def isFilterElement(uri: String, localname: String, qName: String, attributes: Attributes): Boolean =
+          uri == "" && (localname == "description" || localname == "migration")
+      }
+
+      // MAYBE: strip enclosing namespaces; truncate long titles
       val metadataFilter =
         new FilterReceiver(
           new WhitespaceXMLReceiver(
-            newIdentityReceiver(metadataWriter),
+            descriptionMigrationFilter,
             Whitespace.Normalize,
             (_, _, _, _) ⇒ Whitespace.Normalize
           ),

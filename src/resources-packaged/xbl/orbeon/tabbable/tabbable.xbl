@@ -70,14 +70,16 @@
                                                 <!-- Static label, just copy content -->
                                                 <xsl:when test="empty($label/(@ref | @bind | @value))">
                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                        <xsl:copy-of select="$label/node()"/>
+                                                        <xh:span>
+                                                            <xsl:copy-of select="$label/(@* | node())"/>
+                                                        </xh:span>
                                                     </xf:group>
                                                 </xsl:when>
                                                 <!-- Dynamic label, generate xf:output -->
                                                 <xsl:otherwise>
                                                     <!-- Put content in outer scope -->
                                                     <xf:output xxbl:scope="outer">
-                                                        <xsl:copy-of select="$label/(@model | @context | @ref | @bind | @value | node())"/>
+                                                        <xsl:copy-of select="$label/@*"/>
                                                     </xf:output>
                                                 </xsl:otherwise>
                                             </xsl:choose>

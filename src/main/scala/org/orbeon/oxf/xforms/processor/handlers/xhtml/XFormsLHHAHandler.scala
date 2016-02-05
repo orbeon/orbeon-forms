@@ -133,7 +133,7 @@ object XFormsLHHAHandler {
           matched
         )
 
-        Some(handler.getForEffectiveId(targetControlEffectiveId))
+        Option(handler.getForEffectiveId(targetControlEffectiveId))
       case _ ⇒
         None
     }

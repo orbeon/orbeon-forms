@@ -104,6 +104,10 @@
 .orbeon .xforms-trigger input {
   white-space: nowrap;
 }
+.orbeon .xforms-output output {
+  word-wrap: break-word;
+  white-space: normal;
+}
 .orbeon button.btn-link {
   text-decoration: underline;
   font-size: inherit;

@@ -122,7 +122,15 @@
     }
 
     // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
-    .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
+    .xforms-trigger button, .xforms-trigger input {
+        white-space: nowrap;
+    }
+
+    // Allow output to wrap (like .xforms-field)
+    .xforms-output output {
+        word-wrap: break-word;
+        white-space: normal;
+    }
 
     // Updates to Bootstrap btn-link
     button.btn-link {

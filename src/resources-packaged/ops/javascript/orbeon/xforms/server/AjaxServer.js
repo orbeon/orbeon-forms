@@ -1932,7 +1932,8 @@
 
                                 if (resource.indexOf("javascript:") == 0) {
                                     // JavaScript URL
-                                    ORBEON.util.String.eval(resource.substring("javascript:".length));
+                                    var js = decodeURIComponent(resource.substring("javascript:".length));
+                                    eval(js);
                                 } else  if (show == "replace") {
                                     if (target == null) {
                                         // Display loading indicator unless the server tells us not to display it

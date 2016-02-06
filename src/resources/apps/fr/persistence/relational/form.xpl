@@ -72,7 +72,9 @@
                         <xsl:copy-of select="/request/sql:datasource"/>
                         <sql:execute>
                             <sql:query>
-                                SELECT  d.form_metadata form_metadata, d.last_modified_time last_modified_time
+                                SELECT  d.form_metadata      form_metadata,
+                                        d.form_version       form_version,
+                                        d.last_modified_time last_modified_time
                                 FROM    orbeon_form_definition d,
                                         (
                                             SELECT      app, form, MAX(last_modified_time) last_modified_time
@@ -98,6 +100,7 @@
                                     <row>
                                         <sql:get-column-value column="form_metadata" type="odt:xmlFragment"/>
                                         <last-modified-time><sql:get-column-value column="last_modified_time" type="xs:dateTime"/></last-modified-time>
+                                        <form-version><sql:get-column-value column="form_version"/></form-version>
                                     </row>
                                 </sql:row-iterator>
                             </sql:result-set>
@@ -118,7 +121,7 @@
                         <xsl:for-each select="/sql-out/row">
                             <form>
                                 <xsl:copy-of select="metadata/*" copy-namespaces="no"/>
-                                <xsl:copy-of select="last-modified-time" copy-namespaces="no"/>
+                                <xsl:copy-of select="* except metadata" copy-namespaces="no"/>
                             </form>
                         </xsl:for-each>
                     </forms>

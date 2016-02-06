@@ -335,9 +335,9 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
       if (mustRunAnyScripts) {
         val sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ")
 
-        // NOTE: The order of xxf:script vs. javascript: loads should be preserved. It is not currently.
+        // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
 
-        // Initial xxf:script executions if present
+        // Initial script actions executions if present
         for (script ← scriptInvocations) {
           val name     = script.script.shared.clientName
           val target   = namespaceId(containingDocument, script.targetEffectiveId)

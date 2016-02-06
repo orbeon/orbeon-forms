@@ -59,7 +59,7 @@ class XFormsActionAction extends XFormsAction {
       for (_ ← 1 to variablesCount)
         contextStack.popBinding()
     } else {
-      // Delegate to xxf:script
+      // Delegate
       XFormsActions.getScriptAction.execute(actionContext)
     }
   }

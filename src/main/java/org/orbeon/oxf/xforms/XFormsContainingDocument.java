@@ -639,7 +639,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger().logWarning("", "xxf:script will be ignored because two-pass submission started", "script id", staticScript.prefixedId());
+            indentedLogger().logWarning("", "script will be ignored because two-pass submission started", "script id", staticScript.prefixedId());
             return;
         }
 

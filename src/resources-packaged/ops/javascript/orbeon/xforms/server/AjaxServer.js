@@ -726,7 +726,7 @@
                 //         display of the modal progress panel, so we don't want to hide before that request ran.
                 //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
                 //         users could start interacting with a page which is going to be replaced shortly.
-                // We remove the modal progress panel before handling DOM response, as xxf:script may dispatch
+                // We remove the modal progress panel before handling DOM response, as script actions may dispatch
                 // events and we don't want them to be filtered. If there are server events, we don't remove the
                 // panel until they have been processed, i.e. the request sending the server events returns.
                 function doHideProgressDialog() {

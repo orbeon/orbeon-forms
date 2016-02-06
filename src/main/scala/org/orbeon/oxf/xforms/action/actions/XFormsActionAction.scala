@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-
-import scala.collection.JavaConverters._
+import org.orbeon.oxf.xml.Dom4j
 
 /**
  * 10.1.1 The action Element
@@ -33,10 +31,12 @@ class XFormsActionAction extends XFormsAction {
 
     actionContext.partAnalysis.scriptsByPrefixedId.get(actionInterpreter.getActionPrefixedId(actionElement)) match {
       case Some(script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _)) ⇒
-          actionInterpreter.containingDocument.addScriptToRun(
+        // Evaluate script parameters if any and schedule the script to run
+        actionInterpreter.containingDocument.addScriptToRun(
+          ScriptInvocation(
             script,
-            actionContext.interpreter.event,
-            actionContext.interpreter.eventObserver,
+            actionContext.interpreter.event.targetObject.getEffectiveId,
+            actionContext.interpreter.eventObserver.getEffectiveId,
             // https://github.com/orbeon/orbeon-forms/issues/2499
             paramExpressions map { expr ⇒
               actionInterpreter.evaluateAsString(
@@ -47,6 +47,7 @@ class XFormsActionAction extends XFormsAction {
               )
             }
           )
+        )
       case Some(StaticScript(_, XPathScriptType, params, ShareableScript(_, _, body, _))) ⇒
         // Evaluate XPath expression for its side effects only
         actionInterpreter.evaluateKeepItems(
@@ -57,12 +58,13 @@ class XFormsActionAction extends XFormsAction {
         )
       case None ⇒
         // Grouping XForms action which executes its children actions
+
         val contextStack = actionInterpreter.actionXPathContext
-        val partAnalysis = contextStack.container.getPartAnalysis
+        val partAnalysis = actionContext.partAnalysis
 
         // Iterate over child actions
         var variablesCount = 0
-        for (childActionElement ← Dom4jUtils.elements(actionElement).asScala) {
+        for (childActionElement ← Dom4j.elements(actionElement)) {
 
           val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
 
@@ -73,7 +75,7 @@ class XFormsActionAction extends XFormsAction {
               variablesCount += 1
             case Some(action) ⇒
               // Run child action
-              // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
+              // NOTE: We execute children actions even if they happen to have `observer` or `target` attributes.
               actionInterpreter.runAction(action)
             case None ⇒
               throw new IllegalStateException

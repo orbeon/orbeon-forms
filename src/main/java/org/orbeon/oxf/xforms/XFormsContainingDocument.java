@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.Controls;
@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.script.ScriptInterpreter;
@@ -39,8 +38,8 @@ import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -629,35 +628,29 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         }
     }
 
-    public void addScriptToRun(
-        StaticScript staticScript,
-        XFormsEvent event,
-        XFormsEventObserver eventObserver,
-        scala.collection.immutable.List<String> paramValues
-    ) {
-
+    public void addScriptToRun(ScriptInvocation scriptInvocation) {
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger().logWarning("", "script will be ignored because two-pass submission started", "script id", staticScript.prefixedId());
-            return;
+            indentedLogger().logWarning(
+                "",
+                "script will be ignored because two-pass submission started",
+                "script id", scriptInvocation.script().prefixedId()
+            );
+        } else {
+            // Warn that scripts won't run in noscript mode (duh)
+            if (noscript())
+                indentedLogger().logWarning(
+                    "noscript",
+                    "script won't run in noscript mode",
+                    "script id", scriptInvocation.script().prefixedId()
+                );
+
+            if (scriptsToRun == null)
+                scriptsToRun = new ArrayList<ScriptInvocation>();
+
+            scriptsToRun.add(scriptInvocation);
         }
-
-        // Warn that scripts won't run in noscript mode (duh)
-        if (noscript())
-            indentedLogger().logWarning("noscript", "script won't run in noscript mode", "script id", staticScript.prefixedId());
-
-        if (scriptsToRun == null)
-            scriptsToRun = new ArrayList<ScriptInvocation>();
-
-        scriptsToRun.add(
-            ScriptInvocation.apply(
-                staticScript,
-                event.targetObject().getEffectiveId(),
-                eventObserver.getEffectiveId(),
-                paramValues
-            )
-        );
     }
 
     public List<ScriptInvocation> getScriptsToRun() {

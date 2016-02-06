@@ -38,31 +38,29 @@
             </xf:instance>
 
             <!-- Call Google geocoding API, and pass back result to XForms -->
-            <xf:action ev:event="DOMActivate" ev:observer="validate-trigger">
-                <xxf:script>
-                    <![CDATA[
-                        var geocoder = new GClientGeocoder();
-                        var address = ORBEON.xforms.Document.getValue("address");
-                        geocoder.getLocations(address, function(r) {
-                            var addressesXML = [];
-                            addressesXML.push("<addresses>");
-                            for (var addressIndex = 0; addressIndex < r.Placemark.length; addressIndex++) {
-                                var current = r.Placemark[addressIndex];
-                                addressesXML.push("<address>");
-                                addressesXML.push("<full>" + current.address + "</full>");
-                                addressesXML.push("<street>" + current.AddressDetails.Country.AdministrativeArea.Locality.Thoroughfare.ThoroughfareName + "</street>");
-                                addressesXML.push("<city>" + current.AddressDetails.Country.AdministrativeArea.Locality.LocalityName + "</city>");
-                                addressesXML.push("<state>" + current.AddressDetails.Country.AdministrativeArea.AdministrativeAreaName + "</state>");
-                                addressesXML.push("<zip>" + current.AddressDetails.Country.AdministrativeArea.Locality.PostalCode.PostalCodeNumber + "</zip>");
-                                addressesXML.push("</address>");
-                            }
-                            addressesXML.push("</addresses>");
-                            addressesXML = addressesXML.join("");
-                            ORBEON.xforms.Document.setValue("candidates", addressesXML);
-                            ORBEON.xforms.Document.dispatchEvent("main-model", "my-show-candidates");
-                        });
-                    ]]>
-                </xxf:script>
+            <xf:action ev:event="DOMActivate" ev:observer="validate-trigger" type="javascript">
+                <![CDATA[
+                    var geocoder = new GClientGeocoder();
+                    var address = ORBEON.xforms.Document.getValue("address");
+                    geocoder.getLocations(address, function(r) {
+                        var addressesXML = [];
+                        addressesXML.push("<addresses>");
+                        for (var addressIndex = 0; addressIndex < r.Placemark.length; addressIndex++) {
+                            var current = r.Placemark[addressIndex];
+                            addressesXML.push("<address>");
+                            addressesXML.push("<full>" + current.address + "</full>");
+                            addressesXML.push("<street>" + current.AddressDetails.Country.AdministrativeArea.Locality.Thoroughfare.ThoroughfareName + "</street>");
+                            addressesXML.push("<city>" + current.AddressDetails.Country.AdministrativeArea.Locality.LocalityName + "</city>");
+                            addressesXML.push("<state>" + current.AddressDetails.Country.AdministrativeArea.AdministrativeAreaName + "</state>");
+                            addressesXML.push("<zip>" + current.AddressDetails.Country.AdministrativeArea.Locality.PostalCode.PostalCodeNumber + "</zip>");
+                            addressesXML.push("</address>");
+                        }
+                        addressesXML.push("</addresses>");
+                        addressesXML = addressesXML.join("");
+                        ORBEON.xforms.Document.setValue("candidates", addressesXML);
+                        ORBEON.xforms.Document.dispatchEvent("main-model", "my-show-candidates");
+                    });
+                ]]>
             </xf:action>
 
             <!-- Parse XML we got from the client -->

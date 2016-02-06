@@ -19,8 +19,8 @@
     <xh:head>
         <xh:title>Custom Events</xh:title>
         <xf:model id="acme-model" xxf:external-events="acme-super-event">
-            <xf:action event="xforms-ready">
-                <xxf:script>ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");</xxf:script>
+            <xf:action event="xforms-ready" type="javascript">
+                ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");
             </xf:action>
             <xf:message event="acme-super-event" level="modal"
                         value="concat('Hi there! p1=', event('p1'), ', p2=', event('p2'))"/>

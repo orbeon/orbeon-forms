@@ -347,11 +347,11 @@
                                             process:runProcessByName('oxf.fr.detail.process', 'save')
                                         </xf:action>
                                         <!-- Change URL to have new document id -->
-                                        <xxf:script>
+                                        <xf:action type="javascript">
                                             <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
                                             if (history &amp;&amp; history.replaceState)
                                                 history.replaceState(null, "", ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
-                                        </xxf:script>
+                                        </xf:action>
                                     </xf:action>
                                 </fb:dialog-form-settings>
 

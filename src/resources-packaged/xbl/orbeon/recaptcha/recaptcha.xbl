@@ -33,8 +33,8 @@
             <xbl:handler event="fr-verify" phase="target">
                 <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
             </xbl:handler>
-            <xbl:handler event="fr-reload" phase="target">
-                <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxf:script>
+            <xbl:handler event="fr-reload" phase="target" type="javascript">
+                YAHOO.xbl.fr.Recaptcha.instance(this).reload();
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -64,7 +64,7 @@
 
                         <!-- Init event -->
                         <xf:action id="xf-en" ev:event="xforms-enabled">
-                            <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxf:script>
+                            <xf:action type="javascript">YAHOO.xbl.fr.Recaptcha.instance(this).init();</xf:action>
                             <!-- Copy value of private key to local model -->
                             <!-- NOTE: We don't use xxbl:parameter() as we don't want the private key to get to the client -->
                             <xf:var name="private-key">

@@ -66,12 +66,12 @@
                     <xf:bind ref="instance('fr-spell-checker-internal')/button" readonly="../readonly = 'true'"/>
 
                     <!--  Spell checking -->
-                    <xf:submission 
+                    <xf:submission
                             method="post"
                             resource="{xxf:property('oxf.xforms.xbl.fr.spell-checker.service')}"
-                            id="spell-check-submission" 
-                            ref="instance('fr-spell-checker-request')" 
-                            replace="instance" 
+                            id="spell-check-submission"
+                            ref="instance('fr-spell-checker-request')"
+                            replace="instance"
                             instance="fr-spell-checker-result">
                     </xf:submission>
 
@@ -121,7 +121,7 @@
                                 ../unknown-word,
                                 '&lt;/span&gt;',
                                 string-join($current-c/following-sibling::*/@current, ''))"/>
-                            <xxf:script>
+                            <xf:action type="javascript">
                                 var YD = YAHOO.util.Dom;
                                 // Get the word we want to make visible
                                 var unknownWord = document.getElementById("fr-spell-checker-unknown-word");
@@ -130,7 +130,7 @@
                                 if (! YD.hasClass(notInDictionaryDiv, "xforms-output")) notInDictionaryDiv = notInDictionaryDiv.parentNode;
                                 // Set scrollTop on container so the word is visible
                                 notInDictionaryDiv.scrollTop = Math.max(0, unknownWord.offsetTop - unknownWord.offsetHeight);
-                            </xxf:script>
+                            </xf:action>
                         </xf:action>
                     </xf:action>
 

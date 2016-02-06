@@ -46,9 +46,7 @@
         <xh:div id="triggers">
             <xf:trigger>
                 <xf:label>Client-side JS error</xf:label>
-                <xf:action ev:event="DOMActivate">
-                    <xxf:script>invalidFunctionCall();</xxf:script>
-                </xf:action>
+                <xf:action ev:event="DOMActivate" type="javascript">invalidFunctionCall();</xf:action>
             </xf:trigger>
             <xf:trigger>
                 <xf:label>Server-side non-fatal error</xf:label>

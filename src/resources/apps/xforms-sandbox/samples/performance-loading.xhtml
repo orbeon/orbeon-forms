@@ -25,8 +25,8 @@
             <xf:instance id="instance">
                 <instance/>
             </xf:instance>
-            <xf:action ev:event="xforms-ready">
-                <xxf:script>ORBEON.xforms.Document.dispatchEvent("main-model", "show-loaded");</xxf:script>
+            <xf:action ev:event="xforms-ready" type="javascript">
+                ORBEON.xforms.Document.dispatchEvent("main-model", "show-loaded");
             </xf:action>
             <xf:action ev:event="show-loaded">
                 <xf:message level="modal">Page loaded</xf:message>

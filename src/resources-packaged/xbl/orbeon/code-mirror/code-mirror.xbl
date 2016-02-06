@@ -34,26 +34,24 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-enabled xxforms-iteration-moved">
-                <xxf:script>
+                <xf:action type="javascript">
                     <xxf:param name="value" value="xxf:binding('fr-code-mirror')"/>
                     <xxf:body>
                         var instance = YAHOO.xbl.fr.CodeMirror.instance(this);
                         instance.enabled();
                         instance.xformsValue(value);
                     </xxf:body>
-                </xxf:script>
+                </xf:action>
             </xbl:handler>
-            <xbl:handler event="xforms-value-changed">
-                <xxf:script>
-                    <xxf:param name="value" value="xxf:binding('fr-code-mirror')"/>
-                    <xxf:body>YAHOO.xbl.fr.CodeMirror.instance(this).xformsValue(value);</xxf:body>
-                </xxf:script>
+            <xbl:handler event="xforms-value-changed" type="javascript">
+                <xxf:param name="value" value="xxf:binding('fr-code-mirror')"/>
+                <xxf:body>YAHOO.xbl.fr.CodeMirror.instance(this).xformsValue(value);</xxf:body>
             </xbl:handler>
-            <xbl:handler event="xforms-readonly">
-                <xxf:script>YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();</xxf:script>
+            <xbl:handler event="xforms-readonly" type="javascript">
+                YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();
             </xbl:handler>
-            <xbl:handler event="xforms-readwrite">
-                <xxf:script>YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadwrite();</xxf:script>
+            <xbl:handler event="xforms-readwrite" type="javascript">
+                YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadwrite();
             </xbl:handler>
             <xbl:handler event="fr-value-changed">
                 <xf:setvalue ref="xxf:binding('fr-code-mirror')" value="event('value')"/>

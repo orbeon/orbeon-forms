@@ -51,7 +51,7 @@
 
         // Arguments to the function:
         // - First is always `event`
-        // - After that come custom arguments passed with <xxf:param> in <xxf:script>
+        // - After that come custom arguments passed with <xxf:param> in <xf:action>
         var args = [event].concat(_.rest(arguments, 3));
 
         theFunction.apply(observer, args);

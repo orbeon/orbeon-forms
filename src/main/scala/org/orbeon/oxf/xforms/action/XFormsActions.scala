@@ -22,10 +22,11 @@ import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.analysis.{ChildrenActionsAndVariablesTrait, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 
+// 2016-02-05: This object mixes runtime actions and compile-time actions. We should separate this properly.
 object XFormsActions {
   val LOGGING_CATEGORY = "action"
   val logger = LoggerFactory.createLogger(XFormsActions.getClass)
-  
+
   private def xformsQName(name: String) = QName.get(name, XFORMS_NAMESPACE)
   private def xxformsQName(name: String) = QName.get(name, XXFORMS_NAMESPACE)
 
@@ -56,13 +57,13 @@ object XFormsActions {
     xxformsQName("invalidate-instances")    → new XXFormsInvalidateInstancesAction,
     xxformsQName("join-submissions")        → new XXFormsJoinSubmissions,
     xxformsQName("setvisited")              → new XXFormsSetvisitedAction,
-  
+
     // xbl:handler as action container working like xf:action
     XBL_HANDLER_QNAME                       → new XFormsActionAction
   )
 
   // Return a factory for action analysis
-  val ActionFactory = {
+  val ActionFactory: PartialFunction[Element, ControlFactory] = {
 
     def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
 

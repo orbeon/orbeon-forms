@@ -34,9 +34,7 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
         <application-name>acme</application-name>
         <form-name>order</form-name>
         <title xml:lang="en">ACME Order Form</title>
-        <description xml:lang="en">This is a form to order new stuff from ACME, Inc.</description>
         <title xml:lang="fr">Formulaire de commande ACME</title>
-        <description xml:lang="fr">Ceci est un formulaire de commande pour ACME, Inc.</description>
         <permissions>
           <permission operations="read update delete">
             <group-member/>

@@ -74,10 +74,6 @@
                             <!-- Switch serialization when needed -->
                             <xf:action event="xforms-select">
                                 <xf:setvalue
-                                    if="event('xxf:item-value') = ('get', 'delete') and not(. = ('get', 'delete'))"
-                                    ref="../serialization"
-                                    value="'none'"/>
-                                <xf:setvalue
                                     if="not(event('xxf:item-value') = ('get', 'delete')) and . = ('get', 'delete')"
                                     ref="../serialization"
                                     value="'application/xml'"/>
@@ -438,7 +434,7 @@
                 value="not($submission/@method = ('get', 'delete'))"/>
 
             <xf:setvalue ref="$request/method"        value="$submission/@method"/>
-            <xf:setvalue ref="$request/serialization" value="if ($local-has-body) then $submission/@serialization else 'none'"/>
+            <xf:setvalue ref="$request/serialization" value="$submission/@serialization"/>
             <xf:setvalue ref="$request/resource"      value="$submission/@resource"/>
 
             <xf:action if="not($local-has-body)">
@@ -448,7 +444,7 @@
                 <xf:insert
                     context="$request/params"
                     origin="
-                        for $e in $body//*[not(*)]
+                        for $e in $body/*//*[not(*)]
                             return xf:element(
                                 'param',
                                 (
@@ -581,7 +577,10 @@
                     readonly="../is-auth = false()"
                     required="../is-auth = true()"/>
 
-                <xf:bind ref="serialization" readonly="not($has-body)"/>
+                <xf:bind
+                    ref="serialization"
+                    calculate="if ($has-body) then . else 'none'"
+                    readonly="not($has-body)"/>
 
                 <!-- Compute mediatype based on SOAP or serialization -->
                 <xf:bind
@@ -608,6 +607,7 @@
                 />
                 <xf:bind
                     ref="params/param/@name"
+                    type="xs:NCName"
                     required="true()"/>
             </xf:bind>
 

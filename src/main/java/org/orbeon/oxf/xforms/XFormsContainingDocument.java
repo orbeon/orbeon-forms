@@ -629,7 +629,12 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         }
     }
 
-    public void addScriptToRun(StaticScript staticScript, XFormsEvent event, XFormsEventObserver eventObserver, scala.collection.immutable.List<String> paramValues) {
+    public void addScriptToRun(
+        StaticScript staticScript,
+        XFormsEvent event,
+        XFormsEventObserver eventObserver,
+        scala.collection.immutable.List<String> paramValues
+    ) {
 
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run

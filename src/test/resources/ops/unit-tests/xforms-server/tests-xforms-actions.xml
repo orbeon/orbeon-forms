@@ -24,7 +24,7 @@
        xmlns:ev="http://www.w3.org/2001/xml-events"
        xmlns:xbl="http://www.w3.org/ns/xbl"
        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    
+
     <test description="Interaction of context and iterate" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -93,7 +93,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="iterate attribute on action and context() function" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -259,9 +259,9 @@
                             xxf:set-request-attribute('foo', 42)
                         </xf:action>
 
-                        <xxf:script type="xpath" ev:event="xforms-model-construct-done">
+                        <xf:action type="xpath" ev:event="xforms-model-construct-done">
                             xxf:set-session-attribute('bar', 43)
-                        </xxf:script>:action>
+                        </xf:action>
 
                         <xf:setvalue ev:event="xforms-ready" ref="value[1]" value="xxf:get-request-attribute('foo')"/>
                         <xf:setvalue ev:event="xforms-ready" ref="value[2]" value="xxf:get-session-attribute('bar')"/>
@@ -336,7 +336,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="Combine iterate, while and if" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -510,7 +510,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="#684: xxforms:if / xxforms:while don't work anymore" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/684 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
@@ -523,7 +523,7 @@
                                 <condition/>
                             </values>
                         </xf:instance>
-                        
+
                         <xf:instance id="events">
                             <events/>
                         </xf:instance>
@@ -533,7 +533,7 @@
                             <xf:dispatch targetid="model" name="if"/>
                             <xf:dispatch targetid="model" name="xxf-if"/>
                             <xf:dispatch targetid="model" name="exf-if"/>
-                            
+
                             <xf:setvalue ref="condition">false</xf:setvalue>
                             <xf:dispatch targetid="model" name="if"/>
                             <xf:dispatch targetid="model" name="xxf-if"/>
@@ -543,7 +543,7 @@
                         <xf:insert ev:event="if"     if="instance()/condition = 'true'"  context="instance('events')" ref="*" origin="xf:element('if-true')"/>
                         <xf:insert ev:event="xxf-if" if="instance()/condition = 'true'"  context="instance('events')" ref="*" origin="xf:element('xxf-if-true')"/>
                         <xf:insert ev:event="exf-if" if="instance()/condition = 'true'"  context="instance('events')" ref="*" origin="xf:element('exf-if-true')"/>
-                        
+
                         <xf:insert ev:event="if"     if="instance()/condition = 'false'" context="instance('events')" ref="*" origin="xf:element('if-false')"/>
                         <xf:insert ev:event="xxf-if" if="instance()/condition = 'false'" context="instance('events')" ref="*" origin="xf:element('xxf-if-false')"/>
                         <xf:insert ev:event="exf-if" if="instance()/condition = 'false'" context="instance('events')" ref="*" origin="xf:element('exf-if-false')"/>

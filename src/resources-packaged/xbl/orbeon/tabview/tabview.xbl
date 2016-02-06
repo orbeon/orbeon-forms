@@ -64,7 +64,7 @@
                         <xsl:copy-of select="@class"/>
 
                         <!-- Initialization event -->
-                        <xxf:script id="xf-en" ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).init();</xxf:script>
+                        <xf:action type="javascript" id="xf-en" ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).init();</xf:action>
 
                         <!-- Builds relevance-related variables for each tab -->
                         <xsl:for-each select="fr:tab">
@@ -127,12 +127,12 @@
                                         <xsl:copy-of select="@class | @id | @model | @context | @ref | @bind"/>
 
                                         <!-- Upon receiving fr-toggle, tell JavaScript -->
-                                        <xxf:script ev:event="fr-toggle"        ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxf:script>
+                                        <xf:action type="javascript" ev:event="fr-toggle"        ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xf:action>
                                         <!-- Listen to xforms-readonly and xforms-readwrite for this fr:tab -->
-                                        <xxf:script ev:event="xforms-readonly"  ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).readonly(this);</xxf:script>
-                                        <xxf:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).readwrite(this);</xxf:script>
+                                        <xf:action type="javascript" ev:event="xforms-readonly"  ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).readonly(this);</xf:action>
+                                        <xf:action type="javascript" ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).readwrite(this);</xf:action>
                                         <!-- When this fr:tab is newly focused, toggle to it -->
-                                        <xxf:script ev:event="DOMFocusIn"       ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxf:script>
+                                        <xf:action type="javascript" ev:event="DOMFocusIn"       ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xf:action>
 
                                         <!-- Client dispatches fr-select upon tab selection -->
                                         <xf:action ev:event="fr-select" ev:target="#observer">

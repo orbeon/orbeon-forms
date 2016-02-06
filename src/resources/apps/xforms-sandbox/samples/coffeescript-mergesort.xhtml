@@ -32,7 +32,7 @@
 
         <fr:button>
             <xf:label>Sort them!</xf:label>
-            <xxf:script ev:event="DOMActivate" runat="server" type="text/coffeescript">
+            <xf:action ev:event="DOMActivate" runat="server" type="text/coffeescript">
                 <![CDATA[
 
                 # Merge sort function from the CoffeeScript examples
@@ -62,7 +62,7 @@
                   ORBEON.controls.setValue "my-output⊙" + index, sortedValues[index - 1]
 
                 ]]>
-            </xxf:script>
+            </xf:action>
         </fr:button>
 
     </xh:body>

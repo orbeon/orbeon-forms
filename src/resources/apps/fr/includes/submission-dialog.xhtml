@@ -67,7 +67,7 @@
                 <!-- Close window button -->
                 <xf:trigger ref="instance()[context() = 'close-window']">
                     <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-close-window"/>
-                    <xxf:script ev:event="DOMActivate">window.close();</xxf:script>
+                    <xf:action type="javascript" ev:event="DOMActivate">window.close();</xf:action>
                 </xf:trigger>
             </xf:repeat>
         </xf:group>

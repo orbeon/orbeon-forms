@@ -64,7 +64,7 @@
                 <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
                 <xh:div class="xbl-fr-upload-field-container">
                     <xf:upload xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxf:script>
+                        <xf:action type="javascript" id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xf:action>
                         <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
                     </xf:upload>
                     <xh:div class="xbl-fr-upload-fakefile">

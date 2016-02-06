@@ -58,13 +58,13 @@
             </xf:trigger>
             <xf:trigger>
                 <xf:label>Server-side fatal error</xf:label>
-                <xxf:script ev:event="DOMActivate">
+                <xf:action type="javascript" ev:event="DOMActivate">
                     // Store invalid sequence id
                     var formId = ORBEON.xforms.Controls.getForm(this).id;
                     ORBEON.xforms.Document.storeInClientState(formId, "sequence", 1764);
                     // Dispatch event, so an Ajax request is sent, which gives a fatal error
                     ORBEON.xforms.Document.dispatchEvent("xforms-model", "dummy-event");
-                </xxf:script>
+                </xf:action>
             </xf:trigger>
         </xh:div>
         <xh:div>

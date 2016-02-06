@@ -35,15 +35,15 @@
         <xbl:handlers>
             <xbl:handler event="fr-accordion-toggle-all" phase="target">
                 <xf:setvalue ref="operation" value="if (event('selected')) then 'show' else 'hide'"/>
-                <xxf:script id="xf-ta">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxf:script>
+                <xf:action type="javascript" id="xf-ta">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xf:action>
             </xbl:handler>
             <xbl:handler event="fr-show-all" phase="target">
                 <xf:setvalue ref="operation">show</xf:setvalue>
-                <xxf:script id="xf-sa">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxf:script>
+                <xf:action type="javascript" id="xf-sa">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xf:action>
             </xbl:handler>
             <xbl:handler event="fr-hide-all" phase="target">
                 <xf:setvalue ref="operation">hide</xf:setvalue>
-                <xxf:script id="xf-ha">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxf:script>
+                <xf:action type="javascript" id="xf-ha">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xf:action>
             </xbl:handler>
             <!-- Handler for backward compatibility: prefer dispatching fr-toggle/fr-show/fr-hide directly to fr:case by id. -->
             <xbl:handler event="fr-toggle fr-accordion-toggle" phase="target" xxbl:scope="outer">
@@ -77,9 +77,9 @@
                         <xsl:copy-of select="xxbl:parameter(., 'open-closes-others')"/>
 
                         <!-- Constructor -->
-                        <xxf:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.instance(this).init();</xxf:script>
+                        <xf:action type="javascript" id="xf-en" ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.instance(this).init();</xf:action>
                         <!-- Toggle -->
-                        <xxf:script id="xf-tg" ev:event="fr-accordion-toggle fr-toggle fr-show fr-hide">YAHOO.xbl.fr.Accordion.instance(this).toggle(event.target);</xxf:script>
+                        <xf:action type="javascript" id="xf-tg" ev:event="fr-accordion-toggle fr-toggle fr-show fr-hide">YAHOO.xbl.fr.Accordion.instance(this).toggle(event.target);</xf:action>
 
                         <!-- Dummy controls so JavaScript can access the local instance -->
                         <xf:output model="accordion-model" value="operation" class="xbl-fr-accordion-operation" style="display: none"/>

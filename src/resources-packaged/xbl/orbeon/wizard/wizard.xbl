@@ -57,7 +57,7 @@
                             <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" >
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
-                                <xxf:script ev:event="fr-section-scroll" ev:target="#observer">
+                                <xf:action type="javascript" ev:event="fr-section-scroll" ev:target="#observer">
                                     <![CDATA[
                                     var $ = ORBEON.jQuery;
                                     var target = event.target;
@@ -70,7 +70,7 @@
                                         }
                                     }
                                     ]]>
-                                </xxf:script>
+                                </xf:action>
                                 <!-- Wrap each top-level fr:section within each own case -->
                                 <xsl:for-each select="fr:section">
                                     <xf:case id="{@id}-case">

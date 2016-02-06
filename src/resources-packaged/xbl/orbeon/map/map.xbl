@@ -68,7 +68,7 @@
 
                     <!-- Constructor -->
                     <xf:group xxbl:scope="inner">
-                        <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Map.instance(this).init();</xxf:script>
+                        <xf:action type="javascript" id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Map.instance(this).init();</xf:action>
                     </xf:group>
 
                     <!-- Variables for attributes on the control -->
@@ -83,7 +83,7 @@
                 <!-- XForms controls to expose XForms values to JavaScript -->
                 <xf:output class="fb-map-address" xbl:attr="context model ref=address-ref bind=address-bind" style="display: none">
                     <!-- React to change of address -->
-                    <xxf:script id="xf-vc" ev:event="xforms-value-changed">YAHOO.xbl.fr.Map.instance(this).updateMarkerFromAddress();</xxf:script>
+                    <xf:action type="javascript" id="xf-vc" ev:event="xforms-value-changed">YAHOO.xbl.fr.Map.instance(this).updateMarkerFromAddress();</xf:action>
                 </xf:output>
                 <xf:input class="fb-map-longitude" xbl:attr="context model ref=longitude-ref bind=longitude-bind" style="display: none"/>
                 <xf:input class="fb-map-latitude" xbl:attr="context model ref=latitude-ref bind=latitude-bind" style="display: none"/>

@@ -32,12 +32,12 @@
             <xf:action ev:observer="registration" ev:event="xforms-insert xforms-delete xxforms-value-changed">
                 <xf:setvalue ref="instance('data-safe')">false</xf:setvalue>
             </xf:action>
-            <xxf:script ev:event="xforms-ready">
+            <xf:action type="javascript" ev:event="xforms-ready">
                 window.onbeforeunload = function() {
                     if (ORBEON.xforms.Document.getValue('data-safe-input') != 'true')
                         return "You may lose some unsaved changes.";
                 }
-            </xxf:script>
+            </xf:action>
         </xf:model>
         <xh:style type="text/css">
             .xforms-control { display: block }

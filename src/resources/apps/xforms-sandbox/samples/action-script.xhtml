@@ -15,9 +15,9 @@
     </xh:head>
     <xh:body>
         <xf:group id="my-group">
-            <xxf:script ev:event="DOMActivate">
+            <xf:action type="javascript" ev:event="DOMActivate">
                 document.getElementById("out").innerHTML = this.id + " " + event.target.id;
-            </xxf:script>
+            </xf:action>
             <xf:trigger id="my-trigger">
                 <xf:label>Press me</xf:label>
             </xf:trigger>

@@ -47,9 +47,9 @@
                 </xf:var>
 
                 <!-- Init JavaScript, unless user specified loading-indicator="false" -->
-                <xxf:script if="not(string($loading-indicator) = 'false')" event="xforms-enabled xxforms-iteration-moved" id="xf-init">
+                <xf:action type="javascript" if="not(string($loading-indicator) = 'false')" event="xforms-enabled xxforms-iteration-moved" id="xf-init">
                     YAHOO.xbl.fr.LaddaButton.instance(this);
-                </xxf:script>
+                </xf:action>
 
                 <xf:trigger ref="xxf:binding('fr-ladda-button')">
                     <xf:label mediatype="text/html" value="xxf:label('fr-ladda-button')"/>

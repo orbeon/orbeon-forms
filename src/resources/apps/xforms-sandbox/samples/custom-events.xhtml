@@ -29,17 +29,17 @@
     <xh:body>
         <xf:trigger>
             <xf:label>Dispatch</xf:label>
-            <xxf:script event="DOMActivate">ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");</xxf:script>
+            <xf:action type="javascript" event="DOMActivate">ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");</xf:action>
         </xf:trigger>
         <xf:trigger>
             <xf:label>Dispatch with property</xf:label>
-            <xxf:script event="DOMActivate">
+            <xf:action type="javascript" event="DOMActivate">
                 ORBEON.xforms.Document.dispatchEvent({
                     targetId: "acme-model",
                     eventName: "acme-super-event",
                     properties: { p1: 'v1', p2: 'v2' }
                 });
-            </xxf:script>
+            </xf:action>
         </xf:trigger>
     </xh:body>
 </xh:html>

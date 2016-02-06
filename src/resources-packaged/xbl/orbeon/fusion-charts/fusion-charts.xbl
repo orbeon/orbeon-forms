@@ -47,7 +47,7 @@
                             <xh:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xh:div>
                             <!-- XML -->
                             <xf:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml">
-                                <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xxf:script>
+                                <xf:action type="javascript" id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xf:action>
                             </xf:output>
                             <!-- Access to parameters -->
                             <xsl:copy-of select="xxbl:parameter(., 'uri-to-swf')"/>

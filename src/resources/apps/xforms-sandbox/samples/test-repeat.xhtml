@@ -133,7 +133,7 @@
         </xf:input>
         <xh:table id="table">
             <xf:repeat ref=".[@show = 'true']/company" id="company-repeat">
-                <xxf:script ev:event="DOMFocusIn">window.observerElement = this;</xxf:script>
+                <xf:action type="javascript" ev:event="DOMFocusIn">window.observerElement = this;</xf:action>
                 <xh:tr>
                     <xh:td>
                         <xf:input ref="name" id="name"/>
@@ -148,7 +148,7 @@
         <hr/>
         <xh:table id="table-observer">
             <xf:repeat ref=".[@show = 'true']/company" >
-                <xxf:script ev:target="#observer" ev:event="xxforms-ref-changed">window.observerElement = this;</xxf:script>
+                <xf:action type="javascript" ev:target="#observer" ev:event="xxforms-ref-changed">window.observerElement = this;</xf:action>
                 <xh:tr>
                     <xh:td>
                         <xf:input ref="name" id="name-observer"/>
@@ -161,7 +161,7 @@
         <xh:table id="table-xbl">
             <fr:identity id="xbl-component">
                 <xf:repeat ref=".[@show = 'true']/company">
-                    <xxf:script ev:event="DOMFocusIn">window.observerElement = this;</xxf:script>
+                    <xf:action type="javascript" ev:event="DOMFocusIn">window.observerElement = this;</xf:action>
                     <xh:tr>
                         <xh:td>
                             <xf:input ref="name" id="name-xbl"/>

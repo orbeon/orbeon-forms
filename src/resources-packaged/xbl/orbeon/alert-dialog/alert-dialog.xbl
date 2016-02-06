@@ -55,16 +55,16 @@
 
                 <xsl:template match="/*">
 
-                    <xsl:variable 
-                        name="has-multiple-choices" 
+                    <xsl:variable
+                        name="has-multiple-choices"
                         select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
 
                     <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
-                    <xxf:dialog 
-                        xxbl:scope="inner" 
-                        id="dialog" 
-                        level="modal" 
-                        appearance="full" 
+                    <xxf:dialog
+                        xxbl:scope="inner"
+                        id="dialog"
+                        level="modal"
+                        appearance="full"
                         close="{(@close, 'false')[1]}"
                         class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
 
@@ -82,10 +82,10 @@
                              b) We need code to figure out what the id of the first button is, while in JavaScript we
                                 can just refer to "the first button in the dialog".
                         -->
-                        <xxf:script ev:event="xxforms-dialog-open">
+                        <xf:action type="javascript" ev:event="xxforms-dialog-open">
                             var buttons = this.getElementsByTagName("button");
                             if (buttons.length > 0) buttons[0].focus();
-                        </xxf:script>
+                        </xf:action>
                         <xf:label xxbl:scope="outer"><xsl:copy-of select="fr:label/(@* | node())"/></xf:label>
                         <xh:div class="xbl-fr-alert-dialog-message">
                             <xsl:choose>

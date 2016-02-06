@@ -42,8 +42,8 @@
                             <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">
                                 <xh:div class="xbl-fr-date-calendar-div"/>
                                 <xf:input ref="." class="xbl-fr-date-input">
-                                    <xxf:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xxf:script>
-                                    <xxf:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.instance(this).valueChanged();</xxf:script>
+                                    <xf:action type="javascript" ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xf:action>
+                                    <xf:action type="javascript" ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.instance(this).valueChanged();</xf:action>
                                 </xf:input>
                             </xsl:when>
                             <!-- Standard case with text field-->

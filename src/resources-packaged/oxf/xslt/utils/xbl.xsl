@@ -39,7 +39,7 @@
                     <xxf:value xxbl:attr="{$prefix}:{$property}/(@model | @context | @ref | @bind)" value="." xxbl:scope="outer"/>
                 </xf:var>
                 <xf:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
-                    <xxf:script ev:event="xforms-value-changed">
+                    <xf:action type="javascript" ev:event="xforms-value-changed">
                         <xsl:text>ORBEON.xforms.XBL.callValueChanged("</xsl:text>
                         <xsl:value-of select="$prefix"/>
                         <xsl:text>", "</xsl:text>
@@ -47,7 +47,7 @@
                         <xsl:text>", this, "</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($property)"/>
                         <xsl:text>");</xsl:text>
-                    </xxf:script>
+                    </xf:action>
                 </xf:input>
             </xsl:when>
             <xsl:otherwise>

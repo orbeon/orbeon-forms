@@ -32,9 +32,10 @@
                          xbl:attr="href" f:url-type="resource" xxbl:scope="outer"/>
 
                 <!-- In script mode, intercept client-side click and open window directly -->
-                <xxf:script
+                <xf:action
+                    type="javascript"
                     ev:event="xforms-enabled xxforms-iteration-moved"
-                    ev:target="#observer">YAHOO.xbl.fr.HrefButton.instance(this);</xxf:script>
+                    ev:target="#observer">YAHOO.xbl.fr.HrefButton.instance(this);</xf:action>
 
                 <!-- Only load directly in noscript mode -->
                 <xf:load

@@ -29,9 +29,9 @@
                 </instance>
             </xf:instance>
             <xf:bind ref="/instance/bar" calculate="/instance/foo"/>
-            <xxf:script ev:event="xforms-ready">
+            <xf:action type="javascript" ev:event="xforms-ready">
                 ORBEON.xforms.Document.setValue("foo", 42);
-            </xxf:script>
+            </xf:action>
         </xf:model>
     </xh:head>
     <xh:body>
@@ -48,10 +48,10 @@
         <xh:p>
             <xf:trigger>
                 <xf:label>Increment foo with JavaScript</xf:label>
-                <xxf:script ev:event="DOMActivate">
+                <xf:action type="javascript" ev:event="DOMActivate">
                     var fooValue = ORBEON.xforms.Document.getValue("foo");
                     ORBEON.xforms.Document.setValue("foo", Number(fooValue) + 1);
-                </xxf:script>
+                </xf:action>
             </xf:trigger>
         </xh:p>
     </xh:body>

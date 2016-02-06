@@ -86,7 +86,7 @@
 
                     <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
                     <xf:group>
-                        <xxf:script ev:event="xforms-disabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xxf:script>
+                        <xf:action type="javascript" ev:event="xforms-disabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xf:action>
 
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
@@ -169,14 +169,14 @@
                             <xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>
                         </xf:var>
                         <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
-                        <xxf:script
+                        <xf:action type="javascript"
                             ev:target="formatted-value"
-                            ev:event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xxf:script>
+                            ev:event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
 
-                        <xxf:script
+                        <xf:action type="javascript"
                             ev:target="#observer"
                             ev:observer="fr-number"
-                            ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xxf:script>
+                            ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
 
                         <!-- Readwrite mode -->
                         <xf:group ref="$binding[not($view)]">
@@ -201,8 +201,8 @@
                                                 round-half-to-even(xs:decimal($clean), xs:integer($digits-after-decimal))
                                             else
                                                 $clean">
-                                <xxf:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxf:script>
-                                <xxf:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxf:script>
+                                <xf:action type="javascript" id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xf:action>
+                                <xf:action type="javascript" id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xf:action>
                             </xf:input>
 
                             <!--

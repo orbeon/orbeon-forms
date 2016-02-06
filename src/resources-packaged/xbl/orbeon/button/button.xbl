@@ -66,12 +66,12 @@
                                 <xsl:attribute name="ref">.</xsl:attribute>
                             </xsl:if>
                             <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
-                            <xxf:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer"
-                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).enabled();</xxf:script>
-                            <xxf:script ev:event="xforms-readonly" ev:target="#observer"
-                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readonly();</xxf:script>
-                            <xxf:script ev:event="xforms-readwrite" ev:target="#observer"
-                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxf:script>
+                            <xf:action type="javascript" ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).enabled();</xf:action>
+                            <xf:action type="javascript" ev:event="xforms-readonly" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readonly();</xf:action>
+                            <xf:action type="javascript" ev:event="xforms-readwrite" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readwrite();</xf:action>
                         </xf:trigger>
                     </xh:span>
                 </xh:span>

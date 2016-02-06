@@ -172,7 +172,7 @@
             <xf:var name="mode-for-save" value="xxf:instance('fr-parameters-instance')/mode/string()">
                 <!-- If URI is /new (it should be), change it to /edit/id -->
                 <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
-                <xxf:script ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
+                <xf:action type="javascript" ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
                     <![CDATA[
                         if (history && history.replaceState) {
                             var NewSuffix = '/new';
@@ -187,7 +187,7 @@
                             }
                         }
                     ]]>
-                </xxf:script>
+                </xf:action>
             </xf:var>
 
             <!-- This is a HACK for Form Builder only: place non-relevant instances of all toolbox controls so that

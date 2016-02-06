@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl, XFormsEvents}
-import org.orbeon.oxf.xforms.{ShareableScript, StaticScript}
 import org.orbeon.oxf.xml.Dom4j
+
+import scala.collection.mutable
 
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
@@ -29,9 +32,9 @@ trait PartEventHandlerAnalysis {
 
   // Scripts
   private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
-  def scripts = _scriptsByPrefixedId
-  private[PartEventHandlerAnalysis] var _uniqueClientScripts: List[ShareableScript] = Nil
-  def uniqueClientScripts = _uniqueClientScripts
+  def scriptsByPrefixedId = _scriptsByPrefixedId
+  private[PartEventHandlerAnalysis] var _uniqueJsScripts: List[ShareableScript] = Nil
+  def uniqueJsScripts = _uniqueJsScripts
 
   // Register new event handlers
   def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]): Unit = {
@@ -67,7 +70,11 @@ trait PartEventHandlerAnalysis {
 
   private def gatherScripts(): Unit = {
 
-    def extractStaticScript(analysis: ElementAnalysis) = {
+    import StaticScript._
+
+    val shareableByDigest = mutable.LinkedHashMap[String, ShareableScript]()
+
+    def extractStaticScript(analysis: ElementAnalysis, scriptType: ScriptType) = {
 
       val elem     = analysis.element
       val isClient = elem.attributeValue("runat") != "server"
@@ -86,24 +93,34 @@ trait PartEventHandlerAnalysis {
 
       StaticScript(
         analysis.prefixedId,
-        elem.attributeValue("type"),
+        scriptType,
         body,
-        params.to[List]
+        params.to[List],
+        shareableByDigest
       )
     }
 
-    val allScriptsInDocOrder = {
-      val scriptHandlers = controlTypes.get("script").to[List] flatMap (_.values)
-      scriptHandlers map extractStaticScript
-    }
+    def elemHasScriptType(e: ElementAnalysis, scriptType: ScriptType, default: Option[ScriptType]) =
+      scriptTypeFromElem(e, default) contains scriptType
+
+    def findForAction(action: String, scriptType: ScriptType, default: Option[ScriptType]) =
+      controlTypes.get(action).to[Iterator].flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))
+
+    def findForScriptType(scriptType: ScriptType) =
+      findForAction("action", scriptType, None) ++
+      findForAction("script", scriptType, Some(JavaScriptScriptType)) map
+      (extractStaticScript(_, scriptType)) toList
+
+    val jsScripts      = findForScriptType(JavaScriptScriptType)
+    val xpathScriptsIt = findForScriptType(XPathScriptType)
 
     _scriptsByPrefixedId ++=
-      allScriptsInDocOrder map { case script ⇒ script.prefixedId → script }
+      jsScripts.iterator ++
+      xpathScriptsIt     map
+      (script ⇒ script.prefixedId → script)
 
     // Keep only one script body for a given digest
-    import org.orbeon.oxf.util.ScalaUtils._
-    _uniqueClientScripts ++=
-      allScriptsInDocOrder.keepDistinctBy(_.shared.digest, _.shared)
+    _uniqueJsScripts ++= jsScripts.keepDistinctBy(_.shared.digest, _.shared)
   }
 
   // Deregister the given handler
@@ -113,7 +130,7 @@ trait PartEventHandlerAnalysis {
     if (eventHandler.eventNames(XFormsEvents.KEYPRESS))
       _keypressHandlers = _keypressHandlers filterNot (_ eq eventHandler)
 
-    if (eventHandler.localName == "script")
+    if (eventHandler.localName == "script" || eventHandler.localName == "action")
       _scriptsByPrefixedId -= eventHandler.prefixedId
 
     // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched

@@ -14,6 +14,9 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.SecureUtils.digestString
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+
+import scala.collection.mutable
 
 case class ShareableScript(
   digest     : String,
@@ -24,36 +27,56 @@ case class ShareableScript(
 
 case class StaticScript(
   prefixedId       : String,
-  scriptType       : String,
+  scriptType       : ScriptType,
   paramExpressions : List[String],
   shared           : ShareableScript
 )
 
+sealed trait ScriptType
+case object  JavaScriptScriptType extends ScriptType
+case object  XPathScriptType      extends ScriptType
+
 object StaticScript {
 
   def apply(
-    prefixedId : String,
-    scriptType : String,
-    body       : String,
-    params     : List[(String, String)]
+    prefixedId        : String,
+    scriptType        : ScriptType,
+    body              : String,
+    params            : List[(String, String)],
+    shareableByDigest : mutable.Map[String, ShareableScript]
   ): StaticScript = {
 
     val paramNames  = params map (_._1)
     val paramValues = params map (_._2)
     val digest      = digestString(body + '|' + (paramNames mkString "|"), "hex")
 
-    StaticScript(
-      prefixedId,
-      scriptType,
-      paramValues,
+    def newShareableScript =
       ShareableScript(
         digest,
         "xf_" + digest, // digest must be JavaScript-safe (e.g. a hex string)
         body,
         paramNames
       )
+
+    StaticScript(
+      prefixedId,
+      scriptType,
+      paramValues,
+      shareableByDigest.getOrElseUpdate(digest, newShareableScript)
     )
   }
+
+  private val TypeExtractor = "(?:(?:text|application)/)?([a-z]+)".r
+
+  def scriptTypeFromMediatype(mediatype: String, default: Option[ScriptType]) = mediatype match {
+    case null                        ⇒ default
+    case TypeExtractor("javascript") ⇒ Some(JavaScriptScriptType)
+    case TypeExtractor("xpath")      ⇒ Some(XPathScriptType)
+    case _                           ⇒ None
+  }
+
+  def scriptTypeFromElem(elem: ElementAnalysis, default: Option[ScriptType]) =
+    scriptTypeFromMediatype(elem.element.attributeValue("type"), default)
 }
 
 case class ScriptInvocation(

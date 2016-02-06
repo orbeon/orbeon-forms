@@ -84,8 +84,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def getGlobals = collectInParts(_.getGlobals)
 
-  def scripts = collectInParts(_.scripts) toMap
-  def uniqueClientScripts = collectInParts(_.uniqueClientScripts)
+  def scriptsByPrefixedId = collectInParts(_.scriptsByPrefixedId) toMap
+  def uniqueJsScripts = collectInParts(_.uniqueJsScripts)
   def allBindingsMaybeDuplicates: Iterable[AbstractBinding] = collectInParts(_.allBindingsMaybeDuplicates)
 
   def baselineResources =

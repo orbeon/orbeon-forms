@@ -289,7 +289,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
   private def outputScriptDeclarations(xhtmlPrefix: String)(implicit helper: XMLReceiverHelper): Unit = {
 
-    val uniqueClientScripts = containingDocument.getStaticOps.uniqueClientScripts
+    val uniqueClientScripts = containingDocument.getStaticOps.uniqueJsScripts
 
     val errorsToShow      = containingDocument.getServerErrors.asScala
     val scriptInvocations      = containingDocument.getScriptsToRun.asScala

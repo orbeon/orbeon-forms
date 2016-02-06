@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.script
 
 import org.mozilla.javascript.Context
-import org.orbeon.oxf.xforms.{ShareableScript, StaticScript}
+import org.orbeon.oxf.xforms.{ScriptType, ShareableScript, StaticScript}
 
 // NOTE: This is experimental and not in use as of 2016-01-19.
 class ServerScript(
   prefixedId  : String,
-  scriptType  : String,
+  scriptType  : ScriptType,
   paramValues : List[String],
   shared      : ShareableScript
 ) extends StaticScript(
@@ -29,10 +29,12 @@ class ServerScript(
   shared
 ) {
 
-  private def getJavaScriptSource = scriptType match {
-    case "text/coffeescript" ⇒ CoffeeScriptCompiler.compile(shared.body, prefixedId, 1)// TODO: location information if available
-    case _ ⇒ shared.body
-  }
+//  private def getJavaScriptSource = scriptType match {
+//    case "text/coffeescript" ⇒ CoffeeScriptCompiler.compile(shared.body, prefixedId, 1)// TODO: location information if available
+//    case _ ⇒ shared.body
+//  }
+
+  private def getJavaScriptSource = ???
 
   lazy val compiledScript = synchronized { // synchronized might or might not be needed
     val cx = Context.enter()

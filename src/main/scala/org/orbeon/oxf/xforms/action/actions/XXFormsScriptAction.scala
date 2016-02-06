@@ -13,14 +13,10 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.script.ServerScript
 
-/**
- * Extension xxf:script action.
- */
+// Extension `xxf:script` action, also available as `xf:action`.
 class XXFormsScriptAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext): Unit = {
@@ -29,49 +25,32 @@ class XXFormsScriptAction extends XFormsAction {
     val actionElement     = actionContext.element
     val bindingContext    = actionInterpreter.actionXPathContext.getCurrentBindingContext
 
-    actionElement.attributeValue(XFormsConstants.TYPE_QNAME) match {
-      case "javascript" | "text/javascript" | "application/javascript" | null ⇒
-        // Get script based on id
-        val script = {
-          val partAnalysis = actionInterpreter.actionXPathContext.container.getPartAnalysis
-          partAnalysis.scripts(actionInterpreter.getActionPrefixedId(actionElement))
-        }
+    val partAnalysis = actionInterpreter.actionXPathContext.container.getPartAnalysis
 
-        // Run Script on server or client
-        script match {
-          case serverScript: ServerScript ⇒
-            actionInterpreter.containingDocument.getScriptInterpreter.runScript(serverScript)
-          case clientScript ⇒
-
-            // Evaluate parameters if needed
+    partAnalysis.scriptsByPrefixedId(actionInterpreter.getActionPrefixedId(actionElement)) match {
+      case script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _) ⇒
+          actionInterpreter.containingDocument.addScriptToRun(
+            script,
+            actionContext.interpreter.event,
+            actionContext.interpreter.eventObserver,
             // https://github.com/orbeon/orbeon-forms/issues/2499
-            val paramValues =
-              clientScript.paramExpressions map { expr ⇒
-                actionInterpreter.evaluateAsString(
-                  actionElement,
-                  bindingContext.nodeset,
-                  bindingContext.position,
-                  expr
-                )
-              }
-
-            actionInterpreter.containingDocument.addScriptToRun(
-              clientScript,
-              actionContext.interpreter.event,
-              actionContext.interpreter.eventObserver,
-              paramValues
-            )
-        }
-      case "xpath" | "text/xpath" | "application/xpath" ⇒ // "unofficial" type
+            paramExpressions map { expr ⇒
+              actionInterpreter.evaluateAsString(
+                actionElement,
+                bindingContext.nodeset,
+                bindingContext.position,
+                expr
+              )
+            }
+          )
+      case StaticScript(_, XPathScriptType, params, ShareableScript(_, _, body, _)) ⇒
         // Evaluate XPath expression for its side effects only
         actionInterpreter.evaluateKeepItems(
           actionElement,
           bindingContext.nodeset,
           bindingContext.position,
-          actionElement.getText
+          body
         )
-      case other ⇒
-        throw new OXFException("Unsupported script type: " + other)
     }
   }
 }

@@ -26,7 +26,10 @@ case class DynamicActionContext(
   def actionName         = analysis.localName
   def element            = analysis.element
   def scope              = analysis.scope
+  def container          = interpreter.actionXPathContext.container
   def containingDocument = interpreter.containingDocument
+  def bindingContext     = interpreter.actionXPathContext.getCurrentBindingContext
+  def partAnalysis       = container.getPartAnalysis
 
   def logger             = interpreter.indentedLogger
 }

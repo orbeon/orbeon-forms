@@ -50,7 +50,7 @@ object XFormsActions {
     xformsQName("setindex")                 → new XFormsSetindexAction,
 
     // Extension actions
-    xxformsQName("script")                  → new XXFormsScriptAction,
+    xxformsQName("script")                  → new XFormsActionAction,
     xxformsQName("show")                    → new XXFormsShowAction,
     xxformsQName("hide")                    → new XXFormsHideAction,
     xxformsQName("invalidate-instance")     → new XXFormsInvalidateInstanceAction,

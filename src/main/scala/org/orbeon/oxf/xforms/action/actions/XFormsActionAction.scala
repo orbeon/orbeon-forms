@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+
+import scala.collection.JavaConverters._
 
 /**
  * 10.1.1 The action Element
@@ -27,40 +28,61 @@ class XFormsActionAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext): Unit = {
 
     val actionInterpreter = actionContext.interpreter
-    val actionElement = actionContext.element
+    val actionElement     = actionContext.element
+    val bindingContext    = actionContext.bindingContext
 
-    val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
-    if (mediatype eq null) {
-      // Standard XForms action
-      val contextStack = actionInterpreter.actionXPathContext
-      val partAnalysis = contextStack.container.getPartAnalysis
+    actionContext.partAnalysis.scriptsByPrefixedId.get(actionInterpreter.getActionPrefixedId(actionElement)) match {
+      case Some(script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _)) ⇒
+          actionInterpreter.containingDocument.addScriptToRun(
+            script,
+            actionContext.interpreter.event,
+            actionContext.interpreter.eventObserver,
+            // https://github.com/orbeon/orbeon-forms/issues/2499
+            paramExpressions map { expr ⇒
+              actionInterpreter.evaluateAsString(
+                actionElement,
+                bindingContext.nodeset,
+                bindingContext.position,
+                expr
+              )
+            }
+          )
+      case Some(StaticScript(_, XPathScriptType, params, ShareableScript(_, _, body, _))) ⇒
+        // Evaluate XPath expression for its side effects only
+        actionInterpreter.evaluateKeepItems(
+          actionElement,
+          bindingContext.nodeset,
+          bindingContext.position,
+          body
+        )
+      case None ⇒
+        // Grouping XForms action which executes its children actions
+        val contextStack = actionInterpreter.actionXPathContext
+        val partAnalysis = contextStack.container.getPartAnalysis
 
-      // Iterate over child actions
-      var variablesCount = 0
-      for (childActionElement ← Dom4jUtils.elements(actionElement).asScala) {
+        // Iterate over child actions
+        var variablesCount = 0
+        for (childActionElement ← Dom4jUtils.elements(actionElement).asScala) {
 
-        val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
+          val childPrefixedId = actionInterpreter.getActionPrefixedId(childActionElement)
 
-        Option(partAnalysis.getControlAnalysis(childPrefixedId)) match {
-          case Some(variable: VariableAnalysisTrait) ⇒
-            // Scope variable
-            contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
-            variablesCount += 1
-          case Some(action) ⇒
-            // Run child action
-            // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
-            actionInterpreter.runAction(action)
-          case None ⇒
-            throw new IllegalStateException
+          Option(partAnalysis.getControlAnalysis(childPrefixedId)) match {
+            case Some(variable: VariableAnalysisTrait) ⇒
+              // Scope variable
+              contextStack.scopeVariable(variable, actionInterpreter.getSourceEffectiveId(actionElement), false)
+              variablesCount += 1
+            case Some(action) ⇒
+              // Run child action
+              // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
+              actionInterpreter.runAction(action)
+            case None ⇒
+              throw new IllegalStateException
+          }
         }
-      }
 
-      // Unscope all variables
-      for (_ ← 1 to variablesCount)
-        contextStack.popBinding()
-    } else {
-      // Delegate
-      XFormsActions.getScriptAction.execute(actionContext)
+        // Unscope all variables
+        for (_ ← 1 to variablesCount)
+          contextStack.popBinding()
     }
   }
 }

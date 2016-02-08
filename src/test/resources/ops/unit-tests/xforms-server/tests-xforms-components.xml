@@ -582,9 +582,10 @@
                         <xxf:control id="my-currency≡xf-39">$</xxf:control>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
-                        <xxf:control id="my-currency≡xf-42" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-43" relevant="false"/>
+                        <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
+                        <xxf:control id="my-currency≡xf-43" class="add-on" relevant="false"/>
                         <xxf:control id="my-currency≡xf-44" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-45" relevant="false"/>
                     </xxf:control-values>
                     <xxf:script name="xf_efdc0056b6438f9c969545432feab52728756c34" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>

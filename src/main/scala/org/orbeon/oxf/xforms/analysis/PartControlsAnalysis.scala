@@ -55,7 +55,7 @@ trait PartControlsAnalysis extends TransientState {
       case elementWithAppearance: AppearanceTrait ⇒
         appearancesForControlName ++= elementWithAppearance.appearances
 
-        if (controlName == "textarea" && elementWithAppearance.mediatype == Some("text/html")) {
+        if (controlName == "textarea" && elementWithAppearance.mediatype.contains("text/html")) {
           // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxf:richtext
           // appearance had been set, so that we can decide on feature usage based on appearance only.
           appearancesForControlName += XXFORMS_RICH_TEXT_APPEARANCE_QNAME
@@ -103,7 +103,7 @@ trait PartControlsAnalysis extends TransientState {
 
   def iterateControls =
     controlAnalysisMap.valuesIterator
-  
+
   def getControlAnalysisOpt(prefixedId: String) =
     controlAnalysisMap.get(prefixedId)
 

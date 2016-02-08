@@ -14,38 +14,36 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         script-type="application/xhtml+xml">
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/codemirror-3.1/lib/codemirror.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/codemirror-3.1/mode/xml/xml.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/code-mirror.js"/>
-    <xbl:binding id="fr-code-mirror" element="fr|code-mirror" xxbl:mode="lhha binding value focus" xxf:external-events="fr-value-changed">
+    <xbl:binding
+        id="fr-code-mirror"
+        element="fr|code-mirror"
+        xxbl:mode="lhha binding value focus"
+        xxf:external-events="fr-value-changed">
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-3.1/lib/codemirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
         </xbl:resources>
         <xbl:handlers>
-            <xbl:handler event="xforms-enabled xxforms-iteration-moved">
-                <xf:action type="javascript">
-                    <xxf:param name="value" value="xxf:binding('fr-code-mirror')"/>
-                    <xxf:body>
-                        var instance = YAHOO.xbl.fr.CodeMirror.instance(this);
-                        instance.enabled();
-                        instance.xformsValue(value);
-                    </xxf:body>
-                </xf:action>
+            <xbl:handler event="xforms-enabled xxforms-iteration-moved" type="javascript">
+                <xf:param
+                    name="newValue"
+                    value="xxf:binding('fr-code-mirror')"/>
+                <xf:body>
+                    var instance = YAHOO.xbl.fr.CodeMirror.instance(this);
+                    instance.enabled();
+                    instance.xformsValue(newValue);
+                </xf:body>
             </xbl:handler>
             <xbl:handler event="xforms-value-changed" type="javascript">
-                <xxf:param name="value" value="xxf:binding('fr-code-mirror')"/>
-                <xxf:body>YAHOO.xbl.fr.CodeMirror.instance(this).xformsValue(value);</xxf:body>
+                <xf:param name="newValue" value="xxf:binding('fr-code-mirror')"/>
+                <xf:body>YAHOO.xbl.fr.CodeMirror.instance(this).xformsValue(newValue);</xf:body>
             </xbl:handler>
             <xbl:handler event="xforms-readonly" type="javascript">
                 YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();

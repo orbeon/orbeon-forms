@@ -26,6 +26,8 @@ trait PartEventHandlerAnalysis {
 
   self: PartAnalysisImpl ⇒
 
+  import PartEventHandlerAnalysis._
+
   private[PartEventHandlerAnalysis] var _handlersForObserver: Map[String, List[EventHandler]] = Map()
   private[PartEventHandlerAnalysis] var _eventNames: Set[String] = Set()
   private[PartEventHandlerAnalysis] var _keypressHandlers: List[EventHandler] = List()
@@ -72,6 +74,7 @@ trait PartEventHandlerAnalysis {
 
     import StaticScript._
 
+    // Used to eliminate duplicates: we store a single copy of each ShareableScript per digest
     val shareableByDigest = mutable.LinkedHashMap[String, ShareableScript]()
 
     def extractStaticScript(analysis: ElementAnalysis, scriptType: ScriptType) = {
@@ -83,11 +86,11 @@ trait PartEventHandlerAnalysis {
         throw new NotImplementedError(s"""`runat="server"` is not supported""")
 
       val params =
-        Dom4j.elements(elem, XXFORMS_PARAM_QNAME) map (p ⇒ p.attributeValue("name") → p.attributeValue("value"))
+        Dom4j.elements(elem, XFORMS_PARAM_QNAME) map (p ⇒ p.attributeValue("name") → p.attributeValue("value"))
 
       val body =
         if (params.nonEmpty)
-          Dom4j.elements(elem, XXFORMS_BODY_QNAME).headOption map (_.getStringValue) getOrElse ""
+          Dom4j.elements(elem, XFORMS_BODY_QNAME).headOption map (_.getStringValue) getOrElse ""
         else
           elem.getStringValue
 
@@ -103,16 +106,17 @@ trait PartEventHandlerAnalysis {
     def elemHasScriptType(e: ElementAnalysis, scriptType: ScriptType, default: Option[ScriptType]) =
       scriptTypeFromElem(e, default) contains scriptType
 
-    def findForAction(action: String, scriptType: ScriptType, default: Option[ScriptType]) =
+    def findForActionIt(action: String, scriptType: ScriptType, default: Option[ScriptType]) =
       controlTypes.get(action).to[Iterator].flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))
 
-    def findForScriptType(scriptType: ScriptType) =
-      findForAction("action", scriptType, None) ++
-      findForAction("script", scriptType, Some(JavaScriptScriptType)) map
-      (extractStaticScript(_, scriptType)) toList
+    def findForScriptTypeIt(scriptType: ScriptType) =
+      findForActionIt(ActionActionName,  scriptType, None) ++
+      findForActionIt(HandlerActionName, scriptType, None) ++
+      findForActionIt(ScriptActionName,  scriptType, Some(JavaScriptScriptType)) map
+      (extractStaticScript(_, scriptType))
 
-    val jsScripts      = findForScriptType(JavaScriptScriptType)
-    val xpathScriptsIt = findForScriptType(XPathScriptType)
+    val jsScripts      = findForScriptTypeIt(JavaScriptScriptType).to[List]
+    val xpathScriptsIt = findForScriptTypeIt(XPathScriptType)
 
     _scriptsByPrefixedId ++=
       jsScripts.iterator ++
@@ -130,7 +134,7 @@ trait PartEventHandlerAnalysis {
     if (eventHandler.eventNames(XFormsEvents.KEYPRESS))
       _keypressHandlers = _keypressHandlers filterNot (_ eq eventHandler)
 
-    if (eventHandler.localName == "script" || eventHandler.localName == "action")
+    if (ActionNames(eventHandler.localName))
       _scriptsByPrefixedId -= eventHandler.prefixedId
 
     // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched
@@ -155,4 +159,12 @@ trait PartEventHandlerAnalysis {
    */
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean =
     includeAllEvents && _eventNames.contains(XXFORMS_ALL_EVENTS) || _eventNames.contains(eventName)
+}
+
+private object PartEventHandlerAnalysis {
+  val ActionActionName  = "action"
+  val ScriptActionName  = "script"
+  val HandlerActionName = "handler"
+
+  val ActionNames = Set(ActionActionName, ScriptActionName, HandlerActionName)
 }

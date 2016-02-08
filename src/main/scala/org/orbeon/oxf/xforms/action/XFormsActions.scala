@@ -89,9 +89,4 @@ object XFormsActions {
   // Whether the element is xf:action
   def isDispatchAction(qName: QName) =
     qName.getNamespaceURI == XFORMS_NAMESPACE_URI && qName.getName == "dispatch"
-
-  val scriptQName = xxformsQName("script")
-
-  // Return the xxf:script action
-  def getScriptAction = Actions(scriptQName)
 }

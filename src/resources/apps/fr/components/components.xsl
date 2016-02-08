@@ -230,9 +230,10 @@
 
         <!-- Model receiving input parameters -->
         <xf:model
-                id="fr-parameters-model"
-                xxf:readonly-appearance="{{
-                    for $mode in xxf:instance('fr-parameters-instance')/mode/string() return
+            id="fr-parameters-model"
+            xxf:readonly-appearance="{{
+                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                    return
                         if (
                             $mode = 'view' or (
                                 $mode = ('pdf', 'email') and
@@ -242,37 +243,41 @@
                             'static'
                         else
                             'dynamic'
-                }}"
-                xxf:encrypt-item-values="{{
-                    for $mode in xxf:instance('fr-parameters-instance')/mode/string() return
-                        not($mode = ('pdf', 'email') and
-                        normalize-space(xxf:instance('fr-form-attachments')/pdf) != '')
-                }}"
-                xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
-                xxf:order="{{
-                    if (property('xxf:noscript')) then
-                        'label control alert hint help'
-                    else
-                        'help label control alert hint'
-                }}"
-                xxf:host-language="{{
-                    for $mode in xxf:instance('fr-parameters-instance')/mode/string() return
+            }}"
+            xxf:encrypt-item-values="{{
+                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                    return not(
+                        $mode = ('pdf', 'email') and
+                        normalize-space(xxf:instance('fr-form-attachments')/pdf) != ''
+                    )
+            }}"
+            xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
+            xxf:order="{{
+                if (property('xxf:noscript')) then
+                    'label control alert hint help'
+                else
+                    'help label control alert hint'
+            }}"
+            xxf:host-language="{{
+                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                    return
                         if ($mode = 'controls') then
                             'xml'
                         else
                             'xhtml'
-                }}"
-                xxf:no-updates="{{
-                    for $mode in xxf:instance('fr-parameters-instance')/mode/string() return
+            }}"
+            xxf:no-updates="{{
+                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
+                    return
                         if ($mode = ('controls', 'pdf', 'email')) then
                             'true'
                         else
                             'false'
-                }}"
-                xxf:noscript-support="{$is-noscript-support}"
-                xxf:external-events="{@xxf:external-events} fr-open-pdf"
-                xxf:xforms11-switch="false"
-                xxf:xpath-analysis="true">
+            }}"
+            xxf:noscript-support="{$is-noscript-support}"
+            xxf:external-events="{@xxf:external-events} fr-open-pdf"
+            xxf:xforms11-switch="false"
+            xxf:xpath-analysis="true">
 
             <!-- Don't enable client events filtering for FB -->
             <xsl:if test="$is-form-builder">

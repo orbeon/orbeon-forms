@@ -307,10 +307,8 @@ object ControlAnalysisFactory {
 
     val factory =
       context.partAnalysis.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement))) match {
-        case Some(binding) ⇒
-          ComponentFactories.get(binding.abstractBinding.modeValue, binding.abstractBinding.modeLHHA)
-        case None ⇒
-          ControlOrActionFactory(controlElement)
+        case Some(binding) ⇒ ComponentFactories.get(binding.abstractBinding.modeValue, binding.abstractBinding.modeLHHA)
+        case None          ⇒ ControlOrActionFactory(controlElement)
       }
 
     factory map (_(context, controlElement, parent, preceding, scope))

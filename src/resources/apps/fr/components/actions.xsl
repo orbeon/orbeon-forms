@@ -11,18 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xsl:stylesheet version="2.0"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:exf="http://www.exforms.org/exf/1-0"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+<xsl:stylesheet
+    version="2.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -114,9 +115,10 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]"/>
             <!-- Set value and escape single quotes -->
-            <xf:setvalue xmlns:sql="http://orbeon.org/oxf/xml/sql"
-                         ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                         value="concat('''', replace(string({fr:resolve-targets()}), '''', ''''''), '''')"/>
+            <xf:setvalue
+                xmlns:sql="http://orbeon.org/oxf/xml/sql"
+                ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
+                value="concat('''', replace(string({fr:resolve-targets()}), '''', ''''''), '''')"/>
         </xsl:copy>
     </xsl:template>
 

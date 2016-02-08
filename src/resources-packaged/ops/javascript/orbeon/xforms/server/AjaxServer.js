@@ -1979,8 +1979,8 @@
                                 var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
                                 var paramElements = childrenWithLocalName(scriptElement, "param");
                                 var paramValues = _.map(paramElements, function(paramElement) {
-                                        return $(paramElement).text();
-                                    })
+                                    return $(paramElement).text();
+                                });
                                 args = [functionName, targetId, observerId].concat(paramValues);
                                 ORBEON.xforms.server.Server.callUserScript.apply(null, args);
                                 break;

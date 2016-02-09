@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.model.Model.MIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
@@ -29,7 +30,7 @@ import scala.collection.mutable
 
 class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument)
     extends XPathDependencies
-    with Logging {
+       with Logging {
 
   private implicit val logger = containingDocument.indentedLogger
 
@@ -467,15 +468,15 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
   def hasAnyValidationBind(model: Model, instancePrefixedId: String) =
     ! model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
 
-  def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel): Boolean = {
+  def requireModelMIPUpdate(model: Model, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean = {
 
     // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
 
     // Get constraints by the level specified
-    val mips = mipName match {
-      case Model.Constraint.name ⇒ bind.constraintsByLevel.getOrElse(level, Nil)
-      case Model.Type.name       ⇒ bind.typeMIPOpt.toList
-      case _                     ⇒ bind.getXPathMIPs(mipName)
+    val mips = mip match {
+      case Model.Constraint ⇒ bind.constraintsByLevel.getOrElse(level, Nil)
+      case Model.Type       ⇒ bind.typeMIPOpt.toList
+      case _                ⇒ bind.getXPathMIPs(mip.name)
     }
 
     val modelState = getModelState(model.prefixedId)
@@ -509,7 +510,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             // Value dependencies are known
             UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
           case _ ⇒
-            throw new IllegalStateException(s"No value analysis found for xf:bind with name = $mipName")
+            throw new IllegalStateException(s"No value analysis found for `xf:bind` with name = ${mip.name}")
         }
 
         if (updateResult.requireUpdate && logger.isDebugEnabled)

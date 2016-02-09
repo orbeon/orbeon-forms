@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.xforms.XFormsModelBinds.BindRunner
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
@@ -111,15 +110,15 @@ class RuntimeBind(
     (items, bindNodes)
   }
 
-  def applyBinds(bindRunner: BindRunner): Unit =
+  def applyBinds(fn: BindNode ⇒ Unit): Unit =
     if (bindNodes.nonEmpty)
       for (bindNode ← bindNodes) {
         // Handle current node
-        bindRunner.applyBind(bindNode)
+        fn(bindNode)
 
         // Handle children binds if any
         bindNode match {
-          case iteration: BindIteration ⇒ iteration.applyBinds(bindRunner)
+          case iteration: BindIteration ⇒ iteration.applyBinds(fn)
           case _ ⇒
         }
       }

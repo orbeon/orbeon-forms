@@ -14,20 +14,18 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
-import org.orbeon.oxf.xforms._
-
-import action.XFormsActions
-import analysis._
-import event.EventHandlerImpl
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import collection.mutable.LinkedHashMap
-import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
-import Model._
+import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.oxf.xforms.analysis.{StaticStateContext, _}
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xforms.analysis.StaticStateContext
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable.LinkedHashMap
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -120,7 +118,8 @@ trait ModelInstances {
   self: Model ⇒
 
   // Instance objects
-  lazy val instances: collection.Map[String, Instance] = LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
+  lazy val instances: collection.Map[String, Instance] =
+    LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
 
   def instancesMap = instances.asJava
 
@@ -271,39 +270,45 @@ trait ModelBinds {
     assert(! selfModel.part.isTopLevel)
 
     bindTree().destroy()
-    bindTree = new LazyConstant(new BindTree(selfModel, Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement), isCustomMIP))
+    bindTree = new LazyConstant(
+      new BindTree(
+        selfModel,
+        Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement),
+        isCustomMIP
+      )
+    )
   }
 
-  def bindsById = bindTree().bindsById
-  def bindsByName = bindTree().bindsByName
+  def bindsById                             = bindTree().bindsById
+  def bindsByName                           = bindTree().bindsByName
 
-  def hasDefaultValueBind = bindTree().hasDefaultValueBind
-  def hasCalculateBind = bindTree().hasCalculateBind
-  def hasTypeBind = bindTree().hasTypeBind
-  def hasRequiredBind = bindTree().hasRequiredBind
-  def hasConstraintBind = bindTree().hasConstraintBind
+  def hasDefaultValueBind                   = bindTree().hasDefaultValueBind
+  def hasCalculateBind                      = bindTree().hasCalculateBind
+  def hasTypeBind                           = bindTree().hasTypeBind
+  def hasRequiredBind                       = bindTree().hasRequiredBind
+  def hasConstraintBind                     = bindTree().hasConstraintBind
 
-  def hasCalculateComputedCustomBind = bindTree().hasCalculateComputedCustomBind
-  def hasValidateBind = bindTree().hasValidateBind
+  def hasCalculateComputedCustomBind        = bindTree().hasCalculateComputedCustomBind
+  def hasValidateBind                       = bindTree().hasValidateBind
 
-  def bindInstances = bindTree().bindInstances
-  def computedBindExpressionsInstances = bindTree().computedBindExpressionsInstances
-  def validationBindInstances = bindTree().validationBindInstances
+  def bindInstances                         = bindTree().bindInstances
+  def computedBindExpressionsInstances      = bindTree().computedBindExpressionsInstances
+  def validationBindInstances               = bindTree().validationBindInstances
 
   // TODO: use and produce variables introduced with xf:bind/@name
 
-  def topLevelBinds = bindTree().topLevelBinds
+  def topLevelBinds                         = bindTree().topLevelBinds
 
-  def hasBinds = bindTree().hasBinds
-  def containsBind(bindId: String) = bindTree().bindIds(bindId)
+  def hasBinds                              = bindTree().hasBinds
+  def containsBind(bindId: String)          = bindTree().bindIds(bindId)
 
-  def figuredAllBindRefAnalysis = bindTree().figuredAllBindRefAnalysis
-  def recalculateOrder  = bindTree().recalculateOrder
-  def defaultValueOrder = bindTree().defaultValueOrder
+  def figuredAllBindRefAnalysis             = bindTree().figuredAllBindRefAnalysis
+  def recalculateOrder                      = bindTree().recalculateOrder
+  def defaultValueOrder                     = bindTree().defaultValueOrder
 
-  def analyzeBindsXPath() = bindTree().analyzeBindsXPath()
+  def analyzeBindsXPath()                   = bindTree().analyzeBindsXPath()
   def bindsToXML(helper: XMLReceiverHelper) = bindTree().bindsToXML(helper)
-  def freeBindsTransientState() = bindTree().freeBindsTransientState()
+  def freeBindsTransientState()             = bindTree().freeBindsTransientState()
 }
 
 object Model {
@@ -354,15 +359,6 @@ object Model {
   val NeverCustomMIPsURIs      = Set(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
 
   def buildCustomMIPName(qualifiedName: String) = qualifiedName.replace(':', '-')
-
-  // Constants for Java callers
-  val RELEVANT   = Relevant.name
-  val READONLY   = Readonly.name
-  val REQUIRED   = Required.name
-  val CONSTRAINT = Constraint.name
-  val CALCULATE  = Calculate.name
-  val DEFAULT    = Default.name
-  val TYPE       = Type.name
 
   // MIP default values
   val DEFAULT_RELEVANT   = true

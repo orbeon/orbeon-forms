@@ -198,7 +198,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
       // Validate using binds if needed
       if (mustBindValidate)
-        getBinds.applyValidationBinds(invalidInstancesIds.asJava)
+        getBinds.applyValidationBinds(invalidInstancesIds)
 
       invalidInstancesIds
     }

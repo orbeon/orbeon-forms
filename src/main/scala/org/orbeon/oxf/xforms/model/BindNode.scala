@@ -13,21 +13,20 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import collection.JavaConverters._
-import collection.breakOut
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xforms.{XFormsModelBinds, InstanceData}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML
-import org.w3c.dom.Node.ELEMENT_NODE
+
 import org.dom4j.Node
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.InstanceData
+import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.scaxon.XML
+import org.w3c.dom.Node.ELEMENT_NODE
 
-import scala.collection.mutable
+import scala.collection.JavaConverters._
+import scala.collection.{breakOut, mutable}
 
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.
@@ -97,8 +96,8 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
   def setReadonly(value: Boolean) = this._readonly = value
   def setRequired(value: Boolean) = this._required = value
 
-  def setTypeValid(value: Boolean, mip: StaticBind#MIP)     = this._invalidTypeValidation = if (! value) mip else null
-  def setRequiredValid(value: Boolean, mip: StaticBind#MIP) = this._requiredValidation    = if (! value) mip else null
+  def setTypeValid(value: Boolean, mip: StaticBind#MIP)             = this._invalidTypeValidation = if (! value) mip else null
+  def setRequiredValid(value: Boolean, mip: Option[StaticBind#MIP]) = this._requiredValidation    = if (! value) mip.orNull else null
 
   def setCustom(name: String, value: String) = _customMips += name → value
   def clearCustom(name: String)             = _customMips -= name
@@ -244,9 +243,9 @@ class BindIteration(
     for (staticBind ← childrenStaticBinds)
       yield new RuntimeBind(parentBind.model, staticBind, this, childrenBindsHaveSingleNodeContext)
 
-  def applyBinds(bindRunner: XFormsModelBinds.BindRunner): Unit =
+  def applyBinds(fn: BindNode ⇒ Unit): Unit =
     for (currentBind ← childrenBinds)
-      currentBind.applyBinds(bindRunner)
+      currentBind.applyBinds(fn)
 
   def findChildBindByStaticId(bindId: String) =
     childrenBinds find (_.staticBind.staticId == bindId)

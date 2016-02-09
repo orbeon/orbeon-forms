@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.XFormsInstance
-import org.orbeon.oxf.xforms.XFormsModel
-import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xforms.{XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.analysis.model.Model.MIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.saxon.om.NodeInfo
 
-/**
- * This implementation of dependencies simply says that everything must be updated all the time.
- */
+// This implementation of dependencies simply says that everything must be updated all the time.
 class DumbXPathDependencies extends XPathDependencies {
   def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) = ()
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]) = ()
@@ -45,5 +43,5 @@ class DumbXPathDependencies extends XPathDependencies {
   def requireItemsetUpdate(controlPrefixedId: String) = true
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
   def hasAnyValidationBind(model: Model, instancePrefixedId: String) = true
-  def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel) = true
+  def requireModelMIPUpdate(model: Model, bind: StaticBind, mip: MIP, level: ValidationLevel) = true
 }

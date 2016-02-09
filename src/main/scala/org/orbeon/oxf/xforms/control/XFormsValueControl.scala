@@ -13,23 +13,24 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import XFormsValueControl._
-import org.orbeon.oxf.xforms.state.ControlState
-import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsModelBinds
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
+import org.orbeon.oxf.xforms.control.XFormsValueControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.XFormsModelBinds
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiverHelper, NamespaceMapping}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.xml.sax.helpers.AttributesImpl
+
+import scala.collection.JavaConverters._
 
 // For Java classes that can't directly implement XFormsValueControl
 abstract class XFormsValueControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)

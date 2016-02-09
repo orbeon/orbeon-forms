@@ -143,7 +143,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
 
         // Create binds object
-        _binds = XFormsModelBinds.create(this);
+        _binds = XFormsModelBinds.apply(this);
         _mustBindValidate = _binds != null;
 
         // Create context stack

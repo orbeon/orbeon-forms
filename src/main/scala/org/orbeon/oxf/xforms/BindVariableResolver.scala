@@ -25,7 +25,7 @@ object BindVariableResolver {
 
   // Main resolution function
   def resolveClosestBind(
-    modelBinds         : XFormsModelBindsBase,
+    modelBinds         : XFormsModelBinds,
     contextBindNodeOpt : Option[BindNode],
     targetStaticBind   : StaticBind
   ): Option[ValueRepresentation] =
@@ -49,7 +49,7 @@ object BindVariableResolver {
 
   // Try to resolve a bind which is not an ancestor-or-self bind
   def resolveNotAncestorOrSelf(
-    modelBinds         : XFormsModelBindsBase,
+    modelBinds         : XFormsModelBinds,
     contextBindNodeOpt : Option[BindNode],
     targetStaticBind   : StaticBind
   ): Option[Iterator[RuntimeBind]] = {
@@ -126,7 +126,7 @@ object BindVariableResolver {
 
   // Try to resolve using a non-ambiguous, indexed single-node context bind
   def resolveSingle(
-    modelBinds                : XFormsModelBindsBase,
+    modelBinds                : XFormsModelBinds,
     targetBindId              : String,
     concreteAncestorIteration : Option[BindIteration]
   ): Option[Iterator[RuntimeBind]] = {
@@ -179,7 +179,7 @@ object BindVariableResolver {
 
   // Try to resolve by searching descendants nodes
   def resolveMultiple(
-    modelBinds                : XFormsModelBindsBase,
+    modelBinds                : XFormsModelBinds,
     targetAncestorOrSelf      : List[StaticBind],
     concreteAncestorIteration : Option[BindIteration],
     rootId                    : String

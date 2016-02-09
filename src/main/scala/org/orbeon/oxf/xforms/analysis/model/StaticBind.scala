@@ -170,9 +170,6 @@ class StaticBind(
     fromAttribute orElse fromNestedElement.headOption orElse fromNestedElementsLegacy.headOption
   }
 
-  val dataTypeOrNull =
-    typeMIPOpt map (_.datatype) orNull
-
   val dataType: Option[QName] =
     typeMIPOpt map (_.datatype) map
       (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, _, true))
@@ -307,20 +304,8 @@ class StaticBind(
   def getXPathMIPs(mipName: String) = allMIPNameToXPathMIP.getOrElse(mipName, Nil)
 
   // TODO: Support multiple relevant, readonly, and required MIPs.
-  private def firstXPathMIPOrNull(mipName: String) = allMIPNameToXPathMIP.getOrElse(mipName, Nil).headOption.orNull
-  def firstXPathMIP(mip: Model.XPathMIP)           = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
-
-  def hasXPathMIP(mip: Model.XPathMIP) = firstXPathMIP(mip).isDefined
-
-  def hasDefault      = hasXPathMIP(Default)
-  def hasCalculate    = hasXPathMIP(Calculate)
-
-  // These can have multiple values
-  def getRelevant     = firstXPathMIPOrNull(Relevant.name)
-  def getReadonly     = firstXPathMIPOrNull(Readonly.name)
-  def getRequired     = firstXPathMIPOrNull(Required.name)
-
-  def getCustom(mipName: String) = firstXPathMIPOrNull(mipName)
+  def firstXPathMIP(mip: Model.XPathMIP) = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
+  def hasXPathMIP(mip: Model.XPathMIP)   = firstXPathMIP(mip).isDefined
 
   // Compute value analysis if we have a type bound, otherwise don't bother
   override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIPOpt match {

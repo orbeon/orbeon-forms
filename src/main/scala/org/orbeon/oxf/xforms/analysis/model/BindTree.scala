@@ -14,48 +14,51 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
-import org.orbeon.oxf.xforms._
-
-import analysis._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import collection.mutable.{LinkedHashSet, LinkedHashMap}
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+
+import scala.collection.{mutable ⇒ m}
 
 class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName ⇒ Boolean) {
 
   bindTree ⇒
 
   // All bind ids
-  val bindIds = new LinkedHashSet[String]
+  val bindIds = new m.LinkedHashSet[String]
 
   // All binds by static id
-  val bindsById = new LinkedHashMap[String, StaticBind]
+  val bindsById = new m.LinkedHashMap[String, StaticBind]
 
   // Binds by name (for binds with a name)
-  val bindsByName = new LinkedHashMap[String, StaticBind]
+  val bindsByName = new m.LinkedHashMap[String, StaticBind]
 
   // Types of binds we have
-  var hasDefaultValueBind = false
-  var hasCalculateBind = false
-  var hasTypeBind = false
-  var hasRequiredBind = false
-  var hasConstraintBind = false
+  var hasDefaultValueBind            = false
+  var hasCalculateBind               = false
+  var hasTypeBind                    = false
+  var hasRequiredBind                = false
+  var hasConstraintBind              = false
 
-  var hasCalculateComputedCustomBind = false // default
-  var hasValidateBind = false // default
+  var hasCalculateComputedCustomBind = false
+  var hasValidateBind                = false
 
   // Instances affected by binding XPath expressions
-  val bindInstances = new LinkedHashSet[String]                       // instances to which binds apply (i.e. bind/@ref point to them)
-  val computedBindExpressionsInstances = new LinkedHashSet[String]    // instances to which computed binds apply
-  val validationBindInstances = new LinkedHashSet[String]             // instances to which validation binds apply
+  val bindInstances                    = m.LinkedHashSet[String]() // instances to which binds apply (i.e. bind/@ref point to them)
+  val computedBindExpressionsInstances = m.LinkedHashSet[String]() // instances to which computed binds apply
+  val validationBindInstances          = m.LinkedHashSet[String]() // instances to which validation binds apply
 
   // Create static binds hierarchy and yield top-level binds
-  val topLevelBinds: Seq[StaticBind] = {
+  val topLevelBinds: List[StaticBind] = {
     // NOTE: For now, do as if binds follow all top-level variables
     val preceding = model.variablesSeq.lastOption
-    for (bindElement ← bindElements)
-      yield new StaticBind(bindTree, bindElement, model, preceding)
+
+    val staticBinds =
+      for (bindElement ← bindElements)
+        yield new StaticBind(bindTree, bindElement, model, preceding)
+
+    staticBinds.to[List]
   }
 
   def hasBinds = topLevelBinds.nonEmpty
@@ -111,10 +114,10 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
 
   // Whether we figured out all XPath ref analysis
   var figuredAllBindRefAnalysis = ! hasBinds // default value sets to true if no binds
-  
+
   private var _recalculateOrder: Option[List[StaticBind]] = None
   def recalculateOrder = _recalculateOrder
-  
+
   private var _defaultValueOrder: Option[List[StaticBind]] = None
   def defaultValueOrder = _defaultValueOrder
 
@@ -132,7 +135,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
       validationBindInstances.clear()
       // keep bindAnalysis as those can be used independently from each other
     }
-    
+
     if (model.part.staticState.isCalculateDependencies) {
       _recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Calculate))
       _defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Default))

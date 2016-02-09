@@ -69,3 +69,5 @@ trait Logging {
   private def flattenTuples(tuples: Seq[(String, String)]) =
     tuples flatMap { case (n, v) ⇒ Seq(n, v) }
 }
+
+object Logging extends Logging

@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.XFormsInstance
-import org.orbeon.oxf.xforms.XFormsModel
-import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xforms.{XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.analysis.model.Model.MIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.saxon.om.NodeInfo
 
-/**
- * Interface to dependencies implementation.
- */
+// Interface to dependencies implementation.
 trait XPathDependencies {
   def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo)
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance])
@@ -54,5 +52,5 @@ trait XPathDependencies {
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
   def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean
 
-  def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel): Boolean
+  def requireModelMIPUpdate(model: Model, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean
 }

@@ -27,7 +27,7 @@ before_script:
   - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 script:
     # Force use of ant even if other build files are found
-    - ant orbeon-dist-war -Dskip.selenium=true -Dskip.database=true
+    - ant orbeon-dist -Dskip.selenium=true -Dskip.database=true
 addons:
     artifacts:
         paths:

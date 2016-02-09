@@ -52,19 +52,19 @@ private object FlatView {
       val viewExists = {
         val query = req.provider match{
           case "db2"        ⇒ s"""|SELECT *
-                       |  FROM SYSIBM.SYSVIEWS
-                       | WHERE      creator =  (SELECT current_schema
-                       |                          FROM SYSIBM.SYSDUMMY1)
-                       |       AND  name    = ?
-                       |""".stripMargin
+                                  |  FROM SYSIBM.SYSVIEWS
+                                  | WHERE      creator =  (SELECT current_schema
+                                  |                          FROM SYSIBM.SYSDUMMY1)
+                                  |       AND  name    = ?
+                                  |""".stripMargin
           case "postgresql" ⇒ s"""|SELECT *
-                       |  FROM      pg_catalog.pg_class c
-                       |       JOIN pg_catalog.pg_namespace n
-                       |         ON n.oid = c.relnamespace
-                       | WHERE      n.nspname = current_schema
-                       |       AND  c.relkind = 'v'
-                       |       AND  upper(c.relname) = ?
-                       |""".stripMargin
+                                  |  FROM      pg_catalog.pg_class c
+                                  |       JOIN pg_catalog.pg_namespace n
+                                  |         ON n.oid = c.relnamespace
+                                  | WHERE      n.nspname = current_schema
+                                  |       AND  c.relkind = 'v'
+                                  |       AND  upper(c.relname) = ?
+                                  |""".stripMargin
           case _            ⇒ ???
         }
 
@@ -96,23 +96,23 @@ private object FlatView {
     locally {
       val query =
         s"""|CREATE  ${if (Set("oracle", "postgresql")(req.provider)) "OR REPLACE" else ""} VIEW $viewName AS
-          |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
-          |  FROM  orbeon_form_data d,
-          |        (
-          |            SELECT   max(last_modified_time) last_modified_time,
-          |                     app, form, document_id
-          |              FROM   orbeon_form_data d
-          |             WHERE       app   = '${escapeSQL(req.app)}'
-          |                     AND form  = '${escapeSQL(req.form)}'
-          |                     AND draft = 'N'
-          |            GROUP BY app, form, document_id
-          |        ) m
-          | WHERE      d.last_modified_time = m.last_modified_time
-          |        AND d.app                = m.app
-          |        AND d.form               = m.form
-          |        AND d.document_id        = m.document_id
-          |        AND d.deleted            = 'N'
-          |""".stripMargin
+            |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
+            |  FROM  orbeon_form_data d,
+            |        (
+            |            SELECT   max(last_modified_time) last_modified_time,
+            |                     app, form, document_id
+            |              FROM   orbeon_form_data d
+            |             WHERE       app   = '${escapeSQL(req.app)}'
+            |                     AND form  = '${escapeSQL(req.form)}'
+            |                     AND draft = 'N'
+            |            GROUP BY app, form, document_id
+            |        ) m
+            | WHERE      d.last_modified_time = m.last_modified_time
+            |        AND d.app                = m.app
+            |        AND d.form               = m.form
+            |        AND d.document_id        = m.document_id
+            |        AND d.deleted            = 'N'
+            |""".stripMargin
       val ps = connection.prepareStatement(query)
       ps.executeUpdate()
     }

@@ -271,15 +271,15 @@ object InstanceMirror {
       findMatchingNode(valueChanged.targetInstance, valueChanged.node, None) match {
         case Some((matchingInstance, matchingNode)) ⇒
           DataModel.setValueIfChanged(
-            matchingNode,
-            valueChanged.newValue,
-            DataModel.logAndNotifyValueChange(
-              containingDocument,
-              "mirror",
-              matchingNode,
-              _,
-              valueChanged.newValue,
-              isCalculate = false
+            nodeInfo  = matchingNode,
+            newValue  = valueChanged.newValue,
+            onSuccess = oldValue ⇒ DataModel.logAndNotifyValueChange(
+              containingDocument = containingDocument,
+              source             = "mirror",
+              nodeInfo           = matchingNode,
+              oldValue           = oldValue,
+              newValue           = valueChanged.newValue,
+              isCalculate        = false
             ),
             reason ⇒ throw new OXFException(reason.message)
           )

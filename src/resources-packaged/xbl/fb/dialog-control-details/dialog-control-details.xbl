@@ -135,8 +135,12 @@
                 <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'whitespace')"/>
 
                 <!-- Read help -->
-                <xf:setvalue ref="$i/help"  value="fbf:getControlHelpOrEmpty($i/control-name)"/>
-                <xf:setvalue ref="$i/help/@isHTML"  value="if (fbf:isControlLHHAHTMLMediatype($form, $i/control-name, 'help')) then 'true' else ''"/>
+                <xf:setvalue
+                    ref="$i/help"
+                    value="fbf:getControlHelpOrEmpty($i/control-name)"/>
+                <xf:setvalue
+                    ref="$i/help/@isHTML"
+                    value="if (fbf:isControlLHHAHTMLMediatype($form, $i/control-name, 'help')) then 'true' else ''"/>
 
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
@@ -160,10 +164,10 @@
                  process values, including custom control settings, before the dialog is actually closed and becomes
                  non-relevant. -->
             <xbl:handler
-                    event="xxforms-dialog-close"
-                    observer="group-around-dialog"
-                    phase="capture"
-                    if="event('fb-save') and valid($i)">
+                event="xxforms-dialog-close"
+                observer="group-around-dialog"
+                phase="capture"
+                if="event('fb-save') and valid($i)">
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
@@ -185,7 +189,9 @@
                     <xf:var name="position" value="position()"/>
                     <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
                     <xf:var name="xforms-control" value="."/>
-                    <xf:setvalue ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))" value="$bound-node"/>
+                    <xf:setvalue
+                        ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))"
+                        value="$bound-node"/>
                 </xf:action>
 
                 <xf:action type="xpath">
@@ -384,7 +390,12 @@
                             ref="@default-alert"
                             type="xs:boolean"
                             readonly="false()"
-                            calculate="if (not($type = ('required', 'datatype')) and $level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
+                            calculate="
+                                (: No default alert for warning/info constraints :)
+                                if (not($type = ('required', 'datatype')) and $level != 'error') then
+                                    false()
+                                else
+                                    ."/>
 
                         <!-- Keep required in sync -->
                         <xf:bind
@@ -424,7 +435,9 @@
             <xf:group xsl:version="2.0" id="group-around-dialog">
                 <!-- Bindings specified on control -->
                 <!-- LATER: Use xxf:r(). Need to find solution for itemset resources. -->
-                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="resources">
+                    <xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/>
+                </xf:var>
 
                 <xxf:dialog id="dialog" level="modal" class="fb-dialog-control-details">
                     <xf:label ref="$resources/dialog-control-details/label"/>
@@ -495,7 +508,9 @@
                                                 and count($i/appearances/appearance[normalize-space(value) != '']) = 1"/>
 
                                         <!-- Propose a choice between multiple items -->
-                                        <xf:select1 ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) gt 1]" appearance="full">
+                                        <xf:select1
+                                                ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) gt 1]"
+                                                appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
                                             <xf:itemset ref="$i/appearances/appearance">
                                                 <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
@@ -560,7 +575,12 @@
                                 </xh:tr>
                             </fr:grid>
 
-                            <fr:grid id="validations-grid" ref="validation" origin="instance('validation-constraint-template')" repeat="true" freeze="2">
+                            <fr:grid
+                                id="validations-grid"
+                                ref="validation"
+                                origin="instance('validation-constraint-template')"
+                                repeat="true"
+                                freeze="2">
                                 <xh:tr>
                                     <xh:td>
 
@@ -651,7 +671,15 @@
                                                         <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
                                                         <xf:value/>
                                                     </xf:itemset>
-                                                    <xf:itemset ref="$resources/dialog-control-details/builtin-type/choices//(choices[exists(type[. = $supported])] | type[. = $supported])">
+                                                    <xf:itemset
+                                                        ref="
+                                                            $resources/dialog-control-details/builtin-type/choices//(
+                                                                choices[
+                                                                    exists(type[. = $supported])
+                                                                ]
+                                                                |
+                                                                type[. = $supported]
+                                                            )">
                                                         <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then @label else ."/>
                                                         <xf:value ref="if (self::choices) then () else ."/>
                                                     </xf:itemset>
@@ -679,7 +707,10 @@
                                             <!-- Formula or common constraint argument -->
                                             <xf:group ref=".[not(@type = ('required', 'datatype'))]">
                                                 <xf:textarea ref="constraint/@expression">
-                                                    <xf:label class="xforms-hidden" appearance="minimal" ref="$resources/dialog-control-details/formula/label"/>
+                                                    <xf:label
+                                                        class="xforms-hidden"
+                                                        appearance="minimal"
+                                                        ref="$resources/dialog-control-details/formula/label"/>
                                                     <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
                                                 </xf:textarea>
                                                 <xf:input ref="constraint/@argument">
@@ -708,7 +739,12 @@
                                         </xf:select1>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:input ref="if (@default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
+                                        <xf:input
+                                            ref="
+                                                if (@default-alert = false() or @level != 'error') then
+                                                    alert/@message
+                                                else
+                                                    $i/default-alert/@readonly-alert-message">
                                             <xf:label ref="$resources/dialog-control-details/alert/label"/>
                                         </xf:input>
                                         <xf:input ref=".[@level = 'error']/@default-alert">

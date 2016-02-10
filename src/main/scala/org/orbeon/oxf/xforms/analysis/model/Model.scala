@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.LinkedHashMap
+import scala.collection.{mutable ⇒ m}
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -53,6 +53,7 @@ class Model(
   protected def computeContextAnalysis = None
   protected def computeValueAnalysis   = None
   protected def computeBindingAnalysis = None
+
   val model = Some(this)
 
   // NOTE: Same code is in SimpleElementAnalysis, which is not optimal → maybe think about passing the container scope to constructors
@@ -60,17 +61,17 @@ class Model(
 
   override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId ⇒ // instance('defaultInstanceId')
     PathMapXPathAnalysis(
-      part,
-      PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
-      null,
-      None,
-      Map.empty[String, VariableTrait],
-      null,
-      scope,
-      Some(defaultInstancePrefixedId),
-      locationData,
-      element,
-      avt = false
+      partAnalysis              = part,
+      xpathString               = PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
+      namespaceMapping          = null,
+      baseAnalysis              = None,
+      inScopeVariables          = Map.empty[String, VariableTrait],
+      pathMapContext            = null,
+      scope                     = scope,
+      defaultInstancePrefixedId = Some(defaultInstancePrefixedId),
+      locationData              = locationData,
+      element                   = element,
+      avt                       = false
     )
   }
 
@@ -119,7 +120,7 @@ trait ModelInstances {
 
   // Instance objects
   lazy val instances: collection.Map[String, Instance] =
-    LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
+    m.LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
 
   def instancesMap = instances.asJava
 
@@ -181,7 +182,6 @@ trait ModelVariables {
   def jVariablesSeq = variablesSeq.asJava
 
   val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable ⇒ variable.name → variable) toMap
-  val jVariablesMap = variablesMap.asJava
 
   def analyzeVariablesXPath(): Unit =
     for (variable ← variablesSeq)

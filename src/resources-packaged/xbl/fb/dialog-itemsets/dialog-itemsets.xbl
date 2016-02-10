@@ -83,17 +83,17 @@
             <xf:model id="model">
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <instance>
-                        <control-name/>             <!-- So we can find back the control when saving if users change the name -->
-                        <control-type/>             <!-- Either 'select' or 'select1' -->
-                        <control-value/>            <!-- Default value of control -->
+                        <control-name/>     <!-- So we can find back the control when saving if users change the name -->
+                        <control-type/>     <!-- Either 'select' or 'select1' -->
+                        <control-value/>    <!-- Default value of control -->
                         <appearance/>
-                        <html/>                     <!-- Whether labels can contain HTML markup -->
-                        <lang/>                     <!-- The current language -->
-                        <items/>                    <!-- Contains item elements in the current language -->
-                        <template/>                 <!-- Template when adding items -->
-                        <triggers>                  <!-- Nodes to which we bind triggers -->
-                            <enabled/>              <!-- A node that is always enabled -->
-                            <disabled/>             <!-- A node that is always disabled -->
+                        <html/>             <!-- Whether labels can contain HTML markup -->
+                        <lang/>             <!-- The current language -->
+                        <items/>            <!-- Contains item elements in the current language -->
+                        <template/>         <!-- Template when adding items -->
+                        <triggers>          <!-- Nodes to which we bind triggers -->
+                            <enabled/>      <!-- A node that is always enabled -->
+                            <disabled/>     <!-- A node that is always disabled -->
                         </triggers>
                     </instance>
                 </xf:instance>
@@ -102,15 +102,15 @@
 
                 <xf:bind ref="control-type" name="control-type"/>
                 <xf:bind ref="html" type="xs:boolean"/>
-                <xf:bind ref="items/item">                                                                                                 <!-- Constraints on items' value and label -->
-                    <xf:bind ref="label, value" calculate="normalize-space(.)" readonly="false()"/>                                        <!-- Additional spaces are most likely there by error -->
+                <xf:bind ref="items/item">                                                                                      <!-- Constraints on items' value and label -->
+                    <xf:bind ref="label, value" xxf:whitespace="trim" readonly="false()"/>                                      <!-- Additional spaces are most likely there by error -->
                     <xf:bind ref="label" constraint="for $l in string(@lang) return
                                                          . = '' or
-                                                         not(($i/items/item/label[@lang = $l] except .) = .)"/>                            <!-- No duplicate label are allowed -->
+                                                         not(($i/items/item/label[@lang = $l] except .) = .)"/>                 <!-- No duplicate label are allowed -->
                     <xf:bind ref="value">
-                        <xf:bind ref="." constraint=". != ''"/>                                                                            <!-- Empty values are not allowed -->
-                        <xf:bind ref="." constraint="not(($i/items/item/value except .) = .)"/>                                            <!-- No duplicate value are allowed -->
-                        <xf:bind ref="." constraint="frf:isSingleSelectionControl($control-type) or not(contains(., ' '))"/>               <!-- No spaces in values are allowed for xf:select -->
+                        <xf:bind ref="." constraint=". != ''"/>                                                                 <!-- Empty values are not allowed -->
+                        <xf:bind ref="." constraint="not(($i/items/item/value except .) = .)"/>                                 <!-- No duplicate value are allowed -->
+                        <xf:bind ref="." constraint="frf:isSingleSelectionControl($control-type) or not(contains(., ' '))"/>    <!-- No spaces in values are allowed for xf:select -->
                     </xf:bind>
                 </xf:bind>
                 <xf:bind ref="triggers/disabled" readonly="true()"/>
@@ -138,7 +138,12 @@
                             value="fbf:allLangs(fbf:resourcesRoot())"/>
 
                         <!-- Don't display language selector if there is only one language -->
-                        <xf:group ref=".[count($available-languages) gt 1 and normalize-space(xxf:get-request-header('orbeon-liferay-language')) = '']">
+                        <xf:group
+                            ref="
+                                .[
+                                    count($available-languages) gt 1 and
+                                    normalize-space(xxf:get-request-header('orbeon-liferay-language')) = ''
+                                ]">
                             <fr:link-select1 ref="$i/lang">
                                 <xf:itemset ref="$available-languages">
                                     <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>

@@ -129,7 +129,7 @@ class XFormsSelectControl(
       case deselect: XFormsDeselectEvent ⇒
         boundNode match {
           case Some(boundNode) ⇒
-            DataModel.jSetValueIfChanged(
+            DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = this,
               locationData       = getLocationData,
@@ -145,7 +145,7 @@ class XFormsSelectControl(
       case select: XFormsSelectEvent ⇒
         boundNode match {
           case Some(boundNode) ⇒
-            DataModel.jSetValueIfChanged(
+            DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = this,
               locationData       = getLocationData,

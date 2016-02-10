@@ -127,7 +127,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
 
     translateExternalValue(externalValue) foreach { translatedValue ⇒
-      DataModel.jSetValueIfChanged(
+      DataModel.setValueIfChangedHandleErrors(
         containingDocument = containingDocument,
         eventTarget        = this,
         locationData       = getLocationData,

@@ -138,7 +138,7 @@ class XFormsSelect1Control(
       case select: XFormsSelectEvent ⇒
         boundNode match {
           case Some(boundNode) ⇒
-            DataModel.jSetValueIfChanged(
+            DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = this,
               locationData       = getLocationData,

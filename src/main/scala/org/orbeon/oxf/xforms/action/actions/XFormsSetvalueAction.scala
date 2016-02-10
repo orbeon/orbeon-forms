@@ -32,7 +32,7 @@ class XFormsSetvalueAction extends XFormsAction {
     val indentedLogger = actionInterpreter.indentedLogger
     val containingDocument = actionInterpreter.containingDocument
     val contextStack = actionInterpreter.actionXPathContext
-    
+
     val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
 
     // Determine value to set
@@ -50,7 +50,7 @@ class XFormsSetvalueAction extends XFormsAction {
           // Value to set is static content
           actionElement.getStringValue
       }
-    
+
     assert(valueToSet ne null)
 
     // Set the value on target node if possible
@@ -60,9 +60,9 @@ class XFormsSetvalueAction extends XFormsAction {
         // be written to. But because of the way we now handle errors in actions, we throw an exception instead
         // and action processing is interrupted.
         DataModel.setValueIfChanged(
-          nodeInfo,
-          valueToSet,
-          oldValue ⇒ DataModel.logAndNotifyValueChange(
+          nodeInfo   = nodeInfo,
+          newValue   = valueToSet,
+          onSuccess  = oldValue ⇒ DataModel.logAndNotifyValueChange(
             containingDocument = containingDocument,
             source             = "setvalue",
             nodeInfo           = nodeInfo,

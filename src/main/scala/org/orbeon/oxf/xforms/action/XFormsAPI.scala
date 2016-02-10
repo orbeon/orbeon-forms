@@ -75,12 +75,17 @@ object XFormsAPI {
       val nodeInfo = ref.head
 
       def onSuccess(oldValue: String): Unit =
-        for {
-          action ← actionInterpreterDyn.value
-          containingDocument = action.containingDocument
-          logger = action.indentedLogger
-        } yield
-          DataModel.logAndNotifyValueChange(containingDocument, "scala setvalue", nodeInfo, oldValue, value, isCalculate = false)(logger)
+        for (action ← actionInterpreterDyn.value)
+          yield
+            DataModel.logAndNotifyValueChange(
+              containingDocument = action.containingDocument,
+              source             = "scala setvalue",
+              nodeInfo           = nodeInfo,
+              oldValue           = oldValue,
+              newValue           = value,
+              isCalculate        = false)(
+              logger             = action.indentedLogger
+            )
 
       DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
 

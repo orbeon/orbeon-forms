@@ -151,10 +151,8 @@ object DataModel {
    * Used by MIPs and when setting external values on controls.
    *
    * Return true if the value was changed.
-   *
-   * TODO: Move to use setValueIfChanged once callers are all in Scala.
    */
-  def jSetValueIfChanged(
+  def setValueIfChangedHandleErrors(
     containingDocument : XFormsContainingDocument,
     eventTarget        : XFormsEventTarget,
     locationData       : LocationData,
@@ -169,10 +167,10 @@ object DataModel {
     assert(logger ne null)
 
     setValueIfChanged(
-      nodeInfo,
-      valueToSet,
-      logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate),
-      reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
+      nodeInfo  = nodeInfo,
+      newValue  = valueToSet,
+      onSuccess = logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate),
+      onError   = reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
     )
   }
 

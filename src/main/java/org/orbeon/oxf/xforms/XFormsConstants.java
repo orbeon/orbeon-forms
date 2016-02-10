@@ -75,7 +75,8 @@ public class XFormsConstants {
     public static final String XFORMS_PREFIX = "xforms"; // TODO: remove
     public static final String XFORMS_SHORT_PREFIX = "xf";
     public static final String XFORMS_NAMESPACE_URI = "http://www.w3.org/2002/xforms";
-    public static final Namespace XFORMS_NAMESPACE = new Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI);
+    public static final Namespace XFORMS_NAMESPACE       = new Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI);
+    public static final Namespace XFORMS_NAMESPACE_SHORT = new Namespace(XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI);
 
     public static final String XXFORMS_PREFIX = "xxforms"; // TODO: remove
     public static final String XXFORMS_SHORT_PREFIX = "xxf";
@@ -356,6 +357,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_REPEAT_INDEXES_QNAME = new QName("repeat-indexes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DND_QNAME = new QName("dnd", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFERRED_UPDATES_QNAME = new QName("deferred-updates", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_WHITESPACE_QNAME = new QName("whitespace", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_FORMAT_QNAME = new QName("format", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_UNFORMAT_QNAME = new QName("unformat", XXFORMS_NAMESPACE);

@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.dom4j._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
+import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
@@ -12,6 +12,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
+import org.orbeon.oxf.{util ⇒ u}
 
 import scala.collection.immutable.List
 import scala.util.Try
@@ -70,11 +71,11 @@ class StaticBind(
 
       val booleanOrStringExpression =
         if (BooleanXPathMIPNames(name))
-          OrbeonXPath.makeBooleanExpression(expression)
+          u.XPath.makeBooleanExpression(expression)
         else
-          OrbeonXPath.makeStringExpression(expression)
+          u.XPath.makeStringExpression(expression)
 
-      OrbeonXPath.compileExpression(
+      u.XPath.compileExpression(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,
@@ -134,6 +135,11 @@ class StaticBind(
     val level = ErrorLevel
   } with MIP
 
+  class WhitespaceMIP(val id: String, val policy: Policy) extends {
+    val name  = Model.Whitespace.name
+    val level = ErrorLevel
+  } with MIP
+
   // Globally remember binds ids
   bindTree.bindIds += staticId
   bindTree.bindsById += staticId → staticBind
@@ -173,6 +179,13 @@ class StaticBind(
   val dataType: Option[QName] =
     typeMIPOpt map (_.datatype) map
       (Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, _, true))
+
+  val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {
+    Option(element.attributeValue(XXFORMS_WHITESPACE_QNAME)) map
+    (findPolicyByName(_, Preserve)) filterNot
+    (_ == Preserve) map
+    (new WhitespaceMIP(getElementId(element), _))
+  }
 
   // Built-in XPath MIPs
   val mipNameToXPathMIP = {
@@ -261,7 +274,7 @@ class StaticBind(
   val hasCalculateComputedMIPs = mipNameToXPathMIP exists { case (_, mips) ⇒ mips exists (_.isCalculateComputedMIP)}
   val hasValidateMIPs          = typeMIPOpt.nonEmpty || (mipNameToXPathMIP exists { case (_, mips) ⇒ mips exists (_.isValidateMIP) })
   val hasCustomMIPs            = customMIPNameToXPathMIP.nonEmpty
-  val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs
+  val hasMIPs                  = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined
 
   def iterateNestedIds =
     for {
@@ -275,15 +288,17 @@ class StaticBind(
   def children  = _children
 
   // Globally remember if we have seen these categories of binds
-  bindTree.hasDefaultValueBind ||= getXPathMIPs(Default.name).nonEmpty
-  bindTree.hasCalculateBind    ||= getXPathMIPs(Calculate.name).nonEmpty
-  bindTree.hasRequiredBind     ||= getXPathMIPs(Required.name).nonEmpty
+  bindTree.hasDefaultValueBind      ||= getXPathMIPs(Default.name).nonEmpty
+  bindTree.hasCalculateBind         ||= getXPathMIPs(Calculate.name).nonEmpty
+  bindTree.hasRequiredBind          ||= getXPathMIPs(Required.name).nonEmpty
 
-  bindTree.hasTypeBind         ||= typeMIPOpt.nonEmpty
-  bindTree.hasConstraintBind   ||= constraintsByLevel.nonEmpty
+  bindTree.hasTypeBind              ||= typeMIPOpt.nonEmpty
+  bindTree.hasConstraintBind        ||= constraintsByLevel.nonEmpty
 
-  bindTree.hasCalculateComputedCustomBind ||= hasCalculateComputedMIPs || hasCustomMIPs
-  bindTree.hasValidateBind ||= hasValidateMIPs
+  bindTree.mustRecalculate          ||= hasCalculateComputedMIPs || hasCustomMIPs || nonPreserveWhitespaceMIPOpt.isDefined
+  bindTree.mustRevalidate           ||= hasValidateMIPs
+
+  bindTree.hasNonPreserveWhitespace ||= nonPreserveWhitespaceMIPOpt.isDefined
 
   def addBind(bindElement: Element, precedingId: Option[String]): Unit =
     _children = _children :+ new StaticBind(bindTree, bindElement, staticBind, None)// NOTE: preceding not handled for now
@@ -307,8 +322,8 @@ class StaticBind(
   def firstXPathMIP(mip: Model.XPathMIP) = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
   def hasXPathMIP(mip: Model.XPathMIP)   = firstXPathMIP(mip).isDefined
 
-  // Compute value analysis if we have a type bound, otherwise don't bother
-  override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIPOpt match {
+  // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
+  override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIPOpt orElse nonPreserveWhitespaceMIPOpt match {
     case Some(_) if hasBinding ⇒ Some(analyzeXPath(getChildrenContext, "string(.)"))
     case _                     ⇒ None
   }

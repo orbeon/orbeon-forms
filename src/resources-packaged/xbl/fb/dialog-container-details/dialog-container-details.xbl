@@ -177,7 +177,7 @@
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
                          type="xs:NCName"
-                         calculate="normalize-space()"
+                         xxf:whitespace="trim"
                          readonly="false()"
                          required="true()"
                          constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
@@ -194,7 +194,7 @@
 
                 <xf:bind ref="custom-iteration-name"
                          type="xf:NCName"
-                         calculate="normalize-space()"
+                         xxf:whitespace="trim"
                          readonly="false()"
                          required="$i/is-custom-iteration-name = true()"
                          constraint="$i/is-custom-iteration-name = false() or . = $i/original-custom-iteration-name or not(. = xxf:split($i/control-names))"/>
@@ -202,7 +202,7 @@
                 <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
                 <xf:bind ref="min-repeat | max-repeat"
                          type="xxf:xpath2"
-                         calculate="normalize-space()"
+                         xxf:whitespace="trim"
                          readonly="false()"/>
 
                 <xf:bind ref="min-repeat"

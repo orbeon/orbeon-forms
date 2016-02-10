@@ -17,7 +17,9 @@ import org.apache.commons.validator.routines.{EmailValidator, RegexValidator}
 import org.dom4j.QName
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -40,10 +42,9 @@ import org.orbeon.scaxon.XML
 import org.w3c.dom.Node
 
 import scala.collection.JavaConverters._
-import scala.collection.{immutable ⇒ i, mutable ⇒ m}
+import scala.collection.{mutable ⇒ m}
 import scala.language.postfixOps
 import scala.util.control.NonFatal
-import Logging._
 
 class XFormsModelBinds(protected val model: XFormsModel)
   extends RebuildBindOps
@@ -75,7 +76,10 @@ class XFormsModelBinds(protected val model: XFormsModel)
     // NOTE: This only evaluates the first custom MIP of the given name associated with the bind. We do store multiple
     // ones statically, but don't have yet a solution to combine them. Should we string-join them?
     def evaluateCustomMIPByName(mipType: QName) =
-      evaluateCustomMIP(bindNode, bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.getQualifiedName)).head)
+      evaluateCustomMIP(
+        bindNode,
+        bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.getQualifiedName)).head
+      )
 
     mipType match {
       case TYPE_QNAME            ⇒ bind.staticBind.dataType                                 map makeQNameValue
@@ -190,10 +194,13 @@ trait CalculateBindOps {
 
   // Apply calculate binds
   def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy): Unit = {
-    if (! staticModel.hasCalculateComputedCustomBind) {
+    if (! staticModel.mustRecalculate) {
         debug("skipping bind recalculate", List("model id" → model.getEffectiveId, "reason" → "no recalculation binds"))
     } else {
       withDebug("performing bind recalculate", List("model id" → model.getEffectiveId)) {
+
+        if (staticModel.hasNonPreserveWhitespace)
+          applyWhitespaceBinds()
 
         if (staticModel.hasDefaultValueBind)
           (if (isFirstCalculate) AllDefaultsStrategy else defaultsStrategy) match {
@@ -225,8 +232,8 @@ trait CalculateBindOps {
     try {
       Option(evaluateStringExpression(model, bindNode, mip))
     } catch {
-      case NonFatal(e) ⇒
-        handleMIPXPathException(e, bindNode, mip, "evaluating XForms custom bind")
+      case NonFatal(t) ⇒
+        handleMIPXPathException(t, bindNode, mip, "evaluating XForms custom bind")
         None
     }
   }
@@ -246,7 +253,8 @@ trait CalculateBindOps {
     if (staticBind.hasXPathMIP(Relevant) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Relevant, null))
       evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT) foreach bindNode.setRelevant
 
-    if (staticBind.hasXPathMIP(Readonly) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Readonly, null) || staticBind.hasXPathMIP(Calculate))
+    if (staticBind.hasXPathMIP(Readonly) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Readonly, null) ||
+        staticBind.hasXPathMIP(Calculate))
       evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY) match {
         case Some(value) ⇒
           bindNode.setReadonly(value)
@@ -272,6 +280,26 @@ trait CalculateBindOps {
           ! defaultForMIP // https://github.com/orbeon/orbeon-forms/issues/835
       }
     }
+  }
+
+  def applyWhitespaceBinds(): Unit = {
+    iterateBinds(topLevelBinds, bindNode ⇒
+      if (! bindNode.hasChildrenElements) { // quick test to rule out containing elements
+        bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip ⇒
+          if (dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, Model.Whitespace, null)) {
+            DataModel.setValueIfChangedHandleErrors(
+              containingDocument = containingDocument,
+              eventTarget        = model,
+              locationData       = bindNode.locationData,
+              nodeInfo           = bindNode.node,
+              valueToSet         = applyPolicy(DataModel.getValue(bindNode.item), mip.policy),
+              source             = "whitespace",
+              isCalculate        = true
+            )
+          }
+        }
+      }
+    )
   }
 
   // Q: Can bindNode.node ever be null here?
@@ -328,12 +356,19 @@ trait CalculateBindOps {
 
   private def evaluateAndSetCalculatedBind(bindNode: BindNode, mip: StringMIP): Unit =
     evaluateCalculatedBind(bindNode, mip) foreach { stringResult ⇒
-      DataModel.jSetValueIfChanged(
+
+      val valueToSet =
+        bindNode.staticBind.nonPreserveWhitespaceMIPOpt match {
+          case Some(mip) ⇒ applyPolicy(stringResult, mip.policy)
+          case None      ⇒ stringResult
+        }
+
+      DataModel.setValueIfChangedHandleErrors(
         containingDocument = containingDocument,
         eventTarget        = model,
         locationData       = bindNode.locationData,
         nodeInfo           = bindNode.node,
-        valueToSet         = stringResult,
+        valueToSet         = valueToSet,
         source             = mip.name,
         isCalculate        = true
       )
@@ -343,8 +378,8 @@ trait CalculateBindOps {
     bindNode.staticBind.firstXPathMIP(mip) flatMap { xpathMIP ⇒
       try Option(evaluateStringExpression(model, bindNode, xpathMIP))
       catch {
-        case e: Exception ⇒
-          handleMIPXPathException(e, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP")
+        case NonFatal(t) ⇒
+          handleMIPXPathException(t, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP")
           // Blank value so we don't have stale calculated values
           Some("")
       }
@@ -355,10 +390,6 @@ trait ValidationBindOps extends Logging {
 
   self: XFormsModelBinds ⇒
 
-//  def staticModel: Model
-//  def model: XFormsModel
-//  def containingDocument: XFormsContainingDocument
-
   private lazy val xformsValidator = {
     val validator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd")
     validator.loadSchemas(containingDocument)
@@ -366,7 +397,7 @@ trait ValidationBindOps extends Logging {
   }
 
   def applyValidationBinds(invalidInstances: m.Set[String]): Unit = {
-    if (! staticModel.hasValidateBind) {
+    if (! staticModel.mustRevalidate) {
       debug("skipping bind revalidate", List("model id" → model.getEffectiveId, "reason" → "no validation binds"))
     } else {
 
@@ -530,10 +561,14 @@ trait ValidationBindOps extends Logging {
         }
 
       // Try to perform casting
-      // TODO: Should we actually perform casting? This for example removes leading and trailing space around tokens. Is that expected?
+      // TODO: Should we actually perform casting? This for example removes leading and trailing space around tokens.
+      // Is that expected?
       val stringValue = new StringValue(nodeValue)
-      val xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getExecutable)
-      stringValue.convertPrimitive(BuiltInType.getSchemaType(requiredTypeFingerprint).asInstanceOf[BuiltInAtomicType], true, xpContext) match {
+      stringValue.convertPrimitive(
+        BuiltInType.getSchemaType(requiredTypeFingerprint).asInstanceOf[BuiltInAtomicType],
+        true,
+        new XPathContextMajor(stringValue, xpathEvaluator.getExecutable)
+      ) match {
         case _: ValidationFailure ⇒ false
         case _                    ⇒ true
       }
@@ -660,8 +695,8 @@ trait ValidationBindOps extends Logging {
 
       result
     } catch {
-      case NonFatal(e) ⇒
-        handleMIPXPathException(e, bindNode, xpathMIP, "evaluating XForms constraint bind")
+      case NonFatal(t) ⇒
+        handleMIPXPathException(t, bindNode, xpathMIP, "evaluating XForms constraint bind")
         ! Model.DEFAULT_VALID
     }
 }
@@ -699,9 +734,9 @@ object XFormsModelBinds {
     for (currentBind ← topLevelBinds)
       try currentBind.applyBinds(fn)
       catch {
-        case NonFatal(e) ⇒
+        case NonFatal(t) ⇒
           throw OrbeonLocationException.wrapException(
-            e,
+            t,
             new ExtendedLocationData(
               currentBind.staticBind.locationData,
               "evaluating XForms binds",

@@ -300,6 +300,12 @@
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label>Trim leading and trailing spaces</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Data Type</label>
             </types>
@@ -1201,6 +1207,12 @@
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label>Supprimer les espaces avant et après la valeur</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Type de donnée</label>
             </types>
@@ -2104,6 +2116,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Datatype</label>
             </types>
@@ -3007,6 +3025,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Тип данных</label>
             </types>
@@ -3910,6 +3934,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Tipi di dati</label>
             </types>
@@ -4805,6 +4835,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
            <types>
                 <label>Datentyp</label>
             </types>
@@ -5703,6 +5739,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Datatyyppi</label>
             </types>
@@ -6599,6 +6641,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Tipos de Datos</label>
             </types>
@@ -7502,6 +7550,12 @@
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Tipo de Dados</label>
             </types>
@@ -8404,6 +8458,12 @@
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>
+            <whitespace>
+                <item>
+                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <value>trim</value>
+                </item>
+            </whitespace>
             <types>
                 <label>Datatyp</label>
             </types>

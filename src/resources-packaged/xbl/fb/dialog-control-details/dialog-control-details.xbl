@@ -132,6 +132,7 @@
                 <xf:setvalue ref="$i/readonly"   value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'readonly')"/>
                 <xf:setvalue ref="$i/calculate"  value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'calculate')"/>
                 <xf:setvalue ref="$i/default"    value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'default')"/>
+                <xf:setvalue ref="$i/whitespace" value="fbf:readMipAsAttributeOnlyOrEmpty($form, $i/control-name, 'whitespace')"/>
 
                 <!-- Read help -->
                 <xf:setvalue ref="$i/help"  value="fbf:getControlHelpOrEmpty($i/control-name)"/>
@@ -197,7 +198,7 @@
                         $i/validations/validation
                     ),
                     (: Write MIPs :)
-                    for $mip in ('relevant', 'readonly', 'calculate', 'default') return
+                    for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
                         fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
                     (: Write help :)
                     fbf:setControlHelp($i/control-name, $i/help),
@@ -290,6 +291,7 @@
                         <readonly/>
                         <calculate/>
                         <default/>
+                        <whitespace/>
 
                         <help isHTML=""/>
                     </local>
@@ -307,7 +309,7 @@
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
                     type="xs:NCName"
-                    calculate="normalize-space()"
+                    xxf:whitespace="trim"
                     readonly="false()"
                     constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
 
@@ -538,18 +540,21 @@
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:input bind="default-alert">
-                                            <xf:label ref="$resources/dialog-control-details/default-alert/label"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/default-hint/label"/>
-                                        </xf:input>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:input ref="$i/default-alert/alert/@global">
+                                        <fr:checkbox-input ref="instance()/whitespace" selected-value="trim" deselected-value="">
+                                            <xf:label value="xxf:r('dialog-control-details.whitespace.item.label', '|fr-form-resources|')"/>
+                                        </fr:checkbox-input>
+                                        <fr:checkbox-input ref="$i/default-alert/alert/@global">
                                             <xf:label ref="$resources/dialog-control-details/use-global-alert/label"/>
                                             <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
                                             <xf:action event="xforms-value-changed">
                                                 <xf:rebuild/><xf:recalculate/><xf:revalidate/>
                                             </xf:action>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input bind="default-alert">
+                                            <xf:label ref="$resources/dialog-control-details/default-alert/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-details/default-hint/label"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>

@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.fb
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
@@ -41,7 +40,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   val FB = Names.FB
 
-  private val MIPsToRewrite = AllMIPs - Type - Required
+  private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
   private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → toQName(FB → ("fb:" + mip.name))) toMap
 
   val BindElementTest: Test = XF → "bind"
@@ -363,7 +362,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def updateMipAsAttributeOnly(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String): Unit = {
 
     require(Model.AllMIPNames(mipName))
-    val (mipAttQName, _) = mipToFBMIPQNames(AllMIPsByName(mipName))
+    val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
 
     findControlByName(inDoc, controlName) foreach { control ⇒
 
@@ -373,15 +372,18 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
       // expressions and types could use it. So for now the mapping is never garbage collected.
       def isTypeString(value: String) =
-        mipName == Type.name &&
+        mipName == Model.Type.name &&
         valueNamespaceMappingScopeIfNeeded(bind, value).isDefined &&
         Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(value))
 
       def isRequiredFalse(value: String) =
-        mipName == Required.name && value == "false()"
+        mipName == Model.Required.name && value == "false()"
+
+      def isWhitespacePreserve(value: String) =
+        mipName == Model.Whitespace.name && value == Whitespace.Preserve.name
 
       def mustRemoveAttribute(value: String) =
-        isTypeString(value) || isRequiredFalse(value)
+        isTypeString(value) || isRequiredFalse(value) || isWhitespacePreserve(value)
 
       mipValue.trimAllToOpt match {
         case Some(normalizedMipValue) if ! mustRemoveAttribute(normalizedMipValue) ⇒
@@ -425,7 +427,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Get the value of a MIP attribute if present
   def readMipAsAttributeOnly(inDoc: NodeInfo, controlName: String, mipName: String) = {
     require(Model.AllMIPNames(mipName))
-    val (mipAttQName, _) = mipToFBMIPQNames(AllMIPsByName(mipName))
+    val (mipAttQName, _) = mipToFBMIPQNames(Model.AllMIPsByName(mipName))
 
     findBindByName(inDoc, controlName) flatMap (_ attValueOpt mipAttQName)
   }
@@ -435,7 +437,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     readMipAsAttributeOnly(inDoc, controlName, mipName).orNull
 
   // Return (attQName, elemQName)
-  def mipToFBMIPQNames(mip: MIP) =
+  def mipToFBMIPQNames(mip: Model.MIP) =
     RewrittenMIPs.get(mip) match {
       case Some(qn) ⇒ qn        → qn
       case None     ⇒ mip.aName → mip.eName

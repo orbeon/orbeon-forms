@@ -40,9 +40,10 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
   var hasTypeBind                    = false
   var hasRequiredBind                = false
   var hasConstraintBind              = false
+  var hasNonPreserveWhitespace       = false
 
-  var hasCalculateComputedCustomBind = false
-  var hasValidateBind                = false
+  var mustRecalculate                = false
+  var mustRevalidate                 = false
 
   // Instances affected by binding XPath expressions
   val bindInstances                    = m.LinkedHashSet[String]() // instances to which binds apply (i.e. bind/@ref point to them)

@@ -287,9 +287,10 @@ trait ModelBinds {
   def hasTypeBind                           = bindTree().hasTypeBind
   def hasRequiredBind                       = bindTree().hasRequiredBind
   def hasConstraintBind                     = bindTree().hasConstraintBind
+  def hasNonPreserveWhitespace              = bindTree().hasNonPreserveWhitespace
 
-  def hasCalculateComputedCustomBind        = bindTree().hasCalculateComputedCustomBind
-  def hasValidateBind                       = bindTree().hasValidateBind
+  def mustRevalidate                        = bindTree().mustRevalidate
+  def mustRecalculate                       = bindTree().mustRecalculate
 
   def bindInstances                         = bindTree().bindInstances
   def computedBindExpressionsInstances      = bindTree().computedBindExpressionsInstances
@@ -316,9 +317,9 @@ object Model {
   val ChildrenElementsQNames = Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)
 
   // MIP enumeration
-  sealed trait MIP         { def name: String; val aName: QName;                               val eName: QName }
-  trait StdMIP extends MIP { val name: String; val aName = QName.get(name);                    val eName = QName.get(name, XFORMS_NAMESPACE)  }
-  trait ExtMIP extends MIP { val name: String; val aName = QName.get(name, XXFORMS_NAMESPACE); val eName = QName.get(name, XXFORMS_NAMESPACE) }
+  sealed trait MIP         { def name: String; val aName: QName;                                     val eName: QName }
+  trait StdMIP extends MIP { val name: String; val aName = QName.get(name);                          val eName = QName.get(name, XFORMS_NAMESPACE_SHORT) }
+  trait ExtMIP extends MIP { val name: String; val aName = QName.get(name, XXFORMS_NAMESPACE_SHORT); val eName = QName.get(name, XXFORMS_NAMESPACE_SHORT) }
 
   trait ComputedMIP extends MIP
   trait ValidateMIP extends MIP
@@ -333,13 +334,15 @@ object Model {
   case object Readonly     extends { val name = "readonly"   } with StdMIP with BooleanMIP with ComputedMIP
   case object Required     extends { val name = "required"   } with StdMIP with BooleanMIP with ComputedMIP with ValidateMIP
   case object Constraint   extends { val name = "constraint" } with StdMIP with BooleanMIP with ValidateMIP
+
   case object Calculate    extends { val name = "calculate"  } with StdMIP with StringMIP  with ComputedMIP
   case object Default      extends { val name = "default"    } with ExtMIP with StringMIP  with ComputedMIP
   case object Type         extends { val name = "type"       } with StdMIP with ValidateMIP
+  case object Whitespace   extends { val name = "whitespace" } with ExtMIP with ComputedMIP
 
   //case class Custom(n: String) extends { val name = n }        with StdMIP with XPathMIP
 
-  val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type)
+  val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type, Whitespace)
   val AllMIPsInOrder           = AllMIPs.toList.sortBy(_.name)
   val AllMIPNamesInOrder       = AllMIPsInOrder map (_.name)
   val AllMIPsByName            = AllMIPs map (mip ⇒ mip.name → mip) toMap

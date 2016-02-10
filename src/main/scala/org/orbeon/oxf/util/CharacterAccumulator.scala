@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.util
 
-import Whitespace._
+import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.saxon.value.{Whitespace ⇒ SWhitespace}
 
-
 class CharacterAccumulator {
-  
+
   private var appendCount = 0
   private val acc = new java.lang.StringBuilder
 
   // Stats
   private var _savedCharacters = 0
   def savedBytes = _savedCharacters * 2
-  
+
   private var _multipleAppends = 0
   def multipleAppends = _multipleAppends
-  
+
   def append(policy: Policy, ch: Array[Char], start: Int, length: Int): Unit =
     if (length > 0) {
       acc.append(ch, start, length)
@@ -38,12 +37,7 @@ class CharacterAccumulator {
   def collapseAndReset(policy: Policy): String = {
 
     val originalLength = acc.length
-    val resultCS =
-      policy match {
-        case Preserve  ⇒ acc
-        case Normalize ⇒ SWhitespace.collapseWhitespace(acc)
-        case Collapse  ⇒ collapseWhitespaceNoTrim(acc)
-      }
+    val resultCS = Whitespace.applyPolicy(acc, policy)
 
     _savedCharacters += originalLength - resultCS.length
     _multipleAppends += 0 max appendCount - 1
@@ -79,7 +73,7 @@ class CharacterAccumulator {
       sb
     }
   }
-  
+
   private def reset(): Unit = {
     appendCount = 0
     acc.setLength(0)

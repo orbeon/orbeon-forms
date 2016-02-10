@@ -12,6 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <xbl:binding id="fb-input" element="xf|input">
@@ -31,6 +32,7 @@
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
             <templates>
+                <bind xxf:whitespace="trim"/>
                 <view>
                     <xf:input id="" ref="" xmlns="">
                         <xf:label ref=""/>

@@ -16,6 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.orbeon.saxon.value.{Whitespace ⇒ SWhitespace}
 import org.xml.sax.Attributes
 
 import scala.collection.mutable
@@ -28,8 +29,52 @@ object Whitespace  {
   case object Preserve  extends Policy { val name = "preserve"  }
   case object Normalize extends Policy { val name = "normalize" } // like XML Schema's collapse and XPath's normalize-space()
   case object Collapse  extends Policy { val name = "collapse"  } // collapse sequences of multiple whitespace characters to a single space
+  case object Trim      extends Policy { val name = "trim"      } // trim leading and trailing whitespace
 
-  val AllPolicies = List(Preserve, Normalize, Collapse)
+  val AllPolicies = List(Preserve, Normalize, Collapse, Trim)
+
+  def applyPolicy(s: CharSequence, policy: Policy): String = {
+
+    val resultCS =
+      policy match {
+        case Preserve  ⇒ s
+        case Normalize ⇒ SWhitespace.collapseWhitespace(s)
+        case Collapse  ⇒ collapseWhitespaceNoTrim(s)
+        case Trim      ⇒ s.toString.trimAllToEmpty
+      }
+
+    if (resultCS.length > 0) resultCS.toString else ""
+  }
+
+  // Collapse whitespace but don't remove leading/trailing space if any. This is more conservative.
+  // Inspired by Saxon collapseWhitespace
+  private def collapseWhitespaceNoTrim(cs: CharSequence): CharSequence = {
+    val length = cs.length
+    if (length == 0 || ! SWhitespace.containsWhitespace(cs))
+      cs
+    else {
+      val sb = new java.lang.StringBuilder(length)
+      var inWhitespace = false
+      var i = 0
+      while (i < length) {
+        cs.charAt(i) match {
+          case c @ ('\n' | '\r' | '\t' | ' ') ⇒
+            if (! inWhitespace) {
+              sb.append(' ')
+              inWhitespace = true
+            }
+          case c ⇒
+            sb.append(c)
+            inWhitespace = false
+        }
+        i += 1
+      }
+      sb
+    }
+  }
+
+  def findPolicyByName(name: String, default: Policy) =
+    AllPolicies find (_.name == name) getOrElse default
 
   // Only support a small subset of selectors for now
   sealed trait Matcher
@@ -87,7 +132,7 @@ object Whitespace  {
 
   private def defaultPolicy(scope: String, default: Policy) = {
     val name = Properties.instance.getPropertySet.getString(scope + ".default", default.name)
-    AllPolicies find (_.name == name) getOrElse default
+    findPolicyByName(name, default)
   }
 
   def basePolicyMatcher: PolicyMatcher =

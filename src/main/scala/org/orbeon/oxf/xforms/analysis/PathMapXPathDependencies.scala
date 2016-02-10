@@ -476,6 +476,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     val mips = mip match {
       case Model.Constraint ⇒ bind.constraintsByLevel.getOrElse(level, Nil)
       case Model.Type       ⇒ bind.typeMIPOpt.toList
+      case Model.Whitespace ⇒ bind.nonPreserveWhitespaceMIPOpt.toList
       case _                ⇒ bind.getXPathMIPs(mip.name)
     }
 
@@ -494,7 +495,8 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         val valueAnalysis = mip match {
           case xpathMIP: StaticBind#XPathMIP ⇒ Some(xpathMIP.analysis)
           case _: StaticBind#TypeMIP         ⇒ bind.getValueAnalysis
-          case _                             ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
+          case _: StaticBind#WhitespaceMIP   ⇒ bind.getValueAnalysis
+          case _                             ⇒ throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 
         def dependsOnOtherModel(analysis: XPathAnalysis) =

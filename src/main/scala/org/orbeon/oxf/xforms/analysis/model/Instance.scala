@@ -107,10 +107,10 @@ trait InstanceMetadata {
   import ElementAnalysis._
   import Instance._
 
-  val readonly = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
-  val cache = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
-  val timeToLive = Instance.timeToLiveOrDefault(element)
-  val handleXInclude = false
+  val readonly         = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
+  val cache            = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
+  val timeToLive       = Instance.timeToLiveOrDefault(element)
+  val handleXInclude   = false
 
   // lazy because depends on property, which depends on top-level model being set in XFormsStaticStateImpl!
   lazy val exposeXPathTypes =

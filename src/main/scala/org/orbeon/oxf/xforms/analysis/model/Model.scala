@@ -329,13 +329,13 @@ object Model {
   // NOTE: "required" is special: it is evaluated during recalculate, but used during revalidate. In effect both
   // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
   // "required" MIP, not on the XPath of it. See also what we would need for valid(), etc. functions.
-  case object Relevant     extends { val name = "relevant" }   with StdMIP with BooleanMIP with ComputedMIP
-  case object Readonly     extends { val name = "readonly" }   with StdMIP with BooleanMIP with ComputedMIP
-  case object Required     extends { val name = "required" }   with StdMIP with BooleanMIP with ComputedMIP with ValidateMIP
+  case object Relevant     extends { val name = "relevant"   } with StdMIP with BooleanMIP with ComputedMIP
+  case object Readonly     extends { val name = "readonly"   } with StdMIP with BooleanMIP with ComputedMIP
+  case object Required     extends { val name = "required"   } with StdMIP with BooleanMIP with ComputedMIP with ValidateMIP
   case object Constraint   extends { val name = "constraint" } with StdMIP with BooleanMIP with ValidateMIP
-  case object Calculate    extends { val name = "calculate" }  with StdMIP with StringMIP  with ComputedMIP
-  case object Default      extends { val name = "default" }    with ExtMIP with StringMIP  with ComputedMIP
-  case object Type         extends { val name = "type" }       with StdMIP with ValidateMIP
+  case object Calculate    extends { val name = "calculate"  } with StdMIP with StringMIP  with ComputedMIP
+  case object Default      extends { val name = "default"    } with ExtMIP with StringMIP  with ComputedMIP
+  case object Type         extends { val name = "type"       } with StdMIP with ValidateMIP
 
   //case class Custom(n: String) extends { val name = n }        with StdMIP with XPathMIP
 

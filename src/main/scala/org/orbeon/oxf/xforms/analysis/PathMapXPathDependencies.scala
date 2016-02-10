@@ -481,7 +481,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     val modelState = getModelState(model.prefixedId)
 
-    def resultForMIP(mip: StaticBind#MIP) =
+    def resultForMIP(mip: StaticBind#MIP): UpdateResult =
       if (modelState.isMIPInitiallyDirty(mip)) {
         // We absolutely must evaluate the MIP
         MustUpdateResultOne
@@ -497,7 +497,8 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
           case _                             ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
         }
 
-        def dependsOnOtherModel(analysis: XPathAnalysis) = analysis.dependentModels exists (_ != model.prefixedId)
+        def dependsOnOtherModel(analysis: XPathAnalysis) =
+          analysis.dependentModels exists (_ != model.prefixedId)
 
         val updateResult = valueAnalysis match {
           case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
@@ -535,9 +536,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
 object PathMapXPathDependencies {
 
-  /**
-   * Create a fingerprinted path of the form: 3142/1425/@1232 from a node.
-   */
+  // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
   private def createFingerprintedPath(node: NodeInfo): String = {
 
     // Create an immutable list with ancestor-or-self nodes up to but not including the document node
@@ -549,12 +548,17 @@ object PathMapXPathDependencies {
     }
 
     // Fingerprint representation of the element and attribute nodes
-    (if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
-      ancestorOrSelf.tail map (node ⇒ node.getNodeKind match {
-        case ELEMENT_NODE ⇒ node.getFingerprint
-        case ATTRIBUTE_NODE ⇒ "@" + node.getFingerprint
-      })
-    else
-      Nil) mkString "/"
+    val pathElements =
+      if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
+        ancestorOrSelf.tail map { node ⇒
+          node.getNodeKind match {
+            case ELEMENT_NODE   ⇒ node.getFingerprint
+            case ATTRIBUTE_NODE ⇒ "@" + node.getFingerprint
+          }
+        }
+      else
+        Nil
+
+    pathElements mkString "/"
   }
 }

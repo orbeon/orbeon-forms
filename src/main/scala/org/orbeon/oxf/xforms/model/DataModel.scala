@@ -86,7 +86,10 @@ object DataModel {
    * - manually run revalidation
    * - XFormsModelBinds gets node value for validation
    */
-  def getValue(item: Item) = Option(item) map (_.getStringValue) orNull
+  def getValue(item: Item) = item match {
+    case null ⇒ null
+    case item ⇒ item.getStringValue
+  }
 
   /**
    * Set a value on the instance using a NodeInfo and a value.
@@ -130,10 +133,10 @@ object DataModel {
     onSuccess : String ⇒ Unit = _ ⇒ (),
     onError   : Reason ⇒ Unit = _ ⇒ ()
   ) = {
-    
+
     assert(nodeInfo ne null)
     assert(newValue ne null)
-    
+
     val oldValue = getValue(nodeInfo)
     val doUpdate = oldValue != newValue
 
@@ -183,20 +186,32 @@ object DataModel {
     isCalculate        : Boolean)(implicit
     logger             : IndentedLogger
   ) = {
-    logValueChange(logger, source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
+    logValueChange(source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
     notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate)
   }
 
   private def findInstanceEffectiveId(containingDocument: XFormsContainingDocument, nodeInfo: NodeInfo) =
     Option(containingDocument.getInstanceForNode(nodeInfo)) map (_.getEffectiveId)
-  
-  private def logValueChange(indentedLogger: IndentedLogger, source: String, oldValue: String, newValue: String, instanceEffectiveId: Option[String]) =
-    if (indentedLogger.isDebugEnabled)
-      indentedLogger.logDebug("xf:setvalue", "setting instance value", "source", source,
+
+  private def logValueChange(
+    source              : String,
+    oldValue            : String,
+    newValue            : String,
+    instanceEffectiveId : Option[String])(implicit
+    logger              : IndentedLogger
+  ) =
+    if (logger.isDebugEnabled)
+      logger.logDebug("xf:setvalue", "setting instance value", "source", source,
         "old value", oldValue, "new value", newValue,
         "instance", instanceEffectiveId getOrElse "N/A")
 
-  private def notifyValueChange(containingDocument: XFormsContainingDocument, nodeInfo: NodeInfo, oldValue: String, newValue: String, isCalculate: Boolean) =
+  private def notifyValueChange(
+    containingDocument : XFormsContainingDocument,
+    nodeInfo           : NodeInfo,
+    oldValue           : String,
+    newValue           : String,
+    isCalculate        : Boolean
+  ) =
     Option(containingDocument.getInstanceForNode(nodeInfo)) match {
       case Some(modifiedInstance) ⇒
         // Tell the model about the value change
@@ -213,12 +228,12 @@ object DataModel {
 
   private def setValueForNode(node: Node, newValue: String) =
     node match {
-      case element: Element                       ⇒ element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
-      case attribute: Attribute                   ⇒ attribute.setValue(newValue)
-      case text: Text4j if newValue.nonEmpty      ⇒ text.setText(newValue)
-      case text: Text4j                           ⇒ text.getParent.remove(text)
-      case pi: ProcessingInstruction              ⇒ pi.setText(newValue)
-      case comment: Comment4j                     ⇒ comment.setText(newValue)
+      case element: Element                  ⇒ element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
+      case attribute: Attribute              ⇒ attribute.setValue(newValue)
+      case text: Text4j if newValue.nonEmpty ⇒ text.setText(newValue)
+      case text: Text4j                      ⇒ text.getParent.remove(text)
+      case pi: ProcessingInstruction         ⇒ pi.setText(newValue)
+      case comment: Comment4j                ⇒ comment.setText(newValue)
       // Should not happen as caller checks for isWritableItem()
       case _ ⇒ throw new IllegalStateException("Setting value on disallowed node type: " + node.getNodeTypeName)
     }
@@ -228,7 +243,7 @@ object DataModel {
 
   // Whether the an item is a document node.
   def isDocument(item: Item) = isNodeType(item, DOCUMENT_NODE)
-  
+
   private def isNodeType(item: Item, nodeType: Int) = item match {
     case nodeInfo: NodeInfo if nodeInfo.getNodeKind == nodeType ⇒ true
     case _ ⇒ false

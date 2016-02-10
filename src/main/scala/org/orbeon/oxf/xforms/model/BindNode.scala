@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.util.{List ⇒ JList}
+import java.{util ⇒ ju}
 
 import org.dom4j.Node
 import org.orbeon.oxf.util.ScalaUtils._
@@ -127,7 +127,7 @@ object BindNode {
   // NOTE: This takes the first custom MIP of a given name associated with the bind. We do store multiple
   // ones statically, but don't have yet a solution to combine them. Should we string-join them? See also
   // XFormsModelBindsBase.evaluateCustomMIP.
-  def collectAllCustomMIPs(bindNodes: JList[BindNode]) =
+  def collectAllCustomMIPs(bindNodes: ju.List[BindNode]) =
     if (bindNodes eq null)
       Map.empty[String, String]
     else if (bindNodes.size == 1)

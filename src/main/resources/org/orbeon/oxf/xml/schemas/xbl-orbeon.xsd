@@ -11,11 +11,14 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xs:schema targetNamespace="http://www.w3.org/ns/xbl"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:xbl="http://www.w3.org/ns/xbl"
-           elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema
+    targetNamespace="http://www.w3.org/ns/xbl"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
 
     <xs:element name="xbl">
         <xs:complexType>
@@ -77,12 +80,10 @@
                     <xs:any namespace="##other" processContents="lax"/>
                 </xs:choice>
             </xs:sequence>
-            <xs:attribute name="event"/>
-            <xs:attribute name="phase"/>
-            <xs:attribute name="defaultAction"/>
-            <xs:attribute name="observer"/>
-            <xs:attribute name="target"/>
             <xs:attribute name="type" type="xs:NMTOKEN" use="optional"/>
+            <xs:attributeGroup ref="xforms:Common.Attributes"/>
+            <xs:attributeGroup ref="xforms:XML.Events"/>
+
             <xs:anyAttribute namespace="##other" processContents="lax"/>
         </xs:complexType>
     </xs:element>

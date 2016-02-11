@@ -15,9 +15,12 @@
 <!--
     This is the standard XForms schema with some additions by Orbeon.
 -->
-<xsd:schema targetNamespace="http://www.w3.org/2002/xforms" xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ev="http://www.w3.org/2001/xml-events"
-        elementFormDefault="qualified">
+<xsd:schema
+    targetNamespace="http://www.w3.org/2002/xforms"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    elementFormDefault="qualified">
     <!--
       Changes:
     26-Aug MJD fixed typo where more than one child allowed on <instance>
@@ -693,9 +696,13 @@
         <xsd:attribute name="if" type="xsd:string" use="optional"/>
         <xsd:attribute name="while" type="xsd:string" use="optional"/>
         <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
-        <xsd:attribute name="event" type="xs:NMTOKEN"/>
-        <xsd:attribute name="observer" type="xs:NMTOKEN"/>
-        <xsd:attribute name="target" type="xs:NMTOKEN"/>
+        <xsd:attribute name="event" ref="ev:event"/>
+        <xsd:attribute name="observer" ref="ev:observer"/>
+        <xsd:attribute name="target" ref="ev:target"/>
+        <xsd:attribute name="handler" ref="ev:handler"/>
+        <xsd:attribute name="phase" ref="ev:phase"/>
+        <xsd:attribute name="propagate" ref="ev:propagate"/>
+        <xsd:attribute name="defaultAction" ref="ev:defaultAction"/>
         <xsd:attribute ref="ev:event"/>
         <xsd:attribute ref="ev:observer"/>
         <xsd:attribute ref="ev:target"/>

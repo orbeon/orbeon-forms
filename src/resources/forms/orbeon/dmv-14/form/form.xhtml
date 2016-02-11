@@ -12,24 +12,25 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-            xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:saxon="http://saxon.sf.net/"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:dmv="http://orbeon.org/oxf/examples/dmv">
     <xh:head>
         <xh:style type="text/css">
-            .yui-skin-sam .yui-dt .xbl-fr-california-plate .fr-plate-table { margin: auto; border: none }
-            .yui-skin-sam .yui-dt .xbl-fr-california-plate .fr-plate-table td { text-align: center; border: none }
-            .fr-grid .xforms-mediatype-image img { margin: auto }
-
-            .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group, .fr-grid-content span.xbl-fr-us-state
-                { display: inline-block; *zoom: 1; *display: inline; vertical-align: middle }
+            .yui-skin-sam .yui-dt .xbl-fr-california-plate .fr-plate-table {
+                margin: auto; border: none;
+            }
+            .yui-skin-sam .yui-dt .xbl-fr-california-plate .fr-plate-table td {
+                text-align: center; border: none;
+            }
+            .fr-grid .xforms-mediatype-image img {
+                margin: auto;
+            }
+            .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group, .fr-grid-content span.xbl-fr-us-state {
+                display: inline-block; vertical-align: middle;
+            }
         </xh:style>
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
             <xf:instance id="fr-form-instance">
@@ -99,18 +100,18 @@
                                  name="voter-address-change"
                                  type="xf:boolean"/>
                     <xf:bind id="last-name-bind" ref="last-name" name="last-name" type="dmv:last-name"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="first-name-bind" ref="first-name" name="first-name"
                                  type="dmv:first-name"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="driver-license-number-bind" ref="driver-license-number"
                                  name="driver-license-number"
                                  type="dmv:driver-license-number"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
-                    <xf:bind id="initial-bind" ref="initial" name="initial" type="dmv:initial"/>
+                    <xf:bind id="initial-bind" ref="initial" name="initial" type="dmv:initial" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind id="residence-address-bind" ref="residence-address"
                              name="residence-address">
@@ -118,11 +119,11 @@
                     <xf:bind id="residence-street-name-1-bind" ref="residence-street-name-1"
                                  name="residence-street-name-1"
                                  type="dmv:street-name-1"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="residence-city-bind" ref="residence-city" name="residence-city"
                                  type="dmv:city"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="residence-state-bind" ref="residence-state" name="residence-state"
                                  type="dmv:state"
@@ -130,16 +131,16 @@
                                  />
                     <xf:bind id="residence-zip-bind" ref="residence-zip" name="residence-zip"
                                  type="dmv:zip"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="residence-street-number-bind" ref="residence-street-number"
                                  name="residence-street-number"
-                                 type="dmv:street-number"/>
+                                 type="dmv:street-number" xxf:whitespace="trim"/>
                     <xf:bind id="residence-street-name-2-bind" ref="residence-street-name-2"
                                  name="residence-street-name-2"
-                                 type="dmv:street-name-2"/>
+                                 type="dmv:street-name-2" xxf:whitespace="trim"/>
                     <xf:bind id="residence-apt-bind" ref="residence-apt" name="residence-apt"
-                                 type="dmv:apt"/>
+                                 type="dmv:apt" xxf:whitespace="trim"/>
 
                 </xf:bind>
                 <xf:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
@@ -148,26 +149,26 @@
                     <xf:bind id="mailing-street-name-1-bind" ref="mailing-street-name-1"
                                  name="mailing-street-name-1"
                                  type="dmv:street-name-1"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="mailing-city-bind" ref="mailing-city" name="mailing-city"
                                  type="dmv:city"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="mailing-state-bind" ref="mailing-state" name="mailing-state"
                                  type="dmv:state"
                                  required="true()"
                                  />
                     <xf:bind id="mailing-zip-bind" ref="mailing-zip" name="mailing-zip" type="dmv:zip"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="mailing-street-number-bind" ref="mailing-street-number"
                                  name="mailing-street-number"
-                                 type="dmv:street-number"/>
+                                 type="dmv:street-number" xxf:whitespace="trim"/>
                     <xf:bind id="mailing-street-name-2-bind" ref="mailing-street-name-2"
                                  name="mailing-street-name-2"
-                                 type="dmv:street-name-2"/>
-                    <xf:bind id="mailing-apt-bind" ref="mailing-apt" name="mailing-apt" type="dmv:apt"/>
+                                 type="dmv:street-name-2" xxf:whitespace="trim"/>
+                    <xf:bind id="mailing-apt-bind" ref="mailing-apt" name="mailing-apt" type="dmv:apt" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind id="vehicles-bind" ref="vehicles" name="vehicles">
                     <xf:bind id="vehicle-bind" ref="vehicle" name="vehicle">
@@ -176,18 +177,18 @@
                             <xf:bind id="plate-number-bind" ref="plate-number" name="plate-number"
                                          type="dmv:plate-number"
                                          required="true()"
-
+                                         xxf:whitespace="trim"
                                          readonly="false()"
                                          calculate="upper-case(.)"/>
                             <xf:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
-
+                                         xxf:whitespace="trim"
                                          readonly="false()"
                                          calculate="upper-case(.)"/>
                         </xf:bind>
                     </xf:bind>
                     <xf:bind id="leasing-company-name-bind" ref="leasing-company-name"
                                  name="leasing-company-name"
-                                 type="dmv:company-name"/>
+                                 type="dmv:company-name" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind id="trailer-coach-vessel-bind" ref="trailer-coach-vessel"
                              name="trailer-coach-vessel">
@@ -195,37 +196,37 @@
                     <xf:bind id="vehicle-street-name-1-bind" ref="vehicle-street-name-1"
                                  name="vehicle-street-name-1"
                                  type="dmv:street-name-1"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="vehicle-city-bind" ref="vehicle-city" name="vehicle-city"
                                  type="dmv:city"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="vehicle-county-bind" ref="vehicle-county" name="vehicle-county"
                                  type="dmv:county"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="vehicle-street-number-bind" ref="vehicle-street-number"
                                  name="vehicle-street-number"
-                                 type="dmv:street-number"/>
+                                 type="dmv:street-number" xxf:whitespace="trim"/>
                     <xf:bind id="vehicle-street-name-2-bind" ref="vehicle-street-name-2"
                                  name="vehicle-street-name-2"
-                                 type="dmv:street-name-2"/>
+                                 type="dmv:street-name-2" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind id="old-address-bind" ref="old-address" name="old-address">
                     <xf:bind id="old-street-number-name-bind" ref="old-street-number-name"
                                  name="old-street-number-name"
                                  type="xs:string"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="old-city-bind" ref="old-city" name="old-city" type="dmv:city"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                     <xf:bind id="old-state-bind" ref="old-state" name="old-state" type="dmv:state"
                                  required="true()"
                                  />
                     <xf:bind id="old-zip-bind" ref="old-zip" name="old-zip" type="dmv:zip"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  />
                 </xf:bind>
             </xf:bind>

@@ -78,14 +78,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="text-controls-bind" ref="text-controls" name="text-controls">
-                    <xf:bind id="input-bind" ref="input" name="input"/>
+                    <xf:bind id="input-bind" ref="input" name="input" xxf:whitespace="trim"/>
                     <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"/>
                     <xf:bind ref="output" id="output-bind" name="output"/>
                     <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"/>
                     <xf:bind id="input-counter-bind" ref="input-counter" name="input-counter">
                         <xf:constraint id="validation-49-validation" value="xxf:max-length(30)"/>
                     </xf:bind>
-                    <xf:bind id="textarea-bind" ref="textarea" name="textarea"/>
+                    <xf:bind id="textarea-bind" ref="textarea" name="textarea" xxf:whitespace="trim"/>
                     <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
                         <xf:constraint id="constraint-49-constraint" value="xxf:max-length(140)"/>
                     </xf:bind>
@@ -115,7 +115,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                     <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
                              name="checkbox-input"/>
-                    <xf:bind id="open-select1-bind" ref="open-select1" name="open-select1" required="true()"/>
+                    <xf:bind id="open-select1-bind" ref="open-select1" name="open-select1" required="true()" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
@@ -135,7 +135,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                              name="handwritten-signature"/>
                 </xf:bind>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
-                    <xf:bind ref="email" id="email-bind" type="xf:email" name="email"/>
+                    <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"/>
                     <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
                     <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
                     <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
@@ -152,6 +152,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <title xml:lang="fr">Contrôles de Form Builder</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
                     <singleton>false</singleton>
+                    <migration version="4.8.0">[{ "path": "(attachment-controls)/(file-attachments)", "iteration-name": "file-attachments-iteration" }]</migration>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
@@ -726,16 +727,38 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                 </file-attachments-iteration>
             </xf:instance>
             <xf:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')" validate="false" method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="autocomplete-itemset-instance"/>
-        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder"><xbl:binding id="orbeon-address-component" element="component|address" class="fr-section-component"><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance" xxbl:mirror="true"><empty/></xf:instance><xf:instance id="fr-form-template"><address>
+        </xf:model>
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+            <xbl:binding id="orbeon-address-component" element="component|address" class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="address-model">
+                        <xf:instance id="fr-form-instance" xxbl:mirror="true">
+                            <empty/>
+                        </xf:instance>
+                        <xf:instance id="fr-form-template">
+                            <address>
                         <street-number/>
                         <street-name/>
                         <apt-suite/>
                         <city/>
                         <state/>
                         <zip/>
-                    </address></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="street-number-bind" name="street-number" required="true()" ref="street-number">
-                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer" level="warning"/>
-                    </xf:bind><xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()"/><xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite"/><xf:bind id="city-bind" name="city" ref="city" required="true()"/><xf:bind id="state-bind" name="state" ref="state" required="true()"/><xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer"/></xf:bind><xf:instance id="fr-form-resources"><resources><resource xml:lang="en"><address>
+                    </address></xf:instance><xf:bind id="fr-form-binds"
+                     ref="instance('fr-form-instance')">
+                            <xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim" ref="street-number">
+                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer"
+                                       level="warning" xxf:whitespace="trim"/>
+                    </xf:bind>
+                    <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/>
+                    <xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind id="state-bind" name="state" ref="state" required="true()"/>
+                    <xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"/>
+                </xf:bind>
+                        <xf:instance id="fr-form-resources">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <address>
                             <label>US Address</label>
                             <help/>
                         </address><street-number>
@@ -795,9 +818,39 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </state><zip>
                             <label>Code postal</label>
                             <hint/>
-                        </zip></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/><xf:action ev:event="xforms-model-construct-done"><xf:action if="empty(instance()/*)"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
+                                    </zip>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="readonly">
+                            <readonly/>
+                        </xf:instance>
+                        <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
+                        <xf:var name="fr-mode" value="$fr-params/mode"/>
+                        <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
+                        <xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
+                            <xf:action if="empty(instance()/*)">
+                                <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
 
-                            <xf:rebuild/><xf:recalculate xxf:defauls="true"/><xf:revalidate/></xf:action></xf:action></xf:model></xbl:implementation><xbl:template><xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:group appearance="xxf:internal"><xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/address/label"/><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
+                            <xf:rebuild/>
+                                <xf:recalculate xxf:defauls="true"/>
+                                <xf:revalidate/>
+                            </xf:action>
+                        </xf:action>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/>
+                    <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
+                        <xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/>
+                    </xf:var>
+                    <xf:var name="fr-resources" as="element()?">
+                        <xxf:value value="$fr-resources" xxbl:scope="outer"/>
+                    </xf:var>
+                    <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
+                    <xf:group appearance="xxf:internal">
+                        <xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/address/label"/>
+                        <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="street-number-control" bind="street-number-bind">

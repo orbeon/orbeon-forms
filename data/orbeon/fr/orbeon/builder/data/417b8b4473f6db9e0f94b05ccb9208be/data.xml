@@ -78,14 +78,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="text-controls-bind" ref="text-controls" name="text-controls">
-                    <xf:bind id="input-bind" ref="input" name="input"/>
+                    <xf:bind id="input-bind" ref="input" name="input" xxf:whitespace="trim"/>
                     <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"/>
                     <xf:bind ref="output" id="output-bind" name="output"/>
                     <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"/>
                     <xf:bind id="input-counter-bind" ref="input-counter" name="input-counter">
                         <xf:constraint id="validation-49-validation" value="xxf:max-length(30)"/>
                     </xf:bind>
-                    <xf:bind id="textarea-bind" ref="textarea" name="textarea"/>
+                    <xf:bind id="textarea-bind" ref="textarea" name="textarea" xxf:whitespace="trim"/>
                     <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
                         <xf:constraint id="constraint-49-constraint" value="xxf:max-length(140)"/>
                     </xf:bind>
@@ -115,7 +115,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                     <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
                              name="checkbox-input"/>
-                    <xf:bind id="open-select1-bind" ref="open-select1" name="open-select1" required="true()"/>
+                    <xf:bind id="open-select1-bind" ref="open-select1" name="open-select1" required="true()" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
@@ -135,7 +135,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                              name="handwritten-signature"/>
                 </xf:bind>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
-                    <xf:bind ref="email" id="email-bind" type="xf:email" name="email"/>
+                    <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"/>
                     <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
                     <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
                     <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>

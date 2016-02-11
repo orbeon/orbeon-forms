@@ -59,7 +59,6 @@
             <xf:select appearance="full" ref="xxf:binding('fr-checkbox-input-binding')">
                 <xf:item>
                     <xf:label mediatype="text/html" value="xxf:label('fr-checkbox-input-binding')"/>
-                    <xf:hint  mediatype="text/html" value="xxf:hint('fr-checkbox-input-binding')"/>
                     <xf:value xbl:attr="xbl:text=selected-value">true</xf:value>
                 </xf:item>
                 <xf:setvalue

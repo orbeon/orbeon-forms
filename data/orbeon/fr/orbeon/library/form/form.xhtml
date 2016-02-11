@@ -29,16 +29,16 @@
             <xf:bind id="fr-form-binds"
                      ref="instance('fr-form-instance')">
                 <xf:bind id="address-bind" ref="address" name="address">
-                    <xf:bind id="street-number-bind" name="street-number" required="true()"
+                    <xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim"
                              ref="street-number">
                         <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer"
-                                       level="warning"/>
+                                       level="warning" xxf:whitespace="trim"/>
                     </xf:bind>
-                    <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()"/>
-                    <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite"/>
-                    <xf:bind id="city-bind" name="city" ref="city" required="true()"/>
+                    <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/>
+                    <xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"/>
                     <xf:bind id="state-bind" name="state" ref="state" required="true()"/>
-                    <xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer"/>
+                    <xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"/>
                 </xf:bind>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata">

@@ -46,8 +46,8 @@
             <xf:bind id="fr-form-binds"
                      ref="instance('fr-form-instance')">
                 <xf:bind id="applicant-bind" name="applicant" ref="applicant">
-                    <xf:bind id="name-bind" name="name" ref="name" required="true()"/>
-                    <xf:bind name="business-name" id="business-name-bind" ref="business-name"/>
+                    <xf:bind id="name-bind" name="name" ref="name" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind name="business-name" id="business-name-bind" ref="business-name" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind name="classification" id="classification-bind" ref="classification">
                     <xf:bind name="federal-tax-classification" id="federal-tax-classification-bind"
@@ -56,25 +56,20 @@
                     <xf:bind name="llc-classification" id="llc-classification-bind" ref="llc-classification"
                              relevant="$federal-tax-classification = '6'"
                              required="true()"/>
-                    <xf:bind name="other-classification" id="other-classification-bind"
-                             ref="other-classification"
-                             relevant="$federal-tax-classification = '7'"
-                             required="$federal-tax-classification = '7'"/>
+                    <xf:bind name="other-classification" id="other-classification-bind" ref="other-classification" relevant="$federal-tax-classification = '7'" required="$federal-tax-classification = '7'" xxf:whitespace="trim"/>
                     <xf:bind name="exempt-payee" id="exempt-payee-bind" ref="exempt-payee" type="xf:boolean"/>
                 </xf:bind>
                 <xf:bind name="address-account" id="address-account-bind" ref="address-account">
-                    <xf:bind name="address-1" id="address-1-bind" ref="address-1" required="true()"/>
-                    <xf:bind name="address-2" id="address-2-bind" ref="address-2" required="true()"/>
-                    <xf:bind name="account-numbers" id="account-numbers-bind" ref="account-numbers"/>
+                    <xf:bind name="address-1" id="address-1-bind" ref="address-1" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind name="address-2" id="address-2-bind" ref="address-2" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind name="account-numbers" id="account-numbers-bind" ref="account-numbers" xxf:whitespace="trim"/>
                     <xf:bind name="requester-name-address" id="requester-name-address-bind"
                              ref="requester-name-address"/>
                 </xf:bind>
                 <xf:bind name="tin" id="tin-bind" ref="tin">
                     <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
-                    <xf:bind name="ssn" id="ssn-bind" ref="ssn" constraint="matches(., '^\d{3}-\d{2}-\d{4}$')"
-                             relevant="$ssn-or-ein = 'ssn'"/>
-                    <xf:bind name="ein" id="ein-bind" ref="ein" constraint="matches(., '^\d{2}-\d{7}$')"
-                             relevant="$ssn-or-ein = 'ein'"/>
+                    <xf:bind name="ssn" id="ssn-bind" ref="ssn" constraint="matches(., '^\d{3}-\d{2}-\d{4}$')" relevant="$ssn-or-ein = 'ssn'" xxf:whitespace="trim"/>
+                    <xf:bind name="ein" id="ein-bind" ref="ein" constraint="matches(., '^\d{2}-\d{7}$')" relevant="$ssn-or-ein = 'ein'" xxf:whitespace="trim"/>
                 </xf:bind>
                 <xf:bind name="hidden" id="hidden-bind" ref="hidden" relevant="$fr-mode = 'pdf'">
                     <xf:bind name="current-date" id="current-date-bind" ref="current-date"

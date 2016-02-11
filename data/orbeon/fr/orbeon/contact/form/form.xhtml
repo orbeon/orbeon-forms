@@ -31,16 +31,16 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="contact-bind" ref="contact" name="contact">
                     <xf:bind id="first-name-bind" ref="first-name" type="xs:string" required="true()"
-                                 name="first-name"/>
+                                 name="first-name" xxf:whitespace="trim"/>
                     <xf:bind id="last-name-bind" ref="last-name" type="xs:string" required="true()"
-                                 name="last-name"/>
+                                 name="last-name" xxf:whitespace="trim"/>
                     <xf:bind id="email-bind" ref="email" type="xf:email" required="true()"
-                                 name="email"/>
+                                 name="email" xxf:whitespace="trim"/>
                     <xf:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/>
                 </xf:bind>
                 <xf:bind id="message-bind" ref="message" name="message">
                     <xf:bind id="order-number-bind" ref="order-number" type="xs:string"
-                                 required="true()"
+                                 required="true()" xxf:whitespace="trim"
                                  name="order-number"/>
                     <xf:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/>
                     <xf:bind id="comments-bind" ref="comments" type="xs:string" required="true()"

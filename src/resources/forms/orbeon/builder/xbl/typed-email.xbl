@@ -32,7 +32,7 @@
                 <large-icon>/apps/fr/style/images/silk/email.png</large-icon>
             </icon>
             <templates>
-                <bind type="xf:email"/>
+                <bind type="xf:email" xxf:whitespace="trim"/>
                 <view>
                     <xf:input id="" ref="" xmlns="">
                         <xf:label ref=""/>

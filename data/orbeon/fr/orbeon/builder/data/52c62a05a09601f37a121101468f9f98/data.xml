@@ -151,12 +151,12 @@
 
             <xf:bind id="fr-form-binds" ref=".">
                 <xf:bind id="details-bind" ref="details">
-                    <xf:bind id="title-bind" name="title" ref="title" required="true()"/>
-                    <xf:bind id="author-bind" name="author" ref="author" required="true()"/>
+                    <xf:bind id="title-bind" name="title" ref="title" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind id="author-bind" name="author" ref="author" required="true()" xxf:whitespace="trim"/>
                     <xf:bind id="language-bind" name="language" ref="language"/>
-                    <xf:bind id="link-bind" name="link" ref="link"/>
+                    <xf:bind id="link-bind" name="link" ref="link" xxf:whitespace="trim"/>
                     <xf:bind id="rating-bind" name="rating" ref="rating"/>
-                    <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year"/>
+                    <xf:bind id="publication-year-bind" name="publication-year" ref="publication-year" xxf:whitespace="trim"/>
                     <xf:bind id="review-bind" name="review" ref="review"/>
                     <xf:bind id="image-bind" name="image" ref="image" type="xs:anyURI"/>
                 </xf:bind>

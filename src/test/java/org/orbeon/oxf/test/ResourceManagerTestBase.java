@@ -49,7 +49,7 @@ public abstract class ResourceManagerTestBase {
 
     @BeforeClass
     public static void staticSetup() throws Exception {
-        if (!staticSetupDone) {
+        if (! staticSetupDone) {
 
             // Avoid Log4j warning telling us no appender could be found
             LoggerFactory.initBasicLogger();

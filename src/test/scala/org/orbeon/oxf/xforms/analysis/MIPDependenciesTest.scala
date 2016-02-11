@@ -23,7 +23,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
   @Before def setupDocument(): Unit = setupDocument("oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml")
 
-  @Test def typeInvalid() {
+  @Test def typeInvalid(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     // Initial state
@@ -47,7 +47,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
     assert("2300" === getControlValue("subtotal"))
   }
 
-  @Test def relevance() {
+  @Test def relevance(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     val units = getControlValue("units⊙1")
@@ -69,7 +69,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
     assert("2150" === getControlValue("subtotal"))
   }
 
-  @Test def typeConstraintInvalid() {
+  @Test def typeConstraintInvalid(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     val units = getControlValue("units⊙1")
@@ -98,7 +98,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
     assert("2150" === getControlValue("subtotal"))
   }
 
-  @Test def simpleRequired() {
+  @Test def simpleRequired(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
@@ -115,7 +115,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
     assert(isValid("name⊙1"))
   }
 
-  @Test def testNormalizeSpaceContextConstraint() {
+  @Test def testNormalizeSpaceContextConstraint(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
@@ -131,7 +131,7 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
   // See: [ #315733 ] Incorrect MIPs when more than two binds point to the same node
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315733&group_id=168&atid=350207
-  @Test def multipleBindsOnSameNode() {
+  @Test def multipleBindsOnSameNode(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     this setupDocument

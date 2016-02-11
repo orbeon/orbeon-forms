@@ -1,0 +1,82 @@
+<!--
+  Copyright (C) 2016 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xf:model id="model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="main-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <with-trimming>    </with-trimming>
+                    <without-trimming>    </without-trimming>
+                    <calculated-value-with-trimming/>
+                    <calculated-value-without-trimming/>
+                </form>
+            </xf:instance>
+
+            <xf:bind ref="instance()">
+                <xf:bind
+                    id="with-trimming-bind"
+                    ref="with-trimming"
+                    name="with-trimming"
+                    xxf:whitespace="trim"/>
+                <xf:bind
+                    id="without-trimming-bind"
+                    ref="without-trimming"
+                    name="without-trimming"/>
+                <xf:bind
+                    id="calculated-value-with-trimming-bind"
+                    ref="calculated-value-with-trimming"
+                    name="calculated-value-with-trimming"
+                    calculate="concat('    ', $with-trimming, '    ')"
+                    xxf:whitespace="trim"/>
+                <xf:bind
+                    id="calculated-value-without-trimming-bind"
+                    ref="calculated-value-without-trimming"
+                    name="calculated-value-without-trimming"
+                    calculate="concat('    ', $without-trimming, '    ')"/>
+            </xf:bind>
+
+            <xf:instance id="template-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <with-trimming>  Mercury  </with-trimming>
+                    <without-trimming>  Venus  </without-trimming>
+                    <calculated-value-with-trimming/>
+                    <calculated-value-without-trimming/>
+                </form>
+            </xf:instance>
+
+            <xf:submission
+                id="replace-submission"
+                ref="instance('template-instance')"
+                method="post"
+                resource="echo:"
+                replace="instance"
+                instance="main-instance"
+            />
+
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input  id="with-trimming-control"                     bind="with-trimming-bind"/>
+        <xf:input  id="without-trimming-control"                  bind="without-trimming-bind"/>
+        <xf:output id="calculated-value-with-trimming-control"    bind="calculated-value-with-trimming-bind"/>
+        <xf:output id="calculated-value-without-trimming-control" bind="calculated-value-without-trimming-bind"/>
+    </xh:body>
+</xh:html>

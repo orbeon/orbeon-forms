@@ -13,27 +13,28 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis._
-import collection.JavaConverters._
-import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
-import org.orbeon.oxf.xml.XMLConstants._
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
+
+import org.dom4j.{Document, Element}
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.xml.XMLReceiver
-import org.xml.sax.Attributes
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
-import state.AnnotatedTemplate
-import xbl.Scope
-import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{XPath, Whitespace, StringReplacer, NumberUtils}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
+import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.{XMLReceiver, _}
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.xml.sax.Attributes
+
+import scala.collection.JavaConverters._
 
 class XFormsStaticStateImpl(
   val encodedState        : String,
@@ -254,13 +255,13 @@ object XFormsStaticStateImpl {
           new Extractor(
             new WhitespaceXMLReceiver(
               new TeeXMLReceiver(identity, digestContentHandler),
-              Whitespace.defaultBasePolicy,
-              Whitespace.basePolicyMatcher
+              WhitespaceMatching.defaultBasePolicy,
+              WhitespaceMatching.basePolicyMatcher
             )
           )
         ),
-        Whitespace.defaultHTMLPolicy,
-        Whitespace.htmlPolicyMatcher
+        WhitespaceMatching.defaultHTMLPolicy,
+        WhitespaceMatching.htmlPolicyMatcher
       )
     )
 

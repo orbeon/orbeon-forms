@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.dom4j._
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.util.{IndentedLogger, Logging, Whitespace}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, WhitespaceMatching}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
@@ -238,8 +238,8 @@ class XBLBindings(
             new ScopeExtractor(
               new WhitespaceXMLReceiver(
                 extractorOutput,
-                Whitespace.defaultBasePolicy,
-                Whitespace.basePolicyMatcher
+                WhitespaceMatching.defaultBasePolicy,
+                WhitespaceMatching.basePolicyMatcher
               ),
               innerScope,
               outerScope,
@@ -254,8 +254,8 @@ class XBLBindings(
             // controls and shadow trees
             protected override def rewriteId(id: String) = containerScope.fullPrefix + id
           },
-          Whitespace.defaultHTMLPolicy,
-          Whitespace.htmlPolicyMatcher
+          WhitespaceMatching.defaultHTMLPolicy,
+          WhitespaceMatching.htmlPolicyMatcher
         )
       )
 

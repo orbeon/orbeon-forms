@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.util.CharacterAccumulator
-import org.orbeon.oxf.util.Whitespace.{PolicyMatcher, Policy}
+import org.orbeon.oxf.util.Whitespace.Policy
+import org.orbeon.oxf.util.WhitespaceMatching.PolicyMatcher
 import org.xml.sax.Attributes
 
 // This receiver can perform transformations on incoming character data based on a few policies.
@@ -29,7 +30,7 @@ class WhitespaceXMLReceiver(xmlReceiver: XMLReceiver, startPolicy: Policy, polic
     extends ForwardingXMLReceiver(xmlReceiver) {
 
   private case class StackElement(policy: Policy, parent: Option[(String, String)])
-  
+
   private var stack = List(StackElement(startPolicy, None))
   private val acc   = new CharacterAccumulator
 

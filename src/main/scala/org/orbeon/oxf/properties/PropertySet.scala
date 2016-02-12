@@ -19,7 +19,7 @@ import java.util.{Date ⇒ JDate, List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet}
 
 import org.dom4j.{Element, QName}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.ScalaUtils.{BooleanWrapper, CodePointsOps, split}
+import org.orbeon.oxf.util.ScalaUtils.{BooleanWrapper, StringOps, split}
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 

@@ -325,9 +325,7 @@ object ScalaUtils extends PathOps {
   def trimAllToNull(s: String)  = s.trimAllToNull
   def trimAllToOpt(s: String)   = s.trimAllToOpt
 
-  implicit class CodePointsOps(val s: String) extends AnyVal {
-
-    def iterateCodePoints: Iterator[Int] = new CodePointsIterator(s)
+  implicit class StringOps(val s: String) extends AnyVal {
 
     private def isNonBreakingSpace(c: Int) =
       c == '\u00A0' || c == '\u2007' || c == '\u202F'
@@ -380,15 +378,33 @@ object ScalaUtils extends PathOps {
       }
   }
 
-  private class CodePointsIterator(val s: String) extends Iterator[Int] {
+  private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {
+
     private var nextIndex = 0
 
-    def hasNext = nextIndex < s.length
+    def hasNext = nextIndex < cs.length
 
     def next() = {
-      val result = s.codePointAt(nextIndex)
+      val result = cs.codePointAt(nextIndex)
       nextIndex += Character.charCount(result)
       result
+    }
+  }
+
+  implicit class CharSequenceOps(val cs: CharSequence) extends AnyVal {
+
+    def iterateCodePoints: Iterator[Int] = new CodePointsIterator(cs)
+
+    def codePointAt(index: Int): Int = {
+      val first = cs.charAt(index)
+      if (index + 1 < cs.length) {
+        if (Character.isHighSurrogate(first)) {
+          val second = cs.charAt(index + 1)
+          if (Character.isLowSurrogate(second))
+            return Character.toCodePoint(first, second)
+        }
+      }
+      first.toInt
     }
   }
 

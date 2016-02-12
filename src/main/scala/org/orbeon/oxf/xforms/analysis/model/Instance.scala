@@ -17,7 +17,7 @@ import org.dom4j.{Document, Element, QName}
 import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.http.Credentials
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.ScalaUtils.{CodePointsOps, stringOptionToSet}
+import org.orbeon.oxf.util.ScalaUtils.{StringOps, stringOptionToSet}
 import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl

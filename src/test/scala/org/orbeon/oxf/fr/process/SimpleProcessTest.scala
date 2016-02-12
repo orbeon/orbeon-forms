@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.junit.Test
 import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.orbeon.oxf.util.ScalaUtils.StringOps
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, ScalaUtils}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue

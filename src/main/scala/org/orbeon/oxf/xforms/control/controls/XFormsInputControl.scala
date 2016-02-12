@@ -17,7 +17,7 @@ import java.util.{Calendar, GregorianCalendar}
 
 import org.dom4j.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
-import org.orbeon.oxf.util.ScalaUtils.CodePointsOps
+import org.orbeon.oxf.util.ScalaUtils.StringOps
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis

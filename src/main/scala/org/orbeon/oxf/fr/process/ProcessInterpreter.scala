@@ -18,7 +18,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, GroupNode, _}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.XPath.FunctionContext
+import org.orbeon.oxf.{util ⇒ u}
 import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -44,7 +44,7 @@ trait ProcessInterpreter extends Logging {
   def processError(t: Throwable): Unit
   def xpathContext: Item
   implicit def xpathFunctionLibrary: FunctionLibrary
-  def xpathFunctionContext: FunctionContext
+  def xpathFunctionContext: u.XPath.FunctionContext
   def writeSuspendedProcess(process: String): Unit
   def readSuspendedProcess: String
   def createUniqueProcessId: String = SecureUtils.randomHexId
@@ -292,13 +292,13 @@ trait ProcessInterpreter extends Logging {
 
   def evaluateBoolean(expr: String, item: Item = xpathContext) =
     evaluateOne(
-      expr = "boolean(" + expr + ")",
+      expr = u.XPath.makeBooleanExpression(expr),
       item = item
     ).asInstanceOf[BooleanValue].getBooleanValue
 
   def evaluateString(expr: String, item: Item = xpathContext) =
     evaluateOne(
-      expr = "string(" + expr + ")",
+      expr = u.XPath.makeStringExpression(expr),
       item = item
     ).getStringValue
 

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.w3c.dom.Node._
 
-import scala.collection.mutable
+import scala.collection.{mutable ⇒ m}
 
 class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument)
     extends XPathDependencies
@@ -131,7 +131,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
   }
 
   // State of models
-  private val modelStates = new mutable.HashMap[String, ModelState]
+  private val modelStates = new m.HashMap[String, ModelState]
 
   private def getModelState(modelPrefixedId: String) =
     modelStates.getOrElseUpdate(modelPrefixedId, new ModelState(modelPrefixedId))
@@ -143,16 +143,16 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
   // Keep state related to the view
   private object RefreshState {
     // Structural changes
-    val structuralChangeModels = new mutable.HashSet[String]
+    val structuralChangeModels = new m.HashSet[String]
 
     // Modified paths by instance
     val changeset = new MapSet[String, String]
 
     // Caches to speedup checks on repeated items
-    val modifiedBindingCacheForRepeats = new mutable.HashMap[String, UpdateResult]
-    val modifiedValueCacheForRepeats   = new mutable.HashMap[String, UpdateResult]
-    val modifiedLHHACacheForRepeats    = new mutable.HashMap[String, Boolean]
-    val modifiedItemsetCacheForRepeats = new mutable.HashMap[String, Boolean]
+    val modifiedBindingCacheForRepeats = new m.HashMap[String, UpdateResult]
+    val modifiedValueCacheForRepeats   = new m.HashMap[String, UpdateResult]
+    val modifiedLHHACacheForRepeats    = new m.HashMap[String, Boolean]
+    val modifiedItemsetCacheForRepeats = new m.HashMap[String, Boolean]
 
     // Statistics
     var bindingUpdateCount: Int = 0

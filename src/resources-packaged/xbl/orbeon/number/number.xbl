@@ -248,7 +248,7 @@
                                             ''
                                     }}"
                                     maxlength="{{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}}"
-                                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength"/>
+                                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
                                 <xf:group class="add-on" ref=".[$suffix]"><xf:output value="$suffix"/></xf:group>
                             </xh:span>
                         </xf:group>

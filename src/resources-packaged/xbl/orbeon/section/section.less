@@ -135,19 +135,25 @@
 
 @media print {
     .orbeon {
+
         .xbl-fr-section {
             .fr-section-title {
                 background: none;
                 .fr-section-label {
-                    padding-left: 0;            // remove padding as we don't have section arrows
                     &.fr-section-open, &.fr-section-closed {
+                        padding-left: 0;        // remove padding as we don't have section arrows
                         background-image: none; // remove section arrows
-                    }
 
-                    a {
-                        color: black;
+                        a {
+                            color: black;       // might not be needed anymore
+                        }
                     }
                 }
+            }
+
+            .fr-section-content {
+                padding-left: 0;
+                padding-right: 0;
             }
         }
 

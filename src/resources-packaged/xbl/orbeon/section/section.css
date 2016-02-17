@@ -94,15 +94,18 @@
   .orbeon .xbl-fr-section .fr-section-title {
     background: none;
   }
-  .orbeon .xbl-fr-section .fr-section-title .fr-section-label {
-    padding-left: 0;
-  }
   .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
   .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+    padding-left: 0;
     background-image: none;
   }
-  .orbeon .xbl-fr-section .fr-section-title .fr-section-label a {
+  .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open a,
+  .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed a {
     color: black;
+  }
+  .orbeon .xbl-fr-section .fr-section-content {
+    padding-left: 0;
+    padding-right: 0;
   }
   .orbeon #xforms-form .fr-section-title .xforms-help {
     display: none;

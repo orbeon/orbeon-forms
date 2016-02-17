@@ -566,6 +566,11 @@ body.orbeon {
     min-height: 24px !important;
     line-height: 24px;
   }
+  .orbeon .fr-mode-view .span12,
+  .orbeon .fr-mode-pdf .span12,
+  .orbeon .fr-mode-email .span12 {
+    width: 98%;
+  }
   .orbeon .fr-mode-view .fr-grid-1 .xforms-field,
   .orbeon .fr-mode-pdf .fr-grid-1 .xforms-field,
   .orbeon .fr-mode-email .fr-grid-1 .xforms-field {

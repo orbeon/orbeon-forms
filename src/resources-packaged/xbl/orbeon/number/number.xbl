@@ -88,10 +88,9 @@
                             target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xf:action>
 
                         <!-- Access to parameters -->
-                        <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'decimal-separator')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/>
-
+                        <xsl:copy-of select="xxbl:server-parameter(., 'grouping-separator')"/>
+                        <xsl:copy-of select="xxbl:server-parameter(., 'prefix')"/>
                         <xsl:copy-of select="xxbl:server-parameter(., 'suffix')"/>
                         <xsl:copy-of select="xxbl:server-parameter(., 'digits-after-decimal')"/>
                         <xsl:copy-of select="xxbl:server-parameter(., 'round-when-formatting')"/>
@@ -150,6 +149,43 @@
                             If the value has more significant digits after the decimal point than allowed, don't format
                             the value: https://github.com/orbeon/orbeon-forms/issues/599
                         -->
+
+                        <!-- NOTE: There is a lot of code duplication between `$cleaned` below and `unformat`. Would be nice to do this either
+                             in Scala or via xf:function. -->
+                        <xf:var
+                            name="cleaned"
+                            value="
+                                for $raw in string($binding)
+                                return
+                                    translate(
+                                        string(
+                                            for $clean in
+                                                for $v in
+                                                    translate(
+                                                        translate(
+                                                            xxf:trim($raw),
+                                                            $grouping-separator,
+                                                            ''
+                                                        ),
+                                                        $decimal-separator,
+                                                        '.'
+                                                    )
+                                                return
+                                                    (: There shouldn't be a prefix because that's stored out of band, but we remove it for historical reasons :)
+                                                    if (starts-with($v, $prefix)) then
+                                                        xxf:trim(substring-after($v, $prefix))
+                                                    else
+                                                        $v
+                                            return
+                                                if ($clean castable as xs:decimal) then
+                                                    xs:decimal($clean)
+                                                else
+                                                    $raw
+                                        ),
+                                        '.',
+                                        $decimal-separator
+                                    )"/>
+
                         <xf:var
                             name="formatted"
                             id="formatted-value"
@@ -167,7 +203,7 @@
                                         )
                                     )
                                 else
-                                     string($binding)">
+                                     $cleaned">
                             <!-- Rewrite event as xxforms-iteration-moved doesn't bubble -->
                             <xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>
                         </xf:var>
@@ -185,9 +221,13 @@
 
                         <!-- Readwrite mode -->
                         <xf:group ref="$binding[not($view)]">
-                            <!-- Hidden XForms output with non-formatted value, see https://github.com/orbeon/orbeon-forms/issues/2495 -->
+                            <!--
+                                Hidden XForms output with partially-formatted value. We clean as much as we can to help the user.
+
+                                See: https://github.com/orbeon/orbeon-forms/issues/2495
+                            -->
                             <xf:output
-                                value="string(.)"
+                                value="$cleaned"
                                 class="xbl-fr-number-xforms-output xforms-hidden"/>
                             <!-- Hidden XForms input -->
                             <xf:input
@@ -195,25 +235,29 @@
                                 class="xbl-fr-number-xforms-input xforms-hidden"
                                 xxf:format="$formatted"
                                 xxf:unformat="
-                                    for $clean in
-                                        translate(
-                                            translate(
-                                                .,
-                                                $grouping-separator,
-                                                ''
-                                            ),
-                                            $decimal-separator,
-                                            '.'
-                                        )
+                                    for $raw in .
                                     return
-                                        if (
-                                            string($round-when-storing) = 'true' and
-                                            $clean castable as xs:decimal        and
-                                            exists(($validation-fraction-digits-opt, $property-fraction-digits-opt))
-                                        ) then
-                                            round-half-to-even(xs:decimal($clean), ($validation-fraction-digits-opt, $property-fraction-digits-opt)[1])
-                                        else
-                                            $clean">
+                                        for $clean in
+                                            translate(
+                                                translate(
+                                                    $raw,
+                                                    $grouping-separator,
+                                                    ''
+                                                ),
+                                                $decimal-separator,
+                                                '.'
+                                            )
+                                        return
+                                            if (
+                                                string($round-when-storing) = 'true' and
+                                                $clean castable as xs:decimal        and
+                                                exists(($validation-fraction-digits-opt, $property-fraction-digits-opt))
+                                            ) then
+                                                round-half-to-even(xs:decimal($clean), ($validation-fraction-digits-opt, $property-fraction-digits-opt)[1])
+                                            else if ($clean castable as xs:decimal) then
+                                                xs:decimal($clean)
+                                            else
+                                                $raw">
                                 <xf:action type="javascript" id="xf-ro" event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xf:action>
                                 <xf:action type="javascript" id="xf-rw" event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xf:action>
                             </xf:input>

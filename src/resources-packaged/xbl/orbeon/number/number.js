@@ -26,14 +26,8 @@
         xformsOutputElement: null,
         visibleInputElement: null,
 
-        prefixElement: null,
-        prefix: null,
-
         decimalSeparatorElement: null,
         decimalSeparator: null,
-
-        groupingSeparatorElement: null,
-        groupingSeparator: null,
 
         init: function() {
 
@@ -41,7 +35,6 @@
             this.xformsOutputElement = $(this.container).find('.xbl-fr-number-xforms-output')[0];
             this.visibleInputElement = $(this.container).find('.xbl-fr-number-visible-input')[0];
 
-            // Properties
             // Find prefix based on class/control name, as this JS can be used with fr:number and fr:currency and properties use the control name
             var controlClassPrefix = null;
             var containerClasses = this.container.className.split(' ');
@@ -53,19 +46,15 @@
                 }
             }
 
-            this.prefixElement            = $(this.container).find('.' + controlClassPrefix + '-prefix')[0];
-            this.prefix                   = Document.getValue(this.prefixElement);
             this.decimalSeparatorElement  = $(this.container).find('.' + controlClassPrefix + '-decimal-separator')[0];
             this.decimalSeparator         = Document.getValue(this.decimalSeparatorElement);
-            this.groupingSeparatorElement = $(this.container).find('.' + controlClassPrefix + '-grouping-separator')[0];
-            this.groupingSeparator        = Document.getValue(this.groupingSeparatorElement);
 
             // Register listeners
 
             // Switch the input type after cleaning up the value for edition
             $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
 
-                this.visibleInputElement.value = this.numberToEditString(Document.getValue(this.xformsOutputElement));
+                this.visibleInputElement.value = this.getEditString();
 
                 // See https://github.com/orbeon/orbeon-forms/issues/2545
                 function hasNativeDecimalSeparator(separator) {
@@ -115,31 +104,18 @@
             Document.setValue(this.xformsInputElement, newValue);
         },
 
-        numberToEditString: function(number) {
-            var cleaned = number;
-
-            // Remove spaces and grouping separators
-            cleaned = cleaned.replace(new RegExp('[\\s' + this.groupingSeparator + ']', 'g'), '');
-
-            // Remove prefix if present
-            if (cleaned.indexOf(this.prefix) == 0)
-                cleaned = cleaned.substring(this.prefix.length);
-
-            var cleanedAsNumberString = cleaned.replace(new RegExp('[' + this.decimalSeparator + ']', 'g'), '.');
-
-            return isNaN(Number(cleanedAsNumberString)) ? number : cleaned;
+        getEditString: function() {
+            return Document.getValue(this.xformsOutputElement);
         },
 
         updateWithServerValue: function() {
 
-            var numberFormattedValue = Document.getValue(this.xformsInputElement);
-            var numberEditValue      = this.numberToEditString(numberFormattedValue);
-            var hasFocus             = this.visibleInputElement == document.activeElement;
+            var hasFocus = this.visibleInputElement == document.activeElement;
 
             this.visibleInputElement.value =
                 hasFocus ?
-                numberEditValue :
-                numberFormattedValue;
+                this.getEditString() :
+                Document.getValue(this.xformsInputElement);
 
             // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
             this.visibleInputElement.disabled = $(this.xformsInputElement).hasClass('xforms-readonly');
@@ -153,18 +129,8 @@
             this.visibleInputElement.disabled = false;
         },
 
-        parameterPrefixChanged: function() {
-            this.prefix = Document.getValue(this.prefixElement);
-            this.updateWithServerValue();
-        },
-
         parameterDecimalSeparatorChanged: function() {
             this.decimalSeparator = Document.getValue(this.decimalSeparatorElement);
-            this.updateWithServerValue();
-        },
-
-        parameterGroupingSeparatorChanged: function() {
-            this.groupingSeparator = Document.getValue(this.groupingSeparatorElement);
             this.updateWithServerValue();
         }
     };

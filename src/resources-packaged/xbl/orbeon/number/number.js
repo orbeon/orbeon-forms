@@ -62,7 +62,7 @@
                         1.1.toLocaleString().substring(1, 2) == separator;
                 }
 
-                if (hasNativeDecimalSeparator(this.decimalSeparator)) {
+                if ($('body').is('.xforms-mobile') && hasNativeDecimalSeparator(this.decimalSeparator)) {
                     // With Firefox, changing the type synchronously interferes with the focus
                     window.setTimeout(_.bind(function() {
                         $(this.visibleInputElement).attr('type', 'number');

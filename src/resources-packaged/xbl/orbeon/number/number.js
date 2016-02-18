@@ -67,10 +67,18 @@
 
                 this.visibleInputElement.value = this.numberToEditString(Document.getValue(this.xformsOutputElement));
 
-                // With Firefox, changing the type synchronously interferes with the focus
-                window.setTimeout(_.bind(function() {
-                    $(this.visibleInputElement).attr('type', 'number');
-                }, this), 0);
+                // See https://github.com/orbeon/orbeon-forms/issues/2545
+                function hasNativeDecimalSeparator(separator) {
+                    return ! _.isUndefined(Number.toLocaleString) &&
+                        1.1.toLocaleString().substring(1, 2) == separator;
+                }
+
+                if (hasNativeDecimalSeparator(this.decimalSeparator)) {
+                    // With Firefox, changing the type synchronously interferes with the focus
+                    window.setTimeout(_.bind(function() {
+                        $(this.visibleInputElement).attr('type', 'number');
+                    }, this), 0);
+                }
             }, this));
 
             // Restore input type, send the value to the server, and updates value after server response

@@ -164,7 +164,7 @@
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                        value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"          value="0"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"          value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-formatting"         value="false"/>

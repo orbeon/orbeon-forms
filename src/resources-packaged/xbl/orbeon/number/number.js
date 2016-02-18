@@ -17,12 +17,13 @@
     var AS = ORBEON.xforms.server.AjaxServer;
     var Document = ORBEON.xforms.Document;
 
-    YAHOO.namespace("xbl.fr");
+    YAHOO.namespace('xbl.fr');
     YAHOO.xbl.fr.Number = function() {};
-    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Number, "xbl-fr-number");
+    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Number, 'xbl-fr-number');
     YAHOO.xbl.fr.Number.prototype = {
 
         xformsInputElement: null,
+        xformsOutputElement: null,
         visibleInputElement: null,
 
         prefixElement: null,
@@ -35,36 +36,36 @@
         groupingSeparator: null,
 
         init: function() {
-            // Get information from the DOM
 
-            this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-xforms-input", null, this.container)[0];
-            this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, this.container)[0];
+            this.xformsInputElement  = $(this.container).find('.xbl-fr-number-xforms-input')[0];
+            this.xformsOutputElement = $(this.container).find('.xbl-fr-number-xforms-output')[0];
+            this.visibleInputElement = $(this.container).find('.xbl-fr-number-visible-input')[0];
 
             // Properties
             // Find prefix based on class/control name, as this JS can be used with fr:number and fr:currency and properties use the control name
             var controlClassPrefix = null;
-            var containerClasses = this.container.className.split(" ");
+            var containerClasses = this.container.className.split(' ');
             for (var classIndex = 0; classIndex < containerClasses.length; classIndex++) {
                 var currentClass = containerClasses[classIndex];
-                if (currentClass.indexOf("xbl-fr-") == 0) {
+                if (currentClass.indexOf('xbl-fr-') == 0) {
                     controlClassPrefix = currentClass;
                     break;
                 }
             }
 
-            this.prefixElement            = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-prefix", null, this.container)[0];
-            this.prefix                   = Document.getValue(this.prefixElement.id);
-            this.decimalSeparatorElement  = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-decimal-separator", null, this.container)[0];
-            this.decimalSeparator         = Document.getValue(this.decimalSeparatorElement.id);
-            this.groupingSeparatorElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-grouping-separator", null, this.container)[0];
-            this.groupingSeparator        = Document.getValue(this.groupingSeparatorElement.id);
+            this.prefixElement            = $(this.container).find('.' + controlClassPrefix + '-prefix')[0];
+            this.prefix                   = Document.getValue(this.prefixElement);
+            this.decimalSeparatorElement  = $(this.container).find('.' + controlClassPrefix + '-decimal-separator')[0];
+            this.decimalSeparator         = Document.getValue(this.decimalSeparatorElement);
+            this.groupingSeparatorElement = $(this.container).find('.' + controlClassPrefix + '-grouping-separator')[0];
+            this.groupingSeparator        = Document.getValue(this.groupingSeparatorElement);
 
             // Register listeners
 
             // Switch the input type after cleaning up the value for edition
             $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
 
-                this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
+                this.visibleInputElement.value = this.numberToEditString(Document.getValue(this.xformsOutputElement));
 
                 // With Firefox, changing the type synchronously interferes with the focus
                 window.setTimeout(_.bind(function() {
@@ -103,27 +104,27 @@
 
         sendValueToServer: function() {
             var newValue = this.visibleInputElement.value;
-            Document.setValue(this.xformsInputElement.id, newValue);
+            Document.setValue(this.xformsInputElement, newValue);
         },
 
         numberToEditString: function(number) {
             var cleaned = number;
 
             // Remove spaces and grouping separators
-            cleaned = cleaned.replace(new RegExp("[\\s" + this.groupingSeparator + "]", "g"), "");
+            cleaned = cleaned.replace(new RegExp('[\\s' + this.groupingSeparator + ']', 'g'), '');
 
             // Remove prefix if present
             if (cleaned.indexOf(this.prefix) == 0)
                 cleaned = cleaned.substring(this.prefix.length);
 
-            var cleanedAsNumberString = cleaned.replace(new RegExp("[" + this.decimalSeparator + "]", "g"), ".");
+            var cleanedAsNumberString = cleaned.replace(new RegExp('[' + this.decimalSeparator + ']', 'g'), '.');
 
             return isNaN(Number(cleanedAsNumberString)) ? number : cleaned;
         },
 
         updateWithServerValue: function() {
 
-            var numberFormattedValue = Document.getValue(this.xformsInputElement.id);
+            var numberFormattedValue = Document.getValue(this.xformsInputElement);
             var numberEditValue      = this.numberToEditString(numberFormattedValue);
             var hasFocus             = this.visibleInputElement == document.activeElement;
 
@@ -133,7 +134,7 @@
                 numberFormattedValue;
 
             // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
-            this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
+            this.visibleInputElement.disabled = $(this.xformsInputElement).hasClass('xforms-readonly');
         },
 
         readonly: function() {
@@ -145,20 +146,18 @@
         },
 
         parameterPrefixChanged: function() {
-            this.prefix = Document.getValue(this.prefixElement.id);
+            this.prefix = Document.getValue(this.prefixElement);
             this.updateWithServerValue();
         },
 
         parameterDecimalSeparatorChanged: function() {
-            this.decimalSeparator = Document.getValue(this.decimalSeparatorElement.id);
+            this.decimalSeparator = Document.getValue(this.decimalSeparatorElement);
             this.updateWithServerValue();
         },
 
         parameterGroupingSeparatorChanged: function() {
-            this.groupingSeparator = Document.getValue(this.groupingSeparatorElement.id);
+            this.groupingSeparator = Document.getValue(this.groupingSeparatorElement);
             this.updateWithServerValue();
-        },
-
-        parameterDigitsAfterDecimalChanged: function() {}
+        }
     };
 })();

@@ -11,23 +11,33 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+<xsl:stylesheet
+    version="2.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xsl:function name="xxbl:parameter">
-        <xsl:param name="context" as="element()"/>
+        <xsl:param name="context"  as="element()"/>
         <xsl:param name="property" as="xs:string"/>
+        <xsl:copy-of select="xxbl:parameter-impl($context, $property, false())"/>
+    </xsl:function>
 
-        <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
-        <xsl:variable name="namespace" select="namespace-uri($context)"/>
-        <xsl:variable name="component" select="local-name($context)"/>
+    <xsl:function name="xxbl:server-parameter">
+        <xsl:param name="context"  as="element()"/>
+        <xsl:param name="property" as="xs:string"/>
+        <xsl:copy-of select="xxbl:parameter-impl($context, $property, true())"/>
+    </xsl:function>
 
-        <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
+    <xsl:function name="xxbl:parameter-impl">
+        <xsl:param name="context"     as="element()"/>
+        <xsl:param name="property"    as="xs:string"/>
+        <xsl:param name="server-only" as="xs:boolean"/>
+
+        <xsl:variable name="prefix"    select="prefix-from-QName(node-name($context))"/>
         <xsl:variable name="namespace" select="namespace-uri($context)"/>
         <xsl:variable name="component" select="local-name($context)"/>
 
@@ -38,24 +48,28 @@
                 <xf:var name="{$property}">
                     <xxf:value xxbl:attr="{$prefix}:{$property}/(@model | @context | @ref | @bind)" value="." xxbl:scope="outer"/>
                 </xf:var>
-                <xf:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
-                    <xf:action type="javascript" ev:event="xforms-value-changed">
-                        <xsl:text>ORBEON.xforms.XBL.callValueChanged("</xsl:text>
-                        <xsl:value-of select="$prefix"/>
-                        <xsl:text>", "</xsl:text>
-                        <xsl:value-of select="xxbl:to-camel-case($component)"/>
-                        <xsl:text>", this, "</xsl:text>
-                        <xsl:value-of select="xxbl:to-camel-case($property)"/>
-                        <xsl:text>");</xsl:text>
-                    </xf:action>
-                </xf:input>
+                <xsl:if test="not($server-only)">
+                    <xf:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
+                        <xf:action type="javascript" event="xforms-value-changed">
+                            <xsl:text>ORBEON.xforms.XBL.callValueChanged("</xsl:text>
+                            <xsl:value-of select="$prefix"/>
+                            <xsl:text>", "</xsl:text>
+                            <xsl:value-of select="xxbl:to-camel-case($component)"/>
+                            <xsl:text>", this, "</xsl:text>
+                            <xsl:value-of select="xxbl:to-camel-case($property)"/>
+                            <xsl:text>");</xsl:text>
+                        </xf:action>
+                    </xf:input>
+                </xsl:if>
             </xsl:when>
             <xsl:otherwise>
                 <!-- Parameter is constant -->
                 <!-- NOTE: We have a "default" value in the variable so we can detect the difference between the attribute value being the empty string vs. the attribute not being there -->
                 <xf:var name="{$property}-orbeon-xbl" xbl:attr="xbl:text={$property}">&#xb7;</xf:var>
                 <xf:var name="{$property}" value="if (${$property}-orbeon-xbl != '&#xb7;') then ${$property}-orbeon-xbl else xxf:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
-                <xf:output class="xbl-{$prefix}-{$component}-{$property}" style="display: none" value="${$property}"/>
+                <xsl:if test="not($server-only)">
+                    <xf:output class="xbl-{$prefix}-{$component}-{$property}" style="display: none" value="${$property}"/>
+                </xsl:if>
             </xsl:otherwise>
         </xsl:choose>
 

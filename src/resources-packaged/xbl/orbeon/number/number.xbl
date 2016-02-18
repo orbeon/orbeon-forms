@@ -14,11 +14,8 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -35,7 +32,6 @@
             xxbl:mode="lhha binding value focus"
             xxbl:label-for="html-input">
 
-        <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Number</display-name>
             <display-name lang="es">Número</display-name>
@@ -86,45 +82,68 @@
 
                     <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
                     <xf:group>
-                        <xf:action type="javascript" ev:event="xforms-disabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xf:action>
+                        <xf:action
+                            type="javascript"
+                            event="xforms-disabled"
+                            target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xf:action>
 
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'suffix')"/>
-
                         <xsl:copy-of select="xxbl:parameter(., 'decimal-separator')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/>
 
-                        <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
+                        <xsl:copy-of select="xxbl:server-parameter(., 'suffix')"/>
+                        <xsl:copy-of select="xxbl:server-parameter(., 'digits-after-decimal')"/>
+                        <xsl:copy-of select="xxbl:server-parameter(., 'round-when-formatting')"/>
+                        <xsl:copy-of select="xxbl:server-parameter(., 'round-when-storing')"/>
 
-                        <xsl:copy-of select="xxbl:parameter(., 'round-when-formatting')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'round-when-storing')"/>
+                        <xf:var name="binding"
+                            value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
+
+                        <xf:var name="view"
+                            value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+
+                        <xf:var
+                            name="property-fraction-digits-opt"
+                            value="
+                                xs:integer(string($digits-after-decimal)[. castable as xs:integer])"/>
+
+                        <xf:var
+                            name="validation-fraction-digits-opt"
+                            value="
+                                if (local-name-from-QName(xxf:type($binding)) = 'integer') then
+                                    0
+                                else
+                                    xs:integer(xxf:custom-mip($binding, 'fraction-digits')[. castable as xs:integer])"/>
+
+                        <xf:var
+                            name="fractional-digits-min"
+                            value="
+                                if (string($round-when-formatting) = 'true' or not(string($binding) castable as xs:decimal)) then
+                                    0
+                                else
+                                    string-length(
+                                        substring-after(
+                                            string(xs:decimal(string($binding))), (: typed value can also be xs:integer so go through string() first :)
+                                            '.'
+                                        )
+                                    )"/>
 
                         <xf:var
                             name="picture-string"
                             value="
                                 concat(
-                                    '#,##0',
-                                    if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
-                                    string-join(for $i in 1 to xs:integer($digits-after-decimal) return '0', '')
+                                    '#,##0.',
+                                    if (exists($property-fraction-digits-opt)) then
+                                        string-join(for $i in 1 to max(($property-fraction-digits-opt, $fractional-digits-min)) return '0', '')
+                                    else
+                                        string-join(for $i in 1 to max(($validation-fraction-digits-opt, $fractional-digits-min)) return '#', '')
                                 )"/>
 
-                        <!-- Access to XForms value and change event -->
-                        <!-- TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this
-                             leads to a bug when the prefix changes and the amount stays the same -->
                         <!--
-                            format:
-                                if the value is a decimal: prefix and space (if any prefix), then formatted decimal with grouping and decimal separator
-                                otherwise: keep the value as is
-                            unformat:
-                                first remove the grouping separator, then remove the prefix if any
-                        -->
+                            TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this
+                            leads to a bug when the prefix changes and the amount stays the same.
 
-                        <xf:var name="binding"
-                            value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
-                        <xf:var name="view"
-                            value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
-                        <!--
                             Be sure to replace $decimal-separator before $grouping-separator because $grouping-separator
                             can be blank: https://github.com/orbeon/orbeon-forms/issues/587
 
@@ -136,73 +155,67 @@
                             id="formatted-value"
                             value="
                                 if (string($binding) castable as xs:decimal) then
-                                    if (
-                                        not(string($round-when-formatting) = 'true') and (
-                                            string-length(
-                                                substring-after(
-                                                    string(xs:decimal($binding)),
-                                                    '.'
-                                                )
-                                            ) gt xs:integer($digits-after-decimal)
+                                    translate(
+                                        format-number(
+                                            xs:decimal(string($binding)), (: typed value can also be xs:integer so go through string() first :)
+                                            $picture-string
+                                        ),
+                                        '.,',
+                                        concat(
+                                            $decimal-separator,
+                                            $grouping-separator
                                         )
-                                    ) then
-                                        translate(
-                                            string($binding),
-                                            '.',
-                                            $decimal-separator
-                                        )
-                                    else
-                                        translate(
-                                            format-number(
-                                                xs:decimal($binding),
-                                                $picture-string
-                                            ),
-                                            '.,',
-                                            concat(
-                                                $decimal-separator,
-                                                $grouping-separator
-                                            )
-                                        )
+                                    )
                                 else
                                      string($binding)">
                             <!-- Rewrite event as xxforms-iteration-moved doesn't bubble -->
                             <xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>
                         </xf:var>
                         <!-- Update field when formatted value changes or iteration moves. Do this here so client has valid observer id. -->
-                        <xf:action type="javascript"
-                            ev:target="formatted-value"
-                            ev:event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
+                        <xf:action
+                            type="javascript"
+                            target="formatted-value"
+                            event="xforms-enabled xforms-value-changed fr-iteration-moved"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
 
-                        <xf:action type="javascript"
-                            ev:target="#observer"
-                            ev:observer="fr-number"
-                            ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
+                        <xf:action
+                            type="javascript"
+                            target="#observer"
+                            observer="fr-number"
+                            event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xf:action>
 
                         <!-- Readwrite mode -->
                         <xf:group ref="$binding[not($view)]">
-                            <!--  Hidden XForms input -->
+                            <!-- Hidden XForms output with non-formatted value, see https://github.com/orbeon/orbeon-forms/issues/2495 -->
+                            <xf:output
+                                value="string(.)"
+                                class="xbl-fr-number-xforms-output xforms-hidden"/>
+                            <!-- Hidden XForms input -->
                             <xf:input
-                                    ref="."
-                                    class="xbl-fr-number-xforms-input xforms-hidden"
-                                    xxf:format="$formatted"
-                                    xxf:unformat="
-                                        for $clean in
+                                ref="."
+                                class="xbl-fr-number-xforms-input xforms-hidden"
+                                xxf:format="$formatted"
+                                xxf:unformat="
+                                    for $clean in
+                                        translate(
                                             translate(
-                                                translate(
-                                                    .,
-                                                    $grouping-separator,
-                                                    ''
-                                                ),
-                                                $decimal-separator,
-                                                '.'
-                                            )
-                                        return
-                                            if (string($round-when-storing) = 'true' and $clean castable as xs:decimal) then
-                                                round-half-to-even(xs:decimal($clean), xs:integer($digits-after-decimal))
-                                            else
-                                                $clean">
-                                <xf:action type="javascript" id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xf:action>
-                                <xf:action type="javascript" id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xf:action>
+                                                .,
+                                                $grouping-separator,
+                                                ''
+                                            ),
+                                            $decimal-separator,
+                                            '.'
+                                        )
+                                    return
+                                        if (
+                                            string($round-when-storing) = 'true' and
+                                            $clean castable as xs:decimal        and
+                                            exists(($validation-fraction-digits-opt, $property-fraction-digits-opt))
+                                        ) then
+                                            round-half-to-even(xs:decimal($clean), ($validation-fraction-digits-opt, $property-fraction-digits-opt)[1])
+                                        else
+                                            $clean">
+                                <xf:action type="javascript" id="xf-ro" event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xf:action>
+                                <xf:action type="javascript" id="xf-rw" event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xf:action>
                             </xf:input>
 
                             <!--
@@ -230,13 +243,7 @@
                                     type="text"
                                     step="any"
                                     pattern="{{
-                                        if (
-                                            (
-                                                local-name-from-QName(xxf:type($binding)) = 'integer' or
-                                                xs:integer(xxf:custom-mip($binding, 'fraction-digits')[. castable as xs:integer]) = 0
-                                            ) and
-                                                xxf:custom-mip($binding, 'non-negative') = 'true'
-                                        ) then
+                                        if ($validation-fraction-digits-opt = 0 and xxf:custom-mip($binding, 'non-negative') = 'true') then
                                             '[0-9]*'
                                         else
                                             '.*'

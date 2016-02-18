@@ -564,18 +564,11 @@
                     <xxf:control-values>
                         <xxf:control id="my-currency≡xf-9" class="xbl-fr-currency-prefix">$</xxf:control>
                         <xxf:attribute for="my-currency≡xf-9" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-12" class="xbl-fr-currency-suffix"/>
+                        <xxf:control id="my-currency≡xf-12" class="xbl-fr-currency-decimal-separator">.</xxf:control>
                         <xxf:attribute for="my-currency≡xf-12" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-15" class="xbl-fr-currency-decimal-separator">.</xxf:control>
+                        <xxf:control id="my-currency≡xf-15" class="xbl-fr-currency-grouping-separator">,</xxf:control>
                         <xxf:attribute for="my-currency≡xf-15" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-18" class="xbl-fr-currency-grouping-separator">,</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-18" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-21" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-21" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-24" class="xbl-fr-currency-round-when-formatting">false</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-24" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-27" class="xbl-fr-currency-round-when-storing">false</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-27" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency≡xf-34" class="xbl-fr-number-xforms-output xforms-hidden">12.34</xxf:control>
                         <xxf:control id="my-currency≡xf-35" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
                         <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-36"/>
                         <xxf:control id="my-currency≡xf-38" class="add-on"/>

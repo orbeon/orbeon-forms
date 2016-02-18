@@ -38,8 +38,8 @@ trait FormRunnerPDF {
     val formatPairs =
       for {
         formatPropertyName ← propertiesStartingWith("oxf.fr.pdf.format")
-        expression ← Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
-        formatName = formatPropertyName split '.' last
+        expression         ← XXFormsProperty.propertyAsString(formatPropertyName)
+        formatName         = formatPropertyName split '.' last
       } yield
         formatName → expression
 
@@ -54,7 +54,7 @@ trait FormRunnerPDF {
 
     val expressionOpt =
       for {
-        format     ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
+        format     ← XXFormsProperty.propertyAsString(propertyName)
         expression ← Option(pdfFormats.get(format))
       } yield
         expression

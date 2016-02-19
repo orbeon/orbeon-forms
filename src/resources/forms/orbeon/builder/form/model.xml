@@ -159,7 +159,7 @@
 
         <!-- Set language in all blank @xml:lang on template -->
         <xf:setvalue
-            iterate="$template//@xml:lang[normalize-space() = '']"
+            iterate="$template//@xml:lang[xxf:is-blank()]"
             ref="."
             value="xxf:instance('fr-language-instance')"/>
 
@@ -203,7 +203,7 @@
                 <!-- New form -->
                 <xf:action if="not($permissions/app/@name = '*')">
 
-                    <xf:var name="initial-app-value" value="$permissions/app[1]/@name[normalize-space() != '']"/>
+                    <xf:var name="initial-app-value" value="$permissions/app[1]/@name[xxf:non-blank()]"/>
 
                     <xf:action if="empty($initial-app-value)" type="xpath">
                         frf:sendError(403)
@@ -261,7 +261,7 @@
             <xf:var name="before" value="."/>
             <xf:var name="after" value="event('after-urls')[$p]"/>
 
-            <xf:setvalue ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[normalize-space() = $before]" value="$after"/>
+            <xf:setvalue ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[xxf:trim() = $before]" value="$after"/>
         </xf:action>
 
         <!-- Free fr-form-instance and re-mark data as safe -->
@@ -285,19 +285,19 @@
             <!-- Check URL parameters -->
             <xf:var
                 name="requested-app"
-                value="for $p in xxf:get-request-parameter('fr-app') return normalize-space($p)"/>
+                value="for $p in xxf:get-request-parameter('fr-app') return xxf:trim($p)"/>
 
             <xf:var
                 name="requested-form"
-                value="for $p in xxf:get-request-parameter('fr-form') return normalize-space($p)"/>
+                value="for $p in xxf:get-request-parameter('fr-form') return xxf:trim($p)"/>
 
             <xf:var
                 name="requested-title"
-                value="for $p in xxf:get-request-parameter('fr-title') return normalize-space($p)"/>
+                value="for $p in xxf:get-request-parameter('fr-title') return xxf:trim($p)"/>
 
             <xf:var
                 name="requested-description"
-                value="for $p in xxf:get-request-parameter('fr-description') return normalize-space($p)"/>
+                value="for $p in xxf:get-request-parameter('fr-description') return xxf:trim($p)"/>
 
             <!-- NOTE: Validation must match validation in dialog-form-settings.xbl. -->
             <xf:var
@@ -501,7 +501,7 @@
 
     <xf:bind ref="$variables">
         <!-- TODO: move to dialog-language.xml -->
-        <xf:bind ref="new-language-trigger" readonly="normalize-space(../new-language) = ''"/>
+        <xf:bind ref="new-language-trigger" readonly="xxf:is-blank(../new-language)"/>
         <!-- Make buttons readonly depending on whether items can be inserted -->
         <xf:bind ref="section-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
         <xf:bind ref="grid-trigger"     readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
@@ -538,6 +538,7 @@
         ORBEON.jQuery('#fb-test-iframe')[0].contentWindow.location.href = "about:blank";
         ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-dialog");
     </xf:action>
+    // xxx blur
 
     <!-- Dispatched from the client, see above action -->
     <xf:action ev:event="fb-show-test-dialog">

@@ -174,7 +174,6 @@
 
                 <xf:var name="i" value="instance()"/>
 
-                <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
                          type="xs:NCName"
                          xxf:whitespace="trim"

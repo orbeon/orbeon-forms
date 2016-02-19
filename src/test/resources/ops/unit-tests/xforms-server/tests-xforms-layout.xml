@@ -2362,7 +2362,7 @@
         </input>
         <input name="controls">
             <controls>
-                <xxf:attribute for="my-anchor" name="href" value="#{.}" for-name="a" ref=".[normalize-space()]"/>
+                <xxf:attribute for="my-anchor" name="href" value="#{.}" for-name="a" ref=".[xxf:non-blank()]"/>
                 <xf:trigger id="my-trigger">
                     <xf:setvalue ev:event="DOMActivate" ref="." id="setvalue1">section1</xf:setvalue>
                 </xf:trigger>

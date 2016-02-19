@@ -54,7 +54,7 @@
             <xf:bind ref="line/text" readonly="@readonly = 'true'" relevant="@relevant = 'true'"/>
 
             <xf:action ev:event="xforms-model-construct-done" iterate="text">
-                <xf:setvalue ref="." value="normalize-space(.)"/>
+                <xf:setvalue ref="." value="xxf:trim(.)"/>
             </xf:action>
         </xf:model>
 

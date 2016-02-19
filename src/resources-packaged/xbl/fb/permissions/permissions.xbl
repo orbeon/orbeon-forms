@@ -56,7 +56,7 @@
                         <xf:bind ref="permission[position() > 1]/operations" readonly="false()"
                                  calculate="string-join(xxf:split()[not (. = xxf:split(instance('ui')/permissions/permission[1]/operations))], ' ')"/>
                         <xf:bind ref="permission">
-                            <xf:bind ref="role" constraint="normalize-space()" required="true()"/>
+                            <xf:bind ref="role" constraint="xxf:non-blank()" required="true()"/>
                             <!-- If operations contains 'update', automatically add 'read' -->
                             <xf:bind ref="operations" readonly="false()" calculate="if (xxf:split() = 'update')
                                 then string-join(distinct-values((xxf:split(), 'read')), ' ') else ."/>
@@ -130,7 +130,7 @@
                         <xf:insert context="$metadata" ref="*" origin="xxf:element('permissions')"/>
 
                         <!-- In UI replace space in role by %20 -->
-                        <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
+                        <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(xxf:trim(.), ' ', '%20')"/>
 
                         <!-- Add "anyone" permission -->
                         <xf:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>

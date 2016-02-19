@@ -171,7 +171,7 @@ Inserting error information into error list:
                 <xsl:template match="/*">
                     <!-- Outer group around outer event handlers -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
-                        
+
                         <xf:action ev:event="xforms-enabled">
                             <!-- When the group becomes relevant, remember incremental flag -->
                             <!-- NOTE:
@@ -185,7 +185,7 @@ Inserting error information into error list:
                                 xxbl:scope="inner"
                                 ref="instance('fr-state-instance')/incremental"
                                 xbl:attr="xbl:text=incremental"/>
-    
+
                             <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
                             <xf:setvalue
                                 xxbl:scope="inner"
@@ -397,7 +397,7 @@ Inserting error information into error list:
                                             <!-- Clickable / linkable label -->
                                             <xf:var
                                                 name="label"
-                                                value="if (normalize-space(@label) != '') then @label else '&lt;i class=&quot;icon-arrow-right&quot;/>'"/>
+                                                value="if (xxf:non-blank(@label)) then @label else '&lt;i class=&quot;icon-arrow-right&quot;/>'"/>
                                             <xf:var
                                                 name="focusable"
                                                 value="xxf:focusable(@absolute-id)"/>

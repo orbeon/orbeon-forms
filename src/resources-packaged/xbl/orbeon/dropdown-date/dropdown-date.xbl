@@ -134,7 +134,7 @@
                         <xf:setvalue ref="instance('date-instance')/month" value="month-from-date($binding)"/>
                         <xf:setvalue ref="instance('date-instance')/day" value="day-from-date($binding)"/>
                     </xf:action>
-                    <xf:action if="not($value castable as xs:date) and normalize-space($value) = ''">
+                    <xf:action if="not($value castable as xs:date) and xxf:is-blank($value)">
                         <xf:setvalue ref="instance('date-instance')/year"/>
                         <xf:setvalue ref="instance('date-instance')/month"/>
                         <xf:setvalue ref="instance('date-instance')/day"/>
@@ -199,7 +199,7 @@
 
                     <!-- React to update to local values -->
                     <xf:action ev:event="xforms-value-changed">
-                        <xf:var name="c" value="normalize-space(string-join((year, month, day), ''))" as="xs:string"/>
+                        <xf:var name="c" value="xxf:trim(string-join((year, month, day), ''))" as="xs:string"/>
                         <!-- Blank result -->
                         <xf:action if="$c = ''">
                             <xf:setvalue ref="is-valid" value="false()"/>

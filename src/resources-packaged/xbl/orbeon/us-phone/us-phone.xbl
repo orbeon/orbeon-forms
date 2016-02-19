@@ -78,7 +78,7 @@
                         xxf:maxlength="14"
                         xxf:format="$formatted"
                         xxf:unformat="
-                            for $t in translate(normalize-space(), '()*-[].#/'': ', '')
+                            for $t in translate(xxf:trim(), '()*-[].#/'': ', '')
                             return if (matches($t, '^\d+$')) then $t else .">
                         <xf:hint appearance="minimal">(555) 555-5555</xf:hint>
                     </xf:input>

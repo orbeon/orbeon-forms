@@ -343,8 +343,9 @@
             <xf:bind ref="name"
                      type="xs:NCName"
                      required="true()"
-                     constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
-                                        or not(../xf:action[1]/@id = $model/fb:action/@id)"/>
+                     constraint="
+                        (xxf:non-blank() and xxf:trim() = ../initial-name) or
+                         not(../xf:action[1]/@id = $model/fb:action/@id)"/>
             <xf:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
 
             <xf:bind ref="fb:action">
@@ -384,7 +385,7 @@
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
-            <xf:bind ref="delete-trigger" relevant="normalize-space(../initial-name)"/>
+            <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)"/>
             <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xf:bind>
 

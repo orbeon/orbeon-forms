@@ -101,7 +101,7 @@
                         <xf:setvalue ref="instance('date-instance')/month" value="month-from-date($binding)"/>
                         <xf:setvalue ref="instance('date-instance')/day" value="day-from-date($binding)"/>
                     </xf:action>
-                    <xf:action if="not($value castable as xs:date) and normalize-space($value) = ''">
+                    <xf:action if="not($value castable as xs:date) and xxf:is-blank($value)">
                         <xf:setvalue ref="instance('date-instance')/year"/>
                         <xf:setvalue ref="instance('date-instance')/month"/>
                         <xf:setvalue ref="instance('date-instance')/day"/>
@@ -133,7 +133,7 @@
                     <xf:var name="title-1"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'month' else 'day'  ), '|fr-fr-resources|')"/>
                     <xf:var name="title-2"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'day'   else 'month'), '|fr-fr-resources|')"/>
                     <xf:var name="title-3"     value="xxf:r('components.date-time.year', '|fr-fr-resources|')"/>
-                    
+
                     <!-- navindex is copied to first field, but need one for second field too! -->
                     <xf:input ref="$ref-1" xxf:title="{$title-1}" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input"/>
                     <xf:input ref="$ref-2" xxf:title="{$title-2}" class="fr-width-2digits"/>
@@ -142,12 +142,12 @@
 
                 <!-- React to update to local values -->
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
-                    <xf:var name="c" value="normalize-space(string-join((year, month, day), ''))" as="xs:string"/>
-                    <xf:action if="$c = ''">
+                    <xf:var name="empty" value="xxf:is-blank(string-join((year, month, day), ''))" as="xs:string"/>
+                    <xf:action if="$empty">
                         <xf:setvalue ref="is-valid" value="valid($binding)"/>
                         <xf:setvalue ref="$binding"/>
                     </xf:action>
-                    <xf:action if="$c != ''">
+                    <xf:action if="not($empty)">
                         <!-- Compute date parts -->
                         <xf:var name="y" value="if (year castable as xs:integer)  then format-number(xs:integer(year), '0000') else '____'"/>
                         <xf:var name="m" value="if (month castable as xs:integer) then format-number(xs:integer(month), '00')  else '__'"/>

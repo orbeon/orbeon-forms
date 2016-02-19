@@ -38,7 +38,7 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
  */
 class PipelineFunctionLibrary extends {
   // Namespace the functions. We wish we had trait parameters, see:
-  // http://docs.scala-lang.org/sips/pending/trait-parameters.html)
+  // http://docs.scala-lang.org/sips/pending/trait-parameters.html
   val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
   val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
   val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)

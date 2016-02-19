@@ -312,7 +312,6 @@
                     </validation>
                 </xf:instance>
 
-                <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
                     type="xs:NCName"
                     xxf:whitespace="trim"
@@ -504,8 +503,8 @@
                                         <xf:var
                                             name="toggle"
                                             value="
-                                                count($i/appearances/appearance[normalize-space(value) = '']) = 1
-                                                and count($i/appearances/appearance[normalize-space(value) != '']) = 1"/>
+                                                count($i/appearances/appearance[xxf:is-blank(value)]) = 1
+                                                and count($i/appearances/appearance[xxf:non-blank(value)]) = 1"/>
 
                                         <!-- Propose a choice between multiple items -->
                                         <xf:select1
@@ -524,7 +523,7 @@
                                         <!-- Simplified case where we just show a checkbox -->
                                         <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
-                                            <xf:itemset ref="$i/appearances/appearance[normalize-space(value) != '']">
+                                            <xf:itemset ref="$i/appearances/appearance[xxf:non-blank(value)]">
                                                 <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                                                 <xf:label xml:space="preserve">
                                                     <xh:img src="{{icon}}" alt="" width="16" height="16"/>
@@ -648,7 +647,7 @@
                                                          user just chose the "Formula" option. -->
                                                     <xf:setfocus
                                                         event="xforms-enabled"
-                                                        if="normalize-space() = ''"
+                                                        if="xxf:is-blank()"
                                                         control="required-xpath"/>
                                                 </xf:input>
                                             </xf:group>
@@ -680,7 +679,7 @@
                                                                 |
                                                                 type[. = $supported]
                                                             )">
-                                                        <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then @label else ."/>
+                                                        <xf:label ref="if (self::choices) then label else if (xxf:non-blank(@label)) then @label else ."/>
                                                         <xf:value ref="if (self::choices) then () else ."/>
                                                     </xf:itemset>
                                                     <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
@@ -821,7 +820,7 @@
                             xmlns:p="http://www.orbeon.com/oxf/pipeline"
                             name="custom-control-settings"
                             as="xs:string?"
-                            select="normalize-space(p:property('oxf.fb.extension.control-settings'))[. != '']"/>
+                            select="p:trim(p:property('oxf.fb.extension.control-settings'))[p:non-blank()]"/>
 
                         <xsl:if test="$custom-control-settings">
 
@@ -844,7 +843,7 @@
                                     <!--  Allow component to update datatype -->
                                     <xf:setvalue
                                         event="fb-update-datatype"
-                                        if="normalize-space(event('datatype')) != ''"
+                                        if="xxf:non-blank(event('datatype'))"
                                         ref="$i/validations/validation[@type = 'datatype']/builtin-type"
                                         value="event('datatype')"/>
 

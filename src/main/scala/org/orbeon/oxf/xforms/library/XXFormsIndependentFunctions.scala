@@ -156,6 +156,14 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
+    Fun("is-blank", classOf[XXFormsIsBlank], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("non-blank", classOf[XXFormsNonBlank], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_MORE)
+    )
+
     Fun("forall", classOf[XXFormsForall], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
       Arg(ITEM_TYPE, EXACTLY_ONE),

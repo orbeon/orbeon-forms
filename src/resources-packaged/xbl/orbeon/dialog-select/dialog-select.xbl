@@ -91,8 +91,8 @@
                             <callback-id/>
                         </instance>
                     </xf:instance>
-                    <xf:bind ref="add-trigger" readonly="normalize-space(../available) = ''"/>
-                    <xf:bind ref="remove-trigger" readonly="normalize-space(../selected) = ''"/>
+                    <xf:bind ref="add-trigger" readonly="xxf:is-blank(../available)"/>
+                    <xf:bind ref="remove-trigger" readonly="xxf:is-blank(../selected)"/>
                     <xf:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
                                      xxf:readonly="true" xxf:cache="true"/>
                 </xf:model>

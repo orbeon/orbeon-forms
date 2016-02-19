@@ -78,11 +78,21 @@
             <xf:input ref="instance()" id="currency-input" xbl:attr="navindex navindex=tabindex">
                 <!-- React to update to local values -->
                 <xf:action ev:event="xforms-value-changed">
-                    <xf:var name="currency-normalized" value="normalize-space(.)"/>
-                    <xf:var name="currency-no-dollar" value="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized"/>
+                    <xf:var name="currency-normalized" value="xxf:trim()"/>
+                    <xf:var
+                        name="currency-no-dollar"
+                        value="
+                            if (starts-with($currency-normalized, '$')) then
+                                substring-after($currency-normalized, '$')
+                            else
+                                $currency-normalized"/>
                     <xf:setvalue
                         ref="xxf:binding('fr-us-currency-thousands')"
-                        value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>
+                        value="
+                            if ($currency-no-dollar castable as xs:decimal) then
+                                xs:decimal($currency-no-dollar)
+                            else
+                                $currency-no-dollar"/>
                 </xf:action>
             </xf:input>
         </xbl:template>

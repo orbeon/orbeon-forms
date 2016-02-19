@@ -118,7 +118,7 @@
                 <xxf:value value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
-                    <xf:send if="string-length(normalize-space($resource)) > 0" submission="get-itemset">
+                    <xf:send if="xxf:non-blank($resource)" submission="get-itemset">
                         <xf:property name="resource" value="$resource"/>
                     </xf:send>
                 </xf:action>

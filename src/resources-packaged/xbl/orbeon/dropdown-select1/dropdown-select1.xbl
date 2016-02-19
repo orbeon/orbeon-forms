@@ -84,9 +84,9 @@
                 <!-- Title item -->
                 <!-- Always present, but blank if the control is readonly OR if a value is already selected -->
                 <!-- Alternate behavior: remove title item if a value is selected -->
-                <!--<xf:itemset ref=".[not(exf:required() and normalize-space())]">-->
+                <!--<xf:itemset ref=".[not(exf:required() and xxf:non-blank())]">-->
                 <xf:itemset ref=".">
-                    <xf:label value="if (xxf:readonly() or normalize-space()) then '' else xxf:r('select')"/>
+                    <xf:label value="if (xxf:readonly() or xxf:non-blank()) then '' else xxf:r('select')"/>
                     <xf:value/>
                 </xf:itemset>
                 <!-- Copy user items -->

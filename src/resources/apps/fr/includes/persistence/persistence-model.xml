@@ -42,7 +42,7 @@
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
                                            and $autosave-delay gt 0
-                                           and normalize-space(xxf:get-request-header('orbeon-username')) != ''
+                                           and xxf:non-blank(xxf:username())
                                            and frf:xpathAllAuthorizedOperations(
                                                     xxf:instance('fr-form-metadata')/permissions,
                                                     xxf:get-request-header('orbeon-username'),
@@ -72,7 +72,7 @@
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
         <xf:action if="$mode = ('new', 'test', 'edit', 'view', 'pdf', 'email', 'controls')">
 
-            <xf:var name="is-new-id" value="normalize-space($document) = ''"/>
+            <xf:var name="is-new-id" value="xxf:is-blank($document)"/>
             <xf:var name="is-xml-submit" value="$is-submit and exists(xxf:get-request-attribute('fr-form-data'))"/>
 
             <!-- Create random document id if none is provided. This is the default for 'new', but a missing id is also
@@ -486,10 +486,10 @@
              that case they might be able to see data based on ownership -->
         <xf:bind ref="can-access-summary"
                  relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')
-                           or normalize-space(xxf:get-request-header('orbeon-username')) != ''"/>
+                           or xxf:non-blank(xxf:get-request-header('orbeon-username'))"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
-                 relevant="normalize-space(xxf:instance('fr-form-attachments')/pdf) = '' or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
+                 relevant="xxf:is-blank(xxf:instance('fr-form-attachments')/pdf) or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and exf:readonly(../strict-submit)"/>
 

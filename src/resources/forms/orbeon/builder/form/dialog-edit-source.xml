@@ -76,7 +76,7 @@
         </xf:instance>
 
         <xf:bind ref="instance('fb-source-editor-instance')">
-            <xf:bind ref="source" type="xxf:xml" required="true()" constraint="normalize-space() != ''"/>
+            <xf:bind ref="source" type="xxf:xml" required="true()" constraint="xxf:non-blank()"/>
         </xf:bind>
 
     </xf:model>

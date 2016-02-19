@@ -142,7 +142,7 @@
                             ref="
                                 .[
                                     count($available-languages) gt 1 and
-                                    normalize-space(xxf:get-request-header('orbeon-liferay-language')) = ''
+                                    xxf:is-blank(xxf:get-request-header('orbeon-liferay-language'))
                                 ]">
                             <fr:link-select1 ref="$i/lang">
                                 <xf:itemset ref="$available-languages">

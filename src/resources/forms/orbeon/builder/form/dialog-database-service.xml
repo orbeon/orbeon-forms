@@ -182,7 +182,7 @@
             <xf:var name="submission" value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
             <!-- Get query -->
             <xf:var name="query-instance" value="$model/fb:instance[@id = concat($submission-name, '-instance')]"/>
-            <xf:action if="normalize-space($query-instance/*) != ''">
+            <xf:action if="xxf:non-blank($query-instance/*)">
                 <!-- Assume there is a serialized query -->
                 <xf:var name="sql-query" value="saxon:parse($query-instance/*)/*" as="element()"/>
                 <!-- Restore datasource -->
@@ -223,10 +223,10 @@
                 ref="name"
                 type="xs:NCName"
                 required="true()"
-                constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
+                constraint="(xxf:non-blank() and xxf:trim() = ../initial-name)
                                 or not(../submission-id = $model/fb:submission/@id
                                     or ../instance-id = $model/fb:instance/@id)"
-                readonly="normalize-space(../initial-name)"/>
+                readonly="xxf:non-blank(../initial-name)"/>
             <xf:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
             <xf:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
             <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
@@ -236,7 +236,7 @@
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
             <xf:bind ref="query" constraint="valid(../query-xml)" required="true()"/>
 
-            <xf:bind ref="delete-trigger" relevant="normalize-space(../initial-name)"/>
+            <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)"/>
             <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xf:bind>
 

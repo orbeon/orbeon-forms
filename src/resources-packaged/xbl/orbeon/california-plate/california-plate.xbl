@@ -82,7 +82,7 @@
 
             <xf:group class="fr-component-group">
                 <xh:span class="fr-plate-characters">
-                    <xf:repeat ref="instance()/c[normalize-space(.) != '']">
+                    <xf:repeat ref="instance()/c[xxf:non-blank()]">
                         <xh:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
                     </xf:repeat>
                 </xh:span>

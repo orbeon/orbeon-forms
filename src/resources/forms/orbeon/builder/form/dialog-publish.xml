@@ -139,14 +139,14 @@
             <xh:div>
                 <xf:output class="alert alert-success" value="xxf:format-message($form-resources/dialog-publish/publish-success, (data(instance()/published-attachments), data(instance()/published-version)))"/>
                 <!-- Display response content if present -->
-                <xf:var name="response" value="instance('fr-create-update-submission-response')"/>
-                <xf:group ref=".[normalize-space($response) != '']">
+                <xf:var name="response" value="instance('fr-create-update-submission-response')/string()"/>
+                <xf:group ref="$response[xxf:non-blank()]">
                     <xh:div class="fb-publish-message">
-                        <xf:output value="$response" mediatype="text/html"/>
+                        <xf:output value="." mediatype="text/html"/>
                     </xh:div>
                 </xf:group>
                 <xf:var name="buttons" value="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]"/>
-                <xf:group ref=".[not(normalize-space($response) != '') and exists($buttons)]" class="fb-publish-message">
+                <xf:group ref=".[xxf:is-blank($response) and exists($buttons)]" class="fb-publish-message">
                     <xh:ul>
                         <xf:repeat ref="$buttons">
                             <xh:li>
@@ -224,12 +224,13 @@
                      return 1, the default version number. -->
                 <xf:setvalue
                     ref="instance()/existing-version"
-                    value="for $version
-                           in normalize-space(event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value)
-                           return
-                               if ($version != '')
-                               then $version
-                               else 1"/>
+                    value="
+                        for $version in xxf:trim(event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value)
+                        return
+                           if ($version != '') then
+                               $version
+                           else
+                                1"/>
             </xf:action>
 
             <xf:action event="xforms-submit-error" if="event('response-status-code') = (404, 410)">

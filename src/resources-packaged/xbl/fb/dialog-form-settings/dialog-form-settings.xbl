@@ -65,7 +65,7 @@
                 <xf:action>
                     <xf:var
                         name="invalid-app-form"
-                        value="$i/(app, form)[normalize-space() and not(valid())]"/>
+                        value="$i/(app, form)[xxf:non-blank() and not(valid())]"/>
 
                     <xxf:setvisited
                         iterate="$invalid-app-form"
@@ -119,7 +119,7 @@
                     ref="app | form"
                     required="true()"
                     constraint="matches(., '^[A-Za-z0-9\-_]+$')"
-                    calculate="normalize-space()"
+                    xxf:whitespace="trim"
                     readonly="false()"/>
                 <xf:bind
                     ref="app"
@@ -189,7 +189,7 @@
                                 else
                                     $resources/messages/edit-metadata-output
                         "/>
-                        <xf:group ref=".[normalize-space($message)]" xxf:element="p">
+                        <xf:group ref=".[xxf:non-blank($message)]" xxf:element="p">
                             <!-- Display message to user -->
                             <xf:output value="$message"/>
                         </xf:group>
@@ -299,7 +299,7 @@
                                 xmlns:p="http://www.orbeon.com/oxf/pipeline"
                                 name="custom-form-settings"
                                 as="xs:string?"
-                                select="normalize-space(p:property('oxf.fb.extension.form-settings'))[. != '']"/>
+                                select="p:trim(p:property('oxf.fb.extension.form-settings'))[p:non-blank()]"/>
 
                             <xsl:if test="$custom-form-settings">
 

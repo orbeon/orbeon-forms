@@ -91,7 +91,7 @@
                      user just chose the "Other" option. -->
                 <xf:setfocus
                     event="xforms-enabled"
-                    if="normalize-space() = ''"
+                    if="xxf:is-blank()"
                     control="input"/>
             </xf:input>
         </xbl:template>

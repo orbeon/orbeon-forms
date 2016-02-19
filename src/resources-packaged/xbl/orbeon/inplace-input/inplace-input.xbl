@@ -87,7 +87,14 @@
                                 ref="$binding"
                                 xbl:attr="navindex navindex=tabindex"
                                 class="xforms-activable{if (normalize-space(xxf:hint('fr-inplace-input-binding'))) then ' fr-inplace-hint' else ''}"
-                                value="if (normalize-space() = '' and not(exf:readonly()) and normalize-space(xxf:hint('fr-inplace-input-binding'))) then xxf:hint('fr-inplace-input-binding') else .">
+                                value="
+                                    if (xxf:is-blank()      and
+                                        not(exf:readonly()) and
+                                        xxf:non-blank(xxf:hint('fr-inplace-input-binding'))
+                                    ) then
+                                        xxf:hint('fr-inplace-input-binding')
+                                    else
+                                        .">
                         </xf:output>
                     </xh:span>
                     <!-- React to user click on value unless the bound node is readonly -->

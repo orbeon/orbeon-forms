@@ -98,9 +98,9 @@
             event="xforms-submit-done"
             if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
             ref="instance('fr-create-update-submission-response')"/>
-        <xf:header ref=".[normalize-space(event('form-version'))]">
+        <xf:header ref="event('form-version')[xxf:non-blank()]">
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="event('form-version')"/>
+            <xf:value value="."/>
         </xf:header>
     </xf:submission>
 
@@ -114,9 +114,9 @@
             xxf:username="{event('username')}"
             xxf:password="{event('password')}"
             replace="none">
-        <xf:header ref=".[normalize-space(event('form-version'))]">
+        <xf:header ref="event('form-version')[xxf:non-blank()]">
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="event('form-version')"/>
+            <xf:value value="."/>
         </xf:header>
     </xf:submission>
 

@@ -171,7 +171,7 @@
                 </xh:tr>
             </fr:grid>
         </fr:tab>
-        <fr:tab visible="normalize-space($response) != ''">
+        <fr:tab visible="xxf:non-blank($response)">
             <fr:label
                 value="xxf:r('dialog-http-services.tab-test.label', '|fr-form-resources|')"
                 class="label label-{if ($response/error-type = '') then 'success' else 'important'}"/>
@@ -188,12 +188,12 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td>
-                            <xf:output ref="$response/resource-uri[normalize-space()]">
+                            <xf:output ref="$response/resource-uri[xxf:non-blank()]">
                                 <xf:label ref="$form-resources/dialog-http-services/resource-uri/label"/>
                             </xf:output>
                         </xh:td>
                         <xh:td>
-                            <xf:output ref="$response/status-code[normalize-space()]">
+                            <xf:output ref="$response/status-code[xxf:non-blank()]">
                                 <xf:label ref="$form-resources/dialog-http-services/status-code/label"/>
                             </xf:output>
                         </xh:td>
@@ -231,7 +231,7 @@
                 <fr:grid>
                     <xh:tr>
                         <xh:td>
-                            <xf:textarea ref="$response/body[normalize-space()]" class="fb-submission-response-body">
+                            <xf:textarea ref="$response/body[xxf:non-blank()]" class="fb-submission-response-body">
                                 <xf:label ref="$form-resources/dialog-http-services/response-body/label"/>
                             </xf:textarea>
                         </xh:td>
@@ -472,7 +472,7 @@
                 value="
                     for $a in (
                         for $t in tokenize($submission/@mediatype, ';')
-                            return normalize-space($t)
+                            return xxf:trim($t)
                     ) return
                         if (starts-with($a, 'action=')) then
                             $a
@@ -484,7 +484,7 @@
             <xf:setvalue
                 if="$is-soap"
                 ref="$request/soap-action"
-                value="normalize-space(tokenize($soap-action, '=')[2])"/>
+                value="xxf:trim(tokenize($soap-action, '=')[2])"/>
 
             <xf:setvalue ref="$request/is-auth"  value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
             <xf:setvalue ref="$request/username" value="$submission/@xxf:username"/>
@@ -548,7 +548,7 @@
                 ref="name"
                 type="xs:NCName"
                 required="true()"
-                calculate="normalize-space()"
+                xxf:whitespace="trim"
                 constraint="
                     (
                         . != '' and
@@ -557,7 +557,7 @@
                         ../submission-id  = $model/fb:submission/@id or
                         ../instance-id    = $model/fb:instance/@id
                     )"
-                readonly="normalize-space(../initial-name) != ''"/>
+                readonly="xxf:non-blank(../initial-name)"/>
 
             <xf:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
             <xf:bind ref="instance-id"   calculate="concat(../name, '-instance')"/>
@@ -568,12 +568,12 @@
 
                 <xf:bind
                     ref="soap-action"
-                    calculate="normalize-space()"
+                    xxf:whitespace="trim"
                     readonly="../is-soap = false()"/>
 
                 <xf:bind
                     ref="username | password"
-                    calculate="normalize-space()"
+                    xxf:whitespace="trim"
                     readonly="../is-auth = false()"
                     required="../is-auth = true()"/>
 
@@ -590,8 +590,8 @@
                             string-join(
                                 (
                                     'application/soap+xml',
-                                    if (normalize-space(../soap-action) != '') then
-                                        concat('action=', normalize-space(../soap-action))
+                                    if (xxf:non-blank(../soap-action)) then
+                                        concat('action=', xxf:trim(../soap-action))
                                     else
                                         ()
                                 ),
@@ -616,7 +616,7 @@
                 <xf:bind ref="body"       readonly="true()"/>
             </xf:bind>
 
-            <xf:bind ref="delete-trigger"     relevant="normalize-space(../initial-name)"/>
+            <xf:bind ref="delete-trigger"    relevant="xxf:non-blank(../initial-name)"/>
             <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xf:bind>
 

@@ -22,7 +22,7 @@
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
     var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
-    var StringUtils = ORBEON.util.String;
+    var StringUtils = ORBEON.util.StringOps;
     var Globals = ORBEON.xforms.Globals;
 
     function childrenWithLocalName(node, name) {
@@ -1008,7 +1008,7 @@
                             for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
                                 if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
                                     var itemsetElement = itemsetsElement.childNodes[j];
-                                    var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
+                                    var itemsetTree = ORBEON.util.StringOps.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
                                     if (itemsetTree == null) itemsetTree = [];
                                     var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
                                     var documentElement = ORBEON.util.Dom.get(controlId);
@@ -1036,9 +1036,9 @@
                                         // Utility function to generate an option
                                         function generateOption(label, value, clazz, selectedValues) {
                                             var selected = _.contains(selectedValues, value);
-                                            return '<option value="' + ORBEON.util.String.escapeForMarkup(value) + '"'
+                                            return '<option value="' + ORBEON.util.StringOps.escapeForMarkup(value) + '"'
                                                     + (selected ? ' selected="selected"' : '')
-                                                    + (clazz != null ? ' class="' + ORBEON.util.String.escapeForMarkup(clazz) + '"' : '')
+                                                    + (clazz != null ? ' class="' + ORBEON.util.StringOps.escapeForMarkup(clazz) + '"' : '')
                                                     + '>' + label + '</option>';
                                         }
 
@@ -1059,8 +1059,8 @@
                                                 if (inOptgroup) // nested optgroups are not allowed, close the old one
                                                     sb[sb.length] = '</optgroup>';
                                                 // open optgroup
-                                                sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeForMarkup(itemElement.label) + '"'
-                                                    + (clazz != null ? ' class="' + ORBEON.util.String.escapeForMarkup(clazz) + '"' : '')
+                                                sb[sb.length] = '<optgroup label="' + ORBEON.util.StringOps.escapeForMarkup(itemElement.label) + '"'
+                                                    + (clazz != null ? ' class="' + ORBEON.util.StringOps.escapeForMarkup(clazz) + '"' : '')
                                                     + '">';
                                                 inOptgroup = true;
                                                 // add subitems
@@ -1508,9 +1508,9 @@
                                         } else {
                                             var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                             if (currentValue != null) {
-                                                previousServerValue = previousServerValue == null ? null : ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
-                                                currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
-                                                newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
+                                                previousServerValue = previousServerValue == null ? null : ORBEON.util.StringOps.normalizeSerializedHTML(previousServerValue);
+                                                currentValue = ORBEON.util.StringOps.normalizeSerializedHTML(currentValue);
+                                                newControlValue = ORBEON.util.StringOps.normalizeSerializedHTML(newControlValue);
 
                                                 var isInputOrSecret = YAHOO.util.Dom.hasClass(documentElement, "xforms-input")
                                                     || YAHOO.util.Dom.hasClass(documentElement, "xforms-secret");
@@ -2017,10 +2017,10 @@
 
                         // Create HTML with message
                         details += "<li>" + message;
-                        if (file) details += " in " + ORBEON.util.String.escapeForMarkup(file);
-                        if (line) details += " line " + ORBEON.util.String.escapeForMarkup(line);
-                        if (col) details += " column " + ORBEON.util.String.escapeForMarkup(col);
-                        if (exception) details += " (" + ORBEON.util.String.escapeForMarkup(exception) + ")";
+                        if (file) details += " in " + ORBEON.util.StringOps.escapeForMarkup(file);
+                        if (line) details += " line " + ORBEON.util.StringOps.escapeForMarkup(line);
+                        if (col) details += " column " + ORBEON.util.StringOps.escapeForMarkup(col);
+                        if (exception) details += " (" + ORBEON.util.StringOps.escapeForMarkup(exception) + ")";
                         details += "</li>";
                     }
                     details += "</ul>";

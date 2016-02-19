@@ -200,7 +200,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // so we use hasAttribute() which is not implemented by IE to detect that case.
                     if (element.hasAttribute(name)) {
                         if (ORBEON.xforms.Globals.isRenderingEngineWebCore) {
-                            return ORBEON.util.String.replace(element.getAttribute(name), "&#38;", "&");
+                            return ORBEON.util.StringOps.replace(element.getAttribute(name), "&#38;", "&");
                         } else {
                             return element.getAttribute(name);
                         }
@@ -566,7 +566,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             + ORBEON.util.DateTime._padAZero(jsDate.getMinutes());
                 } else {
                     // US time: [h]:[m]:[s] [P] or [h]:[m]:[s] [P,2-2]
-                    var amPm = ORBEON.util.String.endsWith(formatInputTime, "-2]")
+                    var amPm = ORBEON.util.StringOps.endsWith(formatInputTime, "-2]")
                         ? (jsDate.getHours() < 12 ? " am" : " pm")
                         : (jsDate.getHours() < 12 ? " a.m." : " p.m.");
                     return (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12) + ":"
@@ -1949,7 +1949,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
         setHelpMessage: function (control, message) {
             // We escape the value because the help element is a little special, containing escaped HTML
-            message = ORBEON.util.String.escapeForMarkup(message);
+            message = ORBEON.util.StringOps.escapeForMarkup(message);
             ORBEON.xforms.Controls._setMessage(control, "help", message);
             ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
         },
@@ -2667,7 +2667,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 } else if (element.className != null) {
                     if (element.id
-                            && ORBEON.util.String.endsWith(element.id, "_container")
+                            && ORBEON.util.StringOps.endsWith(element.id, "_container")
                             && YAHOO.util.Dom.hasClass(element, "xforms-textarea")
                             && YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")
                             && ORBEON.util.Properties.htmlEditor.get() == "yui") {

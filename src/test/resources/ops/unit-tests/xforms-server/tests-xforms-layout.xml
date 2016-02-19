@@ -1978,7 +1978,7 @@
                 <xh:script src="/ops/javascript/underscore/underscore-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/xforms-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/fQuery-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/String-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/StringOps-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/ExecutionQueue-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/FiniteStateMachine-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/Server-min.js" class="xforms-baseline"/>

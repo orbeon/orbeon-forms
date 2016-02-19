@@ -34,11 +34,11 @@ class XFormsActionAction extends XFormsAction {
         // Evaluate script parameters if any and schedule the script to run
         actionInterpreter.containingDocument.addScriptToRun(
           ScriptInvocation(
-            script,
-            actionContext.interpreter.event.targetObject.getEffectiveId,
-            actionContext.interpreter.eventObserver.getEffectiveId,
-            // https://github.com/orbeon/orbeon-forms/issues/2499
-            paramExpressions map { expr ⇒
+            script              = script,
+            targetEffectiveId   = actionContext.interpreter.event.targetObject.getEffectiveId,
+            observerEffectiveId = actionContext.interpreter.eventObserver.getEffectiveId,
+            paramValues         = paramExpressions map { expr ⇒
+              // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(
                 actionElement,
                 bindingContext.nodeset,
@@ -48,7 +48,7 @@ class XFormsActionAction extends XFormsAction {
             }
           )
         )
-      case Some(StaticScript(_, XPathScriptType, params, ShareableScript(_, _, body, _))) ⇒
+      case Some(StaticScript(_, XPathScriptType, _, ShareableScript(_, _, body, _))) ⇒
         // Evaluate XPath expression for its side effects only
         actionInterpreter.evaluateKeepItems(
           actionElement,

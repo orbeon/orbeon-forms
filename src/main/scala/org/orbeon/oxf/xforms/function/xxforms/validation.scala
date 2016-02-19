@@ -184,10 +184,10 @@ object NumericValidation {
       case v: Int64Value        ⇒ Some(Left(v.longValue))
       case v: BigIntegerValue   ⇒ Some(Right(v.asDecimal))
       case v: ValidationFailure ⇒
-          DecimalValue.makeDecimalValue(value, true) match {
-            case v: DecimalValue      ⇒ Some(Right(v.getDecimalValue))
-            case v: ValidationFailure ⇒ None
-          }
+        DecimalValue.makeDecimalValue(value, true) match {
+          case v: DecimalValue      ⇒ Some(Right(v.getDecimalValue))
+          case v: ValidationFailure ⇒ None
+        }
     }
 }
 

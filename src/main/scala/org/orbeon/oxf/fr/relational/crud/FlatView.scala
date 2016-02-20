@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,12 +14,16 @@
 package org.orbeon.oxf.fr.relational.crud
 
 import java.sql.Connection
+
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
+import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.relational.crud.RequestReader._
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
+
 import scala.annotation.tailrec
 import scala.collection.mutable
-import RequestReader._
 
 private object FlatView {
 
@@ -43,7 +47,7 @@ private object FlatView {
     val viewName = {
       val appXML  = xmlToSQLId(req.app)
       val formXML = xmlToSQLId(req.form)
-      TablePrefix + joinParts(appXML, formXML, MaxNameLength - TablePrefix.length)
+      TablePrefix + joinParts(List(appXML, formXML), MaxNameLength - TablePrefix.length)
     }
 
     // Delete view if it exists
@@ -77,7 +81,7 @@ private object FlatView {
         connection.prepareStatement(s"DROP VIEW $viewName").executeUpdate()
     }
 
-    // Computer columns in the view
+    // Compute columns in the view
     val cols = {
       val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒
         val extractFunction = req.provider match {
@@ -118,43 +122,70 @@ private object FlatView {
     }
   }
 
-  def collectControls(document: DocumentInfo): Iterator[(NodeInfo, NodeInfo)] = {
+  // Returns a list with for each control to be included in the flat view, the parts of the path
+  // to that control, e.g.:
+  //
+  //     List(
+  //         List("top-section", "sub-section", "control-a"),
+  //         List("top-section", "sub-section", "control-b")
+  //     )
+  def collectControlPaths(outerSectionNames: List[String], document: DocumentInfo): List[List[String]] = {
 
     import FormRunner._
 
-    def topLevelSections =
-      document descendant (FR → "section") filter (findAncestorContainers(_).isEmpty)
+    val root = document.rootElement
+    val head = root.child(XH → "head").head
+    val body = root.child(XH → "body").head
+    val xblMappings = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
 
-    def descendantControls(container: NodeInfo) =
-      container descendant * filter
-        (e ⇒ isIdForControl(e.id))
 
-    def isDirectLeafControl(control: NodeInfo) =
-      ! IsContainer(control) && findAncestorRepeats(control).isEmpty && findAncestorSections(control).size <= 1
+    // `outerSectionNames` lists the name of the ancestor sections of the current node,
+    // e.g. List("top-section", "sub-section")
+    def collectFromNode(outerSectionNames: List[String],  node: NodeInfo): List[List[String]] = {
 
-    for {
-      topLevelSection ← topLevelSections.to[Iterator]
-      control         ← descendantControls(topLevelSection)
-      if isDirectLeafControl(control)
-    } yield
-       topLevelSection → control
+      def isControl(n: NodeInfo) = isIdForControl(node.id)
+      def collectFromChildren(sectionNames: List[String]) = {
+        val children = node child *
+        children.toList.flatMap(collectFromNode(sectionNames, _))
+      }
+
+      node match {
+        case _ if isRepeat(node) ⇒
+          // Don't go into repeats, as we don't them yet for flat views
+          Nil
+        case _ if IsSection(node) ⇒
+          val sectionNames = outerSectionNames :+ controlNameFromId(node.id)
+          collectFromChildren(sectionNames)
+        case _ if IsSectionTemplateContent(node) ⇒
+          xblMappings.get(node.uriQualifiedName) match {
+            case None ⇒
+              Nil
+            case Some(xblBindingNode) ⇒
+              val xblTemplate = xblBindingNode.rootElement.child(XBLTemplateTest).head
+              collectFromNode(outerSectionNames, xblTemplate)
+          }
+        case _ if isControl(node) ⇒
+          List(outerSectionNames :+ controlNameFromId(node.id))
+        case _ ⇒
+          collectFromChildren(outerSectionNames)
+      }
+    }
+
+    collectFromNode(Nil, body)
   }
 
-  def extractPathsCols(document: DocumentInfo): Iterator[(String, String)] = {
+  def extractPathsCols(document: DocumentInfo): List[(String, String)] = {
 
-    import FormRunner._
-
+    val paths = collectControlPaths(Nil, document)
     val seen = mutable.HashSet[String](PrefixedMetadataColumns: _*)
 
     for {
-      (section, control) ← collectControls(document)
-      sectionName        = controlNameFromId(section.id)
-      controlName        = controlNameFromId(control.id)
-      path               = sectionName + "/" + controlName
-      col                = joinParts(xmlToSQLId(sectionName), xmlToSQLId(controlName), MaxNameLength)
+      path: List[String]  ← paths
+      sqlPath            = path map xmlToSQLId
+      col                = joinParts(sqlPath, MaxNameLength)
       uniqueCol          = resolveDuplicate(col, MaxNameLength)(seen)
     } yield
-      path → uniqueCol
+      path.mkString("/") → uniqueCol
   }
 
   def resolveDuplicate(value: String, maxLength: Int)(seen: mutable.HashSet[String]): String = {
@@ -194,18 +225,36 @@ private object FlatView {
     .reverse
 
   // Try to truncate reasonably smartly when needed to maximize the characters we keep
-  def fitParts(left: String, right: String, max: Int) = {
-    val usable = max - 1
-    val half   = usable / 2
+  def fitParts(parts: List[String], max: Int): List[String] = {
 
-    if (left.size + right.size <= usable)            left                           →  right
-    else if (left.size > half && right.size > half) (left take half)                → (right take half)
-    else if (left.size > half)                      (left take usable - right.size) →  right
-    else                                             left                           → (right take usable - left.size)
+    val usable = max - parts.length + 1
+
+    @tailrec def shaveParts(parts: List[String]): List[String] = {
+      val partsLength = parts.map(_.length)
+      val totalLength = partsLength.sum
+
+      if (totalLength <= usable) {
+        // Parts fit as is; we're good
+        parts
+      } else {
+        // Parts don't fit; find the longest part
+        val maxPartLength = partsLength.max
+        val maxPartIndex  = partsLength.indexOf(maxPartLength)
+        // Shave the longest part by 1, removing possible '_' leftovers at the end
+        val newPart       = parts(maxPartIndex)
+                            .dropRight(1)
+                            .reverse.dropWhile(_ == '_').reverse
+        val newParts      = parts.updated(maxPartIndex, newPart)
+        // See if we're good now
+        shaveParts(newParts)
+      }
+    }
+
+    shaveParts(parts)
   }
 
-  def joinParts(left: String, right: String, max: Int) =
-    fitParts(left, right, max).productIterator mkString "_"
+  def joinParts(parts: List[String], max: Int) =
+    fitParts(parts, max) mkString "_"
 
   def escapeSQL(s: String) =
     s.replaceAllLiterally("'", "''")

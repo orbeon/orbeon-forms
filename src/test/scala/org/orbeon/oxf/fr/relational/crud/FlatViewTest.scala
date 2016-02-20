@@ -58,10 +58,16 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
       ),
       "oxf:/org/orbeon/oxf/fr/form-with-long-control-names.xhtml"   → List(
         "my-first-section/my-input"                                            → "MY_FIRST_SECTION_MY_INPUT",
-        "section-with-long-name/my-control-with-a-pretty-long-name"            → "SECTION_WITH_L_MY_CONTROL_WIT",
+        "section-with-long-name/my-control-with-a-pretty-long-name"            → "SECTION_WITH_L_MY_CONTROL_WITH",
         "section-with-long-name/my-control-with-a-pretty-long-name-too"        → "SECTION_WITH_L_MY_CONTROL_WIT1",
         "section-with-long-name-too/short"                                     → "SECTION_WITH_LONG_NAME_T_SHORT",
         "section-with-long-name-too/my-control-with-a-pretty-long-name-really" → "SECTION_WITH_L_MY_CONTROL_WIT2"
+      ),
+      "oxf:/org/orbeon/oxf/fr/form-using-section-template.xhtml"    → List(
+        "top-section-a/form-section-b/form-field-a"                            → "TOP_SECTI_FORM_SECT_FORM_FIELD",
+        "top-section-a/form-section-b/form-field-b"                            → "TOP_SECTI_FORM_SECT_FORM_FIEL1",
+        "top-section-a/lib-section-a/lib-field-a"                              → "TOP_SECTI_LIB_SECTIO_LIB_FIELD",
+        "top-section-a/lib-section-a/lib-field-b"                              → "TOP_SECTI_LIB_SECTIO_LIB_FIEL1"
       )
     )
 
@@ -92,6 +98,6 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
     )
 
     for ((expected, left, right) ← expectedForValues)
-      assert(expected === FlatView.joinParts(left, right, 7))
+      assert(expected === FlatView.joinParts(List(left, right), 7))
   }
 }

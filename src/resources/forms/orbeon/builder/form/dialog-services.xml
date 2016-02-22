@@ -251,13 +251,17 @@
                 </xf:label>
 
                 <!-- Test submission -->
-                <xf:action event="DOMActivate">
+                <xf:action event="DOMActivate" if="valid(instance('fb-submission-editor-instance'))">
                     <!-- Clear response -->
                     <xf:setvalue iterate="$response/*[not(*)]" ref="."/>
                     <xf:delete ref="$response/headers/header"/>
 
                     <!-- Send submission -->
                     <xf:send submission="fb-test-service-submission"/>
+                </xf:action>
+
+                <xf:action event="DOMActivate" if="not(valid(instance('fb-submission-editor-instance')))">
+                    <xxf:setvisited control="fb-service-dialog" recurse="true"/>
                 </xf:action>
 
                 <!-- Common response actions -->
@@ -321,7 +325,7 @@
             <xf:trigger ref="$instance/save-test-trigger" id="fb-service-save" appearance="xxf:primary">
                 <xf:label value="$form-resources/dialog-http-services/save/label"/>
                 <!-- Save changes to form -->
-                <xf:action event="DOMActivate">
+                <xf:action event="DOMActivate" if="valid(instance('fb-submission-editor-instance'))">
                     <!-- Actual id of the submission and instance -->
                     <xf:var name="submission-id" value="$instance/submission-id"/>
                     <xf:var name="instance-id" value="$instance/instance-id"/>
@@ -389,6 +393,9 @@
 
                     <!-- Hide dialog -->
                     <xxf:hide dialog="fb-service-dialog"/>
+                </xf:action>
+                <xf:action event="DOMActivate" if="not(valid(instance('fb-submission-editor-instance')))">
+                    <xxf:setvisited control="fb-service-dialog" recurse="true"/>
                 </xf:action>
             </xf:trigger>
             <xf:output value="$form-resources/or/label"/>
@@ -500,7 +507,7 @@
         <xf:var name="model" value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
 
         <xf:instance id="fb-submission-editor-instance">
-            <submission valid="true">
+            <submission>
                 <name/>
                 <initial-name/>
                 <submission-id/>
@@ -537,10 +544,6 @@
         <xf:var name="request"  value="$instance/request"/>
         <xf:var name="response" value="$instance/response"/>
         <xf:var name="has-body" value="not($request/method = ('get', 'delete'))"/>
-
-        <!-- Enable/disable trigger -->
-        <xf:setvalue event="xxforms-invalid" observer="fb-submission-editor-instance" ref="@valid">false</xf:setvalue>
-        <xf:setvalue event="xxforms-valid"   observer="fb-submission-editor-instance" ref="@valid">true</xf:setvalue>
 
         <xf:bind ref="$instance">
 
@@ -617,7 +620,6 @@
             </xf:bind>
 
             <xf:bind ref="delete-trigger"    relevant="xxf:non-blank(../initial-name)"/>
-            <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xf:bind>
 
         <!-- Template for inserting a submission -->

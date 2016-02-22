@@ -71,8 +71,8 @@
 .orbeon .xforms-alert.xforms-active {
   display: none;
 }
-.orbeon .xforms-visited > .xforms-alert.xforms-active,
-.orbeon .xforms-visited.xforms-alert.xforms-active {
+.orbeon .xforms-visited > .xforms-alert.xforms-active:not(:empty),
+.orbeon .xforms-visited.xforms-alert.xforms-active:not(:empty) {
   display: block;
   clear: both;
   margin-top: .2em;
@@ -86,8 +86,8 @@
   background-image: none;
   white-space: normal;
 }
-.orbeon .xforms-visited > .xforms-alert.xforms-active > ul,
-.orbeon .xforms-visited.xforms-alert.xforms-active > ul {
+.orbeon .xforms-visited > .xforms-alert.xforms-active:not(:empty) > ul,
+.orbeon .xforms-visited.xforms-alert.xforms-active:not(:empty) > ul {
   margin-bottom: 0;
   list-style-type: square;
 }

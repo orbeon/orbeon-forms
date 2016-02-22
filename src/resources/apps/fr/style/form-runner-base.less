@@ -85,7 +85,8 @@
 
     // Show active alerts for visited controls only
     // Cover case of nested alert and case of external alert
-    .xforms-visited > .xforms-alert.xforms-active, .xforms-visited.xforms-alert.xforms-active {
+    .xforms-visited > .xforms-alert.xforms-active:not(:empty),
+    .xforms-visited.xforms-alert.xforms-active:not(:empty) {
         display: block;
         clear: both;
 

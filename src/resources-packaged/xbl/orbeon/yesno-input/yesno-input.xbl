@@ -55,7 +55,7 @@
         </metadata>
 
         <xbl:template>
-            <xf:select1 appearance="full xxf:horizontal" ref="xxf:binding('fr-yesno-input-binding')">
+            <xf:select1 appearance="full xxf:horizontal" ref="xxf:binding('fr-yesno-input-binding')" xbl:attr="xxf:encrypt-item-values">
                 <xf:item>
                     <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
                     <xf:value>true</xf:value>

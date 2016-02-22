@@ -125,7 +125,7 @@
             </xf:var>
 
             <!-- The concrete select1 -->
-            <xf:select1 ref="$binding" id="select1">
+            <xf:select1 ref="$binding" id="select1" xbl:attr="xxf:encrypt-item-values">
                 <!-- Blank item -->
                 <xf:item>
                     <xf:label/>

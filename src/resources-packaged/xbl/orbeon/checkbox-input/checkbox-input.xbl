@@ -56,7 +56,7 @@
         </metadata>
 
         <xbl:template>
-            <xf:select appearance="full" ref="xxf:binding('fr-checkbox-input-binding')">
+            <xf:select appearance="full" ref="xxf:binding('fr-checkbox-input-binding')" xbl:attr="xxf:encrypt-item-values">
                 <xf:item>
                     <xf:label mediatype="text/html" value="xxf:label('fr-checkbox-input-binding')"/>
                     <xf:value xbl:attr="xbl:text=selected-value">true</xf:value>

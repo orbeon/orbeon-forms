@@ -507,13 +507,31 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @param showProgress      whether to show the progress indicator when submitting the event
      * @param progressMessage   message to show if the progress indicator is visible
      */
-    public void addDelayedEvent(String eventName, String targetEffectiveId, boolean bubbles, boolean cancelable, int delay,
-                                boolean isMaxDelay, boolean showProgress, String progressMessage) {
+    public void addDelayedEvent(
+        String eventName,
+        String targetEffectiveId,
+        boolean bubbles,
+        boolean cancelable,
+        int delay,
+        boolean isMaxDelay,
+        boolean showProgress,
+        String progressMessage) {
+
         if (delayedEvents == null)
             delayedEvents = new ArrayList<DelayedEvent>();
 
-        delayedEvents.add(new DelayedEvent(eventName, targetEffectiveId, bubbles, cancelable, System.currentTimeMillis() + delay,
-                isMaxDelay, showProgress, progressMessage));
+        delayedEvents.add(
+            new DelayedEvent(
+                eventName,
+                targetEffectiveId,
+                bubbles,
+                cancelable,
+                System.currentTimeMillis() + delay,
+                isMaxDelay,
+                showProgress,
+                progressMessage
+            )
+        );
     }
 
     public List<DelayedEvent> getDelayedEvents() {

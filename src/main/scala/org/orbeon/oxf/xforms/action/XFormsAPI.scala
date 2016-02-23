@@ -249,7 +249,7 @@ object XFormsAPI {
     bubbles         : Boolean = true,
     cancelable      : Boolean = true,
     properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
-    delay           : Int = 0,
+    delay           : Option[Int] = None,
     showProgress    : Boolean = true,
     progressMessage : String = null
   ): Unit =

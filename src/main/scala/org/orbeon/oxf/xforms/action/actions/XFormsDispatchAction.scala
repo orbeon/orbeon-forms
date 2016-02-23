@@ -23,18 +23,20 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
 import org.apache.commons.lang3.StringUtils.isNotBlank
 
+import scala.util.Try
+
 /**
  * 10.1.2 The dispatch Element
  */
 class XFormsDispatchAction extends XFormsAction {
-  
+
   override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
-    
+
     // Mandatory attribute
     val newEventNameAttributeValue =
       Option(actionElement.attributeValue(NAME_QNAME)) getOrElse
       (throw new OXFException("Missing mandatory name attribute on xf:dispatch element."))
-    
+
     // As of 2009-05, XForms 1.1 gives @targetid priority over @target
     val newEventTargetIdValue =
       Option(actionElement.attributeValue(TARGETID_QNAME)) orElse
@@ -58,8 +60,11 @@ class XFormsDispatchAction extends XFormsAction {
     val newEventCancelable =
       (Option(actionInterpreter.resolveAVT(actionElement, "cancelable")) getOrElse "true").toBoolean
 
-    val resolvedDelay =
-      (Option(actionInterpreter.resolveAVT(actionElement, "delay")) filter isNotBlank getOrElse "0").toInt
+    val resolvedDelayOpt =
+      Option(actionInterpreter.resolveAVT(actionElement, "delay")) filter
+      isNotBlank                  flatMap // "The default is the empty string, which indicates no delay"
+      (s ⇒ Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
+      (_ >= 0)                            // "…is dispatched immediately as the result of the dispatch action"
 
     // Whether to tell the client to show a progress indicator when sending this event
     val showProgress =
@@ -73,14 +78,13 @@ class XFormsDispatchAction extends XFormsAction {
       case xformsEventTarget: XFormsEventTarget ⇒
         // Execute the dispatch proper
         XFormsDispatchAction.dispatch(
-          resolvedNewEventName,
-          xformsEventTarget,
-          newEventBubbles,
-          newEventCancelable,
-          XFormsAction.eventProperties(actionInterpreter, actionElement),
-          resolvedDelay,
-          showProgress,
-          progressMessage
+          name            = resolvedNewEventName,
+          target          = xformsEventTarget,
+          bubbles         = newEventBubbles,
+          cancelable      = newEventCancelable,
+          properties      = XFormsAction.eventProperties(actionInterpreter, actionElement),
+          delayOpt        = resolvedDelayOpt,
+          progressMessage = progressMessage
         )
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
@@ -95,52 +99,53 @@ class XFormsDispatchAction extends XFormsAction {
 object XFormsDispatchAction {
 
   def dispatch(
-    name           : String,
-    target         : XFormsEventTarget,
-    bubbles        : Boolean                    = true,
-    cancelable     : Boolean                    = true,
-    properties     : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
-    delay          : Int                        = 0,
-    showProgress   : Boolean                    = true,
-    progressMessage: String                     = null
+    name            : String,
+    target          : XFormsEventTarget,
+    bubbles         : Boolean                    = true,
+    cancelable      : Boolean                    = true,
+    properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
+    delayOpt        : Option[Int]                = None,
+    showProgress    : Boolean                    = true,
+    progressMessage : String                     = null
   ): Unit =
-    if (delay <= 0) {
-      // Event is dispatched immediately
+    delayOpt match {
+      case Some(delay) if delay >= 0 ⇒
+        // Event is dispatched after a delay
 
-      // "10.8 The dispatch Element [...] If the delay is not specified or if the given value does not conform
-      // to xsd:nonNegativeInteger, then the event is dispatched immediately as the result of the dispatch
-      // action."
+        // "10.8 The dispatch Element [...] the specified event is added to the delayed event queue unless an event
+        // with the same name and target element already exists on the delayed event queue. The dispatch action has
+        // no effect if the event delay is a non-negative integer and the specified event is already in the delayed
+        // event queue. [...] Since an element bearing a particular ID may be repeated, the delayed event queue may
+        // contain more than one event with the same name and target IDREF. It is the name and the target run-time
+        // element that must be unique."
 
-      // Create and dispatch the event including custom properties (AKA context information)
-      Dispatch.dispatchEvent(
-        createEvent(
+        XFormsAPI.containingDocument.addDelayedEvent(
           name,
-          target,
-          properties,
-          allowCustomEvents = true,
+          target.getEffectiveId,
           bubbles,
-          cancelable
+          cancelable,
+          delay,
+          false,
+          showProgress,
+          progressMessage
         )
-      )
-    } else {
-      // Event is dispatched after a delay
+      case _ ⇒
+        // Event is dispatched immediately
 
-      // "10.8 The dispatch Element [...] the specified event is added to the delayed event queue unless an event
-      // with the same name and target element already exists on the delayed event queue. The dispatch action has
-      // no effect if the event delay is a non-negative integer and the specified event is already in the delayed
-      // event queue. [...] Since an element bearing a particular ID may be repeated, the delayed event queue may
-      // contain more than one event with the same name and target IDREF. It is the name and the target run-time
-      // element that must be unique."
+        // "10.8 The dispatch Element [...] If the delay is not specified or if the given value does not conform
+        // to xsd:nonNegativeInteger, then the event is dispatched immediately as the result of the dispatch
+        // action."
 
-      XFormsAPI.containingDocument.addDelayedEvent(
-        name,
-        target.getEffectiveId,
-        bubbles,
-        cancelable,
-        delay,
-        false,
-        showProgress,
-        progressMessage
-      )
+        // Create and dispatch the event including custom properties (AKA context information)
+        Dispatch.dispatchEvent(
+          createEvent(
+            name,
+            target,
+            properties,
+            allowCustomEvents = true,
+            bubbles,
+            cancelable
+          )
+        )
     }
 }

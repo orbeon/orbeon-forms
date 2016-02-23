@@ -38,6 +38,7 @@
     <xs:simpleType>
       <xs:restriction base="xs:NMTOKEN">
         <xs:enumeration value="capture"/>
+        <xs:enumeration value="target"/>
         <xs:enumeration value="default"/>
       </xs:restriction>
     </xs:simpleType>

@@ -60,11 +60,11 @@ public class AsynchronousSubmissionManager {
                 containingDocument.getEffectiveId(),
                 false,
                 false,
-                containingDocument.getSubmissionPollDelay(),
+                System.currentTimeMillis() + containingDocument.getSubmissionPollDelay(),
                 true,
                 false,
-                null)
-            ;
+                null
+            );
         }
     }
 

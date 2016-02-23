@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
@@ -39,8 +37,6 @@ import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 
@@ -53,9 +49,9 @@ import java.util.concurrent.locks.Lock;
  *
  * The containing document:
  *
- * o Is the container for root XForms models (including multiple instances)
- * o Contains XForms controls
- * o Handles event handlers hierarchy
+ * - Is the container for root XForms models (including multiple instances)
+ * - Contains XForms controls
+ * - Handles event handlers hierarchy
  */
 public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
@@ -99,7 +95,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     private List<Load> loadsToRun;
     private List<ScriptInvocation> scriptsToRun;
     private String helpEffectiveControlId;
-    private List<DelayedEvent> delayedEvents;
     private List<ServerError> serverErrors;
     private Set<String> controlsStructuralChanges;
 
@@ -184,6 +179,8 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
                 }
                 // End deferred behavior
                 endOutermostActionHandler();
+
+                processDueDelayedEvents();
             }
         });
     }
@@ -420,7 +417,8 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         this.loadsToRun = null;
         this.scriptsToRun = null;
         this.helpEffectiveControlId = null;
-        this.delayedEvents = null;
+
+        this.clearAllDelayedEvents();
 
         this.serverErrors = null;
 
@@ -493,139 +491,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             return messagesToRun;
         else
             return Collections.emptyList();
-    }
-
-    /**
-     * Schedule an event for delayed execution, following xf:dispatch/@delay semantics.
-     *
-     * @param eventName         name of the event to dispatch
-     * @param targetEffectiveId id of the target to dispatch to
-     * @param bubbles           whether the event bubbles
-     * @param cancelable        whether the event is cancelable
-     * @param delay             delay after which to dispatch the event
-     * @param isMaxDelay        whether the delay indicates a maximum delay
-     * @param showProgress      whether to show the progress indicator when submitting the event
-     * @param progressMessage   message to show if the progress indicator is visible
-     */
-    public void addDelayedEvent(
-        String eventName,
-        String targetEffectiveId,
-        boolean bubbles,
-        boolean cancelable,
-        int delay,
-        boolean isMaxDelay,
-        boolean showProgress,
-        String progressMessage) {
-
-        if (delayedEvents == null)
-            delayedEvents = new ArrayList<DelayedEvent>();
-
-        delayedEvents.add(
-            new DelayedEvent(
-                eventName,
-                targetEffectiveId,
-                bubbles,
-                cancelable,
-                System.currentTimeMillis() + delay,
-                isMaxDelay,
-                showProgress,
-                progressMessage
-            )
-        );
-    }
-
-    public List<DelayedEvent> getDelayedEvents() {
-        if (delayedEvents != null)
-            return delayedEvents;
-        else
-            return Collections.emptyList();
-    }
-
-    public static class DelayedEvent {
-        // Event information
-        private final String eventName;
-        private final String targetEffectiveId;
-        private final boolean bubbles;
-        private final boolean cancelable;
-        // Meta information
-        private final long time;
-        private final boolean isMaxDelay;
-        private final boolean showProgress;
-        private final String progressMessage;
-
-        public DelayedEvent(String eventName, String targetEffectiveId, boolean bubbles, boolean cancelable, long time,
-                            boolean isMaxDelay, boolean showProgress, String progressMessage) {
-            this.eventName = eventName;
-            this.targetEffectiveId = targetEffectiveId;
-            this.bubbles = bubbles;
-            this.cancelable = cancelable;
-            this.time = time;
-            this.isMaxDelay = isMaxDelay;
-            this.showProgress = showProgress;
-            this.progressMessage = progressMessage;
-        }
-
-        public String getEncodedDocument() {
-            final Document eventsDocument = Dom4jUtils.createDocument();
-            final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
-
-            final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
-            eventElement.addAttribute("name", eventName);
-            eventElement.addAttribute("source-control-id", targetEffectiveId);
-            eventElement.addAttribute("bubbles", Boolean.toString(bubbles));
-            eventElement.addAttribute("cancelable", Boolean.toString(cancelable));
-
-            return XFormsUtils.encodeXML(eventsDocument, false);
-        }
-
-        public boolean isShowProgress() {
-            return showProgress;
-        }
-
-        public String getProgressMessage() {
-            return progressMessage;
-        }
-
-        public long getTime() {
-            return time;
-        }
-
-        public boolean isMaxDelay() {
-            return isMaxDelay;
-        }
-
-        public void toSAX(XMLReceiverHelper ch, long currentTime) {
-            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
-                    new String[] {
-                            "delay", Long.toString(getTime() - currentTime),
-                            "discardable", isMaxDelay() ? "true" : null,
-                            "show-progress", Boolean.toString(isShowProgress()),
-                            "progress-message", isShowProgress() ? getProgressMessage() : null
-                    });
-            ch.text(getEncodedDocument());
-            ch.endElement();
-        }
-
-        public void toJSON(StringBuilder sb, long currentTime) {
-            sb.append('{');
-            sb.append("\"delay\":");
-            sb.append(getTime() - currentTime);
-            if (isMaxDelay()) {
-                sb.append(",\"discardable\":true");
-            }
-            sb.append(",\"show-progress\":");
-            sb.append(isShowProgress());
-            if (isShowProgress()) {
-                sb.append(",\"progress-message\":\"");
-                XFormsUtils.escapeJavaScript(getProgressMessage());
-                sb.append('"');
-            }
-            sb.append(",\"event\":\"");
-            sb.append(getEncodedDocument());
-            sb.append('"');
-
-            sb.append("}");
-        }
     }
 
     public static class Message {
@@ -857,8 +722,8 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      */
     public void afterExternalEvents() {
 
-        // Process completed asynchronous submissions if any
         processCompletedAsynchronousSubmissions(false, true);
+        processDueDelayedEvents();
 
         this.response = null;
     }

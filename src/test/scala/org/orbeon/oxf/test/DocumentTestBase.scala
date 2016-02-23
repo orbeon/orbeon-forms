@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.test
 
-import org.dom4j.{Document ⇒ JDocument}
+import org.dom4j
 import org.junit.After
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
 
@@ -27,7 +27,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
   def setupDocument(documentURL: String): XFormsContainingDocument =
     setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-  def setupDocument(xhtml: JDocument): XFormsContainingDocument = {
+  def setupDocument(xhtml: dom4j.Document): XFormsContainingDocument = {
     ResourceManagerTestBase.staticSetup()
 
     val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)

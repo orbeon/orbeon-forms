@@ -18,12 +18,10 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.webapp.SessionExpiredException;
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -31,6 +29,7 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.webapp.SessionExpiredException;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -44,7 +43,8 @@ import org.orbeon.oxf.xforms.state.XFormsStateLifecycle;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
@@ -640,11 +640,11 @@ public class XFormsServer extends ProcessorImpl {
                     ch.endElement();
                 }
                 {
-                    final List<XFormsContainingDocument.DelayedEvent> delayedEvents = containingDocument.getDelayedEvents();
-                    if (delayedEvents.size() > 0) {
+                    final List<DelayedEvent> delayedEvents = containingDocument.delayedEventsJava();
+                    if (! delayedEvents.isEmpty()) {
                         final long currentTime = System.currentTimeMillis();
-                        for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
-                            delayedEvent.toSAX(ch, currentTime);
+                        for (DelayedEvent delayedEvent : delayedEvents) {
+                            delayedEvent.writeAsSAX(currentTime, ch.getXmlReceiver());
                         }
                     }
                 }

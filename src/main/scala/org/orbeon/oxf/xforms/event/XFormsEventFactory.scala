@@ -93,11 +93,16 @@ object XFormsEventFactory {
   )
 
   // Create an event
-  def createEvent(eventName: String, target: XFormsEventTarget, properties: PropertyGetter = EmptyGetter, allowCustomEvents: Boolean = false, bubbles: Boolean = true, cancelable: Boolean = true): XFormsEvent =
+  def createEvent(
+    eventName         : String,
+    target            : XFormsEventTarget,
+    properties        : PropertyGetter = EmptyGetter,
+    bubbles           : Boolean = true,
+    cancelable        : Boolean = true
+  ): XFormsEvent =
     nameToClassMap.get(eventName) match {
-      case Some(factory)             ⇒ factory(target, properties)
-      case None if allowCustomEvents ⇒ new XFormsCustomEvent(eventName, target, properties, bubbles, cancelable)
-      case None                      ⇒ throw new OXFException("Invalid event name: " + eventName)
+      case Some(factory) ⇒ factory(target, properties)
+      case None          ⇒ new XFormsCustomEvent(eventName, target, properties, bubbles, cancelable)
     }
 
   // Check whether an event name maps to a built-in event

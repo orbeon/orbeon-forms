@@ -96,14 +96,20 @@ trait XFormsSupport extends MockitoSugar {
     document.endOutermostActionHandler()
   }
 
-  def setControlValueWithEvent(controlId: String, value: String): Unit =
+  def setControlValueWithEvent(controlId: String, value: String): Unit = {
     ClientEvents.processEvent(document, new XXFormsValueEvent(getObject(controlId).asInstanceOf[XFormsEventTarget], value))
+    document.afterExternalEvents()
+    document.afterUpdateResponse()
+    document.beforeExternalEvents(null)
+  }
 
   def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
   def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
   def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
   def isValid(controlId: String)    = getSingleNodeControl(controlId).isValid
   def getType(controlId: String)    = getSingleNodeControl(controlId).valueType
+
+  def hasFocus(controlId: String)   = getSingleNodeControl(controlId) eq document.getControls.getFocusedControl
 
   def getItemset(controlId: String) = {
     val select1 = getObject(controlId).asInstanceOf[XFormsSelect1Control]

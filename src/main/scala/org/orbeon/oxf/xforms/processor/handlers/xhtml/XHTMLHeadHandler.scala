@@ -412,10 +412,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     val hasPaths = true
     val hasInitControls = jsControlsAppearancesMap.nonEmpty
     val hasKeyListeners = containingDocument.getStaticOps.keypressHandlers.nonEmpty
-    val hasServerEvents = {
-      val delayedEvents = containingDocument.getDelayedEvents
-      delayedEvents.asScala.nonEmpty
-    }
+    val hasServerEvents = containingDocument.delayedEvents.nonEmpty
     val outputInitData = hasPaths || hasInitControls || hasKeyListeners || hasServerEvents
 
     if (outputInitData) {
@@ -530,10 +527,10 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         sb.append("\"server-events\":[")
         val currentTime = System.currentTimeMillis
         var first = true
-        for (delayedEvent ← containingDocument.getDelayedEvents.asScala) {
+        for (delayedEvent ← containingDocument.delayedEvents) {
           if (! first)
             sb.append(',')
-          delayedEvent.toJSON(sb, currentTime)
+          delayedEvent.writeAsJSON(sb, currentTime)
           first = false
         }
         sb.append(']')

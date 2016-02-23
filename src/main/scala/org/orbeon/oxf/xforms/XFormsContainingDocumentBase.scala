@@ -13,32 +13,41 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-
-import collection.JavaConverters._
-import collection.mutable
-import org.orbeon.oxf.cache.Cacheable
-import org.orbeon.oxf.util._
-import URLRewriterUtils.PathMatcher
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter
-import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import java.{util ⇒ ju}
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState}
-import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.util.XPath.CompiledExpression
-import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
-import ScalaUtils._
-import XFormsProperties._
+
+import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
+import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
+import org.orbeon.oxf.xforms.event.ClientEvents._
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventFactory, XFormsEventTarget}
+import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
+
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private object XFormsContainingDocumentBase {
   val ContainingDocumentPseudoId = "#document"
 }
 
-import XFormsContainingDocumentBase._
+import org.orbeon.oxf.xforms.XFormsContainingDocumentBase._
 
 abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
     extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
@@ -48,6 +57,7 @@ abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
     with ContainingDocumentProperties
     with ContainingDocumentRequestStats
     with ContainingDocumentRequest
+    with ContainingDocumentDelayedEvents
     with XFormsDocumentLifecycle
     with Cacheable
     with XFormsObject
@@ -273,7 +283,7 @@ trait ContainingDocumentRequestStats {
 
 trait ContainingDocumentRequest {
 
-  private var _deploymentType       : XFormsConstants.DeploymentType = null
+  private var _deploymentType       : DeploymentType = null
   private var _requestContextPath   : String = null
   private var _requestPath          : String = null
   private var _requestHeaders       : Map[String, List[String]] = null
@@ -306,9 +316,9 @@ trait ContainingDocumentRequest {
 
         _deploymentType =
           rendererDeploymentType match {
-            case "separate"   ⇒ XFormsConstants.DeploymentType.separate
-            case "integrated" ⇒ XFormsConstants.DeploymentType.integrated
-            case _            ⇒ XFormsConstants.DeploymentType.standalone
+            case "separate"   ⇒ DeploymentType.separate
+            case "integrated" ⇒ DeploymentType.integrated
+            case _            ⇒ DeploymentType.standalone
           }
 
         // Try to get request context path
@@ -330,7 +340,7 @@ trait ContainingDocumentRequest {
         _containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace, "")
       case None ⇒
         // Special case when we run outside the context of a request
-        _deploymentType = XFormsConstants.DeploymentType.standalone
+        _deploymentType = DeploymentType.standalone
         _requestContextPath = ""
         _requestPath = "/"
         _requestHeaders = Map.empty
@@ -348,7 +358,7 @@ trait ContainingDocumentRequest {
     dynamicState.deploymentType match {
       case Some(_) ⇒
         // Normal case where information below was previously serialized
-        _deploymentType     = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
+        _deploymentType     = DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava)
         _requestContextPath = dynamicState.decodeRequestContextPathJava
         _requestPath        = dynamicState.decodeRequestPathJava
         _requestHeaders     = dynamicState.requestHeaders.toMap
@@ -363,4 +373,159 @@ trait ContainingDocumentRequest {
 
   protected def restorePathMatchers(dynamicState: DynamicState): Unit =
     _versionedPathMatchers = dynamicState.decodePathMatchersJava
+}
+
+trait ContainingDocumentDelayedEvents {
+
+  self: XBLContainer ⇒
+
+  private val _delayedEvents = ListBuffer[DelayedEvent]()
+
+  // Schedule an event for delayed execution, following xf:dispatch/@delay semantics
+  def addDelayedEvent(
+    eventName         : String,
+    targetEffectiveId : String,
+    bubbles           : Boolean,
+    cancelable        : Boolean,
+    time              : Long,
+    discardable       : Boolean,
+    showProgress      : Boolean,
+    progressMessage   : String
+  ): Unit = {
+    _delayedEvents += DelayedEvent(
+      eventName,
+      targetEffectiveId,
+      bubbles,
+      cancelable,
+      time,
+      discardable,
+      showProgress,
+      progressMessage
+    )
+  }
+
+  def delayedEvents =
+    _delayedEvents.toList
+
+  def delayedEventsJava =
+    delayedEvents.asJava
+
+  def clearAllDelayedEvents() =
+    _delayedEvents.clear()
+
+  def processDueDelayedEvents(): Unit = {
+
+    @tailrec
+    def processRemainingBatchesRecursively(): Unit = {
+
+      // Get a fresh time for every batch because processing a batch can take time
+      val currentTime = System.currentTimeMillis()
+
+      val (dueEvents, futureEvents) = delayedEvents partition (_.time <= currentTime)
+
+      if (dueEvents.nonEmpty) {
+
+        _delayedEvents.clear()
+        _delayedEvents ++= futureEvents
+
+        dueEvents foreach { dueEvent ⇒
+
+          startOutermostActionHandler()
+
+          self.getObjectByEffectiveId(dueEvent.targetEffectiveId) match {
+            case eventTarget: XFormsEventTarget ⇒
+              ClientEvents.processEvent(
+                self.containingDocument,
+                XFormsEventFactory.createEvent(
+                  eventName         = dueEvent.eventName,
+                  target            = eventTarget,
+                  properties        = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
+                  bubbles           = dueEvent.bubbles,
+                  cancelable        = dueEvent.cancelable
+                )
+              )
+            case _ ⇒
+              implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
+              debug(
+                "ignoring delayed event with invalid target id",
+                List(
+                  "target id"  → dueEvent.targetEffectiveId,
+                  "event name" → dueEvent.eventName
+                )
+              )
+          }
+
+          endOutermostActionHandler()
+        }
+
+        // Try again in case there are new events available
+        processRemainingBatchesRecursively()
+      }
+    }
+
+    processRemainingBatchesRecursively()
+  }
+}
+
+case class DelayedEvent(
+  eventName         : String,
+  targetEffectiveId : String,
+  bubbles           : Boolean,
+  cancelable        : Boolean,
+  time              : Long,
+  discardable       : Boolean, // whether the client can discard the event past the delay (see AjaxServer.js)
+  showProgress      : Boolean, // whether to show the progress indicator when submitting the event
+  progressMessage   : String   // message to show if the progress indicator is visible
+) {
+
+  private def asEncodedDocument: String = {
+
+    val eventsDocument = Dom4jUtils.createDocument
+    val eventsElement  = eventsDocument.addElement(XXFORMS_EVENTS_QNAME)
+    val eventElement   = eventsElement.addElement(XXFORMS_EVENT_QNAME)
+
+    eventElement.addAttribute("name", eventName)
+    eventElement.addAttribute("source-control-id", targetEffectiveId)
+    eventElement.addAttribute("bubbles", bubbles.toString)
+    eventElement.addAttribute("cancelable", cancelable.toString)
+
+    XFormsUtils.encodeXML(eventsDocument, false)
+  }
+
+  def writeAsSAX(currentTime: Long)(implicit receiver: XMLReceiver): Unit = {
+
+    import XMLReceiverSupport._
+
+    element(
+      localName = "server-events",
+      prefix    = "xxf",
+      uri       = XXFORMS_NAMESPACE_URI,
+      atts      =
+        ("delay"            → (time - currentTime).toString) ::
+        ("discardable"      → discardable.toString)          ::
+        ("show-progress"    → showProgress.toString)         :: (showProgress list
+        ("progress-message" → progressMessage)),
+      text      = asEncodedDocument
+    )
+  }
+
+  def writeAsJSON(sb: java.lang.StringBuilder, currentTime: Long): Unit = {
+    sb.append('{')
+    sb.append("\"delay\":")
+    sb.append(time - currentTime)
+    if (discardable) {
+      sb.append(",\"discardable\":true")
+    }
+    sb.append(",\"show-progress\":")
+    sb.append(showProgress)
+    if (showProgress) {
+      sb.append(",\"progress-message\":\"")
+      XFormsUtils.escapeJavaScript(progressMessage)
+      sb.append('"')
+    }
+    sb.append(",\"event\":\"")
+    sb.append(asEncodedDocument)
+    sb.append('"')
+    sb.append("}")
+  }
 }

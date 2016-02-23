@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsAction, XFormsActionInterpreter}
-import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
-import org.apache.commons.lang3.StringUtils.isNotBlank
 
 import scala.util.Try
 
@@ -78,7 +79,7 @@ class XFormsDispatchAction extends XFormsAction {
       case xformsEventTarget: XFormsEventTarget ⇒
         // Execute the dispatch proper
         XFormsDispatchAction.dispatch(
-          name            = resolvedNewEventName,
+          eventName       = resolvedNewEventName,
           target          = xformsEventTarget,
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
@@ -99,14 +100,14 @@ class XFormsDispatchAction extends XFormsAction {
 object XFormsDispatchAction {
 
   def dispatch(
-    name            : String,
+    eventName       : String,
     target          : XFormsEventTarget,
-    bubbles         : Boolean                    = true,
-    cancelable      : Boolean                    = true,
-    properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
-    delayOpt        : Option[Int]                = None,
-    showProgress    : Boolean                    = true,
-    progressMessage : String                     = null
+    bubbles         : Boolean        = true,
+    cancelable      : Boolean        = true,
+    properties      : PropertyGetter = EmptyGetter,
+    delayOpt        : Option[Int]    = None,
+    showProgress    : Boolean        = true,
+    progressMessage : String         = null
   ): Unit =
     delayOpt match {
       case Some(delay) if delay >= 0 ⇒
@@ -120,14 +121,14 @@ object XFormsDispatchAction {
         // element that must be unique."
 
         XFormsAPI.containingDocument.addDelayedEvent(
-          name,
-          target.getEffectiveId,
-          bubbles,
-          cancelable,
-          delay,
-          false,
-          showProgress,
-          progressMessage
+          eventName         = eventName,
+          targetEffectiveId = target.getEffectiveId,
+          bubbles           = bubbles,
+          cancelable        = cancelable,
+          time              = System.currentTimeMillis + delay,
+          discardable       = false,
+          showProgress      = showProgress,
+          progressMessage   = progressMessage
         )
       case _ ⇒
         // Event is dispatched immediately
@@ -139,10 +140,9 @@ object XFormsDispatchAction {
         // Create and dispatch the event including custom properties (AKA context information)
         Dispatch.dispatchEvent(
           createEvent(
-            name,
+            eventName,
             target,
             properties,
-            allowCustomEvents = true,
             bubbles,
             cancelable
           )

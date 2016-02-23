@@ -318,9 +318,9 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         eventName,
         eventTarget,
         event.properties ++ standardProperties ++ eventValue,
-        allowCustomEvents = true,
         event.bubbles,
-        event.cancelable)
+        event.cancelable
+      )
     }
   }
 

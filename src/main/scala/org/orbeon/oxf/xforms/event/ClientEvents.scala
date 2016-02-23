@@ -153,8 +153,9 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       val valueChangeControlIds = allClientAndServerEvents collect
         { case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId } toSet
 
-      // Last client focus/blur event received
-      val clientFocusControlId = allClientAndServerEvents.reverse collectFirst {
+      // Last focus/blur event received from the client
+      // This ignores server events, see: https://github.com/orbeon/orbeon-forms/issues/2567
+      val clientFocusControlId = allClientAndServerEvents.reverse filterNot (_.trusted) collectFirst {
         case e if e.name == XFORMS_FOCUS ⇒ Some(e.targetEffectiveId)
         case e if e.name == XXFORMS_BLUR ⇒ None
       }

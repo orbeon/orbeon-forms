@@ -27,7 +27,7 @@
         id="fr-open-select1"
         element="fr|open-select1"
         xxbl:container="span"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value focus"
         xxbl:label-for="select1">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -84,15 +84,16 @@
                     <xf:label ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
                     <xf:value ref="if ($closed-value) then '' else ."/>
                 </xf:item>
+                <!-- Focus asynchronously because the input is not visible yet and a plain `setfocus` would fail -->
+                <xf:dispatch
+                    event="xforms-select"
+                    if="xxf:is-blank(event('xxf:item-value'))"
+                    delay="0"
+                    name="xforms-focus"
+                    targetid="input"/>
             </xf:select1>
             <xf:input id="input" ref="$binding[not($closed-value)]">
                 <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
-                <!-- When the control appears and its value is empty, it means that the
-                     user just chose the "Other" option. -->
-                <xf:setfocus
-                    event="xforms-enabled"
-                    if="xxf:is-blank()"
-                    control="input"/>
             </xf:input>
         </xbl:template>
     </xbl:binding>

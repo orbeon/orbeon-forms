@@ -391,7 +391,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     ) throws SAXException {
         if (control != null && ! handlerContext.isTemplate()) {
             // Produce a JSON fragment with hierarchical information
-            final String result = itemset.getJSONTreeInfo(control.getValue(), encode, handlerContext.getLocationData());
+            final String result = itemset.asJSON(control.getValue(), encode, handlerContext.getLocationData());
             contentHandler.characters(result.toCharArray(), 0, result.length());
         } else {
             // Don't produce any content when generating a template

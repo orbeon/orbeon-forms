@@ -238,7 +238,7 @@ class XFormsSelect1Control(
 
       val itemset = getItemset
       if (itemset ne null) {
-        val result = itemset.getJSONTreeInfo(null, mustEncodeValues, getLocationData)
+        val result = itemset.asJSON(null, mustEncodeValues, getLocationData)
         if (result.nonEmpty)
           ch.text(result)
       }

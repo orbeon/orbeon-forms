@@ -35,10 +35,10 @@ class XXFormsItemset extends XFormsFunction with FunctionSupport {
 
       if (format == "json")
         // Return a string
-        itemset.getJSONTreeInfo(controlValueForSelection, control.mustEncodeValues, control.getLocationData)
+        itemset.asJSON(controlValueForSelection, control.mustEncodeValues, control.getLocationData)
       else
         // Return an XML document
-        itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, control.getLocationData)
+        itemset.asXML(xpathContext.getConfiguration, controlValueForSelection, control.getLocationData)
     }
 
     // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856

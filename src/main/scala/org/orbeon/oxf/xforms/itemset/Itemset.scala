@@ -40,10 +40,8 @@ class Itemset(multiple: Boolean) extends ItemContainer {
   def jSelectedItems(value: String): JIterable[Item] =
     (allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList) asJava
 
-  // Return the list of items as a JSON tree
-  def getJSONTreeInfo(controlValue: String, encode: Boolean, locationData: LocationData): String = {
-    // Produce a JSON fragment with hierarchical information
-
+  // Return the list of items as a JSON tree with hierarchical information
+  def asJSON(controlValue: String, encode: Boolean, locationData: LocationData): String = {
     val sb = new StringBuilder
     // Array of top-level items
     sb.append("[")
@@ -117,7 +115,8 @@ class Itemset(multiple: Boolean) extends ItemContainer {
         def endLevel(o: AnyRef) = ()
       })
     } catch {
-      case e: SAXException ⇒ throw new ValidationException("Error while creating itemset tree", e, locationData)
+      case e: SAXException ⇒
+        throw new ValidationException("Error while creating itemset tree", e, locationData)
     }
     sb.append("]")
 
@@ -125,7 +124,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
   }
 
   // Return the list of items as an XML tree
-  def getXMLTreeInfo(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
+  def asXML(configuration: Configuration, controlValue: String, locationData: LocationData): DocumentInfo = {
     val treeBuilder = new TinyBuilder
     val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
     identity.setResult(treeBuilder)

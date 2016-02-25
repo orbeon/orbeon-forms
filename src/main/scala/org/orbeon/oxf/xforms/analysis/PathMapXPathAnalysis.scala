@@ -346,8 +346,12 @@ object PathMapXPathAnalysis {
     }
   }
 
-  private def extractInstancePrefixedId(partAnalysis: PartAnalysis, scope: Scope, expression: Expression,
-                      defaultInstancePrefixedId: Option[String]): String Either Option[String] = {
+  private def extractInstancePrefixedId(
+    partAnalysis              : PartAnalysis,
+    scope                     : Scope,
+    expression                : Expression,
+    defaultInstancePrefixedId : Option[String]
+  ): String Either Option[String] = {
 
     // Local class used as marker for a rewritten StringLiteral in an expression
     class PrefixedIdStringLiteral(value: CharSequence, val prefixedValue: String) extends StringLiteral(value)

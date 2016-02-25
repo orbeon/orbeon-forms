@@ -358,7 +358,11 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     val cached = RefreshState.modifiedValueCacheForRepeats.get(controlPrefixedId)
     val (updateResult, valueAnalysis) =
       cached match {
-        case Some(result) ⇒ (result, if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null)
+        case Some(result) ⇒
+          (
+            result,
+            if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null
+          )
         case None ⇒
           val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
           val tempValueAnalysis = control.getValueAnalysis

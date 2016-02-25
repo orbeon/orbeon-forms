@@ -17,20 +17,21 @@ import org.apache.commons.lang3.StringUtils
 import org.dom4j.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{ScalaUtils, XPath, XPathCache}
+import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.control.LHHAValue
-import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.dom4j.DocumentWrapper
 
-import scala.collection.JavaConverters._
-
-trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait with ChildrenLHHAItemsetsAndActionsTrait {
+trait SelectionControlTrait
+extends InputValueControl
+   with SelectAppearanceTrait
+   with ChildrenLHHAItemsetsAndActionsTrait {
 
   if  (element.attributeValue("selection") == "open")
     throw new ValidationException("Open selection is currently not supported.", locationData)
@@ -107,7 +108,13 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             require(nestedElement ne null)
 
           if (nestedElement ne null) {
-            val nestedAnalysis = new LHHAAnalysis(staticStateContext, nestedElement, Some(itemElementAnalysis), None, itemElementAnalysis.getChildElementScope(nestedElement))
+            val nestedAnalysis = new LHHAAnalysis(
+              staticStateContext = staticStateContext,
+              element            = nestedElement,
+              parent             = Some(itemElementAnalysis),
+              preceding          = None,
+              scope              = itemElementAnalysis.getChildElementScope(nestedElement)
+            )
             nestedAnalysis.analyzeXPath()
             combinedAnalysis = combinedAnalysis combine nestedAnalysis.getValueAnalysis.get
           }
@@ -205,10 +212,13 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
           val nestedElementOpt = Option(element.element(qName))
 
           if (required && nestedElementOpt.isEmpty)
-            throw new ValidationException(s"${XFORMS_ITEM_QNAME.getQualifiedName} must contain an ${qName.getQualifiedName} element.", ElementAnalysis.createLocationData(element))
+            throw new ValidationException(
+              s"${XFORMS_ITEM_QNAME.getQualifiedName} must contain an ${qName.getQualifiedName} element.",
+              ElementAnalysis.createLocationData(element)
+            )
 
           nestedElementOpt flatMap { nestedElement ⇒
-            val containsHTML = Array(false)
+            val containsHTML = Array[Boolean](false)
 
             val valueOpt = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, nestedElement, isFull, containsHTML).trimAllToOpt
 
@@ -230,24 +240,46 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             val value = {
               val valueElement = element.element(XFORMS_VALUE_QNAME)
               if (valueElement eq null)
-                throw new ValidationException("xf:item must contain an xf:value element.", ElementAnalysis.createLocationData(element))
+                throw new ValidationException(
+                  "xf:item must contain an xf:value element.",
+                  ElementAnalysis.createLocationData(element)
+                )
 
               StringUtils.defaultString(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null))
             }
 
-            val attributes = SelectionControlUtil.getAttributes(element)
-            currentContainer.addChildItem(Item(position, isMultiple, attributes, label, help, hint, value))
+            currentContainer.addChildItem(
+              Item(
+                position   = position,
+                isMultiple = isMultiple,
+                attributes = SelectionControlUtil.getAttributes(element),
+                label      = label,
+                help       = help,
+                hint       = hint,
+                value      = value
+              )
+            )
             position += 1
 
           case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
 
-            throw new ValidationException("xf:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
+            throw new ValidationException(
+              "xf:itemset must not appear in static itemset.",
+              ElementAnalysis.createLocationData(element)
+            )
 
           case XFORMS_CHOICES_QNAME ⇒ // xf:choices
 
             findNestedLHHValue(LABEL_QNAME, required = false) foreach { label ⇒
-              val attributes = SelectionControlUtil.getAttributes(element)
-              val newContainer = Item(position, isMultiple, attributes, label, None, None, null)
+              val newContainer = Item(
+                position   = position,
+                isMultiple = isMultiple,
+                attributes = SelectionControlUtil.getAttributes(element),
+                label      = label,
+                help       = None,
+                hint       = None,
+                value      = null
+              )
               position += 1
               currentContainer.addChildItem(newContainer)
               currentContainer = newContainer
@@ -273,20 +305,16 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
 object SelectionControlUtil {
 
+  val AttributesToPropagate = List(CLASS_QNAME, STYLE_QNAME, XXFORMS_OPEN_QNAME)
   val TopLevelItemsetQNames = Set(XFORMS_ITEM_QNAME, XFORMS_ITEMSET_QNAME, XFORMS_CHOICES_QNAME)
+
   def isTopLevelItemsetElement(e: Element) = TopLevelItemsetQNames(e.getQName)
 
-  private val attributesToPropagate = XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE.toSeq
-
-  def getAttributes(itemChoiceItemset: Element) = {
-    val tuples =
-      for {
-        attributeName ← attributesToPropagate
-        attributeValue = itemChoiceItemset.attributeValue(attributeName)
-        if attributeValue ne null
-      } yield
-        attributeName → attributeValue
-
-    tuples.toMap.asJava
-  }
+  def getAttributes(itemChoiceItemset: Element) =
+    for {
+      attributeName   ← AttributesToPropagate
+      attributeValue = itemChoiceItemset.attributeValue(attributeName)
+      if attributeValue ne null
+    } yield
+      attributeName → attributeValue
 }

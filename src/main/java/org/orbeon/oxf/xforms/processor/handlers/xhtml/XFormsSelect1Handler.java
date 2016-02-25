@@ -36,9 +36,11 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.Option;
+import scala.Tuple2;
+import scala.collection.immutable.List$;
 
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Handle xf:select and xf:select1.
@@ -367,7 +369,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             Item.apply(
                 0,
                 isMultiple,
-                null, // make sure the value "$xforms-template-value$" is not encrypted
+                List$.MODULE$.<Tuple2<QName, String>>empty(), // make sure the value "$xforms-template-value$" is not encrypted
                 new LHHAValue("$xforms-template-label$", false),
                 Option.apply(new LHHAValue("$xforms-template-help$", false)),
                 Option.apply(new LHHAValue("$xforms-template-hint$", false)),
@@ -563,29 +565,28 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     private static void addItemAttributes(Item item, AttributesImpl spanAttributes) {
-        final Map<QName, String> itemAttributes = item.jAttributes();
-        if (itemAttributes != null && itemAttributes.size() > 0) {
-            for (final Map.Entry<QName, String> entry: itemAttributes.entrySet()) {
-                final QName attributeQName = entry.getKey();
+        final List<Tuple2<QName, String>> itemAttributes = item.jAttributes();
+        if (! itemAttributes.isEmpty()) {
+            for (final Tuple2<QName, String> nameValue: itemAttributes) {
+                final QName attributeQName = nameValue._1();
                 if (!attributeQName.equals(XFormsConstants.CLASS_QNAME)) { // class is handled separately
                     final String attributeName = Itemset.getAttributeName(attributeQName);
-                    spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, entry.getValue());
+                    spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, nameValue._2());
                 }
             }
         }
     }
 
     private static String getItemClasses(Item item, String initialClasses) {
-        final Map<QName, String> itemAttributes = item.jAttributes();
+        final Option<String> classOpt = item.classAttribute();
         final StringBuilder sb = (initialClasses != null) ? new StringBuilder(initialClasses) : new StringBuilder();
-        if (itemAttributes != null) {
-            final String itemClassValue = itemAttributes.get(XFormsConstants.CLASS_QNAME);
-            if (itemClassValue != null) {
-                if (sb.length() > 0)
-                    sb.append(' ');
-                sb.append(itemClassValue);
-            }
+
+        if (classOpt.isDefined()) {
+            if (sb.length() > 0)
+                sb.append(' ');
+            sb.append(classOpt.get());
         }
+
         return sb.toString();
     }
 

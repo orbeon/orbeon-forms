@@ -357,7 +357,7 @@ object XPathCache {
     functionContext    : FunctionContext,
     baseURI            : String,
     locationData       : LocationData,
-    reporter: Reporter
+    reporter           : Reporter
   ) : String = {
 
     val xpathExpression =

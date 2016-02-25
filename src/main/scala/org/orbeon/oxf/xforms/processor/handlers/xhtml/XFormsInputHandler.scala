@@ -68,7 +68,17 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
       // the encrypted value of "true". So we do not encrypt values.
       // NOTE: Put null label so that it is not output at all
       // encode = false,
-      itemset.addChildItem(Item(0, isMultiple, attributes = null, label = null, help = None, hint = None, value = "true"))
+      itemset.addChildItem(
+        Item(
+          position   = 0,
+          isMultiple = isMultiple,
+          attributes = Nil,
+          label      = null,
+          help       = None,
+          hint       = None,
+          value      = "true"
+        )
+      )
 
       // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
       val select1Handler = new XFormsSelect1Handler {

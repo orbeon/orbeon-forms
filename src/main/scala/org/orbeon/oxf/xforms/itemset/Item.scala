@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import collection.JavaConverters._
-import java.util.{Map ⇒ JMap}
 import org.dom4j.QName
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.LHHAValue
 import org.orbeon.oxf.xml.dom4j.LocationData
+
+import scala.collection.JavaConverters._
 
 /**
  * Represents an item (xf:item, xf:choice, or item in itemset).
@@ -28,7 +29,7 @@ case class Item(
   help       : Option[LHHAValue],
   hint       : Option[LHHAValue],
   value      : String,
-  attributes : Map[QName, String])(val
+  attributes : List[(QName, String)])(val
   position   : Int)
 extends ItemContainer {
 
@@ -48,6 +49,8 @@ extends ItemContainer {
   // - xf|input:xxf-type(xs:boolean)
 
   def jAttributes = attributes.asJava
+
+  def classAttribute = attributes find (_._1 == XFormsConstants.CLASS_QNAME) map (_._2)
 
   def externalValue(encode: Boolean)   = Option(value) map (v ⇒ if (encode) position.toString else v) getOrElse ""
   def javaScriptValue(encode: Boolean) = escapeJavaScript(externalValue(encode))
@@ -87,11 +90,11 @@ object Item {
   def apply(
     position   : Int,
     isMultiple : Boolean,
-    attributes : JMap[QName, String],
+    attributes : List[(QName, String)],
     label      : LHHAValue,
     help       : Option[LHHAValue],
     hint       : Option[LHHAValue],
     value      : String
   ): Item =
-    Item(label, help, hint, value, if (attributes eq null) Map.empty else attributes.asScala.toMap)(position)
+    Item(label, help, hint, value, attributes)(position)
 }

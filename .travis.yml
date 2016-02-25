@@ -32,3 +32,4 @@ addons:
     artifacts:
         paths:
             - $(ls build/distrib/* | tr "\n" ":")
+

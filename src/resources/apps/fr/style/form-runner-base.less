@@ -168,6 +168,34 @@
         -moz-appearance: textfield;
     }
 
+    // For checkboxes and radio buttons, unlike what is done by default by Bootstrap, we don't want the "white"
+    // area to the right of the label text to be clickable. Otherwise users might select a radio or checkbox by
+    // mistake, while they intended to click on the background of the page. This means that the <label> should
+    // only extend as far to the right as necessary for the text of the label, but not always all the way to the
+    // right of the space available to the control.
+
+    .xforms-select1-appearance-full,
+    .xforms-select-appearance-full  {
+        .xforms-selected,
+        .xforms-deselected {
+            display: block;
+        }
+        label.radio,
+        label.checkbox {
+            display: inline-block;
+            padding-left: 0;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-left: 0;
+        }
+        label.radio > span,
+        label.checkbox > span {
+            display: block;
+            margin-left: 20px;
+        }
+    }
+
     // ***** General Layout ********************************************************************************************
 
     // Language and mode selectors

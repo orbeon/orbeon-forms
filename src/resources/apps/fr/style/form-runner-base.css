@@ -139,6 +139,32 @@
 .orbeon input[type=number] {
   -moz-appearance: textfield;
 }
+.orbeon .xforms-select1-appearance-full .xforms-selected,
+.orbeon .xforms-select-appearance-full .xforms-selected,
+.orbeon .xforms-select1-appearance-full .xforms-deselected,
+.orbeon .xforms-select-appearance-full .xforms-deselected {
+  display: block;
+}
+.orbeon .xforms-select1-appearance-full label.radio,
+.orbeon .xforms-select-appearance-full label.radio,
+.orbeon .xforms-select1-appearance-full label.checkbox,
+.orbeon .xforms-select-appearance-full label.checkbox {
+  display: inline-block;
+  padding-left: 0;
+}
+.orbeon .xforms-select1-appearance-full input[type="radio"],
+.orbeon .xforms-select-appearance-full input[type="radio"],
+.orbeon .xforms-select1-appearance-full input[type="checkbox"],
+.orbeon .xforms-select-appearance-full input[type="checkbox"] {
+  margin-left: 0;
+}
+.orbeon .xforms-select1-appearance-full label.radio > span,
+.orbeon .xforms-select-appearance-full label.radio > span,
+.orbeon .xforms-select1-appearance-full label.checkbox > span,
+.orbeon .xforms-select-appearance-full label.checkbox > span {
+  display: block;
+  margin-left: 20px;
+}
 .orbeon .fr-language-choice,
 .orbeon .fr-noscript-choice,
 .orbeon .fr-goto-content,

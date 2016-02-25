@@ -20,7 +20,8 @@
 
     var Form = ORBEON.xforms.Form;
     var Page = ORBEON.xforms.Page;
-    var YD = YAHOO.util.Dom;
+    var $    = ORBEON.jQuery;
+    var YD   = YAHOO.util.Dom;
 
     /** @private @type {Object.<string, ORBEON.xforms.Form>*/
     Page.forms = {};
@@ -76,6 +77,17 @@
      */
     Page.registerControlConstructor = function(controlConstructor, predicate) {
         this.controlConstructors.push({controlConstructor: controlConstructor, predicate: predicate});
+    };
+
+    /**
+     * Returns language for the page, defaulting to English is none is set on html/@lang.
+     */
+    Page.getLang = function() {
+        var lang = $(document.documentElement).attr('lang');
+        if (_.isUndefined(lang))
+            lang = "en"
+        lang = lang.substring(0, 2)
+        return lang;
     };
 
 })();

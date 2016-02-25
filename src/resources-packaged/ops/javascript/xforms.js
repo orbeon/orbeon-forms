@@ -737,45 +737,31 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 },
                 // 4th Jan
-                {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
+                {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\S+)$/i,
                     handler: function(bits) {
                         return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
                     }
                 },
                 // 4th Jan 2003
-                {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
+                {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\S+),? (\d{2,4})$/i,
                     handler: function(bits) {
                         return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
                     }
                 },
                 // Jan 4th
-                {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
+                {   re: /^(\S+) (\d{1,2})(?:st|nd|rd|th)?$/i,
                     handler: function(bits) {
                         return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
                     }
                 },
                 // Jan 4th 2003
-                {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
+                {   re: /^(\S+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
                     handler: function(bits) {
                         return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
                     }
                 },
-                // next Tuesday - this is suspect due to weird meaning of "next"
-                {   re: /^next (\w+)$/i,
-                    handler: function(bits) {
-                        var d = new Date();
-                        var day = d.getDay();
-                        var newDay = ORBEON.util.DateTime._parseWeekday(bits[1]);
-                        var addDays = newDay - day;
-                        if (newDay <= day) {
-                            addDays += 7;
-                        }
-                        d.setDate(d.getDate() + addDays);
-                        return d;
-                    }
-                },
                 // last Tuesday
-                {   re: /^last (\w+)$/i,
+                {   re: /^last (\S+)$/i,
                     handler: function(bits) {
                         throw new Error("Not yet implemented");
                     }
@@ -837,15 +823,18 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
             },
 
-            _monthNames: "January February March April May June July August September October November December".split(" "),
-            _weekdayNames: "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "),
+            _calendarResources: function() {
+                var lang = ORBEON.xforms.Page.getLang();
+                return ORBEON.xforms.control.CalendarResources[lang];
+            },
 
             /**
              *  Takes a string, returns the index of the month matching that string, throws
              *  an error if 0 or more than 1 matches
              */
             _parseMonth: function(month) {
-                var matches = _.filter(ORBEON.util.DateTime._monthNames, function(item) {
+                var monthNames = ORBEON.util.DateTime._calendarResources().properties.MONTHS_LONG;
+                var matches = _.filter(monthNames, function(item) {
                     return new RegExp("^" + month, "i").test(item);
                 });
                 if (matches.length == 0) {
@@ -854,21 +843,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (matches.length > 1) {
                     throw new Error("Ambiguous month");
                 }
-                return _.indexOf(ORBEON.util.DateTime._monthNames, matches[0]);
-            },
-
-            /* Same as parseMonth but for days of the week */
-            _parseWeekday: function(weekday) {
-                var matches = _.filter(ORBEON.util.DateTime._weekdayNames, function(item) {
-                    return new RegExp("^" + weekday, "i").test(item);
-                });
-                if (matches.length == 0) {
-                    throw new Error("Invalid day string");
-                }
-                if (matches.length > 1) {
-                    throw new Error("Ambiguous weekday");
-                }
-                return _.indexOf(ORBEON.util.DateTime._weekdayNames, matches[0]);
+                return _.indexOf(monthNames, matches[0]);
             },
 
             _currentYear: new Date().getFullYear(),

@@ -102,7 +102,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
    *
    * @param startPrefixedId   prefixed id of start control or start action within control
    * @param endPrefixedId     prefixed id of end repeat
-   * @return                  Seq of prefixed id from leaf to root, or empty
+   * @return                  prefixed ids from leaf to root, or empty
    */
   def getAncestorRepeatIds(startPrefixedId: String, endPrefixedId: Option[String] = None): List[String]  =
     // If element analysis is found, find all its ancestor repeats until the root or until the end prefixed id is

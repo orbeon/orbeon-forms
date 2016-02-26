@@ -435,6 +435,9 @@
                     <xsl:copy>
                         <xsl:apply-templates select="@*" mode="#current"/>
 
+                        <!-- Enable indexing by id so that itemsets can resolve -->
+                        <xsl:attribute name="xxf:index" select="'id'"/>
+
                         <xsl:variable
                             name="migration"
                             select="migration:buildGridMigrationMap(/, (), true())"

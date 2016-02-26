@@ -124,7 +124,7 @@ trait PartEventHandlerAnalysis {
       (script ⇒ script.prefixedId → script)
 
     // Keep only one script body for a given digest
-    _uniqueJsScripts ++= jsScripts.keepDistinctBy(_.shared.digest, _.shared)
+    _uniqueJsScripts ++= jsScripts.keepDistinctBy(_.shared.digest) map (_.shared)
   }
 
   // Deregister the given handler

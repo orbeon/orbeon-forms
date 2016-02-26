@@ -6,7 +6,7 @@
     <xh:head>
         <xh:title/>
         <xf:model id="fr-form-model">
-            <xf:instance id="fr-form-instance">
+            <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <section-1>
                         <control-1/>

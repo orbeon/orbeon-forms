@@ -43,7 +43,37 @@
     <!-- Gather top-level model as well as models within section templates -->
     <xsl:variable
         name="action-models-ids"
-        select="$fr-form-model-id, /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
+        select="
+            $fr-form-model-id,
+            /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
+
+    <xsl:variable
+        name="itemset-actions-elements"
+        select="
+            /xh:html/xh:head//
+            xf:model[
+                generate-id() = $action-models-ids
+            ]/
+            xf:action[
+                ends-with(@id, '-binding')
+            ]//
+            xf:action[
+                p:has-class('fr-itemset-action')
+            ]"/>
+
+    <xsl:variable
+        name="models-with-itemset-actions-models-ids"
+        select="distinct-values($itemset-actions-elements/(ancestor::xf:model[1])/generate-id())"/>
+
+    <xsl:variable
+        name="itemset-actions-ids"
+        select="$itemset-actions-elements/generate-id()"/>
+
+    <xsl:variable
+        name="itemset-actions-control-ids"
+        select="
+            for $e in $itemset-actions-elements return
+            replace($e/(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1], '^''(.+)''$', '$1-control')"/>
 
     <!-- Store the absolute id of the source in the request -->
     <xsl:template match="
@@ -74,11 +104,6 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- When setting or getting service values, resolve the target nodes relative to the source id -->
-    <xsl:function name="fr:resolve-targets" as="xs:string">
-        <xsl:text>frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), $control-name)</xsl:text>
-    </xsl:function>
-
     <xsl:template match="
             /xh:html/xh:head//
                 xf:model[
@@ -95,7 +120,9 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
             <!-- Set value -->
-            <xf:setvalue ref="$path" value="{fr:resolve-targets()}"/>
+            <xf:setvalue
+                ref="$path"
+                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), $control-name, true())"/>
         </xsl:copy>
     </xsl:template>
 
@@ -118,7 +145,18 @@
             <xf:setvalue
                 xmlns:sql="http://orbeon.org/oxf/xml/sql"
                 ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                value="concat('''', replace(string({fr:resolve-targets()}), '''', ''''''), '''')"/>
+                value="
+                    concat(
+                        '''',
+                        replace(
+                            string(
+                                frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), $control-name, true())
+                            ),
+                            '''',
+                            ''''''
+                        ),
+                        ''''
+                    )"/>
         </xsl:copy>
     </xsl:template>
 
@@ -138,67 +176,232 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
             <!-- Set values (we choose to set all targets returned) -->
-            <xf:setvalue iterate="{fr:resolve-targets()}" ref="." value="$control-value"/>
+            <xf:setvalue
+                iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), $control-name, true())"
+                ref="."
+                value="$control-value"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="
-            /xh:html/xh:head//
-                xf:model[
-                    generate-id() = $action-models-ids
-                ]/
-                xf:action[
-                    ends-with(@id, '-binding')
-                ]//
-                xf:action[
-                    p:has-class('fr-itemset-action')
-                ]">
+    <!-- Match itemsets of controls which can be the target of an itemset action -->
+    <xsl:template match="xf:itemset[../@id = $itemset-actions-control-ids]">
+        <xsl:copy>
+            <!-- Update `@ref` attribute to disable the default itemset if an `@fr:itemsetid` attribute is present -->
+            <xsl:if test="@ref">
+                <xsl:attribute
+                    name="ref"
+                    select="concat('if (empty(@fr:itemsetid)) then ', @ref, ' else ()')"/>
+           </xsl:if>
+            <xsl:apply-templates select="@* except @ref | node()"/>
+        </xsl:copy>
+        <!-- Add new itemset which kicks in if an `@fr:itemsetid` attribute is present -->
+        <xf:itemset ref="id(@fr:itemsetid)[1]/(choices[@xml:lang = xxf:lang()], choices)[1]/item">
+            <xf:label ref="label"/>
+            <xf:value ref="value"/>
+        </xf:itemset>
+    </xsl:template>
+
+
+    <xsl:template match="/xh:html/xh:head//xf:action[generate-id() = $itemset-actions-ids]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = 'control-name']"/>
-            <xsl:variable name="resource-items-value" select="(*:variable | *:var)[@name = 'response-items']/@value"/>
 
-            <!-- Set itemset -->
+            <xsl:variable
+                name="resource-items-value"
+                select="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]"/>
+
+            <xf:var
+                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
+                name="new-itemset-id"
+                value="concat('fr', secure:randomHexId())"/>
+
+            <!-- New `<itemset>` outer element (not inserted into the instance yet) -->
+            <xf:var
+                name="new-itemset-holder"
+                value="xf:element('itemset', xf:attribute('id', $new-itemset-id))"/>
+
+            <!-- Create `<choices>` elements under the new `<itemset>` outer element -->
             <xf:action iterate="xxf:instance('fr-form-resources')/resource">
+
                 <xf:var name="fr-lang" value="@xml:lang"/>
-                <xf:var name="response-items" context="instance('fr-service-response-instance')" value="{$resource-items-value}"/>
-                <xf:var name="resource-holder" value="*[name() = $control-name]"/>
-                <xf:delete ref="$resource-holder/item"/>
+
+                <!-- Re-evaluate `$response-items` at each iteration because that can depend on `$fr-lang` -->
+                <xf:var
+                    name="response-items"
+                    context="instance('fr-service-response-instance')"
+                    value="{$resource-items-value}"/>
+
+                <xf:insert
+                    context="$new-itemset-holder"
+                    ref="*"
+                    origin="xf:element('choices')"/>
+
+                <xf:var
+                    name="new-choices-holder"
+                    value="$new-itemset-holder/choices[last()]"/>
+
                 <xf:action iterate="$response-items">
                     <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]}"/>
                     <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]}"/>
                     <xf:insert
-                        context="$resource-holder"
+                        context="$new-choices-holder"
                         ref="*"
-                        origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
+                        origin="
+                            xxf:element(
+                                'item',
+                                (
+                                    xxf:element('label', xs:string($item-label)),
+                                    xxf:element('value', xs:string($item-value))
+                                )
+                            )"/>
                 </xf:action>
+            </xf:action>
+
+            <!-- Delegate the rest to common implementation. We should not duplicate much of the code above either, but
+                 the problem is the evaluation of `response-items`, 'item-label', and 'item-value', which must take place
+                 in a context where variables are available, so we cannot use `saxon:evaluate()`. -->
+            <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
+                <xf:property name="control-name"       value="$control-name"/>
+                <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
+                <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>
+            </xf:dispatch>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $models-with-itemset-actions-models-ids]">
+        <xsl:copy>
+            <xsl:apply-templates select="@* | node()"/>
+            <xsl:call-template name="common-actions-impl"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- Common implementation -->
+    <xsl:template name="common-actions-impl">
+        <xf:action event="fr-call-itemset-action">
+
+            <xf:var name="control-name"       value="event('control-name')"/>
+            <xf:var name="new-itemset-id"     value="event('new-itemset-id')"/>
+            <xf:var name="new-itemset-holder" value="event('new-itemset-holder')"/>
+
+            <xf:var
+                name="action-source"
+                value="xxf:get-request-attribute('fr-action-source')"/>
+
+            <xf:var
+                name="resolved-data-holders"
+                value="frf:resolveTargetRelativeToActionSource($action-source, $control-name, false())"/>
+
+            <xf:var
+                name="choices-count"
+                value="count($new-itemset-holder/choices)"/>
+
+            <!--
+                If all itemsets are identical, only keep the first one. This avoids duplication when the itemsets
+                are not localized. See also: https://github.com/orbeon/orbeon-forms/issues/1191
+            -->
+            <xf:var
+                name="keep-only-one"
+                value="
+                    $choices-count = 1 or
+                    deep-equal(
+                        for $ignore in 2 to $choices-count return $new-itemset-holder/choices[1],
+                        $new-itemset-holder/choices[position() ge 2]
+                    )
+                "/>
+
+            <xf:delete
+                if="$keep-only-one"
+                ref="$new-itemset-holder/choices[position() ge 2]"/>
+
+            <xf:action if="not($keep-only-one)">
+                <xf:action iterate="1 to $choices-count">
+                    <xf:var name="p" value="."/>
+                    <xf:insert
+                        context="$new-itemset-holder/choices[$p]"
+                        origin="xxf:instance('fr-form-resources')/resource[$p]/@xml:lang"/>
+                </xf:action>
+            </xf:action>
+
+            <!-- Ensure existence of `<fr:metadata>` -->
+            <xf:insert
+                if="empty(instance('fr-form-instance')/fr:metadata)"
+                context="instance('fr-form-instance')"
+                ref="*"
+                origin="xf:element('fr:metadata')"/>
+
+            <!-- Insert new `<itemset>` -->
+            <xf:insert
+                context="instance('fr-form-instance')/fr:metadata"
+                ref="*"
+                origin="$new-itemset-holder"/>
+
+            <!-- All targeted holders add indirection to itemset -->
+            <xf:insert
+                iterate="$resolved-data-holders"
+                context="."
+                origin="xf:attribute('fr:itemsetid', $new-itemset-id)"/>
+
+            <!-- Set map for new itemsets -->
+            <xf:var
+                name="itemsetmap-node"
+                value="frf:findItemsetMapNode($action-source, $control-name, instance('fr-form-instance'))"/>
+
+            <xf:insert
+                context="$itemsetmap-node"
+                origin="xf:attribute('fr:itemsetmap', frf:addToItemsetMap(@fr:itemsetmap, $control-name, $new-itemset-id))"/>
+
+            <!-- Clear information on descendants -->
+            <xf:action iterate="$itemsetmap-node//*[exists(@fr:itemsetmap)]">
+                <xf:setvalue
+                    ref="."
+                    value="frf:removeFromItemsetMap(@fr:itemsetmap, $control-name)"/>
+            </xf:action>
+
+            <!-- Garbage-collect unused itemsets and metadata -->
+            <xf:action>
+                <xf:var
+                    name="in-use-itemset-ids"
+                    value="distinct-values(instance('fr-form-instance')//(@fr:itemsetid/string(), @fr:itemsetmap/frf:itemsetIdsFromItemsetMap(.)))"/>
+
+                <xf:delete
+                    ref="instance('fr-form-instance')/fr:metadata/itemset[not(@id = $in-use-itemset-ids)]"/>
+
+                <xf:delete
+                    if="empty(instance('fr-form-instance')/fr:metadata)"
+                    ref="instance('fr-form-instance')/fr:metadata"/>
             </xf:action>
 
             <!-- Filter item values that are out of range -->
             <!-- See: https://github.com/orbeon/orbeon-forms/issues/1019 -->
             <!-- NOTE: We guess whether the control is a select or select1 based on the element name. One exception is
                  autocomplete, which is also a single selection control. -->
-            <xf:var name="element-name" value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
-            <xf:var name="possible-values"
-                    value="xxf:instance('fr-form-resources')/resource[1]/*[name() = $control-name]/item/value/string()"/>
-            <xf:action if="frf:isMultipleSelectionControl($element-name)">
-                <xf:action iterate="{fr:resolve-targets()}">
-                    <xf:var name="bind" value="."/>
-                    <xf:setvalue
-                        ref="$bind"
-                        value="string-join(xxf:split($bind)[. = $possible-values], ' ')"/>
+            <xf:action>
+                <xf:var
+                    name="element-name"
+                    value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
+                <xf:var
+                    name="possible-values"
+                    value="$new-itemset-holder/choices[1]/item/value/string()"/>
+                <xf:action if="frf:isMultipleSelectionControl($element-name)">
+                    <xf:action iterate="$resolved-data-holders">
+                        <xf:var name="bind" value="."/>
+                        <xf:setvalue
+                            ref="$bind"
+                            value="string-join(xxf:split($bind)[. = $possible-values], ' ')"/>
+                    </xf:action>
+                </xf:action>
+                <xf:action if="frf:isSingleSelectionControl($element-name) or $element-name = 'autocomplete'">
+                    <xf:action iterate="$resolved-data-holders">
+                        <xf:var name="bind" value="."/>
+                        <xf:setvalue
+                            if="not(string($bind) = $possible-values)"
+                            ref="$bind"/>
+                    </xf:action>
                 </xf:action>
             </xf:action>
-            <xf:action if="frf:isSingleSelectionControl($element-name) or $element-name = 'autocomplete'">
-                <xf:action iterate="{fr:resolve-targets()}">
-                    <xf:var name="bind" value="."/>
-                    <xf:setvalue
-                        if="not(string($bind) = $possible-values)"
-                        ref="$bind"/>
-                </xf:action>
-            </xf:action>
-        </xsl:copy>
+        </xf:action>
     </xsl:template>
 
 </xsl:stylesheet>

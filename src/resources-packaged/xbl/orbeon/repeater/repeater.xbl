@@ -20,7 +20,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xbl:script src="/xbl/orbeon/repeater/repeater.js"/>
 
@@ -131,7 +131,7 @@
                             <xf:insert
                                 context="$repeat-context"
                                 ref="$repeat-sequence"
-                                origin="$repeat-template"
+                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                 at="$p"
                                 xxf:defaults="{$apply-defaults}"/>
                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
@@ -145,7 +145,7 @@
                             <xf:insert
                                 context="$repeat-context"
                                 ref="$repeat-sequence"
-                                origin="$repeat-template"
+                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                 xxf:defaults="{$apply-defaults}"/>
                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
                             <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf5"/>
@@ -244,7 +244,7 @@
                                         <xf:insert
                                             context="$context"
                                             ref="$items[$p - 1]"
-                                            origin="$repeat-template, $source"
+                                            origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template), $source"
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
@@ -257,7 +257,7 @@
                                         <xf:insert
                                             context="$context"
                                             ref="$items[$p - 1]"
-                                            origin="$source, $repeat-template"
+                                            origin="$source, frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->

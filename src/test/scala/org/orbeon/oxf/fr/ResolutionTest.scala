@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatest.junit.AssertionsForJUnit
+import org.dom4j
 import org.junit.Test
-import org.dom4j.{Document ⇒ JDocument}
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.Value
+import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
 
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
-  def source: JDocument =
+  def source: dom4j.Document =
     <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -38,47 +38,85 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
           <xf:instance id="fr-form-instance">
             <form>
-              <section-1>
-                <button/>
-                <result>42</result>
-                <grid>
-                  <number>1</number>
-                  <other>o1</other>
-                </grid>
-                <grid>
-                  <number>2</number>
-                  <other>o2</other>
-                </grid>
-                <grid>
-                  <number>3</number>
-                  <other>o3</other>
-                </grid>
-                <hidden-grid>
-                  <hidden-number>4</hidden-number>
-                  <hidden-other>o4</hidden-other>
-                </hidden-grid>
-                <hidden-grid>
-                  <hidden-number>5</hidden-number>
-                  <hidden-other>o5</hidden-other>
-                </hidden-grid>
-                <hidden-grid>
-                  <hidden-number>6</hidden-number>
-                  <hidden-other>o6</hidden-other>
-                </hidden-grid>
-              </section-1>
+              <section>
+                <section-iteration>
+                  <button/>
+                  <result>42</result>
+                  <grid>
+                    <grid-iteration>
+                      <number>1</number>
+                      <other>o1</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>2</number>
+                      <other>o2</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>3</number>
+                      <other>o3</other>
+                    </grid-iteration>
+                  </grid>
+                  <hidden-grid>
+                    <hidden-number>4</hidden-number>
+                    <hidden-other>o4</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>5</hidden-number>
+                    <hidden-other>o5</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>6</hidden-number>
+                    <hidden-other>o6</hidden-other>
+                  </hidden-grid>
+                </section-iteration>
+                <section-iteration>
+                  <button/>
+                  <result>43</result>
+                  <grid>
+                    <grid-iteration>
+                      <number>21</number>
+                      <other>o21</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>22</number>
+                      <other>o22</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>23</number>
+                      <other>o23</other>
+                    </grid-iteration>
+                  </grid>
+                  <hidden-grid>
+                    <hidden-number>24</hidden-number>
+                    <hidden-other>o24</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>25</hidden-number>
+                    <hidden-other>o25</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>26</hidden-number>
+                    <hidden-other>o26</hidden-other>
+                  </hidden-grid>
+                </section-iteration>
+              </section>
             </form>
           </xf:instance>
           <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-            <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-              <xf:bind id="button-bind" ref="button" name="button"/>
-              <xf:bind id="result-bind" ref="result" name="result"/>
-              <xf:bind id="grid-bind" ref="grid" name="grid">
-                <xf:bind id="number-bind" ref="number" name="number"/>
-                <xf:bind id="other-bind" ref="other" name="other"/>
-              </xf:bind>
-              <xf:bind id="hidden-grid-bind" ref="hidden-grid" name="hidden-grid" relevant="false()">
-                <xf:bind id="hidden-number-bind" ref="hidden-number" name="hidden-number"/>
-                <xf:bind id="hidden-other-bind" ref="hidden-other" name="hidden-other"/>
+            <xf:bind id="section-bind" name="section" ref="section">
+              <xf:bind id="section-iteration-bind" name="section-iteration" ref="section-iteration">
+                <xf:bind id="button-bind" ref="button" name="button"/>
+                <xf:bind id="result-bind" ref="result" name="result"/>
+                <xf:bind id="grid-bind" ref="grid" name="grid">
+                  <xf:bind id="grid-iteration-bind" ref="grid-iteration" name="grid-iteration">
+                    <xf:bind id="number-bind" ref="number" name="number"/>
+                    <xf:bind id="other-bind" ref="other" name="other"/>
+                  </xf:bind>
+                </xf:bind>
+                <xf:bind id="hidden-grid-bind" ref="hidden-grid" name="hidden-grid" relevant="false()">
+                  <xf:bind id="hidden-number-bind" ref="hidden-number" name="hidden-number"/>
+                  <xf:bind id="hidden-other-bind" ref="hidden-other" name="hidden-other"/>
+                </xf:bind>
               </xf:bind>
             </xf:bind>
           </xf:bind>
@@ -87,17 +125,19 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
               <resource xml:lang="en"/>
             </resources>
           </xf:instance>
-          <xf:instance xxf:readonly="true" id="grid-template">
-            <grid>
-              <number/>
-            </grid>
+          <xf:instance xxf:readonly="true" id="dummy-template">
+            <dummy/>
           </xf:instance>
         </xf:model>
       </xh:head>
       <xh:body>
         <fr:view>
           <fr:body>
-            <fr:section id="section-1-control" bind="section-1-bind">
+            <fr:section
+              id="section-control"
+              repeat="content"
+              bind="section-bind"
+              template="instance('dummy-template')">
               <fr:grid>
                 <xh:tr>
                   <xh:td>
@@ -108,9 +148,11 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
                   </xh:td>
                 </xh:tr>
               </fr:grid>
-              <fr:grid id="grid-control" repeat="true" bind="grid-bind"
-                   template="instance('grid-template')"
-                   min="1">
+              <fr:grid
+                  id="grid-control"
+                  repeat="content"
+                  bind="grid-bind"
+                  template="instance('dummy-template')">
                 <xh:tr>
                   <xh:td>
                     <xf:input id="number-control" bind="number-bind"/>
@@ -136,8 +178,8 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
       </xh:body>
     </xh:html>
 
-  private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String) =
-    FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName) match {
+  private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String, followIndexes: Boolean) =
+    FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName, followIndexes) match {
       case value: Value   ⇒ asScalaIterator(value.iterate()) map (_.getStringValue) toList
       case node: NodeInfo ⇒ List(node.getStringValue)
     }
@@ -169,22 +211,32 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
         }
 
         // Resolve from buttonControl
-        assert(List(resultControl.getValue) === resolveAllNodeValues(buttonControl.absoluteId, "result"))
+        for (followIndexes ← List(true, false))
+          assert(List(resultControl.getValue) === resolveAllNodeValues(buttonControl.absoluteId, "result", followIndexes))
 
         for (index ← 1 to 3) {
           setindex("grid-control-repeat", index)
-          assert(List(index.toString) === resolveAllNodeValues(buttonControl.absoluteId, "number"))
+          assert(List(index.toString) === resolveAllNodeValues(buttonControl.absoluteId, "number", followIndexes = true))
+        }
+
+        for (index ← 1 to 3) {
+          setindex("grid-control-repeat", index)
+          assert(((1 to 3) map (_.toString)) === resolveAllNodeValues(buttonControl.absoluteId, "number", followIndexes = false))
         }
 
         // Resolve from numberControls
-        for (numberControl ← numberControls) {
-          assert(List(s"o${numberControl.getValue}") === resolveAllNodeValues(numberControl.absoluteId, "other"))
-          assert(List(resultControl.getValue)        === resolveAllNodeValues(numberControl.absoluteId, "result"))
+        for {
+          followIndexes ← List(true, false)
+          numberControl ← numberControls
+        } locally {
+          assert(List(s"o${numberControl.getValue}") === resolveAllNodeValues(numberControl.absoluteId, "other", followIndexes))
+          assert(List(resultControl.getValue)        === resolveAllNodeValues(numberControl.absoluteId, "result", followIndexes))
         }
 
         // 2. Resolution via binds
 
-        assert((4 to 6 map (_.toString)) === resolveAllNodeValues(buttonControl.absoluteId, "hidden-number"))
+        for (followIndexes ← List(true, false))
+          assert((4 to 6 map (_.toString)) === resolveAllNodeValues(buttonControl.absoluteId, "hidden-number", followIndexes))
       }
     }
 }

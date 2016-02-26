@@ -66,8 +66,7 @@
             </xf:instance>
 
             <!-- All form resources -->
-            <!-- Don't make readonly by default in case a service modifies the resources -->
-            <xf:instance id="fr-form-resources" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+            <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="">
                         <section-1>

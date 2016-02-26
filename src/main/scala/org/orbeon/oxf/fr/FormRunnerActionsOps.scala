@@ -1,0 +1,226 @@
+/**
+ * Copyright (C) 2013 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.fr
+
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
+import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.RuntimeBind
+import org.orbeon.oxf.xforms.{BindVariableResolver, XFormsUtils}
+import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.saxon.om.{SequenceIterator, Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.value.SequenceExtent
+import org.orbeon.scaxon.XML._
+
+trait FormRunnerActionsOps extends FormRunnerBaseOps {
+
+  // Resolve target data nodes from an action source and a target control.
+  //
+  // Must be called from an XPath expression.
+  //
+  // As of 2014-01-31:
+  //
+  // - the source of an action is a concrete
+  //     - control
+  //     - or model
+  // - the target
+  //     - is a control name
+  //     - which must correspond to an existing control (statically)
+  //     - the control must be a value control (or at least a single-node binding control)
+  //
+  // We first try to resolve a concrete target control based on the source and the control name. If that works, great,
+  // we then find the bound nodes if any. This returns:
+  //
+  // - 0 to 1 node if `followIndexes = false`
+  // - 0 to n nodes if `followIndexes = true` (since 2016-02-25).
+  //
+  // If no node is returned above, this means that no target controls are relevant. We fall back to searching binds.
+  // We first identify a bind for the source, if any. Then resolve the target bind. This returns 0 to n nodes.
+  //
+  // Other considerations:
+  //
+  // - in the implementation below, the source can also directly refer to a bind
+  // - if the source is not found, the target is resolved from the enclosing model
+  //
+  // If would be good if the "find closest" algorithm was written once only for both binds and controls! Currently
+  // (2016-02-29) it's not the case.
+  //
+  //@XPathFunction
+  def resolveTargetRelativeToActionSource(
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    followIndexes          : Boolean
+  ): ValueRepresentation = {
+
+    val container = XFormsFunction.context.container
+
+    def fromControl: Option[ValueRepresentation] = {
+
+      def findControls =
+        Controls.resolveControlsById(
+          containingDocument       = container.containingDocument,
+          sourceControlEffectiveId = absoluteIdToEffectiveId(actionSourceAbsoluteId),
+          targetStaticId           = controlId(targetControlName),
+          followIndexes            = followIndexes
+        )
+
+      val boundNodes =
+        findControls collect {
+          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.boundNode
+        } flatten
+
+      boundNodes.nonEmpty option new SequenceExtent(boundNodes.toArray[Item])
+    }
+
+    def fromBind: Option[ValueRepresentation] = {
+
+      val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
+      val model             = XFormsFunction.context.model
+
+      val modelBinds        = model.getBinds
+      val staticModel       = model.staticModel
+
+      def findBindForSource =
+        container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
+          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
+          case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+        } flatten
+
+      def findBindNodeForSource =
+        for (sourceRuntimeBind ← findBindForSource)
+        yield
+          sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
+
+      for {
+        targetStaticBind  ← staticModel.bindsById.get(bindId(targetControlName))
+        value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
+      } yield
+        value
+    }
+
+    fromControl orElse fromBind orNull
+  }
+
+  // Find the node which must store itemset map information
+  //
+  // - if the target is not under a repeat rooted at a common ancestor, there is no node to return
+  // - otherwise, if there is a common ancestor repeat, return the node to which the common iteration binds
+  // - otherwise, return the root element of the instance
+  //
+  //@XPathFunction
+  def findItemsetMapNode(
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    formInstance           : NodeInfo
+  ): Option[NodeInfo] = {
+
+    val doc = XFormsFunction.context.containingDocument
+
+    val sourceEffectiveId = absoluteIdToEffectiveId(actionSourceAbsoluteId)
+    val sourcePrefixedId  = XFormsUtils.getPrefixedId(sourceEffectiveId)
+    val scope             = doc.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
+    val targetPrefixedId  = scope.prefixedIdForStaticId(controlId(targetControlName))
+
+    val (ancestorRepeatPrefixedIdOpt, commonIndexesLeafToRoot, remainingRepeatPrefixedIdsLeafToRoot) =
+      Controls.getStaticRepeatDetails(
+        ops               = doc .getStaticOps,
+        sourceEffectiveId = sourceEffectiveId,
+        targetPrefixedId  = targetPrefixedId
+      )
+
+    remainingRepeatPrefixedIdsLeafToRoot.lastOption match {
+      case None ⇒
+        None
+      case Some(_) ⇒
+        ancestorRepeatPrefixedIdOpt match {
+          case Some(ancestorRepeatPrefixedId) ⇒
+
+            val tree = doc.getControls.getCurrentControlTree
+
+            val repeat =
+              tree.getControl(ancestorRepeatPrefixedId + Controls.buildSuffix(commonIndexesLeafToRoot.tail.reverse)).asInstanceOf[XFormsRepeatControl]
+
+            val iterationBoundNode = repeat.children(commonIndexesLeafToRoot.head - 1).boundNode
+
+            // For section templates we must make sure we don't return a node which is not within the template instance
+            iterationBoundNode filter (_.root == formInstance.root) orElse Some(formInstance)
+
+          case None ⇒
+            Some(formInstance)
+        }
+    }
+  }
+
+  //@XPathFunction
+  def findRepeatedControlsForTarget(actionSourceAbsoluteId: String, targetControlName: String) = {
+
+    val controls =
+      Controls.iterateAllRepeatedControlsForTarget(
+        XFormsFunction.context.containingDocument,
+        XFormsUtils.absoluteIdToEffectiveId(actionSourceAbsoluteId),
+        controlId(targetControlName)
+      )
+
+    controls map (_.getEffectiveId) map XFormsUtils.effectiveIdToAbsoluteId toList
+  }
+
+  //@XPathFunction
+  def addToItemsetMap(map: String, controlName: String, itemsetId: String): String =
+    encodeSimpleQuery((controlName → itemsetId) :: decodeSimpleQuery(removeFromItemsetMap(map, controlName)))
+
+  //@XPathFunction
+  def removeFromItemsetMap(map: String, controlName: String): String =
+    encodeSimpleQuery(decodeSimpleQuery(map) filterNot (_._1 == controlName))
+
+  //@XPathFunction
+  def itemsetIdsFromItemsetMap(map: String): SequenceIterator =
+    decodeSimpleQuery(map) map (_._2)
+
+  // Check all ancestors of `startNode` to find all itemset mappings. If the result is not empty, update elements
+  // with matching names in the given template to add an `fr:itemsetid` attribute.
+  //@XPathFunction
+  def updateTemplateFromInScopeItemsetMaps(startNode: NodeInfo, template: NodeInfo): NodeInfo = {
+
+    import XMLNames._
+
+    val allMappings =
+      startNode ancestor *            flatMap
+      (_ attValueOpt ItemsetMapQName) flatMap
+      decodeSimpleQuery               keepDistinctBy // for a given name, keep the first (from leaf to root) mapping
+      (_._1)
+
+    if (allMappings.isEmpty) {
+      template
+    } else {
+      val newDoc = TransformerUtils.extractAsMutableDocument(template)
+
+      val map = allMappings.toMap
+      val allNames = map.keySet
+
+      newDoc descendant * filter { e ⇒
+        allNames(e.localname)
+      } foreach { e ⇒
+        XFormsAPI.insert(
+          into   = e,
+          origin = attributeInfo(ItemsetIdQName, map(e.localname))
+        )
+      }
+
+      newDoc
+    }
+  }
+}

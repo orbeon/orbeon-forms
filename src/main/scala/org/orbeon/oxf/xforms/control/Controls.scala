@@ -171,62 +171,66 @@ object Controls {
     }
   }
 
-  def findRepeatedControlsForTarget(
+  def iterateAllRepeatedControlsForTarget(
     containingDocument       : XFormsContainingDocument,
     sourceControlEffectiveId : String,
     targetStaticId           : String
-  ) = (
-    resolveObjectById(containingDocument, sourceControlEffectiveId, targetStaticId).toIterator
-    flatMap XFormsRepeatControl.findAllRepeatedControls
-  )
+  ): Iterator[XFormsControl] =
+    resolveControlsById(
+      containingDocument,
+      sourceControlEffectiveId,
+      targetStaticId,
+      followIndexes = true
+    ).toIterator flatMap XFormsRepeatControl.findAllRepeatedControls
 
-  def resolveObjectById(
+  def resolveControlsById(
     containingDocument       : XFormsContainingDocument,
     sourceControlEffectiveId : String,
-    targetStaticId           : String
-  ): Option[XFormsControl] = {
+    targetStaticId           : String,
+    followIndexes            : Boolean
+  ): List[XFormsControl] = {
 
     val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId)
     val scope            = containingDocument.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
     val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
 
-    val effectiveControlId =
-      Option(
-        findEffectiveControlId(
-          containingDocument.getStaticOps,
-          containingDocument.getControls.getCurrentControlTree,
-          sourceControlEffectiveId,
-          targetPrefixedId
-        )
+    val effectiveControlIds =
+      resolveControlsEffectiveIds(
+        containingDocument.getStaticOps,
+        containingDocument.getControls.getCurrentControlTree,
+        sourceControlEffectiveId,
+        targetPrefixedId,
+        followIndexes
       )
 
-    effectiveControlId map containingDocument.getControls.getObjectByEffectiveId
+    effectiveControlIds flatMap (id ⇒ Option(containingDocument.getControls.getObjectByEffectiveId(id)))
   }
 
   def resolveObjectByIdJava(
     containingDocument       : XFormsContainingDocument,
     sourceControlEffectiveId : String,
     targetStaticId           : String
-  ) = resolveObjectById(
+  ): XFormsControl =
+    resolveControlsById(
       containingDocument,
       sourceControlEffectiveId,
-      targetStaticId
-    ).orNull
+      targetStaticId,
+      followIndexes = true
+    ).headOption.orNull
 
   /**
-   * Find an effective control id based on a source and a control static id, following XBL scoping and the repeat
-   * structure.
+   * Find effective control ids based on a source and a control static id, following XBL scoping and the repeat
+   * hierarchy.
    *
-   * @param sourceEffectiveId  reference to source control, e.g. "list$age.3"
-   * @param targetPrefixedId   reference to target control, e.g. "list$xf-10"
-   * @return effective control id, or null if not found
+   * @return effective control ids (0 or 1 if `followIndexes == true`, 0 to n if `followIndexes = false`)
    */
-  def findEffectiveControlId(
+  def resolveControlsEffectiveIds(
     ops               : StaticStateGlobalOps,
     tree              : ControlTree,
-    sourceEffectiveId : String,
-    targetPrefixedId  : String
-  ): String = {
+    sourceEffectiveId : String,   // reference to source control, e.g. "list$age.3"
+    targetPrefixedId  : String,   // reference to target control, e.g. "list$xf-10"
+    followIndexes     : Boolean   // whether to follow repeat indexes
+  ): List[String] = {
 
     // Don't do anything if there are no controls
     if (tree.getChildren.isEmpty)
@@ -245,52 +249,63 @@ object Controls {
     // form author. On the other hand, the target id cannot be trusted as it is typically specified by the form
     // author.
 
-    // 1: Check preconditions
+    val (_, commonIndexesLeafToRoot, remainingRepeatPrefixedIdsLeafToRoot) =
+      getStaticRepeatDetails(ops, sourceEffectiveId, targetPrefixedId)
+
+    def searchNextRepeatLevel(indexes: List[Int], nextRepeatPrefixedIds: List[String]): List[List[Int]] =
+      nextRepeatPrefixedIds match {
+        case Nil ⇒
+          List(indexes)
+        case repeatPrefixedId :: remainingPrefixedIds ⇒
+
+          val repeatControl =
+            tree.getControl(repeatPrefixedId + buildSuffix(indexes)).asInstanceOf[XFormsRepeatControl]
+
+          if (repeatControl eq null) {
+            Nil // control might not exist (but why?)
+          } else if (followIndexes) {
+            searchNextRepeatLevel(repeatControl.getIndex :: indexes, remainingPrefixedIds)
+          } else {
+            1 to repeatControl.getSize flatMap (i ⇒ searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)) toList
+          }
+      }
+
+    val allIndexes = searchNextRepeatLevel(commonIndexesLeafToRoot, remainingRepeatPrefixedIdsLeafToRoot.reverse)
+
+    allIndexes map (indexes ⇒ targetPrefixedId + buildSuffix(indexes))
+  }
+
+  def buildSuffix(iterations: List[Int]) =
+    if (iterations.isEmpty)
+      ""
+    else
+      iterations.reverse map (_.toString) mkString (REPEAT_SEPARATOR.toString, REPEAT_INDEX_SEPARATOR_STRING, "")
+
+  def getStaticRepeatDetails(
+    ops               : StaticStateGlobalOps,
+    sourceEffectiveId : String,
+    targetPrefixedId  : String
+  ) = {
+    // Check preconditions
     require(sourceEffectiveId ne null, "Source effective id is required.")
 
-    // 3: Implement XForms 1.1 "4.7.1 References to Elements within a repeat Element" algorithm
-
-    // Find closest common ancestor repeat
-
     val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
-    val sourceParts = XFormsUtils.getEffectiveIdSuffixParts(sourceEffectiveId)
+    val sourceParts      = XFormsUtils.getEffectiveIdSuffixParts(sourceEffectiveId)
 
-    val targetIndexBuilder = new StringBuilder
+    val ancestorRepeatPrefixedIdOpt = ops.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId)
 
-    def appendIterationToSuffix(iteration: Int): Unit = {
-      if (targetIndexBuilder.isEmpty)
-        targetIndexBuilder.append(REPEAT_SEPARATOR)
-      else if (targetIndexBuilder.length != 1)
-        targetIndexBuilder.append(REPEAT_INDEX_SEPARATOR)
-
-      targetIndexBuilder.append(iteration.toString)
-    }
-
-    val ancestorRepeatPrefixedId = ops.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId)
-
-    ancestorRepeatPrefixedId foreach { ancestorRepeatPrefixedId ⇒
-      // There is a common ancestor repeat, use the current common iteration as starting point
-      for (i ← 0 to ops.getAncestorRepeatIds(ancestorRepeatPrefixedId).size)
-        appendIterationToSuffix(sourceParts(i))
-    }
+    val commonIndexes =
+      for {
+        ancestorRepeatPrefixedId ← ancestorRepeatPrefixedIdOpt.to[List]
+        index                    ← sourceParts.take(ops.getAncestorRepeatIds(ancestorRepeatPrefixedId).size + 1).reverse
+      } yield
+        index
 
     // Find list of ancestor repeats for destination WITHOUT including the closest ancestor repeat if any
-    // NOTE: make a copy because the source might be an immutable wrapped Scala collection which we can't reverse
-    val targetAncestorRepeats = ops.getAncestorRepeatIds(targetPrefixedId, ancestorRepeatPrefixedId).reverse
+    val remainingTargetRepeatsPrefixedIds =
+      ops.getAncestorRepeatIds(targetPrefixedId, ancestorRepeatPrefixedIdOpt)
 
-    // Follow repeat indexes towards target
-    for (repeatPrefixedId ← targetAncestorRepeats) {
-      val repeatControl =
-        tree.getControl(repeatPrefixedId + targetIndexBuilder.toString).asInstanceOf[XFormsRepeatControl]
-      // Control might not exist
-      if (repeatControl eq null)
-        return null
-      // Update iteration suffix
-      appendIterationToSuffix(repeatControl.getIndex)
-    }
-
-    // Return target
-    targetPrefixedId + targetIndexBuilder.toString
+    (ancestorRepeatPrefixedIdOpt, commonIndexes, remainingTargetRepeatsPrefixedIds)
   }
 
   // Update the container's and all its descendants' bindings

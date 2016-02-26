@@ -425,6 +425,10 @@
                  xxf:evaluate-avt(). See https://github.com/orbeon/orbeon-forms/issues/1300 -->
             <xsl:copy-of select="doc('universal-submission.xml')/*/node()"/>
 
+            <!-- Common actions implementation -->
+            <xsl:if test="$fr-form-model-id = $models-with-itemset-actions-models-ids">
+                <xsl:call-template name="common-actions-impl"/>
+            </xsl:if>
         </xsl:copy>
 
         <xsl:if test="not($is-noscript)">

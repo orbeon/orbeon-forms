@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.dom4j.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.scaxon.XML.Test
 
@@ -34,4 +35,8 @@ object XMLNames {
   val XFGroupTest           : Test = XF → "group"
 
   val FRContainerTest = FRSectionTest || FRGridTest
+
+  val FRNamespace     = new Namespace("fr", FR)
+  val ItemsetIdQName  = new QName("itemsetid",  FRNamespace)
+  val ItemsetMapQName = new QName("itemsetmap", FRNamespace)
 }

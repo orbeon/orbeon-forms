@@ -211,7 +211,7 @@
                     <xsl:copy-of select="$fr-form-model/(@schema | @xxf:custom-mips)"/>
 
                     <!-- Section data model -->
-                    <xf:instance id="fr-form-instance" xxbl:mirror="true">
+                    <xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id">
                         <empty/>
                     </xf:instance>
 
@@ -229,7 +229,7 @@
                     </xf:bind>
 
                     <!-- Sections resources: include resource for section and for all leaf controls -->
-                    <xf:instance id="fr-form-resources">
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
                         <resources xmlns="">
                             <xsl:variable name="resources" select="$fr-resources-instance/*"/>
                             <xsl:for-each select="$resources/resource">

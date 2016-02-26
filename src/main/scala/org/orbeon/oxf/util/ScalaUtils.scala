@@ -249,14 +249,14 @@ object ScalaUtils extends PathOps {
       b.result()
     }
 
-    def keepDistinctBy[K, U](key: A ⇒ K, by: A ⇒ U): List[U] = {
-      val result = mutable.ListBuffer[U]()
+    def keepDistinctBy[K, U](key: A ⇒ K): List[A] = {
+      val result = mutable.ListBuffer[A]()
       val seen   = mutable.Set[K]()
 
       for (x ← t) {
         val k = key(x)
         if (! seen(k)) {
-          result += by(x)
+          result += x
           seen += k
         }
       }

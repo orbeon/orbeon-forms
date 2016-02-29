@@ -468,8 +468,10 @@ body {
 .orbeon .fb-publish-dialog .table th {
   font-weight: bold;
   text-align: right;
-  white-space: nowrap;
   width: 1px;
+}
+.orbeon .fb-publish-dialog .table th .xforms-output output {
+  white-space: nowrap;
 }
 .orbeon .fb-publish-dialog .fb-publish-message {
   background-color: white;

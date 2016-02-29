@@ -462,8 +462,11 @@ body {
             th {
                 font-weight: bold;
                 text-align: right;
-                white-space: nowrap;
-                .narrow-td()
+                .narrow-td();
+
+                .xforms-output output {
+                    white-space: nowrap;            // because output by default now wraps
+                }
             }
         }
 

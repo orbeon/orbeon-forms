@@ -97,13 +97,9 @@ abstract class XFormsAction extends Logging {
 }
 
 object XFormsAction {
-  /**
-   * Obtain context attributes based on nested xf:property elements.
-   *
-   * @param actionInterpreter current XFormsActionInterpreter
-   * @param actionElement     action element
-   */
-  def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element): PropertyGetter = {
+
+  // Obtain context attributes based on nested xf:property elements.
+  def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element) = {
 
     val contextStack = actionInterpreter.actionXPathContext
 
@@ -133,17 +129,19 @@ object XFormsAction {
 
             // Evaluate context parameter
             val result =
-              XPathCache.normalizeSingletons(XPathCache.evaluate(
-                actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
-                actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
-                value,
-                actionInterpreter.getNamespaceMappings(element),
-                contextStack.getCurrentBindingContext.getInScopeVariables,
-                XFormsContainingDocument.getFunctionLibrary,
-                contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
-                null,
-                element.getData.asInstanceOf[LocationData],
-                actionInterpreter.containingDocument().getRequestStats.addXPathStat).asScala
+              XPathCache.normalizeSingletons(
+                XPathCache.evaluate(
+                  contextItems       = actionInterpreter.actionXPathContext.getCurrentBindingContext.nodeset,
+                  contextPosition    = actionInterpreter.actionXPathContext.getCurrentBindingContext.position,
+                  xpathString        = value,
+                  namespaceMapping   = actionInterpreter.getNamespaceMappings(element),
+                  variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
+                  functionLibrary    = XFormsContainingDocument.getFunctionLibrary,
+                  functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
+                  baseURI            = null,
+                  locationData       = element.getData.asInstanceOf[LocationData],
+                  reporter           = actionInterpreter.containingDocument().getRequestStats.addXPathStat
+                ).asScala
               )
 
             contextStack.popBinding()

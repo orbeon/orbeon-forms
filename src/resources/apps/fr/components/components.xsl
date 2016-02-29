@@ -389,9 +389,10 @@
                 name="fr-resources"
                 value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"
                 as="element(resource)?"/>
-            <xf:var name="form-resources"
-                    value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"
-                    as="element(resource)?"/>
+            <xf:var
+                name="form-resources"
+                value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"
+                as="element(resource)?"/>
 
             <!-- Focus on the first control supporting input on load. Place this before custom model content. Form
                  Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to

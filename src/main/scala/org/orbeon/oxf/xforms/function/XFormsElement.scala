@@ -19,7 +19,7 @@ import org.orbeon.scaxon.XML
 import org.orbeon.scaxon.XML._
 
 /**
- * xxf:element()
+ * xf:element()
  */
 class XFormsElement extends XFormsFunction {
 

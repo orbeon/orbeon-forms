@@ -437,11 +437,11 @@ trait ContainingDocumentDelayedEvents {
               ClientEvents.processEvent(
                 self.containingDocument,
                 XFormsEventFactory.createEvent(
-                  eventName         = dueEvent.eventName,
-                  target            = eventTarget,
-                  properties        = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
-                  bubbles           = dueEvent.bubbles,
-                  cancelable        = dueEvent.cancelable
+                  eventName  = dueEvent.eventName,
+                  target     = eventTarget,
+                  properties = EmptyGetter, // NOTE: We don't support properties for delayed events yet.
+                  bubbles    = dueEvent.bubbles,
+                  cancelable = dueEvent.cancelable
                 )
               )
             case _ ⇒

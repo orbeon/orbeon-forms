@@ -18,7 +18,7 @@ import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.XML
 
 /**
- * xxf:attribute()
+ * xf:attribute()
  */
 class XFormsAttribute extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {

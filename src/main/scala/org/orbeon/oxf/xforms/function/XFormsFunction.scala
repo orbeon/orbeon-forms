@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.function
 
 import java.util.{Iterator ⇒ JIterator}
 
-import org.dom4j.{Namespace, QName ⇒ Dom4jQName}
+import org.dom4j
+import org.dom4j.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
@@ -79,7 +80,7 @@ abstract class XFormsFunction extends SystemFunction {
   def setProperty(name: String, value: Option[String]) =
     context.setProperty(name, value)
 
-  protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): Dom4jQName = {
+  protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): dom4j.QName = {
 
     val evaluatedExpression =
       qNameExpression.evaluateItem(xpathContext)
@@ -245,13 +246,13 @@ object XFormsFunction {
       case (prefix, local) ⇒ PrefixedName(prefix, local)
     }
 
-  def qNameFromQNameValue(value: QNameValue): Dom4jQName =
+  def qNameFromQNameValue(value: QNameValue): dom4j.QName =
     parseQName(value.getStringValue) match {
-      case PrefixedName(prefix, local) ⇒ new Dom4jQName(local, new Namespace(prefix, value.getNamespaceURI))
-      case UnprefixedName(local)       ⇒ new Dom4jQName(local)
+      case PrefixedName(prefix, local) ⇒ new dom4j.QName(local, new Namespace(prefix, value.getNamespaceURI))
+      case UnprefixedName(local)       ⇒ new dom4j.QName(local)
     }
 
-  def qNameFromStringValue(value: String, bindingContext: BindingContext): Dom4jQName =
+  def qNameFromStringValue(value: String, bindingContext: BindingContext): dom4j.QName =
     parseQName(value) match {
       case PrefixedName(prefix, local) ⇒
 
@@ -276,8 +277,8 @@ object XFormsFunction {
         if (qNameURI eq null)
           prefixNotInScope()
 
-        new Dom4jQName(local, new Namespace(prefix, qNameURI))
+        new dom4j.QName(local, new Namespace(prefix, qNameURI))
       case UnprefixedName(local) ⇒
-        new Dom4jQName(local)
+        new dom4j.QName(local)
     }
 }

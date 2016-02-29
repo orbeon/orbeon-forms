@@ -179,8 +179,8 @@ public class TransformerUtils {
     }
 
     public static Transformer getIdentityTransformer(Configuration configuration) throws TransformerConfigurationException {
-        final Transformer transformer = new TransformerFactoryImpl(configuration).newTransformer();
-        // Wrap Transformer for properties
+        // See https://github.com/orbeon/orbeon-forms/issues/2577
+        final Transformer transformer = new IdentityTransformerWithFixup(configuration);
         return new TransformerWrapper(transformer, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
     }
 
@@ -469,13 +469,16 @@ public class TransformerUtils {
 
     /**
      * Transform a TinyTree to a dom4j document.
-     *
-     * This version uses a temporary string as we are having issues with converting directly from TinyTree to dom4j.
      */
     public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
         try {
-            final String xmlString = tinyTreeToString(nodeInfo);
-            return Dom4jUtils.readDom4j(xmlString);
+            final Transformer identity = getXMLIdentityTransformer();
+            final LocationDocumentResult documentResult = new LocationDocumentResult();
+
+            identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            identity.transform(nodeInfo, documentResult);
+
+            return documentResult.getDocument();
         } catch (Exception e) {
             throw new OXFException(e);
         }

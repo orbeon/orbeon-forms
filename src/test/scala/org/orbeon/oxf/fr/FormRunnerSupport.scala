@@ -38,15 +38,17 @@ trait FormRunnerSupport {
 
   // Simulate a call to Form Runner by running the FR PFC
   // Currently fails due to the call to the persistence proxy via HTTP.
+  // 2016-03-01: Checked if works now that we have internal requests, but `InternalHttpClient` requires a scope
+  // servlet/portlet to obtain a `ProcessorService`. It should be possible to scope what's necessary.
   def runFormRunner2(
-    app: String,
-    form: String,
-    mode: String,
-    formVersion: String = "",
-    document: String    = "",
-    uuid: String        = "",
-    noscript: Boolean   = false,
-    initialize: Boolean = true
+    app         : String,
+    form        : String,
+    mode        : String,
+    formVersion : String = "",
+    document    : String = "",
+    uuid        : String = "",
+    noscript    : Boolean = false,
+    initialize  : Boolean = true
   ): List[CacheEvent] = {
 
     def newProcessorDef(name: String) =
@@ -83,14 +85,14 @@ trait FormRunnerSupport {
 
   // Simulate a call to Form Runner by duplicating some of the functionality of the Form Runner pipeline
   def runFormRunner(
-    app: String,
-    form: String,
-    mode: String,
-    formVersion: String = "",
-    document: String    = "",
-    uuid: String        = "",
-    noscript: Boolean   = false,
-    initialize: Boolean = true
+    app         : String,
+    form        : String,
+    mode        : String,
+    formVersion : String = "",
+    document    : String = "",
+    uuid        : String = "",
+    noscript    : Boolean = false,
+    initialize  : Boolean = true
   ): (DocumentInfo, List[CacheEvent]) = {
 
     def newProcessorDef(name: String) =
@@ -138,7 +140,7 @@ trait FormRunnerSupport {
       pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
       pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", initialize)
 
-      for (p ← Seq(xsltProcessor, includeProcessor, xformsProcessor, serializer))
+      for (p ← List(xsltProcessor, includeProcessor, xformsProcessor, serializer))
         p.reset(pipelineContext)
 
       (serializer.runGetTinyTree(pipelineContext), events.toList)

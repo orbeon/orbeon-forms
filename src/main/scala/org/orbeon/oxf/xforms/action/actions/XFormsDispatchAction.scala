@@ -120,6 +120,10 @@ object XFormsDispatchAction {
         // contain more than one event with the same name and target IDREF. It is the name and the target run-time
         // element that must be unique."
 
+        // TODO: We should either handle properties or throw an exception. We could handle atomic value but not nodes.
+        // However, we cannot implement this as is because `PropertyGetter` does not provide a way to enumerate the
+        // properties. So we cannot check whether they are empty or whether we support their type.
+
         XFormsAPI.containingDocument.addDelayedEvent(
           eventName         = eventName,
           targetEffectiveId = target.getEffectiveId,

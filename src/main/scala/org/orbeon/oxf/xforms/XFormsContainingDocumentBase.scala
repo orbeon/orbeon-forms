@@ -35,7 +35,6 @@ import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventFactory, XFormsEven
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
 
 import scala.annotation.tailrec
@@ -480,16 +479,18 @@ case class DelayedEvent(
 
   private def asEncodedDocument: String = {
 
-    val eventsDocument = Dom4jUtils.createDocument
-    val eventsElement  = eventsDocument.addElement(XXFORMS_EVENTS_QNAME)
-    val eventElement   = eventsElement.addElement(XXFORMS_EVENT_QNAME)
+    import org.orbeon.oxf.xml.Dom4j._
 
-    eventElement.addAttribute("name", eventName)
-    eventElement.addAttribute("source-control-id", targetEffectiveId)
-    eventElement.addAttribute("bubbles", bubbles.toString)
-    eventElement.addAttribute("cancelable", cancelable.toString)
-
-    XFormsUtils.encodeXML(eventsDocument, false)
+    XFormsUtils.encodeXML(
+      <xxf:events>
+        <xxf:event
+          name={eventName}
+          source-control-id={targetEffectiveId}
+          bubbles={bubbles.toString}
+          cancelable={cancelable.toString}/>
+      </xxf:events>,
+      false
+    )
   }
 
   def writeAsSAX(currentTime: Long)(implicit receiver: XMLReceiver): Unit = {

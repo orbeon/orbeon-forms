@@ -76,7 +76,7 @@
                 <!-- Binary PUT -->
                 <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
 
-                    <!-- TODO: fix oxf:url-serializer to support binary documents 
+                    <!-- TODO: fix oxf:url-serializer to support binary documents
                                Note that the file serializer can now be used with oxf:/ URLs... -->
 
                 </p:when>

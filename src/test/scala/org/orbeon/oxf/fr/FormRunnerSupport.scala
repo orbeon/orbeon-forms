@@ -48,6 +48,7 @@ trait FormRunnerSupport {
   ): List[CacheEvent] = {
 
     val processorService = {
+
       def newProcessorDef(name: String) =
         new ProcessorDefinition(new QName(name, OXF_PROCESSORS_NAMESPACE))
 
@@ -78,6 +79,7 @@ trait FormRunnerSupport {
         processorService.service(pipelineContext, externalContext)
       }
     }
+    
     events.toList
   }
 

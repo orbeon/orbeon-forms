@@ -19,7 +19,8 @@
 
     <!-- ==== Form Runner send submissions ========================================================================= -->
 
-    <xf:submission id="fr-send-submission"
+    <xf:submission
+        id="fr-send-submission"
         resource="{instance('fr-send-submission-params')/@uri}"
         relevant="{instance('fr-send-submission-params')/@prune}"
         validate="false"
@@ -51,8 +52,7 @@
                        xxf:instance('fr-form-instance')/root()
                )[1]"
         replace="{instance('fr-send-submission-params')/@replace}"
-        instance="fr-send-submission-response">
-    </xf:submission>
+        instance="fr-send-submission-response"/>
 
     <!-- Instance to store the result of the create/update submission -->
     <xf:instance id="fr-send-submission-response">
@@ -88,16 +88,17 @@
          enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
          code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
          form instance is created. -->
-    <xf:submission id="fr-create-update-submission"
-            validate="false"
-            relevant="false"
-            method="put"
-            ref="event('holder')"
-            resource="{event('resource')}"
-            xxf:username="{event('username')}"
-            xxf:password="{event('password')}"
-            replace="text"
-            target="instance('fr-create-update-submission-response')">
+    <xf:submission
+        id="fr-create-update-submission"
+        validate="false"
+        relevant="false"
+        method="put"
+        ref="event('holder')"
+        resource="{event('resource')}"
+        xxf:username="{event('username')}"
+        xxf:password="{event('password')}"
+        replace="text"
+        target="instance('fr-create-update-submission-response')">
 
         <!-- Clear response if not HTML -->
         <xf:setvalue
@@ -111,15 +112,17 @@
     </xf:submission>
 
     <!-- Submission to create/update an attachment -->
-    <xf:submission id="fr-create-update-attachment-submission"
-            validate="false"
-            method="put"
-            serialization="application/octet-stream"
-            ref="event('holder')"
-            resource="{event('resource')}"
-            xxf:username="{event('username')}"
-            xxf:password="{event('password')}"
-            replace="none">
+    <xf:submission
+        id="fr-create-update-attachment-submission"
+        validate="false"
+        method="put"
+        serialization="application/octet-stream"
+        ref="event('holder')"
+        resource="{event('resource')}"
+        xxf:username="{event('username')}"
+        xxf:password="{event('password')}"
+        replace="none">
+
         <xf:header ref="event('form-version')[xxf:non-blank()]">
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
             <xf:value value="."/>

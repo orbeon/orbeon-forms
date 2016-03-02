@@ -42,7 +42,12 @@ object XFormsModelSubmissionBase {
   // - annotate with `xxf:id` if requested
   // - prune non-relevant nodes if requested
   // - annotate with alerts if requested
-  def prepareXML(xfcd: XFormsContainingDocument, ref: NodeInfo, prune: Boolean, annotateWith: String): Document =
+  def prepareXML(
+    xfcd         : XFormsContainingDocument,
+    ref          : NodeInfo,
+    prune        : Boolean,
+    annotateWith : String
+  ): Document =
     ref match {
       case virtualNode: VirtualNode ⇒
 

@@ -49,6 +49,8 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider2.city-name"                 value="São Paulo"/>
     <property as="xs:integer" name="oxf.fr.persistence.provider2.population"                value="11244369"/>
 
+    <property as="xs:string"   name="oxf.fr.persistence.provider.cache-test.*.form"         value="resource"/>
+
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.cache-test.noscript-false-pdf-template-wizard-true" value="wizard"/>
 
 </properties>

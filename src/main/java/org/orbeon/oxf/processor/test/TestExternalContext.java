@@ -394,8 +394,14 @@ public class TestExternalContext implements ExternalContext  {
             return null;
         }
 
+        private ByteArrayOutputStream outputStream = null;
+
         public OutputStream getOutputStream() throws IOException {
-            return null;
+
+            if (outputStream == null)
+                outputStream = new ByteArrayOutputStream();
+
+            return outputStream;
         }
 
         public PrintWriter getWriter() throws IOException {

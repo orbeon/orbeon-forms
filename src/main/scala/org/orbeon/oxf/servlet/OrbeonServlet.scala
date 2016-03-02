@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.pipeline.api._
 import javax.servlet.ServletException
 import javax.servlet.http._
-import org.orbeon.oxf.util.DynamicVariable
 
-import collection.JavaConverters._
-import org.orbeon.oxf.webapp.{WebAppContext, ProcessorService, ServletPortlet}
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+
+import scala.collection.JavaConverters._
 
 // For backward compatibility
 class OrbeonServletDelegate extends OrbeonServlet
@@ -35,8 +35,6 @@ class OrbeonServletDelegate extends OrbeonServlet
  * All servlets and portlets instances in a given web app share the same resource manager.
  */
 class OrbeonServlet extends HttpServlet with ServletPortlet {
-
-  import OrbeonServlet._
 
   private implicit val logger = ProcessorService.Logger
 
@@ -68,7 +66,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
 
   // Servlet request
   override def service(request: HttpServletRequest, response: HttpServletResponse): Unit =
-    currentServlet.withValue(this) {
+    ProcessorService.currentProcessorService.withValue(processorService) {
       withRootException("request", new ServletException(_)) {
         val httpMethod = request.getMethod
         if (! acceptedMethods(httpMethod.toLowerCase))
@@ -79,8 +77,4 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
         processorService.service(pipelineContext, externalContext)
       }
     }
-}
-
-object OrbeonServlet {
-  val currentServlet = new DynamicVariable[OrbeonServlet]
 }

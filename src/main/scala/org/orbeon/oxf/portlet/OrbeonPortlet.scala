@@ -13,20 +13,17 @@
  */
 package org.orbeon.oxf.portlet
 
-import java.io.ByteArrayInputStream
+import javax.portlet._
 
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
-
-import collection.JavaConverters._
-import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
-import OrbeonPortlet._
-import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.util.ScalaUtils._
-import javax.portlet._
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
-import org.orbeon.oxf.webapp.{WebAppContext, ProcessorService, ServletPortlet}
-import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+
+import scala.collection.JavaConverters._
 
 // For backward compatibility
 class OrbeonPortlet2         extends OrbeonPortlet
@@ -84,7 +81,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
   // Portlet render
   override def render(request: RenderRequest, response: RenderResponse): Unit =
-    currentPortlet.withValue(this) {
+    ProcessorService.currentProcessorService.withValue(processorService) {
       withRootException("render", new PortletException(_)) {
         implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
         bufferedRender(request, response, callService(directContext(request)))
@@ -93,7 +90,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
   // Portlet action
   override def processAction(request: ActionRequest, response: ActionResponse): Unit =
-    currentPortlet.withValue(this) {
+    ProcessorService.currentProcessorService.withValue(processorService) {
       withRootException("action", new PortletException(_)) {
         implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null)
         bufferedProcessAction(request, response, callService(directContext(request)))
@@ -102,7 +99,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
   // Portlet resource
   override def serveResource(request: ResourceRequest, response: ResourceResponse) =
-    currentPortlet.withValue(this) {
+    ProcessorService.currentProcessorService.withValue(processorService) {
       withRootException("resource", new PortletException(_)) {
         implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
         directServeResource(request, response)
@@ -147,9 +144,4 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
       val bytes = bufferedResponse.getBytes
       StreamedContent.fromBytes(bytes, Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
     }
-}
-
-object OrbeonPortlet {
-  // As of 2016-01-28, used only by InternalHttpClient
-  val currentPortlet = new DynamicVariable[OrbeonPortlet]
 }

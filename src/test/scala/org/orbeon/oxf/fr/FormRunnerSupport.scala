@@ -14,17 +14,16 @@
 package org.orbeon.oxf.fr
 
 import org.dom4j.QName
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
-import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
-import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.pipeline.InitUtils._
-import org.orbeon.oxf.processor.DOMSerializer
-import org.orbeon.oxf.util.PipelineUtils._
+import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.test.TestExternalContext
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.ProcessorService
+import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
+import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
 import scala.collection.mutable.ListBuffer
 
@@ -36,11 +35,8 @@ trait FormRunnerSupport {
 
   val DummyDocument: NodeInfo = <dummy/>
 
-  // Simulate a call to Form Runner by running the FR PFC
-  // Currently fails due to the call to the persistence proxy via HTTP.
-  // 2016-03-01: Checked if works now that we have internal requests, but `InternalHttpClient` requires a scope
-  // servlet/portlet to obtain a `ProcessorService`. It should be possible to scope what's necessary.
-  def runFormRunner2(
+  // Simulate a call to Form Runner by running the Form Runner PFC
+  def runFormRunner(
     app         : String,
     form        : String,
     mode        : String,
@@ -51,100 +47,38 @@ trait FormRunnerSupport {
     initialize  : Boolean = true
   ): List[CacheEvent] = {
 
-    def newProcessorDef(name: String) =
-      new ProcessorDefinition(new QName(name, OXF_PROCESSORS_NAMESPACE))
+    val processorService = {
+      def newProcessorDef(name: String) =
+        new ProcessorDefinition(new QName(name, OXF_PROCESSORS_NAMESPACE))
+
+      val pfcProcessorDefinition =
+        newProcessorDef("page-flow") |!> (_.addInput("controller", "oxf:/apps/fr/page-flow.xml"))
+
+      new ProcessorService(pfcProcessorDefinition, None)
+    }
+
+    val events = ListBuffer[CacheEvent]()
+
+    val tracer = new CacheTracer {
+      override def digestAndTemplateStatus(digestIfFound: Option[String]) = events += DigestAndTemplate(digestIfFound)
+      override def staticStateStatus(found: Boolean, digest: String)      = events += StaticState(found, digest)
+    }
 
     val request = newFRRequest(s"/fr/$app/$form/$mode", noscript)
 
-    val pfcProcessor =
-      createProcessor(
-        newProcessorDef("page-flow")
-          |!> (_.addInput("controller", "oxf:/apps/fr/page-flow.xml"))
-      )
-
     withPipelineContext { pipelineContext ⇒
 
-      val events = ListBuffer[CacheEvent]()
-
-      val tracer = new CacheTracer {
-        override def digestAndTemplateStatus(digestIfFound: Option[String]) = events += DigestAndTemplate(digestIfFound)
-        override def staticStateStatus(found: Boolean, digest: String)      = events += StaticState(found, digest)
-      }
-
       val externalContext = new TestExternalContext(pipelineContext, TransformerUtils.tinyTreeToDom4j(request))
+
       pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
       pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
       pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", initialize)
 
-      pfcProcessor.reset(pipelineContext)
-      pfcProcessor.start(pipelineContext)
-
-      events.toList
-    }
-  }
-
-  // Simulate a call to Form Runner by duplicating some of the functionality of the Form Runner pipeline
-  def runFormRunner(
-    app         : String,
-    form        : String,
-    mode        : String,
-    formVersion : String = "",
-    document    : String = "",
-    uuid        : String = "",
-    noscript    : Boolean = false,
-    initialize  : Boolean = true
-  ): (DocumentInfo, List[CacheEvent]) = {
-
-    def newProcessorDef(name: String) =
-      new ProcessorDefinition(new QName(name, OXF_PROCESSORS_NAMESPACE))
-
-    val params  = newFRParams(app, form, mode, formVersion, document, uuid)
-    val request = newFRRequest(s"/fr/$app/$form/$mode", noscript)
-
-    val xsltProcessor =
-      createProcessor(
-        newProcessorDef("unsafe-xslt")
-          |!> (_.addInput("config",   "oxf:/apps/fr/components/components.xsl"))
-          |!> (_.addInput("data",     s"oxf:/forms/$app/$form/form/form.xml"))
-          |!> (_.addInput("instance", params))
-          |!> (_.addInput("request",  request))
-      )
-
-    val xformsProcessor =
-      createProcessor(
-        newProcessorDef("xforms-to-xhtml")
-          |!> (_.addInput("data",     DummyDocument))
-          |!> (_.addInput("instance", params))
-      )
-
-    val includeProcessor =
-      createProcessor(newProcessorDef("xinclude"))
-
-    val serializer = new DOMSerializer
-
-    connect(xsltProcessor,    "data",     includeProcessor, "config")
-    connect(includeProcessor, "data",     xformsProcessor,  "annotated-document")
-    connect(xformsProcessor,  "document", serializer,       "data")
-
-    withPipelineContext { pipelineContext ⇒
-
-      val events = ListBuffer[CacheEvent]()
-
-      val tracer = new CacheTracer {
-        override def digestAndTemplateStatus(digestIfFound: Option[String]) = events += DigestAndTemplate(digestIfFound)
-        override def staticStateStatus(found: Boolean, digest: String)      = events += StaticState(found, digest)
+      ProcessorService.currentProcessorService.withValue(processorService) {
+        processorService.service(pipelineContext, externalContext)
       }
-
-      val externalContext = new TestExternalContext(pipelineContext, TransformerUtils.tinyTreeToDom4j(request))
-      pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-      pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
-      pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", initialize)
-
-      for (p ← List(xsltProcessor, includeProcessor, xformsProcessor, serializer))
-        p.reset(pipelineContext)
-
-      (serializer.runGetTinyTree(pipelineContext), events.toList)
     }
+    events.toList
   }
 
   def newFRRequest(path: String, noscript: Boolean): NodeInfo =

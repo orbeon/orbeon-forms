@@ -18,8 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.portlet.OrbeonPortlet
-import org.orbeon.oxf.servlet.OrbeonServlet
+import org.orbeon.oxf.webapp.ProcessorService
 
 import scala.annotation.tailrec
 
@@ -40,9 +39,8 @@ object InternalHttpClient extends HttpClient {
 
     require(url.startsWith("/"), "InternalHttpClient only supports absolute paths")
 
-    val currentServletPortlet =
-      OrbeonServlet.currentServlet.value orElse
-      OrbeonPortlet.currentPortlet.value getOrElse
+    val currentProcessorService =
+      ProcessorService.currentProcessorService.value getOrElse
       (throw new OXFException(s"InternalHttpClient: missing current servlet or portlet connecting to $url."))
 
     val incomingExternalContext = NetUtils.getExternalContext
@@ -84,7 +82,7 @@ object InternalHttpClient extends HttpClient {
 
       val response = new LocalResponse(urlRewriter)
 
-      currentServletPortlet.processorService.service(
+      currentProcessorService.service(
         new PipelineContext,
         new LocalExternalContext(
           incomingExternalContext.getWebAppContext,

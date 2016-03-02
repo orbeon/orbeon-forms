@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.{DynamicVariable, LoggerFactory}
 import java.io.PrintWriter
 import scala.util.control.NonFatal
 
@@ -126,4 +126,7 @@ object ProcessorService {
   // Whether to show exceptions to the client
   def showExceptions =
     Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
+
+  // For InternalHttpClient
+  val currentProcessorService = new DynamicVariable[ProcessorService]
 }

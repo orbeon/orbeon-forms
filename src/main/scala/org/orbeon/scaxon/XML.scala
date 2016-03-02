@@ -352,6 +352,8 @@ object XML {
     def /@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
     def \@(test: Test): Seq[NodeInfo] = /@(test)
 
+    def namespaceNodes: Seq[NodeInfo] = find(Axis.NAMESPACE, AnyTest)
+
     // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
 //        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
 //        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
@@ -501,6 +503,8 @@ object XML {
     def \@(attName: QName): Seq[NodeInfo]  = /@(attName)
     def \@(attName: (String, String))      = /@(attName)
     def \@(test: Test): Seq[NodeInfo]      = /@(test)
+
+    def namespaceNodes: Seq[NodeInfo] = seq flatMap (_.namespaceNodes)
 
     // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
 //        def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)

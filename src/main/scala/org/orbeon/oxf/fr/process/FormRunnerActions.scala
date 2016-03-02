@@ -91,7 +91,7 @@ trait FormRunnerActions {
       import DataMigration._
 
       val dataMaybeMigrated =
-        dataMaybeMigratedFrom(formInstance.root, metadataInstance map (_.root)) getOrElse formInstance.root
+        dataMaybeMigratedFrom(formInstance.root, metadataInstance map (_.root), pruneMetadata = false) getOrElse formInstance.root
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(
@@ -202,7 +202,7 @@ trait FormRunnerActions {
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE)
 
-  // Defaults except for `uri` and `serialization`
+  // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
     "method"              → "post",
     "prune"               → "true",
@@ -213,7 +213,7 @@ trait FormRunnerActions {
     "parameters"          → "app form form-version document valid language process data-format-version"
   )
 
-  private val SendParameterKeys = List("uri", "serialization") ++ DefaultSendParameters.keys
+  private val SendParameterKeys = List("uri", "serialization", "prune-metadata") ++ DefaultSendParameters.keys
 
   def trySend(params: ActionParams): Try[Any] =
     Try {
@@ -262,17 +262,29 @@ trait FormRunnerActions {
           case other                       ⇒ other
         } toMap
 
-      def findDefaultSerialization(method: String) = method match {
-        case "post" | "put" ⇒ "application/xml"
-        case _              ⇒ "none"
+      // Handle defaults which depend on other properties
+      val evaluatedSendProperties = {
+
+        def findDefaultSerialization(method: String) = method match {
+          case "post" | "put" ⇒ "application/xml"
+          case _              ⇒ "none"
+        }
+
+        def findDefaultPruneMetadata(dataFormatVersion: String) = dataFormatVersion match {
+          case "edge" ⇒ "false"
+          case _      ⇒ "true"
+        }
+
+        val effectiveSerialization =
+          evaluatedPropertiesAsMap.get("serialization").flatten orElse
+            (evaluatedPropertiesAsMap.get("method").flatten map findDefaultSerialization)
+
+        val effectivePruneMetadata =
+          evaluatedPropertiesAsMap.get("prune-metadata").flatten orElse
+            (evaluatedPropertiesAsMap.get("data-format-version").flatten map findDefaultPruneMetadata)
+
+        evaluatedPropertiesAsMap + ("serialization" → effectiveSerialization) + ("prune-metadata" → effectivePruneMetadata)
       }
-
-      val effectiveSerialization =
-        evaluatedPropertiesAsMap.get("serialization").flatten orElse
-          (evaluatedPropertiesAsMap.get("method").flatten map findDefaultSerialization)
-
-      val evaluatedSendProperties =
-        evaluatedPropertiesAsMap + ("serialization" → effectiveSerialization)
 
       // Create PDF and/or TIFF if needed
       for (format ← SupportedRenderFormats)
@@ -351,6 +363,7 @@ trait FormRunnerActions {
         Some("replace")             → replace,
         Some("content")             → "xml",
         Some("data-format-version") → "edge",
+        Some("prune-metadata")      → "false",
         Some("parameters")          → "form-version data-format-version"
       )
     } flatMap

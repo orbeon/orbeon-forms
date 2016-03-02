@@ -87,18 +87,18 @@ object DataMigration {
   import org.orbeon.oxf.xforms.action.XFormsAPI._
 
   //@XPathFunction
-  def dataMaybeMigratedFrom(data: DocumentInfo, metadata: Option[DocumentInfo]) =
-    dataMaybeMigratedFromTo(data, metadata, migrateDataFrom)
+  def dataMaybeMigratedFrom(data: DocumentInfo, metadata: Option[DocumentInfo], pruneMetadata: Boolean): Option[DocumentInfo] =
+    dataMaybeMigratedFromTo(data, metadata, migrateDataFrom(_, _, pruneMetadata))
 
   //@XPathFunction
-  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]) =
+  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]): Option[DocumentInfo] =
     dataMaybeMigratedFromTo(data, metadata, migrateDataTo)
 
   private def dataMaybeMigratedFromTo(
     data     : DocumentInfo,
     metadata : Option[DocumentInfo],
     migrate  : (DocumentInfo, String) ⇒ DocumentInfo
-  ) =
+  ): Option[DocumentInfo] =
     for {
       metadata  ← metadata
       migration ← migrationMapFromMetadata(metadata.rootElement)
@@ -151,7 +151,7 @@ object DataMigration {
     mutableData
   }
 
-  def migrateDataFrom(data: DocumentInfo, jsonMigrationMap: String): DocumentInfo = {
+  def migrateDataFrom(data: DocumentInfo, jsonMigrationMap: String, pruneMetadata: Boolean): DocumentInfo = {
 
     val mutableData = TransformerUtils.extractAsMutableDocument(data)
 
@@ -173,6 +173,37 @@ object DataMigration {
         delete(container, doDispatch = false)
     }
 
+    if (pruneMetadata)
+      pruneFormRunnerMetadataFromMutableData(mutableData)
+
     mutableData
+  }
+
+  //@XPathFunction
+  def pruneFormRunnerMetadata(data: DocumentInfo): DocumentInfo = {
+    val mutableData = TransformerUtils.extractAsMutableDocument(data)
+    pruneFormRunnerMetadataFromMutableData(mutableData)
+    mutableData
+  }
+
+  // Remove all `fr:*` elements and attributes
+  def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentInfo): Unit = {
+    // Delete elements from concrete `List` to avoid possible laziness
+    val frElements = mutableData descendant * filter (_.namespaceURI == XMLNames.FR) toList
+
+    frElements.foreach (delete(_, doDispatch = false))
+
+    // Attributes OTOH can be deleted in document order just fine
+    val allElements = mutableData descendant *
+
+    val frAttributes = allElements /@ @* filter (_.namespaceURI == XMLNames.FR)
+
+    frAttributes.foreach (delete(_, doDispatch = false))
+
+    // Also remove all `fr:*` namespaces
+    // TODO: This doesn't work: we find the nodes but the delete action doesn't manage to delete the node.
+    val frlNamespaces = allElements.namespaceNodes filter (_.stringValue == XMLNames.FR)
+
+    frlNamespaces.foreach (delete(_, doDispatch = false))
   }
 }

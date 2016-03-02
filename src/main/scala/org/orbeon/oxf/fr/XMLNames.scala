@@ -19,6 +19,8 @@ import org.orbeon.scaxon.XML.Test
 
 object XMLNames {
 
+  val FR = "http://orbeon.org/oxf/xml/form-runner"
+
   val XBLXBLTest            : Test = XBL → "xbl"
   val XBLBindingTest        : Test = XBL → "binding"
   val XBLTemplateTest       : Test = XBL → "template"

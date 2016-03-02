@@ -332,7 +332,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
     } locally {
       assertXMLDocumentsIgnoreNamespacesInScope(
         from.root,
-        DataMigration.migrateDataFrom(to.root, MigrationJSON)
+        DataMigration.migrateDataFrom(to.root, MigrationJSON, pruneMetadata = false)
       )
     }
 
@@ -345,7 +345,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
     } locally {
       assertXMLDocumentsIgnoreNamespacesInScope(
         from.root,
-        DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON)
+        DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON, pruneMetadata = false)
       )
     }
 }

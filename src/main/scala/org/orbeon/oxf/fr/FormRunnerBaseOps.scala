@@ -31,7 +31,7 @@ trait FormRunnerBaseOps {
   val XF = XFORMS_NAMESPACE_URI
   val XS = XSD_URI
   val XBL = XBL_NAMESPACE_URI
-  val FR = "http://orbeon.org/oxf/xml/form-runner"
+  val FR = XMLNames.FR
 
   val NoscriptParam         = "fr-noscript"
   val LanguageParam         = "fr-language"

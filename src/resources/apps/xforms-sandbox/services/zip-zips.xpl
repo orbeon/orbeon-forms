@@ -40,7 +40,7 @@
                 <xsl:variable name="zips" as="element(zip)*" select="/zips/zip[state-abbreviation = $state-abbreviation and city = $city]"/>
                 <xsl:for-each select="$zips[empty($max) or position() lt $max]">
                     <xsl:sort select="code"/>
-                    <zip code="{code}" latitute="{latitute}" longitude="{longitude}"/>
+                    <zip code="{code}" latitude="{latitude}" longitude="{longitude}"/>
                 </xsl:for-each>
             </zips>
         </p:input>

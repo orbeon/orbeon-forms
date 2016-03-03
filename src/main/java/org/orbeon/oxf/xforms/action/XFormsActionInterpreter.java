@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait;
-import org.orbeon.oxf.xforms.event.EventHandlerImpl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -404,29 +404,25 @@ public class XFormsActionInterpreter {
     public XFormsObject resolveObject(Element actionElement, String targetStaticOrAbsoluteId) {
 
         // First resolve the object by static id
-        final XFormsObject result =
-                _container.resolveObjectByIdInScopeJava(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, null);
+        final scala.Option<XFormsObject> result =
+            _container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, Option.<Item>apply(null));
 
-        if (result == null) {
+        if (result.isEmpty()) {
             return null;
         } else {
             // Get indexes as space-separated list
             final String repeatIndexes = resolveAVT(actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME);
             if (StringUtils.isBlank(repeatIndexes)) {
                 // Most common case: just return the resolved object
-                return result;
+                return result.get();
             } else {
                 // Extension: repeat indexes are provided
-
-                // Repeat indexes in current scope
-                final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
-                final int[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
-
-                // Append new indexes
-                final int[] newSuffix = EventHandlerImpl.appendSuffixes(containerParts, repeatIndexes);
-
-                final String effectiveId = EventHandlerImpl.replaceIdSuffix(result.getEffectiveId(), newSuffix);
-
+                final String effectiveId = Dispatch.resolveRepeatIndexes(
+                    _container,
+                    result.get(),
+                    getActionPrefixedId(actionElement),
+                    repeatIndexes
+                );
                 return _containingDocument.getControlByEffectiveId(effectiveId);
             }
         }
@@ -444,10 +440,6 @@ public class XFormsActionInterpreter {
 
     public Scope getActionScope(Element actionElement) {
         return _container.getPartAnalysis().scopeForPrefixedId(getActionPrefixedId(actionElement));
-    }
-
-    private XBLContainer findResolutionScopeContainer(Element actionElement) {
-        return _container.findScopeRoot(getActionPrefixedId(actionElement));
     }
 
     /**

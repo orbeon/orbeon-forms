@@ -1,0 +1,171 @@
+/**
+ * Copyright (C) 2016 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.fr
+
+import org.junit.Test
+import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.scalatest.junit.AssertionsForJUnit
+
+class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFormsSupport with AssertionsForJUnit {
+
+  // Test itemset-related actions, including setting dependent and non-dependent itemsets and internationalization
+  @Test def formRunnerItemsetActions(): Unit = {
+
+    val (processorService, docOpt, _) =
+      runFormRunner("tests", "itemset-action", "new", document = "", noscript = false, initialize = true)
+
+    val doc = docOpt.get
+
+    withFormRunnerDocument(processorService, doc) {
+
+      def resolveCityAndZipControls(indexes: List[Int]) = {
+        val cityControl = resolveObject[XFormsComponentControl]("city-control", indexes = indexes).get
+        val zipControl  = resolveObject[XFormsComponentControl]("zip-control", cityControl.effectiveId, indexes).get
+
+        cityControl → zipControl
+      }
+
+      def assertEmptyRowValues(indexes: List[Int]) = {
+
+        val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
+
+        assert("" === getControlValue(cityControl.effectiveId))
+        assert("" === getControlValue(zipControl.effectiveId))
+      }
+
+      def assertRowItemsetsContain(indexes: List[Int], cityOpt: Option[String], zipOpt: Option[String]) = {
+
+        val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
+
+        def assertOne(control: XFormsComponentControl, itemValueOpt: Option[String]) = itemValueOpt match {
+          case Some(itemValue) ⇒
+            assert(getItemsetSearchNested(control).get.allItemsIterator exists (_.value == itemValue))
+          case None ⇒
+            assert(1 === getItemsetSearchNested(control).get.allItemsIterator.size) // because fr:dropdown has a blank item
+        }
+
+        assertOne(cityControl, cityOpt)
+        assertOne(zipControl, zipOpt)
+      }
+
+      def assertRowValues(indexes: List[Int], cityToSet: String, zipToSet: String) = {
+        val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
+
+        assert(cityToSet === getControlValue(cityControl.effectiveId))
+        assert(zipToSet  === getControlValue(zipControl.effectiveId))
+
+        assertRowItemsetsContain(indexes, Some(cityToSet), Some(zipToSet))
+      }
+
+      def assertItemsetsChange(indexes: List[Int], cityToSet: String, zipToSet: String) = {
+
+        val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
+
+        setControlValueWithEvent(cityControl.getEffectiveId, cityToSet)
+        setControlValueWithEvent(zipControl.effectiveId, zipToSet)
+
+        assertRowValues(indexes, cityToSet, zipToSet)
+      }
+
+      def assertSectionIteration(stateControl: XFormsComponentControl, stateValue: String, expected: List[(List[Int], String, String)]) = {
+
+        val sectionIndex = expected.head._1.head
+
+        // Initial state
+        assert("" === getControlValue(stateControl.effectiveId))
+        assertEmptyRowValues(List(sectionIndex, 1))
+        assertRowItemsetsContain(List(sectionIndex, 1), None, None)
+
+        // Switch to CA
+        setControlValueWithEvent(stateControl.getEffectiveId, stateValue)
+        assert(stateValue === getControlValue(stateControl.effectiveId))
+
+        // Set values and add iterations
+        for ((indexes @ List(sectionIndex, gridIndex), city, zip) ← expected) {
+
+          assertEmptyRowValues(indexes)
+          assertItemsetsChange(indexes, city, zip)
+
+          performGridAction(
+            resolveObject[XFormsControl]("city-zip-grid-control", indexes = indexes take 1).get,
+            "fr-insert-below"
+          )
+
+          val newRowIndexes = sectionIndex :: (gridIndex + 1) :: Nil
+
+          assertEmptyRowValues(newRowIndexes)
+          assertRowItemsetsContain(newRowIndexes, Some(city), None)
+        }
+
+        for ((indexes, city, zip) ← expected) {
+          assertRowValues(indexes, city, zip)
+        }
+
+        // Change state
+        setControlValueWithEvent(stateControl.getEffectiveId, "AK")
+        assert("AK" === getControlValue(stateControl.effectiveId))
+
+        // Check that all values are cleared on all iterations, and that the city itemsets are updated
+        for ((indexes @ List(sectionIndex, gridIndex), _, _) ← expected ) {
+          assertEmptyRowValues(indexes)
+          assertRowItemsetsContain(indexes, Some("Anchorage"), None)
+        }
+      }
+
+      assertSectionIteration(
+        stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(1)).get,
+        stateValue   = "CA",
+        expected     = List(
+          (List(1, 1), "Los Angeles", "90001"),
+          (List(1, 2), "Beverly Hills", "90212"),
+          (List(1, 3), "Hermosa Beach", "90254")
+        )
+      )
+
+      // New section iteration
+      performSectionAction(
+        resolveObject[XFormsControl]("states-section-control").get,
+        "fr-insert-below"
+      )
+
+      assertSectionIteration(
+        stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(2)).get,
+        stateValue   = "LA",
+        expected     = List(
+          (List(2, 1), "Metairie", "70001"),
+          (List(2, 2), "Belle Chasse", "70037"),
+          (List(2, 3), "Des Allemands", "70030")
+        )
+      )
+
+      // Itemset internationalization
+      def assertStateItemsetsContain(label: String) =
+        for (sectionIndex ← 1 to 2) {
+          val stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(sectionIndex)).get
+          assert(getItemsetSearchNested(stateControl).get.allItemsIterator exists (_.label.label == label))
+        }
+
+      assertStateItemsetsContain("California")
+
+      // Switch language to French
+      setFormRunnerLanguage("fr")
+
+      // Check that state names have switched
+      assertStateItemsetsContain("Californie")
+
+      // TODO: check data for fr:itemsetid, fr:itemsetmap, fr:metadata
+    }
+  }
+}

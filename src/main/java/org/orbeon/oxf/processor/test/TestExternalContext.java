@@ -61,6 +61,13 @@ public class TestExternalContext implements ExternalContext  {
         return webAppContext;
     }
 
+    public byte[] getResponseBytes() {
+        if (response.outputStream == null)
+            return null;
+        else
+            return response.outputStream.toByteArray();
+    }
+
     private class Request implements ExternalContext.Request {
 
         private Map<String, Object> attributesMap;

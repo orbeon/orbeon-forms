@@ -25,11 +25,13 @@
         <p:input name="data" href="zip-flat.xml"/>
         <p:input name="config">
             <states xsl:version="2.0">
-                <xsl:variable name="zips" as="element(zip)+" select="/zips/zip"/>
+                <xsl:variable name="zips"   as="element(zip)+"   select="/zips/zip"/>
+                <xsl:variable name="states" as="element(state)+" select="doc('/xbl/orbeon/us-state/states.xml')/states/state"/>
                 <xsl:for-each select="distinct-values($zips/state-abbreviation)">
                     <xsl:sort/>
-                    <xsl:variable name="abbreviation" as="xs:string" select="."/>
-                    <state abbreviation="{$abbreviation}" name="{($zips[state-abbreviation = $abbreviation])[1]/state-name}"/>
+                    <xsl:variable name="abbreviation" as="xs:string"       select="."/>
+                    <xsl:variable name="state"        as="element(state)?" select="$states[@abbreviation = $abbreviation]"/>
+                    <state abbreviation="{$abbreviation}" name="{$state/@name}" name-fr="{$state/@name-fr}"/>
                 </xsl:for-each>
             </states>
         </p:input>

@@ -12,56 +12,56 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <states>
-    <state abbreviation="AK" name="Alaska"/>
-    <state abbreviation="AL" name="Alabama"/>
-    <state abbreviation="AR" name="Arkansas"/>
-    <state abbreviation="AZ" name="Arizona"/>
-    <state abbreviation="CA" name="California"/>
-    <state abbreviation="CO" name="Colorado"/>
-    <state abbreviation="CT" name="Connecticut"/>
-    <state abbreviation="DC" name="District of Columbia"/>
-    <state abbreviation="DE" name="Delaware"/>
-    <state abbreviation="FL" name="Florida"/>
-    <state abbreviation="GA" name="Georgia"/>
-    <state abbreviation="HI" name="Hawaii"/>
-    <state abbreviation="IA" name="Iowa"/>
-    <state abbreviation="ID" name="Idaho"/>
-    <state abbreviation="IL" name="Illinois"/>
-    <state abbreviation="IN" name="Indiana"/>
-    <state abbreviation="KS" name="Kansas"/>
-    <state abbreviation="KY" name="Kentucky"/>
-    <state abbreviation="LA" name="Louisiana"/>
-    <state abbreviation="MA" name="Massachusetts"/>
-    <state abbreviation="MD" name="Maryland"/>
-    <state abbreviation="ME" name="Maine"/>
-    <state abbreviation="MI" name="Michigan"/>
-    <state abbreviation="MN" name="Minnesota"/>
-    <state abbreviation="MO" name="Missouri"/>
-    <state abbreviation="MS" name="Mississippi"/>
-    <state abbreviation="MT" name="Montana"/>
-    <state abbreviation="NC" name="North Carolina"/>
-    <state abbreviation="ND" name="North Dakota"/>
-    <state abbreviation="NE" name="Nebraska"/>
-    <state abbreviation="NH" name="New Hampshire"/>
-    <state abbreviation="NJ" name="New Jersey"/>
-    <state abbreviation="NM" name="New Mexico"/>
-    <state abbreviation="NV" name="Nevada"/>
-    <state abbreviation="NY" name="New York"/>
-    <state abbreviation="OH" name="Ohio"/>
-    <state abbreviation="OK" name="Oklahoma"/>
-    <state abbreviation="OR" name="Oregon"/>
-    <state abbreviation="PA" name="Pennsylvania"/>
-    <state abbreviation="PR" name="Puerto Rico"/>
-    <state abbreviation="RI" name="Rhode Island"/>
-    <state abbreviation="SC" name="South Carolina"/>
-    <state abbreviation="SD" name="South Dakota"/>
-    <state abbreviation="TN" name="Tennessee"/>
-    <state abbreviation="TX" name="Texas"/>
-    <state abbreviation="UT" name="Utah"/>
-    <state abbreviation="VA" name="Virginia"/>
-    <state abbreviation="VT" name="Vermont"/>
-    <state abbreviation="WA" name="Washington"/>
-    <state abbreviation="WI" name="Wisconsin"/>
-    <state abbreviation="WV" name="West Virginia"/>
-    <state abbreviation="WY" name="Wyoming"/>
+    <state abbreviation="AK" name="Alaska" name-fr="Alaska"/>
+    <state abbreviation="AL" name="Alabama" name-fr="Alabama"/>
+    <state abbreviation="AR" name="Arkansas" name-fr="Arkansas"/>
+    <state abbreviation="AZ" name="Arizona" name-fr="Arizona"/>
+    <state abbreviation="CA" name="California" name-fr="Californie"/>
+    <state abbreviation="CO" name="Colorado" name-fr="Colorado"/>
+    <state abbreviation="CT" name="Connecticut" name-fr="Connecticut"/>
+    <state abbreviation="DC" name="District of Columbia" name-fr="Washington (district de Columbia)"/>
+    <state abbreviation="DE" name="Delaware" name-fr="Delaware"/>
+    <state abbreviation="FL" name="Florida" name-fr="Floride"/>
+    <state abbreviation="GA" name="Georgia" name-fr="Georgie"/>
+    <state abbreviation="HI" name="Hawaii" name-fr="Hawaï"/>
+    <state abbreviation="IA" name="Iowa" name-fr="Iowa"/>
+    <state abbreviation="ID" name="Idaho" name-fr="Idaho"/>
+    <state abbreviation="IL" name="Illinois" name-fr="Illinois"/>
+    <state abbreviation="IN" name="Indiana" name-fr="Indiana"/>
+    <state abbreviation="KS" name="Kansas" name-fr="Kansas"/>
+    <state abbreviation="KY" name="Kentucky" name-fr="Kentucky"/>
+    <state abbreviation="LA" name="Louisiana" name-fr="Louisiane"/>
+    <state abbreviation="MA" name="Massachusetts" name-fr="Massachusetts"/>
+    <state abbreviation="MD" name="Maryland" name-fr="Maryland"/>
+    <state abbreviation="ME" name="Maine" name-fr="Maine"/>
+    <state abbreviation="MI" name="Michigan" name-fr="Michigan"/>
+    <state abbreviation="MN" name="Minnesota" name-fr="Minnesota"/>
+    <state abbreviation="MO" name="Missouri" name-fr="Missouri"/>
+    <state abbreviation="MS" name="Mississippi" name-fr="Mississippi"/>
+    <state abbreviation="MT" name="Montana" name-fr="Montana"/>
+    <state abbreviation="NC" name="North Carolina" name-fr="Caroline du Nord"/>
+    <state abbreviation="ND" name="North Dakota" name-fr="Dakota du Nord"/>
+    <state abbreviation="NE" name="Nebraska" name-fr="Nebraska"/>
+    <state abbreviation="NH" name="New Hampshire" name-fr="New Hampshire"/>
+    <state abbreviation="NJ" name="New Jersey" name-fr="New Jersey"/>
+    <state abbreviation="NM" name="New Mexico" name-fr="Nouveau Mexique"/>
+    <state abbreviation="NV" name="Nevada" name-fr="Nevada"/>
+    <state abbreviation="NY" name="New York" name-fr="New York"/>
+    <state abbreviation="OH" name="Ohio" name-fr="Ohio"/>
+    <state abbreviation="OK" name="Oklahoma" name-fr="Oklahoma"/>
+    <state abbreviation="OR" name="Oregon" name-fr="Oregon"/>
+    <state abbreviation="PA" name="Pennsylvania" name-fr="Pennsylvanie"/>
+    <state abbreviation="PR" name="Puerto Rico" name-fr="Porto Rico"/>
+    <state abbreviation="RI" name="Rhode Island" name-fr="Rhode Island"/>
+    <state abbreviation="SC" name="South Carolina" name-fr="Caroline du Sud"/>
+    <state abbreviation="SD" name="South Dakota" name-fr="Dakota du Sud"/>
+    <state abbreviation="TN" name="Tennessee" name-fr="Tennessee"/>
+    <state abbreviation="TX" name="Texas" name-fr="Texas"/>
+    <state abbreviation="UT" name="Utah" name-fr="Utah"/>
+    <state abbreviation="VA" name="Virginia" name-fr="Vermont"/>
+    <state abbreviation="VT" name="Vermont" name-fr="Virginie"/>
+    <state abbreviation="WA" name="Washington" name-fr="Virginie Occidentale"/>
+    <state abbreviation="WI" name="Wisconsin" name-fr="Washington"/>
+    <state abbreviation="WV" name="West Virginia" name-fr="Wisconsin"/>
+    <state abbreviation="WY" name="Wyoming" name-fr="Wyoming"/>
 </states>

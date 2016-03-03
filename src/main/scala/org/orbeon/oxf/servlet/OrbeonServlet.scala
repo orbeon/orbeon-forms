@@ -66,7 +66,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
 
   // Servlet request
   override def service(request: HttpServletRequest, response: HttpServletResponse): Unit =
-    ProcessorService.currentProcessorService.withValue(processorService) {
+    ProcessorService.withProcessorService(processorService) {
       withRootException("request", new ServletException(_)) {
         val httpMethod = request.getMethod
         if (! acceptedMethods(httpMethod.toLowerCase))

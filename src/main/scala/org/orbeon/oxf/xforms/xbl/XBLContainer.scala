@@ -348,15 +348,12 @@ trait ContainerResolver {
 
       containingDocument.getStaticOps.getControlAnalysisOption(repeatPrefixedId) match {
         case Some(repeat: RepeatControl) ⇒ Some(0)
-        case _ ⇒ None
+        case _                           ⇒ None
       }
     }
 
     fromConcreteRepeat orElse fromStaticRepeat getOrElse -1
   }
-
-  def resolveObjectByIdInScopeJava(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item) =
-    resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId, Option(contextItem)).orNull
 
   def resolveObjectByIdInScope(
     sourceEffectiveId  : String,

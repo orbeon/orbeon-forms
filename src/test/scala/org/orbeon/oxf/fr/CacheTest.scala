@@ -22,6 +22,8 @@ class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsF
 
   @Test def formRunnerStaticCache(): Unit = {
 
+    import FormRunnerSupport._
+
     val Id1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
     val Id2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
 
@@ -38,12 +40,14 @@ class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsF
       )
 
       // First time may or may not pass
-      val events1 = runFormRunner("cache-test", form, mode, document = Id1, noscript = noscript, initialize = true)
+      val (_, docOpt1, events1) = runFormRunner("tests", form, mode, document = Id1, noscript = noscript, initialize = true)
       assert(Some(expectedInitialHit) === staticStateFoundOpt(events1))
+      assert(docOpt1.nonEmpty || mode == "pdf")
 
       // Second time with different document must always pass
-      val events2 = runFormRunner("cache-test", form, mode, document = Id2, noscript = noscript, initialize = true)
+      val (_, docOpt2, events2) = runFormRunner("tests", form, mode, document = Id2, noscript = noscript, initialize = true)
       assert(Some(true) === staticStateFoundOpt(events2))
+      assert(docOpt2.nonEmpty || mode == "pdf")
 
       assert(Some(staticStateHoldsTemplate) === staticStateHasTemplateOpt(events2))
     }

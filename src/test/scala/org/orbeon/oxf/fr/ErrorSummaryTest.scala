@@ -13,16 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
 
 class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -51,7 +48,7 @@ class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {
       </xh:html>
 
     withContainingDocument(doc) {
-      val errorSummary = resolveComponent("error-summary").get
+      val errorSummary = resolveObject[XFormsComponentControl]("error-summary").get
       val stateInstance = errorSummary.nestedContainer.models.head.getInstance("fr-state-instance").documentInfo
       val visibleAlertCountAttr = stateInstance / "state" / "visible-counts" /@ "alert"
       val visibleAlertCountValue = visibleAlertCountAttr.headOption.map(_.stringValue).getOrElse("")

@@ -15,9 +15,14 @@ package org.orbeon.oxf.xforms.event
 
 
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{Logging, ScalaUtils}
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{XFormsObject, XFormsUtils}
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+
 import scala.util.control.NonFatal
 
 object Dispatch extends Logging {
@@ -153,5 +158,38 @@ object Dispatch extends Logging {
               "target id" → target.getEffectiveId)
             ))
     }
+  }
+
+  def resolveRepeatIndexes(
+    container        : XBLContainer,
+    result           : XFormsObject,
+    sourcePrefixedId : String,
+    repeatIndexes    : String
+  ): String = {
+
+    // E.g.:
+    // - foo$bar.1-2 and Array(4, 5, 6) => foo$bar.4-5-6
+    // - foo$bar.1-2 and Array() => foo$bar
+    def replaceIdSuffix(prefixedOrEffectiveId: String , parts: Array[Int]): String = {
+      val prefixedId = prefixedOrEffectiveId split REPEAT_SEPARATOR head
+
+      if (parts.length == 0)
+        prefixedId
+      else
+        prefixedId + REPEAT_SEPARATOR + (parts mkString REPEAT_INDEX_SEPARATOR_STRING)
+    }
+
+    // Append space-separated suffix indexes to existing indexes
+    def appendSuffixes(first: Array[Int], second: String) =
+      first ++ (second.trimAllToEmpty split """\s+""" map (_.toInt))
+
+    // Repeat indexes in current scope
+    val resolutionScopeContainer = container.findScopeRoot(sourcePrefixedId)
+    val containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId)
+
+    // Append new indexes
+    val newSuffix = appendSuffixes(containerParts, repeatIndexes)
+
+    replaceIdSuffix(result.getEffectiveId, newSuffix)
   }
 }

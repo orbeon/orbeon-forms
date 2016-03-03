@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.event
 
 import org.dom4j.{Element, QName}
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.util.ScalaUtils.StringOps
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
@@ -291,22 +290,6 @@ object EventHandlerImpl extends Logging {
   // Whether the element is an event handler (a known action element with @*:event)
   def isEventHandler(element: Element) =
     XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.getName) ne null)
-
-  // E.g.:
-  // - foo$bar.1-2 and Array(4, 5, 6) => foo$bar.4-5-6
-  // - foo$bar.1-2 and Array() => foo$bar
-  def replaceIdSuffix(prefixedOrEffectiveId: String , parts: Array[Int]): String = {
-    val prefixedId = prefixedOrEffectiveId split REPEAT_SEPARATOR head
-
-    if (parts.length == 0)
-      prefixedId
-    else
-      prefixedId + REPEAT_SEPARATOR + (parts mkString REPEAT_INDEX_SEPARATOR_STRING)
-  }
-
-  // Append space-separated suffix indexes to existing indexes
-  def appendSuffixes(first: Array[Int], second: String) =
-    first ++ (second.trimAllToEmpty split """\s+""" map (_.toInt))
 
   // Given a static handler, and concrete observer and target, try to find the concrete handler
   def resolveHandler(

@@ -17,7 +17,9 @@ import org.dom4j
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.saxon.om.NodeInfo
@@ -187,14 +189,14 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def resolveTarget(): Unit =
     withActionAndDoc(setupDocument(source)) {
 
-      val model = resolveModel("fr-form-model").get
+      val model = resolveObject[XFormsModel]("fr-form-model").get
 
       XPath.withFunctionContext(XFormsFunction.Context(containingDocument, null, model.getId, model, null)) {
 
         // 1. Resolution via concrete controls
 
-        val buttonControl = resolveControl("button-control").get
-        val resultControl = resolveValueControl("result-control").get
+        val buttonControl = resolveObject[XFormsControl]("button-control").get
+        val resultControl = resolveObject[XFormsValueControl]("result-control").get
 
         val numberControls = {
 
@@ -202,7 +204,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
             for (index ← 1 to 3)
             yield {
               setindex("grid-control-repeat", index)
-              resolveValueControl("number-control").get
+              resolveObject[XFormsValueControl]("number-control").get
             }
 
           setindex("grid-control-repeat", 1)

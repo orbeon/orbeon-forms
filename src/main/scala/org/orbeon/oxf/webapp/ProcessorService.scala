@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.webapp
 
-import ProcessorService._
+import java.io.PrintWriter
 import javax.naming.InitialContext
+
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition
+import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.{DynamicVariable, LoggerFactory}
-import java.io.PrintWriter
+import org.orbeon.oxf.webapp.ProcessorService._
+
 import scala.util.control.NonFatal
 
 class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProcessorDefinition: Option[ProcessorDefinition]) {
@@ -128,5 +128,8 @@ object ProcessorService {
     Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
 
   // For InternalHttpClient
+  def withProcessorService[T](processorService: ProcessorService)(thunk: ⇒ T): T =
+    currentProcessorService.withValue(processorService)(thunk)
+
   val currentProcessorService = new DynamicVariable[ProcessorService]
 }

@@ -17,8 +17,14 @@ import org.dom4j.QName
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.test.TestExternalContext
+import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.ProcessorService
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.state.XFormsDocumentCache
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants._
@@ -27,13 +33,17 @@ import org.orbeon.scaxon.XML._
 
 import scala.collection.mutable.ListBuffer
 
-trait FormRunnerSupport {
+trait FormRunnerSupport extends DocumentTestBase {
 
-  sealed trait CacheEvent
-  case class DigestAndTemplate(digestIfFound: Option[String]) extends CacheEvent
-  case class StaticState(found: Boolean, digest: String)      extends CacheEvent
+  import FormRunnerSupport._
 
-  val DummyDocument: NodeInfo = <dummy/>
+  def withFormRunnerDocument[T](processorService: ProcessorService, doc: XFormsContainingDocument)(thunk: ⇒ T): T =
+    ProcessorService.withProcessorService(processorService) {
+      setupDocument(doc) // FIXME: to make it available to XFormsSupport
+      withContainingDocument(doc) {
+        thunk
+      }
+    }
 
   // Simulate a call to Form Runner by running the Form Runner PFC
   def runFormRunner(
@@ -45,7 +55,7 @@ trait FormRunnerSupport {
     uuid        : String = "",
     noscript    : Boolean = false,
     initialize  : Boolean = true
-  ): List[CacheEvent] = {
+  ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
     val processorService = {
 
@@ -53,7 +63,7 @@ trait FormRunnerSupport {
         new ProcessorDefinition(new QName(name, OXF_PROCESSORS_NAMESPACE))
 
       val pfcProcessorDefinition =
-        newProcessorDef("page-flow") |!> (_.addInput("controller", "oxf:/apps/fr/page-flow.xml"))
+        newProcessorDef("page-flow") |!> (_.addInput("controller", "oxf:/page-flow.xml"))
 
       new ProcessorService(pfcProcessorDefinition, None)
     }
@@ -67,21 +77,52 @@ trait FormRunnerSupport {
 
     val request = newFRRequest(s"/fr/$app/$form/$mode", noscript)
 
-    withPipelineContext { pipelineContext ⇒
+    val docOpt =
+      withPipelineContext { pipelineContext ⇒
 
-      val externalContext = new TestExternalContext(pipelineContext, TransformerUtils.tinyTreeToDom4j(request))
+        val externalContext = new TestExternalContext(pipelineContext, TransformerUtils.tinyTreeToDom4j(request))
 
-      pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-      pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
-      pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", initialize)
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
+        pipelineContext.setAttribute("orbeon.cache.test.tracer", tracer)
+        pipelineContext.setAttribute("orbeon.cache.test.initialize-xforms-document", initialize)
 
-      ProcessorService.currentProcessorService.withValue(processorService) {
-        processorService.service(pipelineContext, externalContext)
+        ProcessorService.withProcessorService(processorService) {
+          processorService.service(pipelineContext, externalContext)
+        }
+
+        val bytesOpt = Option(externalContext.getResponseBytes)
+        val Re = """(?s).+name="\$uuid"\s+value="([^"]+)".+""".r
+
+        val uuidOpt = bytesOpt map (b ⇒ new String(b, "utf-8")) flatMap Re.findFirstMatchIn map (_.group(1))
+
+        uuidOpt map XFormsDocumentCache.instance.takeDocument
       }
-    }
-    
-    events.toList
+
+    (processorService, docOpt, events.toList)
   }
+
+  def performSectionAction(sectionControl: XFormsControl, action: String): Unit = {
+      // NOTE: We can't yet just dispatch `fr-insert-below` to the section, so find the nested repeater.
+      val repeater =
+        ControlsIterator(sectionControl, includeSelf = false) collectFirst {
+          case c: XFormsComponentControl if c.localName == "repeater" ⇒  c
+        } get
+
+      dispatch(action, repeater.effectiveId)
+  }
+
+  def performGridAction(gridControl: XFormsControl, action: String): Unit =
+      dispatch(action, gridControl.effectiveId)
+
+  def setFormRunnerLanguage(lang: String): Unit =
+    setControlValueWithEvent("fr-language-selector-select", lang)
+}
+
+object FormRunnerSupport {
+
+  sealed trait CacheEvent
+  case class DigestAndTemplate(digestIfFound: Option[String]) extends CacheEvent
+  case class StaticState(found: Boolean, digest: String)      extends CacheEvent
 
   def newFRRequest(path: String, noscript: Boolean): NodeInfo =
     <request>
@@ -160,4 +201,5 @@ trait FormRunnerSupport {
       <mode>{mode}</mode>
       <uuid>{uuid}</uuid>
     </request>
+
 }

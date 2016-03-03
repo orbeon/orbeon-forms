@@ -13,20 +13,24 @@
  */
 package org.orbeon.oxf.test
 
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsValueControl, XFormsSingleNodeControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
-import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget, XFormsCustomEvent, Dispatch}
+import org.orbeon.oxf.xforms.event.{ClientEvents, Dispatch, XFormsCustomEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.xforms.{XFormsObject, XFormsModel, XFormsContainingDocument, XFormsInstance}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.mock.MockitoSugar
-import org.mockito.stubbing.Answer
-import org.mockito.invocation.InvocationOnMock
+
+import scala.reflect.ClassTag
 
 
 trait XFormsSupport extends MockitoSugar {
@@ -68,11 +72,11 @@ trait XFormsSupport extends MockitoSugar {
   }
 
   // Dispatch a custom event to the object with the given prefixed id
-  def dispatch(name: String, prefixedId: String) =
+  def dispatch(name: String, effectiveId: String) =
     Dispatch.dispatchEvent(
       new XFormsCustomEvent(
         name,
-        document.getObjectByEffectiveId(prefixedId).asInstanceOf[XFormsEventTarget],
+        document.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsEventTarget],
         Map(),
         bubbles = true,
         cancelable = true)
@@ -86,41 +90,55 @@ trait XFormsSupport extends MockitoSugar {
   def instanceToString(instance: XFormsInstance) =
     TransformerUtils.tinyTreeToString(instance.documentInfo)
 
-  def getControlValue(controlId: String) = getValueControl(controlId).getValue
-  def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue
+  def getControlValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getValue
+  def getControlExternalValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getExternalValue
 
-  def setControlValue(controlId: String, value: String): Unit = {
+  def setControlValue(controlEffectiveId: String, value: String): Unit = {
     // This stores the value without testing for readonly
     document.startOutermostActionHandler()
-    getValueControl(controlId).storeExternalValue(value)
+    getValueControl(controlEffectiveId).storeExternalValue(value)
     document.endOutermostActionHandler()
   }
 
-  def setControlValueWithEvent(controlId: String, value: String): Unit = {
-    ClientEvents.processEvent(document, new XXFormsValueEvent(getObject(controlId).asInstanceOf[XFormsEventTarget], value))
+  def setControlValueWithEvent(controlEffectiveId: String, value: String): Unit = {
+    ClientEvents.processEvent(document, new XXFormsValueEvent(getObject(controlEffectiveId).asInstanceOf[XFormsEventTarget], value))
     document.afterExternalEvents()
     document.afterUpdateResponse()
     document.beforeExternalEvents(null)
   }
 
-  def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
-  def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
-  def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
-  def isValid(controlId: String)    = getSingleNodeControl(controlId).isValid
-  def getType(controlId: String)    = getSingleNodeControl(controlId).valueType
+  def isRelevant(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsControl].isRelevant
+  def isRequired(controlEffectiveId: String) = getSingleNodeControl(controlEffectiveId).isRequired
+  def isReadonly(controlEffectiveId: String) = getSingleNodeControl(controlEffectiveId).isReadonly
+  def isValid(controlEffectiveId: String)    = getSingleNodeControl(controlEffectiveId).isValid
+  def getType(controlEffectiveId: String)    = getSingleNodeControl(controlEffectiveId).valueType
 
-  def hasFocus(controlId: String)   = getSingleNodeControl(controlId) eq document.getControls.getFocusedControl
+  def hasFocus(controlEffectiveId: String)   = getSingleNodeControl(controlEffectiveId) eq document.getControls.getFocusedControl
 
-  def getItemset(controlId: String) = {
-    val select1 = getObject(controlId).asInstanceOf[XFormsSelect1Control]
+  def getItemset(controlEffectiveId: String) = {
+    val select1 = getObject(controlEffectiveId).asInstanceOf[XFormsSelect1Control]
     select1.getItemset.asJSON(null, select1.mustEncodeValues, null)
   }
 
-  def resolveControl(staticOrAbsoluteId: String)       = resolveObject(staticOrAbsoluteId) collect { case c: XFormsControl ⇒ c }
-  def resolveComponent(staticOrAbsoluteId: String)     = resolveObject(staticOrAbsoluteId) collect { case c: XFormsComponentControl ⇒ c }
-  def resolveValueControl(staticOrAbsoluteId: String)  = resolveObject(staticOrAbsoluteId) collect { case c: XFormsValueControl ⇒ c }
-  def resolveModel(staticOrAbsoluteId: String)         = resolveObject(staticOrAbsoluteId) collect { case m: XFormsModel   ⇒ m }
-  def resolveObject(staticOrAbsoluteId: String)        = document.resolveObjectByIdInScope("#document", staticOrAbsoluteId)
+  def getItemsetSearchNested(control: XFormsControl): Option[Itemset] = control match {
+    case c: XFormsSelect1Control   ⇒ Some(c.getItemset)
+    case c: XFormsComponentControl ⇒ ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control ⇒  c.getItemset }
+    case _                         ⇒ None
+  }
+
+  private val DocId = "#document"
+
+  def resolveObject[T: ClassTag](staticOrAbsoluteId: String, sourceEffectiveId: String = DocId, indexes: List[Int] = Nil): Option[T] = {
+    val resolvedOpt =
+      document.resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId) collect {
+        case result if indexes.nonEmpty ⇒
+          document.getObjectByEffectiveId(Dispatch.resolveRepeatIndexes(document, result, document.prefixedId, indexes mkString " "))
+        case result ⇒
+          result
+      }
+
+    resolvedOpt collect { case c: T ⇒ c }
+  }
 
   def getControl(controlEffectiveId: String)           = getObject(controlEffectiveId).asInstanceOf[XFormsControl]
   def getSingleNodeControl(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsSingleNodeControl]

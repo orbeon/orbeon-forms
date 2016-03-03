@@ -149,20 +149,16 @@ body.orbeon { background-color: @frBackground }
     // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
     .fr-mode-new, .fr-mode-edit, .fr-mode-test, .xforms-dialog {
         .xforms-required {
-            .xforms-label {
-                background-position: 0 2px;             // lower the star, so it doesn't sit "too high" relative to the text of the label
-                background-repeat: no-repeat;
-                padding-left: 12px;
+            .xforms-label:before {
+                content: '* ';
+                vertical-align: middle;                   // So the star doesn't show too high relative to the text of the label
+                font-size: 150%;                          // Default size isn't visible enough
             }
         }
 
-        .xforms-required .xforms-label {
-            background-image: url(asterisk-bw.png);     // black and white when filled
-        }
-
         .xforms-required.xforms-empty {
-            .xforms-label {
-                background-image: url(asterisk.png);    // red when empty
+            .xforms-label:before {
+                color: @error;                            // Error-red when empty
             }
         }
     }

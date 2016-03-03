@@ -24,8 +24,8 @@ env:
     # ARTIFACTS_BUCKET
     - secure: "aCCisKF6bb5E9zeM9ALLOmBA5kHiKit4XnUIfb90+kAqONYzJPbGZbuGZGdii8x+4AOsmsdppgXBrku/G2k9AwNITJfBp7Q0yziqgnSg+5we7yvztohuwueQhXqxwchpnp9Y5CqASq/HmgRctyeAbaNBw+VaSDpIhYW/QN6GoBw="
   matrix:
-    TARGET=test-unit
-    TARGET=orbeon-dist
+    - TARGET=test-unit
+    - TARGET=orbeon-dist
 before_script:
   - curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 script:

@@ -31,7 +31,13 @@ import scala.util.Try
  */
 class XFormsDispatchAction extends XFormsAction {
 
-  override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
+  override def execute(
+    actionInterpreter    : XFormsActionInterpreter,
+    actionElement        : Element,
+    actionScope          : Scope,
+    hasOverriddenContext : Boolean,
+    overriddenContext    : Item
+  ): Unit = {
 
     // Mandatory attribute
     val newEventNameAttributeValue =

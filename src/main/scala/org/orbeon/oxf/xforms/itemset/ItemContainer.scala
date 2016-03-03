@@ -79,8 +79,11 @@ trait ItemContainer {
   // Implement deep equals
   override def equals(other: Any) = other match {
     case other: ItemContainer ⇒ _children == other._children
-    case _ ⇒ false
+    case _                    ⇒ false
   }
 
-  private def selfItem = if (this.isInstanceOf[Item]) this.asInstanceOf[Item] else null
+  private def selfItem = this match {
+    case item: Item ⇒ item
+    case _          ⇒ null
+  }
 }

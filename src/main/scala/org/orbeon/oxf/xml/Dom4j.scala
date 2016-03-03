@@ -154,6 +154,7 @@ object Dom4j {
     insertIfNeeded(root, path.iterator)
   }
 
+  // TODO: should ideally not got go through serialization/deserialization
   implicit def elemToDocument(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
   implicit def elemToElement(e: Elem): Element   = Dom4jUtils.readDom4j(e.toString).getRootElement
   implicit def elementToElem(e: Element): Elem   = XML.loadString(Dom4jUtils.domToString(e))

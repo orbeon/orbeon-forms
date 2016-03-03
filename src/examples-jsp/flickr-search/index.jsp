@@ -11,19 +11,25 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 --%>
-<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+<xh:html
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <xh:head>
         <xh:title>Flickr Search</xh:title>
         <xf:model>
-            <xf:instance src="/xforms-jsp/flickr-search/service-search.jsp" id="photos"/>
+            <xf:instance id="photos" src="/xforms-jsp/flickr-search/service-search.jsp"/>
             <xf:instance id="query">
                 <query>red</query>
             </xf:instance>
-            <xf:submission id="do-query" method="post" replace="instance" ref="instance('query')"
-                    instance="photos" action="/xforms-jsp/flickr-search/service-search.jsp"/>
+            <xf:submission
+                id="do-query"
+                method="post"
+                replace="instance"
+                ref="instance('query')"
+                instance="photos"
+                action="/xforms-jsp/flickr-search/service-search.jsp"/>
+
         </xf:model>
         <xh:style type="text/css">
             .row { margin-top: 10px }
@@ -41,7 +47,7 @@
                     <xf:trigger>
                         <xf:label>Flickr Search</xf:label>
                     </xf:trigger>
-                    <xf:send submission="do-query" ev:event="DOMActivate"/>
+                    <xf:send submission="do-query" event="DOMActivate"/>
                 </xh:div>
             </xh:div>
             <xh:div class="row">

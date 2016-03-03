@@ -49,7 +49,7 @@
   margin-top: 2px;
   margin-bottom: 4px;
   overflow: hidden;
-  display: block;
+  display: table;
 }
 .orbeon .xbl-fr-grid .fr-grid select,
 .orbeon .xbl-fr-grid .fr-grid textarea,

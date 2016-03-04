@@ -2287,12 +2287,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             $(control).toggleClass("xforms-filled", isRequired && emptyAttr == "false");
         },
 
-        updateHTMLAreaClasses: function (textarea) {
-            var iframe = textarea.previousSibling;
-            while (iframe.nodeType != ORBEON.util.Dom.ELEMENT_TYPE) iframe = textarea.previousSibling;
-            iframe.className = textarea.className;
-        },
-
         showDialog: function (controlId, neighbor) {
             var divElement = ORBEON.util.Dom.get(controlId);
             var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];

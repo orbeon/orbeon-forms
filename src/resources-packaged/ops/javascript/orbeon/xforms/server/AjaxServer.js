@@ -842,7 +842,7 @@
                                     var startSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "start-suffix"));
                                     var endSuffix = Number(ORBEON.util.Dom.getAttribute(copyRepeatTemplateElement, "end-suffix"));
                                     // Put nodes of the template in an array
-                                    var templateNodes = new Array();
+                                    var templateNodes = [];
                                     {
                                         // Locate end of the repeat
                                         var delimiterTagName = null;
@@ -863,7 +863,7 @@
                                                     nestedRepeatLevel++;
                                                 // Remove "xforms-repeat-template", "xforms-disabled" from classes on copy of element
                                                 var nodeCopyClasses = nodeCopy.className.split(" ");
-                                                var nodeCopyNewClasses = new Array();
+                                                var nodeCopyNewClasses = [];
                                                 for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
                                                     var currentClass = nodeCopyClasses[nodeCopyClassIndex];
                                                     if (currentClass != "xforms-repeat-template" && currentClass != "xforms-disabled" && currentClass != "xforms-disabled-subsequent")
@@ -1025,7 +1025,7 @@
 
                                         // Remember selected values
                                         var selectedValueCount = 0;
-                                        var selectedValues = new Array();
+                                        var selectedValues = [];
                                         for (var k = 0; k < options.length; k++) {
                                             if (options[k].selected) {
                                                 selectedValues[selectedValueCount] = options[k].value;
@@ -1043,7 +1043,7 @@
                                         }
 
                                         // Utility function to generate an item, including its sub-items, and make sure we do not produce nested optgroups
-                                        var sb = new Array(); // avoid concatenation to the same string over and over again
+                                        var sb = []; // avoid concatenation to the same string over and over again
                                         var inOptgroup = false;
                                         function generateItem(itemElement) {
                                             var clazz = null;
@@ -1684,8 +1684,8 @@
 
                                 // Handle updates to HTML attributes
                                 var attributeElements = childrenWithLocalName(controlValuesElement, 'attribute');
-                                var attributeElementslength = attributeElements.length;
-                                for (var j = 0; j < attributeElementslength; j++) {
+                                var attributeElementsLength = attributeElements.length;
+                                for (var j = 0; j < attributeElementsLength; j++) {
                                     var attributeElement = attributeElements[j];
                                     var newAttributeValue = ORBEON.util.Dom.getStringValue(attributeElement);
                                     var forAttribute = ORBEON.util.Dom.getAttribute(attributeElement, "for");
@@ -1698,8 +1698,8 @@
 
                                 // Handle text updates
                                 var textElements = childrenWithLocalName(controlValuesElement, 'text');
-                                var textElementslength = textElements.length;
-                                for (var j = 0; j < textElementslength; j++) {
+                                var textElementsLength = textElements.length;
+                                for (var j = 0; j < textElementsLength; j++) {
                                     var textElement = textElements[j];
                                     var newTextValue = ORBEON.util.Dom.getStringValue(textElement);
                                     var forAttribute = ORBEON.util.Dom.getAttribute(textElement, "for");
@@ -1713,8 +1713,8 @@
 
                                 // Model item properties on a repeat item
                                 var repeatIterationElements = childrenWithLocalName(controlValuesElement, 'repeat-iteration');
-                                var repeatIterationElementslength = repeatIterationElements.length;
-                                for (var j = 0; j < repeatIterationElementslength; j++) {
+                                var repeatIterationElementsLength = repeatIterationElements.length;
+                                for (var j = 0; j < repeatIterationElementsLength; j++) {
                                     var repeatIterationElement = repeatIterationElements[j];
                                     // Extract data from server response
                                     var repeatId = ORBEON.util.Dom.getAttribute(repeatIterationElement, "id");

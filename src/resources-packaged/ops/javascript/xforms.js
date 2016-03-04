@@ -3718,7 +3718,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
                         while (parent != null) {
                             if (!ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent])
-                                ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent] = new Array();
+                                ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent] = [];
                             ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent].push(child);
                             parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
                         }

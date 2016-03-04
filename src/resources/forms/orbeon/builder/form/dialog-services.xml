@@ -582,7 +582,7 @@
 
                 <xf:bind
                     ref="serialization"
-                    calculate="if ($has-body) then . else 'none'"
+                    calculate="if ($has-body) then . else if (exists($param-names)) then 'application/x-www-form-urlencoded' else 'none'"
                     readonly="not($has-body)"/>
 
                 <!-- Compute mediatype based on SOAP or serialization -->
@@ -609,6 +609,7 @@
                     required="$has-body"
                 />
                 <xf:bind
+                    name="param-names"
                     ref="params/param/@name"
                     type="xs:NCName"
                     required="true()"/>

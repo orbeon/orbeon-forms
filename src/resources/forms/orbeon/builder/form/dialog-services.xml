@@ -244,6 +244,28 @@
 
     <xh:div class="fr-dialog-buttons">
         <xf:group>
+            <xh:div class="pull-left">
+                <!-- Delete button -->
+                <xf:trigger ref="$instance/delete-trigger" appearance="xxf:danger" id="fb-service-delete">
+                    <xf:label value="$form-resources/remove/label"/>
+                    <xf:action event="DOMActivate">
+                        <!-- Ask confirmation -->
+                        <xxf:show dialog="fb-confirmation-dialog">
+                            <xf:property
+                                name="fr:message"
+                                value="concat($form-resources/messages/delete-service, ' ''', $instance/name, '''?')"/>
+                            <xf:property
+                                name="fr:confirmation-target"
+                                value="'fb-service-delete'"/>
+                        </xxf:show>
+                    </xf:action>
+                    <xf:action event="fb-confirmation-yes">
+                        <!-- Delete stuff and close dialog -->
+                        <xf:delete ref="$model/(fb:submission[@id = $instance/submission-id], fb:instance[@id = $instance/instance-id])"/>
+                        <xxf:hide dialog="fb-service-dialog"/>
+                    </xf:action>
+                </xf:trigger>
+            </xh:div>
             <!-- Test button -->
             <xf:trigger ref="$instance/save-test-trigger">
                 <xf:label>
@@ -299,26 +321,6 @@
                     <xf:action context="$response">
                         <xf:setvalue ref="error-type" value="event('error-type')"/>
                     </xf:action>
-                </xf:action>
-            </xf:trigger>
-            <!-- Delete button -->
-            <xf:trigger ref="$instance/delete-trigger" appearance="xxf:danger" id="fb-service-delete">
-                <xf:label value="$form-resources/remove/label"/>
-                <xf:action event="DOMActivate">
-                    <!-- Ask confirmation -->
-                    <xxf:show dialog="fb-confirmation-dialog">
-                        <xf:property
-                            name="fr:message"
-                            value="concat($form-resources/messages/delete-service, ' ''', $instance/name, '''?')"/>
-                        <xf:property
-                            name="fr:confirmation-target"
-                            value="'fb-service-delete'"/>
-                    </xxf:show>
-                </xf:action>
-                <xf:action event="fb-confirmation-yes">
-                    <!-- Delete stuff and close dialog -->
-                    <xf:delete ref="$model/(fb:submission[@id = $instance/submission-id], fb:instance[@id = $instance/instance-id])"/>
-                    <xxf:hide dialog="fb-service-dialog"/>
                 </xf:action>
             </xf:trigger>
             <!-- Save button -->

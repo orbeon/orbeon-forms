@@ -631,4 +631,33 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     allUnneededHolders.flatten
   }
+
+  //@XPathFunction
+  def findNextControlId(inDoc: NodeInfo, controlName: String, previousOrNext: String): Option[String] = {
+    findControlByName(inDoc, controlName) flatMap { control ⇒
+
+      val currentTd = control parent *
+
+      val tds =
+        previousOrNext match {
+          case "previous" ⇒ currentTd preceding "*:td"
+          case "next"     ⇒ currentTd following "*:td"
+        }
+
+      val tdWithChild = tds find (_ child * nonEmpty)
+
+      tdWithChild flatMap (_ child * map (_.id) headOption)
+    }
+  }
+
+  //@XPathFunction
+  def findNextContainer(inDoc: NodeInfo, controlName: String, previousOrNext: String): Option[NodeInfo] = {
+
+    val allContainersWithSettings = getAllContainerControlsWithIds(inDoc) filter hasContainerSettings
+
+    previousOrNext match {
+      case "previous" ⇒ allContainersWithSettings takeWhile (n ⇒ getControlName(n) != controlName) lastOption
+      case "next"     ⇒ allContainersWithSettings dropWhile (n ⇒ getControlName(n) != controlName) drop 1 headOption
+    }
+  }
 }

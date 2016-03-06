@@ -47,6 +47,10 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def isRepeat(node: NodeInfo) =
     isContentRepeat(node) || isLegacyRepeat(node)
 
+  // Non-repeated grid doesn't (yet) have container settings
+  def hasContainerSettings(node: NodeInfo) =
+    IsSection(node) || isRepeat(node)
+
   val IsContainer: NodeInfo ⇒ Boolean =
     node ⇒ (node self FRContainerTest) || isFBBody(node)
 

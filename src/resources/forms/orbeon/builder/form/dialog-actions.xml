@@ -254,6 +254,30 @@
 
     <xh:div class="fr-dialog-buttons">
         <xf:group>
+            <xh:div class="pull-left">
+                <!-- Delete button -->
+                <xf:trigger ref="$instance/delete-trigger" appearance="xxf:danger" id="fb-action-delete">
+                    <xf:label>
+                        <xf:output value="$form-resources/remove/label"/>
+                    </xf:label>
+
+                    <xf:action ev:event="DOMActivate">
+                        <!-- Ask confirmation -->
+                        <xxf:show dialog="fb-confirmation-dialog">
+                            <xf:property name="fr:message"
+                                             value="concat($form-resources/messages/delete-service, ' ''',
+                                                         $instance/name,
+                                                         '''?')"/>
+                            <xf:property name="fr:confirmation-target" value="'fb-action-delete'"/>
+                        </xxf:show>
+                    </xf:action>
+                    <xf:action ev:event="fb-confirmation-yes">
+                        <!-- Delete stuff and close dialog -->
+                        <xf:delete ref="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
+                        <xxf:hide dialog="fb-action-dialog"/>
+                    </xf:action>
+                </xf:trigger>
+            </xh:div>
             <!-- Test button -->
             <xf:trigger ref="$instance/save-test-trigger[false()]">
                 <xf:label>
@@ -263,28 +287,6 @@
                 <!-- Test submission -->
                 <xf:action ev:event="DOMActivate">
                     <!-- TODO-->
-                </xf:action>
-            </xf:trigger>
-            <!-- Delete button -->
-            <xf:trigger ref="$instance/delete-trigger" appearance="xxf:danger" id="fb-action-delete">
-                <xf:label>
-                    <xf:output value="$form-resources/remove/label"/>
-                </xf:label>
-
-                <xf:action ev:event="DOMActivate">
-                    <!-- Ask confirmation -->
-                    <xxf:show dialog="fb-confirmation-dialog">
-                        <xf:property name="fr:message"
-                                         value="concat($form-resources/messages/delete-service, ' ''',
-                                                     $instance/name,
-                                                     '''?')"/>
-                        <xf:property name="fr:confirmation-target" value="'fb-action-delete'"/>
-                    </xxf:show>
-                </xf:action>
-                <xf:action ev:event="fb-confirmation-yes">
-                    <!-- Delete stuff and close dialog -->
-                    <xf:delete ref="$model/fb:action[@id = concat($instance/initial-name, '-binding')]"/>
-                    <xxf:hide dialog="fb-action-dialog"/>
                 </xf:action>
             </xf:trigger>
             <!-- Save button -->

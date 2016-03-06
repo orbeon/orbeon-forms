@@ -28,9 +28,11 @@
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details" xxbl:mode="binding">
         <xbl:handlers>
             <!-- Read data upon dialog open -->
-            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+            <xbl:handler event="fb-show-dialog fb-load" phase="target" defaultAction="cancel">
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
+
+                <xf:action type="xpath">fbf:selectTdForControlId($form, event('control-id'))</xf:action>
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
@@ -142,6 +144,24 @@
                     ref="$i/help/@isHTML"
                     value="if (fbf:isControlLHHAHTMLMediatype($form, $i/control-name, 'help')) then 'true' else ''"/>
 
+                <!-- Set prev/next buttons -->
+                <xf:setvalue
+                    ref="$i/prev-control-id"
+                    value="
+                        fbf:findNextControlId(
+                            $form,
+                            $i/control-name,
+                            'previous'
+                        )"/>
+                <xf:setvalue
+                    ref="$i/next-control-id"
+                    value="
+                        fbf:findNextControlId(
+                            $form,
+                            $i/control-name,
+                            'next'
+                        )"/>
+
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
@@ -168,6 +188,13 @@
                 observer="group-around-dialog"
                 phase="capture"
                 if="event('fb-save') and valid($i)">
+
+                <xf:dispatch
+                    name="fb-save"
+                    targetid="fb-dialog-control-details"/>
+
+            </xbl:handler>
+            <xbl:handler event="fb-save" phase="target">
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
@@ -221,24 +248,48 @@
                 </xf:dispatch>
 
             </xbl:handler>
-            <!-- If valid, close and save... -->
             <xbl:handler
                 event="DOMActivate"
-                observer="control-name-input control-custom-input save-button"
-                if="valid($i)">
+                observer="control-name-input control-custom-input save-button prev-button next-button">
 
-                <xxf:hide dialog="dialog">
-                    <xf:property name="fb-save" value="true()"/>
-                </xxf:hide>
+                <xf:action if="valid($i)">
+                    <xf:var
+                        name="must-close"
+                        value="not(event('xxf:targetid') = ('prev-button', 'next-button'))"/>
+
+                    <xxf:hide if="$must-close" dialog="dialog">
+                        <xf:property name="fb-save" value="true()"/>
+                    </xxf:hide>
+
+                    <xf:dispatch
+                        if="not($must-close)"
+                        name="fb-save"
+                        targetid="fb-dialog-control-details"/>
+                </xf:action>
+
+                <!-- Mark all visited if the data is invalid -->
+                <xxf:setvisited
+                    if="not(valid($i))"
+                    control="dialog"
+                    recurse="true"/>
 
             </xbl:handler>
-            <!-- ...else mark all visited so that errors show -->
-            <xbl:handler
-                event="DOMActivate"
-                observer="control-name-input control-custom-input save-button"
-                if="not(valid($i))" >
+            <!-- Prev and Next buttons -->
+            <xbl:handler event="DOMActivate" observer="prev-button next-button">
 
-                <xxf:setvisited control="dialog" recurse="true"/>
+                <xf:var
+                    name="new-control-id"
+                    value="
+                        $i/(
+                            if (event('xxf:targetid') = 'prev-button') then
+                                prev-control-id
+                            else
+                                next-control-id
+                        )/string()"/>
+
+                <xf:dispatch if="exists($new-control-id)" name="fb-load" targetid="fb-dialog-control-details">
+                    <xf:property name="control-id" value="$new-control-id"/>
+                </xf:dispatch>
 
             </xbl:handler>
             <!-- Close and cancel upon DOMActivate -->
@@ -300,6 +351,9 @@
                         <whitespace/>
 
                         <help isHTML=""/>
+
+                        <prev-control-id/>
+                        <next-control-id/>
                     </local>
                 </xf:instance>
 
@@ -427,6 +481,10 @@
                     ref="relevant | readonly | default | calculate"
                     type="xxf:xpath2"
                     required="false()"/>
+
+                <xf:bind
+                    ref="prev-control-id, next-control-id"
+                    readonly="xxf:is-blank()"/>
 
             </xf:model>
         </xbl:implementation>
@@ -853,6 +911,14 @@
                     </fr:tabbable>
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
+                        <xh:div class="pull-left">
+                            <xf:trigger id="prev-button" ref="$i/prev-control-id">
+                                <xf:label ref="xxf:r('buttons.previous', '|fr-fr-resources|')"/>
+                            </xf:trigger>
+                            <xf:trigger id="next-button" ref="$i/next-control-id">
+                                <xf:label ref="xxf:r('buttons.next', '|fr-fr-resources|')"/>
+                            </xf:trigger>
+                        </xh:div>
                         <xf:trigger appearance="xxf:primary" id="save-button">
                             <xf:label ref="$resources/apply/label"/>
                         </xf:trigger>

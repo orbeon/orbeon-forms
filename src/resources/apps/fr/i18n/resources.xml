@@ -74,6 +74,8 @@
             <yes>&lt;i class="icon-ok"/&gt; Yes</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
             <ok>OK</ok>
+            <previous>Previous</previous>
+            <next>Next</next>
         </buttons>
         <components>
             <labels>
@@ -161,8 +163,6 @@
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
                 <any>[Any]</any>
-                <previous>Back</previous>
-                <next>Next</next>
                 <script>Full Version</script>
                 <noscript>Accessible Version</noscript>
                 <refresh>Refresh</refresh>
@@ -376,6 +376,8 @@
             <yes>&lt;i class="icon-ok"/&gt; Oui</yes>
             <no>&lt;i class="icon-remove"/&gt; Non</no>
             <ok>OK</ok>
+            <previous>Précédent</previous>
+            <next>Suivant</next>
         </buttons>
         <components>
             <labels>
@@ -466,8 +468,6 @@
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
                 <any>[Tous]</any>
-                <previous>Précédent</previous>
-                <next>Suivant</next>
                 <script>Version complète</script>
                 <noscript>Version accessible</noscript>
                 <refresh>Rafraîchir</refresh>
@@ -682,6 +682,8 @@
             <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+            <previous>Previo</previous>
+            <next>Próximo</next>
         </buttons>
         <components>
             <labels>
@@ -763,8 +765,6 @@
                 <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
                 <any>[Cualquiera]</any>
-                <previous>Previo</previous>
-                <next>Próximo</next>
                 <script>Versión Complete</script>
                 <noscript>Version Accesible</noscript>
                 <refresh>Actualizar</refresh>
@@ -974,6 +974,8 @@
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+            <previous>Tilbake</previous>
+            <next>Neste</next>
         </buttons>
         <components>
             <labels>
@@ -1056,8 +1058,6 @@
                 <form-choice>Velg et skjema</form-choice>
                 <free-search>Fritekstsøk</free-search>
                 <any>[Vilkårlig]</any>
-                <previous>Tilbake</previous>
-                <next>Neste</next>
                 <script>Full versjon</script>
                 <noscript>Tilgjengelig versjon</noscript>
                 <refresh>Oppdater</refresh>
@@ -1264,7 +1264,8 @@
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
-
+            <previous>Назад</previous>
+            <next>Вперед</next>
         </buttons>
         <components>
             <labels>
@@ -1346,8 +1347,6 @@
                 <form-choice>Выберите форму</form-choice>
                 <free-search>Поиск</free-search>
                 <any>[Что угодно]</any>
-                <previous>Назад</previous>
-                <next>Вперед</next>
                 <script>Полная версия</script>
                 <noscript>Упрощенная версия</noscript>
                 <refresh>Обновить</refresh>
@@ -1553,6 +1552,8 @@
             <yes>&lt;i class="icon-ok"/&gt; Sì</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+            <previous>Indietro</previous>
+            <next>Avanti</next>
         </buttons>
         <components>
             <labels>
@@ -1640,8 +1641,6 @@
                 <form-choice>Seleziona un modulo</form-choice>
                 <free-search>Ricerca libera</free-search>
                 <any>[Tutti]</any>
-                <previous>Indietro</previous>
-                <next>Avanti</next>
                 <script>Versione completa</script>
                 <noscript>Versione accessibile</noscript>
                 <refresh>Aggiorna</refresh>
@@ -1854,6 +1853,8 @@
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nein</no>
             <ok todo="true">OK</ok>
+            <previous>Zurück</previous>
+            <next>Weiter</next>
         </buttons>
         <components>
             <labels>
@@ -1941,8 +1942,6 @@
                 <form-choice>Wählen Sie ein Formular</form-choice>
                 <free-search>Freie Suche</free-search>
                 <any>[Alle]</any>
-                <previous>Zurück</previous>
-                <next>Weiter</next>
                 <script>Vollversion</script>
                 <noscript>Verfügbare Version</noscript>
                 <refresh>Aktualisieren</refresh>
@@ -2155,6 +2154,8 @@
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+            <previous>Paluu</previous>
+            <next>Seuraava</next>
         </buttons>
         <components>
             <labels>
@@ -2242,8 +2243,6 @@
                 <form-choice>Valitse taulukko</form-choice>
                 <free-search>Vapaa haku</free-search>
                 <any>[mikä tahansa]</any>
-                <previous>Paluu</previous>
-                <next>Seuraava</next>
                 <script>Täysi versio</script>
                 <noscript>Helppokäyttöinen versio</noscript>
                 <refresh>Lataa sivu uudelleen</refresh>
@@ -2456,6 +2455,8 @@
             <yes>&lt;i class="icon-ok"/&gt; Ja</yes>
             <no>&lt;i class="icon-remove"/&gt; Nej</no>
             <ok>OK</ok>
+            <previous>Tillbaka</previous>
+            <next>Nästa</next>
         </buttons>
         <components>
             <labels>
@@ -2543,8 +2544,6 @@
                 <form-choice>Välj ett formulär</form-choice>
                 <free-search>Fri sökning</free-search>
                 <any>[Alla]</any>
-                <previous>Tillbaka</previous>
-                <next>Nästa</next>
                 <script>Fullständig version</script>
                 <noscript>Tillgänglig version</noscript>
                 <refresh>Visa på nytt</refresh>
@@ -2757,6 +2756,8 @@
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+            <previous>Vorige</previous>
+            <next>Volgende</next>
         </buttons>
         <components>
             <labels>
@@ -2844,8 +2845,6 @@
                 <form-choice>Een form kiezen</form-choice>
                 <free-search>Vrij zoeken</free-search>
                 <any>[Elke]</any>
-                <previous>Vorige</previous>
-                <next>Volgende</next>
                 <script>Volledige versie</script>
                 <noscript>Toegankelijke versie</noscript>
                 <refresh>Verversen</refresh>
@@ -3058,6 +3057,8 @@
             <yes todo="true">&lt;i class="icon-ok"/&gt; Yes</yes>
             <no todo="true">&lt;i class="icon-remove"/&gt; No</no>
             <ok todo="true">OK</ok>
+            <previous>Anterior</previous>
+            <next>Próximo</next>
         </buttons>
         <components>
             <labels>
@@ -3145,8 +3146,6 @@
                 <form-choice>Escolha um Formulário</form-choice>
                 <free-search>Pesquisa Livre</free-search>
                 <any>[Qualquer]</any>
-                <previous>Anterior</previous>
-                <next>Próximo</next>
                 <script>Versão Completa</script>
                 <noscript>Versão acessível</noscript>
                 <refresh>Refrescar</refresh>

@@ -328,9 +328,13 @@ trait GridOps extends ContainerOps {
   def findSelectedTd(inDoc: NodeInfo) =
     findInViewTryIndex(inDoc, selectedCellVar.stringValue)
 
+  //@XPathFunction
+  def selectTdForControlId(inDoc: NodeInfo, controlId: String): Unit =
+    findControlByName(inDoc, controlNameFromId(controlId)).to[List] flatMap (_ parent "*:td") foreach selectTd
+
   // Make the given grid td selected
   def selectTd(newTd: NodeInfo): Unit =
-    setvalue(selectedCellVar, newTd \@ "id" stringValue)
+    setvalue(selectedCellVar, newTd.id)
 
   // Whether a call to ensureEmptyTd() will succeed
   def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
@@ -383,7 +387,7 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  // @mi/@max can be simple AVTs, i.e. AVTs which cover the whole attribute, e.g. "{my-min}"
+  // @min/@max can be simple AVTs, i.e. AVTs which cover the whole attribute, e.g. "{my-min}"
   // The main reason to do this instead of making @min/@max plain XPath expressions is that @max also supports the
   // literal "none" (and "unbounded" for backward compatibility).
   // NOTE: This doesn't check that the expression is syntactically correct, in particular it doesn't check that

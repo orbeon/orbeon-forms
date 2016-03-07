@@ -924,26 +924,49 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             hideModalProgressPanel: function() {
-                if (ORBEON.xforms.Globals.modalProgressPanel)
+                if (ORBEON.xforms.Globals.modalProgressPanel) {
+                    // Remove timer so that the modal progress panel doesn't show just after we try to hide it
+                    if (ORBEON.xforms.Globals.modalProgressPanelTimerId) {
+                        clearTimeout(ORBEON.xforms.Globals.modalProgressPanelTimerId);
+                        ORBEON.xforms.Globals.modalProgressPanelTimerId = null;
+                    }
                     ORBEON.xforms.Globals.modalProgressPanel.hide();
+                }
             },
 
             displayModalProgressPanel: function(formID) {
-                if (!ORBEON.xforms.Globals.modalProgressPanel) {
-                    ORBEON.xforms.Globals.modalProgressPanel =
-                    new YAHOO.widget.Panel(ORBEON.xforms.Globals.ns[formID] + "orbeon-spinner", {
-                        width: "60px",
-                        fixedcenter: true,
-                        close: false,
-                        draggable: false,
-                        zindex: 4,
-                        modal: true,
-                        visible: true
-                    });
-                    ORBEON.xforms.Globals.modalProgressPanel.setBody('<div class="xforms-modal-progress"/>');
-                    ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
+                if (! ORBEON.xforms.Globals.modalProgressPanelTimerId) { // async progress panel will show soon
+                    if (! ORBEON.xforms.Globals.modalProgressPanel) {
+                        ORBEON.xforms.Globals.modalProgressPanel =
+                            new YAHOO.widget.Panel(ORBEON.xforms.Globals.ns[formID] + "orbeon-spinner", {
+                                width: "60px",
+                                fixedcenter: true,
+                                close: false,
+                                draggable: false,
+                                zindex: 4,
+                                modal: true,
+                                visible: true
+                            });
+                        ORBEON.xforms.Globals.modalProgressPanel.setBody('<div class="xforms-modal-progress"/>');
+                        ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
+                    }
+
+                    function showSpinner() {
+                        ORBEON.xforms.Globals.modalProgressPanel.show();
+                    }
+
+                    if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
+                        ORBEON.util.Utils.resetIOSZoom();
+                        var timerId = setTimeout(function() {
+                            ORBEON.xforms.Globals.modalProgressPanelTimerId = null;
+                            showSpinner();
+                        }, 200);
+
+                        ORBEON.xforms.Globals.modalProgressPanelTimerId = timerId;
+                    } else {
+                        showSpinner();
+                    }
                 }
-                ORBEON.xforms.Globals.modalProgressPanel.show();
             },
 
             /**
@@ -1294,6 +1317,45 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     var arrayElement = array[arrayIndex];
                     if (overrideContext) fn.call(obj, arrayElement); else fn(arrayElement);
                 }
+            },
+
+            isIOS: function() {
+                return $(document.body).hasClass("xforms-ios");
+            },
+
+            getZoomLevel: function() {
+                return document.documentElement.clientWidth / window.innerWidth;
+            },
+
+            resetIOSZoom: function() {
+                var viewPortMeta = document.querySelector('meta[name="viewport"]');
+                if (viewPortMeta) {
+                    var contentAttribute = viewPortMeta.getAttribute('content');
+                    if (contentAttribute) {
+                        var parts = contentAttribute.split(/\s*[,;]\s*/);
+
+                        var pairs =
+                            _.map(parts, function(part) {
+                                return part.split(/\s*=\s*/);
+                            });
+
+                        var filteredWithoutMaximumScale =
+                            _.filter(pairs, function(pair) {
+                                return pair.length == 2 && pair[0] != "maximum-scale";
+                            });
+
+                        var newParametersWithoutMaximumScale =
+                            _.map(filteredWithoutMaximumScale, function(pair) {
+                                return pair.join('=');
+                            });
+
+                        var newParametersWithMaximumScale =
+                            newParametersWithoutMaximumScale.slice(0).concat('maximum-scale=1.0');
+
+                        viewPortMeta.setAttribute('content', newParametersWithMaximumScale.join(','));
+                        viewPortMeta.setAttribute('content', newParametersWithoutMaximumScale.join(','));
+                    }
+                }
             }
         },
 
@@ -1624,14 +1686,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Triggers don't have a value: don't update them
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
                 // Time control
-                if (!YAHOO.util.Dom.hasClass(document.body, "xforms-ios")) {
+                if (! ORBEON.util.Utils.isIOS()) {
                     var inputField = control.getElementsByTagName("input")[0];
                     var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
                     inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
                 }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date")) {
                 // Date control
-                if (!YAHOO.util.Dom.hasClass(document.body, "xforms-ios")) {
+                if (! ORBEON.util.Utils.isIOS()) {
                     var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
                     var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
                     if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
@@ -1665,7 +1727,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Only update value if different from the one we have. This handle the case where the fields contain invalid
                 // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
                 // to separate into 2 values.
-                if (!YAHOO.util.Dom.hasClass(document.body, "xforms-ios")) {
+                if (! ORBEON.util.Utils.isIOS()) {
                     if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
                         var separatorIndex = newControlValue.indexOf("T");
                         // Populate date field
@@ -2792,7 +2854,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                                 }
                             }
                         }
-                    } else if (!$('body').is('.xforms-ios') &&
+                    } else if (! ORBEON.util.Utils.isIOS() &&
                             (
                             YAHOO.util.Dom.hasClass(target, "xforms-type-time")
                             || (YAHOO.util.Dom.hasClass(target, "xforms-type-date") && !YAHOO.util.Dom.hasClass(target, "xforms-input-appearance-minimal"))
@@ -3678,6 +3740,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 activeControl: null,                 // The currently active control, used to disable hint
                 dialogs: {},                         // Map for dialogs: id -> YUI dialog object
                 dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
+                dialogTimerIds: {},                  // Maps dialog ids to timer ids for dialogs shown asynchronously (iOS)
                 hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
                 alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
                 helpTooltipForControl: {},           // Map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
@@ -3699,6 +3762,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 formServerEvents: {},                // Server events information
                 formClientState: {},                 // Store for information we want to keep when the page is reloaded
                 modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
+                modalProgressPanelTimerId: null,     // Timer id for modal progress panels shown asynchronously (iOS)
                 changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
                 topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
                         ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered,

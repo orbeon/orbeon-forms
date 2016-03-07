@@ -810,6 +810,8 @@
                 }
             }
 
+            var responseDialogIdsToShowAsynchronously = [];
+
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
                 // Store new dynamic and static state as soon as we find it. This is because the server only keeps the last
@@ -824,7 +826,37 @@
                 } else if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "action") {
                     var actionElement = responseRoot.childNodes[i];
 
-                    // First repeat and delete "lines" in repeat (as itemset changed below might be in a new line)
+                    function findDialogsToShow(actionElement) {
+
+                        var result = [];
+
+                        for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+                            if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "control-values") {
+                                var controlValuesElement = actionElement.childNodes[actionIndex];
+                                _.each(childrenWithLocalName(controlValuesElement, 'div'), function(divElement) {
+
+                                    var id        = ORBEON.util.Dom.getAttribute(divElement, "id");
+                                    var visible   = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
+                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[id];
+
+                                    if (visible && yuiDialog != null)
+                                        result.push(id);
+                                });
+                            }
+                        }
+
+                        return result;
+                    }
+
+                    if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
+                        var dialogsToShowArray = findDialogsToShow(actionElement);
+                        if (dialogsToShowArray.length > 0) {
+                            responseDialogIdsToShowAsynchronously = dialogsToShowArray;
+                            ORBEON.util.Utils.resetIOSZoom();
+                        }
+                    }
+
+                    // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
                     for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
                         var actionName = ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]);
                         switch (actionName) {
@@ -1184,7 +1216,6 @@
                     }
 
                     // Handle other actions
-                    var serverEventsIndex = -1;
                     for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
 
                         var actionName = ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]);
@@ -1724,26 +1755,39 @@
                                     if (relevant != null)
                                         ORBEON.xforms.Controls.setRepeatIterationRelevance(repeatId, iteration, relevant == "true" ? true : false);
                                 }
+                            }
+                            break;
+                        }
+                    }
 
-                                // "div" elements for xf:switch and xxf:dialog
-                                var divsElements = childrenWithLocalName(controlValuesElement, 'div');
-                                var divElementsLength = divsElements.length;
-                                for (var j = 0; j < divElementsLength; j++) {
-                                    var divElement = divsElements[j];
+                    // "div" elements for xf:switch and xxf:dialog
+                    function processDivs(actionElement) {
+                        for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+                            if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "control-values") {
+                                var controlValuesElement = actionElement.childNodes[actionIndex];
+                                _.each(childrenWithLocalName(controlValuesElement, 'div'), function(divElement) {
 
-                                    var controlVisibilityChangeId = ORBEON.util.Dom.getAttribute(divElement, "id");
-                                    var visible = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
-                                    var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
+                                    var id        = ORBEON.util.Dom.getAttribute(divElement, "id");
+                                    var visible   = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
+                                    var neighbor  = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
+                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[id];
 
-                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[controlVisibilityChangeId];
                                     if (yuiDialog == null) {
                                         // This is a case
-                                        ORBEON.xforms.Controls.toggleCase(controlVisibilityChangeId, visible);
+                                        ORBEON.xforms.Controls.toggleCase(id, visible);
                                     } else {
                                         // This is a dialog
                                         if (visible) {
-                                            ORBEON.xforms.Controls.showDialog(controlVisibilityChangeId, neighbor);
+                                            ORBEON.xforms.Controls.showDialog(id, neighbor);
                                         } else {
+
+                                            // Remove timer to show the dialog asynchronously so it doesn't show later!
+                                            var dialogTimerIdsMap = ORBEON.xforms.Globals.dialogTimerIds[formID];
+                                            if (dialogTimerIdsMap && dialogTimerIdsMap[id]) {
+                                                clearTimeout(dialogTimerIdsMap[id]);
+                                                delete dialogTimerIdsMap[id];
+                                            }
+
                                             ORBEON.xforms.Globals.maskDialogCloseEvents = true;
                                             yuiDialog.hide();
                                             ORBEON.xforms.Globals.maskDialogCloseEvents = false;
@@ -1751,250 +1795,279 @@
                                             yuiDialog.element.style.display = "none";
                                         }
                                     }
-                                }
-
-                                break;
+                                });
                             }
+                        }
+                    }
 
-                            // Change highlighted section in repeat
-                            case "repeat-indexes": {
-                                var repeatIndexesElement = actionElement.childNodes[actionIndex];
-                                var newRepeatIndexes = {};
-                                // Extract data from server response
-                                for (var j = 0; j < repeatIndexesElement.childNodes.length; j++) {
-                                    if (ORBEON.util.Utils.getLocalName(repeatIndexesElement.childNodes[j]) == "repeat-index") {
-                                        var repeatIndexElement = repeatIndexesElement.childNodes[j];
-                                        var repeatId = ORBEON.util.Dom.getAttribute(repeatIndexElement, "id");
-                                        var newIndex = ORBEON.util.Dom.getAttribute(repeatIndexElement, "new-index");
-                                        newRepeatIndexes[repeatId] = newIndex;
+                    function otherActions(actionElement) {
+
+                        var serverEventsIndex = -1;
+
+                        for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+
+                            var actionName = ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]);
+                            switch (actionName) {
+
+                                // Change highlighted section in repeat
+                                case "repeat-indexes": {
+                                    var repeatIndexesElement = actionElement.childNodes[actionIndex];
+                                    var newRepeatIndexes = {};
+                                    // Extract data from server response
+                                    for (var j = 0; j < repeatIndexesElement.childNodes.length; j++) {
+                                        if (ORBEON.util.Utils.getLocalName(repeatIndexesElement.childNodes[j]) == "repeat-index") {
+                                            var repeatIndexElement = repeatIndexesElement.childNodes[j];
+                                            var repeatId = ORBEON.util.Dom.getAttribute(repeatIndexElement, "id");
+                                            var newIndex = ORBEON.util.Dom.getAttribute(repeatIndexElement, "new-index");
+                                            newRepeatIndexes[repeatId] = newIndex;
+                                        }
                                     }
-                                }
-                                // For each repeat id that changes, see if all the children are also included in
-                                // newRepeatIndexes. If they are not, add an entry with the index unchanged.
-                                for (var repeatId in newRepeatIndexes) {
-                                    if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
-                                        var children = ORBEON.xforms.Globals.repeatTreeParentToAllChildren[repeatId];
-                                        if (children != null) { // test on null is a hack because repeatId may be trash when some libraries override Object
-                                            for (var childIndex in children) {
-                                                var child = children[childIndex];
-                                                if (!newRepeatIndexes[child])
-                                                    newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
+                                    // For each repeat id that changes, see if all the children are also included in
+                                    // newRepeatIndexes. If they are not, add an entry with the index unchanged.
+                                    for (var repeatId in newRepeatIndexes) {
+                                        if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
+                                            var children = ORBEON.xforms.Globals.repeatTreeParentToAllChildren[repeatId];
+                                            if (children != null) { // test on null is a hack because repeatId may be trash when some libraries override Object
+                                                for (var childIndex in children) {
+                                                    var child = children[childIndex];
+                                                    if (!newRepeatIndexes[child])
+                                                        newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                // Unhighlight items at old indexes
-                                for (var repeatId in newRepeatIndexes) {
-                                    if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
-                                        var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
-                                        if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
-                                            var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, oldIndex);
-                                            if (oldItemDelimiter != null) {
-                                                var cursor = oldItemDelimiter.nextSibling;
+                                    // Unhighlight items at old indexes
+                                    for (var repeatId in newRepeatIndexes) {
+                                        if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
+                                            var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
+                                            if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
+                                                var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, oldIndex);
+                                                if (oldItemDelimiter != null) {
+                                                    var cursor = oldItemDelimiter.nextSibling;
+                                                    while (cursor.nodeType != ELEMENT_TYPE ||
+                                                           (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                                   && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                                        if (cursor.nodeType == ELEMENT_TYPE)
+                                                            YAHOO.util.Dom.removeClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
+                                                        cursor = cursor.nextSibling;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Store new indexes
+                                    for (var repeatId in newRepeatIndexes) {
+                                        var newIndex = newRepeatIndexes[repeatId];
+                                        ORBEON.xforms.Globals.repeatIndexes[repeatId] = newIndex;
+                                    }
+                                    // Highlight item at new index
+                                    for (var repeatId in newRepeatIndexes) {
+                                        if (typeof repeatId == "string") { // Hack because repeatId may be trash when some libraries override Object
+                                            var newIndex = newRepeatIndexes[repeatId];
+                                            if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
+                                                var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
+                                                var cursor = newItemDelimiter.nextSibling;
                                                 while (cursor.nodeType != ELEMENT_TYPE ||
                                                        (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                                                                && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                                     if (cursor.nodeType == ELEMENT_TYPE)
-                                                        YAHOO.util.Dom.removeClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
+                                                        YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
                                                     cursor = cursor.nextSibling;
                                                 }
                                             }
                                         }
                                     }
+                                    break;
                                 }
-                                // Store new indexes
-                                for (var repeatId in newRepeatIndexes) {
-                                    var newIndex = newRepeatIndexes[repeatId];
-                                    ORBEON.xforms.Globals.repeatIndexes[repeatId] = newIndex;
-                                }
-                                // Highlight item at new index
-                                for (var repeatId in newRepeatIndexes) {
-                                    if (typeof repeatId == "string") { // Hack because repeatId may be trash when some libraries override Object
-                                        var newIndex = newRepeatIndexes[repeatId];
-                                        if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
-                                            var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
-                                            var cursor = newItemDelimiter.nextSibling;
-                                            while (cursor.nodeType != ELEMENT_TYPE ||
-                                                   (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                           && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
-                                                if (cursor.nodeType == ELEMENT_TYPE)
-                                                    YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
-                                                cursor = cursor.nextSibling;
-                                            }
-                                        }
+
+                                // Server events
+                                case "server-events": {
+                                    var serverEventsElement = actionElement.childNodes[actionIndex];
+                                    var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
+                                    var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
+                                    showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
+                                    var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
+                                    discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
+                                    var progressMessage = ORBEON.util.Dom.getAttribute(serverEventsElement, "progress-message");
+                                    if (delay == null) {
+                                        // Case of 2-phase submission: store position of this element, and later when we
+                                        // process the submission element, we'll store the value of server-events in the
+                                        // $server-events form field, which will be submitted to the server by POSTing
+                                        // the form.
+                                        serverEventsIndex = actionIndex;
+                                    } else {
+                                        // Case where we need to send those events to the server with a regular Ajax request
+                                        // after the given delay.
+                                        var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
+                                        AjaxServer.createDelayedServerEvent(serverEvents, delay, showProgress, progressMessage, discardable, formID);
                                     }
-                                }
-                                break;
-                            }
-
-                            // Server events
-                            case "server-events": {
-                                var serverEventsElement = actionElement.childNodes[actionIndex];
-                                var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
-                                var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
-                                showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
-                                var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
-                                discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
-                                var progressMessage = ORBEON.util.Dom.getAttribute(serverEventsElement, "progress-message");
-                                if (delay == null) {
-                                    // Case of 2-phase submission: store position of this element, and later when we
-                                    // process the submission element, we'll store the value of server-events in the
-                                    // $server-events form field, which will be submitted to the server by POSTing
-                                    // the form.
-                                    serverEventsIndex = actionIndex;
-                                } else {
-                                    // Case where we need to send those events to the server with a regular Ajax request
-                                    // after the given delay.
-                                    var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                    AjaxServer.createDelayedServerEvent(serverEvents, delay, showProgress, progressMessage, discardable, formID);
-                                }
-                                break;
-                            }
-
-                            // Submit form
-                            case "submission": {
-                                var submissionElement = actionElement.childNodes[actionIndex];
-                                var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
-                                var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
-
-                                ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsIndex != -1
-                                    ? ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]) : "";
-                                // Increment and send sequence number
-                                var requestForm = ORBEON.util.Dom.get(formID);
-                                // Go to another page
-                                if (showProgress != "false") {
-                                    // Display loading indicator unless the server tells us not to display it
-                                    newDynamicStateTriggersReplace = true;
+                                    break;
                                 }
 
-                                /**
-                                 * Set the action to the URL of the current page.
-                                 *
-                                 * We can't (or don't know how to) set the URL to the URL to which we did a submission
-                                 * replace="all", so the best we can do it to set it to the current URL.
-                                 *
-                                 * We don't do it when the server generated a <form action="…"> that contains
-                                 * xforms-server-submit, which can happen in cases (e.g. running in a portal) where for
-                                 * some reason submitting to the URL of the page wouldn't work.
-                                 *
-                                 * When the target is an iframe, we add a ?t=id to work around a Chrome bug happening
-                                 * when doing a POST to the same page that was just loaded, gut that the POST returns
-                                 * a PDF. See:
-                                 *
-                                 *     https://code.google.com/p/chromium/issues/detail?id=330687
-                                 *     https://github.com/orbeon/orbeon-forms/issues/1480
-                                 */
-                                if (requestForm.action.indexOf("xforms-server-submit") == -1) {
-                                    var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
-                                    var a = $('<a>');
-                                    a.prop('href', window.location.href);
-                                    if (isTargetAnIframe) {
-                                        var param = "t=" + _.uniqueId();
-                                        var search = a.prop('search');
-                                        var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
-                                        a.prop('search', newSearch);
-                                    }
-                                    requestForm.action = a.prop('href');
-                                }
+                                // Submit form
+                                case "submission": {
+                                    var submissionElement = actionElement.childNodes[actionIndex];
+                                    var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
+                                    var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
+                                    var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
 
-                                if (target == null) {
-                                    // Reset as this may have been changed before by asyncAjaxRequest
-                                    requestForm.removeAttribute("target");
-                                } else {
-                                    // Set the requested target
-                                    requestForm.target = target;
-                                }
-                                try {
-                                    requestForm.submit();
-                                } catch (e) {
-                                    // NOP: This is to prevent the error "Unspecified error" in IE. This can
-                                    // happen when navigating away is cancelled by the user pressing cancel
-                                    // on a dialog displayed on unload.
-                                }
-                                break;
-                            }
-
-                            // Display modal message
-                            case "message": {
-                                var messageElement = actionElement.childNodes[actionIndex];
-                                ORBEON.xforms.action.Message.execute(messageElement);
-                                break;
-                            }
-
-                            // Load another page
-                            case "load": {
-                                var loadElement = actionElement.childNodes[actionIndex];
-                                var resource = ORBEON.util.Dom.getAttribute(loadElement, "resource");
-                                var show = ORBEON.util.Dom.getAttribute(loadElement, "show");
-                                var target = ORBEON.util.Dom.getAttribute(loadElement, "target");
-                                var showProgress = ORBEON.util.Dom.getAttribute(loadElement, "show-progress");
-
-                                if (resource.indexOf("javascript:") == 0) {
-                                    // JavaScript URL
-                                    var js = decodeURIComponent(resource.substring("javascript:".length));
-                                    eval(js);
-                                } else  if (show == "replace") {
-                                    if (target == null) {
+                                    ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsIndex != -1
+                                        ? ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]) : "";
+                                    // Increment and send sequence number
+                                    var requestForm = ORBEON.util.Dom.get(formID);
+                                    // Go to another page
+                                    if (showProgress != "false") {
                                         // Display loading indicator unless the server tells us not to display it
-                                        if (resource.charAt(0) != '#' && showProgress != "false")
-                                            newDynamicStateTriggersReplace = true;
-                                        try {
-                                            window.location.href = resource;
-                                        } catch (e) {
-                                            // NOP: This is to prevent the error "Unspecified error" in IE. This can
-                                            // happen when navigating away is cancelled by the user pressing cancel
-                                            // on a dialog displayed on unload.
+                                        newDynamicStateTriggersReplace = true;
+                                    }
+
+                                    /**
+                                     * Set the action to the URL of the current page.
+                                     *
+                                     * We can't (or don't know how to) set the URL to the URL to which we did a submission
+                                     * replace="all", so the best we can do it to set it to the current URL.
+                                     *
+                                     * We don't do it when the server generated a <form action="…"> that contains
+                                     * xforms-server-submit, which can happen in cases (e.g. running in a portal) where for
+                                     * some reason submitting to the URL of the page wouldn't work.
+                                     *
+                                     * When the target is an iframe, we add a ?t=id to work around a Chrome bug happening
+                                     * when doing a POST to the same page that was just loaded, gut that the POST returns
+                                     * a PDF. See:
+                                     *
+                                     *     https://code.google.com/p/chromium/issues/detail?id=330687
+                                     *     https://github.com/orbeon/orbeon-forms/issues/1480
+                                     */
+                                    if (requestForm.action.indexOf("xforms-server-submit") == -1) {
+                                        var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
+                                        var a = $('<a>');
+                                        a.prop('href', window.location.href);
+                                        if (isTargetAnIframe) {
+                                            var param = "t=" + _.uniqueId();
+                                            var search = a.prop('search');
+                                            var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
+                                            a.prop('search', newSearch);
+                                        }
+                                        requestForm.action = a.prop('href');
+                                    }
+
+                                    if (target == null) {
+                                        // Reset as this may have been changed before by asyncAjaxRequest
+                                        requestForm.removeAttribute("target");
+                                    } else {
+                                        // Set the requested target
+                                        requestForm.target = target;
+                                    }
+                                    try {
+                                        requestForm.submit();
+                                    } catch (e) {
+                                        // NOP: This is to prevent the error "Unspecified error" in IE. This can
+                                        // happen when navigating away is cancelled by the user pressing cancel
+                                        // on a dialog displayed on unload.
+                                    }
+                                    break;
+                                }
+
+                                // Display modal message
+                                case "message": {
+                                    var messageElement = actionElement.childNodes[actionIndex];
+                                    ORBEON.xforms.action.Message.execute(messageElement);
+                                    break;
+                                }
+
+                                // Load another page
+                                case "load": {
+                                    var loadElement = actionElement.childNodes[actionIndex];
+                                    var resource = ORBEON.util.Dom.getAttribute(loadElement, "resource");
+                                    var show = ORBEON.util.Dom.getAttribute(loadElement, "show");
+                                    var target = ORBEON.util.Dom.getAttribute(loadElement, "target");
+                                    var showProgress = ORBEON.util.Dom.getAttribute(loadElement, "show-progress");
+
+                                    if (resource.indexOf("javascript:") == 0) {
+                                        // JavaScript URL
+                                        var js = decodeURIComponent(resource.substring("javascript:".length));
+                                        eval(js);
+                                    } else  if (show == "replace") {
+                                        if (target == null) {
+                                            // Display loading indicator unless the server tells us not to display it
+                                            if (resource.charAt(0) != '#' && showProgress != "false")
+                                                newDynamicStateTriggersReplace = true;
+                                            try {
+                                                window.location.href = resource;
+                                            } catch (e) {
+                                                // NOP: This is to prevent the error "Unspecified error" in IE. This can
+                                                // happen when navigating away is cancelled by the user pressing cancel
+                                                // on a dialog displayed on unload.
+                                            }
+                                        } else {
+                                            window.open(resource, target);
                                         }
                                     } else {
-                                        window.open(resource, target);
+                                        window.open(resource, "_blank");
                                     }
-                                } else {
-                                    window.open(resource, "_blank");
+                                    break;
                                 }
-                                break;
-                            }
 
-                            // Set focus to a control
-                            case "focus": {
-                                var focusElement = actionElement.childNodes[actionIndex];
-                                var controlId = ORBEON.util.Dom.getAttribute(focusElement, "control-id");
-                                ORBEON.xforms.Controls.setFocus(controlId);
-                                break;
-                            }
+                                // Set focus to a control
+                                case "focus": {
+                                    var focusElement = actionElement.childNodes[actionIndex];
+                                    var controlId = ORBEON.util.Dom.getAttribute(focusElement, "control-id");
+                                    ORBEON.xforms.Controls.setFocus(controlId);
+                                    break;
+                                }
 
-                            // Remove focus from a control
-                            case "blur": {
-                                var blurElement = actionElement.childNodes[actionIndex];
-                                var controlId = ORBEON.util.Dom.getAttribute(blurElement, "control-id");
-                                ORBEON.xforms.Controls.removeFocus(controlId);
-                                break;
-                            }
+                                // Remove focus from a control
+                                case "blur": {
+                                    var blurElement = actionElement.childNodes[actionIndex];
+                                    var controlId = ORBEON.util.Dom.getAttribute(blurElement, "control-id");
+                                    ORBEON.xforms.Controls.removeFocus(controlId);
+                                    break;
+                                }
 
-                            // Run JavaScript code
-                            case "script": {
-                                var scriptElement = actionElement.childNodes[actionIndex];
-                                var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
-                                var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
-                                var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
-                                var paramElements = childrenWithLocalName(scriptElement, "param");
-                                var paramValues = _.map(paramElements, function(paramElement) {
-                                    return $(paramElement).text();
-                                });
-                                args = [functionName, targetId, observerId].concat(paramValues);
-                                ORBEON.xforms.server.Server.callUserScript.apply(null, args);
-                                break;
-                            }
+                                // Run JavaScript code
+                                case "script": {
+                                    var scriptElement = actionElement.childNodes[actionIndex];
+                                    var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
+                                    var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
+                                    var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
+                                    var paramElements = childrenWithLocalName(scriptElement, "param");
+                                    var paramValues = _.map(paramElements, function(paramElement) {
+                                        return $(paramElement).text();
+                                    });
+                                    args = [functionName, targetId, observerId].concat(paramValues);
+                                    ORBEON.xforms.server.Server.callUserScript.apply(null, args);
+                                    break;
+                                }
 
-                            // Show help message for specified control
-                            case "help": {
-                                var helpElement = actionElement.childNodes[actionIndex];
-                                var controlId = ORBEON.util.Dom.getAttribute(helpElement, "control-id");
-                                var control = ORBEON.util.Dom.get(controlId);
-                                ORBEON.xforms.Controls.showHelp(control);
-                                break;
+                                // Show help message for specified control
+                                case "help": {
+                                    var helpElement = actionElement.childNodes[actionIndex];
+                                    var controlId = ORBEON.util.Dom.getAttribute(helpElement, "control-id");
+                                    var control = ORBEON.util.Dom.get(controlId);
+                                    ORBEON.xforms.Controls.showHelp(control);
+                                    break;
+                                }
                             }
                         }
+                    }
+
+                    if (responseDialogIdsToShowAsynchronously.length > 0) {
+                        var timerId = setTimeout(function() {
+                            processDivs(actionElement);
+                            otherActions(actionElement);
+                        }, 200);
+
+                        var dialogTimerIdsMap = ORBEON.xforms.Globals.dialogTimerIds[formID] || {};
+                        ORBEON.xforms.Globals.dialogTimerIds[formID] = dialogTimerIdsMap;
+
+                        _.each(responseDialogIdsToShowAsynchronously, function(dialogId) {
+                            dialogTimerIdsMap[dialogId] = timerId;
+                        });
+
+                    } else {
+                        // Process synchronously
+                        processDivs(actionElement);
+                        otherActions(actionElement);
                     }
 
                 } else if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "errors") {

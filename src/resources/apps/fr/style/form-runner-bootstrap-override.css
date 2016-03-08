@@ -144,6 +144,12 @@ body.orbeon {
   margin-top: 3px;
   margin-top: 0px\9;
 }
+.orbeon .xforms-select1-appearance-xxforms-horizontal .xforms-items .xforms-selected,
+.orbeon .xforms-select-appearance-xxforms-horizontal .xforms-items .xforms-selected,
+.orbeon .xforms-select1-appearance-xxforms-horizontal .xforms-items .xforms-deselected,
+.orbeon .xforms-select-appearance-xxforms-horizontal .xforms-items .xforms-deselected {
+  display: inline;
+}
 .orbeon .xforms-select1-appearance-xxforms-horizontal label.radio,
 .orbeon .xforms-select-appearance-xxforms-horizontal label.radio,
 .orbeon .xforms-select1-appearance-xxforms-horizontal label.checkbox,

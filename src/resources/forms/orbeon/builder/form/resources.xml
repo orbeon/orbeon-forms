@@ -465,10 +465,29 @@
             <options>
                 <label>Options</label>
                 <item>
+                    <label>Initially Open</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Page Break Before</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label>Collapsible</label>
+                <item>
+                    <label>Use Default</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label>Always</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label>Never</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Visibility</label>
                 <alert>Incorrect XPath expression</alert>
@@ -1372,10 +1391,29 @@
             <options>
                 <label>Options</label>
                 <item>
+                    <label>Initialement ouverte</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Saut de page avant</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label>Fermable</label>
+                <item>
+                    <label>Utiliser le défaut</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label>Toujours</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label>Jamais</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Visibilité</label>
                 <alert>Expression XPath incorrecte</alert>
@@ -2282,10 +2320,29 @@
             <options>
                 <label todo="true">[Options]</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Synlighet</label>
                 <alert>Galt XPath-uttrykk</alert>
@@ -3190,10 +3247,29 @@
             <options>
                 <label todo="true">[Options]</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label todo="true">[Page Break Before]</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Настройки видимости</label>
                 <alert>Некорректное выражение XPath</alert>
@@ -4099,10 +4175,29 @@
             <options>
                 <label>Opzioni</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Interruzione di pagina prima</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Visibilità</label>
                 <alert>Espressione XPath non valida</alert>
@@ -5000,10 +5095,29 @@
             <options>
                 <label>Optionen</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Seitenumbruch vor diesem Abschnitt</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Sichtbarkeit</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
@@ -5904,10 +6018,29 @@
             <options>
                 <label>Asetukset</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Sivunvaihto ennen lohkoa</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Näkyvyys</label>
                 <alert>Virheellinen XPath-lauseke</alert>
@@ -6806,10 +6939,29 @@
             <options>
                 <label>Opciones</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Salto de Página Antes</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Visibilidad</label>
                 <alert>Expresión XPath incorrecta</alert>
@@ -7715,10 +7867,29 @@
             <options>
                 <label>Opções</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Quebra de Página Antes</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Visibilidade</label>
                 <alert>Expressão de XPath incorrecta</alert>
@@ -8623,10 +8794,29 @@
             <options>
                 <label>Val</label>
                 <item>
+                    <label todo="true">[Initially Open]</label>
+                    <value>fr-initially-open</value>
+                </item>
+                <item>
                     <label>Sidbrytning före</label>
                     <value>fr-page-break-before</value>
                 </item>
             </options>
+            <collapsible>
+                <label todo="true">[Collapsible]</label>
+                <item>
+                    <label todo="true">[Use Default]</label>
+                    <value>default</value>
+                </item>
+                <item>
+                    <label todo="true">[Always]</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label todo="true">[Never]</label>
+                    <value>false</value>
+                </item>
+            </collapsible>
             <visibility>
                 <label>Synlighet</label>
                 <alert>Felaktigt XPath-uttryck</alert>

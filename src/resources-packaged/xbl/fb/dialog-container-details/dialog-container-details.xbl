@@ -32,9 +32,16 @@
 
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <xf:setvalue ref="$i/container-type"                 value="local-name(event('container'))"/>
-                <xf:setvalue ref="$i/original-control-name"          value="fbf:getContainerNameOrEmpty(event('container'))"/>
+                <xf:var name="control" value="event('container')"/>
+
+                <xf:setvalue ref="$i/container-type"                 value="local-name($control)"/>
+                <xf:setvalue ref="$i/original-control-name"          value="fbf:getContainerNameOrEmpty($control)"/>
                 <xf:setvalue ref="$i/control-name"                   value="$i/original-control-name"/>
+
+                <xf:action if="$i/container-type = 'section'">
+                    <xf:setvalue ref="$i/initially-open"             value="not($control/@fb:open = 'false')"/>
+                    <xf:setvalue ref="$i/collapsible"                value="(for $a in $control/(@collapse, @collapsible)[1] return $a = 'true', 'default')[1]"/>
+                </xf:action>
 
                 <xf:setvalue ref="$i/was-repeat"                     value="fbf:isRepeat(fbf:findControlByNameOrEmpty($form, $i/control-name))"/>
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
@@ -154,6 +161,16 @@
                     <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                     <xf:delete if="count($classes) = 0" ref="$control/@class"/>
                     <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
+
+                    <xf:action if="$i/container-type = 'section'">
+                        <!-- Initially open -->
+                        <xf:delete if="data($i/initially-open)"      ref="$control/@fb:open"/>
+                        <xf:insert if="not(data($i/initially-open))" context="$control" origin="xxf:attribute('fb:open', 'false')"/>
+
+                        <!-- Collapsible -->
+                        <xf:delete if="$i/collapsible = 'default'"      ref="$control/(@collapse, @collapsible)"/>
+                        <xf:insert if="not($i/collapsible = 'default')" context="$control" origin="xxf:attribute('collapsible', $i/collapsible = true())"/>
+                    </xf:action>
                 </xf:action>
 
             </xbl:handler>
@@ -216,6 +233,9 @@
                         <original-control-name/>
                         <control-name/>
 
+                        <initially-open/>
+                        <collapsible/>
+
                         <standard-classes/>
                         <custom-classes/>
 
@@ -258,13 +278,29 @@
                     ref="instance('modified')"
                     value="true()"/>
 
-                <xf:bind ref="control-name"
-                         type="xs:NCName"
-                         xxf:whitespace="trim"
-                         readonly="false()"
-                         required="true()"
-                         constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
-                <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
+                <xf:bind
+                    ref="control-name"
+                    type="xs:NCName"
+                    xxf:whitespace="trim"
+                    readonly="false()"
+                    required="true()"
+                    constraint=". = $i/original-control-name or not(. = xxf:split($i/control-names))"/>
+
+                <xf:bind
+                    ref="relevant | readonly"
+                    type="xxf:xpath2"
+                    required="false()"/>
+
+                <xf:bind
+                    ref="initially-open"
+                    type="xs:boolean"
+                    relevant="$i/container-type = 'section'"
+                    readonly="../collapsible = 'false'"
+                    calculate="if (../collapsible = 'false') then 'true' else ."/>
+
+                <xf:bind
+                    ref="collapsible"
+                    relevant="$i/container-type = 'section'"/>
 
                 <xf:bind
                     ref="was-repeat | is-repeat | was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
@@ -272,37 +308,52 @@
                     xxf:default="false()"/>
 
                 <!-- Don't yet allow changing grids back and forth -->
-                <xf:bind ref="is-repeat"
-                         readonly="$i/container-type = 'grid'"/>
+                <xf:bind
+                    ref="is-repeat"
+                    readonly="$i/container-type = 'grid'"/>
 
-                <xf:bind ref="custom-iteration-name"
-                         type="xf:NCName"
-                         xxf:whitespace="trim"
-                         readonly="false()"
-                         required="$i/is-custom-iteration-name = true()"
-                         constraint="$i/is-custom-iteration-name = false() or . = $i/original-custom-iteration-name or not(. = xxf:split($i/control-names))"/>
+                <xf:bind
+                    ref="custom-iteration-name"
+                    type="xf:NCName"
+                    xxf:whitespace="trim"
+                    readonly="false()"
+                    required="$i/is-custom-iteration-name = true()"
+                    constraint="
+                        $i/is-custom-iteration-name = false() or
+                        . = $i/original-custom-iteration-name or
+                        not(. = xxf:split($i/control-names))"/>
 
                 <!-- Use xxf:xpath2 as integer values are also XPath expressions! -->
-                <xf:bind ref="min-repeat | max-repeat"
-                         type="xxf:xpath2"
-                         xxf:whitespace="trim"
-                         readonly="false()"/>
+                <xf:bind
+                    ref="min-repeat | max-repeat"
+                    type="xxf:xpath2"
+                    xxf:whitespace="trim"
+                    readonly="false()"/>
 
-                <xf:bind ref="min-repeat"
-                         required="../is-repeat = true()"
-                         constraint="../is-repeat = false()
-                                     or not(string() castable as xs:integer)
-                                     or xs:integer(.) ge 0"/>
+                <xf:bind
+                    ref="min-repeat"
+                    required="../is-repeat = true()"
+                    constraint="
+                        ../is-repeat = false()               or
+                        not(string() castable as xs:integer) or
+                        xs:integer(.) ge 0"/>
 
-                <xf:bind ref="max-repeat"
-                         constraint="../is-repeat = false()
-                                     or not(string() castable as xs:integer)
-                                     or xs:integer(.) ge 1"/>
+                <xf:bind
+                    ref="max-repeat"
+                    constraint="
+                        ../is-repeat = false()               or
+                        not(string() castable as xs:integer) or
+                        xs:integer(.) ge 1"/>
 
-                <xf:bind ref="max-repeat"
-                         constraint="../is-repeat = false()
-                                     or not(string() castable as xs:integer and string(../min-repeat) castable as xs:integer)
-                                     or (xs:integer(.) ge xs:integer(../min-repeat))"/>
+                <xf:bind
+                    ref="max-repeat"
+                    constraint="
+                        ../is-repeat = false() or
+                        not(
+                            string() castable as xs:integer and
+                            string(../min-repeat) castable as xs:integer
+                        ) or
+                        (xs:integer(.) ge xs:integer(../min-repeat))"/>
 
                 <xf:bind
                     ref="prev-control-id, next-control-id"
@@ -326,7 +377,7 @@
 
                             <fr:grid>
                                 <xh:tr>
-                                    <xh:td>
+                                    <xh:td colspan="2">
                                         <!-- Section name -->
                                         <xf:input ref="control-name" incremental="true" id="fb-control-name-input">
                                             <xf:label ref="$resources/dialog-container-details/control-name/label"/>
@@ -337,14 +388,29 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <!-- Classes -->
+                                        <fr:checkbox-input ref="initially-open">
+                                            <xf:label ref="$resources/dialog-container-details/options/item[value = 'fr-initially-open']/label"/>
+                                        </fr:checkbox-input>
                                         <xf:select ref="$i/standard-classes" appearance="full">
-                                            <xf:label ref="$resources/dialog-container-details/options/label"/>
-                                            <xf:itemset ref="$resources/dialog-container-details/options/item">
+                                            <xf:label ref="$resources/dialog-container-details/options/label" class="xforms-hidden"/>
+                                            <xf:itemset ref="$resources/dialog-container-details/options/item[value != 'fr-initially-open']">
                                                 <xf:label ref="label"/>
                                                 <xf:value ref="value"/>
                                             </xf:itemset>
                                         </xf:select>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select1 ref="collapsible" appearance="full xxf:horizontal">
+                                            <xf:label ref="$resources/dialog-container-details/collapsible/label"/>
+                                            <xf:itemset ref="$resources/dialog-container-details/collapsible/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td colspan="2">
                                         <xf:input ref="$i/custom-classes">
                                             <xf:label ref="$resources/classes/label"/>
                                         </xf:input>
@@ -353,21 +419,19 @@
                                 <xh:tr>
                                     <xh:td>
                                         <!-- Relevant -->
-                                        <xf:input ref="relevant" incremental="true">
+                                        <xf:textarea ref="relevant" incremental="true">
                                             <xf:label ref="$resources/dialog-container-details/visibility/label"/>
                                             <xf:alert ref="$resources/dialog-container-details/visibility/alert"/>
                                             <xf:hint  ref="$resources/dialog-container-details/visibility/hint"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </xh:td>
-                                </xh:tr>
-                                <xh:tr>
                                     <xh:td>
                                         <!-- Readonly -->
-                                        <xf:input ref="readonly" incremental="true">
+                                        <xf:textarea ref="readonly" incremental="true">
                                             <xf:label ref="$resources/dialog-container-details/readonly/label"/>
                                             <xf:alert ref="$resources/dialog-container-details/readonly/alert"/>
                                             <xf:hint  ref="$resources/dialog-container-details/readonly/hint"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

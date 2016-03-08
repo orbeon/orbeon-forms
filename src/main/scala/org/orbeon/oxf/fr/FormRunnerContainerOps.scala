@@ -121,7 +121,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     for {
       control       ← findControlByName(inDoc, controlName)
       if controlRequiresNestedIterationElement(control)
-      bind          ← findBindByName(inDoc, controlName)
+      bind          ← control attValueOpt "bind" map controlNameFromId flatMap (findBindByName(inDoc, _))
       iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)

@@ -980,18 +980,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 overlay.beforeHideEvent.subscribe(function() { YD.setStyle(overlay.element, "display", "none"); });
             },
 
-            countOccurrences: function(str, character) {
-                var count = 0;
-                var pos = str.indexOf(character);
-                while ( pos != -1 ) {
-                    count++;
-                    pos = str.indexOf(character,pos+1);
-                }
-                return count;
-            },
-
             /**
-             * For example: appendToEffectivefId("foo⊙1", "bar") returns "foobar⊙1"
+             * For example: appendToEffectiveId("foo⊙1", "bar") returns "foobar⊙1"
              */
             appendToEffectiveId: function(effectiveId, ending) {
                 var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(effectiveId);
@@ -2391,19 +2381,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         },
 
         /**
-         * Return the widget that applies to a given control.
-         */
-        getWidget: function (control) {
-            for (var widgetClass in ORBEON.widgets) {
-                var widget = ORBEON.widgets[widgetClass];
-                if (widget.extending != null && widget.appliesToControl(control)) {
-                    return widget;
-                }
-            }
-        },
-
-        /**
          * Called when a control is removed from the DOM. We trash all the information we might store about this control.
+         *
+         * 2016-03-07: Doesn't seem to be used.
          */
         deleteControl: function (control) {
             ORBEON.xforms.ServerValueStore.remove(control.id);

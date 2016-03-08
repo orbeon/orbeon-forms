@@ -694,10 +694,6 @@ body {
 .orbeon .fr-view .xbl-fr-grid .fr-grid.fr-editable .fr-grid-content .xforms-hint input {
   width: 100%;
 }
-.orbeon #fr-view .fr-grid.fr-editable .xforms-hint.xforms-disabled {
-  display: block;
-  position: static;
-}
 .orbeon .fb-use-toolbar-message,
 .orbeon .fb-click-message {
   display: none;

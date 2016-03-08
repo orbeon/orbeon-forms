@@ -656,12 +656,6 @@ body {
         }
     }
 
-    // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
-    #fr-view .fr-grid.fr-editable .xforms-hint.xforms-disabled {                                                        // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less
-        display: block;
-        position: static;                                                                                               // Overrides position: absolute; top: -10000px; left: -10000px in xforms.css
-    }
-
     .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
     .fb-selected .fb-use-toolbar-message { display: block }
     td:hover .fb-click-message { display: block }

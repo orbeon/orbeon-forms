@@ -73,24 +73,24 @@ body {
   display: none;
   padding: 0;
 }
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .fb-grid-td:hover .xforms-label:empty:before,
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .fb-grid-th:hover .xforms-label:empty:before,
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .fb-grid-td:hover .xforms-hint:empty:before,
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .fb-grid-th:hover .xforms-hint:empty:before,
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .fb-grid-td:hover .xforms-text .xforms-output-output:empty:before,
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .fb-grid-th:hover .xforms-text .xforms-output-output:empty:before {
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .fb-grid-td:hover .xforms-label:empty:before,
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .fb-grid-th:hover .xforms-label:empty:before,
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .fb-grid-td:hover .xforms-hint:empty:before,
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .fb-grid-th:hover .xforms-hint:empty:before,
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .fb-grid-td:hover .xforms-text .xforms-output-output:empty:before,
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .fb-grid-th:hover .xforms-text .xforms-output-output:empty:before {
   content: attr(placeholder);
   color: #bbb;
 }
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .xforms-label {
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .xforms-label {
   display: block;
 }
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .xforms-label .fb-edit-label-html {
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .xforms-label .fb-edit-label-html {
   float: right;
   width: auto;
   margin: 0 0 0 5px;
 }
-.orbeon .fr-view .fb .fr-section-container .fr-grid.fr-editable .xforms-label .fb-edit-label {
+.orbeon .fr-view .fr-section-container .fr-grid.fr-editable .xforms-label .fb-edit-label {
   display: block;
   overflow: hidden;
 }

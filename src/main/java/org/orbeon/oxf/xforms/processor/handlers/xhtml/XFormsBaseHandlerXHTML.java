@@ -350,21 +350,10 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 // Handle visibility
                 // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
                 if (control != null) {
-                    if (isAlert || isLabel) {
-                        // Allow empty labels and alerts
-                        if (!control.isRelevant()) {
-                            if (classes.length() > 0)
-                                classes.append(' ');
-                            classes.append("xforms-disabled");
-                        }
-                    } else {
-                        // For help and hint, consider "non-relevant" if empty
-                        final boolean isHintHelpRelevant = control.isRelevant() && StringUtils.isNotEmpty(labelHintHelpAlertValue);
-                        if (!isHintHelpRelevant) {
-                            if (classes.length() > 0)
-                                classes.append(' ');
-                            classes.append("xforms-disabled");
-                        }
+                    if (!control.isRelevant()) {
+                        if (classes.length() > 0)
+                            classes.append(' ');
+                        classes.append("xforms-disabled");
                     }
                 } else if (!isTemplate || isHelp) {
                     // Null control outside of template OR help within template

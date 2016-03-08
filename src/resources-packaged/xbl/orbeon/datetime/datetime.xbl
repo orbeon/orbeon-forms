@@ -22,7 +22,7 @@
                  element="
                     fr|datetime,
                     xf|input:xxf-type('xs:dateTime')"
-                 xxbl:mode="lhha binding value focus"
+                 xxbl:mode="lhha binding value"
                  xxbl:label-for="date">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

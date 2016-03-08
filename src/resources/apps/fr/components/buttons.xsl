@@ -74,7 +74,7 @@
                     )
                 }}.pdf">
             <xsl:copy-of select="@appearance | @ref | @class" />
-            <xf:label mediatype="text/html" value="$fr-resources/buttons/pdf"/>
+            <xf:label mediatype="text/html" model="fr-form-model" value="$fr-resources/buttons/pdf"/>
         </fr:href-button>
     </xsl:template>
 

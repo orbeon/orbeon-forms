@@ -90,7 +90,7 @@ trait FormRunnerEmail {
       control        ← controls
       controlClasses = control.attClasses
       if classNamesList forall controlClasses.contains
-      bindId         ← control /@ "bind" map (_.stringValue)
+      bindId         ← control.attValueOpt("bind").toList
       bindName       ← controlNameFromIdOpt(bindId).toList
       holder         ← findDataHoldersInDocument(inDoc, bindName, contextItem)
     } yield

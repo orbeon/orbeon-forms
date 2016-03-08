@@ -167,6 +167,10 @@
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
+                <xf:setvalue
+                    ref="instance('modified')"
+                    value="false()"/>
+
                 <xxf:show dialog="dialog"/>
 
                 <!-- Tell custom settings to initialize -->
@@ -198,44 +202,47 @@
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
-                <xf:var name="old-name" value="$i/original-control-name/string()"/>
-                <xf:var name="new-name" value="$i/control-name/string()"/>
+                <xf:action if="instance('modified') = true()">
 
-                <!-- Find reference to control -->
-                <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
-                <!-- Rename if needed -->
-                <xf:action type="xpath">
-                    fbf:renameControlIfNeeded($form, $old-name, $new-name)
-                </xf:action>
-                <!-- Write classes -->
-                <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
-                <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
-                <!-- Update custom XBL properties -->
-                <xf:action iterate="$i/fb:control-details/*">
-                    <xf:var name="position" value="position()"/>
-                    <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
-                    <xf:var name="xforms-control" value="."/>
-                    <xf:setvalue
-                        ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))"
-                        value="$bound-node"/>
-                </xf:action>
+                    <xf:var name="old-name" value="$i/original-control-name/string()"/>
+                    <xf:var name="new-name" value="$i/control-name/string()"/>
 
-                <xf:action type="xpath">
-                    (: Write alerts and constraints :)
-                    fbf:writeAlertsAndValidationsAsXML(
-                        $form,
-                        $i/control-name,
-                        $i/appearances/@selection,
-                        $i/default-alert/alert,
-                        $i/validations/validation
-                    ),
-                    (: Write MIPs :)
-                    for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
-                        fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
-                    (: Write help :)
-                    fbf:setControlHelp($i/control-name, $i/help),
-                    fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
+                    <!-- Find reference to control -->
+                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
+                    <!-- Rename if needed -->
+                    <xf:action type="xpath">
+                        fbf:renameControlIfNeeded($form, $old-name, $new-name)
+                    </xf:action>
+                    <!-- Write classes -->
+                    <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
+                    <xf:delete if="count($classes) = 0" ref="$control/@class"/>
+                    <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
+                    <!-- Update custom XBL properties -->
+                    <xf:action iterate="$i/fb:control-details/*">
+                        <xf:var name="position" value="position()"/>
+                        <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
+                        <xf:var name="xforms-control" value="."/>
+                        <xf:setvalue
+                            ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))"
+                            value="$bound-node"/>
+                    </xf:action>
+
+                    <xf:action type="xpath">
+                        (: Write alerts and constraints :)
+                        fbf:writeAlertsAndValidationsAsXML(
+                            $form,
+                            $i/control-name,
+                            $i/appearances/@selection,
+                            $i/default-alert/alert,
+                            $i/validations/validation
+                        ),
+                        (: Write MIPs :)
+                        for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
+                            fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
+                        (: Write help :)
+                        fbf:setControlHelp($i/control-name, $i/help),
+                        fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
+                    </xf:action>
                 </xf:action>
 
                 <!-- Tell custom settings to apply changes -->
@@ -329,7 +336,7 @@
                 </xf:action>
 
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <local>
+                    <local modified="false">
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
                         <standard-classes/>         <!-- fr-summary, fr-search... -->
@@ -358,6 +365,16 @@
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>
+
+                <xf:instance id="modified">
+                    <modified/>
+                </xf:instance>
+
+                <xf:setvalue
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed"
+                    observer="i"
+                    ref="instance('modified')"
+                    value="true()"/>
 
                 <xf:instance id="validation-constraint-template" xxf:exclude-result-prefixes="#all">
                     <validation id="" type="formula" level="error" default-alert="true">

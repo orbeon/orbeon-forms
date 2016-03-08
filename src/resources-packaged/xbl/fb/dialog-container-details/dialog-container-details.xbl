@@ -88,6 +88,10 @@
                             'next'
                         )/@id"/>
 
+                <xf:setvalue
+                    ref="instance('modified')"
+                    value="false()"/>
+
                 <xxf:show dialog="dialog"/>
 
                 <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
@@ -110,49 +114,50 @@
             </xbl:handler>
             <xbl:handler event="fb-save" phase="target">
 
-                <xf:var name="form" value="xxf:binding('fb-dialog-container-details')"/>
+                <xf:action if="instance('modified') = true()">
 
-                <!-- NOTE: We use string() to access string value of NCName -->
-                <xf:var name="old-name"       value="$i/original-control-name/string()"/>
-                <xf:var name="new-name"       value="$i/control-name/string()"/>
-                <xf:var name="remains-repeat" value="$i/was-repeat = true() and $i/is-repeat = true()"/>
+                    <xf:var name="form" value="xxf:binding('fb-dialog-container-details')"/>
 
-                <xf:action type="xpath">
-                    if ($remains-repeat) then
-                        fbf:renameControlIterationIfNeeded(
-                            $form,
-                            $old-name,
-                            $new-name,
-                            $i/original-custom-iteration-name/string(),
-                            $i/custom-iteration-name/string()
+                    <!-- NOTE: We use string() to access string value of NCName -->
+                    <xf:var name="old-name"       value="$i/original-control-name/string()"/>
+                    <xf:var name="new-name"       value="$i/control-name/string()"/>
+                    <xf:var name="remains-repeat" value="$i/was-repeat = true() and $i/is-repeat = true()"/>
+
+                    <xf:action type="xpath">
+                        if ($remains-repeat) then
+                            fbf:renameControlIterationIfNeeded(
+                                $form,
+                                $old-name,
+                                $new-name,
+                                $i/original-custom-iteration-name/string(),
+                                $i/custom-iteration-name/string()
+                            )
+                        else
+                            (),
+                        fbf:renameControlIfNeeded($form, $old-name, $new-name),
+                        fbf:updateMipAsAttributeOnly($form, $new-name, 'relevant', $i/relevant),
+                        fbf:updateMipAsAttributeOnly($form, $new-name, 'readonly', $i/readonly),
+                        fbf:setRepeatProperties(
+                            $form, $new-name,
+                            $i/is-repeat = true(),
+                            $i/min-repeat,
+                            $i/max-repeat,
+                            $i/custom-iteration-name/string(),
+                            $i/apply-defaults = true(),
+                            if ($i/initial-iterations = true()) then 'first' else ''
                         )
-                    else
-                        (),
-                    fbf:renameControlIfNeeded($form, $old-name, $new-name),
-                    fbf:updateMipAsAttributeOnly($form, $new-name, 'relevant', $i/relevant),
-                    fbf:updateMipAsAttributeOnly($form, $new-name, 'readonly', $i/readonly),
-                    fbf:setRepeatProperties(
-                        $form, $new-name,
-                        $i/is-repeat = true(),
-                        $i/min-repeat,
-                        $i/max-repeat,
-                        $i/custom-iteration-name/string(),
-                        $i/apply-defaults = true(),
-                        if ($i/initial-iterations = true()) then 'first' else ''
-                    )
+                    </xf:action>
+
+                    <!-- Write classes -->
+                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $new-name)"/>
+
+                    <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
+                    <xf:delete if="count($classes) = 0" ref="$control/@class"/>
+                    <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
                 </xf:action>
 
-                <!-- Write classes -->
-                <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $new-name)"/>
-
-                <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
-                <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
-
             </xbl:handler>
-            <xbl:handler
-                event="DOMActivate"
-                observer="dialog" if="event('xxf:targetid') != 'cancel-button'">
+            <xbl:handler event="DOMActivate" observer="fb-control-name-input save-button prev-button next-button">
 
                 <xf:action if="valid($i)">
                     <xf:var
@@ -242,6 +247,16 @@
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>
+
+                <xf:instance id="modified">
+                    <modified/>
+                </xf:instance>
+
+                <xf:setvalue
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed"
+                    observer="i"
+                    ref="instance('modified')"
+                    value="true()"/>
 
                 <xf:bind ref="control-name"
                          type="xs:NCName"

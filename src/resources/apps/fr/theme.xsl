@@ -28,7 +28,7 @@
             <!-- Favicon -->
             <xh:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
             <xh:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
-            <xh:meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+            <xh:meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
         </xsl:copy>
     </xsl:template>
 

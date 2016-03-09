@@ -33,7 +33,18 @@
                 <xf:setvalue if="event('positive-targetid')" ref="positive" value="event('positive-targetid')"/>
                 <xf:setvalue if="event('negative-targetid')" ref="negative" value="event('negative-targetid')"/>
                 <xf:setvalue if="event('neutral-targetid')"  ref="neutral"  value="event('neutral-targetid')"/>
-                <xxf:show dialog="dialog" xxbl:scope="inner"/>
+
+                <!-- Use an open count because event handlers for buttons can cause a show of this dialog again. See:
+                     https://github.com/orbeon/orbeon-forms/issues/2524 -->
+                <xf:setvalue ref="open-count" value=". + 1"/>
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="fr-hide" phase="target">
+                <xf:setvalue ref="open-count" value=". - 1"/>
+                <xf:action if="open-count = 0">
+                    <xxf:hide dialog="dialog"/>
+                    <xf:setvalue iterate="* except open-count" ref="."/>
+                </xf:action>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -45,8 +56,10 @@
                         <positive/>
                         <negative/>
                         <neutral/>
+                        <open-count/>
                     </alert>
                 </xf:instance>
+                <xf:bind ref="open-count" type="xs:integer" xxf:default="0"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -61,7 +74,6 @@
 
                     <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
                     <xxf:dialog
-                        xxbl:scope="inner"
                         id="dialog"
                         level="modal"
                         appearance="full"
@@ -105,8 +117,7 @@
                             <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                 <!-- Any button click closes the dialog and clears the local data -->
                                 <xf:action ev:event="DOMActivate">
-                                    <xxf:hide dialog="dialog" xxbl:scope="inner"/>
-                                    <xf:setvalue iterate="*" ref="." xxbl:scope="inner"/>
+                                    <xf:dispatch name="fr-hide" targetid="fr-alert-dialog" xxbl:scope="inner"/>
                                 </xf:action>
                                 <xsl:variable name="buttons" as="element()*">
                                     <xsl:apply-templates/>

@@ -30,35 +30,37 @@
     <xh:div>
         <xf:group>
             <xf:group class="fb-hide-alert">
-                <xh:div class="fr-grid">
-                    <xh:div class="fr-grid-content">
-                        <xf:var
-                            name="languages"
-                            model="fr-resources-model"
-                            value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
+                <fr:grid>
+                    <xh:tr>
+                        <xh:td>
+                            <xf:var
+                                name="languages"
+                                model="fr-resources-model"
+                                value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
 
-                        <fr:dropdown-select1 ref="$variables/new-language" id="fb-add-language-select1">
-                            <xf:label ref="$form-resources/dialog-add-language/new-language/label"/>
-                            <!-- All the languages except the languages already selected -->
-                            <xf:choices>
-                                <xf:label ref="$form-resources/dialog-add-language/common"/>
-                                <xf:itemset ref="xxf:sort($languages[@top = 'true' and not(@code = $resources/resource/@xml:lang)], @english-name, 'text', 'ascending')">
-                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                                    <xf:value ref="@code"/>
-                                </xf:itemset>
-                            </xf:choices>
-                            <xf:choices>
-                                <xf:label ref="$form-resources/dialog-add-language/all"/>
-                                <xf:itemset ref="$languages[not(@top = 'true') and not(@code = $resources/resource/@xml:lang)]">
-                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                                    <xf:value ref="@code"/>
-                                </xf:itemset>
-                            </xf:choices>
-                        </fr:dropdown-select1>
-                    </xh:div>
-                </xh:div>
+                            <fr:dropdown-select1 ref="$variables/new-language" id="fb-add-language-select1">
+                                <xf:label ref="$form-resources/dialog-add-language/new-language/label"/>
+                                <!-- All the languages except the languages already selected -->
+                                <xf:choices>
+                                    <xf:label ref="$form-resources/dialog-add-language/common"/>
+                                    <xf:itemset ref="xxf:sort($languages[@top = 'true' and not(@code = $resources/resource/@xml:lang)], @english-name, 'text', 'ascending')">
+                                        <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                        <xf:value ref="@code"/>
+                                    </xf:itemset>
+                                </xf:choices>
+                                <xf:choices>
+                                    <xf:label ref="$form-resources/dialog-add-language/all"/>
+                                    <xf:itemset ref="$languages[not(@top = 'true') and not(@code = $resources/resource/@xml:lang)]">
+                                        <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                        <xf:value ref="@code"/>
+                                    </xf:itemset>
+                                </xf:choices>
+                            </fr:dropdown-select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
             </xf:group>
-            <xh:span>
+            <xh:div class="fr-dialog-buttons">
                 <xf:trigger ref="$variables/new-language-trigger" id="fb-language-add" appearance="xxf:primary">
                     <xf:label ref="$form-resources/add/label"/>
                     <xf:action ev:event="DOMActivate">
@@ -88,7 +90,7 @@
                 <xf:trigger appearance="minimal">
                     <xf:label ref="$form-resources/cancel/label"/>
                 </xf:trigger>
-            </xh:span>
+            </xh:div>
         </xf:group>
     </xh:div>
     <!-- Hide dialog -->

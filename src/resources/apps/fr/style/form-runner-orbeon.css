@@ -167,12 +167,6 @@ body.orbeon {
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-title {
   padding: 5px 10px;
   color: white;
-  -webkit-border-top-left-radius: 4px;
-  -moz-border-radius-topleft: 4px;
-  border-top-left-radius: 4px;
-  -webkit-border-top-right-radius: 4px;
-  -moz-border-radius-topright: 4px;
-  border-top-right-radius: 4px;
 }
 .orbeon .fr-view .xbl-fr-error-summary .fr-level-info .fr-error-title {
   background-color: #333333;

@@ -117,26 +117,48 @@
                                         true()
                                      )"/>
 
+                            <xf:var
+                                name="current-case"
+                                value="case('switch')"/>
+
+                            <xf:var
+                                name="case-index"
+                                value="index-of($relevant-cases, $current-case)"/>
+
+                            <xf:var
+                                name="prev-cases"
+                                value="$relevant-cases[position() lt $case-index]"/>
+
+                            <xf:var
+                                name="next-cases"
+                                value="$relevant-cases[position() gt $case-index]"/>
+
+                            <xf:var
+                                name="check-validation"
+                                value="xxf:instance('local')/validate = 'true'"/>
+
+                            <xf:var
+                                name="allow-next"
+                                value=
+                                    "not($check-validation)
+                                     or xxf:visited($next-cases[1])
+                                     or not(
+                                        exists(
+                                            frf:topLevelSectionsWithErrors(
+                                                string-join(
+                                                    for $c in ($prev-cases, $current-case)
+                                                    return frf:controlNameFromIdOpt(replace($c, '-case$', '')),
+                                                    ' '
+                                                ),
+                                                false()
+                                            )
+                                        )
+                                     )"/>
+
                             <xh:ul class="nav nav-list">
                                 <xsl:apply-templates mode="toc-sections"/>
                             </xh:ul>
                             <xh:div class="fr-wizard-navigation">
-
-                                <xf:var
-                                    name="current-case"
-                                    value="case('switch')"/>
-
-                                <xf:var
-                                    name="case-index"
-                                    value="index-of($relevant-cases, $current-case)"/>
-
-                                <xf:var
-                                    name="prev-cases"
-                                    value="$relevant-cases[position() lt $case-index]"/>
-
-                                <xf:var
-                                    name="next-cases"
-                                    value="$relevant-cases[position() gt $case-index]"/>
 
                                 <xf:var name="prev-button-ref" value="if (exists($prev-cases)) then xxf:instance('local')/readwrite else ''"/>
                                 <xf:var name="next-button-ref" value="if (exists($next-cases)) then xxf:instance('local')/readwrite else ''"/>
@@ -181,10 +203,6 @@
                                                 </xf:label>
                                                 <xf:action event="DOMActivate">
 
-                                                    <xf:var
-                                                        name="check-validation"
-                                                        value="xxf:instance('local')/validate = 'true'"/>
-
                                                     <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                                     <xxf:setvisited
                                                         if="$check-validation"
@@ -193,27 +211,12 @@
                                                         visited="true"
                                                         recurse="true"/>
 
-                                                    <xf:var
-                                                        name="allow-next"
-                                                        value=
-                                                            "not($check-validation)
-                                                             or xxf:visited($next-cases[1])
-                                                             or not(
-                                                                exists(
-                                                                    frf:topLevelSectionsWithErrors(
-                                                                        string-join(
-                                                                            for $c in ($prev-cases, $current-case)
-                                                                            return frf:controlNameFromIdOpt(replace($c, '-case$', '')),
-                                                                            ' '
-                                                                        ),
-                                                                        false()
-                                                                    )
-                                                                )
-                                                             )"/>
-
                                                     <xf:action if="$allow-next">
                                                         <xf:toggle case="{{$next-cases[1]}}"/>
                                                         <xf:setfocus control="{{$next-cases[1]}}" input-only="true"/>
+                                                    </xf:action>
+                                                    <xf:action if="not($allow-next)">
+                                                        <xf:setfocus control="{{$current-case}}" input-only="true"/>
                                                     </xf:action>
                                                 </xf:action>
                                             </xf:trigger>
@@ -247,7 +250,7 @@
                         <!-- NOTE: Only make active top-level sections -->
                         <xf:var
                             name="active"
-                            value="case('switch') = '{concat(@id, '-case')}'"/>
+                            value="$current-case = '{concat(@id, '-case')}'"/>
 
                         <xf:var
                             name="visited"
@@ -257,26 +260,27 @@
                             name="valid"
                             value="not($sections-with-visible-errors = frf:controlNameFromId('{$top-level-section-id}'))"/>
 
-                        <xh:li class="{{if ($active)                  then 'active'  else (),
-                                        if ($visited and not($valid)) then 'invalid' else ()}}">
+                        <xf:var
+                            name="disabled"
+                            value="
+                                not(
+                                    not($check-validation)                         or
+                                    $visited                                       or
+                                    $current-case = '{$top-level-section-case-id}' or
+                                    $allow-next and $next-cases[1] = '{$top-level-section-case-id}'
+                                )
+                            "/>
+
+                        <xh:li class="{{'active'[$active], 'invalid'[$visited and not($valid)], 'disabled'[$disabled]}}">
 
                             <xf:var
                                 name="section-label"
                                 value="xxf:label('{@id}')"/>
 
-                            <xf:trigger
-                                appearance="minimal"
-                                ref="
-                                    if (
-                                        xxf:instance('local')/validate != 'true' or
-                                        $visited
-                                    ) then
-                                        xxf:instance('local')/readwrite
-                                    else
-                                        ''">
+                            <xf:trigger appearance="minimal">
                                 <xf:label value="$section-label"/>
                                 <xf:hint  value="$section-label"/>
-                                <xf:action event="DOMActivate">
+                                <xf:action event="DOMActivate" if="not($disabled)">
                                     <!-- Toggle to top-level section... -->
                                     <xf:toggle case="{$top-level-section-case-id}"/>
                                     <!-- ...but focus on specific sub-section -->

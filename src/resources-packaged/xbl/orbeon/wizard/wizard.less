@@ -11,6 +11,7 @@
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 @import (reference) "../../../../resources/apps/fr/style/form-runner-common";
+@import (reference) "../../../../resources/apps/fr/style/form-runner-orbeon";
 
 @frWizardWidth: 940px;
 @frWizardTocWidth: 199px;
@@ -40,7 +41,12 @@
             }
 
             .invalid > span > a {
-                color: #b94a48;
+                color: @error;
+            }
+
+            .active.invalid > span > a {
+                color: @white;
+                background-color: @error;
             }
 
             .invalid.active > span > a {

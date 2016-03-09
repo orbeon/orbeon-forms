@@ -25,6 +25,10 @@
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav .invalid > span > a {
   color: #b94a48;
 }
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav .active.invalid > span > a {
+  color: #ffffff;
+  background-color: #b94a48;
+}
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav .invalid.active > span > a {
   color: #ffffff;
 }

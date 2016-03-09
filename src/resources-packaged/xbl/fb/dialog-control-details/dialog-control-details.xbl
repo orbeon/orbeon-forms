@@ -282,7 +282,7 @@
 
             </xbl:handler>
             <!-- Prev and Next buttons -->
-            <xbl:handler event="DOMActivate" observer="prev-button next-button">
+            <xbl:handler event="DOMActivate" observer="prev-button next-button" if="valid($i)">
 
                 <xf:var
                     name="new-control-id"

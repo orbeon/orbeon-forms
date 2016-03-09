@@ -14,7 +14,6 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -57,7 +56,7 @@
                             <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" >
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
-                                <xf:action type="javascript" ev:event="fr-section-scroll" ev:target="#observer">
+                                <xf:action type="javascript" event="fr-section-scroll" target="#observer">
                                     <![CDATA[
                                     var $ = ORBEON.jQuery;
                                     var target = event.target;
@@ -81,10 +80,10 @@
                                                 xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                                         </xsl:if>
                                         <xxf:setvisited
-                                            ev:event="xforms-deselect" ev:target="#observer"
+                                            event="xforms-deselect" target="#observer"
                                             control="{{event('xxf:targetid')}}" visited="true" recurse="true"/>
                                         <xf:dispatch
-                                            ev:event="xforms-select" ev:target="#observer"
+                                            event="xforms-select" target="#observer"
                                             name="fr-section-scroll" targetid="switch"/>
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
@@ -149,8 +148,8 @@
                                      relevance, we might be able to let this behavior be handled by the XForms engine.
                                  -->
                                 <xf:toggle
-                                    ev:event="xforms-enabled"
-                                    ev:target="#observer"
+                                    event="xforms-enabled"
+                                    target="#observer"
                                     case="{{$relevant-cases[1]}}"/>
 
                                 <xh:div class="pagination pagination-centered">
@@ -162,7 +161,7 @@
                                                 <xf:label>
                                                     <xh:i class="icon-chevron-left"/>&#x200b;
                                                 </xf:label>
-                                                <xf:action ev:event="DOMActivate">
+                                                <xf:action event="DOMActivate">
                                                     <xf:toggle case="{{$prev-cases[last()]}}"/>
                                                     <xf:setfocus control="{{$prev-cases[last()]}}" input-only="true"/>
                                                 </xf:action>
@@ -180,7 +179,7 @@
                                                 <xf:label>
                                                     <xh:i class="icon-chevron-right"/>&#x200b;
                                                 </xf:label>
-                                                <xf:action ev:event="DOMActivate">
+                                                <xf:action event="DOMActivate">
 
                                                     <xf:var
                                                         name="check-validation"
@@ -268,12 +267,16 @@
                             <xf:trigger
                                 appearance="minimal"
                                 ref="
-                                    if (xxf:instance('local')/validate != 'true' or $visited)
-                                    then xxf:instance('local')/readwrite
-                                    else ''">
+                                    if (
+                                        xxf:instance('local')/validate != 'true' or
+                                        $visited
+                                    ) then
+                                        xxf:instance('local')/readwrite
+                                    else
+                                        ''">
                                 <xf:label value="$section-label"/>
                                 <xf:hint  value="$section-label"/>
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <!-- Toggle to top-level section... -->
                                     <xf:toggle case="{$top-level-section-case-id}"/>
                                     <!-- ...but focus on specific sub-section -->

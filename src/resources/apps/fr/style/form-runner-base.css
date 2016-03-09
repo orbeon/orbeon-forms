@@ -165,6 +165,11 @@
   display: block;
   margin-left: 20px;
 }
+.orbeon .xforms-readonly label.radio,
+.orbeon .xforms-readonly label.checkbox,
+.orbeon .xforms-readonly .xforms-label {
+  color: #999999;
+}
 .orbeon .fr-language-choice,
 .orbeon .fr-noscript-choice,
 .orbeon .fr-goto-content,

@@ -68,19 +68,15 @@
                 overflow: hidden;               // Avoid wrapping under help image for long title
                 font-size: @frSectionTitleHeight;
 
-                // Case of collapsible section
-                a {
-                    text-decoration: none;
-                    color: @frHeaderColor;      // Don't use the default styling for anchors
-                                                // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
-                    display: block;             // - So it extends all the way to the right
+                // <a> is collapsible section, <output> for non-collapsible
+                a, output {
+                    display: block;             // So it extends all the way to the right
                     min-height: @frSectionTitleLineHeight;
                     overflow: hidden;           // For correct positioning of click interceptor; see issue #636
                 }
-
-                // Case of non-collapsible section
-                output {
-                    cursor: default;
+                a {
+                    text-decoration: none;
+                    color: @frHeaderColor;      // Don't use the default styling for anchors
                 }
 
                 // Override default label styles

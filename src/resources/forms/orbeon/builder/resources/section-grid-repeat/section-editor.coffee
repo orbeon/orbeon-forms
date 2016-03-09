@@ -13,6 +13,7 @@ $ ->
     sectionsCache = []
     frBodyLeft = 0;
     pageX = 0; pageY = 0
+    SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first output'
 
     FSM.create
         transitions : [
@@ -74,7 +75,7 @@ $ ->
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
             section = Builder.findInCache sectionsCache, (Builder.adjustedOffset labelInput).top
-            f$.text newLabelValue, f$.find '.fr-section-label:first a', section.el
+            f$.text newLabelValue, f$.find SectionLabelSelector, section.el
             sectionId = f$.attr 'id', section.el
             OD.dispatchEvent
                 targetId: sectionId
@@ -99,7 +100,7 @@ $ ->
                 # From the section title, get the anchor element, which contains the title
                 labelAnchor = do ->
                     section = Builder.findInCache sectionsCache, interceptorOffset.top
-                    f$.find '.fr-section-label:first a', section.el
+                    f$.find SectionLabelSelector, section.el
                 # Set placeholder, done every time to account for a value change when changing current language
                 do ->
                     placeholderOutput = f$.children '.fb-type-section-title-label', sectionEditor
@@ -132,7 +133,7 @@ $ ->
         showClickHintIfTitleEmpty = (clickInterceptor) ->
             interceptorOffset = Builder.adjustedOffset clickInterceptor
             section = Builder.findInCache sectionsCache, interceptorOffset.top
-            labelAnchor = f$.find '.fr-section-label:first a', section.el
+            labelAnchor = f$.find SectionLabelSelector, section.el
             if (f$.text labelAnchor) == ''
                 outputWithHintMessage = sectionEditor.children('.fb-enter-section-title-label')
                 hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0))
@@ -160,7 +161,7 @@ $ ->
                     labelClickInterceptors[pos].hide()
                 # Position interceptor for each section
                 _.each _.range(sections.length), (pos) ->
-                    title = f$.find '.fr-section-label a', $ sections[pos]
+                    title = f$.find SectionLabelSelector, $ sections[pos]
                     interceptor = labelClickInterceptors[pos]
                     interceptor.show()                                          # Might be an interceptor that was previously hidden, and is now reused
                     interceptor.offset title.offset()

@@ -28,24 +28,32 @@
     <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xf:var name="instance" value="instance('fb-database-service-instance')"/>
-    <xh:div class="fr-grid">
-        <xh:div class="fr-grid-content">
-            <xf:input ref="name" id="fb-database-service-name-input" incremental="true">
-                <xf:label ref="$form-resources/dialog-database-services/service-name/label"/>
-                <xf:hint ref="$form-resources/dialog-database-services/service-name/hint"/>
-            </xf:input>
-
-            <xf:input ref="datasource" incremental="true">
-                <xf:label ref="$form-resources/dialog-database-services/datasource/label"/>
-                <xf:hint ref="$form-resources/dialog-database-services/datasource/hint"/>
-            </xf:input>
-
-            <xf:textarea ref="query" incremental="true">
-                <xf:label ref="$form-resources/dialog-database-services/query/label"/>
-                <xf:hint ref="$form-resources/dialog-database-services/query/hint"/>
-            </xf:textarea>
-        </xh:div>
-    </xh:div>
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input ref="name" id="fb-database-service-name-input" incremental="true">
+                    <xf:label ref="$form-resources/dialog-database-services/service-name/label"/>
+                    <xf:hint ref="$form-resources/dialog-database-services/service-name/hint"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input ref="datasource" incremental="true">
+                    <xf:label ref="$form-resources/dialog-database-services/datasource/label"/>
+                    <xf:hint ref="$form-resources/dialog-database-services/datasource/hint"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:textarea ref="query" incremental="true">
+                    <xf:label ref="$form-resources/dialog-database-services/query/label"/>
+                    <xf:hint ref="$form-resources/dialog-database-services/query/hint"/>
+                </xf:textarea>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
     <xh:div class="fr-dialog-buttons">
         <xf:group>
             <xh:div class="pull-left">

@@ -14,7 +14,6 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -100,7 +99,7 @@
                         <xh:div class="xbl-fr-alert-dialog-buttons">
                             <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                 <!-- Any button click closes the dialog and clears the local data -->
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <xf:dispatch name="fr-hide" targetid="fr-alert-dialog" xxbl:scope="inner"/>
                                 </xf:action>
                                 <xsl:variable name="buttons" as="element()*">
@@ -156,7 +155,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                         <!-- If a custom target is provided, dispatch to it -->
-                        <xf:action ev:event="DOMActivate">
+                        <xf:action event="DOMActivate">
                             <xf:var name="local"><xxf:value value="$local" xxbl:scope="inner"/></xf:var>
                             <xf:var name="targetid" value="xxf:trim($local/{$handler})"/>
 

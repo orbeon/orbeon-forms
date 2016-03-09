@@ -188,16 +188,6 @@
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
 
-    <!-- Test form by retrieving form from the database first -->
-    <page path="/fr/([^/^.]+)/([^/^.]+)/(test)/([^/^.]+)"
-          default-submission="request-parameters.xml"
-          model="test-model.xpl" view="html-view.xpl">
-        <setvalue ref="/*/app"      matcher-group="1"/>
-        <setvalue ref="/*/form"     matcher-group="2"/>
-        <setvalue ref="/*/mode"     matcher-group="3"/>
-        <setvalue ref="/*/document" matcher-group="4"/>
-    </page>
-
     <!-- Test form "inline" (when being edited) with new empty document -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(test)"
           model="inline-test-model.xpl" view="html-view.xpl">

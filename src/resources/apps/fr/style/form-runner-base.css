@@ -165,9 +165,15 @@
   display: block;
   margin-left: 20px;
 }
-.orbeon .xforms-readonly label.radio,
-.orbeon .xforms-readonly label.checkbox,
-.orbeon .xforms-readonly .xforms-label {
+.orbeon .fr-mode-new .xforms-readonly label.radio,
+.orbeon .fr-mode-edit .xforms-readonly label.radio,
+.orbeon .fr-mode-test .xforms-readonly label.radio,
+.orbeon .fr-mode-new .xforms-readonly label.checkbox,
+.orbeon .fr-mode-edit .xforms-readonly label.checkbox,
+.orbeon .fr-mode-test .xforms-readonly label.checkbox,
+.orbeon .fr-mode-new .xforms-readonly .xforms-label,
+.orbeon .fr-mode-edit .xforms-readonly .xforms-label,
+.orbeon .fr-mode-test .xforms-readonly .xforms-label {
   color: #999999;
 }
 .orbeon .fr-language-choice,

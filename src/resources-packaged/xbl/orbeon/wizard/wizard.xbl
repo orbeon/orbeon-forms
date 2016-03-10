@@ -11,17 +11,17 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xbl:binding id="fr-wizard" element="fr|wizard">
         <xbl:resources>
@@ -102,7 +102,7 @@
                                 value="
                                     xxf:cases('switch')[
                                         for $c in replace(., '-case$', '')
-                                        return exists(xxf:binding($c)) and exf:relevant(xxf:binding($c))
+                                        return exists(xxf:binding($c)) and xxf:relevant(xxf:binding($c))
                                     ]"/>
 
                             <xf:var
@@ -134,13 +134,13 @@
                                 value="$relevant-cases[position() gt $case-index]"/>
 
                             <xf:var
-                                name="check-validation"
+                                name="validated-mode"
                                 value="xxf:instance('local')/validate = 'true'"/>
 
                             <xf:var
                                 name="allow-next"
                                 value=
-                                    "not($check-validation)
+                                    "not($validated-mode)
                                      or xxf:visited($next-cases[1])
                                      or not(
                                         exists(
@@ -162,9 +162,9 @@
                             <xf:var name="prev-button-ref" value="if (exists($prev-cases)) then xxf:instance('local')/readwrite else ''"/>
                             <xf:var name="next-button-ref" value="if (not($is-last-page))  then xxf:instance('local')/readwrite else ''"/>
 
-                            <xf:group id="fr-wizard-prev-hide"   ref="$prev-button-ref[not(exf:readonly())]"/>
-                            <xf:group id="fr-wizard-next-hide"   ref="$next-button-ref[not(exf:readonly())]"/>
-                            <xf:group id="fr-wizard-submit-hide" ref="if ($is-last-page) then xxf:instance('local')/readwrite else ()"/>
+                            <xf:group id="fr-wizard-prev-hide"   ref="$prev-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
+                            <xf:group id="fr-wizard-next-hide"   ref="$next-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
+                            <xf:group id="fr-wizard-submit-hide" ref="xxf:instance('local')/readwrite[not($validated-mode) or $is-last-page]"/>
 
                             <xh:ul class="nav nav-list">
                                 <xsl:apply-templates mode="toc-sections"/>
@@ -213,7 +213,7 @@
 
                                                     <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                                     <xxf:setvisited
-                                                        if="$check-validation"
+                                                        if="$validated-mode"
                                                         iterate="$prev-cases, $current-case"
                                                         control="{{.}}"
                                                         visited="true"
@@ -274,7 +274,7 @@
                             name="disabled"
                             value="
                                 not(
-                                    not($check-validation)                         or
+                                    not($validated-mode)                           or
                                     $visited                                       or
                                     $current-case = '{$top-level-section-case-id}' or
                                     $allow-next and $next-cases[1] = '{$top-level-section-case-id}'

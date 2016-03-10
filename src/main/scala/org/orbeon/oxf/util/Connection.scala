@@ -126,27 +126,11 @@ class Connection(
           combineValues[String, String, List](capitalizedHeaders).toMap
         }
 
-        val internalPath = {
-
-          val servicePrefix =
-            URLRewriterUtils.rewriteServiceURL(
-              NetUtils.getExternalContext.getRequest,
-              "/",
-              URLRewriter.REWRITE_MODE_ABSOLUTE
-            )
-
-          val matchesServicePrefix = urlString.startsWith(servicePrefix)
-
-          val servicePath = matchesServicePrefix option urlString.substring(servicePrefix.size - 1)
-
-          servicePath filter isInternalPath
-        }
-
         val cookieStore = cookieStoreOpt getOrElse new BasicCookieStore
         cookieStoreOpt = Some(cookieStore)
 
         val (effectiveConnectionURL, client) =
-          internalPath match {
+          findInternalURL(urlString) match {
             case Some(internalPath) ⇒ (internalPath, InternalHttpClient)
             case _                  ⇒ (urlString,    PropertiesApacheHttpClient)
           }
@@ -363,6 +347,23 @@ object Connection extends Logging {
     val r = p.associatedValue(_.value.toString.r)
 
     r.pattern.matcher(path).matches()
+  }
+
+  def findInternalURL(url: String) = {
+
+    val servicePrefix =
+      URLRewriterUtils.rewriteServiceURL(
+        NetUtils.getExternalContext.getRequest,
+        "/",
+        URLRewriter.REWRITE_MODE_ABSOLUTE
+      )
+
+    for {
+      pathQuery ← url.startsWith(servicePrefix) option url.substring(servicePrefix.size - 1)
+      pathOnly  = splitQuery(pathQuery)._1
+      if isInternalPath(pathOnly)
+    } yield
+      pathQuery
   }
 
   // Whether the given method requires a request body

@@ -137,10 +137,16 @@
                                 name="validated-mode"
                                 value="xxf:instance('local')/validate = 'true'"/>
 
+                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2602 -->
+                            <xf:var
+                                name="is-edit-final"
+                                value="$fr-mode = 'edit' and not(xxf:get-request-parameter('draft') = 'true')"/>
+
                             <xf:var
                                 name="allow-next"
                                 value=
                                     "not($validated-mode)
+                                     or $is-edit-final
                                      or xxf:visited($next-cases[1])
                                      or not(
                                         exists(
@@ -264,7 +270,7 @@
 
                         <xf:var
                             name="visited"
-                            value="xxf:visited('{$top-level-section-case-id}')"/>
+                            value="$is-edit-final or xxf:visited('{$top-level-section-case-id}')"/>
 
                         <xf:var
                             name="valid"

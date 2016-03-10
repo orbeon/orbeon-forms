@@ -3,7 +3,7 @@
 .orbeon {
 
     @media (max-width: 980px) {
-    
+
         .fr-view {
             width: auto;
             // Add padding on the sides, so the content doesn't touch the border of the viewport
@@ -14,7 +14,7 @@
             // Remove rounded borders
             border-radius: 0;
         }
-        
+
         .span12 {
             // Don't use fixed width
             width: auto;
@@ -30,7 +30,7 @@
                 margin-left: 0;
             }
         }
-        
+
         .fr-grid:not(.fr-repeat-table) {
 
             // Instead of fixed, so each cell doesn't take 1/x of the width of the table
@@ -39,25 +39,6 @@
             & > tbody > tr >  td {
                 // The main thing this CSS does: change table cells into blocks
                 display: block;
-            }
-        }
-
-        .xbl-fr-wizard {
-
-            // Use flex layout to get the TOC to show before the body
-            .flex();
-            .flex-direction(column-reverse);
-            
-            width: 100%;
-            .fr-wizard-body {
-                width: 100%;
-                position: static;
-                // We don't need explicit borders, as they are added by the container .fr-border
-                border: none;
-            }
-            .fr-wizard-toc {
-                position: static;
-                width: 100%;
             }
         }
 

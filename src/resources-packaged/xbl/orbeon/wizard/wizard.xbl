@@ -234,7 +234,9 @@
                             </xh:div>
                         </xh:div>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
-                        <xsl:apply-templates select="* except fr:section"/>
+                        <xh:div class="fr-wizard-other">
+                            <xsl:apply-templates select="* except fr:section"/>
+                        </xh:div>
                     </xf:group>
                 </xsl:template>
 

@@ -21,22 +21,6 @@
   .orbeon .fr-grid:not(.fr-repeat-table) > tbody > tr > td {
     display: block;
   }
-  .orbeon .xbl-fr-wizard {
-    display: flex;
-    display: -webkit-flex;
-    flex-direction: column-reverse;
-    -webkit-flex-direction: column-reverse;
-    width: 100%;
-  }
-  .orbeon .xbl-fr-wizard .fr-wizard-body {
-    width: 100%;
-    position: static;
-    border: none;
-  }
-  .orbeon .xbl-fr-wizard .fr-wizard-toc {
-    position: static;
-    width: 100%;
-  }
   .orbeon.xforms-mobile select,
   .orbeon.xforms-mobile textarea,
   .orbeon.xforms-mobile input[type="text"],

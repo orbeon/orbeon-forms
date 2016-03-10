@@ -1,17 +1,29 @@
 .orbeon .xbl-fr-wizard {
   width: 940px;
+  display: table;
+  table-layout: fixed;
+  direction: rtl;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-body,
+.orbeon .xbl-fr-wizard .fr-wizard-toc {
+  display: table-cell;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-other {
+  display: table-row;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-body,
+.orbeon .xbl-fr-wizard .fr-wizard-toc,
+.orbeon .xbl-fr-wizard .fr-wizard-other {
+  direction: ltr;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-toc,
 .orbeon .xbl-fr-wizard .fr-wizard-body {
-  display: inline-block;
   vertical-align: top;
-  position: relative;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-toc {
   width: 199px;
-  left: -738px;
   margin-bottom: 0;
-  overflow: hidden;
+  border-bottom: 1px solid #e3e3e3;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav {
   margin-bottom: 15px;
@@ -39,10 +51,9 @@
   list-style-type: none;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-body {
-  width: 738px;
-  left: 199px;
   border-left: 1px solid #e3e3e3;
   border-bottom: 1px solid #e3e3e3;
+  background-color: white;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-navigation .pagination {
   margin: 10px 0;
@@ -51,18 +62,44 @@
   width: 60px;
 }
 .orbeon .xbl-fr-wizard .fr-buttons {
-  display: block;
-  float: right;
-  box-sizing: border-box;
-  width: 738px;
+  display: table-cell;
   padding-top: 10px;
   padding-bottom: 5px;
   padding-right: 9px;
   padding-left: 9px;
   text-align: right;
-  margin-bottom: 0 !important;
 }
-.orbeon .xbl-fr-wizard .fr-buttons > * {
-  display: inline-block;
-  margin-bottom: 5px;
+@media (max-width: 980px) {
+  .orbeon .xbl-fr-wizard {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    direction: ltr;
+    width: 100%;
+  }
+  .orbeon .xbl-fr-wizard .fr-wizard-body,
+  .orbeon .xbl-fr-wizard .fr-wizard-toc,
+  .orbeon .xbl-fr-wizard .fr-wizard-other {
+    display: block;
+    position: static;
+    width: 100%;
+  }
+  .orbeon .xbl-fr-wizard .fr-wizard-toc {
+    order: 1;
+    -webkit-order: 1;
+    border: none;
+  }
+  .orbeon .xbl-fr-wizard .fr-wizard-body {
+    order: 2;
+    -webkit-order: 2;
+    border: none;
+  }
+  .orbeon .xbl-fr-wizard .fr-wizard-other {
+    order: 3;
+    -webkit-order: 3;
+  }
+  .orbeon .xbl-fr-wizard .fr-buttons {
+    display: block;
+  }
 }

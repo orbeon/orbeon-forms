@@ -212,17 +212,17 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     // NOTE: also from exforms
     Fun("relevant", classOf[EXFormsMIP], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
-      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
     // NOTE: also from exforms
     Fun("readonly", classOf[EXFormsMIP], op = 1, min = 0, BOOLEAN, EXACTLY_ONE,
-      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
     // NOTE: also from exforms
     Fun("required", classOf[EXFormsMIP], op = 2, min = 0, BOOLEAN, EXACTLY_ONE,
-      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
     // Now available in XForms 2.0

@@ -11,20 +11,18 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xf:model id="fr-persistence-model"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:exf="http://www.exforms.org/exf/1-0"
-        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:saxon="http://saxon.sf.net/"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-        xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-        xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
-        xmlns:migration="java:org.orbeon.oxf.fr.DataMigration">
+<xf:model
+    id="fr-persistence-model"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
+    xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
+    xmlns:migration="java:org.orbeon.oxf.fr.DataMigration">
 
     <xf:var name="parameters"       value="xxf:instance('fr-parameters-instance')"/>
     <xf:var name="app"              value="$parameters/app/string()"/>
@@ -37,8 +35,13 @@
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
 
     <xf:var name="autosave-elem"        value="$persistence-instance/autosave"/>
-    <xf:var name="autosave-delay"       value="for $d in xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))
-                                               return xs:integer($d[. castable as xs:integer])"/>
+
+    <xf:var
+        name="autosave-delay"
+        value="
+            for $d in xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))
+            return xs:integer($d[. castable as xs:integer])"/>
+
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
                                            and $autosave-delay gt 0
@@ -491,13 +494,13 @@
         <xf:bind ref="pdf"
                  relevant="xxf:is-blank(xxf:instance('fr-form-attachments')/pdf) or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
-                           and exf:readonly(../strict-submit)"/>
+                           and xxf:readonly(../strict-submit)"/>
 
         <!-- Don't show the TIFF button at all in CE version -->
         <xf:bind ref="tiff"
                  relevant="version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
-                           and exf:readonly(../strict-submit)"/>
+                           and xxf:readonly(../strict-submit)"/>
 
         <xf:bind ref="noscript"
                  relevant="property('xxf:noscript')"/>

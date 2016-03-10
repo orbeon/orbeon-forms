@@ -80,11 +80,16 @@
                                                 xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                                         </xsl:if>
                                         <xxf:setvisited
-                                            event="xforms-deselect" target="#observer"
-                                            control="{{event('xxf:targetid')}}" visited="true" recurse="true"/>
+                                            event="xforms-deselect"
+                                            target="#observer"
+                                            control="{{event('xxf:targetid')}}"
+                                            visited="true"
+                                            recurse="true"/>
                                         <xf:dispatch
-                                            event="xforms-select" target="#observer"
-                                            name="fr-section-scroll" targetid="switch"/>
+                                            event="xforms-select"
+                                            target="#observer"
+                                            name="fr-section-scroll"
+                                            targetid="switch"/>
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>

@@ -576,7 +576,7 @@ object Connection extends Logging {
     if (cookiesToForward.nonEmpty) {
 
       // By convention, the first cookie name is the session cookie
-      val sessionCookieName = cookiesToForward(0)
+      val sessionCookieName = cookiesToForward.head
 
       // NOTES 2011-01-22:
       //
@@ -747,7 +747,7 @@ object Connection extends Logging {
       }
 
     if (newHeaders.nonEmpty)
-      debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ capitalizeCommonOrSplitHeader(k) → v(0) })
+      debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ capitalizeCommonOrSplitHeader(k) → v.head })
 
     newHeaders
   }

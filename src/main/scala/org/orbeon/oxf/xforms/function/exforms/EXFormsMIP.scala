@@ -29,7 +29,7 @@ class EXFormsMIP extends XXFormsMIPFunction {
 
     def getOrDefault(item: Item, getFromNode: NodeInfo ⇒ Boolean, default: Boolean) = item match {
       case nodeInfo: NodeInfo ⇒ getFromNode(nodeInfo)
-      case _ ⇒ default
+      case _                  ⇒ default
     }
 
     def get(item: Item) = operation match {

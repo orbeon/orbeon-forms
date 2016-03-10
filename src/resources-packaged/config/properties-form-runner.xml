@@ -175,8 +175,13 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w9"                                value="-1"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9">
-        refresh summary save-final wizard-prev wizard-next review
+    
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w9">
+        refresh wizard-prev wizard-next review
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.w9">
+        refresh edit pdf save
     </property>
 
     <!-- Register and license forms -->

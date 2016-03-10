@@ -104,8 +104,8 @@
                         <xsl:if test="exists($inner-buttons)">
                             <xsl:call-template name="fr-buttons-bar">
                                 <xsl:with-param name="buttons-property"  select="'oxf.fr.detail.buttons.inner'" tunnel="yes"/>
-                                <xsl:with-param name="highlight-primary" select="false()"        tunnel="yes"/>
-                                <xsl:with-param name="inverse"           select="false()"        tunnel="yes"/>
+                                <xsl:with-param name="highlight-primary" select="true()"                        tunnel="yes"/>
+                                <xsl:with-param name="inverse"           select="false()"                       tunnel="yes"/>
                             </xsl:call-template>
                         </xsl:if>
                     </xsl:element>
@@ -595,6 +595,10 @@
                     <xf:var name="inverse-override"           value="'{$inverse}'"/>
 
                     <xf:var
+                        name="is-inner"
+                        value="starts-with($buttons-property-override, 'oxf.fr.detail.buttons.inner')"/>
+
+                    <xf:var
                         name="highlight-primary"
                         value="
                             if ($highlight-primary-override = '') then
@@ -614,7 +618,7 @@
                     <xf:var
                         name="buttons-property"
                         value="
-                            if (normalize-space($buttons-property-override) != '') then
+                            if (xxf:non-blank($buttons-property-override)) then
                                 $buttons-property-override
                             else if ($fr-mode = 'view') then
                                 'oxf.fr.detail.buttons.view'
@@ -625,9 +629,9 @@
                     <xf:var
                         name="buttons-names"
                         value="
-                            if (normalize-space($buttons-property-override) = '' and $fr-mode = ('pdf', 'email')) then
+                            if (xxf:is-blank($buttons-property-override) and $fr-mode = ('pdf', 'email')) then
                                 ()
-                            else if (normalize-space($buttons-property-override) = '' and $fr-mode = 'test') then
+                            else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
                                 'validate'
                             else
                                 xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.')))
@@ -638,10 +642,45 @@
                         <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
                     </xh:span>
 
-                    <xf:repeat ref="$buttons-names">
+                    <xf:var
+                        name="names-and-refs-if-relevant"
+                        value="
+                            for $button-name in $buttons-names
+                            return
+                                for $ref in
+                                    if ($is-inner and $button-name = ('save-final', 'submit', 'send', 'review', 'pdf', 'tiff', 'email')) then
+                                        xxf:binding('fr-wizard-submit-hide')
+                                    else if ($is-inner and $button-name = 'wizard-next') then
+                                        xxf:binding('fr-wizard-next-hide')
+                                    else if ($is-inner and $button-name = 'wizard-prev') then
+                                        xxf:binding('fr-wizard-prev-hide')
+                                    else if ($button-name = 'wizard-prev') then
+                                        xxf:binding('fr-wizard-prev')
+                                    else if ($button-name = 'wizard-next') then
+                                        xxf:binding('fr-wizard-next')
+                                    else
+                                        xxf:instance('fr-triggers-instance')/*[name() = (
+                                            if ($button-name = 'summary') then
+                                                'can-access-summary'
+                                            else if ($button-name = 'refresh') then
+                                                'noscript'
+                                            else if ($button-name = 'pdf') then
+                                                'pdf'
+                                            else if ($button-name = 'tiff') then
+                                                'tiff'
+                                            else
+                                                'other'
+                                        )]
+                                return
+                                    ($button-name, $ref)[exf:relevant($ref)]
+                        "/>
+
+                    <xf:repeat ref="$names-and-refs-if-relevant[position() mod 2 = 1]">
+                        <xf:var name="position"    value="position()"/>
                         <xf:var name="button-name" value="."/>
-                        <xf:var name="pdf"         value="$button-name = 'pdf'"/>
-                        <xf:var name="tiff"        value="$button-name = 'tiff'"/>
+                        <xf:var name="ref"         value="$names-and-refs-if-relevant[$position * 2]"/>
+
+                        <xf:var name="pdf-or-tiff" value="$button-name = ('pdf', 'tiff')"/>
                         <xf:var name="primary"     value="$highlight-primary and position() = last()"/>
 
                         <xf:var
@@ -658,35 +697,17 @@
                                 )
                         "/>
 
-                        <xf:var name="ref"
-                                value="
-                                    if ($button-name = 'wizard-prev') then
-                                        xxf:binding('fr-wizard-prev')
-                                    else if ($button-name = 'wizard-next') then
-                                        xxf:binding('fr-wizard-next')
-                                    else
-                                        xxf:instance('fr-triggers-instance')/*[name() = (
-                                            if ($button-name = 'summary') then
-                                                'can-access-summary'
-                                            else if ($button-name = 'refresh') then
-                                                'noscript'
-                                            else if ($pdf) then
-                                                'pdf'
-                                            else if ($tiff) then
-                                                'tiff'
-                                            else
-                                                'other'
-                                        )]
-                        "/>
-
                         <!-- Because @appearance is static, use a CSS class instead for primary/inverse. This requires
                              changes to form-runner-bootstrap-override.less, which is not the best solution. Ideally,
                              we could find a dynamic way to set that class on the nested <button> so that standard
                              Bootstrap rules apply. -->
-                        <fr:process-button name="{{$button-name}}" ref="$ref[not($pdf or $tiff)]" class="{{$class}}"/>
+                        <fr:process-button
+                            name="{{$button-name}}"
+                            ref="$ref[not($pdf-or-tiff)]"
+                            class="{{$class}}"/>
                         <fr:href-button
                             model="fr-persistence-model"
-                            ref="$ref[$pdf or $tiff]"
+                            ref="$ref[$pdf-or-tiff]"
                             class="{{$class}}"
                             href=
                                 "/fr/service/{

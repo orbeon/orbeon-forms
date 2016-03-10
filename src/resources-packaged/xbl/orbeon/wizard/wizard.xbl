@@ -155,13 +155,21 @@
                                         )
                                      )"/>
 
+                            <xf:var
+                                name="is-last-page"
+                                value="empty($next-cases)"/>
+
+                            <xf:var name="prev-button-ref" value="if (exists($prev-cases)) then xxf:instance('local')/readwrite else ''"/>
+                            <xf:var name="next-button-ref" value="if (not($is-last-page))  then xxf:instance('local')/readwrite else ''"/>
+
+                            <xf:group id="fr-wizard-prev-hide"   ref="$prev-button-ref[not(exf:readonly())]"/>
+                            <xf:group id="fr-wizard-next-hide"   ref="$next-button-ref[not(exf:readonly())]"/>
+                            <xf:group id="fr-wizard-submit-hide" ref="if ($is-last-page) then xxf:instance('local')/readwrite else ()"/>
+
                             <xh:ul class="nav nav-list">
                                 <xsl:apply-templates mode="toc-sections"/>
                             </xh:ul>
                             <xh:div class="fr-wizard-navigation">
-
-                                <xf:var name="prev-button-ref" value="if (exists($prev-cases)) then xxf:instance('local')/readwrite else ''"/>
-                                <xf:var name="next-button-ref" value="if (exists($next-cases)) then xxf:instance('local')/readwrite else ''"/>
 
                                 <!-- Make sure the first relevant case is shown initially -->
                                 <!-- NOTE: Ideally, we should also handle the case where the fr:section in the

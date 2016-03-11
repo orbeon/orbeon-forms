@@ -73,7 +73,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   // New scripts created during an update (not functional as of 2012-04-19)
   // NOTE: This should instead be accumulated at the level of the request.
-  private var _newScripts: scala.collection.immutable.Seq[ShareableScript] = Nil
+  private var _newScripts: List[ShareableScript] = Nil
   def newScripts = _newScripts
   def clearNewScripts() = _newScripts = Nil
 
@@ -204,7 +204,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       def changeListener(record: Seq[NodeInfo] ⇒ Boolean): MirrorEventListener = {
         case insert: XFormsInsertEvent              ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
         case delete: XFormsDeleteEvent              ⇒ record(delete.deletedNodes)
-        case valueChanged: XXFormsValueChangedEvent ⇒ record(Seq(valueChanged.node))
+        case valueChanged: XXFormsValueChangedEvent ⇒ record(List(valueChanged.node))
         case _                                      ⇒ false
       }
 
@@ -217,7 +217,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
       // Compose listeners
       toEventListener(composeListeners(
-        Seq(
+        List(
           instanceListener,
           changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
           changeListener(recordChanges(findBindChange, bindChanges)),

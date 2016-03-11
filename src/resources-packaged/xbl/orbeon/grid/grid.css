@@ -157,6 +157,16 @@
   display: inline-block;
   margin-right: 5px;
 }
+.orbeon .xbl-fr-grid .fr-repeat-table .fr-grid-master-row .fr-repeat-column-left,
+.orbeon .xbl-fr-grid .fr-repeat-table .fr-grid-master-row .fr-repeat-column-right {
+  vertical-align: middle;
+}
+.orbeon .xbl-fr-grid .fr-repeat-table .fr-grid-master-row .xforms-label {
+  margin: 0 4px;
+}
+.orbeon .xbl-fr-grid .fr-repeat-table .fr-grid-master-row .xforms-hint {
+  margin-left: 4px;
+}
 .orbeon .xbl-fr-grid .fr-repeat-table .xforms-repeat-selected-item-1 .fr-repeat-column-left {
   background-color: #eeeeee;
 }

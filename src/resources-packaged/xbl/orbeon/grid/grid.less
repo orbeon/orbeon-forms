@@ -172,8 +172,9 @@
                     &> .fr-grid-content > * {           // which repeats over a single row only (they are shown in the
                         &> .xforms-label,               // column header). But only do this for the top-level control within
                         &> .xforms-help,                // a cell.
-                        &> .xforms-hint
-                            { display: none }
+                        &> .xforms-hint {
+                            display: none;
+                        }
                     }
                 }
                 th span.xforms-group                    // So the group that contains the control label is sized, to allow
@@ -185,6 +186,7 @@
                 .xforms-label { display: block }        // Label in repeat table header is block so yellow background in FB takes the whole width
                 .xforms-help { margin-top: 4px }
             }
+
             .fr-repeat-column-left, .fr-repeat-column-right {
                 //width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
                 width: 35px;
@@ -204,6 +206,20 @@
                 .dropdown-menu i {
                     display: inline-block;
                     margin-right: 5px;
+                }
+            }
+
+            .fr-grid-master-row {
+                .fr-repeat-column-left, .fr-repeat-column-right {
+                    vertical-align: middle;
+                }
+
+                .xforms-label {
+                    margin: 0 4px;
+                }
+
+                .xforms-hint {
+                    margin-left: 4px;
                 }
             }
 

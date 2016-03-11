@@ -7,8 +7,10 @@
   margin-top: 11px;
   margin-right: 5px;
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: auto;
+  height: auto;
+  max-width: 14px;
+  max-height: 14px;
   line-height: 14px;
   vertical-align: text-top;
   background-image: url("../../../../resources/apps/fr/style/bootstrap/img/glyphicons-halflings.png");

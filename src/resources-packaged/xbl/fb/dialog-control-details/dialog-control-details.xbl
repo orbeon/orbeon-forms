@@ -167,10 +167,6 @@
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
-                <xf:setvalue
-                    ref="instance('modified')"
-                    value="false()"/>
-
                 <xxf:show dialog="dialog"/>
 
                 <!-- Tell custom settings to initialize -->
@@ -182,6 +178,10 @@
                     <xf:property name="original-control-name" value="$i/original-control-name"/>
                     <xf:property name="data-holders"          value="fbf:findDataHolders($form, $i/original-control-name)"/>
                 </xf:dispatch>
+
+                <xf:setvalue
+                    ref="instance('modified')"
+                    value="false()"/>
 
             </xbl:handler>
             <!-- Save data upon close unless the sub-form is not valid. Do this upon capture phase so that we can

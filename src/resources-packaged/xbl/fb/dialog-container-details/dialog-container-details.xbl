@@ -98,15 +98,16 @@
                             'next'
                         )/@id"/>
 
-                <xf:setvalue
-                    ref="instance('modified')"
-                    value="false()"/>
-
                 <xxf:show dialog="dialog"/>
 
                 <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
                      want them to win -->
                 <xf:setfocus ev:event="xforms-enabled" control="dialog"/>
+
+                <xf:setvalue
+                    ref="instance('modified')"
+                    value="false()"/>
+
             </xbl:handler>
             <!-- Save data upon close unless the sub-form is not valid. Do this upon capture phase so that we can
                  process values, including custom control settings, before the dialog is actually closed and becomes

@@ -103,13 +103,13 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         final String realPath = NetUtils.getRealPath(baseDirectoryURLString, locationData);
                         config.setBaseDirectory(realPath);
 
-                        for (Iterator i = XPathUtils.selectIterator(configNode, "/config/include"); i.hasNext();) {
+                        for (Iterator i = XPathUtils.selectNodeIterator(configNode, "/config/include"); i.hasNext();) {
                             final Node node = (Node) i.next();
                             final String value = XPathUtils.selectStringValueNormalize(node, ".");
                             if (value != null)
                                 config.addInclude(value);
                         }
-                        for (Iterator i = XPathUtils.selectIterator(configNode, "/config/exclude"); i.hasNext();) {
+                        for (Iterator i = XPathUtils.selectNodeIterator(configNode, "/config/exclude"); i.hasNext();) {
                             final Node node = (Node) i.next();
                             final String value = XPathUtils.selectStringValueNormalize(node, ".");
                             if (value != null)

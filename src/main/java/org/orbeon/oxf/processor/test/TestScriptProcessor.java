@@ -58,7 +58,7 @@ public class TestScriptProcessor extends ProcessorImpl {
         ExecutionContext executionContext = new ExecutionContext();
 
         // Iterate through actions
-        for (Iterator i = XPathUtils.selectIterator(config, "/*/*"); i.hasNext();) {
+        for (Iterator i = XPathUtils.selectNodeIterator(config, "/*/*"); i.hasNext();) {
             Element commandElement = (Element) i.next();
 
             String commandName = commandElement.getName();

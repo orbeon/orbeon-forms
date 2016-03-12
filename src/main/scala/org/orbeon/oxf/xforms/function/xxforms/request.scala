@@ -17,25 +17,25 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, StringConversions}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
 // xxf:get-request-method() as xs:string
-class XXFormsGetRequestMethod extends XFormsFunction with FunctionSupport {
+class XXFormsGetRequestMethod extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getMethod
 }
 
 // xxf:get-portlet-mode() as xs:string
-class XXFormsGetPortletMode extends XFormsFunction with FunctionSupport {
+class XXFormsGetPortletMode extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getPortletMode
 }
 
 // xxf:get-window-state() as xs:string
-class XXFormsGetWindowState extends XFormsFunction with FunctionSupport {
+class XXFormsGetWindowState extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getWindowState
 }
@@ -60,7 +60,7 @@ class XXFormsGetRequestHeader extends RequestFunction {
     Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase)) map (_.toList)
 }
 
-trait RequestFunction extends XFormsFunction with FunctionSupport {
+trait RequestFunction extends XFormsFunction {
 
   def fromDocument(containingDocument: XFormsContainingDocument, name: String): Option[List[String]]
   def fromRequest(request: Request, name: String): Option[List[String]]
@@ -82,25 +82,25 @@ trait RequestFunction extends XFormsFunction with FunctionSupport {
 }
 
 // xxf:username()  as xs:string? and xxf:get-remote-user() as xs:string?
-class XXFormsUsername extends XFormsFunction with FunctionSupport {
+class XXFormsUsername extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     Option(NetUtils.getExternalContext.getRequest.getUsername)
 }
 
 // xxf:user-group() as xs:string?
-class XXFormsUserGroup extends XFormsFunction with FunctionSupport {
+class XXFormsUserGroup extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     Option(NetUtils.getExternalContext.getRequest.getUserGroup)
 }
 
 // xxf:user-roles() as xs:string*
-class XXFormsUserRoles extends XFormsFunction with FunctionSupport {
+class XXFormsUserRoles extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     asIterator(NetUtils.getExternalContext.getRequest.getUserRoles)
 }
 
 // xxf:is-user-in-role(xs:string) as xs:boolean
-class XXFormsIsUserInRole extends XFormsFunction with FunctionSupport {
+class XXFormsIsUserInRole extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     NetUtils.getExternalContext.getRequest.isUserInRole(stringArgument(0)(xpathContext))
 }

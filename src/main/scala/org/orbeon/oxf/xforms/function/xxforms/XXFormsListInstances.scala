@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.XFormsModel
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.{XFormsModel, XFormsUtils}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
+
 import scala.collection.JavaConverters._
 
-class XXFormsListInstances extends XFormsFunction with FunctionSupport {
+class XXFormsListInstances extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {

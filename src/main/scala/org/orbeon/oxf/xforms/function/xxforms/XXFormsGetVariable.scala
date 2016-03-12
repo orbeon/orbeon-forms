@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.XFormsModel
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.EmptyIterator
 
-class XXFormsGetVariable extends XFormsFunction with FunctionSupport {
+class XXFormsGetVariable extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext) = {
 

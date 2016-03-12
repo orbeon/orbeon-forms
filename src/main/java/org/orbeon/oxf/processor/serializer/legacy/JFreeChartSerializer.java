@@ -108,15 +108,15 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         ExtendedPieDataset ds = new ExtendedPieDataset();
         Value value = (Value) chartConfig.getValueIterator().next();
 
-        Iterator cats = XPathUtils.selectIterator(data, value.getCategories());
-        Iterator series = XPathUtils.selectIterator(data, value.getSeries());
+        Iterator cats = XPathUtils.selectNodeIterator(data, value.getCategories());
+        Iterator series = XPathUtils.selectNodeIterator(data, value.getSeries());
         Iterator colors = null;
         if (value.getColors() != null)
-            colors = XPathUtils.selectIterator(data, value.getColors());
+            colors = XPathUtils.selectNodeIterator(data, value.getColors());
 
         Iterator explodedPercents = null;
         if (value.getExplodedPercents() != null)
-            explodedPercents = XPathUtils.selectIterator(data, value.getExplodedPercents());
+            explodedPercents = XPathUtils.selectNodeIterator(data, value.getExplodedPercents());
 
         while (cats.hasNext() && series.hasNext()) {
             Element s = (Element) series.next();
@@ -144,12 +144,12 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         ItemPaintCategoryDataset ds = new ItemPaintCategoryDataset();
         for (Iterator i = chartConfig.getValueIterator(); i.hasNext();) {
             Value value = (Value) i.next();
-            Iterator cats = XPathUtils.selectIterator(data, value.getCategories());
-            Iterator series = XPathUtils.selectIterator(data, value.getSeries());
+            Iterator cats = XPathUtils.selectNodeIterator(data, value.getCategories());
+            Iterator series = XPathUtils.selectNodeIterator(data, value.getSeries());
 
             Iterator colors = null;
             if (value.getColors() != null)
-                colors = XPathUtils.selectIterator(data, value.getColors());
+                colors = XPathUtils.selectNodeIterator(data, value.getColors());
 
             while (cats.hasNext() && series.hasNext()) {
                 Node s = (Node) series.next();
@@ -171,8 +171,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         for (Iterator i = chartConfig.getValueIterator(); i.hasNext();) {
             Value value = (Value) i.next();
             String title = value.getTitle();
-            Iterator x = XPathUtils.selectIterator(data, value.getCategories());
-            Iterator y = XPathUtils.selectIterator(data, value.getSeries());
+            Iterator x = XPathUtils.selectNodeIterator(data, value.getCategories());
+            Iterator y = XPathUtils.selectNodeIterator(data, value.getSeries());
 
             XYSeries xyseries = new XYSeries(title);
             while (x.hasNext() && y.hasNext()) {
@@ -192,8 +192,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         for (Iterator i = chartConfig.getValueIterator(); i.hasNext();) {
             Value value = (Value) i.next();
             String title = value.getTitle();
-            Iterator x = XPathUtils.selectIterator(data, value.getCategories());
-            Iterator y = XPathUtils.selectIterator(data, value.getSeries());
+            Iterator x = XPathUtils.selectNodeIterator(data, value.getCategories());
+            Iterator y = XPathUtils.selectNodeIterator(data, value.getSeries());
 
             TimeSeries timeSeries = new TimeSeries(title, FixedMillisecond.class );
             while (x.hasNext() && y.hasNext()) {
@@ -261,7 +261,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             chart.setCategoryMargin(Double.parseDouble(catMargin));
 
         chart.setSerieTitle(XPathUtils.selectStringValueNormalize(doc, "/chart/serie-title"));
-        chart.setSerieAutoRangeIncludeZero(XPathUtils.selectBooleanValue(doc, "not(/chart/serie-auto-range-include-zero = 'false')").booleanValue());
+        chart.setSerieAutoRangeIncludeZero(XPathUtils.selectBooleanValue(doc, "not(/chart/serie-auto-range-include-zero = 'false')"));
         chart.setxSize(XPathUtils.selectIntegerValue(doc, "/chart/x-size").intValue());
         chart.setySize(XPathUtils.selectIntegerValue(doc, "/chart/y-size").intValue());
 
@@ -290,8 +290,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
         // legend
         CustomLegend legend = new CustomLegend(null);
-        Boolean legendVis = XPathUtils.selectBooleanValue(doc, "/chart/legend/@visible = 'true'");
-        legend.setVisible(legendVis.booleanValue());
+        boolean legendVis = XPathUtils.selectBooleanValue(doc, "/chart/legend/@visible = 'true'");
+        legend.setVisible(legendVis);
         if(legend.isVisible()) {
             String pos = XPathUtils.selectStringValueNormalize(doc, "/chart/legend/@position");
 
@@ -307,7 +307,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             else if ("west".equals(pos)) {
                 legend.setPosition(RectangleEdge.LEFT);
             }
-            for (Iterator i = XPathUtils.selectIterator(doc, "/chart/legend/item"); i.hasNext();) {
+            for (Iterator i = XPathUtils.selectNodeIterator(doc, "/chart/legend/item"); i.hasNext();) {
                 Element el = (Element) i.next();
                 Color color = getRGBColor(el.attributeValue("color"));
                 String label = el.attributeValue("label");
@@ -316,7 +316,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
         chart.setLegendConfig(legend);
 
-        for (Iterator i = XPathUtils.selectIterator(doc, "/chart/*[name()='value']"); i.hasNext();) {
+        for (Iterator i = XPathUtils.selectNodeIterator(doc, "/chart/*[name()='value']"); i.hasNext();) {
             Element el = (Element) i.next();
             String c = el.attributeValue("color");
             Paint color;

@@ -86,7 +86,7 @@ public class PipelineReader extends ProcessorImpl {
         List<ASTParam> params = new ArrayList<ASTParam>();
 
         // Read params
-        for (final Iterator i = XPathUtils.selectIterator(rootElement, "p:param", PREFIXES); i.hasNext();) {
+        for (final Iterator i = XPathUtils.selectNodeIterator(rootElement, "p:param", PREFIXES); i.hasNext();) {
             final Element paramElement = (Element) i.next();
             final ASTParam param = new ASTParam();
 

@@ -23,7 +23,7 @@ import org.orbeon.saxon.om._
  *
  * 7.11.1 The instance() Function
  */
-class Instance extends XFormsFunction with FunctionSupport {
+class Instance extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

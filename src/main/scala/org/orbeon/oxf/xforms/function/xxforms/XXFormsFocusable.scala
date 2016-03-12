@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
 
-class XXFormsFocusable extends XFormsFunction with FunctionSupport {
+class XXFormsFocusable extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     relevantControl(0)(xpathContext).iterator flatMap (_.focusableControls) nonEmpty
 }

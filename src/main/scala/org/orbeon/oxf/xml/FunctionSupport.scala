@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,19 +11,21 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.xforms.XFormsObject
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.saxon.expr.{ExpressionTool, Expression, XPathContext}
+import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContext}
+import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.value.{Int64Value, IntegerValue, BooleanValue, StringValue}
-import collection.JavaConverters._
+import org.orbeon.saxon.value.{BooleanValue, Int64Value, IntegerValue, StringValue}
 import org.orbeon.scaxon.XML._
 
-protected trait FunctionSupport extends XFormsFunction {
+import scala.collection.JavaConverters._
 
-  import XFormsFunction._
+abstract class FunctionSupport extends SystemFunction {
+
+  // Public accessor for Scala traits
+  def arguments: Seq[Expression] = argument
+  def functionOperation: Int = operation
 
   def stringArgument(i: Int)(implicit xpathContext: XPathContext) =
     arguments(i).evaluateAsString(xpathContext).toString
@@ -60,31 +62,6 @@ protected trait FunctionSupport extends XFormsFunction {
 
   def itemsArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
     itemsArgumentOpt(i) getOrElse SingletonIterator.makeIterator(xpathContext.getContextItem)
-
-  // Resolve the relevant control by argument expression
-  def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    relevantControl(arguments(i).evaluateAsString(xpathContext).toString)
-
-  // Resolve a relevant control by id
-  def relevantControl(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
-      { case control: XFormsControl if control.isRelevant ⇒ control }
-
-  // Resolve an object by id
-  def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
-    context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId)
-
-  def resolveStaticOrAbsoluteId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =
-    staticIdExpr match {
-      case None ⇒
-        // If no argument is supplied, return the closest id (source id)
-        Option(getSourceEffectiveId)
-      case Some(expr) ⇒
-        // Otherwise resolve the id passed against the source id
-        val staticOrAbsoluteId = expr.evaluateAsString(xpathContext).toString
-        resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
-          (_.getEffectiveId)
-    }
 
   def effectiveBooleanValue(e: Expression)(implicit xpathContext: XPathContext) =
     ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))

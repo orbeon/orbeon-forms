@@ -61,7 +61,7 @@ public class RequestSecurityGenerator extends ProcessorImpl {
                         }
                     }
                     // NOTE: We could output username, user-group, user-roles, but those are already present as headers.
-                    for (Iterator i = XPathUtils.selectIterator(config, "/config/role"); i.hasNext();) {
+                    for (Iterator i = XPathUtils.selectNodeIterator(config, "/config/role"); i.hasNext();) {
                         Node node = (Node) i.next();
                         String nodeString = XPathUtils.selectStringValueNormalize(node, ".");
                         if (request.isUserInRole(nodeString))

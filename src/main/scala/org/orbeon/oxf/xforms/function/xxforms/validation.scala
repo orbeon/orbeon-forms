@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext}
 import org.orbeon.saxon.`type`.ValidationFailure
@@ -26,7 +26,7 @@ import org.orbeon.saxon.value._
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-trait ValidationFunction extends XFormsFunction with FunctionSupport {
+trait ValidationFunction extends XFormsFunction {
 
   def propertyName: String
 

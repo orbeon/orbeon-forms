@@ -26,7 +26,7 @@ public class ErrorProcessor extends ProcessorImpl {
 
     public void start(PipelineContext context) {
         Document config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
-        throw new ValidationException((String) config.selectObject("string(/)"),
+        throw new ValidationException(config.getStringValue(),
                 (LocationData) config.getRootElement().getData());
     }
 }

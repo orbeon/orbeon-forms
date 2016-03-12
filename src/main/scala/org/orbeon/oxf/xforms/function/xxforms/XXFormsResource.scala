@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{Instance, FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.{AxisExpression, StringLiteral, PathMap, XPathContext}
-import org.orbeon.saxon.om.{Axis, NamespaceConstant, StructuredQName, NodeInfo}
-import org.orbeon.saxon.`type`.Type
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.XFormsInstance
-import org.orbeon.saxon.value.StringValue
-import org.orbeon.saxon.pattern.NameTest
-import org.orbeon.oxf.util.ScalaUtils._
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsInstance
+import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
+import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.expr.{AxisExpression, PathMap, StringLiteral, XPathContext}
+import org.orbeon.saxon.om.{Axis, NamespaceConstant, NodeInfo, StructuredQName}
+import org.orbeon.saxon.pattern.NameTest
+import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.XML._
 
-class XXFormsResource extends XFormsFunction with FunctionSupport {
+class XXFormsResource extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 

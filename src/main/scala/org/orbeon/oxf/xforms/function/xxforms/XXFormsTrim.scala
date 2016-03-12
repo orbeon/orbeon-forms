@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.value.StringValue
 
-class XXFormsTrim extends XFormsFunction with FunctionSupport {
+class XXFormsTrim extends XFormsFunction {
 
   override def evaluateItem(context: XPathContext): StringValue =
     stringArgumentOrContextOpt(0)(context) map (_.trimAllToEmpty)

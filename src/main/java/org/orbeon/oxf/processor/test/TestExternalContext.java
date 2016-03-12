@@ -86,7 +86,7 @@ public class TestExternalContext implements ExternalContext  {
         public Map<String, Object> getAttributesMap() {
             if (attributesMap == null) {
                 attributesMap = new LinkedHashMap<String, Object>();
-                for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/attributes/attribute"); i.hasNext();) {
+                for (Iterator i = XPathUtils.selectNodeIterator(requestDocument, "/*/attributes/attribute"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");
                     final String value = XPathUtils.selectStringValueNormalize(e, "value[1]");
@@ -224,10 +224,10 @@ public class TestExternalContext implements ExternalContext  {
         public Map<String, String[]> getHeaderValuesMap() {
             if (headerValuesMap == null) {
                 final Map<String, String[]> map = new LinkedHashMap<String, String[]>();
-                for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
+                for (Iterator i = XPathUtils.selectNodeIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");
-                    for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
+                    for (Iterator j = XPathUtils.selectNodeIterator(e, "value"); j.hasNext();) {
                         final Element valueElement = (Element) j.next();
                         final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
                         StringConversions.addValueToStringArrayMap(map, name, value);
@@ -255,10 +255,10 @@ public class TestExternalContext implements ExternalContext  {
         public Map<String, Object[]> getParameterMap() {
             if (parameterMap == null) {
                 final Map<String, Object[]> map = new LinkedHashMap<String, Object[]>();
-                for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/parameters/parameter"); i.hasNext();) {
+                for (Iterator i = XPathUtils.selectNodeIterator(requestDocument, "/*/parameters/parameter"); i.hasNext();) {
                     final Element e = (Element) i.next();
                     final String name = XPathUtils.selectStringValueNormalize(e, "name");
-                    for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
+                    for (Iterator j = XPathUtils.selectNodeIterator(e, "value"); j.hasNext();) {
                         final Element valueElement = (Element) j.next();
                         final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
                         StringConversions.addValueToObjectArrayMap(map, name, value);

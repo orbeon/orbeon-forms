@@ -100,7 +100,7 @@ public class LDAPProcessor extends ProcessorImpl {
 
                             config.setRootDN(XPathUtils.selectStringValueNormalize(doc, "/config/root-dn"));
 
-                            for (Iterator i = XPathUtils.selectIterator(doc, "/config/attribute"); i.hasNext();) {
+                            for (Iterator i = XPathUtils.selectNodeIterator(doc, "/config/attribute"); i.hasNext();) {
                                 Element e = (Element) i.next();
                                 config.addAttribute(e.getTextTrim());
                             }
@@ -175,11 +175,11 @@ public class LDAPProcessor extends ProcessorImpl {
     }
 
     private void parseAttributes(Node filterDoc, String attributeXPath, CommandWithAttributes command) {
-        for (Iterator i = XPathUtils.selectIterator(filterDoc, attributeXPath); i.hasNext();) {
+        for (Iterator i = XPathUtils.selectNodeIterator(filterDoc, attributeXPath); i.hasNext();) {
             Node curAttr = (Node) i.next();
             String name = XPathUtils.selectStringValue(curAttr, "name");
             List values = new ArrayList();
-            for (Iterator j = XPathUtils.selectIterator(curAttr, "value"); j.hasNext();) {
+            for (Iterator j = XPathUtils.selectNodeIterator(curAttr, "value"); j.hasNext();) {
                 String value = ((Node) j.next()).getText();
                 values.add(value);
             }

@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 
-class XXFormsEvaluateBindProperty extends XFormsFunction with FunctionSupport {
+class XXFormsEvaluateBindProperty extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {
 
     implicit val ctx = xpathContext

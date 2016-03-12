@@ -16,19 +16,17 @@ package org.orbeon.oxf.processor.sql.interpreters;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.jaxen.Function;
-import org.jaxen.UnresolvableException;
-import org.jaxen.VariableContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -39,9 +37,6 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
 
-/**
- *
- */
 public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     //    private static final String SQL_TYPE_VARCHAR = "varchar";
@@ -152,7 +147,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
         if (selectString != null) {
             if (type != UPDATE)
                 throw new ValidationException("select attribute is valid only on update element", new LocationData(getDocumentLocator()));
-            nodeIterator = XPathUtils.selectIterator(getInterpreterContext().getCurrentNode(), selectString, getInterpreterContext().getPrefixesMap(), null, getInterpreterContext().getFunctionContext());
+            nodeIterator =
+                XPathUtils.selectNodeIterator(
+                    getInterpreterContext().getCurrentNode(),
+                    selectString,
+                    getInterpreterContext().getPrefixesMap(),
+                    SQLFunctionLibrary.instance(),
+                    getInterpreterContext().getFunctionContext()
+                );
         }
         // Get debug attribute
         debugString = attributes.getValue("debug");
@@ -180,59 +182,31 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
             // Iterate through all source nodes (only one if "select" attribute is missing)
             for (Iterator j = (nodeIterator != null) ? nodeIterator : Collections.singletonList(getInterpreterContext().getCurrentNode()).iterator(); j.hasNext(); nodeCount++) {
                 final Node currentNode = (Node) j.next();
-                final int _nodeCount = nodeCount;
-//                    LocationData locationData = (currentNode instanceof Element)
+                //                    LocationData locationData = (currentNode instanceof Element)
 //                            ? (LocationData) ((Element) currentNode).getData() : null;
 
-                // Scope sql:position variable (deprecated)
                 Map prefixesMap = getInterpreterContext().getPrefixesMap();
-                VariableContext variableContext = new VariableContext() {
-                    public Object getVariableValue(String namespaceURI, String prefix, String localName) throws UnresolvableException {
-                        if (!SQLProcessor.SQL_NAMESPACE_URI.equals(namespaceURI))
-                            throw new UnresolvableException("Unbound variable: {" + namespaceURI + "}" + localName);
-                        if ("position".equals(localName)) {
-                            return new Integer(_nodeCount);
-                        } else
-                            throw new UnresolvableException("Unbound variable: {" + namespaceURI + "}" + localName);
+
+                final scala.Function2<String, Object, String> getColumnFunction = new SQLFunctionLibrary.Function2Base<String, Object, String>()  {
+
+                    @Override
+                    public String apply(String colName, Object levelString) {
+
+                    final int level = (Integer) levelString;
+
+                    if (level < 1)
+                        throw new OXFException("Attribute level must be 1 or greater in query");
+                    final ResultSet rs = getInterpreterContext().getResultSet(level);
+                    try {
+                        return rs.getString(colName);
+                    } catch (SQLException e) {
+                        throw new OXFException(e);
+                    }
                     }
                 };
 
-                // Scope sql:current(), sql:position() and sql:get-column functions
-                Map functions = new HashMap();
-                functions.put("{" + SQLProcessor.SQL_NAMESPACE_URI + "}" + "current", new Function() {
-                    public Object call(org.jaxen.Context context, List args) {
-                        return currentNode;
-                    }
-                });
-
-                functions.put("{" + SQLProcessor.SQL_NAMESPACE_URI + "}" + "position", new Function() {
-                    public Object call(org.jaxen.Context context, List args) {
-                        return new Integer(_nodeCount);
-                    }
-                });
-
-                functions.put("{" + SQLProcessor.SQL_NAMESPACE_URI + "}" + "get-column", new Function() {
-                    public Object call(org.jaxen.Context context, List args) {
-                        int argc = args.size();
-                        if (argc < 1 || argc > 2)
-                            throw new OXFException("sql:get-column expects one or two parameters");
-                        String colname = (String) args.get(0);
-                        String levelString = (argc == 2) ? (String) args.get(1) : null;
-                        int level = (levelString == null) ? 1 : Integer.parseInt(levelString);
-                        if (level < 1)
-                            throw new OXFException("Attribute level must be 1 or greater in query");
-                        ResultSet rs = getInterpreterContext().getResultSet(level);
-                        try {
-                            return rs.getString(colname);
-                        } catch (SQLException e) {
-                            throw new OXFException(e);
-                        }
-                    }
-                });
-
+                getInterpreterContext().pushFunctionContext(new SQLFunctionLibrary.SQLFunctionContext(currentNode, nodeCount, getColumnFunction));
                 try {
-                    getInterpreterContext().pushFunctions(functions);
-
                     // Replace inline parameters
                     StringBuilder replacedQuery = query;
                     if (hasReplaceOrSeparator) {
@@ -256,14 +230,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         // Read the expression as a string if there is a select, otherwise get parameter value as string
                                         Object objectValue;
                                         if (select != null) {
-                                            objectValue = XPathUtils.selectStringValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext());
+                                            objectValue = XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
                                         } else {
                                             objectValue = (parameter.getValue() == null) ? null : parameter.getValue().toString();
                                         }
                                         values = Collections.singletonList(objectValue);
                                     } else {
                                         // Accept only a node or node-set if there is a separator, in which case a select is mandatory
-                                        Object objectValue = XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext());
+                                        Object objectValue = XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
                                         if (objectValue instanceof List) {
                                             values = (List) objectValue;
                                         } else if (objectValue instanceof Node) {
@@ -346,7 +320,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                     }
 
                                     boolean doSetNull = parameter.getNullIf() != null
-                                            && XPathUtils.selectBooleanValue(currentNode, parameter.getNullIf(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext()).booleanValue();
+                                            && XPathUtils.selectBooleanValue(currentNode, parameter.getNullIf(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
 
                                     if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME).equals(xmlType) || Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                                         // Set a string or XML Fragment
@@ -356,7 +330,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         if (parameter.getValues() != null)
                                             values = parameter.getValues();
                                         else if (select != null)
-                                            values = Collections.singletonList(XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext()));
+                                            values = Collections.singletonList(XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext()));
                                         else
                                             values = Collections.singletonList(parameter.getValue());
 
@@ -498,7 +472,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                             xpathReceiver.selectContentHandler(parameter.getSelect(), new Base64XMLReceiver(blobOutputStream));
                                             blobOutputStream.close();
                                         } else {
-                                            String base64Value = XPathUtils.selectStringValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext());
+                                            String base64Value = XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
                                             getInterpreterContext().getDelegate().setBlob(stmt, index, NetUtils.base64StringToByteArray(base64Value));
                                         }
                                     } else {
@@ -509,7 +483,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         if (parameter.getValues() != null)
                                             values = parameter.getValues();
                                         else if (select != null)
-                                            values = Collections.singletonList(XPathUtils.selectStringValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext()));
+                                            values = Collections.singletonList(XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext()));
                                         else
                                             values = Collections.singletonList(parameter.getValue());
 
@@ -589,7 +563,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                         }
                     }
                 } finally {
-                    getInterpreterContext().popFunctions();
+                    getInterpreterContext().popFunctionContext();
                 }
                 if (type == QUERY || type == CALL) {
                     if (nodeCount > 1)

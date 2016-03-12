@@ -38,7 +38,7 @@ private object Property {
   val ConformanceLevelProperty = "conformance-level"
 }
 
-class Property extends XFormsFunction with FunctionSupport {
+class Property extends XFormsFunction {
 
   import Property._
 

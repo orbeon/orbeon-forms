@@ -45,7 +45,7 @@ public class ResourceServer extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read config input into a String, cache if possible
-            final Node configNode = readCacheInputAsDOM(context, INPUT_CONFIG);
+            final org.dom4j.Node configNode = readCacheInputAsDOM4J(context, INPUT_CONFIG);
 
             // Get config URL first
             String urlString = XPathUtils.selectStringValueNormalize(configNode, "url");

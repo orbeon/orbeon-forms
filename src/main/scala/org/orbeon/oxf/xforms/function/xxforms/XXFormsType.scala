@@ -14,13 +14,12 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.InstanceData
-import org.orbeon.oxf.xforms.function.FunctionSupport
 import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{NodeInfo, StandardNames}
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 
-class XXFormsType extends XXFormsMIPFunction with FunctionSupport {
+class XXFormsType extends XXFormsMIPFunction {
 
   override def evaluateItem(xpathContext: XPathContext): QNameValue =
     itemArgumentOrContextOpt(0)(xpathContext) match {

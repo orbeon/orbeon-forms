@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 
-class XXFormsLHHA extends XFormsFunction with FunctionSupport {
+class XXFormsLHHA extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext) = {
 

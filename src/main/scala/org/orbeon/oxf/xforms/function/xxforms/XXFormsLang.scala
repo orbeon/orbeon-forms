@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.analysis.{PathMapXPathAnalysis, AVTLangRef, LiteralLangRef, ElementAnalysis}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.{AVTLangRef, ElementAnalysis, LiteralLangRef, PathMapXPathAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 
-class XXFormsLang extends XFormsFunction with FunctionSupport {
+class XXFormsLang extends XFormsFunction {
 
   import XXFormsLang._
 

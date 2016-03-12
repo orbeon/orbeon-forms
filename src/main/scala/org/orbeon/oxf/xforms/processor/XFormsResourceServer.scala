@@ -112,6 +112,8 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
               saveState = true
             )
 
+          // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
+
           useAndClose(cxr.content.inputStream) { is ⇒
             useAndClose(response.getOutputStream) { os ⇒
               copyStream(is, os)

@@ -50,13 +50,13 @@ public class RedirectProcessor extends ProcessorImpl {
             final String path = XPathUtils.selectStringValueNormalize(node, "normalize-space(redirect-url/path-info)");
             final Map<String, String[]> parameters = new HashMap<String, String[]>();
 
-            for (Iterator i = XPathUtils.selectIterator(node, "redirect-url/parameters/parameter"); i.hasNext();) {
+            for (Iterator i = XPathUtils.selectNodeIterator(node, "redirect-url/parameters/parameter"); i.hasNext();) {
                 final Node parameter = (Node) i.next();
                 final String name = XPathUtils.selectStringValue(parameter, "name");
                 final int valueCount = XPathUtils.selectIntegerValue(parameter, "count(value)");
                 final String[] values = new String[valueCount];
                 int valueIndex = 0;
-                for (Iterator j = XPathUtils.selectIterator(parameter, "value"); j.hasNext(); valueIndex++) {
+                for (Iterator j = XPathUtils.selectNodeIterator(parameter, "value"); j.hasNext(); valueIndex++) {
                     final Node value = (Node) j.next();
                     values[valueIndex] = XPathUtils.selectStringValue(value, ".");
                 }

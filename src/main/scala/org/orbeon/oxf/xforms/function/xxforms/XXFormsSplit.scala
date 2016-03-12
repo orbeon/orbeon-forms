@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.ScalaUtils
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 
-class XXFormsSplit extends XFormsFunction with FunctionSupport {
+class XXFormsSplit extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext) = {
     val separator = stringArgumentOpt(1)(xpathContext)

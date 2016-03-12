@@ -14,10 +14,10 @@
 
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 
-class XXFormsDocumentId extends XFormsFunction with FunctionSupport {
+class XXFormsDocumentId extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext) =
     getContainingDocument(xpathContext).getUUID
 }

@@ -78,7 +78,7 @@ public class ProcessorUtils {
         Processor processor = processorFactory.createInstance();
 
         // Connect inputs
-        for (Iterator j = XPathUtils.selectIterator(testNode, "input"); j.hasNext();) {
+        for (Iterator j = XPathUtils.selectNodeIterator(testNode, "input"); j.hasNext();) {
             Element inputElement = (Element) j.next();
             String name = XPathUtils.selectStringValue(inputElement, "@name");
             if (XPathUtils.selectStringValue(inputElement, "@href") == null) {

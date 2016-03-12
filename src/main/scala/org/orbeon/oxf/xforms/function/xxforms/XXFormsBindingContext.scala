@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.FunctionSupport
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 
-class XXFormsBindingContext extends FunctionSupport {
+class XXFormsBindingContext extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext) =
     relevantControl(0)(xpathContext) flatMap (_.contextForBinding) orNull

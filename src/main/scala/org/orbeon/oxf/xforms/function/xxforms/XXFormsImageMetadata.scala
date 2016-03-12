@@ -18,13 +18,13 @@ import java.io.{ByteArrayInputStream, InputStream}
 import org.apache.commons.codec.binary.Base64
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ImageMetadata._
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{ImageMetadata, NetUtils}
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 
-class XXFormsImageMetadata extends XFormsFunction with FunctionSupport {
+class XXFormsImageMetadata extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): Item = {
 

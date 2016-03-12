@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -60,7 +61,8 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     dsa.initVerify(pubKey);
 
                     final Document data = readInputAsDOM4J(context, INPUT_DATA);
-                    final Node sigDataNode = data.selectSingleNode("/signed-data/data/*");
+                    final Element dataElement = Dom4jUtils.elements(data.getRootElement(), "data").get(0);
+                    final Node sigDataNode =  Dom4jUtils.elements(dataElement).get(0);
                     final String sig = ScalaUtils.trimAllToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
 
                     sigDataNode.detach();

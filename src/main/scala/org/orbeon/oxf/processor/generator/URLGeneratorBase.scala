@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.processor.generator
 
-import java.{lang ⇒ jl}
-import java.{util ⇒ ju}
+import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.dom4j.Element
 import org.orbeon.oxf.util.{DateUtils, ScalaUtils}
+import org.orbeon.oxf.xml.Dom4j
 
 import scala.collection.JavaConverters._
 
@@ -27,7 +27,7 @@ object URLGeneratorBase {
 
     val headerPairs =
       for {
-        headerElem  ← configElement.selectNodes("/config/header").asInstanceOf[ju.List[Element]].asScala
+        headerElem  ← Dom4j.elements(configElement, "header")
         headerName  = headerElem.element("name").getStringValue
         valueElem   ← headerElem.elements("value").asInstanceOf[ju.List[Element]].asScala
         headerValue = valueElem.getStringValue

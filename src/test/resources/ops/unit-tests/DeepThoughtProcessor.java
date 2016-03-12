@@ -11,6 +11,7 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -33,10 +34,10 @@ public class DeepThoughtProcessor extends SimpleProcessor {
     public void generateDouble(PipelineContext context, ContentHandler contentHandler) throws SAXException {
 
         // Get number from input using DOM4J
-        Document numberDocument = readInputAsDOM4J(context, "number");
-        String numberString = (String) numberDocument.selectObject("string(/number)");
-        int number = Integer.parseInt(numberString);
-        String doubleString = Integer.toString(number * 2);
+        final Document numberDocument = readInputAsDOM4J(context, "number");
+        final String numberString = numberDocument.getRootElement().getStringValue();
+        final int number = Integer.parseInt(numberString);
+        final String doubleString = Integer.toString(number * 2);
 
         // Generate output document with SAX
         contentHandler.startDocument();

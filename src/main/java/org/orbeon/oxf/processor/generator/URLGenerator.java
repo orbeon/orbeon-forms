@@ -26,7 +26,10 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.resources.handler.SystemHandler;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.webapp.HttpStatusCodeException;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -399,7 +402,7 @@ public class URLGenerator extends ProcessorImpl {
                             }
 
                             final List<String> readHeaders = new LinkedList<String>();
-                            for (Object o: configElement.selectNodes("/config/read-header")) {
+                            for (Object o : Dom4jUtils.elements(configElement, "read-header")) {
                                 final Element el = (Element) o;
                                 readHeaders.add(el.getStringValue());
                             }

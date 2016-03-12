@@ -17,9 +17,11 @@ import org.dom4j.Document;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 /**
  * This processor reads its data input, sleeps for a delay specified on its config input, and then sends the data input
@@ -41,7 +43,7 @@ public class SleepProcessor extends ProcessorImpl {
                     final SAXStore inputStore = new SAXStore();
                     readInputAsSAX(context, INPUT_DATA, inputStore);
                     final Document delayDocument = readInputAsDOM4J(context, INPUT_CONFIG);
-                    final String delayString = (String) delayDocument.selectObject("string()");
+                    final String delayString = delayDocument.getStringValue();
                     Thread.sleep(Long.parseLong(delayString));
                     inputStore.replay(xmlReceiver);
                 } catch (Exception e) {

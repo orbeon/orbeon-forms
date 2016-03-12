@@ -23,6 +23,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
@@ -96,7 +97,7 @@ public class UtilsTest extends TestCase {
             transformer.transform(source, result);
 
             Document doc = result.getDocument();
-            Element firstName = (Element) doc.createXPath("//firstname").selectNodes(doc).get(0);
+            Element firstName = (Element) XPathUtils.selectSingleNode(doc, "//firstname");
             assertEquals("Ada", firstName.getTextTrim());
             assertEquals(4, ((LocationData) firstName.getData()).getLine());
 

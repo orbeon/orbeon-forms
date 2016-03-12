@@ -18,7 +18,10 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.XQuery.XQueryProcessor;
-import org.orbeon.oxf.processor.converter.*;
+import org.orbeon.oxf.processor.converter.JFreeChartConverter;
+import org.orbeon.oxf.processor.converter.QNameConverter;
+import org.orbeon.oxf.processor.converter.XMLConverter;
+import org.orbeon.oxf.processor.converter.XSLFOConverter;
 import org.orbeon.oxf.processor.execute.ExecuteProcessor;
 import org.orbeon.oxf.processor.file.FileProcessor;
 import org.orbeon.oxf.processor.generator.*;
@@ -88,7 +91,6 @@ public class SchemaRepository {
         SCHEMAS.put(JFreeChartSerializer.CHART_CONVERTER_CHART_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-chart.rng");
         SCHEMAS.put(JFreeChartConverter.CHART_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-config.rng");
         SCHEMAS.put(XSLFOConverter.XSLFO_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/xslfo-converter-config.rng");
-        SCHEMAS.put(ToXLSConverter.TO_XLS_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/to-xls-converter-config.rng");
         SCHEMAS.put(QNameConverter.QNAME_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/qname-converter-config.rng");
 
         SCHEMAS.put(ScopeProcessorBase.SCOPE_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scope/scope-config.rng");
@@ -112,7 +114,7 @@ public class SchemaRepository {
         SCHEMAS.put(PageFlowControllerProcessor.ControllerNamespaceURI(), "schemas/page-flow-controller.rng");
         SCHEMAS.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
         SCHEMAS.put(DirectoryScannerProcessor.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
-        
+
         // SQL processor schemas
         SCHEMAS.put(SQLProcessor.SQL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-config.rng");
         SCHEMAS.put(SQLProcessor.SQL_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-datasource.rng");
@@ -128,7 +130,7 @@ public class SchemaRepository {
         SCHEMAS.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
 
         SCHEMAS.put(PDFTemplateProcessor.PDFTemplateModelNamespaceURI(), PROCESSORS_SCHEMA_PATH + "pdf/pdf-template-model.rng");
-        
+
         SCHEMAS.put("http://relaxng.org/ns/structure/1.0", "schemas/relaxng.rng");
         SCHEMAS.put("http://www.w3.org/2001/xml-events", "schemas/XML-Events-Schema.xsd");
         SCHEMAS.put("http://www.w3.org/2001/XMLSchema", "schemas/XMLSchema.xsd");

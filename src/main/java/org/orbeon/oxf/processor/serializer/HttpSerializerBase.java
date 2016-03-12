@@ -247,7 +247,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                                 throw new OXFException("The force-encoding element requires an encoding element.");
                             config.ignoreDocumentEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-document-encoding", DEFAULT_IGNORE_DOCUMENT_ENCODING);
                             // Headers
-                            for (Iterator i = XPathUtils.selectIterator(configElement, "/config/header"); i.hasNext();) {
+                            for (Iterator i = XPathUtils.selectNodeIterator(configElement, "/config/header"); i.hasNext();) {
                                 Element header = (Element) i.next();
                                 String name = header.element("name").getTextTrim();
                                 String value = header.element("value").getTextTrim();

@@ -438,18 +438,18 @@ public class RequestGenerator extends ProcessorImpl {
         // We always want to keep the root element (even if nothing is selected)
         requestDocument.getRootElement().addAttribute(MARK_ATTRIBUTE, MARK_ATTRIBUTE_VALUE);
 
-        for (Iterator i = XPathUtils.selectIterator(config, "/config/*"); i.hasNext();) {
+        for (Iterator i = XPathUtils.selectNodeIterator(config, "/config/*"); i.hasNext();) {
             Element includeExcludeElement = (Element) i.next();
             LocationData locationData = (LocationData) includeExcludeElement.getData();
             String includeExcludeXPath = includeExcludeElement.getText();
             if (includeExcludeElement.getName().equals(INCLUDE_ELEMENT)) {
-                for (Iterator j = XPathUtils.selectIterator(requestDocument, includeExcludeXPath); j.hasNext();) {
+                for (Iterator j = XPathUtils.selectNodeIterator(requestDocument, includeExcludeXPath); j.hasNext();) {
                     Element e = referencedElement((Node) j.next(), locationData, includeExcludeXPath);
                     markAncestors(e);
                     markDescendants(e);
                 }
             } else if (includeExcludeElement.getName().equals(EXCLUDE_ELEMENT)) {
-                for (Iterator j = XPathUtils.selectIterator(requestDocument, includeExcludeXPath); j.hasNext();) {
+                for (Iterator j = XPathUtils.selectNodeIterator(requestDocument, includeExcludeXPath); j.hasNext();) {
                     Element e = referencedElement((Node) j.next(), locationData, includeExcludeXPath);
                     e.detach();
                 }

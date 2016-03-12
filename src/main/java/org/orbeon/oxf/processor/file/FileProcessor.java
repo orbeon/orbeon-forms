@@ -60,7 +60,7 @@ public class FileProcessor extends ProcessorImpl {
             // Read config
             final Document config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
 
-            for (Iterator i = XPathUtils.selectIterator(config, "/*/*"); i.hasNext();) {
+            for (Iterator i = XPathUtils.selectNodeIterator(config, "/*/*"); i.hasNext();) {
                 final Element currentElement = (Element) i.next();
                 if (currentElement.getName().equals("delete")) {
                     // delete operation
@@ -94,7 +94,7 @@ public class FileProcessor extends ProcessorImpl {
                             );
 
                     if (!fromFile.exists() || ! fromFile.canRead()) {
-                        throw new OXFException("Can't move file: " + fromFile);    
+                        throw new OXFException("Can't move file: " + fromFile);
                     }
 
                     // To
@@ -112,7 +112,7 @@ public class FileProcessor extends ProcessorImpl {
 
                     // Move
                     if (! fromFile.renameTo(toFile)) {
-                        // If for whatever reason renameTo fails, try to copy and delete it 
+                        // If for whatever reason renameTo fails, try to copy and delete it
                         copyFile(fromFile, toFile);
                         final boolean deleted = fromFile.delete();
                         if (!deleted)

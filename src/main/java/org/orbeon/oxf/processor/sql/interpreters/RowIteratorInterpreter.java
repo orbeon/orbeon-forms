@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.jaxen.Function;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
@@ -27,13 +27,8 @@ import org.xml.sax.SAXException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- *
- */
 public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     private DeferredXMLReceiver savedOutput;
@@ -62,18 +57,18 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
             if (SQLProcessor.logger.isDebugEnabled())
                 SQLProcessor.logger.debug("Preparing to execute row: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
 
-            // Functions in this context
-            Map functions = new HashMap();
-            functions.put("{" + SQLProcessor.SQL_NAMESPACE_URI + "}" + "row-position", new Function() {
-                public Object call(org.jaxen.Context context, List args) {
-                    return new Integer(interpreterContext.getRowPosition());
-                }
-            });
+            // Iterate through the result set
+            while (hasNext) {
 
-            interpreterContext.pushFunctions(functions);
-            try {
-                // Iterate through the result set
-                while (hasNext) {
+                interpreterContext.pushFunctionContext(
+                    new SQLFunctionLibrary.SQLFunctionContext(
+                        interpreterContext.getFunctionContext().currentNode(),
+                        rowNum,
+                        interpreterContext.getFunctionContext().getColumn()
+                    )
+                );
+
+                try {
                     // Output footers that need it
                     if (groups != null) {
                         for (int i = groups.size() - 1; i >= 0; i--) {
@@ -85,18 +80,28 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                         }
                         groupCount = 0;
                     }
-                    // Set variables
-                    interpreterContext.setRowPosition(rowNum);
 
                     if (SQLProcessor.logger.isDebugEnabled())
                         SQLProcessor.logger.debug("Execute row: rowNum = " + rowNum);
 
                     // Interpret row
                     repeatBody();
-                    // Go to following row
-                    hasNext = resultSet.next();
-                    rowNum++;
+                } finally {
+                    interpreterContext.popFunctionContext();
                 }
+                // Go to following row
+                hasNext = resultSet.next();
+                rowNum++;
+            }
+
+            interpreterContext.pushFunctionContext(
+                new SQLFunctionLibrary.SQLFunctionContext(
+                    interpreterContext.getFunctionContext().currentNode(),
+                    rowNum,
+                    interpreterContext.getFunctionContext().getColumn()
+                )
+            );
+            try {
                 // Output last footers
                 if (groups != null) {
                     for (int i = groups.size() - 1; i >= 0; i--) {
@@ -106,7 +111,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                     }
                 }
             } finally {
-                interpreterContext.popFunctions();
+                interpreterContext.popFunctionContext();
             }
         } catch (Exception e) {
             throw new ValidationException(e, new LocationData(getDocumentLocator()));

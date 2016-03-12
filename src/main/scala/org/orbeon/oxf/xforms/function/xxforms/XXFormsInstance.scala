@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * xxf:instance() function. This function operates like the standard instance() function, except that it looks for
  * instances globally instead of using the current model.
  */
-class XXFormsInstance extends XFormsFunction with FunctionSupport {
+class XXFormsInstance extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.xforms.InstanceData
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 
 /**
  * xxf:invalid-binds()
  */
-class XXFormsInvalidBinds extends XFormsFunction with FunctionSupport {// don't extend XFormsMIPFunction as addToPathMap returns something different
+class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunction as addToPathMap returns something different
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

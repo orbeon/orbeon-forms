@@ -20,13 +20,14 @@ import org.dom4j.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.model.BindNode
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, XFormsModel, XFormsUtils}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsModel, XFormsObject, XFormsUtils}
+import org.orbeon.oxf.xml.FunctionSupport
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.XML
@@ -40,13 +41,34 @@ import scala.collection.{mutable ⇒ m}
  * TODO: context should contain PropertyContext directly
  * TODO: context should contain BindingContext directly if any
  */
-abstract class XFormsFunction extends SystemFunction {
+abstract class XFormsFunction extends FunctionSupport {
 
   import XFormsFunction._
 
-  // Public accessor for Scala traits
-  def arguments: Seq[Expression] = argument
-  def functionOperation: Int = operation
+  // Resolve the relevant control by argument expression
+  def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
+    relevantControl(arguments(i).evaluateAsString(xpathContext).toString)
+
+  // Resolve a relevant control by id
+  def relevantControl(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsControl] =
+    resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
+      { case control: XFormsControl if control.isRelevant ⇒ control }
+
+  // Resolve an object by id
+  def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
+    context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId)
+
+  def resolveStaticOrAbsoluteId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =
+    staticIdExpr match {
+      case None ⇒
+        // If no argument is supplied, return the closest id (source id)
+        Option(getSourceEffectiveId)
+      case Some(expr) ⇒
+        // Otherwise resolve the id passed against the source id
+        val staticOrAbsoluteId = expr.evaluateAsString(xpathContext).toString
+        resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
+          (_.getEffectiveId)
+    }
 
   /**
    * preEvaluate: this method suppresses compile-time evaluation by doing nothing

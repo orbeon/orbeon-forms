@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.value.BooleanValue
 
-class XXFormsIsBlank extends XFormsFunction with FunctionSupport {
+class XXFormsIsBlank extends XFormsFunction {
 
   override def evaluateItem(context: XPathContext): BooleanValue =
     ! (stringArgumentOrContextOpt(0)(context) exists (_.trimAllToEmpty.nonEmpty))

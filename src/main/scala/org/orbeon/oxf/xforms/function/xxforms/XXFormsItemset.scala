@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
 
-class XXFormsItemset extends XFormsFunction with FunctionSupport {
+class XXFormsItemset extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {
 
     implicit val ctx = xpathContext

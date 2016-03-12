@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Node;
-import org.jaxen.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -30,7 +28,10 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -55,7 +56,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
 
     private List executionContextStack;
     private List currentNodes;
-    private List currentFunctions = new ArrayList();
+    private List<SQLFunctionLibrary.SQLFunctionContext> functionContextStack = new ArrayList<SQLFunctionLibrary.SQLFunctionContext>();
     public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context"; // used by SQLProcessor and related
 
     public SQLProcessorInterpreterContext(PropertySet propertySet) {
@@ -72,7 +73,6 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         public String statementString;
         public boolean emptyResultSet;
         public boolean gotResults;
-        public int rowPosition;
         public int updateCount;
 
         public int columnIndex;
@@ -196,39 +196,16 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         return (Node) currentNodes.get(currentNodes.size() - 1);
     }
 
-    public void pushFunctions(Map functions) {
-        currentFunctions.add(functions);
+    public void pushFunctionContext(SQLFunctionLibrary.SQLFunctionContext ctx) {
+        functionContextStack.add(ctx);
     }
 
-    public Map popFunctions() {
-        return (Map) currentFunctions.remove(currentFunctions.size() - 1);
+    public SQLFunctionLibrary.SQLFunctionContext popFunctionContext() {
+        return functionContextStack.remove(functionContextStack.size() - 1);
     }
 
-    private FunctionContext functionContext = new FunctionContext() {
-        public Function getFunction(String namespaceURI, String prefix, String localName) throws UnresolvableException {
-
-            String fullName = StringUtils.isEmpty(namespaceURI)
-                    ? localName : "{" + namespaceURI + "}" + localName;
-
-            for (int i = currentFunctions.size() - 1; i >= 0; i--) {
-                Map current = (Map) currentFunctions.get(i);
-                Function function = (Function) current.get(fullName);
-                if (function != null) {
-                    return function;
-                }
-            }
-
-            // If the namespace is local, we know the function is not declared
-            if (SQLProcessor.SQL_NAMESPACE_URI.equals(namespaceURI))
-                throw new UnresolvableException("Undeclared function: {" + namespaceURI + "}" + localName);
-
-            // Nothing found, but maybe it is one of the default functions
-            return null;
-        }
-    };
-
-    public FunctionContext getFunctionContext() {
-        return functionContext;
+    public SQLFunctionLibrary.SQLFunctionContext getFunctionContext() {
+        return functionContextStack.get(functionContextStack.size() - 1);
     }
 
     public void setResultSet(ResultSet resultSet) {
@@ -384,16 +361,6 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     public void setUpdateCount(int updateCount) {
         final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.updateCount = updateCount;
-    }
-
-    public int getRowPosition() {
-        final ExecutionContext executionContext = getExecutionContext(0);
-        return executionContext.rowPosition;
-    }
-
-    public void setRowPosition(int rowPosition) {
-        final ExecutionContext executionContext = getExecutionContext(0);
-        executionContext.rowPosition = rowPosition;
     }
 
     public NamespaceSupport getNamespaceSupport() {

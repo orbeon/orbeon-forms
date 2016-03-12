@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.NodeInfo
 import org.w3c.dom.Node._
 
-class XXFormsClasses extends XFormsFunction with FunctionSupport with ClassSupport {
+class XXFormsClasses extends XFormsFunction with ClassSupport {
   override def iterate(xpathContext: XPathContext) =
     asIterator(classes(0)(xpathContext).toList)
 
@@ -28,7 +28,7 @@ class XXFormsClasses extends XFormsFunction with FunctionSupport with ClassSuppo
     if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }
 
-protected trait ClassSupport extends FunctionSupport {
+protected trait ClassSupport extends XFormsFunction {
   def classes(i: Int)(implicit xpathContext: XPathContext): Set[String] =
     itemArgumentOrContextOpt(i) match {
       case Some(node: NodeInfo) if node.getNodeKind == ELEMENT_NODE ⇒

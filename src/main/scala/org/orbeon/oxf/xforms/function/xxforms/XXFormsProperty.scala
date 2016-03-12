@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.value.AtomicValue
 
@@ -25,7 +25,7 @@ import org.orbeon.saxon.value.AtomicValue
   *
   * Return the value of a property from properties.xml.
   */
-class XXFormsProperty extends XFormsFunction with FunctionSupport {
+class XXFormsProperty extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): AtomicValue =
     XXFormsProperty.property(stringArgument(0)(xpathContext)).orNull

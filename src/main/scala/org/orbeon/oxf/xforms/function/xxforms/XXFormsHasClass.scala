@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 
-class XXFormsHasClass extends XFormsFunction with FunctionSupport with ClassSupport {
+class XXFormsHasClass extends XFormsFunction with ClassSupport {
   override def evaluateItem(xpathContext: XPathContext) =
     classes(1)(xpathContext)(stringArgument(0)(xpathContext))
 

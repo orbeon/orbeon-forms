@@ -71,7 +71,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
         String currentTestError = null;
         try {
             staticSetup();
-            
+
             final List<Object[]> parameters = new ArrayList<Object[]>();
             final Document tests; {
                 final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG), true);
@@ -82,10 +82,10 @@ public class ProcessorTest extends ResourceManagerTestBase {
             }
 
             // If there are tests with a true "only" attribute but not a true "exclude" attribute, execute only those
-            Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[ancestor-or-self::*/@only = 'true' and not(ancestor-or-self::*/@exclude = 'true')]");
+            Iterator i = XPathUtils.selectNodeIterator(tests, "(/tests/test | /tests/group/test)[ancestor-or-self::*/@only = 'true' and not(ancestor-or-self::*/@exclude = 'true')]");
             // Otherwise, run all tests that are not excluded
             if (!i.hasNext())
-                i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[not(ancestor-or-self::*/@exclude = 'true')]");
+                i = XPathUtils.selectNodeIterator(tests, "(/tests/test | /tests/group/test)[not(ancestor-or-self::*/@exclude = 'true')]");
 
             for (; i.hasNext();) {
                 final Element testNode = (Element) i.next();
@@ -109,7 +109,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 // Connect outputs
                 final List<DOMSerializer> domSerializers = new ArrayList<DOMSerializer>();
                 final List<Document> expectedDocuments = new ArrayList<Document>();
-                for (Iterator j = XPathUtils.selectIterator(testNode, "output"); j.hasNext();) {
+                for (Iterator j = XPathUtils.selectNodeIterator(testNode, "output"); j.hasNext();) {
                     final Element outputElement = (Element) j.next();
                     final String name = XPathUtils.selectStringValue(outputElement, "@name");
                     if (name == null || name.equals(""))

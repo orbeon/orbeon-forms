@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * Extension xxf:cases($switch-id as xs:string) as xs:string* function.
  */
-class XXFormsCases extends XFormsFunction with FunctionSupport {
+class XXFormsCases extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     asIterator(
       relevantControl(0)(xpathContext)             flatMap

@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.functions.Evaluate.PreparedExpression
 import org.orbeon.saxon.trace.Location
 import org.orbeon.saxon.trans.{SaxonErrorCode, XPathException}
-import org.orbeon.saxon.value.{ObjectValue, BooleanValue}
+import org.orbeon.saxon.value.{BooleanValue, ObjectValue}
+
 import scala.util.control.Breaks._
 
 class XXFormsForall extends XFormsFunction with ExistentialFunction  {
@@ -31,7 +32,7 @@ class XXFormsExists extends XFormsFunction with ExistentialFunction  {
   def returnNonDefaultValue(b: Boolean) = b
 }
 
-trait ExistentialFunction extends XFormsFunction with FunctionSupport {
+trait ExistentialFunction extends XFormsFunction {
 
   def defaultValue: Boolean
   def returnNonDefaultValue(b: Boolean): Boolean

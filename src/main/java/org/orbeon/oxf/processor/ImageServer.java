@@ -157,7 +157,7 @@ public class ImageServer extends ProcessorImpl {
                     if (transforms != null && transforms instanceof Node)
                         transforms = Collections.singletonList(transforms);
                     result.transforms = transforms;
-                    result.transformIterator = XPathUtils.selectIterator(imageConfigDocument, "/image/transform");
+                    result.transformIterator = XPathUtils.selectNodeIterator(imageConfigDocument, "/image/transform");
 
                     return result;
                 }
@@ -609,7 +609,7 @@ public class ImageServer extends ProcessorImpl {
         graphics.drawImage(filteredImg, null, null);
         // Check for drawing operation
         for (Node drawConfigNode: drawConfiguration) {
-            for (Iterator i = XPathUtils.selectIterator(drawConfigNode, "rect | fill | line"); i.hasNext();) {
+            for (Iterator i = XPathUtils.selectNodeIterator(drawConfigNode, "rect | fill | line"); i.hasNext();) {
                 Node node = (Node) i.next();
                 String operation = XPathUtils.selectStringValueNormalize(node, "name()");
                 if ("rect".equals(operation)) {

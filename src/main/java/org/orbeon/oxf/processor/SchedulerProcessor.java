@@ -52,7 +52,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                     List configs = new ArrayList();
                     Document document = readInputAsDOM4J(context, input);
 
-                    for (Iterator i = XPathUtils.selectIterator(document, "/config/start-task"); i.hasNext();) {
+                    for (Iterator i = XPathUtils.selectNodeIterator(document, "/config/start-task"); i.hasNext();) {
                         Element startTaskElement = (Element) i.next();
                         Config config = new Config(Config.START);
                         config.setName(XPathUtils.selectStringValueNormalize(startTaskElement, "name"));
@@ -65,7 +65,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                             final QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement, true);
                             processorDefinition = new ProcessorDefinition(processorQName);
 
-                            for (final Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
+                            for (final Iterator j = XPathUtils.selectNodeIterator(startTaskElement, "input"); j.hasNext();) {
                                 Element inputElement = (Element) j.next();
                                 String name = inputElement.attributeValue("name");
                                 String url = inputElement.attributeValue("url");
@@ -107,7 +107,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         configs.add(config);
                     }
 
-                    for (Iterator i = XPathUtils.selectIterator(document, "/config/stop-task"); i.hasNext();) {
+                    for (Iterator i = XPathUtils.selectNodeIterator(document, "/config/stop-task"); i.hasNext();) {
                         Element el = (Element) i.next();
                         Config config = new Config(Config.STOP);
                         config.setName(XPathUtils.selectStringValueNormalize(el, "name"));

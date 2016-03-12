@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 
-class XXFormsListModels extends XFormsFunction with FunctionSupport {
+class XXFormsListModels extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     for {
       model       ← getContainingDocument(xpathContext).allModels

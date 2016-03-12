@@ -335,7 +335,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                         final List<Serializable> parameterValues = new ArrayList<Serializable>();
 
                                         // Go through elements
-                                        for (Iterator i = XPathUtils.selectIterator(parametersDocument, "/*/*"); i.hasNext();) {
+                                        for (Iterator i = XPathUtils.selectNodeIterator(parametersDocument, "/*/*"); i.hasNext();) {
                                             final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
                                             // TODO: should pass true?
@@ -487,7 +487,7 @@ public class DelegationProcessor extends ProcessorImpl {
             service.returnFault = "true".equals(serviceElement.attributeValue("return-fault"));
 
             // Create operations
-            for (java.util.Iterator j = XPathUtils.selectIterator(serviceElement, "operation"); j.hasNext();) {
+            for (java.util.Iterator j = XPathUtils.selectNodeIterator(serviceElement, "operation"); j.hasNext();) {
                 Element operationElement = (Element) j.next();
                 OperationDefinition operation = new OperationDefinition();
                 operation.service = service;

@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
-class Bind extends XFormsFunction with FunctionSupport {
+class Bind extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

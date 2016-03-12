@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
 
-class XXFormsVisited extends XFormsFunction with FunctionSupport {
+class XXFormsVisited extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     relevantControl(0)(xpathContext) map (_.visited)
 }

@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xforms.function.FunctionSupport
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 
-class XXFormsValue extends FunctionSupport {
+class XXFormsValue extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext) =
     relevantControl(0)(xpathContext) collect {

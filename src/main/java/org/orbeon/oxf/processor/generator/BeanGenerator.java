@@ -63,12 +63,12 @@ public class BeanGenerator extends ProcessorImpl {
                     Document dom = readInputAsDOM4J(context, input);
                     try {
                         Config config2 = new Config();
-                        for (Iterator i = XPathUtils.selectIterator(dom, "/config/attribute"); i.hasNext();) {
+                        for (Iterator i = XPathUtils.selectNodeIterator(dom, "/config/attribute"); i.hasNext();) {
                             Element el = (Element) i.next();
                             config2.addAttribute(el.getTextTrim());
                         }
 
-                        for (Iterator i = XPathUtils.selectIterator(dom, "/config/source"); i.hasNext();) {
+                        for (Iterator i = XPathUtils.selectNodeIterator(dom, "/config/source"); i.hasNext();) {
                             String s = ((Element) i.next()).getTextTrim();
                             if (s.equalsIgnoreCase("request"))
                                 config2.addSource(Config.REQUEST);

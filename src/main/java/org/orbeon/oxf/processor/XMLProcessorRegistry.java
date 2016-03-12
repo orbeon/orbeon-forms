@@ -42,7 +42,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
         try {
             final Node cfg = readInputAsDOM4J(ctxt, INPUT_CONFIG);
 
-            for (Iterator i = XPathUtils.selectIterator(cfg, "/processors//processor"); i.hasNext();) { // support multiple nesting levels
+            for (Iterator i = XPathUtils.selectNodeIterator(cfg, "/processors//processor"); i.hasNext();) { // support multiple nesting levels
                 Element processorElement = (Element) i.next();
 
                 // Extract processor name
@@ -118,7 +118,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                 // Override the name - can this have unexpected consequences?
                                 baseProcessor.setName(defaultQName);
 
-                                for (Iterator j = XPathUtils.selectIterator(instantiationDef, "input"); j.hasNext();) {
+                                for (Iterator j = XPathUtils.selectNodeIterator(instantiationDef, "input"); j.hasNext();) {
                                     final Element inputElement = (Element) j.next();
                                     final String name = XPathUtils.selectStringValueNormalize(inputElement, "@name");
                                     final String href = XPathUtils.selectStringValueNormalize(inputElement, "@href");

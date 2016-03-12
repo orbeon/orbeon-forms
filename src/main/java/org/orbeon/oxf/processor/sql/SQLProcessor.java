@@ -38,27 +38,24 @@ import java.util.*;
 
 /**
  * This is the SQL processor implementation.
- * <p/>
+ *
  * TODO:
- * <p/>
- * o batch for mass updates when supported
- * o esql:use-limit-clause, esql:skip-rows, esql:max-rows
- * <p/>
- * o The position() and last() functions are not implemented within
- * sql:for-each it does not appear to be trivial to implement them, because
- * they are already defined by default. Probably that playing with the Jaxen
- * Context object will allow a correct implementation.
- * <p/>
- * o debugging facilities, i.e. output full query with replaced parameters (even on PreparedStatement)
- * o support more types in replace mode
- * <p/>
- * o sql:choose, sql:if
- * o sql:variable
- * o define variables such as:
- * o $sql:results (?)
- * o $sql:column-count
- * o $sql:update-count
- * o caching options
+ *
+ * - batch for mass updates when supported
+ * - esql:use-limit-clause, esql:skip-rows, esql:max-rows
+ *
+ * - The position() and last() functions are not implemented within
+ *   sql:for-each it does not appear to be trivial to implement them, because
+ *   they are already defined by default.
+ * - debugging facilities, i.e. output full query with replaced parameters (even on PreparedStatement)
+ * - support more types in replace mode
+ * - sql:choose, sql:if
+ * - sql:variable
+ * - define variables such as:
+ * - $sql:results (?)
+ * - $sql:column-count
+ * - $sql:update-count
+ * - caching options
  */
 public class SQLProcessor extends ProcessorImpl {
 
@@ -125,7 +122,7 @@ public class SQLProcessor extends ProcessorImpl {
                     // NOTE: For now, just match <sql:param select="/*" type="xs:base64Binary"/>
                     List xpathExpressions = new ArrayList();
                     boolean useXPathExpressions = false;
-                    for (Iterator i = XPathUtils.selectIterator(configDocument, "//*[namespace-uri() = '" + SQL_NAMESPACE_URI + "' and @select]"); i.hasNext();) {
+                    for (Iterator i = XPathUtils.selectNodeIterator(configDocument, "//*[namespace-uri() = '" + SQL_NAMESPACE_URI + "' and @select]"); i.hasNext();) {
                         Element element = (Element) i.next();
                         useXPathExpressions = true;
                         String typeAttribute = element.attributeValue("type");

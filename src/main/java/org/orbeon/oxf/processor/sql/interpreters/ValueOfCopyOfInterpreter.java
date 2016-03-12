@@ -14,10 +14,9 @@
 package org.orbeon.oxf.processor.sql.interpreters;
 
 import org.dom4j.Node;
-import org.jaxen.UnresolvableException;
-import org.jaxen.VariableContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
@@ -56,21 +55,9 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
         try {
             String selectString = attributes.getValue("select");
 
-            // Variable context (obsolete)
-            VariableContext variableContext = new VariableContext() {
-                public Object getVariableValue(String namespaceURI, String prefix, String localName) throws UnresolvableException {
-                    if (!SQLProcessor.SQL_NAMESPACE_URI.equals(namespaceURI))
-                        throw new UnresolvableException("Unbound variable: {" + namespaceURI + "}" + localName);
-                    if ("row-position".equals(localName)) {
-                        return new Integer(interpreterContext.getRowPosition());
-                    } else
-                        throw new UnresolvableException("Unbound variable: {" + namespaceURI + "}" + localName);
-                }
-            };
-
             // Interpret expression
             Object result = XPathUtils.selectObjectValue(interpreterContext.getCurrentNode(), selectString,
-                    interpreterContext.getPrefixesMap(), variableContext, interpreterContext.getFunctionContext());
+                    interpreterContext.getPrefixesMap(), SQLFunctionLibrary.instance(), interpreterContext.getFunctionContext());
             if (wrapper == null)
                 wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPath.GlobalConfiguration());
 

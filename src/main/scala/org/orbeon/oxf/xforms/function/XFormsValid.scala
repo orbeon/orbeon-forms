@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction
-import org.orbeon.oxf.xml.AttributesAndElementsIterator
+import org.orbeon.oxf.xml.{AttributesAndElementsIterator, FunctionSupport}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML.{asScalaIterator, isElementOrAttribute}
@@ -58,7 +58,7 @@ class XXFormsValid extends XXFormsMIPFunction with ValidSupport {
   }
 }
 
-trait ValidSupport extends FunctionSupport {
+trait ValidSupport extends XFormsFunction {
 
   def isValid(pruneNonRelevant: Boolean, recurse: Boolean)(implicit xpathContext: XPathContext) = {
 

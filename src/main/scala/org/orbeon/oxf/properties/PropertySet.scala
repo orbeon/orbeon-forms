@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.properties
 
-import java.lang.{Boolean ⇒ JBoolean, Integer ⇒ JInteger}
 import java.net.URI
-import java.util.{Date ⇒ JDate, List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet}
+import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.dom4j.{Element, QName}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.util.ScalaUtils.{BooleanWrapper, StringOps, split}
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -83,20 +83,19 @@ class PropertySet {
     currentNode.property = property
   }
 
-  def keySet: JSet[String] = exactProperties.keySet.asJava
+  def keySet: ju.Set[String] = exactProperties.keySet.asJava
   def size = exactProperties.size
 
   /**
    * an unmodifiable Map<String, Boolean> of all Boolean properties.
    */
-  def getBooleanProperties: JMap[String, JBoolean] = {
+  def getBooleanProperties: ju.Map[String, jl.Boolean] = {
     val tuples =
       for {
-        key ← exactProperties.keys
-        o = getObject(key)
-        if o.isInstanceOf[JBoolean]
+        key   ← exactProperties.keys
+        value ← ScalaUtils.collectByErasedType[java.lang.Boolean](getObject(key))
       } yield
-        key → o.asInstanceOf[JBoolean]
+        key → value
 
     tuples.toMap.asJava
   }
@@ -144,7 +143,7 @@ class PropertySet {
   }
 
   // For Java callers
-  def getPropertiesStartsWith(name: String): JList[String] = propertiesStartsWith(name).asJava
+  def getPropertiesStartsWith(name: String): ju.List[String] = propertiesStartsWith(name).asJava
 
   /**
    * Get a property.
@@ -221,29 +220,29 @@ class PropertySet {
   def getString(name: String): String =
     getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToNull
 
-  def getNmtokens(name: String): JSet[String] =
-    getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[JSet[String]]
+  def getNmtokens(name: String): ju.Set[String] =
+    getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
 
   def getString(name: String, default: String): String =
     Option(getString(name)) getOrElse default
 
-  def getInteger(name: String): JInteger =
-    getPropertyValue(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[JInteger]
+  def getInteger(name: String): jl.Integer =
+    getPropertyValue(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]
 
-  def getInteger(name: String, default: Int): JInteger =
-    Option(getInteger(name)) getOrElse new JInteger(default)
+  def getInteger(name: String, default: Int): jl.Integer =
+    Option(getInteger(name)) getOrElse new jl.Integer(default)
 
-  def getBoolean(name: String): JBoolean =
-    getPropertyValue(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[JBoolean]
+  def getBoolean(name: String): jl.Boolean =
+    getPropertyValue(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[jl.Boolean]
 
   def getBoolean(name: String, default: Boolean): Boolean =
     Option(getBoolean(name)) map (_.booleanValue) getOrElse default
 
-  def getDate(name: String): JDate =
-    getPropertyValue(name, XMLConstants.XS_DATE_QNAME).asInstanceOf[JDate]
+  def getDate(name: String): ju.Date =
+    getPropertyValue(name, XMLConstants.XS_DATE_QNAME).asInstanceOf[ju.Date]
 
-  def getDateTime(name: String): JDate =
-    getPropertyValue(name, XMLConstants.XS_DATETIME_QNAME).asInstanceOf[JDate]
+  def getDateTime(name: String): ju.Date =
+    getPropertyValue(name, XMLConstants.XS_DATETIME_QNAME).asInstanceOf[ju.Date]
 
   def getQName(name: String): QName =
     getPropertyValue(name, XMLConstants.XS_QNAME_QNAME).asInstanceOf[QName]
@@ -254,8 +253,8 @@ class PropertySet {
   def getURI(name: String): URI =
     getPropertyValue(name, XMLConstants.XS_ANYURI_QNAME).asInstanceOf[URI]
 
-  def getNonNegativeInteger(nm: String): JInteger =
-    getPropertyValue(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME).asInstanceOf[JInteger]
+  def getNonNegativeInteger(nm: String): jl.Integer =
+    getPropertyValue(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME).asInstanceOf[jl.Integer]
 
   def getNCName(nm: String): String =
     getPropertyValue(nm, XMLConstants.XS_NCNAME_QNAME).asInstanceOf[String]

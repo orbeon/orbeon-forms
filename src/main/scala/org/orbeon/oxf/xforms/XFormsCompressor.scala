@@ -128,7 +128,7 @@ object XFormsCompressor extends Logging {
         out.close()
         closed = true
       }
-			
+
 		// Override because IBM implementation calls def.end()
 		override def finish(): Unit = {
 
@@ -154,7 +154,7 @@ object XFormsCompressor extends Logging {
 				while (!deflater.finished) {
 					var len = deflater.deflate(buf, 0, buf.length)
 					if (deflater.finished && len <= buf.length - TRAILER_SIZE) {
-						// last deflater buffer. Fit trailer at the end 
+						// last deflater buffer. Fit trailer at the end
 						writeTrailer(buf, len)
 						len = len + TRAILER_SIZE
 						out.write(buf, 0, len)

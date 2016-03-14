@@ -20,9 +20,9 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{StreamedContent, HttpClient, ApacheHttpClient, HttpClientSettings}
+import org.orbeon.oxf.http.{ApacheHttpClient, HttpClient, HttpClientSettings, StreamedContent}
 import org.orbeon.oxf.portlet.liferay.LiferaySupport
-import org.orbeon.oxf.util.ScalaUtils.{withRootException ⇒ _, _}
+import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.breakOut
 import scala.util.control.NonFatal

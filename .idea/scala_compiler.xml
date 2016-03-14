@@ -30,7 +30,7 @@
         <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.9.jar" />
       </plugins>
     </profile>
-    <profile name="SBT 5" modules="root,core,resourcesPackaged">
+    <profile name="SBT 5" modules="root,common,core,resourcesPackaged,xupdate">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />

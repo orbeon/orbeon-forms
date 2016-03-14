@@ -14,10 +14,10 @@
 package org.orbeon.oxf.common
 
 import java.util.concurrent.ConcurrentHashMap
+import java.{util ⇒ ju}
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
-import java.{util ⇒ ju}
 
 class CEVersion extends Version {
 

@@ -15,10 +15,11 @@ package org.orbeon.oxf.common
 
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
+
 import scala.util.control.NonFatal
-import org.orbeon.oxf.util.ScalaUtils._
 
 // Product version information
 // NOTE: This could be a trait, but this causes difficulties to XPath callers to reach `object Version` functions.

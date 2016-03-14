@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.webapp
 
+import javax.servlet.{ServletContextEvent, ServletContextListener, ServletException}
+
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
-import javax.servlet.{ServletException, ServletContextEvent, ServletContextListener}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.ServletPortlet._
 
 // For backward compatibility
 class OrbeonServletContextListenerDelegate extends OrbeonServletContextListener

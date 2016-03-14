@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
 
 import scala.collection.JavaConverters._

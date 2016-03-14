@@ -1,0 +1,1 @@
+This directory contains some common dependencies used both by the legacy XUpdate module of Orbeon Forms and by other modules.

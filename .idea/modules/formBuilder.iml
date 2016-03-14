@@ -22,9 +22,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: be.doeraene:scalajs-jquery_sjs0.6_2.11:0.9.0:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.9:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-js:scalajs-dom_sjs0.6_2.11:0.9.0:jar" level="project" />
     <orderEntry type="module" module-name="formBuilderSharedJS" exported="" />
+    <orderEntry type="library" name="SBT: org.scala-js:scalajs-dom_sjs0.6_2.11:0.9.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.9:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
   </component>
 </module>

@@ -1,0 +1,74 @@
+
+<html>
+	<head>
+		<title>
+			Jaxen: Java XPath Engine
+		</title>
+	</head>
+
+	<body bgcolor="white">
+
+		<p>Jaxen is a fast Java engine for <a href="http://www.w3.org/TR/xpath">XPath 1.0</a>
+                  that works on all XML object models.
+                </p>
+
+		<p>
+		Jaxen currently works with the following XML models:
+			<a href="http://dom4j.org/">dom4j</a>,
+			<a href="http://jdom.org/">JDOM</a>,
+			<a href="http://www.w3.org/">W3C DOM</a>
+				and
+			<a href="http://www.xom.nu/">XOM</a>.
+
+		</p>
+
+		<p>
+		An <code>XPath</code> implementation is typically all that's required
+		to get started with Jaxen.
+		</p>
+
+		<table>
+			<tr>
+				<td>
+					<b>Object Model</b>
+				</td>
+				<td>
+					<b>Class</b>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					dom4j
+				</td>
+				<td>
+					{@link org.orbeon.jaxen.dom4j.Dom4jXPath org.orbeon.jaxen.dom4j.Dom4jXPath}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					JDOM
+				</td>
+				<td>
+					{@link org.orbeon.jaxen.jdom.JDOMXPath org.orbeon.jaxen.jdom.JDOMXPath}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					W3C DOM
+				</td>
+				<td>
+					{@link org.orbeon.jaxen.dom.DOMXPath org.orbeon.jaxen.dom.DOMXPath}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					XOM
+				</td>
+				<td>
+					{@link org.orbeon.jaxen.xom.XOMXPath org.orbeon.jaxen.xom.XOMXPath}
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
+

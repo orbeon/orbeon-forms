@@ -17,7 +17,7 @@ import javax.servlet.ServletException
 import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
 
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.ServletPortlet._
 
 import scala.util.control.NonFatal
 

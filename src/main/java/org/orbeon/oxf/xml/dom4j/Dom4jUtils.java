@@ -285,22 +285,6 @@ public class Dom4jUtils {
         return saxReader.read(inputStream);
     }
 
-    /**
-     * Removes the elements and text inside the given element, but not the attributes or namespace
-     * declarations on the element.
-     */
-    public static void clearElementContent(final Element elt) {
-        final java.util.List cntnt = elt.content();
-        for (final java.util.ListIterator j = cntnt.listIterator();
-             j.hasNext();) {
-            final Node chld = (Node) j.next();
-            if (chld.getNodeType() == Node.TEXT_NODE
-                    || chld.getNodeType() == Node.ELEMENT_NODE) {
-                j.remove();
-            }
-        }
-    }
-
     public static String makeSystemId(final Element e) {
         final LocationData ld = (LocationData) e.getData();
         final String ldSid = ld == null ? null : ld.getSystemID();
@@ -591,11 +575,6 @@ public class Dom4jUtils {
         String namespaceURI = qName.substring(openIndex + 1, qName.indexOf("}"));
         String localName = qName.substring(qName.indexOf("}") + 1);
         return new QName(localName, new Namespace("p1", namespaceURI));
-    }
-
-    public static XPath createXPath(final String expression) throws InvalidXPathException {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
-        return factory.createXPath(expression);
     }
 
     public static Text createText(final String text) {
@@ -895,7 +874,7 @@ public class Dom4jUtils {
         return XMLUtils.buildURIQualifiedName(qName.getNamespaceURI(), qName.getName());
     }
 
-    public static interface VisitorListener {
+    public interface VisitorListener {
         void startElement(Element element);
         void endElement(Element element);
         void text(Text text);

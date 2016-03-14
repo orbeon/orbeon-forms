@@ -128,6 +128,24 @@ lazy val formBuilder = (project in file("builder"))
     )
   )
 
+lazy val common = (project in file("common"))
+  .settings(commonSettings: _*)
+  .settings(
+    name                         := "orbeon-common",
+    unmanagedBase                := baseDirectory.value / ".." / "lib",
+    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
+  )
+
+lazy val xupdate = (project in file("xupdate"))
+  .dependsOn(common)
+  .settings(commonSettings: _*)
+  .settings(
+    name                         := "orbeon-xupdate",
+    unmanagedBase                := baseDirectory.value / ".." / "lib",
+    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
+  )
+
+
 lazy val resourcesPackaged = (project in file("src"))
   .settings(commonSettings: _*)
   .settings(
@@ -139,7 +157,7 @@ lazy val resourcesPackaged = (project in file("src"))
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(formBuilderSharedJVM)
+  .dependsOn(common, xupdate, formBuilderSharedJVM)
   .settings(commonSettings: _*)
   .settings(
     name                         := "orbeon-core",

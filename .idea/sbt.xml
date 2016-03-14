@@ -10,6 +10,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/builder" />
             <option value="$PROJECT_DIR$/builder/project" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/common/project" />
             <option value="$PROJECT_DIR$/project" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/shared/.js" />
@@ -18,6 +20,8 @@
             <option value="$PROJECT_DIR$/shared/.jvm/project" />
             <option value="$PROJECT_DIR$/src" />
             <option value="$PROJECT_DIR$/src/project" />
+            <option value="$PROJECT_DIR$/xupdate" />
+            <option value="$PROJECT_DIR$/xupdate/project" />
           </set>
         </option>
         <option name="sbtVersion" value="0.13.9" />

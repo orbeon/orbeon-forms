@@ -20,8 +20,8 @@ import org.dom4j.Document
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
-import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.processor.generator.DOMGenerator
+import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundException}
 import org.orbeon.oxf.util.DateUtils._
 import org.orbeon.oxf.util.PipelineUtils._

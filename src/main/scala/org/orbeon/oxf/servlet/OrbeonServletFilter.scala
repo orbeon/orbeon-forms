@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.servlet
 
+import javax.servlet._
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.processor.ServletFilterGenerator
-import javax.servlet._
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import collection.JavaConverters._
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.webapp.{WebAppContext, ProcessorService, ServletPortlet}
+import org.orbeon.oxf.webapp.ServletPortlet._
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+
+import scala.collection.JavaConverters._
 
 // For backward compatibility
 class OrbeonServletFilterDelegate extends OrbeonServletFilter

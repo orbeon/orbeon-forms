@@ -13,11 +13,15 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.pipeline.InitUtils._
-import org.orbeon.oxf.webapp.ProcessorService._
-import org.orbeon.oxf.pipeline.api.{ProcessorDefinition, PipelineContext}
+import org.apache.log4j.Logger
+import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.pipeline.InitUtils._
+import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.util.ScalaUtils._
+
+import scala.util.control.NonFatal
 
 // Servlet/portlet helper for processor definitions and services
 trait ServletPortlet {
@@ -45,14 +49,14 @@ trait ServletPortlet {
 
     // Run listener if needed
     processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
-    Logger.info(logPrefix + " initialized.")
+    ProcessorService.Logger.info(logPrefix + " initialized.")
   }
 
   // Destroy the servlet or portlet
   def destroy(processor: Option[(String, String)]): Unit = {
     // Run listener if needed
     processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
-    Logger.info(logPrefix + " destroyed.")
+    ProcessorService.Logger.info(logPrefix + " destroyed.")
 
      // Clean-up
     _processorService = None
@@ -62,11 +66,11 @@ trait ServletPortlet {
   private def runInitDestroyListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
     // Create and run processor if definition is found
     searchDefinition(processorPrefix, inputPrefix) foreach  { definition ⇒
-      Logger.info(logPrefix + " - About to run processor: " +  definition.toString)
+      ProcessorService.Logger.info(logPrefix + " - About to run processor: " +  definition.toString)
 
       val processor = createProcessor(definition)
       val externalContext = new WebAppExternalContext(webAppContext)
-      runProcessor(processor, externalContext, new PipelineContext)(Logger)
+      runProcessor(processor, externalContext, new PipelineContext)(ProcessorService.Logger)
     }
   }
 
@@ -91,4 +95,15 @@ trait ServletPortlet {
 
     (functions flatMap (_(processorPrefix, inputPrefix))).nextOption()
   }
+}
+
+object ServletPortlet {
+  // Run the body and log/rethrow the root cause of any Exception caught
+  def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit logger: Logger): T =
+    try body
+    catch {
+      case NonFatal(t) ⇒
+        logger.error("Exception when running " + action + '\n' + OrbeonFormatter.format(t))
+        throw newException(Exceptions.getRootThrowable(t))
+    }
 }

@@ -29,10 +29,12 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.6">
+      <module name="common" target="1.6" />
       <module name="core" target="1.6" />
       <module name="formBuilder" target="1.6" />
       <module name="resourcesPackaged" target="1.6" />
       <module name="root" target="1.6" />
+      <module name="xupdate" target="1.6" />
     </bytecodeTargetLevel>
   </component>
   <component name="EclipseCompilerSettings">

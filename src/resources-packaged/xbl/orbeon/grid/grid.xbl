@@ -344,11 +344,6 @@
                                                 <xh:th class="fr-repeat-column fr-repeat-column-right" xxf:control="true" ref=".[not($view-mode)]"/>
                                             </xsl:if>
                                         </xh:tr>
-                                        <!-- Optional row(s) shown before the repeated rows -->
-                                        <!--<xsl:for-each select="fr:header">-->
-                                            <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
-                                            <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
-                                        <!--</xsl:for-each>-->
                                     </xh:thead>
                                 </xsl:if>
 

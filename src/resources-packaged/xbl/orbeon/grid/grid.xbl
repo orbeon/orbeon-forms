@@ -334,7 +334,14 @@
                                                         </xf:var>
                                                         <!-- Point to control binding if any, dummy value otherwise
                                                              and make sure there is an empty value. -->
-                                                        <xf:output xxbl:scope="outer" ref="$control-binding, ''" value="''">
+                                                        <xf:output
+                                                                xxbl:scope="outer"
+                                                                ref="$control-binding, ''"
+                                                                value="''">
+                                                            <xsl:if test="$control/@id">
+                                                                <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->
+                                                                <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', $control/@id)"/>
+                                                            </xsl:if>
                                                             <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                         </xf:output>
                                                     </xsl:if>

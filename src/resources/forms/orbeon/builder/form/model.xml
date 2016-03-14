@@ -493,7 +493,13 @@
         <xf:setvalue ref="$current-resources/*[name() = fbf:controlNameFromId(event('xxf:targetid'))]/label" value="event('label')"/>
     </xf:action>
     <xf:action ev:observer="fb" ev:event="fb-update-control-lhha" xxf:phantom="true">
-        <xf:setvalue ref="$current-resources/*[name() = fbf:controlNameFromId(event('xxf:targetid'))]/*[name() = event('lhha')]" value="event('value')"/>
+        <!-- The target might the control itself, or for grids with LHH in headers, an xf:output added to edit the LHH -->
+        <xf:var name="targetid"      value="event('xxf:targetid')"/>
+        <xf:var name="editor-prefix" value="'fb-lhh-editor-for-'"/>
+        <xf:var name="control-id"    value="if   (starts-with($targetid, $editor-prefix))
+                                            then substring-after($targetid, $editor-prefix)
+                                            else $targetid"/>
+        <xf:setvalue ref="$current-resources/*[name() = fbf:controlNameFromId($control-id)]/*[name() = event('lhha')]" value="event('value')"/>
         <xf:action type="xpath">fbf:setControlLHHAMediatype(instance('fb-form-instance'), fbf:controlNameFromId(event('xxf:targetid')), event('lhha'), event('isHtml') = 'true')</xf:action>
     </xf:action>
     <xf:var name="variables" value="instance('fb-variables')"/>

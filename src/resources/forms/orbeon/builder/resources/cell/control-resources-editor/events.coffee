@@ -41,10 +41,8 @@ $ ->
         th = Builder.resourceEditorCurrentLabelHint.parents('th')
         Builder.resourceEditorCurrentControl =
             if th.is('*')
-                # Case of a repeat
-                trWithControls = th.parents('table').find('tbody tr.fb-grid-tr').first()
-                tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
-                tdWithControl.find(ControlSelector)
+                # Case of a repeat: we might not have a control, so instead keep track of the LHH editor
+                Builder.resourceEditorCurrentLabelHint.parents(ControlSelector).first()
             else
                 explanation = Builder.resourceEditorCurrentLabelHint.parents(ExplanationSelector).toArray()
                 controls = Builder.resourceEditorCurrentLabelHint.parents(ControlSelector).toArray()

@@ -41,7 +41,7 @@ object InstanceMirror {
   // specially takes care of instance root replacement. However in order to ensure that indexes are properly
   // maintained in the case of two linked instances, xxforms-replace will be needed. For now this doesn't happen
   // with Form Builder.
-  private val MutationEvents = Seq(XXFORMS_VALUE_CHANGED, XFORMS_INSERT, XFORMS_DELETE, XXFORMS_REPLACE)
+  private val MutationEvents = List(XXFORMS_VALUE_CHANGED, XFORMS_INSERT, XFORMS_DELETE, XXFORMS_REPLACE)
 
   // (sourceInstance, sourceNode, siblingIndexOpt) ⇒ Option[(destinationInstance, destinationNode)]
   type NodeMatcher = (XFormsInstance, NodeInfo, Option[Int]) ⇒ Option[(XFormsInstance, NodeInfo)]
@@ -141,7 +141,7 @@ object InstanceMirror {
       else
         outerNode ancestorOrSelf *
 
-    val inScope = ancestors intersect Seq(referenceNode) nonEmpty
+    val inScope = ancestors intersect List(referenceNode) nonEmpty
 
     def namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unsafeUnwrapElement(referenceNode)))
 
@@ -170,9 +170,9 @@ object InstanceMirror {
             assert(pathToOuterNode.startsWith(pathToWrapper))
 
             if (pathToWrapper == "/")
-              Seq("", "*") ++ (pathToOuterNode split '/' drop 2) mkString "/"
+              List("", "*") ++ (pathToOuterNode split '/' drop 2) mkString "/"
             else if (pathToOuterNode.size > pathToWrapper.size)
-              Seq("", "*") ++ (pathToOuterNode.substring(pathToWrapper.size) split '/' drop 2) mkString "/"
+              List("", "*") ++ (pathToOuterNode.substring(pathToWrapper.size) split '/' drop 2) mkString "/"
             else
               "/"
           }
@@ -331,7 +331,7 @@ object InstanceMirror {
 
                     body(newParentNode) match {
                       case (Some(nodeToRemove: Node), result) ⇒
-                        XFormsAPI.delete(Seq(docWrapper.wrap(nodeToRemove)))
+                        XFormsAPI.delete(List(docWrapper.wrap(nodeToRemove)))
                         result
                       case (_, result) ⇒
                         result

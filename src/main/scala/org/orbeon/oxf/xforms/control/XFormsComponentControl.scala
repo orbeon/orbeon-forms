@@ -225,7 +225,7 @@ class XFormsComponentControl(
     }
   }
 
-  private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Unit = {
+  private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Option[XFormsInstance] = {
 
     // NOTE: Must be called after xforms-model-construct so that instances are present
     def findMirrorInstance = (
@@ -235,7 +235,7 @@ class XFormsComponentControl(
     )
 
     // Process mirror instance if any
-    findMirrorInstance foreach { mirrorInstance ⇒
+    findMirrorInstance map { mirrorInstance ⇒
 
       // Reference node must be a wrapped element
       // Also support case where there is no binding, and in which case use the binding context. This is done
@@ -259,6 +259,8 @@ class XFormsComponentControl(
 
       // Create the listeners
       createMirrorListener(mirrorInstance, referenceNode.get)
+
+      mirrorInstance
     }
   }
 
@@ -293,7 +295,11 @@ class XFormsComponentControl(
     val isNodesetChange = ! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)
     if (isNodesetChange) {
       destroyMirrorListenerIfNeeded()
-      initializeMirrorListenerIfNeeded(dispatch = true)
+      initializeMirrorListenerIfNeeded(dispatch = true) foreach { mirrorInstance ⇒
+        // If the instance was updated, it is due for an RRR, but nobody will check that before the refresh is done, so do it here.
+        mirrorInstance.model.doRebuild()
+        mirrorInstance.model.doRecalculateRevalidate()
+      }
     }
   }
 
@@ -326,8 +332,6 @@ class XFormsComponentControl(
       buildTree = (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix),
       idSuffix  = idSuffix
     )
-
-
 
   // Get the control at the root of the inner scope of the component
   def innerRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get

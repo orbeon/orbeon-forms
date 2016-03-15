@@ -127,6 +127,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     xblChanges.clear()
     bindChanges.clear()
 
+    if (create)
+      containingDocument.addControlStructuralChange(prefixedId)
+
     // Outer instance
     val outerInstance = containingDocument.getInstanceForNode(node)
     if (outerInstance eq null)

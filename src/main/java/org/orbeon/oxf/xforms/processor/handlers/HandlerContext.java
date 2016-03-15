@@ -213,15 +213,6 @@ public class HandlerContext {
     }
 
     /**
-     * Whether this is running during a full client update.
-     *
-     * @return  true iif so
-     */
-    public boolean isFullUpdate() {
-        return topLevelControlEffectiveId != null;
-    }
-
-    /**
      * Return location data associated with the current SAX event.
      *
      * @return  LocationData, null if no Locator was found

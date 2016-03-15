@@ -105,7 +105,7 @@ class ControlsComparator(
                 assert(fullUpdateBuffer.isEmpty, "xxf:dynamic within full update is not supported")
 
                 def replay(r: XMLReceiver) =
-                  element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" → c.effectiveId))(r)
+                  element("dynamic", uri = XXFORMS_NAMESPACE_URI, atts = List("id" → c.getId))(r)
 
                 processFullUpdateForContent(c, replay)
                 true

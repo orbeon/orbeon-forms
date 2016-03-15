@@ -106,8 +106,7 @@ object SaxonUtils {
       case _                                   ⇒ throw new IllegalStateException
     }
 
-  // Adapted from Saxon, but build paths with namespace information as needed
-  def buildNodePathHandleNamespaces(node: NodeInfo): String = {
+  def buildNodePath(node: NodeInfo): List[String] = {
 
     def findNodePosition(node: NodeInfo): Int = {
 
@@ -127,52 +126,52 @@ object SaxonUtils {
       i
     }
 
-    def buildPrefix(parent: NodeInfo) = {
-      val pre = buildNodePathHandleNamespaces(parent)
-      if (pre == "/") "" else pre
-    }
+    def buildOne(node: NodeInfo): List[String] = {
 
-    def buildNameTest(node: NodeInfo) =
-      if (node.getURI == "")
-        node.getLocalPart
-      else
-        s"*:${node.getLocalPart}[namespace-uri() = '${node.getURI}']"
+      def buildNameTest(node: NodeInfo) =
+        if (node.getURI == "")
+          node.getLocalPart
+        else
+          s"*:${node.getLocalPart}[namespace-uri() = '${node.getURI}']"
 
-    if (node ne null) {
-      val parent = node.getParent
-      node.getNodeKind match {
-        case Type.DOCUMENT ⇒
-          "/"
-        case Type.ELEMENT ⇒
-          if (parent eq null) {
-            buildNameTest(node)
-          } else {
-            val pre = buildNodePathHandleNamespaces(parent)
-            if (pre == "/") {
-              '/' + buildNameTest(node)
+      if (node ne null) {
+        val parent = node.getParent
+        node.getNodeKind match {
+          case Type.DOCUMENT ⇒
+            Nil
+          case Type.ELEMENT ⇒
+            if (parent eq null) {
+              List(buildNameTest(node))
             } else {
-              pre + '/' + buildNameTest(node) + '[' + findNodePosition(node) + ']'
+              val pre = buildOne(parent)
+              if (pre == Nil) {
+                buildNameTest(node) :: pre
+              } else {
+                (buildNameTest(node) + '[' + findNodePosition(node) + ']') :: pre
+              }
             }
-          }
-        case Type.ATTRIBUTE ⇒
-          buildNodePathHandleNamespaces(parent) + "/@" + buildNameTest(node)
-        case Type.TEXT ⇒
-          buildPrefix(parent) + "/text()[" + findNodePosition(node) + ']'
-        case Type.COMMENT ⇒
-          buildPrefix(parent) + "/comment()[" + findNodePosition(node) + ']'
-        case Type.PROCESSING_INSTRUCTION ⇒
-          buildPrefix(parent) + "/processing-instruction()[" + findNodePosition(node) + ']'
-        case Type.NAMESPACE ⇒
-          var test = node.getLocalPart
-          if (test.isEmpty) {
-            test = "*[not(local-name()]"
-          }
-          buildNodePathHandleNamespaces(parent) + "/namespace::" + test
-        case _ ⇒
-          ""
+          case Type.ATTRIBUTE ⇒
+            ("@" + buildNameTest(node)) :: buildOne(parent)
+          case Type.TEXT ⇒
+            ("text()[" + findNodePosition(node) + ']') :: buildOne(parent)
+          case Type.COMMENT ⇒
+            "comment()[" + findNodePosition(node) + ']' :: buildOne(parent)
+          case Type.PROCESSING_INSTRUCTION ⇒
+            ("processing-instruction()[" + findNodePosition(node) + ']') :: buildOne(parent)
+          case Type.NAMESPACE ⇒
+            var test = node.getLocalPart
+            if (test.isEmpty) {
+              test = "*[not(local-name()]"
+            }
+            ("namespace::" + test) :: buildOne(parent)
+          case _ ⇒
+            throw new IllegalArgumentException
+        }
+      } else {
+        throw new IllegalArgumentException
       }
-    } else {
-      ""
     }
+
+    buildOne(node).reverse
   }
 }

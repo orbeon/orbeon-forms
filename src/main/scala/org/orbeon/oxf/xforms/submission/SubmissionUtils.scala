@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 object SubmissionUtils {
 
   def dataNodeHash(node: NodeInfo) =
-    SecureUtils.hmacString(SaxonUtils.buildNodePathHandleNamespaces(node), "hex")
+    SecureUtils.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
   def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
     processGETConnection(model, resolvedURL) { is ⇒

@@ -13,26 +13,27 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.event.events.{XXFormsReplaceEvent, XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
-import event.XFormsEvents._
-import model.DataModel
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.saxon.value.StringValue
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.util.IndentedLogger
+
 import org.dom4j._
-import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, ListenersTrait}
-import Dispatch.EventListener
-import org.orbeon.saxon.om._
-import org.orbeon.oxf.xml.{SaxonUtils, NamespaceMapping}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsReplaceEvent, XXFormsValueChangedEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
+import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.om._
+import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.XML._
+import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE, TEXT_NODE}
 
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
@@ -162,25 +163,28 @@ object InstanceMirror {
         case InstanceDetails(instanceId, referenceNode, _) ⇒
           // This is a change to an instance
 
-          // Find path rooted at wrapper
-          val innerPath = {
-            val pathToWrapper   = SaxonUtils.buildNodePathHandleNamespaces(referenceNode)
-            val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
-
-            assert(pathToOuterNode.startsWith(pathToWrapper))
-
-            if (pathToWrapper == "/")
-              List("", "*") ++ (pathToOuterNode split '/' drop 2) mkString "/"
-            else if (pathToOuterNode.size > pathToWrapper.size)
-              List("", "*") ++ (pathToOuterNode.substring(pathToWrapper.size) split '/' drop 2) mkString "/"
-            else
-              "/"
-          }
-
-          // Find inner instance
           container.findInstance(instanceId) match {
             case Some(innerInstance) ⇒
               // Find destination path in instance
+
+              // Find path rooted at wrapper
+              val innerPath = {
+
+                val pathToWrapper   = SaxonUtils.buildNodePath(referenceNode)
+                val pathToOuterNode = getNodePath(outerNode, siblingIndexOpt)
+
+                assert(pathToOuterNode.startsWith(pathToWrapper))
+
+                val innerPathElems =
+                  pathToWrapper match {
+                    case Nil                                            ⇒ "*" :: (pathToOuterNode drop 1)
+                    case _ if pathToOuterNode.size > pathToWrapper.size ⇒ "*" :: (pathToOuterNode drop (pathToWrapper.size + 1))
+                    case _                                              ⇒ Nil
+                  }
+
+                innerPathElems mkString ("/", "/", "")
+              }
+
               evalOne(innerInstance.documentInfo, innerPath, NamespaceMapping.EMPTY_MAPPING) match {
                 case newNode: VirtualNode ⇒ Some(innerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
@@ -196,9 +200,9 @@ object InstanceMirror {
   private def getNodePath(node: NodeInfo, siblingIndexOpt: Option[Int]) = {
     siblingIndexOpt match {
       case Some(siblingIndex) if node.getNodeKind != ATTRIBUTE_NODE ⇒
-        SaxonUtils.buildNodePathHandleNamespaces(node.getParent) + s"/node()[${siblingIndex + 1}]"
+        SaxonUtils.buildNodePath(node.getParent) :+ s"node()[${siblingIndex + 1}]"
       case _ ⇒
-        SaxonUtils.buildNodePathHandleNamespaces(node)
+        SaxonUtils.buildNodePath(node)
     }
   }
 
@@ -224,7 +228,7 @@ object InstanceMirror {
             case _ ⇒
               // All other cases
 
-              val path = dropStartingSlash(getNodePath(innerNode, siblingIndexOpt))
+              val path = getNodePath(innerNode, siblingIndexOpt) mkString "/"
 
               // Find destination node in inline instance in original doc
               evalOne(instanceWrapper, path, NamespaceMapping.EMPTY_MAPPING) match {
@@ -244,10 +248,10 @@ object InstanceMirror {
 
     (_, innerNode, siblingIndexOpt) ⇒
 
-      // The path to the inner node looks like /a/b[i1]/c[i2], where "a" is the root element. The outer element is
-      // allowed to have another name. So we create a relative path starting at /a, which can be applied to the
-      // outer element.
-      val relativePath = getNodePath(innerNode, siblingIndexOpt) split '/' drop 2 mkString "/"
+      // The path to the inner node looks like `a :: b[i1] :: c[i2] :: Nil`, where `a` is the root element.
+      // The outer element is allowed to have another name. So we create a relative path starting at `/a`,
+      // which can be applied to the outer element.
+      val relativePath = getNodePath(innerNode, siblingIndexOpt).tail mkString "/"
 
       if (relativePath.isEmpty)
         // The root element

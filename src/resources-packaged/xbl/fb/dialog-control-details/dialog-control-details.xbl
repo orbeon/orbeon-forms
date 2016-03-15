@@ -51,32 +51,55 @@
                 <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
-                <!-- Copy XBL control-details from xbl:binding in local instance -->
-                <xf:delete ref="$i/fb:control-details"/>
-                <xf:insert ref="$i/*" origin="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
+                <!-- Process fb:control-details -->
+                <xf:action>
 
-                <!-- Process the LHHA of each details control -->
-                <!-- LATER: Use xxf:dynamic for custom properties. -->
-                <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
-                <xf:action iterate="$i/fb:control-details/*/(xf:label, xf:hint, xf:help, xf:alert)">
-                    <xf:var name="lhha" value="."/>
-                    <!-- If it has a lang attribute, only keep if matches the current language -->
-                    <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
-                    <!-- If it has a ref="$resources/...", evaluate it -->
-                    <xf:action if="starts-with($lhha/@ref, '$resources/')">
-                        <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
-                        <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
-                        <xf:delete ref="$lhha/@ref"/>
+                    <xf:delete
+                        ref="instance('dynamic')/*"/>
+
+                    <xf:var
+                        name="control-details"
+                        value="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
+
+                    <xf:action if="exists($control-details)">
+
+                        <xf:var
+                            name="mutable-control-details"
+                            value="xxf:mutable-document($control-details)/*"/>
+
+                        <!-- Process the LHHA of each details control -->
+                        <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
+                        <xf:action iterate="$mutable-control-details//(xf:label, xf:hint, xf:help, xf:alert)">
+                            <xf:var name="lhha" value="."/>
+                            <!-- If it has a lang attribute, only keep if matches the current language -->
+                            <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
+                            <!-- If it has a ref="$resources/...", evaluate it -->
+                            <xf:action if="starts-with($lhha/@ref, '$resources/')">
+                                <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
+                                <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
+                                <xf:delete ref="$lhha/@ref"/>
+                            </xf:action>
+                        </xf:action>
+
+                        <!-- Complete the custom form -->
+                        <xf:insert
+                            ref="instance('dynamic')"
+                            origin="instance('dynamic-template')"/>
+
+                        <xf:insert
+                            context="instance('dynamic')//xf:model"
+                            ref="*"
+                            origin="$mutable-control-details/xf:model/*"/>
+
+                        <xf:insert
+                            context="instance('dynamic')//xf:instance"
+                            origin="$control"/>
+
+                        <xf:insert
+                            context="instance('dynamic')//xh:body"
+                            origin="$mutable-control-details/(* except xf:model)"/>
+
                     </xf:action>
-                </xf:action>
-
-                <!-- Create elements for additional properties, populating their initial value from the control -->
-                <xf:delete ref="$i/control-details/*"/>
-                <xf:action iterate="$i/fb:control-details/*">
-                    <xf:var name="position" value="position()"/>
-                    <xf:var name="xforms-control" value="."/>
-                    <xf:var name="control-ref" value="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))"/>
-                    <xf:insert context="$i/control-details" ref="*" origin="xxf:element('control-detail', string($control-ref))"/>
                 </xf:action>
 
                 <!-- Clear default alert -->
@@ -180,7 +203,8 @@
                 </xf:dispatch>
 
                 <xf:setvalue
-                    ref="instance('modified')"
+                    iterate="instance('modified')/@*"
+                    ref="."
                     value="false()"/>
 
             </xbl:handler>
@@ -197,51 +221,66 @@
                     name="fb-save"
                     targetid="fb-dialog-control-details"/>
 
+                <!-- Don't leave this stuff around -->
+                <xf:delete
+                    ref="instance('dynamic')/*"/>
+
             </xbl:handler>
             <xbl:handler event="fb-save" phase="target">
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-details')"/>
 
-                <xf:action if="instance('modified') = true()">
+                <xf:action if="instance('modified')/@* = true()">
 
                     <xf:var name="old-name" value="$i/original-control-name/string()"/>
-                    <xf:var name="new-name" value="$i/control-name/string()"/>
+                    <xf:var name="control"  value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
 
-                    <!-- Find reference to control -->
-                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
-                    <!-- Rename if needed -->
-                    <xf:action type="xpath">
-                        fbf:renameControlIfNeeded($form, $old-name, $new-name)
-                    </xf:action>
-                    <!-- Write classes -->
-                    <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
-                    <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                    <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
+                    <xf:var
+                        name="control-details"
+                        value="fbf:bindingForControlElementOrEmpty($control)/fb:metadata/fb:control-details"/>
+
                     <!-- Update custom XBL properties -->
-                    <xf:action iterate="$i/fb:control-details/*">
-                        <xf:var name="position" value="position()"/>
-                        <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
-                        <xf:var name="xforms-control" value="."/>
-                        <xf:setvalue
-                            ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))"
-                            value="$bound-node"/>
+                    <xf:action if="exists($control-details) and instance('modified')/@dynamic = true()">
+
+                        <!-- Replace all attributes and content -->
+                        <xf:delete
+                            ref="$control/(@*, node())"/>
+
+                        <xf:insert
+                            context="$control"
+                            origin="instance('dynamic')//xf:instance[1]/*/(@*, node())"/>
+
                     </xf:action>
 
-                    <xf:action type="xpath">
-                        (: Write alerts and constraints :)
-                        fbf:writeAlertsAndValidationsAsXML(
-                            $form,
-                            $i/control-name,
-                            $i/appearances/@selection,
-                            $i/default-alert/alert,
-                            $i/validations/validation
-                        ),
-                        (: Write MIPs :)
-                        for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
-                            fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
-                        (: Write help :)
-                        fbf:setControlHelp($i/control-name, $i/help),
-                        fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
+                    <xf:action if="instance('modified')/@i = true()">
+
+                        <xf:var name="new-name" value="$i/control-name/string()"/>
+
+                        <!-- Rename if needed -->
+                        <xf:action type="xpath">
+                            fbf:renameControlIfNeeded($form, $old-name, $new-name)
+                        </xf:action>
+                        <!-- Write classes -->
+                        <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
+                        <xf:delete if="count($classes) = 0" ref="$control/@class"/>
+                        <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
+
+                        <xf:action type="xpath">
+                            (: Write alerts and constraints :)
+                            fbf:writeAlertsAndValidationsAsXML(
+                                $form,
+                                $i/control-name,
+                                $i/appearances/@selection,
+                                $i/default-alert/alert,
+                                $i/validations/validation
+                            ),
+                            (: Write MIPs :)
+                            for $mip in ('relevant', 'readonly', 'calculate', 'default', 'whitespace') return
+                                fbf:updateMipAsAttributeOnly($form, $i/control-name, $mip, $i/*[name() = $mip]),
+                            (: Write help :)
+                            fbf:setControlHelp($i/control-name, $i/help),
+                            fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
+                        </xf:action>
                     </xf:action>
                 </xf:action>
 
@@ -342,7 +381,6 @@
                         <standard-classes/>         <!-- fr-summary, fr-search... -->
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
-                        <control-details/>          <!-- Sub-elements contain additional properties for this control -->
 
                         <default-alert
                             global-default-alert-message=""
@@ -366,14 +404,35 @@
 
                 <xf:var name="i" value="instance()"/>
 
+                <xf:instance id="dynamic">
+                    <xh:html/>
+                </xf:instance>
+
+                <xf:instance id="dynamic-template" xxf:readonly="true">
+                    <xh:html>
+                        <xh:head>
+                            <xf:model id="custom-model">
+                                <xf:instance id="custom-instance"/>
+                            </xf:model>
+                        </xh:head>
+                        <xh:body/>
+                    </xh:html>
+                </xf:instance>
+
                 <xf:instance id="modified">
-                    <modified/>
+                    <modified i="" dynamic=""/>
                 </xf:instance>
 
                 <xf:setvalue
                     event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed"
                     observer="i"
-                    ref="instance('modified')"
+                    ref="instance('modified')/@i"
+                    value="true()"/>
+
+                <xf:setvalue
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed"
+                    observer="dynamic"
+                    ref="instance('modified')/@dynamic"
                     value="true()"/>
 
                 <xf:instance id="validation-constraint-template" xxf:exclude-result-prefixes="#all">
@@ -609,17 +668,7 @@
                                         </xf:select>
 
                                         <!-- Properties specific to this control defined in the XBL metadata -->
-                                        <xf:repeat ref="$i/fb:control-details/*" id="control-custom-input">
-                                            <xf:var name="position" value="position()"/>
-                                            <xf:var name="bound-node" value="$i/control-details/*[$position]"/>
-                                            <xf:var name="xforms-control" value="."/>
-                                            <xf:input ref="if ($xforms-control/self::xf:input) then $bound-node else ()">
-                                                <xf:label ref="$xforms-control/xf:label"/>
-                                                <xf:hint ref="$xforms-control/xf:hint" appearance="minimal"/>
-                                                <xf:help ref="$xforms-control/xf:help"/>
-                                                <xf:alert ref="$xforms-control/xf:alert"/>
-                                            </xf:input>
-                                        </xf:repeat>
+                                        <xxf:dynamic ref="instance('dynamic')[exists(//xf:instance/*)]" id="custom-properties"/>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

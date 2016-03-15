@@ -115,13 +115,7 @@
                     <fr:process-button
                         name="{$button-name}"
                         class="{$class}"
-                        ref="
-                            xxf:instance('fb-triggers-instance')/(
-                                if ($button-name = 'publish') then
-                                    publish
-                                else
-                                    other
-                            )"/>
+                        ref="xxf:instance('fb-triggers-instance')/other"/>
 
                 </xf:repeat>
 

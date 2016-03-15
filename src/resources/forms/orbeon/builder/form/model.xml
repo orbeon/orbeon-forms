@@ -553,38 +553,44 @@
     </xf:action>
 
     <!-- Publish form operation -->
-    <xf:action ev:event="fb-publish-form" type="xpath">
-        for $annotated in
-            xxf:call-xpl(
-                'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                (
-                    'data',
-                    'bindings'
-                ),
-                (
-                    xxf:call-xpl(
-                        'oxf:/forms/orbeon/builder/form/add-migration.xpl',
-                            (
-                                'data',
-                                'bindings'
-                            ),
-                            (
-                            xxf:call-xpl(
-                                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                                'data',
-                                xxf:instance('fb-form-instance'),
-                                'data'
-                            ),
-                            xxf:instance('fb-components-instance')
-                        ),
-                        'data'
+    <xf:action ev:event="fb-publish-form">
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
+        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+            process:runProcessByName('oxf.fr.detail.process', 'save')
+        </xf:action>
+        <xf:action type="xpath">
+            for $annotated in
+                xxf:call-xpl(
+                    'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                    (
+                        'data',
+                        'bindings'
                     ),
-                    xxf:instance('fb-components-instance')
-                ),
-                'data'
-            )
-        return
-            fbf:publish($annotated, event('app'), event('form'), event('document'), event('version'))
+                    (
+                        xxf:call-xpl(
+                            'oxf:/forms/orbeon/builder/form/add-migration.xpl',
+                                (
+                                    'data',
+                                    'bindings'
+                                ),
+                                (
+                                xxf:call-xpl(
+                                    'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                                    'data',
+                                    xxf:instance('fb-form-instance'),
+                                    'data'
+                                ),
+                                xxf:instance('fb-components-instance')
+                            ),
+                            'data'
+                        ),
+                        xxf:instance('fb-components-instance')
+                    ),
+                    'data'
+                )
+            return
+                fbf:publish($annotated, event('app'), event('form'), event('document'), event('version'))
+        </xf:action>
     </xf:action>
 
     <!-- These actions track how many dialogs are open at a given time -->

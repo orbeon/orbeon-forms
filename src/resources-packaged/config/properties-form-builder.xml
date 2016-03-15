@@ -100,7 +100,7 @@
 
     <!-- Form Builder detail page buttons -->
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.builder">
-        summary new test save-publish save
+        summary new test publish save
     </property>
 
     <!-- Form Builder summary page  -->
@@ -122,10 +122,6 @@
 
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
         xf:dispatch(name = "fb-test-form")
-    </property>
-
-    <property as="xs:string"  name="oxf.fr.detail.process.save-publish.orbeon.builder">
-        save then publish
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">

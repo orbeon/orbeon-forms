@@ -26,10 +26,11 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def mirrorInSamePart(): Unit = {
 
     this setupDocument
-      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:ev="http://www.w3.org/2001/xml-events"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+      <xh:html
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
         <xh:head>
           <xf:model id="model">
@@ -59,7 +60,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             <xf:insert   ev:event="update7"  context="//xf:instance/instance"   origin="xf:attribute('first', 'Arthur')"/>
             <xf:insert   ev:event="update8"  ref="//xf:instance/instance/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
             <xf:setvalue ev:event="update9"  ref="//xf:instance/instance/@last">Conan Doyle</xf:setvalue>
-            <xf:delete   ev:event="update10"  ref="//xf:instance/instance/@*"/>
+            <xf:delete   ev:event="update10" ref="//xf:instance/instance/@*"/>
             <xf:insert   ev:event="update11" context="/*/xh:body"               origin="xf:element('xh:div')"/>
             <xf:setvalue ev:event="update12" ref="/*/xh:body/xh:div">Hello!</xf:setvalue>
           </xf:model>

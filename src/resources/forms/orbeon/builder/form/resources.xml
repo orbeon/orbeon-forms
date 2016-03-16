@@ -776,24 +776,20 @@
             <event-type>
                 <label>React to</label>
                 <hint>Event (on a control or global) to react to</hint>
-                <!-- Just a value change -->
                 <item>
-                    <label>Value Change</label>
+                    <label>control changing its value</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Value Change or Form Load</label>
+                    <label>control appearing or changing its value</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
-                    <label>Activation</label>
+                    <label>activation</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
-                    <label>Form Load</label>
+                    <label>form load</label>
                     <value>xforms-ready</value>
                 </item>
             </event-type>
@@ -1150,7 +1146,7 @@
             <label>Ajouter</label>
         </add>
         <remove>
-            <label>Suppr.</label>
+            <label>Supprimer</label>
         </remove>
         <edit>
             <label>Editer</label>
@@ -1701,26 +1697,22 @@
                 <hint>Choisisez un nom d'action unique</hint>
             </service-name>
             <event-type>
-                <label>Réagir à</label>
+                <label>Réagir quand</label>
                 <hint>Evénement (sur un contrôle ou global) auquel réagir</hint>
-                <!-- Just a value change -->
                 <item>
-                    <label>Changement de valeur</label>
+                    <label>le contrôle change sa valeur</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Changement de valeur ou chargement du formulaire</label>
+                    <label>le contrôle apparait ou change sa valeur</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
-                    <label>Activation</label>
+                    <label>le contrôle est activé</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
-                    <label>Chargement du formulaire</label>
+                    <label>le formulaire se charge</label>
                     <value>xforms-ready</value>
                 </item>
             </event-type>
@@ -2631,22 +2623,18 @@
             <event-type>
                 <label>Reager på</label>
                 <hint>Hendelse (på en kontroll eller globalt) som det skal reageres på</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Verdiendring</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Verdiendring eller skjemainnlasting</label>
+                    <label todo="true">Verdiendring eller skjemainnlasting</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Aktivering</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Skjemainnlasting</label>
                     <value>xforms-ready</value>
@@ -3558,22 +3546,18 @@
             <event-type>
                 <label>Реагировать на</label>
                 <hint>Событие (отдельного элемента или всей формы), которое вызывает действие.</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Изменение значения</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Изменение значения ИЛИ загрузка формы</label>
+                    <label todo="true">Изменение значения ИЛИ загрузка формы</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Активация элемента</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Загрузка формы</label>
                     <value>xforms-ready</value>
@@ -4478,22 +4462,18 @@
             <event-type>
                 <label>Reagisce a</label>
                 <hint>Evento (su un controllo o globale) sul quale reagire</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Cambia valore</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Cambia valore o carica modulo</label>
+                    <label todo="true">Cambia valore o carica modulo</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Attivazione</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Carica modulo</label>
                     <value>xforms-ready</value>
@@ -5399,22 +5379,18 @@
             <event-type>
                 <label>Reagiert auf</label>
                 <hint>Ereignis (auf ein Steuerelement oder global) auf das reagiert wird.</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Wertänderung</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Wertänderung oder Formular laden</label>
+                    <label todo="true">Wertänderung oder Formular laden</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Aktivierung</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Formular laden</label>
                     <value>xforms-ready</value>
@@ -6322,22 +6298,18 @@
             <event-type>
                 <label>Reagoi</label>
                 <hint>Tapahtuma (kontrollissa tai globaalissa) johon reagoidaan</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Arvonmuutos</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>FI Arvonmuutos tai lomakkeen lataus</label>
+                    <label todo="true">FI Arvonmuutos tai lomakkeen lataus</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Aktivointi</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Lomakkeen lataus</label>
                     <value>xforms-ready</value>
@@ -7250,22 +7222,18 @@
             <event-type>
                 <label>Reaccionar a</label>
                 <hint>Evento (globla o en un control) para reaccionar a </hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Valor Cambió</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Valor Cambió o Formulario Iniciado</label>
+                    <label todo="true">Valor Cambió o Formulario Iniciado</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Activación</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Formulario Iniciado</label>
                     <value>xforms-ready</value>
@@ -8177,22 +8145,18 @@
             <event-type>
                 <label>Reagir a</label>
                 <hint>Evento (num controlo ou global) ao qual reagir</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Mudança de valor</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Mudança de valor ou carregamento de formulário</label>
+                    <label todo="true">Mudança de valor ou carregamento de formulário</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Activação</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Carregamento de Formulário</label>
                     <value>xforms-ready</value>
@@ -9105,22 +9069,18 @@
             <event-type>
                 <label>Reagera på</label>
                 <hint>Händelse som ska trigga kommandot</hint>
-                <!-- Just a value change -->
                 <item>
                     <label>Värdeändring</label>
                     <value>xforms-value-changed</value>
                 </item>
-                <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Värdeändring eller formulär laddas in</label>
+                    <label todo="true">Värdeändring eller formulär laddas in</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
-                <!-- Control activation -->
                 <item>
                     <label>Aktivering</label>
                     <value>DOMActivate</value>
                 </item>
-                <!-- Form load -->
                 <item>
                     <label>Formulär inladdat</label>
                     <value>xforms-ready</value>

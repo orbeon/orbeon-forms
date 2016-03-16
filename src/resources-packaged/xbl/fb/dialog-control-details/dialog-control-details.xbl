@@ -600,6 +600,10 @@
                                                     <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
                                                     <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
                                                 </xf:input>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
 
                                                 <xf:var
                                                     name="is-attachment"
@@ -629,7 +633,10 @@
                                                         <xf:value ref="value"/>
                                                     </xf:itemset>
                                                 </xf:select>
-
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
                                                 <!-- Custom classes -->
                                                 <xf:input ref="$i/custom-classes">
                                                     <xf:label ref="$resources/classes/label"/>

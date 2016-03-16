@@ -407,13 +407,11 @@ body {
   display: flex;
   display: -webkit-flex;
 }
-.orbeon .fb-dialog-control-details .fb-base-tab-div .fb-base-tab-left {
-  flex-flow: column;
-  -webkit-flex-flow: column;
-}
+.orbeon .fb-dialog-control-details .fb-base-tab-div .fb-base-tab-left,
 .orbeon .fb-dialog-control-details .fb-base-tab-div .fb-base-tab-right {
   flex-flow: column;
   -webkit-flex-flow: column;
+  width: 50%;
 }
 .orbeon .fb-dialog-control-details .fr-grid-validations td:nth-of-type(5) .fr-grid-content {
   display: flex;

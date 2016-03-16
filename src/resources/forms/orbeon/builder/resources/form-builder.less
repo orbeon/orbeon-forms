@@ -409,6 +409,16 @@ body {
 
         .fr-grid-help .xforms-textarea textarea { height: @baseLineHeight * 5 + 8px; }
 
+        .fb-base-tab-div {
+            .flex();
+            .fb-base-tab-left {
+                .flex-flow(column)
+            }
+            .fb-base-tab-right {
+                .flex-flow(column)
+            }
+        }
+
         .fr-grid-validations {
 
             td:nth-of-type(5) .fr-grid-content {

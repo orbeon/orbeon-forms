@@ -588,90 +588,105 @@
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-control-details/tab-base/label"/>
-                            <fr:grid id="fb-base-tab-grid">
-                                <xh:tr>
-                                    <xh:td>
-                                        <!-- Control name -->
-                                        <xf:input ref="$i/control-name" incremental="true" id="control-name-input">
-                                            <xf:label ref="$resources/dialog-control-details/control-name/label"/>
-                                            <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
-                                            <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
-                                        </xf:input>
 
-                                        <xf:var
-                                            name="is-attachment"
-                                            value="xxf:split($i/standard-classes) = 'fr-attachment'"/>
+                            <xh:div class="fb-base-tab-div">
+                                <xh:div class="fb-base-tab-left">
+                                    <fr:grid id="fb-base-tab-grid">
+                                        <xh:tr>
+                                            <xh:td>
+                                                <!-- Control name -->
+                                                <xf:input ref="$i/control-name" incremental="true" id="control-name-input">
+                                                    <xf:label ref="$resources/dialog-control-details/control-name/label"/>
+                                                    <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
+                                                    <xf:hint  ref="$resources/dialog-control-details/control-name/hint"/>
+                                                </xf:input>
 
-                                        <xf:var
-                                            name="is-static-attachment"
-                                            value="xxf:split($i/standard-classes) = 'fr-static-attachment'"/>
+                                                <xf:var
+                                                    name="is-attachment"
+                                                    value="xxf:split($i/standard-classes) = 'fr-attachment'"/>
 
-                                        <xf:var
-                                            name="items-to-show"
-                                            value="
-                                                $resources/dialog-control-details/options/item[
-                                                    (
-                                                        $is-attachment or value != 'fr-email-attachment'
-                                                    ) and not(
-                                                        ($is-attachment or $is-static-attachment) and value = ('fr-email-recipient', 'fr-email-subject')
-                                                    )
-                                                ]
-                                            "/>
+                                                <xf:var
+                                                    name="is-static-attachment"
+                                                    value="xxf:split($i/standard-classes) = 'fr-static-attachment'"/>
 
-                                        <!-- Options (predefined classes) -->
-                                        <xf:select ref="$i/standard-classes" appearance="full">
-                                            <xf:label ref="$resources/dialog-control-details/options/label"/>
-                                            <xf:itemset ref="$items-to-show">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                        </xf:select>
+                                                <xf:var
+                                                    name="items-to-show"
+                                                    value="
+                                                        $resources/dialog-control-details/options/item[
+                                                            (
+                                                                $is-attachment or value != 'fr-email-attachment'
+                                                            ) and not(
+                                                                ($is-attachment or $is-static-attachment) and value = ('fr-email-recipient', 'fr-email-subject')
+                                                            )
+                                                        ]
+                                                    "/>
 
-                                        <!-- Custom classes -->
-                                        <xf:input ref="$i/custom-classes">
-                                            <xf:label ref="$resources/classes/label"/>
-                                        </xf:input>
-                                    </xh:td>
-                                    <xh:td>
-                                        <!-- Appearances -->
-                                        <xf:var
-                                            name="toggle"
-                                            value="
-                                                count($i/appearances/appearance[xxf:is-blank(value)]) = 1
-                                                and count($i/appearances/appearance[xxf:non-blank(value)]) = 1"/>
+                                                <!-- Options (predefined classes) -->
+                                                <xf:select ref="$i/standard-classes" appearance="full">
+                                                    <xf:label ref="$resources/dialog-control-details/options/label"/>
+                                                    <xf:itemset ref="$items-to-show">
+                                                        <xf:label ref="label"/>
+                                                        <xf:value ref="value"/>
+                                                    </xf:itemset>
+                                                </xf:select>
 
-                                        <!-- Propose a choice between multiple items -->
-                                        <xf:select1
-                                                ref="$i/appearances/@selection[not($toggle) and count($i/appearances/appearance) gt 1]"
-                                                appearance="full">
-                                            <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
-                                            <xf:itemset ref="$i/appearances/appearance">
-                                                <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
-                                                <xf:label xml:space="preserve">
-                                                    <xh:img src="{{icon}}" alt="" width="16" height="16"/>
-                                                    <xf:output value="label"/>
-                                                </xf:label>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                        </xf:select1>
-                                        <!-- Simplified case where we just show a checkbox -->
-                                        <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
-                                            <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
-                                            <xf:itemset ref="$i/appearances/appearance[xxf:non-blank(value)]">
-                                                <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
-                                                <xf:label xml:space="preserve">
-                                                    <xh:img src="{{icon}}" alt="" width="16" height="16"/>
-                                                    <xf:output value="label"/>
-                                                </xf:label>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                        </xf:select>
+                                                <!-- Custom classes -->
+                                                <xf:input ref="$i/custom-classes">
+                                                    <xf:label ref="$resources/classes/label"/>
+                                                </xf:input>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </fr:grid>
+                                </xh:div>
+                                <xh:div class="fb-base-tab-right">
 
-                                        <!-- Properties specific to this control defined in the XBL metadata -->
-                                        <xxf:dynamic ref="instance('dynamic')[exists(//xf:instance/*)]" id="custom-properties"/>
-                                    </xh:td>
-                                </xh:tr>
-                            </fr:grid>
+                                    <!-- Appearances -->
+                                    <xf:var
+                                        name="toggle"
+                                        value="
+                                            count($i/appearances/appearance[xxf:is-blank(value)]) = 1
+                                            and count($i/appearances/appearance[xxf:non-blank(value)]) = 1"/>
+
+                                    <xf:var
+                                        name="multi"
+                                        value="not($toggle) and count($i/appearances/appearance) gt 1"/>
+
+                                    <xf:group ref=".[$multi or $toggle]">
+                                        <fr:grid>
+                                            <xh:tr>
+                                                <xh:td>
+                                                    <!-- Propose a choice between multiple items -->
+                                                    <xf:select1 ref="$i/appearances/@selection[$multi]" appearance="full">
+                                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                                        <xf:itemset ref="$i/appearances/appearance">
+                                                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
+                                                            <xf:label xml:space="preserve">
+                                                                <xh:img src="{{icon}}" alt="" width="16" height="16"/>
+                                                                <xf:output value="label"/>
+                                                            </xf:label>
+                                                            <xf:value ref="value"/>
+                                                        </xf:itemset>
+                                                    </xf:select1>
+                                                    <!-- Simplified case where we just show a checkbox -->
+                                                    <xf:select ref="$i/appearances/@selection[$toggle]" appearance="full">
+                                                        <xf:label ref="$resources/dialog-control-details/control-appearance/label"/>
+                                                        <xf:itemset ref="$i/appearances/appearance[xxf:non-blank(value)]">
+                                                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
+                                                            <xf:label xml:space="preserve">
+                                                                <xh:img src="{{icon}}" alt="" width="16" height="16"/>
+                                                                <xf:output value="label"/>
+                                                            </xf:label>
+                                                            <xf:value ref="value"/>
+                                                        </xf:itemset>
+                                                    </xf:select>
+                                                </xh:td>
+                                            </xh:tr>
+                                        </fr:grid>
+                                    </xf:group>
+                                    <!-- Properties specific to this control defined in the XBL metadata -->
+                                    <xxf:dynamic ref="instance('dynamic')[exists(//xf:instance/*)]" id="custom-properties"/>
+                                </xh:div>
+                            </xh:div>
                         </fr:tab>
                         <fr:tab id="validations-tab" context="validations">
                             <fr:label ref="$resources/dialog-control-details/tab-validations/label"/>

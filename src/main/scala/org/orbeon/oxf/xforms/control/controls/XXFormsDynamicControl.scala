@@ -127,7 +127,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     xblChanges.clear()
     bindChanges.clear()
 
-    if (create)
+    if (create && ! containingDocument.isInitializing)
       containingDocument.addControlStructuralChange(prefixedId)
 
     // Outer instance

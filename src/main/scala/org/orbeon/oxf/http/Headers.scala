@@ -43,6 +43,8 @@ object Headers {
   val LocationLower       = Location.toLowerCase
   val OrbeonClientLower   = OrbeonClient.toLowerCase
 
+  val EmbeddedClientValues = Set("embedded", "portlet")
+
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //
   // - Don't proxy Content-Length and Content-Type. Proxies must associate these with the content and propagate via

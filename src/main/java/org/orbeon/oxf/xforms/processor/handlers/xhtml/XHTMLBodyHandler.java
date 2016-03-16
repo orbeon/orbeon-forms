@@ -15,10 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
-import org.orbeon.oxf.http.Headers;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
@@ -70,11 +67,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
-        final boolean isEmbeddedClient; {
-            final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
-            final String client = NetUtils.getHeader(request.getHeaderValuesMap(), Headers.OrbeonClientLower());
-            isEmbeddedClient = "embedded".equals(client) || "portlet".equals(client);
-        }
+        final boolean isEmbeddedClient = containingDocument.isEmbedded();
 
         final String requestPath = containingDocument.getRequestPath();
         final String xformsSubmissionPath;

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.ScalaUtils._
@@ -290,6 +291,7 @@ trait ContainingDocumentRequest {
   private var _containerType        : String = null
   private var _containerNamespace   : String = null
   private var _versionedPathMatchers: ju.List[URLRewriterUtils.PathMatcher] = null
+  private var _isEmbedded           : Boolean = false
 
   def getDeploymentType        = _deploymentType
   def getRequestContextPath    = _requestContextPath
@@ -297,11 +299,16 @@ trait ContainingDocumentRequest {
   def getRequestHeaders        = _requestHeaders
   def getRequestParameters     = _requestParameters
   def getContainerType         = _containerType
-  def isPortletContainer       = _containerType == "portlet"
   def getContainerNamespace    = _containerNamespace // always "" for servlets.
   def getVersionedPathMatchers = _versionedPathMatchers
 
   def headersGetter: String ⇒ Option[List[String]] = getRequestHeaders.get
+
+  def isPortletContainer       = _containerType == "portlet"
+  def isEmbedded               = _isEmbedded
+
+  private def isEmbeddedFromHeaders(headers: Map[String, List[String]]) =
+    Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) exists Headers.EmbeddedClientValues
 
   protected def initializeRequestInformation(): Unit =
     Option(NetUtils.getExternalContext.getRequest) match {
@@ -332,6 +339,8 @@ trait ContainingDocumentRequest {
         _requestHeaders =
           request.getHeaderValuesMap.asScala mapValues (_.toList) toMap
 
+        _isEmbedded = isEmbeddedFromHeaders(_requestHeaders)
+
         _requestParameters =
           request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap
 
@@ -343,6 +352,7 @@ trait ContainingDocumentRequest {
         _requestContextPath = ""
         _requestPath = "/"
         _requestHeaders = Map.empty
+        _isEmbedded = false
         _requestParameters = Map.empty
         _containerType = "servlet"
         _containerNamespace = ""
@@ -361,6 +371,7 @@ trait ContainingDocumentRequest {
         _requestContextPath = dynamicState.decodeRequestContextPathJava
         _requestPath        = dynamicState.decodeRequestPathJava
         _requestHeaders     = dynamicState.requestHeaders.toMap
+        _isEmbedded         = isEmbeddedFromHeaders(_requestHeaders)
         _requestParameters  = dynamicState.requestParameters.toMap
         _containerType      = dynamicState.decodeContainerTypeJava
         _containerNamespace = dynamicState.decodeContainerNamespaceJava

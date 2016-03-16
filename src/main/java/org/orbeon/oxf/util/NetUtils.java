@@ -61,7 +61,7 @@ public class NetUtils {
     /**
      * Return the first header for the given name in a headers map, or null
      */
-    public static String getHeader(Map<String, String[]> headers, String name) {
+    public static String getFirstHeaderOrNull(Map<String, String[]> headers, String name) {
         final String[] results = headers.get(name);
         if (results == null || results.length < 1)
             return null;

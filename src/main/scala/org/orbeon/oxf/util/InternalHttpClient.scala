@@ -72,7 +72,7 @@ object InternalHttpClient extends HttpClient {
       // Honor Orbeon-Client header (see also ServletExternalContext)
       val urlRewriter =
         Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
-          case Some(client) if EmbeddedClientValues(client) ⇒
+          case Some(client) if Headers.EmbeddedClientValues(client) ⇒
             new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
           case Some(client) ⇒
             new ServletURLRewriter(request)
@@ -118,6 +118,4 @@ object InternalHttpClient extends HttpClient {
   }
 
   override def shutdown() = ()
-
-  private val EmbeddedClientValues = Set("embedded", "portlet")
 }

@@ -62,6 +62,9 @@
             </templates>
         </metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/open-select1/open-select1.css"/>
+        </xbl:resources>
         <xbl:template>
 
             <xf:var name="binding" value="xxf:binding('fr-open-select1')"/>
@@ -75,26 +78,28 @@
 
             <xf:var name="closed-value" value="$binding = $items/value/string()"/>
 
-            <xf:select1 id="select1" ref="$binding" appearance="full" xbl:attr="appearance xxf:encrypt-item-values">
-                <xf:itemset ref="$items">
-                    <xf:label ref="label"/>
-                    <xf:value ref="value"/>
-                </xf:itemset>
-                <xf:item>
-                    <xf:label ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
-                    <xf:value ref="if ($closed-value) then '' else ."/>
-                </xf:item>
-                <!-- Focus asynchronously because the input is not visible yet and a plain `setfocus` would fail -->
-                <xf:dispatch
-                    event="xforms-select"
-                    if="xxf:is-blank(event('xxf:item-value'))"
-                    delay="0"
-                    name="xforms-focus"
-                    targetid="input"/>
-            </xf:select1>
-            <xf:input id="input" ref="$binding[not($closed-value)]">
-                <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
-            </xf:input>
+            <xh:span class="fr-component-group">
+                <xf:select1 id="select1" ref="$binding" appearance="full" xbl:attr="appearance xxf:encrypt-item-values">
+                    <xf:itemset ref="$items">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
+                    <xf:item>
+                        <xf:label ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
+                        <xf:value ref="if ($closed-value) then '' else ."/>
+                    </xf:item>
+                    <!-- Focus asynchronously because the input is not visible yet and a plain `setfocus` would fail -->
+                    <xf:dispatch
+                        event="xforms-select"
+                        if="xxf:is-blank(event('xxf:item-value'))"
+                        delay="0"
+                        name="xforms-focus"
+                        targetid="input"/>
+                </xf:select1>
+                <xf:input id="input" ref="$binding[not($closed-value)]">
+                    <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
+                </xf:input>
+            </xh:span>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

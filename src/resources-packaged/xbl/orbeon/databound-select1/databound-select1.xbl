@@ -17,44 +17,51 @@
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fr-databound-select1" element="fr|databound-select1" xxbl:mode="lhha binding value" xxbl:label-for="select1">
-        <fb:metadata>
-            <fb:display-name lang="en">Dynamic Data Dropdown</fb:display-name>
-            <fb:display-name lang="es">Lista Desplegable Dinámica</fb:display-name>
-            <fb:display-name lang="fi">Dynaamisen datan pudotusvalikko</fb:display-name>
-            <fb:display-name lang="fr">Menu données dynamique</fb:display-name>
-            <fb:display-name lang="ru">Список из веб-сервиса</fb:display-name>
-            <fb:display-name lang="de">Daten Dropdown-Liste</fb:display-name>
-            <fb:display-name lang="it">Tendina dati</fb:display-name>
-            <fb:display-name lang="sv">Dynamisk rullgardinsmeny</fb:display-name>
-            <fb:display-name lang="nl">Selectie met dynamische gegevens</fb:display-name>
-            <fb:display-name lang="pt">Lista de Opções Dinâmica</fb:display-name>
-            <fb:icon lang="en">
-                <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
-                <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
-            </fb:icon>
-            <fb:datatype>xf:string</fb:datatype>
-            <fb:editors static-itemset="false"/>
-            <fb:template>
-                <fr:databound-select1 id="" appearance="minimal" ref="" resource="" xmlns:xf="http://www.w3.org/2002/xforms">
-                    <xf:label ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:help ref=""/>
-                    <xf:alert ref=""/>
-                    <xf:itemset ref="item">
-                        <xf:label ref="label"/>
-                        <xf:value ref="value"/>
-                    </xf:itemset>
-                </fr:databound-select1>
-            </fb:template>
-            <fb:control-details>
+    <xbl:binding
+        id="fr-databound-select1"
+        element="fr|databound-select1"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="select1">
+
+        <metadata
+            xmlns="http://orbeon.org/oxf/xml/form-builder"
+            xmlns:xf="http://www.w3.org/2002/xforms">
+
+            <display-name lang="en">Dynamic Data Dropdown</display-name>
+            <display-name lang="es">Lista Desplegable Dinámica</display-name>
+            <display-name lang="fi">Dynaamisen datan pudotusvalikko</display-name>
+            <display-name lang="fr">Menu données dynamique</display-name>
+            <display-name lang="ru">Список из веб-сервиса</display-name>
+            <display-name lang="de">Daten Dropdown-Liste</display-name>
+            <display-name lang="it">Tendina dati</display-name>
+            <display-name lang="sv">Dynamisk rullgardinsmeny</display-name>
+            <display-name lang="nl">Selectie met dynamische gegevens</display-name>
+            <display-name lang="pt">Lista de Opções Dinâmica</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
+            </icon>
+            <datatype>xf:string</datatype>
+            <editors static-itemset="false"/>
+            <templates>
+                <view>
+                    <fr:databound-select1 id="" appearance="minimal" ref="" resource="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                    </fr:databound-select1>
+                </view>
+            </templates>
+            <control-details>
                 <xf:model>
                     <xf:bind ref="@resource"/>
                     <xf:bind ref="xf:itemset">
@@ -114,8 +121,9 @@
                         </xh:td>
                     </xh:tr>
                 </fr:grid>
-            </fb:control-details>
-        </fb:metadata>
+            </control-details>
+        </metadata>
+
         <xbl:resources>
             <xbl:style>
                 div.xbl-fr-databound-select1 { display: inline; }

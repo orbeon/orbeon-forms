@@ -16,7 +16,6 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
@@ -27,14 +26,18 @@
     <xbl:script src="/ops/yui/datasource/datasource.js"/>
     <xbl:script src="/ops/yui/autocomplete/autocomplete.js"/>
 
-    <xbl:binding id="fr-autocomplete"
-            element="fr|autocomplete"
-            xxf:external-events="fr-value-selected"
-            xxbl:mode="lhha binding value"
-            xxbl:label-for="search"
-            xxbl:container="span">
+    <xbl:binding
+        id="fr-autocomplete"
+        element="fr|autocomplete"
+        xxf:external-events="fr-value-selected"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="search"
+        xxbl:container="span">
 
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
+        <metadata
+            xmlns="http://orbeon.org/oxf/xml/form-builder"
+            xmlns:xf="http://www.w3.org/2002/xforms">
+
             <display-name lang="en">Autocomplete</display-name>
             <display-name lang="es">Autocompletar</display-name>
             <display-name lang="fi">Automaattinen täydennys</display-name>
@@ -57,47 +60,73 @@
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
                         <xf:alert ref=""/>
-                        <!-- Itemset points to an empty nodeset until users set them in the control details dialog -->
-                        <xf:itemset ref="()">
-                            <xf:label ref="()"/>
-                            <xf:value ref="()"/>
+                        <xf:itemset ref="item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
                         </xf:itemset>
                     </fr:autocomplete>
                 </view>
             </templates>
             <control-details>
-                <xf:input ref="@resource">
-                    <xf:label lang="en">Resource URI</xf:label>
-                    <xf:label lang="es">URI del Recurso</xf:label>
-                    <xf:label lang="fi">Resurssi URI</xf:label>
-                    <xf:label lang="fr">URI de la ressource</xf:label>
-                    <xf:label lang="it">URI della risorsa</xf:label>
-                    <xf:label lang="de">URI der Ressource</xf:label>
-                    <xf:label lang="sv">Resursens adress</xf:label>
-                    <xf:label lang="nl">Resource URI</xf:label>
-                    <xf:label lang="pt">URI do recurso</xf:label>
-                    <xf:hint lang="en">HTTP URI returning data used for the suggestions</xf:hint>
-                    <xf:hint lang="es">HTTP URI retornando datos usados en las sugerencias</xf:hint>
-                    <xf:hint lang="fi">HTTP URI palauttaa ehdotuksiin käytettyä dataa</xf:hint>
-                    <xf:hint lang="fr">URI HTTP auquel réside le service</xf:hint>
-                    <xf:hint lang="de">HTTP URI welche die Daten für den Hinweis liefert</xf:hint>
-                    <xf:hint lang="it">URI HTTP che da i dati per il suggerimento</xf:hint>
-                    <xf:hint lang="sv">Vanligen en Internetadress som börjar med http://</xf:hint>
-                    <xf:hint lang="nl">HTTP URI met de gegevens voor suggesties</xf:hint>
-                    <xf:hint lang="pt">HTTP URI que retorna os dados a usar nas sugestões</xf:hint>
-                </xf:input>
-                <xf:input ref="xf:itemset/@ref">
-                    <xf:label ref="$resources/dialog-actions/items/label"/>
-                    <xf:hint ref="$resources/dialog-actions/items/hint"/>
-                </xf:input>
-                <xf:input ref="xf:itemset/xf:label/@ref">
-                    <xf:label ref="$resources/dialog-actions/item-label/label"/>
-                    <xf:hint ref="$resources/dialog-actions/item-label/hint"/>
-                </xf:input>
-                <xf:input ref="xf:itemset/xf:value/@ref">
-                    <xf:label ref="$resources/dialog-actions/item-value/label"/>
-                    <xf:hint ref="$resources/dialog-actions/item-value/hint"/>
-                </xf:input>
+                <xf:model>
+                    <xf:bind ref="@resource"/>
+                    <xf:bind ref="xf:itemset">
+                        <xf:bind
+                            ref="@ref | xf:label/@ref | xf:value/@ref"
+                            type="xxf:xpath2"
+                            required="true()"/>
+                    </xf:bind>
+                </xf:model>
+                <fr:grid>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="@resource">
+                                <xf:label lang="en">Resource URL</xf:label>
+                                <xf:label lang="es">URL del Recurso</xf:label>
+                                <xf:label lang="fi">Resurssi URL</xf:label>
+                                <xf:label lang="fr">URL de la ressource</xf:label>
+                                <xf:label lang="ru">URL ресурса</xf:label>
+                                <xf:label lang="it">URL della risorsa</xf:label>
+                                <xf:label lang="de">URL der Ressource</xf:label>
+                                <xf:label lang="sv">Resursens adress</xf:label>
+                                <xf:label lang="nl">Resource URL</xf:label>
+                                <xf:label lang="pt">URL do Recurso</xf:label>
+                                <xf:hint lang="en">HTTP URL returning data used to populate the dropdown</xf:hint>
+                                <xf:hint lang="es">HTTP URL retornando datos para poblar la lista</xf:hint>
+                                <xf:hint lang="fi">HTTP URL palauttaa pudotusvalikon täyttämiseen käytettyä dataa</xf:hint>
+                                <xf:hint lang="fr">URL HTTP auquel réside le service</xf:hint>
+                                <xf:hint lang="ru">HTTP URL сервиса, данными из которого будет заполнен выпадающий список</xf:hint>
+                                <xf:hint lang="it">URL HTTP che da i dati per il menu a tendina</xf:hint>
+                                <xf:hint lang="de">HTTP URL die die Inhalte für das Dropdown-Menü liefert</xf:hint>
+                                <xf:hint lang="sv">Vanligen en Internetadress som börjar med http://</xf:hint>
+                                <xf:hint lang="nl">HTTP URL als bron voor de gegevens in de selectie</xf:hint>
+                                <xf:hint lang="pt">HTTP URL devolvendo dados para preencher a lista de opções</xf:hint>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="xf:itemset/@ref">
+                                <xf:label ref="$resources/dialog-actions/items/label"/>
+                                <xf:hint ref="$resources/dialog-actions/items/hint"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td>
+                            <xf:input ref="xf:itemset/xf:label/@ref">
+                                <xf:label ref="$resources/dialog-actions/item-label/label"/>
+                                <xf:hint ref="$resources/dialog-actions/item-label/hint"/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td>
+                            <xf:input ref="xf:itemset/xf:value/@ref">
+                                <xf:label ref="$resources/dialog-actions/item-value/label"/>
+                                <xf:hint ref="$resources/dialog-actions/item-value/hint"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
             </control-details>
         </metadata>
 
@@ -145,9 +174,18 @@
                             <!-- In resource mode, the suggestions -->
                             <xf:instance id="suggestions-instance"><dummy/></xf:instance>
                             <!-- What do when doing a refresh -->
-                            <xf:submission id="get-itemset" method="get" resource="{{event('resource')}}" replace="instance"
-                                               instance="suggestions-instance" serialization="none">
-                                <xf:insert ev:event="xforms-submit-error" ref="instance('suggestions-instance')" origin="xxf:element('dummy')"/>
+                            <xf:submission
+                                id="get-itemset"
+                                method="get"
+                                resource="{{event('resource')}}"
+                                replace="instance"
+                                instance="suggestions-instance"
+                                serialization="none">
+
+                                <xf:insert
+                                    ev:event="xforms-submit-error"
+                                    ref="instance('suggestions-instance')"
+                                    origin="xxf:element('dummy')"/>
                             </xf:submission>
                         </xf:model>
 
@@ -155,7 +193,7 @@
 
                         <!-- Variable pointing to external single-node binding -->
                         <xf:var name="binding" value="xxf:binding('fr-autocomplete')"/>
-                        <xf:var name="script"  value="not(exf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
+                        <xf:var name="script"  value="not(xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
 
                         <xf:var name="local" value="instance('local')"/>
                         <xf:var name="dynamic-itemset-attribute" xbl:attr="xbl:text=dynamic-itemset"/>

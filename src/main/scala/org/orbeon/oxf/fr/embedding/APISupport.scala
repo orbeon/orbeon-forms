@@ -142,7 +142,8 @@ object APISupport {
 
     val cx = connectURL(requestDetails)
     if (isRedirectCode(cx.statusCode))
-      Redirect(cx.headers("Location").head, exitPortal = true)
+      // TODO: Check `exitPortal` which was `true` before #2513. Do we need a way to discriminate?
+      Redirect(cx.headers("Location").head, exitPortal = false)
     else
       cx.content
   }

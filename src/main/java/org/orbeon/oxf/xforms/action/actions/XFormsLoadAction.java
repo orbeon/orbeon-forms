@@ -111,9 +111,73 @@ public class XFormsLoadAction extends XFormsAction {
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             } else {
                 // Load as render URL
-                // NOTE: Skip URL rewriting step in portlet mode, because this will trigger a two-pass load, and during
-                // the second pass we call sendRedirect(), which will actually rewrite the URL.
-                externalURL = XFormsUtils.resolveRenderURL(containingDocument, currentElement, value, containingDocument.isPortletContainer());
+
+                // Cases for `show="replace"` and `render` URLs:
+                //
+                // 1. Servlet in non-embedded mode
+                //     1. Upon initialization
+                //         - URL is rewritten to absolute URL
+                //         - `XFormsToXHTML` calls `getResponse.sendRedirect()`
+                //             - just use the absolute `location` URL without any further processing
+                //     2. Upon Ajax request
+                //         - URL is rewritten to absolute URL
+                //         - `xxf:load` sent to client in Ajax response
+                //         - client does `window.location.href = ...` or `window.open()`
+                // 2. Servlet in embedded mode (with client proxy portlet or embedding API)
+                //     1. Upon initialization
+                //         - URL is first rewritten to a absolute path without context (resolving of `resolveXMLBase`)
+                //         - URL is not WSRP-encoded
+                //         - `XFormsToXHTML` calls `getResponse.sendRedirect()`
+                //         - `ServletExternalContext.getResponse.sendRedirect()`
+                //             - rewrite the path to an absolute path including context
+                //             - add `orbeon-embeddable=true`
+                //         - embedding client performs HTTP redirect
+                //     2. Upon Ajax request
+                //         - URL is WSRP-encoded
+                //         - `xxf:load` sent to client in Ajax response
+                //         - client does `window.location.href = ...` or `window.open()`
+                // 3. Portlet
+                //     1. Upon initialization
+                //         - not handled (https://github.com/orbeon/orbeon-forms/issues/2617)
+                //     2. Upon Ajax
+                //         - perform a "two-pass load"
+                //         - URL is first rewritten to a absolute path without context (resolving of `resolveXMLBase`)
+                //         - URL is not WSRP-encoded
+                //         - `XFormsServer` adds a server event with `xxforms-load` dispatched to `#document`
+                //         - client performs form submission (`action`) which includes server events
+                //         - server dispatches incoming `xxforms-load` to `XXFormsRootControl`
+                //         - `XXFormsRootControl` performs `getResponse.sendRedirect()`
+                //         - `OrbeonPortlet` creates `Redirect()` object
+                //         - `BufferedPortlet.bufferedProcessAction()` sets new render parameters
+                //         - portlet then renders with new path set by the redirection
+                //
+                // Questions/suggestions:
+                //
+                // - why do we handle the Ajax case differently in embedded vs. portlet modes?
+                // - it's unclear which parts of the rewriting must take place here vs. in `sendRedirect()`
+                // - make clearer what's stored with `addLoadToRun()` (`location` is not clear enough)
+                //
+                final boolean skipRewrite;
+                if (! containingDocument.isPortletContainer()) {
+                    // Servlet container
+                    if (! containingDocument.isEmbedded()) {
+                        // Not embedded
+                        skipRewrite = false;
+                    } else {
+                        // Embedded
+                        if (containingDocument.isInitializing()) {
+                            skipRewrite = true;
+                        } else {
+                            skipRewrite = false;
+                        }
+                    }
+                } else {
+                    // Portlet container
+                    // NOTE: As of 2016-03-17, the initialization case will fail and the portlet will throw an exception.
+                    skipRewrite = true;
+                }
+
+                externalURL = XFormsUtils.resolveRenderURL(containingDocument, currentElement, value, skipRewrite);
             }
         }
 

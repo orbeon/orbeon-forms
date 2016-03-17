@@ -80,8 +80,8 @@ public class URLRewriterUtils {
     /**
      * Rewrite a service URL. The URL is rewritten against a base URL which is:
      *
-     * o specified externally or
-     * o the incoming request if not specified externally
+     * - specified externally or
+     * - the incoming request if not specified externally
      *
      * @param request           incoming request
      * @param urlString         URL to rewrite
@@ -90,7 +90,8 @@ public class URLRewriterUtils {
      */
     public static String rewriteServiceURL(ExternalContext.Request request, String urlString, int rewriteMode) {
 
-        assert (rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE) != 0;
+        // NOTE: We used to assert here that the mode required an absolute URL, but as of 2016-03-17 one caller
+        // wants a path.
 
         // Case where a protocol is specified: the URL is left untouched
         if (NetUtils.urlHasProtocol(urlString))

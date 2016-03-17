@@ -75,7 +75,8 @@ object XFormsToXHTML {
     } else if (nonJavaScriptLoads.nonEmpty) {
       // 2. Got at least one xf:load which is not a JavaScript call
 
-      // Send redirect on first one
+      // This is the "load upon initialization in Servlet container, embedded or not" case.
+      // See `XFormsLoadAction` for details.
       val location = nonJavaScriptLoads.head.getResource
       indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
       externalContext.getResponse.sendRedirect(location, false, false)

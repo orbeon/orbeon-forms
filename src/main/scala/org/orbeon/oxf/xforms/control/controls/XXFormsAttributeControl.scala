@@ -71,10 +71,10 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
       case "href" if ! externalValue.startsWith("#") ⇒
         // NOTE: Keep value unchanged if it's just a fragment (see also XFormsLoadAction)
         attributeControl.urlType match {
-        case "action"   ⇒ resolveActionURL(containingDocument, element, externalValue, false)
-        case "resource" ⇒ resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
-        case _          ⇒ resolveRenderURL(containingDocument, element, externalValue, false) // default is "render"
-      }
+          case "action"   ⇒ resolveActionURL  (containingDocument, element, externalValue)
+          case "resource" ⇒ resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          case _          ⇒ resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
+        }
       case _ ⇒ externalValue
     }
 

@@ -38,10 +38,10 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {
     case load: XXFormsLoadEvent ⇒
-      // Internal load event
-      try
+      // Internal load event for "two-pass load" handling Ajax load in portlet environments (see `XFormsLoadAction`)
+      try {
         NetUtils.getExternalContext.getResponse.sendRedirect(load.resource, false, false)
-      catch {
+      } catch {
         case e: IOException ⇒ throw new ValidationException(e, getLocationData)
       }
     case _ ⇒

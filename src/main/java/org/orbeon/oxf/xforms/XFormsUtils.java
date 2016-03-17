@@ -439,36 +439,26 @@ public class XFormsUtils {
         return resultBytes;
     }
 
-    /**
-     * Resolve a render URL including xml:base resolution.
-     *
-     * @param containingDocument    current document
-     * @param currentElement        element used for xml:base resolution
-     * @param url                   URL to resolve
-     * @param skipRewrite           whether to skip the actual URL rewriting step
-     * @return                      resolved URL
-     */
     public static String resolveRenderURL(XFormsContainingDocument containingDocument, Element currentElement, String url, boolean skipRewrite) {
         final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
 
-        final String resolvedURIStringNoPortletFragment = uriToStringNoFragment(containingDocument, resolvedURI);
+        final String resolvedURIStringNoPortletFragment = uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument, resolvedURI);
 
         return skipRewrite ? resolvedURIStringNoPortletFragment :
                 NetUtils.getExternalContext().getResponse().rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null);
     }
 
-    public static String resolveActionURL(XFormsContainingDocument containingDocument, Element currentElement, String url, boolean skipRewrite) {
+    public static String resolveActionURL(XFormsContainingDocument containingDocument, Element currentElement, String url) {
         final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
 
-        final String resolvedURIStringNoPortletFragment = uriToStringNoFragment(containingDocument, resolvedURI);
+        final String resolvedURIStringNoPortletFragment = uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument, resolvedURI);
 
-        return skipRewrite ? resolvedURIStringNoPortletFragment :
-                NetUtils.getExternalContext().getResponse().rewriteActionURL(resolvedURIStringNoPortletFragment, null, null);
+        return NetUtils.getExternalContext().getResponse().rewriteActionURL(resolvedURIStringNoPortletFragment, null, null);
     }
 
-    private static String uriToStringNoFragment(XFormsContainingDocument containingDocument, URI resolvedURI) {
-        if (containingDocument.isPortletContainer() && resolvedURI.getFragment() != null) {
-            // XForms page was loaded from a portlet and there is a fragment, remove it
+    private static String uriToStringRemoveFragmentForPortletAndEmbedded(XFormsContainingDocument containingDocument, URI resolvedURI) {
+        if ((containingDocument.isPortletContainer() || containingDocument.isEmbedded()) && resolvedURI.getFragment() != null) {
+            // Page was loaded from a portlet or embedding API and there is a fragment, remove it
             try {
                 return new URI(resolvedURI.getScheme(), resolvedURI.getRawAuthority(), resolvedURI.getRawPath(), resolvedURI.getRawQuery(), null).toString();
             } catch (URISyntaxException e) {

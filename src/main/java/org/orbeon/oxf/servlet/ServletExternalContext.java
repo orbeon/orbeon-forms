@@ -501,7 +501,12 @@ public class ServletExternalContext implements ExternalContext  {
                 }
             } else {
                 // Client-side redirect: send the redirect to the client
-                nativeResponse.sendRedirect(location);
+
+                nativeResponse.sendRedirect(
+                    isEmbedded()
+                        ? NetUtils.appendQueryString(URLRewriterUtils.rewriteServiceURL(getRequest(), location, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH), "orbeon-embeddable=true")
+                        : location
+                );
             }
         }
 
@@ -694,6 +699,13 @@ public class ServletExternalContext implements ExternalContext  {
         return request;
     }
 
+    private boolean isEmbedded() {
+        // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
+        // the headers map is generated internally as in that case it might be lowercase already.
+        final String override = NetUtils.getFirstHeaderOrNull(request.getHeaderValuesMap(), Headers.OrbeonClientLower());
+        return Headers.EmbeddedClientValues().contains(override);
+    }
+
     public ExternalContext.Response getResponse() {
         if (response == null) {
             response = new Response();
@@ -703,11 +715,7 @@ public class ServletExternalContext implements ExternalContext  {
             // Check if there is an override of container type. This is currently used by the proxy portlet and by
             // XHTMLToPDF, as both require a specific type of URL rewriting to take place. Using this header means that
             // using a global property is not required anymore.
-
-            // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
-            // the headers map is generated internally as in that case it might be lowercase already.
-            final String override = NetUtils.getFirstHeaderOrNull(request.getHeaderValuesMap(), Headers.OrbeonClientLower());
-            if (Headers.EmbeddedClientValues().contains(override)) {
+            if (isEmbedded()) {
                 // Always set wsrpEncodeResources to true if the client is a remote portlet
                 response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), true));
             } else {

@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis.controls.RepeatControl
-import collection.JavaConverters._
-import org.dom4j.QName
-import org.orbeon.oxf.xforms.xbl.{XBLResources, AbstractBinding, Scope}
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLResources}
+
+import scala.collection.JavaConverters._
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -73,7 +73,6 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def hasControlByName(controlName: String) = existsInParts(_.hasControlByName(controlName))
   def controlsByName(controlName: String) = collectInParts(_.controlsByName(controlName))
   def jControlsByName(controlName: String) = controlsByName(controlName).asJava
-  def hasControlAppearance(controlName: String, appearance: QName) = existsInParts(_.hasControlAppearance(controlName, appearance))
   def getBinding(prefixedId: String) = findInPartsOpt(_.getBinding(prefixedId))
 
   def repeats = collectInPartsReverse(_.repeats)

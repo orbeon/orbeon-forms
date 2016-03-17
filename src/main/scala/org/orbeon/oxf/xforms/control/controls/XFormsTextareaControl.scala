@@ -13,64 +13,26 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.dom4j.{Document, Element}
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils.htmlStringToDom4jTagSoup
+import org.dom4j.Element
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils.domToString
 
 /**
  * xf:textarea control
  */
-class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-    extends XFormsSingleNodeControl(container, parent, element, id)
-    with XFormsValueControl
-    with FocusableTrait {
+class XFormsTextareaControl(
+  container : XBLContainer,
+  parent    : XFormsControl,
+  element   : Element,
+  id        : String
+) extends XFormsSingleNodeControl(
+  container,
+  parent,
+  element,
+  id
+) with XFormsValueControl with FocusableTrait {
 
-  override def getJavaScriptInitialization = {
-    val hasInitialization = XFormsControl.isHTMLMediatype(this)
-    if (hasInitialization) getCommonJavaScriptInitialization else null
-  }
-
-  /**
-   * For textareas with mediatype="text/html", we first clean the HTML with TagSoup, and then transform it with
-   * a stylesheet that removes all unknown or dangerous content.
-   */
-  override def translateExternalValue(externalValue: String) = {
-
-    def sanitizeForMediatype(s: String) =
-      if (XFormsControl.isHTMLMediatype(this)) {
-
-        withDebug("cleaning-up xf:textarea HTML", Seq("value" → s)) {
-
-          def cleanWithTagSoup(s: String) = {
-            val result = htmlStringToDom4jTagSoup(s, null)
-            debug("after TagSoup xf:textarea cleanup", Seq("value" → domToString(result)))
-            result
-          }
-
-          def cleanWithXSLT(document: Document) = {
-            val cleanedDocument = XMLCleaner.cleanXML(document, "oxf:/ops/xforms/clean-html.xsl")
-
-            // Remove dummy tag are added by the XSLT
-            domToString(cleanedDocument) match {
-              case "<dummy-root/>" ⇒ ""
-              case value ⇒
-                val tagLength = "<dummy-root>".size
-                value.substring(tagLength, value.length - tagLength - 1)
-            }
-          }
-
-          // Do TagSoup and XSLT cleaning
-          val result = cleanWithXSLT(cleanWithTagSoup(s))
-          debug("after XSLT xf:textarea cleanup", Seq("value" → result))
-          result
-        }
-      } else
-        s
-
-    // Replacement-based input sanitation
-    Option(containingDocument.getStaticState.sanitizeInput(sanitizeForMediatype(externalValue)))
-  }
+  // Replacement-based input sanitation
+  override def translateExternalValue(externalValue: String) =
+    Option(containingDocument.getStaticState.sanitizeInput(externalValue))
 }

@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -74,24 +75,17 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
             } else {
                 // Static readonly
 
-                // For now the mediatype is known statically
-                final boolean isHTMLMediaType = "text/html".equals(attributes.getValue("mediatype"));
-
                 // Use <pre> in text/plain so that spaces are kept by the serializer
                 // NOTE: Another option would be to transform the text to output &nbsp; and <br/> instead.
-                final String containerName = isHTMLMediaType ? "span" : "pre";
+                final String containerName = "pre";
                 final String containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName);
 
                 xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, htmlTextareaAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue();
                     if (value != null) {
-                        if (!isHTMLMediaType) {
-                            // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
-                            xmlReceiver.characters(value.toCharArray(), 0, value.length());
-                        } else {
-                            XFormsUtils.streamHTMLFragment(xmlReceiver, value, textareaControl.getLocationData(), xhtmlPrefix);
-                        }
+                        // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
+                        xmlReceiver.characters(value.toCharArray(), 0, value.length());
                     }
                 }
                 xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName);

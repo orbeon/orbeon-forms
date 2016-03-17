@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis.controls._
-import analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.model.{Model, Instance}
-import event.EventHandler
-import org.dom4j.QName
 import java.util.{Collection ⇒ JCollection}
-import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xforms.xbl._
+
 import org.apache.commons.lang3.StringUtils
-import collection.JavaConverters._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
+import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.xbl._
+import org.orbeon.oxf.xml.SAXStore
+
+import scala.collection.JavaConverters._
 
 trait PartGlobalOps {
 
@@ -39,7 +40,6 @@ trait PartGlobalOps {
   def getControlAnalysis(prefixedId: String): ElementAnalysis
   def hasControlByName(controlName: String): Boolean
   def controlsByName(controlName: String): Traversable[ElementAnalysis]
-  def hasControlAppearance(controlName: String, appearance: QName): Boolean
 
   // Events
   def hasHandlerForEvent(eventName: String): Boolean

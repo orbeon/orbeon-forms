@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.dom4j.QName;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
-import org.orbeon.oxf.xforms.XFormsConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +26,6 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/progressbar/assets/skins/sam/progressbar.css", null),
             // Calendar CSS
             new ResourceConfig("/ops/yui/calendar/assets/skins/sam/calendar.css", null),
-            // HTML area
-            new ResourceConfig("/ops/yui/editor/assets/skins/sam/editor.css", null) {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isYUIRTEInUse(staticStateGlobalOps);
-                }
-            },
-            new ResourceConfig("/ops/yui/button/assets/skins/sam/button.css", null) {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isYUIRTEInUse(staticStateGlobalOps);
-                }
-            },
             // Other standard stylesheets
             new ResourceConfig("/apps/fr/style/bootstrap/css/bootstrap.css", "/apps/fr/style/bootstrap/css/bootstrap.min.css"),
             new ResourceConfig("/apps/fr/style/form-runner-bootstrap-override.css", null),
@@ -70,17 +57,6 @@ public class XFormsFeatures {
                     return isRangeInUse(staticStateGlobalOps);
                 }
             },
-            // HTML area
-            new ResourceConfig("/ops/yui/button/button.js", "/ops/yui/button/button-min.js") {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isYUIRTEInUse(staticStateGlobalOps);
-                }
-            },
-            new ResourceConfig("/ops/yui/editor/editor.js", "/ops/yui/editor/editor-min.js") {
-                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
-                    return isYUIRTEInUse(staticStateGlobalOps);
-                }
-            },
             // Underscore library
             new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             // XForms client
@@ -102,8 +78,6 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/CalendarResources.js",            "/ops/javascript/orbeon/xforms/control/CalendarResources-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Calendar.js",                     "/ops/javascript/orbeon/xforms/control/Calendar-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Upload.js",                       "/ops/javascript/orbeon/xforms/control/Upload-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTEConfig.js",                    "/ops/javascript/orbeon/xforms/control/RTEConfig-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTE.js",                          "/ops/javascript/orbeon/xforms/control/RTE-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",                       "/ops/javascript/orbeon/xforms/action/Message-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",                  "/ops/javascript/orbeon/xforms/control/Placeholder-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/controls/Placement.js",                   "/ops/javascript/orbeon/xforms/controls/Placement-min.js"),
@@ -135,20 +109,8 @@ public class XFormsFeatures {
             return staticStateGlobalOps != null && staticStateGlobalOps.hasControlByName(controlName);
         }
 
-        public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName, QName appearanceOrMediatypeName) {
-            return staticStateGlobalOps != null && staticStateGlobalOps.hasControlAppearance(controlName, appearanceOrMediatypeName);
-        }
-
         protected boolean isRangeInUse(StaticStateGlobalOps staticStateGlobalOps) {
             return isInUse(staticStateGlobalOps, "range");
-        }
-
-        private boolean isHtmlAreaInUse(StaticStateGlobalOps staticStateGlobalOps) {
-            return isInUse(staticStateGlobalOps, "textarea", XFormsConstants.XXFORMS_RICH_TEXT_APPEARANCE_QNAME);
-        }
-
-        protected boolean isYUIRTEInUse(StaticStateGlobalOps staticStateGlobalOps) {
-            return isHtmlAreaInUse(staticStateGlobalOps);
         }
     }
 

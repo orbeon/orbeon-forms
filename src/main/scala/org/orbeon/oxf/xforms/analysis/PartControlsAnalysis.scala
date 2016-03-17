@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls._
-import model.Model
-import collection.JavaConverters._
-import org.dom4j.QName
-import org.orbeon.oxf.xforms.XFormsConstants._
-import collection.mutable.{Buffer, HashMap, HashSet, LinkedHashMap}
+import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable.{Buffer, HashMap, LinkedHashMap}
 
 trait PartControlsAnalysis extends TransientState {
 
@@ -27,7 +26,6 @@ trait PartControlsAnalysis extends TransientState {
 
   protected val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
   protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type → Map of prefixedId → ElementAnalysis
-  private   val controlAppearances = HashMap[String, HashSet[QName]]()                         // type → Set of appearances
 
   // Special handling of attributes
   private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
@@ -47,21 +45,6 @@ trait PartControlsAnalysis extends TransientState {
     // Index by type
     val controlsMap = controlTypes.getOrElseUpdate(controlName, LinkedHashMap[String, ElementAnalysis]())
     controlsMap += elementAnalysis.prefixedId → elementAnalysis
-
-    // Remember appearances in use
-    val appearancesForControlName = controlAppearances.getOrElseUpdate(controlName, HashSet[QName]())
-
-    elementAnalysis match {
-      case elementWithAppearance: AppearanceTrait ⇒
-        appearancesForControlName ++= elementWithAppearance.appearances
-
-        if (controlName == "textarea" && elementWithAppearance.mediatype.contains("text/html")) {
-          // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxf:richtext
-          // appearance had been set, so that we can decide on feature usage based on appearance only.
-          appearancesForControlName += XXFORMS_RICH_TEXT_APPEARANCE_QNAME
-        }
-      case _ ⇒
-    }
 
     // Register special controls
     elementAnalysis match {
@@ -124,9 +107,6 @@ trait PartControlsAnalysis extends TransientState {
 
   def controlsByName(controlName: String): Traversable[ElementAnalysis] =
     controlTypes.get(controlName).toList flatMap (_.values)
-
-  def hasControlAppearance(controlName: String, appearance: QName) =
-    controlAppearances.get(controlName) exists (_(appearance))
 
   // Repeats
   def repeats = controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Seq.empty

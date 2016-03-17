@@ -1994,8 +1994,6 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Upload-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/RTEConfig-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/RTE-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/action/Message-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Placement-min.js" class="xforms-baseline"/>

@@ -13,30 +13,25 @@
 */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.Element
-import org.dom4j.QName
+import org.dom4j.{Element, QName}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xforms.state.ControlState
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NodeInfo
-import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xforms.BindingContext
-import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.model.BindNode
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.state.ControlState
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.value.AtomicValue
+import org.xml.sax.helpers.AttributesImpl
 
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
@@ -213,7 +208,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   }
 
   def isValueChangedCommit() = false // TODO: move this to trait shared by value control and variable
-  def typeExplodedQName    = Dom4jUtils.qNameToExplodedQName(valueType)
+  def typeExplodedQName = Dom4jUtils.qNameToExplodedQName(valueType)
 
   /**
    * Convenience method to return the local name of a built-in XML Schema or XForms type.
@@ -262,11 +257,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     other match {
       case other if this eq other ⇒ true
       case other: XFormsSingleNodeControl ⇒
-        isReadonly      == other.isReadonly &&
-        isRequired      == other.isRequired &&
-        isValid         == other.isValid &&
+        isReadonly == other.isReadonly &&
+        isRequired == other.isRequired &&
+        isValid    == other.isValid    &&
         alertLevel == other.alertLevel &&
-        customMIPs      == other.customMIPs &&
+        customMIPs == other.customMIPs &&
         super.equalsExternal(other)
       case _ ⇒ false
     }
@@ -287,23 +282,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     // Add attributes
     val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
 
-    def outputElement() =
-      if (doOutputElement)
-        ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
-
-    // Get current value if possible for this control
-    // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
-    // client not to update the value, unlike with attributes which can be omitted
-    control2 match {
-      case _: XFormsUploadControl | _: XFormsComponentControl ⇒
-        outputElement()
-      case valueControl: XFormsValueControl ⇒
-        // TODO: Output value only when changed
-        outputValueElement(ch, valueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control")
-      case _ ⇒
-        // No value, just output element with no content (but there may be attributes)
-        outputElement()
-    }
+    if (doOutputElement)
+      ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
 
     // Output attributes (like style) in no namespace which must be output via xxf:attribute
     // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
@@ -347,19 +327,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     added |= addAjaxCustomMIPs(attributesImpl, isNewlyVisibleSubtree, control1, control2)
 
     added
-  }
-
-  protected def outputValueElement(ch: XMLReceiverHelper, valueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String): Unit = {
-
-    // Create element with text value
-    val value = valueControl.getEscapedExternalValue
-
-    if (doOutputElement || ! isNewlyVisibleSubtree || value != "") {
-      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, elementName, attributesImpl)
-      if (value.length > 0)
-        ch.text(value)
-      ch.endElement()
-    }
   }
 
   override def writeMIPs(write: (String, String) ⇒ Unit): Unit = {
@@ -474,7 +441,7 @@ object XFormsSingleNodeControl {
     val customMIPs2 = control2.customMIPs
 
     def addOrAppend(s: String) =
-      AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "class", s, newlyVisibleSubtree, s == "")
+      ControlAjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "class", s, newlyVisibleSubtree, s == "")
 
     // This attribute is a space-separate list of class names prefixed with either '-' or '+'
     if (newlyVisibleSubtree) {

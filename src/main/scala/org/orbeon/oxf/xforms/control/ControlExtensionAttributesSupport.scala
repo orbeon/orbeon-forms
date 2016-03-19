@@ -76,7 +76,9 @@ trait ControlExtensionAttributesSupport {
     for {
       name ← staticControl.extensionAttributes.keys
       if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
-    } outputAttributeElement(originalControl, name.getName, _.extensionAttributeValue(name).orNull, isNewlyVisibleSubtree)(ch)
+    } locally {
+      outputAttributeElement(originalControl, name.getName, _.extensionAttributeValue(name).orNull, isNewlyVisibleSubtree)(ch)
+    }
 }
 
 private object ControlExtensionAttributesSupport {

@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
 import org.xml.sax.helpers.AttributesImpl
@@ -224,14 +224,71 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     super.getBackCopy
   }
 
-  override def equalsExternal(other: XFormsControl): Boolean =
-    other match {
-      case other if this eq other ⇒ true
-      case other: XFormsValueControl ⇒
-        getExternalValue == other.getExternalValue &&
+  final def compareExternalMaybeClientValue(
+    clientValue     : Option[String],
+    previousControl : Option[XFormsValueControl]
+  ): Boolean =
+    (previousControl exists (_ eq this)) ||
+    compareExternalUseExternalValue(clientValue getOrElse getExternalValue, previousControl)
+
+  def compareExternalUseExternalValue(
+    previousExternalValue : String,
+    previousControl       : Option[XFormsValueControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other) ⇒
+        previousExternalValue == other.getExternalValue &&
         super.equalsExternal(other)
       case _ ⇒ false
     }
+
+  final def outputAjaxDiffMaybeClientValue(
+    clientValue           : Option[String],
+    previousControl       : Option[XFormsValueControl])(implicit
+    receiver              : XMLReceiver
+  ) =
+    outputAjaxDiffUseClientValue(
+      clientValue orElse (previousControl map (_.getExternalValue)),
+      previousControl,
+      previousControl.isEmpty)(
+      new XMLReceiverHelper(receiver)
+    )
+
+  def outputAjaxDiffUseClientValue(
+    previousValue         : Option[String],
+    previousControl       : Option[XFormsValueControl],
+    isNewlyVisibleSubtree : Boolean)(implicit
+    ch                    : XMLReceiverHelper
+  ): Unit = {
+    super.outputAjaxDiff(ch, previousControl.orNull, new AttributesImpl, isNewlyVisibleSubtree)
+
+    if (! (previousValue contains getExternalValue)) {
+
+      val attributesImpl = new AttributesImpl
+      attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, this.getEffectiveId)
+
+      outputValueElement(
+        isNewlyVisibleSubtree,
+        attributesImpl,
+        "value"
+      )
+    }
+  }
+
+  protected def outputValueElement(
+    isNewlyVisibleSubtree : Boolean,
+    attributesImpl        : AttributesImpl,
+    elementName           : String)(implicit
+    ch                    : XMLReceiverHelper
+  ): Unit = {
+    val value = getEscapedExternalValue
+    if (attributesImpl.getLength > 0 || ! isNewlyVisibleSubtree || value != "") {
+      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, elementName, attributesImpl)
+      if (value.nonEmpty)
+        ch.text(value)
+      ch.endElement()
+    }
+  }
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {
     case xxformsValue: XXFormsValueEvent ⇒ storeExternalValue(xxformsValue.value)

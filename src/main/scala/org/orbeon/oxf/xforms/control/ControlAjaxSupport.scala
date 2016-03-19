@@ -14,14 +14,15 @@
 package org.orbeon.oxf.xforms.control
 
 
-import org.orbeon.oxf.xforms._
-import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xforms.XFormsConstants._
-import collection.mutable.LinkedHashSet
-import AjaxSupport._
-import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
-import XMLReceiverHelper.CDATA
 import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
+import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
+import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper}
+import org.xml.sax.helpers.AttributesImpl
+
+import scala.collection.mutable.LinkedHashSet
 
 trait ControlAjaxSupport {
 
@@ -136,8 +137,7 @@ trait ControlAjaxSupport {
   }
 }
 
-// NOTE: Use name different from trait so that the Java compiler is happy
-object AjaxSupport {
+object ControlAjaxSupport {
 
   private def tokenize(value: String) = ScalaUtils.split[LinkedHashSet](value)
 
@@ -168,18 +168,30 @@ object AjaxSupport {
       false
   }
 
-  def addOrAppendToAttributeIfNeeded(attributesImpl: AttributesImpl, name: String, value: String, isNewRepeatIteration: Boolean, isDefaultValue: Boolean) =
-    if (isNewRepeatIteration && isDefaultValue)
+  def addOrAppendToAttributeIfNeeded(
+    attributesImpl       : AttributesImpl,
+    name                 : String,
+    value                : String,
+    isNewRepeatIteration : Boolean,
+    isDefaultValue       : Boolean
+  ) =
+    if (isNewRepeatIteration && isDefaultValue) {
       false
-    else {
+    } else {
       SAXUtils.addOrAppendToAttribute(attributesImpl, name, value)
       true
     }
 
-  def addAttributeIfNeeded(attributesImpl: AttributesImpl, name: String, value: String, isNewRepeatIteration: Boolean, isDefaultValue: Boolean) =
-    if (isNewRepeatIteration && isDefaultValue)
+  def addAttributeIfNeeded(
+    attributesImpl       : AttributesImpl,
+    name                 : String,
+    value                : String,
+    isNewRepeatIteration : Boolean,
+    isDefaultValue       : Boolean
+  ) =
+    if (isNewRepeatIteration && isDefaultValue) {
       false
-    else {
+    } else {
       attributesImpl.addAttribute("", name, name, CDATA, value)
       true
     }

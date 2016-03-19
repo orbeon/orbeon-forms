@@ -14,52 +14,28 @@
 package org.orbeon.oxf.xforms.processor
 
 import java.{util ⇒ ju}
+
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
-import org.orbeon.oxf.util.ContentHandlerWriter
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
-import org.orbeon.oxf.xforms.control.controls.{XXFormsDynamicControl, XFormsRepeatControl}
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XXFormsDynamicControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.processor.handlers._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XXFormsAttributeHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 import org.xml.sax.helpers.AttributesImpl
+
 import scala.collection.JavaConverters._
+import scala.collection.{immutable ⇒ i}
 import scala.util.control.Breaks
 
 class ControlsComparator(
-  document              : XFormsContainingDocument,
-  valueChangeControlIds : collection.Set[String],
-  isTestMode            : Boolean
+  document                       : XFormsContainingDocument,
+  valueChangeControlIdsAndValues : i.Map[String, String],
+  isTestMode                     : Boolean
 ) extends XMLReceiverSupport {
-
-  // For Java callers
-  def this(
-    containingDocument    : XFormsContainingDocument,
-    valueChangeControlIds : ju.Set[String],
-    isTestMode            : Boolean
-  ) = this(
-    containingDocument,
-    Option(valueChangeControlIds) map (_.asScala) getOrElse Set.empty[String],
-    isTestMode
-  )
-
-  // For Java callers
-  def diffJava(
-    receiver : XMLReceiver,
-    left     : ju.List[XFormsControl],
-    right    : ju.List[XFormsControl]
-  ) = diffChildren(
-    if (left  ne null) left.asScala  else Nil,
-    if (right ne null) right.asScala else Nil,
-    None)(
-    receiver
-  )
 
   private val FullUpdateThreshold = document.getAjaxFullUpdateThreshold
 
@@ -145,22 +121,32 @@ class ControlsComparator(
       assert(left.isEmpty, "illegal state when comparing controls")
   }
 
+  // Q: Do we need a distinction between new iteration AND control just becoming relevant?
   private def outputSingleControlDiffIfNeeded(
     control1Opt : Option[XFormsControl],
     control2    : XFormsControl)(implicit
     receiver    : XMLReceiver
-  ): Unit = {
-    // Force a change for controls whose values changed in the request
-    // Q: Do we need a distinction between new iteration AND control just becoming relevant?
-    if (control2.supportAjaxUpdates &&
-        (valueChangeControlIds(control2.effectiveId) || ! control2.equalsExternal(control1Opt.orNull)))
-      control2.outputAjaxDiff(
-        new XMLReceiverHelper(receiver),
-        control1Opt.orNull,
-        new AttributesImpl,
-        isNewlyVisibleSubtree = control1Opt.isEmpty
-      )
-  }
+  ): Unit =
+    if (control2.supportAjaxUpdates)
+      control2 match {
+        case c: XFormsValueControl ⇒
+          // See https://github.com/orbeon/orbeon-forms/issues/2442
+          val clientValueOpt   = valueChangeControlIdsAndValues.get(c.effectiveId)
+          val controlValue1Opt = control1Opt.asInstanceOf[Option[XFormsValueControl]]
+          if (! c.compareExternalMaybeClientValue(clientValueOpt, controlValue1Opt))
+            c.outputAjaxDiffMaybeClientValue(
+              clientValueOpt,
+              controlValue1Opt
+            )
+        case c ⇒
+          if (! c.equalsExternal(control1Opt.orNull))
+            c.outputAjaxDiff(
+              new XMLReceiverHelper(receiver),
+              control1Opt.orNull,
+              new AttributesImpl,
+              isNewlyVisibleSubtree = control1Opt.isEmpty
+            )
+      }
 
   private def outputDescendantControlsDiffs(
     control1Opt      : Option[XFormsControl],
@@ -352,4 +338,30 @@ class ControlsComparator(
         )
       )
     }
+}
+
+object ControlsComparator {
+
+  def diffJava(
+    document                             : XFormsContainingDocument,
+    left                                 : ju.List[XFormsControl],
+    right                                : ju.List[XFormsControl],
+    valueChangeControlIdsAndValuesOrNull : i.Map[String, String],
+    isTestMode                           : Boolean,
+    receiver                             : XMLReceiver
+  ) = {
+
+    val comparator = new ControlsComparator(
+      document,
+      Option(valueChangeControlIdsAndValuesOrNull) getOrElse i.Map.empty,
+      isTestMode
+    )
+
+    comparator.diffChildren(
+      if (left  ne null) left.asScala  else Nil,
+      if (right ne null) right.asScala else Nil,
+      None)(
+      receiver
+    )
+  }
 }

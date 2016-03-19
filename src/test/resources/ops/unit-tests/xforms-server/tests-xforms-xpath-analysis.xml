@@ -2166,9 +2166,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
 
                     <xf:model xxf:xpath-analysis="true" id="model">
@@ -2181,10 +2179,10 @@
                         </xf:instance>
 
                         <xf:var id="vfoo" name="foo">
-                            <xxf:value  value="foo"/>
+                            <xxf:value value="foo"/>
                         </xf:var>
                         <xf:var id="vbar" name="bar">
-                            <xxf:value  value="bar"/>
+                            <xxf:value value="bar"/>
                         </xf:var>
                     </xf:model>
                     <xbl:xbl>
@@ -2508,9 +2506,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model"/>
                     <xbl:xbl>
@@ -2608,7 +2604,9 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
+                    <xxf:control-values>
+                        <xxf:value id="g11"/>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -3429,21 +3427,21 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="name⊙1" required="true" empty="false">Item 1</xxf:control>
-                        <xxf:control id="units⊙1" type="{http://www.w3.org/2001/XMLSchema}integer">3</xxf:control>
-                        <xxf:control id="price⊙1" type="{http://www.w3.org/2001/XMLSchema}decimal">60</xxf:control>
-                        <xxf:control id="line-total⊙1" readonly="true">180.00</xxf:control>
-                        <xxf:control id="name⊙2" required="true" empty="false">Item 2</xxf:control>
-                        <xxf:control id="units⊙2" type="{http://www.w3.org/2001/XMLSchema}integer">1</xxf:control>
-                        <xxf:control id="price⊙2" type="{http://www.w3.org/2001/XMLSchema}decimal">500</xxf:control>
-                        <xxf:control id="line-total⊙2" readonly="true">500.00</xxf:control>
-                        <xxf:control id="name⊙3" required="true" empty="false">Item 3</xxf:control>
-                        <xxf:control id="units⊙3" type="{http://www.w3.org/2001/XMLSchema}integer">1</xxf:control>
-                        <xxf:control id="price⊙3" type="{http://www.w3.org/2001/XMLSchema}decimal">1500</xxf:control>
-                        <xxf:control id="line-total⊙3" readonly="true">1,500.00</xxf:control>
-                        <xxf:control id="subtotal" readonly="true">2,180.00</xxf:control>
-                        <xxf:control id="tax" readonly="true">479.60</xxf:control>
-                        <xxf:control id="total" readonly="true">2,393.64</xxf:control>
+                        <xxf:control id="name⊙1" required="true" empty="false"/><xxf:value id="name⊙1">Item 1</xxf:value>
+                        <xxf:control id="units⊙1" type="{http://www.w3.org/2001/XMLSchema}integer"/><xxf:value id="units⊙1">3</xxf:value>
+                        <xxf:control id="price⊙1" type="{http://www.w3.org/2001/XMLSchema}decimal"/><xxf:value id="price⊙1">60</xxf:value>
+                        <xxf:control id="line-total⊙1" readonly="true"/><xxf:value id="line-total⊙1">180.00</xxf:value>
+                        <xxf:control id="name⊙2" required="true" empty="false"/><xxf:value id="name⊙2">Item 2</xxf:value>
+                        <xxf:control id="units⊙2" type="{http://www.w3.org/2001/XMLSchema}integer"/><xxf:value id="units⊙2">1</xxf:value>
+                        <xxf:control id="price⊙2" type="{http://www.w3.org/2001/XMLSchema}decimal"/><xxf:value id="price⊙2">500</xxf:value>
+                        <xxf:control id="line-total⊙2" readonly="true"/><xxf:value id="line-total⊙2">500.00</xxf:value>
+                        <xxf:control id="name⊙3" required="true" empty="false"/><xxf:value id="name⊙3">Item 3</xxf:value>
+                        <xxf:control id="units⊙3" type="{http://www.w3.org/2001/XMLSchema}integer"/><xxf:value id="units⊙3">1</xxf:value>
+                        <xxf:control id="price⊙3" type="{http://www.w3.org/2001/XMLSchema}decimal"/><xxf:value id="price⊙3">1500</xxf:value>
+                        <xxf:control id="line-total⊙3" readonly="true"/><xxf:value id="line-total⊙3">1,500.00</xxf:value>
+                        <xxf:control id="subtotal" readonly="true"/><xxf:value id="subtotal">2,180.00</xxf:value>
+                        <xxf:control id="tax" readonly="true"/><xxf:value id="tax">479.60</xxf:value>
+                        <xxf:control id="total" readonly="true"/><xxf:value id="total">2,393.64</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3455,9 +3453,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="i1">
@@ -3499,9 +3495,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="i1">
@@ -3669,9 +3663,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="i1">
@@ -3918,9 +3910,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="i1">
@@ -4097,9 +4087,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:exf="http://www.exforms.org/exf/1-0"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="i1">
@@ -4180,7 +4168,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true">
                         <xf:instance id="instance">
@@ -4352,7 +4340,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true">
                         <xf:instance id="instance">
@@ -4394,7 +4382,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true">
                         <xf:instance id="instance">
@@ -4480,7 +4468,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true">
                         <xf:instance id="instance">
@@ -4582,7 +4570,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true">
                         <xf:instance id="instance">
@@ -4716,8 +4704,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="m1">
                         <xf:instance id="i11">
@@ -4958,8 +4945,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="m1">
                         <xf:instance id="i11">
@@ -5084,8 +5070,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -5148,8 +5133,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="m1">
                         <xf:instance id="i11">
@@ -5214,8 +5198,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -5308,8 +5291,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -5553,9 +5535,7 @@
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315598&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
-            <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:xh="http://www.w3.org/1999/xhtml"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true">
                         <xf:instance>
@@ -5572,8 +5552,8 @@
             </xh:html>
         </input>
         <output name="response">
-            <controls xmlns:xh="http://www.w3.org/1999/xhtml">
-                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-empty">
+            <controls>
+                <xh:span id="my-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-empty">
                     <xh:input id="my-input≡xforms-input-1" type="text" name="my-input≡xforms-input-1" value="" class="xforms-input-input" aria-required="true" aria-invalid="true"/>
                     <xh:span class="xforms-active xforms-alert">First name is mandatory</xh:span>
                 </xh:span>
@@ -5586,7 +5566,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -5728,7 +5708,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model1">
                         <xf:instance id="instance1">
@@ -6133,8 +6113,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -6302,8 +6281,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -6382,9 +6360,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-                     xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true">
                         <xf:instance id="instance">
@@ -6520,12 +6496,7 @@
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-                     xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                     xmlns:xbl="http://www.w3.org/ns/xbl"
-                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model id="m1" xxf:xpath-analysis="true">
                         <xf:instance id="m1i1"><instance/></xf:instance>
@@ -7253,7 +7224,7 @@
                 <xh:head>
                     <xf:model id="model1" xxf:xpath-analysis="true">
                         <xf:instance id="instance1">
-                            <roles1 xmlns=""/>
+                            <roles1/>
                         </xf:instance>
                         <xf:action ev:event="xforms-model-construct-done">
                             <xf:setvalue ref=".">a b c</xf:setvalue>
@@ -7262,7 +7233,7 @@
                     </xf:model>
                     <xf:model id="model2">
                         <xf:instance id="instance2">
-                            <roles2 xmlns=""/>
+                            <roles2/>
                         </xf:instance>
                         <xf:var name="roles" value="xxf:instance('instance1')"/>
                         <xf:bind ref="." calculate="$roles" id="roles-bind"/>
@@ -7289,7 +7260,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output" readonly="true">a b c</xxf:control>
+                        <xxf:control id="my-output" readonly="true"/><xxf:value id="my-output">a b c</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

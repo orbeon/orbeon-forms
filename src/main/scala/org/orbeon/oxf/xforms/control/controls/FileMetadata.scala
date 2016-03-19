@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.control.XFormsControl.{ImmutableControlProperty, MutableControlProperty, ControlProperty}
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xforms.control.{XFormsValueControl, AjaxSupport, XFormsControl}
+import org.orbeon.oxf.xforms.control.{XFormsValueControl, ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
 import org.apache.commons.io.FileUtils
@@ -112,7 +112,7 @@ trait FileMetadata extends XFormsValueControl {
 
       if (value1 != value2) {
         val attributeValue = Option(value2) getOrElse ""
-        added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, name, attributeValue, isNewRepeatIteration, attributeValue == "")
+        added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, name, attributeValue, isNewRepeatIteration, attributeValue == "")
       }
     }
 

@@ -184,6 +184,11 @@
                                                 <data type="string"/>
                                             </optional>
                                         </element>
+                                        <!-- For value controls only -->
+                                        <element name="xxf:value">
+                                            <attribute name="id"/>
+                                            <data type="string"/>
+                                        </element>
                                         <!-- For selection controls only -->
                                         <element name="xxf:itemset">
                                             <attribute name="id"/>

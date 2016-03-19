@@ -27,13 +27,13 @@
 
     <test description="Simple itemset" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="selection">
@@ -79,13 +79,13 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="select-control" label="Items">1</xxf:control>
+                        <xxf:control id="select-control" label="Items"/><xxf:value id="select-control">1</xxf:value>
                         <xxf:itemset id="select-control">[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -95,13 +95,13 @@
 
     <test description="Hierarchical itemset" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="selection">
@@ -145,13 +145,13 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="select-control" label="Items"/>
+                        <xxf:control id="select-control" label="Items"/><xxf:value id="select-control"/>
                         <xxf:itemset id="select-control">[{"label":"Encyclopedia","value":"en1","children":[{"label":"Science","value":"sc1"},{"label":"Culture","value":"cu1","children":[{"label":"Art","value":"ar1"},{"label":"Craft","value":"cr1"}]}]},{"label":"Encyclopedia","value":"en2","children":[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"}]}]}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -161,13 +161,13 @@
 
     <test description="Hierarchical itemset with relevance" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="selection">
@@ -268,14 +268,17 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="select-1"/>
                         <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:value id="select-2"/>
                         <xxf:itemset id="select-2">[{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:value id="select-3"/>
                         <xxf:itemset id="select-3">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"","children":[{"label":"2.3.2","value":"","children":[{"label":"2.three.4","value":"2.three.4"}]}]}]}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -285,7 +288,7 @@
 
     <test description="Hierarchical instance but flat itemset" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -331,12 +334,13 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="select-1"/>
                         <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2.1","value":"2.1"},{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2.1","value":"2.2.2.1"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -347,7 +351,7 @@
     <test description="Hierarchical itemset with item deletion" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model" xxf:encrypt-item-values="false">
                         <xf:instance id="selection">
@@ -384,7 +388,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -407,6 +411,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="select-1"/>
                         <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -416,13 +421,13 @@
 
     <test description="xxf:itemset() function on flat itemset" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="selection">
@@ -525,7 +530,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -641,13 +646,13 @@
 
     <test description="xxf:itemset() function on hierarchical itemset" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="selection">
@@ -745,7 +750,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -949,13 +954,13 @@
 
     <test description="xxf:itemset() function returns blank if control is non-relevant" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="selection">
@@ -1035,7 +1040,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1076,17 +1081,17 @@
 
     <test description="Itemset pointing to sequence of atomic values" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="instance">
-                                        <value xmlns=""/>
+                                        <value/>
                                     </xf:instance>
                                 </xf:model>
                             </xh:head>
@@ -1105,12 +1110,13 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="my-select"/>
                         <xxf:itemset id="my-select">[{"label":"foo","value":"foo"},{"label":"bar","value":"bar"},{"label":"42","value":"42"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -1120,17 +1126,17 @@
 
     <test description="xxf:open attribute on itemset" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="instance">
-                                        <value xmlns=""/>
+                                        <value/>
                                     </xf:instance>
                                     <xf:instance id="itemset">
                                         <itemset>
@@ -1169,12 +1175,13 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="my-select"/>
                         <xxf:itemset id="my-select">[{"label":"Apple","value":"1","attributes":{"xxforms-open":"false"}},{"label":"Banana","value":"2","attributes":{"xxforms-open":"true"}},{"label":"Orange","value":"3","attributes":{"xxforms-open":"false"}},{"label":"Kiwi","value":"4","attributes":{"xxforms-open":"true"}}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
@@ -1185,13 +1192,13 @@
     <test description="xxf:itemset() function used during construction of new repeat iteration" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316177&group_id=168&atid=350207 -->
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
                                     <xf:instance id="instance">
@@ -1235,7 +1242,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1252,9 +1259,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-select⊙1">1</xxf:control>
+                        <xxf:value id="my-select⊙1">1</xxf:value>
                         <xxf:itemset id="my-select⊙1">[{"label":"Apple","value":"1"}]</xxf:itemset>
-                        <xxf:control id="my-output⊙1">1</xxf:control>
+                        <xxf:value id="my-output⊙1">1</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1264,13 +1271,13 @@
     <test description="#382: xf:item/xf:choices: ref and context attributes are ignored" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/382 -->
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xh:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
 
@@ -1330,8 +1337,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="my-select"/>
                         <xxf:itemset id="my-select">[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"},{"label":"Art","value":"ar1"}]}]</xxf:itemset>
-                        <xxf:control id="my-output">sc2 - cu2 - ar2 - cr2 - ar1</xxf:control>
+                        <xxf:value id="my-output">sc2 - cu2 - ar2 - cr2 - ar1</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1341,7 +1349,7 @@
     <test description="#479: Error evaluating itemset when control label contains HTML" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/479 -->
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1377,7 +1385,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-select" label="&lt;span class=&quot;question&quot;&gt;Dynamic label (value is 42)&lt;/span&gt;"/>
+                        <xxf:control id="my-select" label="&lt;span class=&#34;question&#34;&gt;Dynamic label (value is 42)&lt;/span&gt;"/><xxf:value id="my-select"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1387,7 +1395,7 @@
     <test description="#2250: context() returning unexpected result in xf:itemset" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/479 -->
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1396,13 +1404,13 @@
                         <html>
                             <head>
                                 <xf:model>
-                                    <xf:instance id="selected-values" xmlns="">
+                                    <xf:instance id="selected-values">
                                         <instance>
                                             <pets>cat dog</pets>
                                             <favorite/>
                                         </instance>
                                     </xf:instance>
-                                    <xf:instance id="pets" xmlns="">
+                                    <xf:instance id="pets">
                                         <root>
                                             <item name="Cat" value="cat"/>
                                             <item name="Dog" value="dog"/>
@@ -1437,7 +1445,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="select1">0</xxf:control>
+                        <xxf:value id="select1">0</xxf:value>
                         <xxf:itemset id="select1">[{"label":"favorite","value":"0"},{"label":"Cat","value":"1"},{"label":"Dog","value":"2"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>

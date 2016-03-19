@@ -1631,16 +1631,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          *
          * @param control           HTML element for the control we want to update
          * @param newControlValue   New value
-         * @param attribute1        Optional
-         * @param attribute2        Optional
-         * @param attribute3        Optional
-         * @param attribute4        Optional
-         * @param attribute5        Optional
          */
         beforeValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-        setCurrentValue: function (control, newControlValue, attribute1, attribute2, attribute3, attribute4, attribute5) {
+        setCurrentValue: function (control, newControlValue) {
             var customEvent = {control: control, newValue: newControlValue};
             ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
             ORBEON.xforms.Controls.valueChange.fire(customEvent);
@@ -1672,8 +1667,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // User has modified the value of this control since we sent our request:
                 // so don't try to update it
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
-                // Triggers don't have a value: don't update them
+                    || YAHOO.util.Dom.hasClass(control, "xforms-submit")
+                    || YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
+                // No value
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
                 // Time control
                 if (! ORBEON.util.Utils.isIOS()) {
@@ -1694,25 +1690,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         inputField.value = displayDate;
                     }
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
-                // Upload
-
-                // Get elements we want to modify from the DOM
-                var fileNameSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, control)[0];
-                var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, control)[0];
-                var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
-                // Set values in DOM
-                var upload = ORBEON.xforms.Page.getControl(control);
-                if (attribute1) upload.setState(attribute1);
-                if (attribute2 != null)
-                    ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
-                if (attribute3 != null)
-                    ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
-                if (attribute4 != null)
-                    ORBEON.util.Dom.setStringValue(sizeSpan, attribute4);
-                // NOTE: Server can send a space-separated value but accept expects a comma-separated value
-                if (attribute5 != null)
-                    $(control).find(".xforms-upload-select").attr("accept", attribute5.split(/\s+/).join(","));
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
                 // Only update value if different from the one we have. This handle the case where the fields contain invalid
                 // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
@@ -1742,26 +1719,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 if (input.value != newControlValue)
                     input.value = newControlValue;
-
-                // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
-                if (attribute1 != null) {
-                    if (attribute1 == "")
-                        input.removeAttribute("size");
-                    else
-                        input.size = attribute1;
-                }
-                if (attribute2 != null) {
-                    if (attribute2 == "")
-                        input.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
-                    else
-                        input.maxLength = attribute2;// setAttribute() doesn't work with IE 6
-                }
-                if (attribute3 != null) {
-                    if (attribute2 == "")
-                        input.removeAttribute("autocomplete");
-                    else
-                        input.autocomplete = attribute3;
-                }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
                     || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                     || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
@@ -1804,23 +1761,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                     && !YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 // Text area
-                var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
+                var textarea = control.getElementsByTagName("textarea")[0];
                 textarea.value = newControlValue;
-
-                // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
-                // NOTE: There is no "maxlength" attribute in HTML 4, but there is one in HTML 5. Should we add it anyway?
-                if (attribute2 != null) {
-                    if (attribute2 == "")
-                        textarea.removeAttribute("cols");
-                    else
-                        textarea.cols = attribute2;
-                }
-                if (attribute3 != null) {
-                    if (attribute2 == "")
-                        textarea.removeAttribute("rows");
-                    else
-                        textarea.rows = attribute3;
-                }
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                     && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 // HTML area

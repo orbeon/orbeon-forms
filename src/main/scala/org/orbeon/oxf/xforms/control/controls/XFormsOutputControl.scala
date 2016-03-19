@@ -235,10 +235,14 @@ class XFormsOutputControl(
     added
   }
 
-  override def equalsExternal(other: XFormsControl) =
-    other match {
-      case other if this eq other ⇒ true
-      case other: XFormsOutputControl ⇒ compareFileMetadata(other) && super.equalsExternal(other)
+  override def compareExternalUseExternalValue(
+    previousExternalValue : String,
+    previousControl       : Option[XFormsValueControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XFormsOutputControl) ⇒
+        compareFileMetadata(other) &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒ false
     }
 

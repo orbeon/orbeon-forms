@@ -24,20 +24,20 @@ import org.xml.sax.helpers.AttributesImpl
 import org.scalatest.junit.AssertionsForJUnit
 
 class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit {
-  
+
   // Mock just what's needed to make XFormsInputControl as used below happy
   private def getContainingDocument(id: String): XFormsContainingDocument = {
     val doc = Mockito.mock(classOf[XFormsContainingDocument])
     Mockito.when(doc.getContainingDocument).thenReturn(doc)
-    
+
     val elementAnalysis = Mockito.mock(classOf[ElementAnalysis])
     Mockito.when(elementAnalysis.staticId).thenReturn(id)
     Mockito.when(elementAnalysis.prefixedId).thenReturn(id)
-    
+
     val partAnalysis = Mockito.mock(classOf[PartAnalysis])
     Mockito.when(partAnalysis.getControlAnalysis(Matchers.anyString)).thenReturn(elementAnalysis)
     Mockito.when(doc.getPartAnalysis).thenReturn(partAnalysis)
-    
+
     doc
   }
 
@@ -91,7 +91,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
       override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
     }
-    AjaxSupport.addAjaxClasses(attributes, false, control1, control2)
+    ControlAjaxSupport.addAjaxClasses(attributes, false, control1, control2)
     assert("-foo -gaga +toto" === attributes.getValue("class"))
   }
 
@@ -100,7 +100,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
     }
-    AjaxSupport.addAjaxClasses(attributes, false, null, control2)
+    ControlAjaxSupport.addAjaxClasses(attributes, false, null, control2)
     assert("foo bar" === attributes.getValue("class"))
   }
 

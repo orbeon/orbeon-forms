@@ -140,7 +140,7 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="main-instance">
-                            <instance xmlns="">
+                            <instance>
                                 <required-but-emtpy-element/>
                                 <other-element required-but-emtpy-attribute=""/>
                                 <submission-serialized>false</submission-serialized>
@@ -236,7 +236,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" label="Value:" readonly="true">2</xxf:control>
+                        <xxf:control id="my-input" label="Value:" readonly="true"/><xxf:value id="my-input">2</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -251,7 +251,7 @@
                     <xf:model id="model">
                         <!-- Instance with XInclude -->
                         <xf:instance id="instance-xinclude">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
                         <!-- Load instance upon init -->
                         <xf:send ev:event="xforms-model-construct-done" submission="get-instance-xinclude"/>
@@ -261,7 +261,7 @@
 
                         <!-- Instance without XInclude -->
                         <xf:instance id="instance-no-xinclude">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
                         <!-- Load instance upon init -->
                         <xf:send ev:event="xforms-model-construct-done" submission="get-instance-no-xinclude"/>
@@ -290,8 +290,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output-xinclude" readonly="true">Summary</xxf:control>
-                        <xxf:control id="my-output-no-xinclude" relevant="false"/>
+                        <xxf:control id="my-output-xinclude" readonly="true"/><xxf:value id="my-output-xinclude">Summary</xxf:value>
+                        <xxf:control id="my-output-no-xinclude" relevant="false"/><xxf:value id="my-output-no-xinclude"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -306,7 +306,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -376,7 +376,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -446,7 +446,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <books xmlns="">
+                            <books>
                                 <before/>
                                 <here/>
                                 <after/>
@@ -525,11 +525,11 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -599,11 +599,11 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -673,11 +673,11 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -747,7 +747,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <xf:instance id="destination-instance">
@@ -830,7 +830,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns="" foo="bar"/>
+                            <dummy foo="bar"/>
                         </xf:instance>
 
                         <xf:action ev:event="xforms-model-construct-done">
@@ -908,7 +908,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <books xmlns="">
+                            <books>
                                 <book/>
                                 <book>
                                     <title lang="fr">Jacques le fataliste et son maître</title>
@@ -1003,10 +1003,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title1">Pale Blue Dot</xxf:control>
-                        <xxf:control id="lang1">en</xxf:control>
-                        <xxf:control id="title2">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="lang2">fr</xxf:control>
+                        <xxf:value id="title1">Pale Blue Dot</xxf:value>
+                        <xxf:value id="lang1">en</xxf:value>
+                        <xxf:value id="title2">Jacques le fataliste et son maître</xxf:value>
+                        <xxf:value id="lang2">fr</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1021,7 +1021,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <book xmlns=""/>
+                            <book/>
                         </xf:instance>
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
@@ -1090,7 +1090,7 @@
                     <xf:model id="model">
 
                         <xf:instance id="source-instance">
-                            <dummy xmlns="">
+                            <dummy>
                                 <nested-element/>
                             </dummy>
                         </xf:instance>
@@ -1180,10 +1180,10 @@
                     <xf:model id="model">
 
                         <xf:instance id="instance-1">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
                         <xf:instance id="instance-2">
-                            <dummy xmlns=""/>
+                            <dummy/>
                         </xf:instance>
 
                         <!-- Load instances upon init -->
@@ -1222,8 +1222,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output-1">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:control>
-                        <xxf:control id="my-output-2">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:control>
+                        <xxf:value id="my-output-1">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:value>
+                        <xxf:value id="my-output-2">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1658,7 +1658,7 @@
         </output>
     </test>
 
-    <test description="Submission replace=&quot;all&quot; upon initialization with content response" name="oxf:pipeline">
+    <test description="Submission replace=&#34;all&#34; upon initialization with content response" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-init.xpl"/>
         <input name="document">
@@ -1681,7 +1681,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/xml" status-code="200">PGJvb2s+CiAgICA8ZGV0YWlscz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUg
+            <document xsi:type="xs:base64Binary" content-type="application/xml" status-code="200">PGJvb2s+CiAgICA8ZGV0YWlscz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUg
 ZXQgc29uIG1hw650cmU8L3RpdGxlPgogICAgICAgIDxhdXRob3I+RGVuaXMgRGlkZXJvdDwvYXV0
 aG9yPgogICAgICAgIDxsYW5ndWFnZT5mcjwvbGFuZ3VhZ2U+CiAgICAgICAgPGxpbmsvPgogICAg
 ICAgIDxyYXRpbmcvPgogICAgICAgIDxwdWJsaWNhdGlvbi15ZWFyLz4KICAgICAgICA8cmV2aWV3
@@ -1691,7 +1691,7 @@ az4K</document>
         </output>
     </test>
 
-    <test description="Submission replace=&quot;all&quot; upon initialization with redirect response" name="oxf:pipeline">
+    <test description="Submission replace=&#34;all&#34; upon initialization with redirect response" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

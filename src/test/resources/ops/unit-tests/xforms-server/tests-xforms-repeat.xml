@@ -93,7 +93,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -104,22 +104,22 @@
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
-                <xxf:action xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id125⊙1-1">f11</xxf:control>
-                        <xxf:control id="id126⊙1-1">l11</xxf:control>
-                        <xxf:control id="id125⊙1-2">f12</xxf:control>
-                        <xxf:control id="id126⊙1-2">l12</xxf:control>
-                        <xxf:control id="id125⊙2-1">f21</xxf:control>
-                        <xxf:control id="id126⊙2-1">l21</xxf:control>
-                        <xxf:control id="id125⊙3-1">f31</xxf:control>
-                        <xxf:control id="id126⊙3-1">l31</xxf:control>
-                        <xxf:control id="id125⊙3-2">f32</xxf:control>
-                        <xxf:control id="id126⊙3-2">l32</xxf:control>
-                        <xxf:control id="id125⊙3-3">f33</xxf:control>
-                        <xxf:control id="id126⊙3-3">l33</xxf:control>
-                        <xxf:control id="id125⊙3-4">f34</xxf:control>
-                        <xxf:control id="id126⊙3-4">l34</xxf:control>
+                        <xxf:value id="id125⊙1-1">f11</xxf:value>
+                        <xxf:value id="id126⊙1-1">l11</xxf:value>
+                        <xxf:value id="id125⊙1-2">f12</xxf:value>
+                        <xxf:value id="id126⊙1-2">l12</xxf:value>
+                        <xxf:value id="id125⊙2-1">f21</xxf:value>
+                        <xxf:value id="id126⊙2-1">l21</xxf:value>
+                        <xxf:value id="id125⊙3-1">f31</xxf:value>
+                        <xxf:value id="id126⊙3-1">l31</xxf:value>
+                        <xxf:value id="id125⊙3-2">f32</xxf:value>
+                        <xxf:value id="id126⊙3-2">l32</xxf:value>
+                        <xxf:value id="id125⊙3-3">f33</xxf:value>
+                        <xxf:value id="id126⊙3-3">l33</xxf:value>
+                        <xxf:value id="id125⊙3-4">f34</xxf:value>
+                        <xxf:value id="id126⊙3-4">l34</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -129,7 +129,7 @@
     <test description="xf:repeat insert action" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
                 </xh:head>
@@ -156,7 +156,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -199,41 +199,41 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="id127⊙1-1" label="Insert"/>
-                        <xxf:control id="id125⊙1-1">f11</xxf:control>
-                        <xxf:control id="id126⊙1-1">l11</xxf:control>
+                        <xxf:value id="id125⊙1-1">f11</xxf:value>
+                        <xxf:value id="id126⊙1-1">l11</xxf:value>
                         <xxf:control id="id127⊙1-2" label="Insert"/>
-                        <xxf:control id="id125⊙1-2">f12</xxf:control>
-                        <xxf:control id="id126⊙1-2">l12</xxf:control>
+                        <xxf:value id="id125⊙1-2">f12</xxf:value>
+                        <xxf:value id="id126⊙1-2">l12</xxf:value>
                         <xxf:control id="id127⊙1-3" label="Insert"/>
-                        <xxf:control id="id125⊙1-3">f12</xxf:control>
-                        <xxf:control id="id126⊙1-3">l12</xxf:control>
+                        <xxf:value id="id125⊙1-3">f12</xxf:value>
+                        <xxf:value id="id126⊙1-3">l12</xxf:value>
                         <xxf:control id="id127⊙2-1" label="Insert"/>
-                        <xxf:control id="id125⊙2-1">f21</xxf:control>
-                        <xxf:control id="id126⊙2-1">l21</xxf:control>
+                        <xxf:value id="id125⊙2-1">f21</xxf:value>
+                        <xxf:value id="id126⊙2-1">l21</xxf:value>
                         <xxf:control id="id127⊙3-1" label="Insert"/>
-                        <xxf:control id="id125⊙3-1">f31</xxf:control>
-                        <xxf:control id="id126⊙3-1">l31</xxf:control>
+                        <xxf:value id="id125⊙3-1">f31</xxf:value>
+                        <xxf:value id="id126⊙3-1">l31</xxf:value>
                         <xxf:control id="id127⊙3-2" label="Insert"/>
-                        <xxf:control id="id125⊙3-2">f32</xxf:control>
-                        <xxf:control id="id126⊙3-2">l32</xxf:control>
+                        <xxf:value id="id125⊙3-2">f32</xxf:value>
+                        <xxf:value id="id126⊙3-2">l32</xxf:value>
                         <xxf:control id="id127⊙3-3" label="Insert"/>
-                        <xxf:control id="id125⊙3-3">f33</xxf:control>
-                        <xxf:control id="id126⊙3-3">l33</xxf:control>
+                        <xxf:value id="id125⊙3-3">f33</xxf:value>
+                        <xxf:value id="id126⊙3-3">l33</xxf:value>
                         <xxf:control id="id127⊙3-4" label="Insert"/>
-                        <xxf:control id="id125⊙3-4">f34</xxf:control>
-                        <xxf:control id="id126⊙3-4">l34</xxf:control>
+                        <xxf:value id="id125⊙3-4">f34</xxf:value>
+                        <xxf:value id="id126⊙3-4">l34</xxf:value>
                         <xxf:control id="id127⊙4-1" label="Insert"/>
-                        <xxf:control id="id125⊙4-1">f31</xxf:control>
-                        <xxf:control id="id126⊙4-1">l31</xxf:control>
+                        <xxf:value id="id125⊙4-1">f31</xxf:value>
+                        <xxf:value id="id126⊙4-1">l31</xxf:value>
                         <xxf:control id="id127⊙4-2" label="Insert"/>
-                        <xxf:control id="id125⊙4-2">f32</xxf:control>
-                        <xxf:control id="id126⊙4-2">l32</xxf:control>
+                        <xxf:value id="id125⊙4-2">f32</xxf:value>
+                        <xxf:value id="id126⊙4-2">l32</xxf:value>
                         <xxf:control id="id127⊙4-3" label="Insert"/>
-                        <xxf:control id="id125⊙4-3">f33</xxf:control>
-                        <xxf:control id="id126⊙4-3">l33</xxf:control>
+                        <xxf:value id="id125⊙4-3">f33</xxf:value>
+                        <xxf:value id="id126⊙4-3">l33</xxf:value>
                         <xxf:control id="id127⊙4-4" label="Insert"/>
-                        <xxf:control id="id125⊙4-4">f34</xxf:control>
-                        <xxf:control id="id126⊙4-4">l34</xxf:control>
+                        <xxf:value id="id125⊙4-4">f34</xxf:value>
+                        <xxf:value id="id126⊙4-4">l34</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -243,7 +243,7 @@
      <test description="xf:repeat delete action" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
                 </xh:head>
@@ -267,7 +267,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -301,23 +301,23 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="id127⊙1-1" label="Delete"/>
-                        <xxf:control id="id125⊙1-1">f11</xxf:control>
-                        <xxf:control id="id126⊙1-1">l11</xxf:control>
+                        <xxf:value id="id125⊙1-1">f11</xxf:value>
+                        <xxf:value id="id126⊙1-1">l11</xxf:value>
                         <xxf:control id="id127⊙2-1" label="Delete"/>
-                        <xxf:control id="id125⊙2-1">f21</xxf:control>
-                        <xxf:control id="id126⊙2-1">l21</xxf:control>
+                        <xxf:value id="id125⊙2-1">f21</xxf:value>
+                        <xxf:value id="id126⊙2-1">l21</xxf:value>
                         <xxf:control id="id127⊙3-1" label="Delete"/>
-                        <xxf:control id="id125⊙3-1">f31</xxf:control>
-                        <xxf:control id="id126⊙3-1">l31</xxf:control>
+                        <xxf:value id="id125⊙3-1">f31</xxf:value>
+                        <xxf:value id="id126⊙3-1">l31</xxf:value>
                         <xxf:control id="id127⊙3-2" label="Delete"/>
-                        <xxf:control id="id125⊙3-2">f32</xxf:control>
-                        <xxf:control id="id126⊙3-2">l32</xxf:control>
+                        <xxf:value id="id125⊙3-2">f32</xxf:value>
+                        <xxf:value id="id126⊙3-2">l32</xxf:value>
                         <xxf:control id="id127⊙3-3" label="Delete"/>
-                        <xxf:control id="id125⊙3-3">f33</xxf:control>
-                        <xxf:control id="id126⊙3-3">l33</xxf:control>
+                        <xxf:value id="id125⊙3-3">f33</xxf:value>
+                        <xxf:value id="id126⊙3-3">l33</xxf:value>
                         <xxf:control id="id127⊙3-4" label="Delete"/>
-                        <xxf:control id="id125⊙3-4">f34</xxf:control>
-                        <xxf:control id="id126⊙3-4">l34</xxf:control>
+                        <xxf:value id="id125⊙3-4">f34</xxf:value>
+                        <xxf:value id="id126⊙3-4">l34</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -327,7 +327,7 @@
     <test description="Simple xf:repeat startindex" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -358,7 +358,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -379,7 +379,7 @@
     <test description="xf:repeat setindex action in reaction to event dispatched to nested repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="main-instance">
@@ -420,7 +420,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -484,7 +484,7 @@
             </instances>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -509,7 +509,7 @@
     <test description="xf:insert with @context and @origin" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="instance">
@@ -553,7 +553,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -586,9 +586,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="test-trigger" label="Add"/>
-                        <xxf:control id="first-name-input⊙1">Joe</xxf:control>
-                        <xxf:control id="first-name-input⊙2">Billy</xxf:control>
-                        <xxf:control id="first-name-input⊙3">Mary</xxf:control>
+                        <xxf:value id="first-name-input⊙1">Joe</xxf:value>
+                        <xxf:value id="first-name-input⊙2">Billy</xxf:value>
+                        <xxf:value id="first-name-input⊙3">Mary</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -597,7 +597,7 @@
 
     <test description="Index initialization" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
@@ -669,7 +669,7 @@
 
     <test description="Reference to nested binds from repeat" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -679,7 +679,7 @@
                             <xh:head>
                                 <xf:model id="main-model">
                                     <xf:instance id="main-instance">
-                                        <instance xmlns="">
+                                        <instance>
                                             <book>
                                                 <title>Don Quixote de la Mancha</title>
                                                 <author>Miguel de Cervantes Saavedra</author>
@@ -719,7 +719,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -729,12 +729,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-control⊙1" label="Title" required="true" empty="false">Don Quixote de la Mancha</xxf:control>
-                        <xxf:control id="author-control⊙1" label="Author" required="true" empty="false">Miguel de Cervantes Saavedra</xxf:control>
-                        <xxf:control id="title-control⊙2" label="Title" required="true" empty="false">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="author-control⊙2" label="Author" required="true" empty="false">Denis Diderot</xxf:control>
-                        <xxf:control id="title-control⊙3" label="Title" required="true" empty="false">Childhood's End</xxf:control>
-                        <xxf:control id="author-control⊙3" label="Author" required="true" empty="false">Arthur C. Clarke</xxf:control>
+                        <xxf:control id="title-control⊙1" label="Title" required="true" empty="false"/><xxf:value id="title-control⊙1">Don Quixote de la Mancha</xxf:value>
+                        <xxf:control id="author-control⊙1" label="Author" required="true" empty="false"/><xxf:value id="author-control⊙1">Miguel de Cervantes Saavedra</xxf:value>
+                        <xxf:control id="title-control⊙2" label="Title" required="true" empty="false"/><xxf:value id="title-control⊙2">Jacques le fataliste et son maître</xxf:value>
+                        <xxf:control id="author-control⊙2" label="Author" required="true" empty="false"/><xxf:value id="author-control⊙2">Denis Diderot</xxf:value>
+                        <xxf:control id="title-control⊙3" label="Title" required="true" empty="false"/><xxf:value id="title-control⊙3">Childhood's End</xxf:value>
+                        <xxf:control id="author-control⊙3" label="Author" required="true" empty="false"/><xxf:value id="author-control⊙3">Arthur C. Clarke</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -743,7 +743,7 @@
 
     <test description="position() function within repeat" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -779,7 +779,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -789,12 +789,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input⊙1" label="City: " readonly="true">San Francisco</xxf:control>
-                        <xxf:control id="my-output⊙1" label="Position: ">1</xxf:control>
-                        <xxf:control id="my-input⊙2" label="City: " readonly="true">Los Angeles</xxf:control>
-                        <xxf:control id="my-output⊙2" label="Position: ">2</xxf:control>
-                        <xxf:control id="my-input⊙3" label="City: " readonly="true">San Diego</xxf:control>
-                        <xxf:control id="my-output⊙3" label="Position: ">3</xxf:control>
+                        <xxf:control id="my-input⊙1" label="City: " readonly="true"/><xxf:value id="my-input⊙1">San Francisco</xxf:value>
+                        <xxf:control id="my-output⊙1" label="Position: "/><xxf:value id="my-output⊙1">1</xxf:value>
+                        <xxf:control id="my-input⊙2" label="City: " readonly="true"/><xxf:value id="my-input⊙2">Los Angeles</xxf:value>
+                        <xxf:control id="my-output⊙2" label="Position: "/><xxf:value id="my-output⊙2">2</xxf:value>
+                        <xxf:control id="my-input⊙3" label="City: " readonly="true"/><xxf:value id="my-input⊙3">San Diego</xxf:value>
+                        <xxf:control id="my-output⊙3" label="Position: "/><xxf:value id="my-output⊙3">3</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -803,7 +803,7 @@
 
     <test description="UI events upon repeat update" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -853,7 +853,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -880,9 +880,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input⊙1">bloody</xxf:control>
-                        <xxf:control id="my-input⊙2">yellow</xxf:control>
-                        <xxf:control id="my-input⊙3">green</xxf:control>
+                        <xxf:value id="my-input⊙1">bloody</xxf:value>
+                        <xxf:value id="my-input⊙2">yellow</xxf:value>
+                        <xxf:value id="my-input⊙3">green</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -919,7 +919,7 @@
         <input name="instances">
             <instances>
                 <instance model-id="main-model" id="main-instance">
-                    <tea xmlns="">
+                    <tea>
                         <authorizations>
                             <authorization>
                                 <approvalStatus>aaa</approvalStatus>
@@ -953,7 +953,7 @@
             </instances>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -999,10 +999,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="approvalStatus-input⊙2">bbb</xxf:control>
                         <xxf:copy-repeat-template id="condition-repeat" parent-indexes="2" start-suffix="1" end-suffix="2"/>
                         <xxf:control id="description-textarea⊙2-1" label="Condition:"/>
+                        <xxf:value id="description-textarea⊙2-1"/>
                         <xxf:control id="description-textarea⊙2-2" label="Condition:"/>
+                        <xxf:value id="description-textarea⊙2-2"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" new-index="2"/>
@@ -1014,7 +1015,7 @@
 
     <test description="Simple master-detail repeat initialization" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1058,7 +1059,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -1068,10 +1069,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="orange-repeat-output⊙1" label="Orange type:">Persian</xxf:control>
-                        <xxf:control id="orange-repeat-output⊙2" label="Orange type:">Navel</xxf:control>
-                        <xxf:control id="detail-type" label="Orange type:">Persian</xxf:control>
-                        <xxf:control id="detail-id" label="Orange id:">1</xxf:control>
+                        <xxf:control id="orange-repeat-output⊙1" label="Orange type:"/><xxf:value id="orange-repeat-output⊙1">Persian</xxf:value>
+                        <xxf:control id="orange-repeat-output⊙2" label="Orange type:"/><xxf:value id="orange-repeat-output⊙2">Navel</xxf:value>
+                        <xxf:control id="detail-type" label="Orange type:"/><xxf:value id="detail-type">Persian</xxf:value>
+                        <xxf:control id="detail-id" label="Orange id:"/><xxf:value id="detail-id">1</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1080,7 +1081,7 @@
 
     <test description="Repeat iterations updating only at time of refresh" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1093,7 +1094,7 @@
                                         <books/>
                                     </xf:instance>
                                     <xf:instance id="templates">
-                                        <book xmlns="">
+                                        <book>
                                             <title/>
                                             <author/>
                                         </book>
@@ -1124,7 +1125,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1144,8 +1145,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-title⊙1">T3</xxf:control>
-                        <xxf:control id="my-author⊙1">A3</xxf:control>
+                        <xxf:value id="my-title⊙1">T3</xxf:value>
+                        <xxf:value id="my-author⊙1">A3</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1154,7 +1155,7 @@
 
     <test description="Dispatch events to all iterations of repeated controls" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1163,7 +1164,7 @@
                         <xh:html>
                             <xh:head>
                                 <xf:model id="model">
-                                    <xf:instance xmlns="" id="instance">
+                                    <xf:instance id="instance">
                                         <values>
                                             <value/>
                                             <value/>
@@ -1204,7 +1205,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1224,10 +1225,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input⊙1">1</xxf:control>
-                        <xxf:control id="my-input⊙2">2</xxf:control>
-                        <xxf:control id="my-input⊙3">3</xxf:control>
-                        <xxf:control id="my-input⊙4">4</xxf:control>
+                        <xxf:value id="my-input⊙1">1</xxf:value>
+                        <xxf:value id="my-input⊙2">2</xxf:value>
+                        <xxf:value id="my-input⊙3">3</xxf:value>
+                        <xxf:value id="my-input⊙4">4</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1236,7 +1237,7 @@
 
     <test description="xxforms-nodeset-changed event" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1245,7 +1246,7 @@
                         <xh:html>
                             <xh:head>
                                 <xf:model id="model">
-                                    <xf:instance xmlns="" id="instance">
+                                    <xf:instance id="instance">
                                         <values order="ascending">
                                             <value>1</value>
                                             <value>2</value>
@@ -1253,7 +1254,7 @@
                                             <value>4</value>
                                         </values>
                                     </xf:instance>
-                                    <xf:instance xmlns="" id="changes">
+                                    <xf:instance id="changes">
                                         <changes/>
                                     </xf:instance>
 
@@ -1291,7 +1292,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1315,7 +1316,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output⊙1">1</xxf:control>
+                        <xxf:value id="my-output⊙1">1</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1324,7 +1325,7 @@
 
     <test description="No dispatch of xxforms-nodeset-changed upon control becoming relevant" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1333,7 +1334,7 @@
                         <xh:html>
                             <xh:head>
                                 <xf:model id="model">
-                                    <xf:instance xmlns="" id="instance">
+                                    <xf:instance id="instance">
                                         <values show="false">
                                             <value>1</value>
                                             <value>2</value>
@@ -1341,7 +1342,7 @@
                                             <value>4</value>
                                         </values>
                                     </xf:instance>
-                                    <xf:instance xmlns="" id="changes">
+                                    <xf:instance id="changes">
                                         <changes/>
                                     </xf:instance>
 
@@ -1382,7 +1383,7 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1423,7 +1424,7 @@
     <test description="Simple event dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -1487,7 +1488,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1507,7 +1508,14 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
+                    <xxf:control-values>
+                        <xxf:value id="my-outer-input⊙1"/>
+                        <xxf:value id="my-outer-output⊙1"/>
+                        <xxf:value id="my-inner-input⊙1-1"/>
+                        <xxf:value id="my-inner-output⊙1-1"/>
+                        <xxf:value id="my-inner-input⊙1-2"/>
+                        <xxf:value id="my-inner-output⊙1-2"/>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1516,7 +1524,7 @@
     <test description="Complex dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -1664,7 +1672,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1700,7 +1708,30 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
+                    <xxf:control-values>
+                        <xxf:value id="my-top-level-input"/>
+                        <xxf:value id="my-top-level-output"/>
+                        <xxf:value id="my-outer-input⊙1"/>
+                        <xxf:value id="my-outer-output⊙1"/>
+                        <xxf:value id="my-inner-input⊙1-1"/>
+                        <xxf:value id="my-inner-output⊙1-1"/>
+                        <xxf:value id="my-inner-input⊙1-2"/>
+                        <xxf:value id="my-inner-output⊙1-2"/>
+                        <xxf:value id="my-outer-input⊙2"/>
+                        <xxf:value id="my-outer-output⊙2"/>
+                        <xxf:value id="my-inner-input⊙2-1"/>
+                        <xxf:value id="my-inner-output⊙2-1"/>
+                        <xxf:value id="my-inner-input⊙2-2"/>
+                        <xxf:value id="my-inner-output⊙2-2"/>
+                        <xxf:value id="my-outer-input⊙3"/>
+                        <xxf:value id="my-outer-output⊙3"/>
+                        <xxf:value id="my-inner-input⊙3-1"/>
+                        <xxf:value id="my-inner-output⊙3-1"/>
+                        <xxf:value id="my-inner-input⊙3-2"/>
+                        <xxf:value id="my-inner-output⊙3-2"/>
+                        <xxf:value id="my-inner-input⊙3-3"/>
+                        <xxf:value id="my-inner-output⊙3-3"/>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1709,7 +1740,7 @@
     <test description="xxf:repeat-items() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -1757,7 +1788,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1789,33 +1820,33 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="department-output-1⊙1">3</xxf:control>
-                        <xxf:control id="department-output-2⊙1">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙1-1">2</xxf:control>
-                        <xxf:control id="employee-output-2⊙1-1">2</xxf:control>
-                        <xxf:control id="department-output-3⊙1-1">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙1-2">2</xxf:control>
-                        <xxf:control id="employee-output-2⊙1-2">2</xxf:control>
-                        <xxf:control id="department-output-3⊙1-2">3</xxf:control>
-                        <xxf:control id="department-output-1⊙2">3</xxf:control>
-                        <xxf:control id="department-output-2⊙2">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙2-1">1</xxf:control>
-                        <xxf:control id="employee-output-2⊙2-1">1</xxf:control>
-                        <xxf:control id="department-output-3⊙2-1">3</xxf:control>
-                        <xxf:control id="department-output-1⊙3">3</xxf:control>
-                        <xxf:control id="department-output-2⊙3">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙3-1">4</xxf:control>
-                        <xxf:control id="employee-output-2⊙3-1">4</xxf:control>
-                        <xxf:control id="department-output-3⊙3-1">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙3-2">4</xxf:control>
-                        <xxf:control id="employee-output-2⊙3-2">4</xxf:control>
-                        <xxf:control id="department-output-3⊙3-2">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙3-3">4</xxf:control>
-                        <xxf:control id="employee-output-2⊙3-3">4</xxf:control>
-                        <xxf:control id="department-output-3⊙3-3">3</xxf:control>
-                        <xxf:control id="employee-output-1⊙3-4">4</xxf:control>
-                        <xxf:control id="employee-output-2⊙3-4">4</xxf:control>
-                        <xxf:control id="department-output-3⊙3-4">3</xxf:control>
+                        <xxf:value id="department-output-1⊙1">3</xxf:value>
+                        <xxf:value id="department-output-2⊙1">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙1-1">2</xxf:value>
+                        <xxf:value id="employee-output-2⊙1-1">2</xxf:value>
+                        <xxf:value id="department-output-3⊙1-1">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙1-2">2</xxf:value>
+                        <xxf:value id="employee-output-2⊙1-2">2</xxf:value>
+                        <xxf:value id="department-output-3⊙1-2">3</xxf:value>
+                        <xxf:value id="department-output-1⊙2">3</xxf:value>
+                        <xxf:value id="department-output-2⊙2">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙2-1">1</xxf:value>
+                        <xxf:value id="employee-output-2⊙2-1">1</xxf:value>
+                        <xxf:value id="department-output-3⊙2-1">3</xxf:value>
+                        <xxf:value id="department-output-1⊙3">3</xxf:value>
+                        <xxf:value id="department-output-2⊙3">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-1">4</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-1">4</xxf:value>
+                        <xxf:value id="department-output-3⊙3-1">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-2">4</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-2">4</xxf:value>
+                        <xxf:value id="department-output-3⊙3-2">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-3">4</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-3">4</xxf:value>
+                        <xxf:value id="department-output-3⊙3-3">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-4">4</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-4">4</xxf:value>
+                        <xxf:value id="department-output-3⊙3-4">3</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1882,7 +1913,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1914,33 +1945,33 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="department-output-1⊙1">3</xxf:control>
-                        <xxf:control id="department-output-2⊙1">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙1-1">2</xxf:control>
-                            <xxf:control id="employee-output-2⊙1-1">2</xxf:control>
-                        <xxf:control id="department-output-3⊙1-1">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙1-2">2</xxf:control>
-                            <xxf:control id="employee-output-2⊙1-2">2</xxf:control>
-                        <xxf:control id="department-output-3⊙1-2">3</xxf:control>
-                        <xxf:control id="department-output-1⊙2">3</xxf:control>
-                        <xxf:control id="department-output-2⊙2">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙2-1">1</xxf:control>
-                            <xxf:control id="employee-output-2⊙2-1">1</xxf:control>
-                        <xxf:control id="department-output-3⊙2-1">3</xxf:control>
-                        <xxf:control id="department-output-1⊙3">3</xxf:control>
-                        <xxf:control id="department-output-2⊙3">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙3-1">3</xxf:control>
-                            <xxf:control id="employee-output-2⊙3-1">3</xxf:control>
-                        <xxf:control id="department-output-3⊙3-1">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙3-2">3</xxf:control>
-                            <xxf:control id="employee-output-2⊙3-2">3</xxf:control>
-                        <xxf:control id="department-output-3⊙3-2">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙3-3">3</xxf:control>
-                            <xxf:control id="employee-output-2⊙3-3">3</xxf:control>
-                        <xxf:control id="department-output-3⊙3-3">3</xxf:control>
-                            <xxf:control id="employee-output-1⊙3-4">3</xxf:control>
-                            <xxf:control id="employee-output-2⊙3-4">3</xxf:control>
-                        <xxf:control id="department-output-3⊙3-4">3</xxf:control>
+                        <xxf:value id="department-output-1⊙1">3</xxf:value>
+                        <xxf:value id="department-output-2⊙1">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙1-1">2</xxf:value>
+                        <xxf:value id="employee-output-2⊙1-1">2</xxf:value>
+                        <xxf:value id="department-output-3⊙1-1">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙1-2">2</xxf:value>
+                        <xxf:value id="employee-output-2⊙1-2">2</xxf:value>
+                        <xxf:value id="department-output-3⊙1-2">3</xxf:value>
+                        <xxf:value id="department-output-1⊙2">3</xxf:value>
+                        <xxf:value id="department-output-2⊙2">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙2-1">1</xxf:value>
+                        <xxf:value id="employee-output-2⊙2-1">1</xxf:value>
+                        <xxf:value id="department-output-3⊙2-1">3</xxf:value>
+                        <xxf:value id="department-output-1⊙3">3</xxf:value>
+                        <xxf:value id="department-output-2⊙3">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-1">3</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-1">3</xxf:value>
+                        <xxf:value id="department-output-3⊙3-1">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-2">3</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-2">3</xxf:value>
+                        <xxf:value id="department-output-3⊙3-2">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-3">3</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-3">3</xxf:value>
+                        <xxf:value id="department-output-3⊙3-3">3</xxf:value>
+                        <xxf:value id="employee-output-1⊙3-4">3</xxf:value>
+                        <xxf:value id="employee-output-2⊙3-4">3</xxf:value>
+                        <xxf:value id="department-output-3⊙3-4">3</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1950,16 +1981,16 @@
     <test description="xxf:index() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model>
                         <xf:instance id="item-instance">
-                            <item xmlns="">
+                            <item>
                                 <name>New item</name>
                             </item>
                         </xf:instance>
                         <xf:instance id="items-instance">
-                            <items xmlns=""/>
+                            <items/>
                         </xf:instance>
                         <!-- Insert upon initialization -->
                         <xf:action ev:event="xforms-ready">
@@ -1970,7 +2001,7 @@
                 <xh:body>
                     <xf:group id="outer-group" ref=".[count(instance('items-instance')/item) gt 0]">
                         <xf:repeat ref="instance('items-instance')/item" id="items-item-repeat">
-                            <xf:output id="position-output" value="count(preceding-sibling::item) + 1" />
+                            <xf:output id="position-output" value="count(preceding-sibling::item) + 1"/>
                             <xf:output id="index-output-1" value="index('items-item-repeat')"/>
                             <xf:group id="input-group" ref=".[count(preceding-sibling::item) + 1 = index('items-item-repeat')]">
                                 <xf:input id="input" ref="name"/>
@@ -1985,7 +2016,7 @@
 
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2004,11 +2035,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="position-output⊙1">1</xxf:control>
-                        <xxf:control id="index-output-1⊙1">1</xxf:control>
-                        <xxf:control id="input⊙1">New item</xxf:control>
+                        <xxf:value id="position-output⊙1">1</xxf:value>
+                        <xxf:value id="index-output-1⊙1">1</xxf:value>
+                        <xxf:value id="input⊙1">New item</xxf:value>
                         <xxf:control id="output-group⊙1" relevant="false"/>
                         <xxf:control id="output⊙1" relevant="false"/>
+                        <xxf:value id="output⊙1"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2018,18 +2050,18 @@
     <test description="Repeat iteration update upon nodeset shuffle with exf:sort()" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance xmlns="">
+                            <instance>
                                 <event>000000000000</event>
                                 <event>000000000001</event>
                             </instance>
                         </xf:instance>
 
                         <xf:instance id="other">
-                            <instance xmlns="">
+                            <instance>
                                 <order>ascending</order>
                                 <selection/>
                                 <index/>
@@ -2055,7 +2087,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2074,8 +2106,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output⊙1">000000000001</xxf:control>
-                        <xxf:control id="my-output⊙2">000000000000</xxf:control>
+                        <xxf:value id="my-output⊙1">000000000001</xxf:value>
+                        <xxf:value id="my-output⊙2">000000000000</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2085,7 +2117,7 @@
     <test description="xxforms-index-changed event" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2123,7 +2155,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2150,7 +2182,7 @@
     <test description="xforms-enabled event on xf:repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xh:head>
                     <xf:model id="model">
                         <!-- All relevant -->
@@ -2245,7 +2277,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2277,7 +2309,7 @@
     <test description="Repeat bound to items" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2300,7 +2332,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2317,10 +2349,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-position⊙1">1</xxf:control>
-                        <xxf:control id="my-value⊙1" readonly="true">2</xxf:control>
-                        <xxf:control id="my-position⊙2">2</xxf:control>
-                        <xxf:control id="my-value⊙2" readonly="true">1</xxf:control>
+                        <xxf:value id="my-position⊙1">1</xxf:value>
+                        <xxf:control id="my-value⊙1" readonly="true"/><xxf:value id="my-value⊙1">2</xxf:value>
+                        <xxf:value id="my-position⊙2">2</xxf:value>
+                        <xxf:control id="my-value⊙2" readonly="true"/><xxf:value id="my-value⊙2">1</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2330,7 +2362,7 @@
     <test description="xforms-enabled dispatch when new iteration appears upon refresh" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2374,7 +2406,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2402,8 +2434,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input⊙1">1</xxf:control>
-                        <xxf:control id="my-input⊙2">2</xxf:control>
+                        <xxf:value id="my-input⊙1">1</xxf:value>
+                        <xxf:value id="my-input⊙2">2</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2413,7 +2445,7 @@
     <test description="xxforms-iteration-changed event" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xh:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2461,7 +2493,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2491,10 +2523,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-name⊙1">WA</xxf:control>
-                        <xxf:control id="my-value⊙1">111</xxf:control>
-                        <xxf:control id="my-name⊙2">CA</xxf:control>
-                        <xxf:control id="my-value⊙2">222</xxf:control>
+                        <xxf:value id="my-name⊙1">WA</xxf:value>
+                        <xxf:value id="my-value⊙1">111</xxf:value>
+                        <xxf:value id="my-name⊙2">CA</xxf:value>
+                        <xxf:value id="my-value⊙2">222</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2505,11 +2537,11 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=313774&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance xmlns="">
+                            <instance>
                                 <department>
                                     <employee/>
                                     <employee/>
@@ -2543,7 +2575,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -2555,11 +2587,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output⊙1-1">1 1 2 2</xxf:control>
-                        <xxf:control id="my-output⊙1-2">1 2 2 2</xxf:control>
-                        <xxf:control id="my-output⊙2-1">2 1 2 3</xxf:control>
-                        <xxf:control id="my-output⊙2-2">2 2 2 3</xxf:control>
-                        <xxf:control id="my-output⊙2-3">2 3 2 3</xxf:control>
+                        <xxf:value id="my-output⊙1-1">1 1 2 2</xxf:value>
+                        <xxf:value id="my-output⊙1-2">1 2 2 2</xxf:value>
+                        <xxf:value id="my-output⊙2-1">2 1 2 3</xxf:value>
+                        <xxf:value id="my-output⊙2-2">2 2 2 3</xxf:value>
+                        <xxf:value id="my-output⊙2-3">2 3 2 3</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2570,7 +2602,7 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314760&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2597,7 +2629,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2618,7 +2650,7 @@
         <!-- See http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=314804&group_id=168 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2642,7 +2674,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2670,7 +2702,7 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314831&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2697,7 +2729,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2752,7 +2784,7 @@
             </instances>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2783,7 +2815,7 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315434&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -2804,7 +2836,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -2868,8 +2900,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output⊙1">1</xxf:control>
-                        <xxf:control id="my-output⊙2">2</xxf:control>
+                        <xxf:value id="my-output⊙1">1</xxf:value>
+                        <xxf:value id="my-output⊙2">2</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2948,8 +2980,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-bar-1≡my-output⊙1">42</xxf:control>
-                        <xxf:control id="my-bar-1≡my-output⊙2">42</xxf:control>
+                        <xxf:value id="my-bar-1≡my-output⊙1">42</xxf:value>
+                        <xxf:value id="my-bar-1≡my-output⊙2">42</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

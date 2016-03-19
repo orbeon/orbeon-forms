@@ -13,25 +13,29 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import events._
-import org.orbeon.oxf.webapp.SessionExpiredException
+import java.{util ⇒ ju}
+
+import org.dom4j.{Document, Element}
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.pipeline.api._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.SessionExpiredException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.oxf.xml._
-import java.{util ⇒ ju}
-import dom4j.{LocationSAXContentHandler, Dom4jUtils}
-import org.orbeon.oxf.pipeline.api._
-import org.dom4j.{Document, Element}
-import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.util.{NetUtils, IndentedLogger, Multipart, Logging}
-import XFormsEvents._
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.state.XFormsStateManager
+import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
+
+import scala.collection.JavaConverters._
+import scala.collection.{immutable ⇒ i}
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
@@ -73,7 +77,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     doc                  : XFormsContainingDocument,
     clientEvents         : List[LocalEvent],
     serverEventsElements : List[Element]
-  ): (Boolean, ju.Set[String], Option[String]) = {
+  ): (Boolean, i.Map[String, String], Option[String]) = {
 
     val allClientAndServerEvents = {
 
@@ -107,7 +111,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       def filterEvents(events: List[LocalEvent]) = events filter {
         case a if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒ false
         case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
-          debug("ignoring invalid client event", Seq(
+          debug("ignoring invalid client event", List(
             "control id" → a.targetEffectiveId,
             "event name" → a.name)
           )(doc.indentedLogger)
@@ -150,8 +154,9 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         (_.name == XXFORMS_ALL_EVENTS_REQUIRED)
 
       // Set of all control ids for which we got value events
-      val valueChangeControlIds = allClientAndServerEvents collect
-        { case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId } toSet
+      val valueChangeControlIdsAndValues = allClientAndServerEvents collect {
+        case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId -> e.value
+      }
 
       // Last focus/blur event received from the client
       // This ignores server events, see: https://github.com/orbeon/orbeon-forms/issues/2567
@@ -160,10 +165,10 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         case e if e.name == XXFORMS_BLUR ⇒ None
       }
 
-      (gotAllEvents, valueChangeControlIds.asJava, clientFocusControlId.orNull)
+      (gotAllEvents, valueChangeControlIdsAndValues.toMap, clientFocusControlId.orNull)
 
     } else
-      (false, ju.Collections.emptySet[String], null)
+      (false, i.Map.empty, null)
   }
 
   // NOTE: Leave public for unit tests
@@ -246,7 +251,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     val eventTarget = doc.getObjectByEffectiveId(deNamespaceId(doc, adjustIdForRepeatIteration(doc, event.targetEffectiveId))) match {
       case eventTarget: XFormsEventTarget ⇒ eventTarget
       case _ ⇒
-        debug("ignoring client event with invalid target id", Seq("target id" → event.targetEffectiveId, "event name" → event.name))
+        debug("ignoring client event with invalid target id", List("target id" → event.targetEffectiveId, "event name" → event.name))
         return None
     }
 
@@ -264,7 +269,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       isExplicitlyAllowedExternalEvent || {
         val explicitlyAllowed = eventTarget.allowExternalEvent(event.name)
         if (! explicitlyAllowed)
-          debug("ignoring invalid client event on target", Seq("id" → eventTarget.getEffectiveId, "event name" → event.name))
+          debug("ignoring invalid client event on target", List("id" → eventTarget.getEffectiveId, "event name" → event.name))
         explicitlyAllowed
       }
     }
@@ -272,7 +277,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     // Check the event is allowed on target
     if (event.trusted)
       // Event is trusted, don't check if it is allowed
-      debug("processing trusted event", Seq("target id" → eventTarget.getEffectiveId, "event name" → event.name))
+      debug("processing trusted event", List("target id" → eventTarget.getEffectiveId, "event name" → event.name))
     else if (! checkAllowedExternalEvents)
       return None // event is not trusted and is not allowed
 
@@ -287,6 +292,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
           //   <input type="submit" name="foobar" value="Hi There">...
           //   <input type="image" name="foobar" value="Hi There" src="...">...
 
+          // TODO: Remove IE 6/7 support below.
           // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
           // we must test for any empty content here instead of !"activate".equals(valueString). (Note that
           // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
@@ -312,7 +318,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         } yield
           attributeName → Option(attributeValue)
 
-      def eventValue = if (eventName == XXFORMS_VALUE) Seq("value" → Option(event.value)) else Seq()
+      def eventValue = eventName == XXFORMS_VALUE list ("value" → Option(event.value))
 
       XFormsEventFactory.createEvent(
         eventName,

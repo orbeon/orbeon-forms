@@ -28,8 +28,7 @@
     <test description="fr:inplace-input's hint evaluates in outer context" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -52,7 +51,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -66,8 +65,10 @@
                         <xxf:control id="my-inplace-input≡xf-4" class="fr-component-group"/>
                         <xxf:div id="my-inplace-input≡fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input≡fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input≡xf-6" class="xforms-activable fr-inplace-hint">Hint hint!</xxf:control>
+                        <xxf:control id="my-inplace-input≡xf-6" class="xforms-activable fr-inplace-hint"/>
+                        <xxf:value id="my-inplace-input≡xf-6">Hint hint!</xxf:value>
                         <xxf:control id="my-inplace-input≡xf-11" class="fr-inplace-content fr-inplace-edit"/>
+                        <xxf:value id="my-inplace-input≡input"/>
                         <xxf:control id="my-inplace-input≡apply" label="Apply"/>
                         <xxf:control id="my-inplace-input≡xf-13" label="Cancel"/>
                     </xxf:control-values>
@@ -79,8 +80,7 @@
     <test description="fr:inplace-input pointing to readonly node" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -101,7 +101,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
@@ -115,9 +115,11 @@
                         <xxf:control id="my-inplace-input≡xf-4" class="fr-component-group"/>
                         <xxf:div id="my-inplace-input≡fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input≡fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input≡xf-6" class="xforms-activable fr-inplace-hint" readonly="true">42</xxf:control>
+                        <xxf:control id="my-inplace-input≡xf-6" class="xforms-activable fr-inplace-hint" readonly="true"/>
+                        <xxf:value id="my-inplace-input≡xf-6">42</xxf:value>
                         <xxf:control id="my-inplace-input≡xf-11" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input≡input" relevant="false"/>
+                        <xxf:value id="my-inplace-input≡input"/>
                         <xxf:control id="my-inplace-input≡apply" relevant="false"/>
                         <xxf:control id="my-inplace-input≡xf-13" relevant="false"/>
                     </xxf:control-values>
@@ -129,8 +131,7 @@
     <test description="fr:tabview id and XPath references" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -213,7 +214,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -237,10 +238,10 @@
                     <xxf:control-values>
                         <xxf:control class="selected" id="my-tabview≡nav-1"/>
                         <xxf:control id="my-tabview≡fr-tabview-content" class="yui-content"/>
-                        <xxf:control id="my-tabview≡output1">42</xxf:control>
-                        <xxf:control id="my-tabview≡output2">42</xxf:control>
-                        <xxf:control id="my-tabview≡output3">42</xxf:control>
-                        <xxf:control id="my-tabview≡output4">42</xxf:control>
+                        <xxf:value id="my-tabview≡output1">42</xxf:value>
+                        <xxf:value id="my-tabview≡output2">42</xxf:value>
+                        <xxf:value id="my-tabview≡output3">42</xxf:value>
+                        <xxf:value id="my-tabview≡output4">42</xxf:value>
                     </xxf:control-values>
                     <xxf:script name="xf_723b3546dedd73c5a9253d34adce2089f0bcea93" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
                 </xxf:action>
@@ -251,8 +252,7 @@
     <test description="fr:tabview label resolution" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -303,7 +303,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -318,11 +318,11 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control class="selected" id="my-tabview≡nav-1"/>
-                        <xxf:control id="my-tabview≡xf-38">My label 3</xxf:control>
-                        <xxf:control id="my-tabview≡xf-40">My label 4</xxf:control>
-                        <xxf:control id="my-tabview≡xf-42">My label 5</xxf:control>
-                        <xxf:control id="my-tabview≡xf-44">My label 6</xxf:control>
-                        <xxf:control id="my-tabview≡xf-46">My label 7</xxf:control>
+                        <xxf:value id="my-tabview≡xf-38">My label 3</xxf:value>
+                        <xxf:value id="my-tabview≡xf-40">My label 4</xxf:value>
+                        <xxf:value id="my-tabview≡xf-42">My label 5</xxf:value>
+                        <xxf:value id="my-tabview≡xf-44">My label 6</xxf:value>
+                        <xxf:value id="my-tabview≡xf-46">My label 7</xxf:value>
                         <xxf:control id="my-tabview≡fr-tabview-content" class="yui-content"/>
                     </xxf:control-values>
                     <xxf:script name="xf_723b3546dedd73c5a9253d34adce2089f0bcea93" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
@@ -334,8 +334,7 @@
     <test description="fr:error-summary" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -455,31 +454,42 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary≡body" class="fr-error-summary-body fr-level-error"/>
-                        <xxf:control id="my-summary≡xf-115⊙1">1</xxf:control>
+                        <xxf:value id="my-summary≡xf-115⊙1">1</xxf:value>
                         <xxf:div id="my-summary≡xf-121⊙1" visibility="visible"/>
                         <xxf:div id="my-summary≡xf-117⊙1" visibility="hidden"/>
                         <xxf:attribute for="my-summary≡xf-118⊙1" name="href"/>
                         <xxf:control id="my-summary≡xf-120⊙1" class="fr-error-label" relevant="false"/>
+                        <xxf:value id="my-summary≡xf-120⊙1"/>
                         <xxf:div id="my-summary≡xf-123⊙1" visibility="visible"/>
                         <xxf:div id="my-summary≡xf-127⊙1" visibility="hidden"/>
                         <xxf:control id="my-summary≡xf-124⊙1" class="fr-error-label" label="Note"/>
                         <xxf:control id="my-summary≡xf-128⊙1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡ao⊙1" class="fr-error-alert fr-error-alert-error">Invalid note</xxf:control>
-                        <xxf:control id="my-summary≡xf-115⊙2">2</xxf:control>
+                        <xxf:value id="my-summary≡xf-128⊙1"/>
+                        <xxf:control id="my-summary≡ao⊙1" class="fr-error-alert fr-error-alert-error"/>
+                        <xxf:value id="my-summary≡ao⊙1">Invalid note</xxf:value>
+                        <xxf:value id="my-summary≡xf-115⊙2">2</xxf:value>
                         <xxf:div id="my-summary≡xf-121⊙2" visibility="visible"/>
                         <xxf:div id="my-summary≡xf-117⊙2" visibility="hidden"/>
                         <xxf:attribute for="my-summary≡xf-118⊙2" name="href"/>
                         <xxf:control id="my-summary≡xf-120⊙2" class="fr-error-label" relevant="false"/>
+                        <xxf:value id="my-summary≡xf-120⊙2"/>
                         <xxf:div id="my-summary≡xf-123⊙2" visibility="visible"/>
                         <xxf:div id="my-summary≡xf-127⊙2" visibility="hidden"/>
                         <xxf:control id="my-summary≡xf-124⊙2" class="fr-error-label" label="Last name"/>
                         <xxf:control id="my-summary≡xf-128⊙2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡ao⊙2" class="fr-error-alert fr-error-alert-error">Invalid last name</xxf:control>
+                        <xxf:value id="my-summary≡xf-128⊙2"/>
+                        <xxf:control id="my-summary≡ao⊙2" class="fr-error-alert fr-error-alert-error"/>
+                        <xxf:value id="my-summary≡ao⊙2">Invalid last name</xxf:value>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error" empty="true"/>
+                        <xxf:value id="first-name-control"/>
                         <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
+                        <xxf:value id="note-control⊙1"/>
                         <xxf:control id="note-control⊙2" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
+                        <xxf:value id="note-control⊙2"/>
                         <xxf:control id="note-control⊙3" label="Note" alert="Invalid note" visited="true" required="true" level="error" empty="true"/>
+                        <xxf:value id="note-control⊙3"/>
                         <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" visited="true" required="true" level="error" empty="true"/>
+                        <xxf:value id="last-name-control"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -489,11 +499,11 @@
     <test description="xf:setfocus on fr:date" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance xmlns="">
+                            <instance>
                                 <date>2010-01-13</date>
                             </instance>
                         </xf:instance>
@@ -511,19 +521,22 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date≡xf-6">2010-01-13</xxf:control>
+                        <xxf:value id="my-date≡xf-6">2010-01-13</xxf:value>
                         <xxf:control id="my-date≡xf-9" class="xbl-fr-date-mindate"/>
                         <xxf:attribute for="my-date≡xf-9" name="style">display: none</xxf:attribute>
+                        <xxf:value id="my-date≡xf-9"/>
                         <xxf:control id="my-date≡xf-12" class="xbl-fr-date-maxdate"/>
                         <xxf:attribute for="my-date≡xf-12" name="style">display: none</xxf:attribute>
+                        <xxf:value id="my-date≡xf-12"/>
                         <xxf:control id="my-date≡xf-15" class="xbl-fr-date-pagedate"/>
                         <xxf:attribute for="my-date≡xf-15" name="style">display: none</xxf:attribute>
+                        <xxf:value id="my-date≡xf-15"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-date≡xf-6"/>
                 </xxf:action>
@@ -534,11 +547,11 @@
     <test description="xf:setfocus on fr:currency" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance xmlns="">
+                            <instance>
                                 <currency>12.34</currency>
                             </instance>
                         </xf:instance>
@@ -562,19 +575,25 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency≡xf-9" class="xbl-fr-currency-decimal-separator">.</xxf:control>
+                        <xxf:value id="my-currency"/>
+                        <xxf:control id="my-currency≡xf-9" class="xbl-fr-currency-decimal-separator"/>
                         <xxf:attribute for="my-currency≡xf-9" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-33" class="xbl-fr-number-xforms-output xforms-hidden">12.34</xxf:control>
-                        <xxf:control id="my-currency≡xf-34" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
+                        <xxf:value id="my-currency≡xf-9">.</xxf:value>
+                        <xxf:control id="my-currency≡xf-33" class="xbl-fr-number-xforms-output xforms-hidden"/>
+                        <xxf:value id="my-currency≡xf-33">12.34</xxf:value>
+                        <xxf:control id="my-currency≡xf-34" class="xbl-fr-number-xforms-input xforms-hidden"/>
+                        <xxf:value id="my-currency≡xf-34">12.34</xxf:value>
                         <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-35"/>
                         <xxf:control id="my-currency≡xf-37" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-38">$</xxf:control>
+                        <xxf:value id="my-currency≡xf-38">$</xxf:value>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
                         <xxf:control id="my-currency≡xf-42" class="add-on" relevant="false"/>
                         <xxf:control id="my-currency≡xf-43" relevant="false"/>
+                        <xxf:value id="my-currency≡xf-43"/>
                         <xxf:control id="my-currency≡xf-44" relevant="false"/>
+                        <xxf:value id="my-currency≡xf-44"/>
                     </xxf:control-values>
                     <xxf:script name="xf_efdc0056b6438f9c969545432feab52728756c34" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>
@@ -586,11 +605,11 @@
     <test description="xf:setfocus on fr:autocomplete" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance xmlns="">
+                            <instance>
                                 <value>One</value>
                                 <item>One</item>
                                 <item>Two</item>
@@ -616,24 +635,30 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="my-autocomplete"/>
                         <xxf:control id="my-autocomplete≡component-inner-group" class="fr-autocomplete-container"/>
                         <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
-                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
-                        <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
+                        <xxf:value id="my-autocomplete≡search"/>
+                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&#34;&#34; src=&#34;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&#34;&gt;"/>
+                        <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset"/>
                         <xxf:attribute for="my-autocomplete≡itemset" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete≡xf-68" class="xbl-fr-autocomplete-max-results-displayed">10</xxf:control>
+                        <xxf:value id="my-autocomplete≡itemset">true</xxf:value>
+                        <xxf:control id="my-autocomplete≡xf-68" class="xbl-fr-autocomplete-max-results-displayed"/>
                         <xxf:attribute for="my-autocomplete≡xf-68" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1">One</xxf:control>
+                        <xxf:value id="my-autocomplete≡xf-68">10</xxf:value>
+                        <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1"/>
                         <xxf:attribute for="my-autocomplete≡select1" name="style">display: none</xxf:attribute>
+                        <xxf:value id="my-autocomplete≡select1">One</xxf:value>
                         <xxf:itemset id="my-autocomplete≡select1">[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
-                        <xxf:control id="my-autocomplete≡external-value" class="fr-autocomplete-external-value">One</xxf:control>
+                        <xxf:control id="my-autocomplete≡external-value" class="fr-autocomplete-external-value"/>
                         <xxf:attribute for="my-autocomplete≡external-value" name="style">display: none</xxf:attribute>
+                        <xxf:value id="my-autocomplete≡external-value">One</xxf:value>
                     </xxf:control-values>
                     <xxf:script name="xf_d4f6ea393e77ed5e81903deb659f91bb70adae1a" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
                     <xxf:focus control-id="my-autocomplete≡search"/>

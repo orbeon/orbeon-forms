@@ -279,15 +279,15 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             final boolean allEvents;
-                            final Set<String> valueChangeControlIds;
+                            final scala.collection.immutable.Map<String, String> valueChangeControlIdsAndValuesOrNull;
                             final scala.Option<String> clientFocusControlId;
                             if (eventsFindings[0] != null) {
                                 allEvents = ((Boolean) eventsFindings[0]._1());
-                                valueChangeControlIds = ((Set<String>) eventsFindings[0]._2());
+                                valueChangeControlIdsAndValuesOrNull = ((scala.collection.immutable.Map<String, String>) eventsFindings[0]._2());
                                 clientFocusControlId = ((scala.Option<String>) eventsFindings[0]._3());
                             } else {
                                 allEvents = false;
-                                valueChangeControlIds = Collections.emptySet();
+                                valueChangeControlIdsAndValuesOrNull = null;
                                 clientFocusControlId = null;
                             }
 
@@ -335,7 +335,7 @@ public class XFormsServer extends ProcessorImpl {
                                         outputAjaxResponse(
                                             containingDocument,
                                             indentedLogger,
-                                            valueChangeControlIds,
+                                            valueChangeControlIdsAndValuesOrNull,
                                             clientFocusControlId,
                                             beforeFocusedControl,
                                             repeatHierarchy,
@@ -488,20 +488,20 @@ public class XFormsServer extends ProcessorImpl {
     /**
      * Output an Ajax response for the regular Ajax mode.
      *
-     * @param containingDocument                containing document
-     * @param indentedLogger                    logger
-     * @param valueChangeControlIds             control ids for which the client sent a value change
-     * @param clientFocusControlId              id of the last control that received focus from client
-     * @param beforeFocusedControl              control which had the focus before the updates, if any
-     * @param requestDocument                   incoming request document (for all events mode)
-     * @param xmlReceiver                       handler for the Ajax result
-     * @param allEvents                         whether to handle all events
-     * @param testOutputAllActions              for testing purposes
+     * @param containingDocument             containing document
+     * @param indentedLogger                 logger
+     * @param valueChangeControlIdsAndValues control ids for which the client sent a value change
+     * @param clientFocusControlId           id of the last control that received focus from client
+     * @param beforeFocusedControl           control which had the focus before the updates, if any
+     * @param requestDocument                incoming request document (for all events mode)
+     * @param xmlReceiver                    handler for the Ajax result
+     * @param allEvents                      whether to handle all events
+     * @param testOutputAllActions           for testing purposes
      */
     public static void outputAjaxResponse(
             XFormsContainingDocument containingDocument,
             IndentedLogger indentedLogger,
-            Set<String> valueChangeControlIds,
+            scala.collection.immutable.Map<String, String> valueChangeControlIdsAndValues,
             scala.Option<String> clientFocusControlId,
             XFormsControl beforeFocusedControl,
             String repeatHierarchy,
@@ -604,14 +604,27 @@ public class XFormsServer extends ProcessorImpl {
                         for (final ElementAnalysis e : containingDocument.getStaticOps().jControlsByName("dynamic"))
                             containingDocument.addControlStructuralChange(e.prefixedId());
 
-                        diffControls(ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
-                                currentControlTree.getChildren(), null, testOutputAllActions);
+                        diffControls(
+                            containingDocument,
+                            initialControlTree.getChildren(),
+                            currentControlTree.getChildren(),
+                            null,
+                            testOutputAllActions,
+                            ch,
+                            indentedLogger
+                        );
                     } else if (testOutputAllActions || containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                        diffControls(ch, containingDocument, indentedLogger,
-                                xformsControls.getInitialControlTree().getChildren(),
-                                currentControlTree.getChildren(), valueChangeControlIds, testOutputAllActions);
+                        diffControls(
+                            containingDocument,
+                            xformsControls.getInitialControlTree().getChildren(),
+                            currentControlTree.getChildren(),
+                            valueChangeControlIdsAndValues,
+                            testOutputAllActions,
+                            ch,
+                            indentedLogger
+                        );
                     }
 
                     ch.endElement();
@@ -773,17 +786,22 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void diffControls(XMLReceiverHelper ch,
-                                    XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
-                                    List<XFormsControl> state1, List<XFormsControl> state2,
-                                    Set<String> valueChangeControlIds, boolean isTestMode) {
+    public static void diffControls(
+        XFormsContainingDocument containingDocument,
+        List<XFormsControl> state1,
+        List<XFormsControl> state2,
+        scala.collection.immutable.Map<String, String> valueChangeControlIdsAndValuesOrNull,
+        boolean isTestMode,
+        XMLReceiverHelper ch,
+        IndentedLogger indentedLogger
+    ) {
 
         // In test mode, ignore first tree
         if (isTestMode)
             state1 = null;
 
         indentedLogger.startHandleOperation("", "computing differences");
-        new ControlsComparator(containingDocument, valueChangeControlIds, isTestMode).diffJava(ch.getXmlReceiver(), state1, state2);
+        ControlsComparator.diffJava(containingDocument, state1, state2, valueChangeControlIdsAndValuesOrNull, isTestMode, ch.getXmlReceiver());
         indentedLogger.endHandleOperation();
     }
 

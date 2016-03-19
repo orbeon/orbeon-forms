@@ -320,7 +320,7 @@
                     ORBEON.xforms.Globals.requestIgnoreErrors = true;
                     var sendInitialDynamicState = false;
                     var showProgress = false;
-                    var progressMessage;
+                    var progressMessage = null;
                     var foundEventOtherThanHeartBeat = false;
                     for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                         var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
@@ -811,6 +811,8 @@
             }
 
             var responseDialogIdsToShowAsynchronously = [];
+            var controlsWithUpdatedItemsets = {};
+            var recreatedInputs = {};
 
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
@@ -1032,19 +1034,22 @@
 
                     // Second handle the <xxf:itemset> actions (we want to do this before we set the value of
                     // controls as the value of the select might be in the new values of the itemset).
-                    var controlsWithUpdatedItemsets = {};
                     for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
                         // Change values in an itemset
                         if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "control-values") {
                             var itemsetsElement = actionElement.childNodes[actionIndex];
                             for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
                                 if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
-                                    var itemsetElement = itemsetsElement.childNodes[j];
-                                    var itemsetTree = ORBEON.util.StringOps.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
-                                    if (itemsetTree == null) itemsetTree = [];
-                                    var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
+
+                                    var itemsetElement  = itemsetsElement.childNodes[j];
+                                    var itemsetTree     = ORBEON.util.StringOps.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
+
+                                    if (itemsetTree == null)
+                                        itemsetTree = [];
+
+                                    var controlId       = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
                                     var documentElement = ORBEON.util.Dom.get(controlId);
-                                    var documentElementClasses = documentElement.className.split(" ");
+
                                     controlsWithUpdatedItemsets[controlId] = true;
 
                                     if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
@@ -1224,39 +1229,31 @@
                             // Update controls
                             case "control-values": {
                                 var controlValuesElement = actionElement.childNodes[actionIndex];
-                                var controlElements = childrenWithLocalName(controlValuesElement, 'control');
-                                var controlElementsLength = controlElements.length;
-                                // Update control value and MIPs
-                                for (var j = 0; j < controlElementsLength; j++) {
-                                    var controlElement = controlElements[j];
-                                    var newControlValue = ORBEON.util.Dom.getStringValue(controlElement);
-                                    var controlId = ORBEON.util.Dom.getAttribute(controlElement, "id");
-                                    var staticReadonly = ORBEON.util.Dom.getAttribute(controlElement, "static");
-                                    var relevant = ORBEON.util.Dom.getAttribute(controlElement, "relevant");
-                                    var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
-                                    var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
-                                    var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
-                                    var alt = ORBEON.util.Dom.getAttribute(controlElement, "alt");
-                                    var newLevel = ORBEON.util.Dom.getAttribute(controlElement, "level");
-                                    var progressState = ORBEON.util.Dom.getAttribute(controlElement, "progress-state");
+
+                                // Update control MIPs and related
+                                _.each(childrenWithLocalName(controlValuesElement, 'control'), function(controlElement) {
+
+                                    var controlId        = ORBEON.util.Dom.getAttribute(controlElement, "id");
+                                    var staticReadonly   = ORBEON.util.Dom.getAttribute(controlElement, "static");
+                                    var relevant         = ORBEON.util.Dom.getAttribute(controlElement, "relevant");
+                                    var readonly         = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
+                                    var required         = ORBEON.util.Dom.getAttribute(controlElement, "required");
+                                    var classes          = ORBEON.util.Dom.getAttribute(controlElement, "class");
+                                    var newLevel         = ORBEON.util.Dom.getAttribute(controlElement, "level");
+                                    var progressState    = ORBEON.util.Dom.getAttribute(controlElement, "progress-state");
                                     var progressReceived = ORBEON.util.Dom.getAttribute(controlElement, "progress-received");
                                     var progressExpected = ORBEON.util.Dom.getAttribute(controlElement, "progress-expected");
+                                    var newSchemaType    = ORBEON.util.Dom.getAttribute(controlElement, "type");
 
-                                    var newSchemaType = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                     var documentElement = ORBEON.util.Dom.get(controlId);
                                     if (documentElement == null) {
                                         documentElement = ORBEON.util.Dom.get("group-begin-" + controlId);
                                         if (documentElement == null) ORBEON.util.Utils.logMessage ("Can't find element or iteration with ID '" + controlId + "'");
                                     }
-                                    var documentElementClasses = documentElement.className.split(" ");
-                                    var isLeafControl = YAHOO.util.Dom.hasClass(documentElement, "xforms-control");
-
                                     var jDocumentElement = $(documentElement);
 
-                                    // Save new value sent by server (upload controls don't carry their value the same way as other controls)
-                                    var previousServerValue = ORBEON.xforms.ServerValueStore.get(controlId);
-                                    if (! YAHOO.util.Dom.hasClass(documentElement, "xforms-upload"))
-                                        ORBEON.xforms.ServerValueStore.set(controlId, newControlValue);
+                                    var documentElementClasses = documentElement.className.split(" ");
+                                    var isLeafControl = YAHOO.util.Dom.hasClass(documentElement, "xforms-control");
 
                                     // Handle migration of control from non-static to static if needed
                                     var isStaticReadonly = YAHOO.util.Dom.hasClass(documentElement, "xforms-static");
@@ -1284,7 +1281,6 @@
                                             YAHOO.util.Dom.addClass(documentElement, "xforms-static");
                                         }
                                         isStaticReadonly = true;
-                                        documentElementClasses = documentElement.className.split(" ");
                                     }
 
                                     // We update the relevance and readonly before we update the value. If we don't, updating the value
@@ -1298,7 +1294,6 @@
 
                                     // Update input control type
                                     // NOTE: This is not ideal: in the future, we would like a template-based mechanism instead.
-                                    var recreatedInput = false;
                                     if (newSchemaType != null) {
 
                                         if (YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
@@ -1317,7 +1312,7 @@
                                             if (newType != existingType) {
 
                                                 // Remember that this input has be recreated which means we need to update its value
-                                                recreatedInput = true;
+                                                recreatedInputs[controlId] = documentElement;
                                                 // Clean-up document element by removing type classes
                                                 _.each(INPUT_TYPES, function(type) { YAHOO.util.Dom.removeClass(documentElement, type.className); });
                                                 // Minimal control content can be different
@@ -1484,10 +1479,18 @@
                                         }
                                     }
 
-                                    // Update value
+                                    // Update the required-empty/required-full even if the required has not changed or
+                                    // is not specified as the value may have changed
+                                    if (! isStaticReadonly) {
+                                        var emptyAttr = controlElement.getAttribute("empty");
+                                        if (!_.isNull(emptyAttr))
+                                            ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, emptyAttr);
+                                    }
+
+                                    // Custom attributes on controls
                                     if (isLeafControl) {
 
-                                        // Aria attributes
+                                        // Aria attributes on some controls only
                                         if (jDocumentElement.is(".xforms-input")                                     ||
                                             jDocumentElement.is(".xforms-textarea")                                  ||
                                             jDocumentElement.is(".xforms-secret")                                    ||
@@ -1516,103 +1519,107 @@
                                             //    state="empty|file"
                                             //    accept=".txt"
                                             //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
-                                            ORBEON.xforms.Controls.setCurrentValue(
-                                                documentElement,
-                                                newControlValue,
-                                                ORBEON.util.Dom.getAttribute(controlElement, "state"),
-                                                ORBEON.util.Dom.getAttribute(controlElement, "filename"),
-                                                ORBEON.util.Dom.getAttribute(controlElement, "mediatype"),
-                                                ORBEON.util.Dom.getAttribute(controlElement, "size"),
-                                                ORBEON.util.Dom.getAttribute(controlElement, "accept"));
+
+                                            // Get elements we want to modify from the DOM
+                                            var fileNameSpan  = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, documentElement)[0];
+                                            var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, documentElement)[0];
+                                            var sizeSpan      = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, documentElement)[0];
+
+                                            // Set values in DOM
+                                            var upload = ORBEON.xforms.Page.getControl(documentElement);
+
+                                            var state     = ORBEON.util.Dom.getAttribute(controlElement, "state");
+                                            var fileName  = ORBEON.util.Dom.getAttribute(controlElement, "filename");
+                                            var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
+                                            var size      = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                            var accept    = ORBEON.util.Dom.getAttribute(controlElement, "accept");
+
+                                            if (state)
+                                                upload.setState(state);
+                                            if (fileName != null)
+                                                ORBEON.util.Dom.setStringValue(fileNameSpan, fileName);
+                                            if (mediatype != null)
+                                                ORBEON.util.Dom.setStringValue(mediatypeSpan, mediatype);
+                                            if (size != null)
+                                                ORBEON.util.Dom.setStringValue(sizeSpan, size);
+                                            // NOTE: Server can send a space-separated value but accept expects a comma-separated value
+                                            if (accept != null)
+                                                jDocumentElement.find(".xforms-upload-select").attr("accept", accept.split(/\s+/).join(","));
+
                                         } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-output")
                                                     || YAHOO.util.Dom.hasClass(documentElement, "xforms-static")) {
-                                            if ($(documentElement).is('.xforms-mediatype-image') && alt != null) {
-                                                var img = $(documentElement).children('img').first();
+
+                                            var alt = ORBEON.util.Dom.getAttribute(controlElement, "alt");
+
+                                            if (alt != null && jDocumentElement.is('.xforms-mediatype-image')) {
+                                                var img = jDocumentElement.children('img').first();
                                                 img.attr('alt', alt);
                                             }
-                                            // Output-only control, just set the value
-                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                         } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-trigger")
                                                     || YAHOO.util.Dom.hasClass(documentElement, "xforms-submit")) {
                                             // It isn't a control that can hold a value (e.g. trigger) and there is no point in trying to update it
                                             // NOP
-                                        } else {
-                                            var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
-                                            if (currentValue != null) {
-                                                previousServerValue = previousServerValue == null ? null : ORBEON.util.StringOps.normalizeSerializedHTML(previousServerValue);
-                                                currentValue = ORBEON.util.StringOps.normalizeSerializedHTML(currentValue);
-                                                newControlValue = ORBEON.util.StringOps.normalizeSerializedHTML(newControlValue);
+                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-input")
+                                            || YAHOO.util.Dom.hasClass(documentElement, "xforms-secret")) {
+                                            // Additional attributes for xf:input and xf:secret
 
-                                                var isInputOrSecret = YAHOO.util.Dom.hasClass(documentElement, "xforms-input")
-                                                    || YAHOO.util.Dom.hasClass(documentElement, "xforms-secret");
+                                            var inputSize         = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                            var maxlength         = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
+                                            var inputAutocomplete = ORBEON.util.Dom.getAttribute(controlElement, "autocomplete");
 
-                                                var inputSize = isInputOrSecret ? ORBEON.util.Dom.getAttribute(controlElement, "size") : null;
-                                                var inputAutocomplete = isInputOrSecret ? ORBEON.util.Dom.getAttribute(controlElement, "autocomplete") : null;
+                                            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be
+                                            // the best thing to do.
 
-                                                var isTextarea = YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea");
+                                            var input = documentElement.getElementsByTagName("input")[0];
 
-                                                var textareaCols = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "cols") : null;
-                                                var textareaRows = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "rows") : null;
+                                            if (inputSize != null) {
+                                                if (inputSize == "")
+                                                    input.removeAttribute("size");
+                                                else
+                                                    input.size = inputSize;
+                                            }
+                                            if (maxlength != null) {
+                                                if (maxlength == "")
+                                                    input.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
+                                                else
+                                                    input.maxLength = maxlength;// setAttribute() doesn't work with IE 6
+                                            }
+                                            if (inputAutocomplete != null) {
+                                                if (inputAutocomplete == "")
+                                                    input.removeAttribute("autocomplete");
+                                                else
+                                                    input.autocomplete = inputAutocomplete;
+                                            }
+                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea")) {
+                                            // Additional attributes for xf:textarea
 
-                                                var maxlength = (isInputOrSecret || isTextarea) ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+                                            var maxlength    = ORBEON.util.Dom.getAttribute(controlElement, "maxlength");
+                                            var textareaCols = ORBEON.util.Dom.getAttribute(controlElement, "cols");
+                                            var textareaRows = ORBEON.util.Dom.getAttribute(controlElement, "rows");
 
-                                                var doUpdate =
-                                                        // If this was an input that was recreated because of a type change, we always set its value
-                                                        recreatedInput ||
-                                                        // If this is a control for which we recreated the itemset, we want to set its value
-                                                        controlsWithUpdatedItemsets[controlId] ||
-                                                        (
-                                                            // Update only if the new value is different than the value already have in the HTML area
-                                                            currentValue != newControlValue
-                                                            // Update only if the value in the control is the same now as it was when we sent it to the server,
-                                                            // so not to override a change done by the user since the control value was last sent to the server
-                                                            && (previousServerValue == null || currentValue == previousServerValue)
-                                                        ) ||
-                                                        // Special xf:input attributes
-                                                        (isInputOrSecret && (inputSize != null || maxlength != null || inputAutocomplete != null)) ||
-                                                        // Special xf:textarea attributes
-                                                        (isTextarea && (maxlength != null || textareaCols != null || textareaRows != null));
-                                                if (doUpdate) {
-                                                    if (isInputOrSecret) {
-                                                        // Additional attributes for xf:input
-                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, maxlength, inputAutocomplete);
-                                                    } else if (isTextarea && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
-                                                    } else if (isTextarea) {
-                                                        // Additional attributes for xf:textarea
-                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, maxlength, textareaCols, textareaRows);
-                                                    } else {
-                                                        // Other control just have a new value
-                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
-                                                    }
-                                                    // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
-                                                    //
-                                                    // 1) For HTML editors, the HTML might change once we put it in the DOM.
-                                                    // 2) For select/select1, if the server sends an out-of-range value, the actual value of the field won't be the out
-                                                    //    of range value but the empty string.
-                                                    // 3) For boolean inputs, the server might tell us the new value is "" when the field becomes non-relevant, which is
-                                                    //    equivalent to "false".
-                                                    //
-                                                    // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
-                                                    // value for the field, since the current value is different from the server value, we will incorrectly think that the
-                                                    // user modified the field, and won't update the field with the value provided by the AjaxServer.
-                                                    ORBEON.xforms.ServerValueStore.set(documentElement.id, ORBEON.xforms.Controls.getCurrentValue(documentElement));
-                                                }
+                                            var textarea = documentElement.getElementsByTagName("textarea")[0];
+
+                                            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be
+                                            // the best thing to do.
+                                            if (maxlength != null) {
+                                                if (maxlength == "")
+                                                    textarea.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
+                                                else
+                                                    textarea.maxLength = maxlength;// setAttribute() doesn't work with IE 6
+                                            }
+                                            if (textareaCols != null) {
+                                                if (textareaCols == "")
+                                                    textarea.removeAttribute("cols");
+                                                else
+                                                    textarea.cols = textareaCols;
+                                            }
+                                            if (textareaRows != null) {
+                                                if (textareaRows == "")
+                                                    textarea.removeAttribute("rows");
+                                                else
+                                                    textarea.rows = textareaRows;
                                             }
                                         }
-
-                                        // Call custom listener if any (temporary until we have a good API for custom components)
-                                        if (typeof xformsValueChangedListener != "undefined") {
-                                            xformsValueChangedListener(controlId, newControlValue);
-                                        }
-                                    }
-
-                                    // Update the required-empty/required-full even if the required has not changed or
-                                    // is not specified as the value may have changed
-                                    if (! isStaticReadonly) {
-                                        var emptyAttr = controlElement.getAttribute("empty");
-                                        if (!_.isNull(emptyAttr))
-                                            ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, emptyAttr);
                                     }
 
                                     // Store new label message in control attribute
@@ -1646,10 +1653,77 @@
                                     var newVisited = ORBEON.util.Dom.getAttribute(controlElement, "visited");
                                     if (newVisited)
                                         ORBEON.xforms.Controls.updateVisited(documentElement, newVisited == 'true');
+                                }); // end `xxf:control`
 
-                                    // Notification event if the type changed
-                                    if (recreatedInput) Controls.typeChangedEvent.fire({control: documentElement});
-                                }
+                                // Update control values
+                                _.each(childrenWithLocalName(controlValuesElement, 'value'), function(controlElement) {
+
+                                    var controlId        = $(controlElement).attr('id');
+                                    var newControlValue  = ORBEON.util.Dom.getStringValue(controlElement);
+                                    var documentElement  = ORBEON.util.Dom.get(controlId);
+                                    var jDocumentElement = $(documentElement);
+
+                                    // Save new value sent by server (upload controls don't carry their value the same way as other controls)
+                                    var previousServerValue = ORBEON.xforms.ServerValueStore.get(controlId);
+
+                                    if (! jDocumentElement.is('.xforms-upload')) // Should not happen to match
+                                        ORBEON.xforms.ServerValueStore.set(controlId, newControlValue);
+
+                                    // Update value
+                                    if (jDocumentElement.is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
+                                       // Should not happen
+                                    } else if (jDocumentElement.is('.xforms-output, .xforms-static')) {
+                                        // Output-only control, just set the value
+                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                    } else {
+                                        var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                        if (currentValue != null) {
+                                            previousServerValue = previousServerValue == null ? null : ORBEON.util.StringOps.normalizeSerializedHTML(previousServerValue);
+                                            currentValue    = ORBEON.util.StringOps.normalizeSerializedHTML(currentValue);
+                                            newControlValue = ORBEON.util.StringOps.normalizeSerializedHTML(newControlValue);
+
+                                            var doUpdate =
+                                                // If this was an input that was recreated because of a type change, we always set its value
+                                                recreatedInputs[controlId] ||
+                                                // If this is a control for which we recreated the itemset, we want to set its value
+                                                controlsWithUpdatedItemsets[controlId] ||
+                                                (
+                                                    // Update only if the new value is different than the value already have in the HTML area
+                                                    currentValue != newControlValue
+                                                    // Update only if the value in the control is the same now as it was when we sent it to the server,
+                                                    // so not to override a change done by the user since the control value was last sent to the server
+                                                    && (previousServerValue == null || currentValue == previousServerValue)
+                                                );
+
+                                            if (doUpdate) {
+                                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+
+                                                // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
+                                                //
+                                                // 1) For HTML editors, the HTML might change once we put it in the DOM.
+                                                // 2) For select/select1, if the server sends an out-of-range value, the actual value of the field won't be the out
+                                                //    of range value but the empty string.
+                                                // 3) For boolean inputs, the server might tell us the new value is "" when the field becomes non-relevant, which is
+                                                //    equivalent to "false".
+                                                //
+                                                // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
+                                                // value for the field, since the current value is different from the server value, we will incorrectly think that the
+                                                // user modified the field, and won't update the field with the value provided by the AjaxServer.
+                                                ORBEON.xforms.ServerValueStore.set(documentElement.id, ORBEON.xforms.Controls.getCurrentValue(documentElement));
+                                            }
+                                        }
+                                    }
+
+                                    // Call custom listener if any (temporary until we have a good API for custom components)
+                                    if (typeof xformsValueChangedListener != "undefined") {
+                                        xformsValueChangedListener(controlId, newControlValue);
+                                    }
+                                }); // end `xxf:value`
+
+                                // Notification event if the type changed
+                                _.each(recreatedInputs, function(controlId, documentElement) {
+                                    Controls.typeChangedEvent.fire({control: documentElement});
+                                });
 
                                 // Handle innerHTML updates
                                 var innerElements = childrenWithLocalName(controlValuesElement, 'inner-html');
@@ -1711,7 +1785,7 @@
                                         var focusControl = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
                                         if (focusControl != null) ORBEON.xforms.Controls.setFocus(ORBEON.xforms.Globals.currentFocusControlId);
                                     }
-                                }
+                                } // end `xxf:inner-html`
 
                                 // Handle updates to HTML attributes
                                 var attributeElements = childrenWithLocalName(controlValuesElement, 'attribute');

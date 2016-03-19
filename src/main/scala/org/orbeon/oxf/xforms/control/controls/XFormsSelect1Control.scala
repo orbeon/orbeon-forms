@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls
 import org.dom4j.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
@@ -27,9 +26,9 @@ import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable
 import scala.util.control.NonFatal
@@ -190,13 +189,14 @@ class XFormsSelect1Control(
     cloned
   }
 
-  override def equalsExternal(other: XFormsControl) =
-    other match {
-      case other if this eq other ⇒ true
-      case other: XFormsSelect1Control ⇒
-        // Itemset comparison
+  override def compareExternalUseExternalValue(
+    previousExternalValue : String,
+    previousControl       : Option[XFormsValueControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XFormsSelect1Control) ⇒
         ! mustSendItemsetUpdate(other) &&
-        super.equalsExternal(other)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒ false
     }
 
@@ -227,13 +227,18 @@ class XFormsSelect1Control(
     }
   }
 
-  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
+  override def outputAjaxDiffUseClientValue(
+    previousValue         : Option[String],
+    previousControl       : Option[XFormsValueControl],
+    isNewlyVisibleSubtree : Boolean)(implicit
+    ch                    : XMLReceiverHelper
+  ) = {
 
     // Output regular diff
-    super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree)
+    super.outputAjaxDiffUseClientValue(previousValue, previousControl, isNewlyVisibleSubtree)
 
     // Output itemset diff
-    if (mustSendItemsetUpdate(other.asInstanceOf[XFormsSelect1Control])) {
+    if (mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)) {
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", Array("id", XFormsUtils.namespaceId(containingDocument, getEffectiveId)))
 
       val itemset = getItemset

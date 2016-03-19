@@ -205,13 +205,14 @@ class XFormsInputControl(
   def getSecondValueType =
     if (getBuiltinTypeName == "dateTime") "time" else null
 
-  // Also compare type
-  override def equalsExternal(other: XFormsControl) =
-    other match {
-      case other if this eq other ⇒ true
-      case other: XFormsInputControl ⇒
+  override def compareExternalUseExternalValue(
+    previousExternalValue : String,
+    previousControl       : Option[XFormsValueControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XFormsInputControl) ⇒
         valueType == other.valueType &&
-        super.equalsExternal(other)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒ false
     }
 
@@ -228,7 +229,7 @@ class XFormsInputControl(
     val typeValue2 = typeExplodedQName
     if (isNewlyVisibleSubtree || typeValue1 != typeValue2) {
       val attributeValue = if (typeValue2 ne null) typeValue2 else ""
-      added |= AjaxSupport.addOrAppendToAttributeIfNeeded(
+      added |= ControlAjaxSupport.addOrAppendToAttributeIfNeeded(
         attributesImpl,
         "type",
         attributeValue,

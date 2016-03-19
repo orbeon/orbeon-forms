@@ -938,14 +938,19 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input1a" class="my-static">XML</xxf:control>
+                        <xxf:control id="input1a" class="my-static"/>
+                        <xxf:value id="input1a">XML</xxf:value>
                         <xxf:control id="group1a" class="my-static"/>
                         <xxf:control id="group2a" relevant="false"/>
                         <xxf:control id="input2a" class="my-static" relevant="false"/>
-                        <xxf:control id="input1b" class="my-odd">XML</xxf:control>
+                        <xxf:value id="input2a"/>
+                        <xxf:control id="input1b" class="my-odd"/>
+                        <xxf:value id="input1b">XML</xxf:value>
                         <xxf:control id="group1b" class="my-odd"/>
-                        <xxf:control id="input2b" class="my-odd">XML</xxf:control>
-                        <xxf:control id="input3b" class="my-odd">XML</xxf:control>
+                        <xxf:control id="input2b" class="my-odd"/>
+                        <xxf:value id="input2b">XML</xxf:value>
+                        <xxf:control id="input3b" class="my-odd"/>
+                        <xxf:value id="input3b">XML</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1123,7 +1128,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output" relevant="false">/orbeon/ops/images/xforms/spacer.gif</xxf:control>
+                        <xxf:control id="my-output" relevant="false"/>
+                        <xxf:value id="my-output">/orbeon/ops/images/xforms/spacer.gif</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

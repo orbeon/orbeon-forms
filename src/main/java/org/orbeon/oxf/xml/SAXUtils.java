@@ -150,16 +150,13 @@ public class SAXUtils {
         final int oldAttributeIndex = attributes.getIndex(attributeName);
 
         if (oldAttributeIndex == -1) {
-            // No existing class attribute
-
-            // Add
+            // No existing attribute
             attributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attributeValue);
         } else {
             // Existing attribute
             final String oldAttributeValue = attributes.getValue(oldAttributeIndex);
             final String newAttributeValue = oldAttributeValue + ' ' + attributeValue;
 
-            // Replace value
             attributes.setValue(oldAttributeIndex, newAttributeValue);
         }
     }

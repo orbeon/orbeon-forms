@@ -74,7 +74,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id2" label="test noFoundData:" readonly="true">1</xxf:control>
+                        <xxf:control id="id2" label="test noFoundData:" readonly="true"/><xxf:value id="id2">1</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -118,7 +118,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:value id="id2"/>
                         <xxf:control id="id3" relevant="false"/>
+                        <xxf:value id="id3"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -172,9 +174,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id1">gigi1</xxf:control>
-                        <xxf:control id="id2" relevant="false"/>
-                        <xxf:control id="id3" readonly="true">gigi3</xxf:control>
+                        <xxf:value id="id1">gigi1</xxf:value>
+                        <xxf:control id="id2" relevant="false"/><xxf:value id="id2"/>
+                        <xxf:control id="id3" readonly="true"/><xxf:value id="id3">gigi3</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -279,7 +281,7 @@
                                         <instance>
                                             <emails>
                                                 <email/>
-                                                <email>editors@example.com</email>>
+                                                <email>editors@example.com</email>&gt;
                                                 <email>~my_mail+{nospam}$?@sub-domain.example.info</email>
                                                 <email>editors@(this is a comment)example.info</email>
                                                 <email>editors{at}example{dot}info</email>
@@ -401,14 +403,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-control⊙1" class="+foo-bar-is-not-g">bloody</xxf:control>
-                        <xxf:control id="my-control⊙2" class="+foo-bar-is-not-g">valencia</xxf:control>
-                        <xxf:control id="my-control⊙3" class="+foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control⊙4" class="+foo-bar-is-not-g">red</xxf:control>
-                        <xxf:control id="my-control⊙5" class="+foo-bar-is-not-g">iPod</xxf:control>
-                        <xxf:control id="my-control⊙6" class="+foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control⊙7" class="+foo-bar-is-not-g">williams</xxf:control>
-                        <xxf:control id="my-control⊙8" class="+foo-bar-is-not-g">yellow</xxf:control>
+                        <xxf:control id="my-control⊙1" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙1">bloody</xxf:value>
+                        <xxf:control id="my-control⊙2" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙2">valencia</xxf:value>
+                        <xxf:control id="my-control⊙3" class="+foo-bar-is-g"/><xxf:value id="my-control⊙3">green</xxf:value>
+                        <xxf:control id="my-control⊙4" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙4">red</xxf:value>
+                        <xxf:control id="my-control⊙5" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙5">iPod</xxf:value>
+                        <xxf:control id="my-control⊙6" class="+foo-bar-is-g"/><xxf:value id="my-control⊙6">green</xxf:value>
+                        <xxf:control id="my-control⊙7" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙7">williams</xxf:value>
+                        <xxf:control id="my-control⊙8" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙8">yellow</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -427,7 +429,7 @@
                             <xh:head>
                                 <xf:model id="model">
                                     <xf:instance id="instance">
-                                        <instance xmlns="">
+                                        <instance>
                                             <readonly/>
                                             <required/>
                                             <relevant/>
@@ -470,13 +472,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-readonly-1">I am readonly</xxf:control>
-                        <xxf:control id="output-readonly-2" readonly="true">I am readonly</xxf:control>
-                        <xxf:control id="output-required-1">I am required</xxf:control>
-                        <xxf:control id="output-required-2" required="true" level="error" empty="false">I am required</xxf:control>
-                        <xxf:control id="output-relevant">I am not relevant</xxf:control>
-                        <xxf:control id="output-valid-1">I am not valid</xxf:control>
-                        <xxf:control id="output-valid-2" level="error">I am not valid</xxf:control>
+                        <xxf:value id="output-readonly-1">I am readonly</xxf:value>
+                        <xxf:control id="output-readonly-2" readonly="true"/><xxf:value id="output-readonly-2">I am readonly</xxf:value>
+                        <xxf:value id="output-required-1">I am required</xxf:value>
+                        <xxf:control id="output-required-2" required="true" level="error" empty="false"/><xxf:value id="output-required-2">I am required</xxf:value>
+                        <xxf:value id="output-relevant">I am not relevant</xxf:value>
+                        <xxf:value id="output-valid-1">I am not valid</xxf:value>
+                        <xxf:control id="output-valid-2" level="error"/><xxf:value id="output-valid-2">I am not valid</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -496,7 +498,7 @@
                                 <xf:model id="form-model">
                                     <!-- Form instance -->
                                     <xf:instance id="form-instance">
-                                        <first-name xmlns=""/>
+                                        <first-name/>
                                     </xf:instance>
                                     <!-- Value is always invalid -->
                                     <xf:bind ref="." constraint="false()"/>
@@ -506,7 +508,7 @@
 
                                     <!-- This will be set to "false" during initial refresh -->
                                     <xf:instance id="form-valid-instance">
-                                        <valid xmlns="">true</valid>
+                                        <valid>true</valid>
                                     </xf:instance>
 
                                 </xf:model>
@@ -514,7 +516,7 @@
                                 <xf:model id="persistence-model">
 
                                     <xf:instance id="triggers-instance">
-                                        <submit xmlns=""/>
+                                        <submit/>
                                     </xf:instance>
                                     <!-- Cross-model dependency with xxf:instance() won't update without explicit xf:recalculate -->
                                     <xf:bind ref="." readonly="xxf:instance('form-valid-instance') = 'false'"/>
@@ -563,6 +565,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="first-name-control" label="First name" level="error"/>
+                        <xxf:value id="first-name-control"/>
                         <xxf:control id="submit-trigger" label="Submit" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -582,7 +585,7 @@
                             <xh:head>
                                 <xf:model id="form-model">
                                     <xf:instance id="values">
-                                        <values xmlns="">
+                                        <values>
                                             <value nodetype="" valuetype="">Lucy</value>
                                             <value xsi:type="xs:integer" nodetype="" valuetype="">35</value>
                                             <value xsi:type="xs:boolean" nodetype="" valuetype="">false</value>
@@ -657,7 +660,7 @@
                             <xh:head>
                                 <xf:model id="form-model" xxf:expose-xpath-types="true">
                                     <xf:instance id="values">
-                                        <values xmlns="">
+                                        <values>
                                             <value>Lucy</value>
                                             <value xsi:type="xs:integer">35</value>
                                             <value xsi:type="xs:boolean">false</value>
@@ -692,13 +695,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-string">Lucy</xxf:control>
-                        <xxf:control id="output-integer">36</xxf:control>
-                        <xxf:control id="output-boolean">false</xxf:control>
-                        <xxf:control id="output-date">1980-01-02</xxf:control>
-                        <xxf:control id="output-time">22:30:00</xxf:control>
-                        <xxf:control id="output-double">13</xxf:control>
-                        <xxf:control id="output-string-2">Lucy</xxf:control>
+                        <xxf:value id="output-string">Lucy</xxf:value>
+                        <xxf:value id="output-integer">36</xxf:value>
+                        <xxf:value id="output-boolean">false</xxf:value>
+                        <xxf:value id="output-date">1980-01-02</xxf:value>
+                        <xxf:value id="output-time">22:30:00</xxf:value>
+                        <xxf:value id="output-double">13</xxf:value>
+                        <xxf:value id="output-string-2">Lucy</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -717,10 +720,10 @@
                             <xh:head>
                                 <xf:model id="model">
 
-                                    <xf:instance id="value" xmlns="">
+                                    <xf:instance id="value">
                                         <value/>
                                     </xf:instance>
-                                    <xf:bind ref="instance('value')" required="true()" />
+                                    <xf:bind ref="instance('value')" required="true()"/>
 
                                     <xf:instance id="validity">
                                         <validity/>
@@ -766,7 +769,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" required="true" empty="false">42</xxf:control>
+                        <xxf:control id="my-input" required="true" empty="false"/><xxf:value id="my-input">42</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -810,21 +813,21 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:output id="output-relevant"    value="xxf:evaluate-bind-property('foo-bind', 'relevant')"/>
-                    <xf:output id="output-readonly"    value="xxf:evaluate-bind-property('foo-bind', 'readonly')"/>
-                    <xf:output id="output-required"    value="xxf:evaluate-bind-property('foo-bind', 'required')"/>
-                    <xf:output id="output-type"        value="xxf:evaluate-bind-property('foo-bind', 'type')"/>
-                    <xf:output id="output-constraint"  value="xxf:evaluate-bind-property('foo-bind', 'constraint')"/>
-                    <xf:output id="output-calculate"   value="xxf:evaluate-bind-property('foo-bind', 'calculate')"/>
-                    <xf:output id="output-default"     value="xxf:evaluate-bind-property('foo-bind', 'xxf:default')"/>
+                    <xf:output id="output-relevant" value="xxf:evaluate-bind-property('foo-bind', 'relevant')"/>
+                    <xf:output id="output-readonly" value="xxf:evaluate-bind-property('foo-bind', 'readonly')"/>
+                    <xf:output id="output-required" value="xxf:evaluate-bind-property('foo-bind', 'required')"/>
+                    <xf:output id="output-type" value="xxf:evaluate-bind-property('foo-bind', 'type')"/>
+                    <xf:output id="output-constraint" value="xxf:evaluate-bind-property('foo-bind', 'constraint')"/>
+                    <xf:output id="output-calculate" value="xxf:evaluate-bind-property('foo-bind', 'calculate')"/>
+                    <xf:output id="output-default" value="xxf:evaluate-bind-property('foo-bind', 'xxf:default')"/>
 
-                    <xf:output id="output-relevant2"   value="xxf:evaluate-bind-property('foo-bind2', 'relevant')"/>
-                    <xf:output id="output-readonly2"   value="xxf:evaluate-bind-property('foo-bind2', 'readonly')"/>
-                    <xf:output id="output-required2"   value="xxf:evaluate-bind-property('foo-bind2', 'required')"/>
-                    <xf:output id="output-type2"       value="xxf:evaluate-bind-property('foo-bind2', 'type')"/>
+                    <xf:output id="output-relevant2" value="xxf:evaluate-bind-property('foo-bind2', 'relevant')"/>
+                    <xf:output id="output-readonly2" value="xxf:evaluate-bind-property('foo-bind2', 'readonly')"/>
+                    <xf:output id="output-required2" value="xxf:evaluate-bind-property('foo-bind2', 'required')"/>
+                    <xf:output id="output-type2" value="xxf:evaluate-bind-property('foo-bind2', 'type')"/>
                     <xf:output id="output-constraint2" value="xxf:evaluate-bind-property('foo-bind2', 'constraint')"/>
-                    <xf:output id="output-calculate2"  value="xxf:evaluate-bind-property('foo-bind2', 'calculate')"/>
-                    <xf:output id="output-default2"    value="xxf:evaluate-bind-property('foo-bind2', 'xxf:default')"/>
+                    <xf:output id="output-calculate2" value="xxf:evaluate-bind-property('foo-bind2', 'calculate')"/>
+                    <xf:output id="output-default2" value="xxf:evaluate-bind-property('foo-bind2', 'xxf:default')"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -850,18 +853,20 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-relevant">true</xxf:control>
-                        <xxf:control id="output-readonly">false</xxf:control>
-                        <xxf:control id="output-required">true</xxf:control>
-                        <xxf:control id="output-type">xs:integer</xxf:control>
-                        <xxf:control id="output-calculate">86</xxf:control>
-                        <xxf:control id="output-default">42</xxf:control>
-                        <xxf:control id="output-relevant2">true</xxf:control>
-                        <xxf:control id="output-readonly2">false</xxf:control>
-                        <xxf:control id="output-required2">true</xxf:control>
-                        <xxf:control id="output-type2">xs:integer</xxf:control>
-                        <xxf:control id="output-calculate2">86</xxf:control>
-                        <xxf:control id="output-default2">42</xxf:control>
+                        <xxf:value id="output-relevant">true</xxf:value>
+                        <xxf:value id="output-readonly">false</xxf:value>
+                        <xxf:value id="output-required">true</xxf:value>
+                        <xxf:value id="output-type">xs:integer</xxf:value>
+                        <xxf:value id="output-constraint"/>
+                        <xxf:value id="output-calculate">86</xxf:value>
+                        <xxf:value id="output-default">42</xxf:value>
+                        <xxf:value id="output-relevant2">true</xxf:value>
+                        <xxf:value id="output-readonly2">false</xxf:value>
+                        <xxf:value id="output-required2">true</xxf:value>
+                        <xxf:value id="output-type2">xs:integer</xxf:value>
+                        <xxf:value id="output-constraint2"/>
+                        <xxf:value id="output-calculate2">86</xxf:value>
+                        <xxf:value id="output-default2">42</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -933,22 +938,22 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-relevant⊙1">true</xxf:control>
-                        <xxf:control id="output-readonly⊙1">true</xxf:control>
-                        <xxf:control id="output-required⊙1">true</xxf:control>
-                        <xxf:control id="output-type⊙1">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint⊙1">true</xxf:control>
-                        <xxf:control id="output-default⊙1">42</xxf:control>
-                        <xxf:control id="output-custom⊙1">42, 43</xxf:control>
-                        <xxf:control id="output-calculate⊙1">43</xxf:control>
-                        <xxf:control id="output-relevant⊙2">true</xxf:control>
-                        <xxf:control id="output-readonly⊙2">false</xxf:control>
-                        <xxf:control id="output-required⊙2">false</xxf:control>
-                        <xxf:control id="output-type⊙2">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint⊙2">false</xxf:control>
-                        <xxf:control id="output-default⊙2">44</xxf:control>
-                        <xxf:control id="output-custom⊙2">44, 45</xxf:control>
-                        <xxf:control id="output-calculate⊙2">45</xxf:control>
+                        <xxf:value id="output-relevant⊙1">true</xxf:value>
+                        <xxf:value id="output-readonly⊙1">true</xxf:value>
+                        <xxf:value id="output-required⊙1">true</xxf:value>
+                        <xxf:value id="output-type⊙1">xs:integer</xxf:value>
+                        <xxf:value id="output-constraint⊙1">true</xxf:value>
+                        <xxf:value id="output-default⊙1">42</xxf:value>
+                        <xxf:value id="output-custom⊙1">42, 43</xxf:value>
+                        <xxf:value id="output-calculate⊙1">43</xxf:value>
+                        <xxf:value id="output-relevant⊙2">true</xxf:value>
+                        <xxf:value id="output-readonly⊙2">false</xxf:value>
+                        <xxf:value id="output-required⊙2">false</xxf:value>
+                        <xxf:value id="output-type⊙2">xs:integer</xxf:value>
+                        <xxf:value id="output-constraint⊙2">false</xxf:value>
+                        <xxf:value id="output-default⊙2">44</xxf:value>
+                        <xxf:value id="output-custom⊙2">44, 45</xxf:value>
+                        <xxf:value id="output-calculate⊙2">45</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -962,12 +967,12 @@
                 <xh:head>
                     <xf:model id="fr-persistence-model">
                         <xf:instance id="fr-persistence-instance">
-                            <save xmlns="">
+                            <save>
                                 <data-status>clean</data-status>
                             </save>
                         </xf:instance>
                         <xf:instance id="fr-triggers-instance">
-                            <triggers xmlns="">
+                            <triggers>
                                 <save/>
                             </triggers>
                         </xf:instance>
@@ -1052,7 +1057,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-input" label="Note">Cool title</xxf:control>
+                        <xxf:control id="title-input" label="Note"/>
+                        <xxf:value id="title-input">Cool title</xxf:value>
                         <xxf:control id="save-trigger" label="Save" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -1121,9 +1127,13 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="input1" relevant="false"/>
+                        <xxf:value id="input1"/>
                         <xxf:control id="input2" relevant="false"/>
+                        <xxf:value id="input2"/>
+                        <xxf:value id="input3"/>
                         <xxf:control id="group2" relevant="false"/>
                         <xxf:control id="input4" relevant="false"/>
+                        <xxf:value id="input4"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1188,11 +1198,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input1⊙1-1">Mickey</xxf:control>
-                        <xxf:control id="input1⊙1-2">Minnie</xxf:control>
-                        <xxf:control id="input1⊙2-1">Donald</xxf:control>
-                        <xxf:control id="input1⊙2-2">Daisy</xxf:control>
-                        <xxf:control id="input2">Mickey</xxf:control>
+                        <xxf:value id="input1⊙1-1">Mickey</xxf:value>
+                        <xxf:value id="input1⊙1-2">Minnie</xxf:value>
+                        <xxf:value id="input1⊙2-1">Donald</xxf:value>
+                        <xxf:value id="input1⊙2-2">Daisy</xxf:value>
+                        <xxf:value id="input2">Mickey</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1296,7 +1306,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" type="{http://www.w3.org/2001/XMLSchema}date">2001-01-01</xxf:control>
+                        <xxf:control id="my-input" type="{http://www.w3.org/2001/XMLSchema}date"/><xxf:value id="my-input">2001-01-01</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1336,8 +1346,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1">required-bind1</xxf:control>
-                        <xxf:control id="output2">required-bind2</xxf:control>
+                        <xxf:value id="output1">required-bind1</xxf:value>
+                        <xxf:value id="output2">required-bind2</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1440,7 +1450,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1488,7 +1498,7 @@
                         </xs:schema>
 
                         <xf:instance id="instance">
-                            <data xmlns="">
+                            <data>
                                 <test attr1="false" attr2="true"/>
                                 <test2 attr1="true"/>
                             </data>
@@ -1512,8 +1522,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input1" type="{http://www.w3.org/2001/XMLSchema}boolean">false</xxf:control>
-                        <xxf:control id="input2" type="{http://www.w3.org/2001/XMLSchema}boolean">true</xxf:control>
+                        <xxf:control id="input1" type="{http://www.w3.org/2001/XMLSchema}boolean"/><xxf:value id="input1">false</xxf:value>
+                        <xxf:control id="input2" type="{http://www.w3.org/2001/XMLSchema}boolean"/><xxf:value id="input2">true</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1527,7 +1537,7 @@
             <xh:html>
                 <xh:head>
                 <!-- Override xs prefix -->
-                <xf:model id="model" xmlns:xs="foo">
+                <xf:model xmlns:xs="foo" id="model">
                     <xf:instance id="instance">
                         <value/>
                     </xf:instance>
@@ -1567,7 +1577,7 @@
                             <xh:head>
                                 <xf:model id="form-model" xxf:expose-xpath-types="true">
                                     <xf:instance id="input">
-                                        <values xmlns="">
+                                        <values>
                                             <int>35</int>
                                             <int/>
                                         </values>
@@ -1581,7 +1591,7 @@
                                         <xf:bind ref="double"  type="xf:double"/>
                                     </xf:bind>
                                     <xf:instance id="output">
-                                        <values xmlns="">
+                                        <values>
                                             <value/>
                                             <value/>
                                             <value>MUST BE BLANKED</value>
@@ -1655,7 +1665,7 @@
                             <xh:head>
                                 <xf:model id="model">
                                     <xf:instance id="instance">
-                                        <instance xmlns="">
+                                        <instance>
                                             <xpath>my:get-request-parameter('foo')</xpath>
                                             <xpath xmlns:my="http://orbeon.org/oxf/xml/xforms">my:get-request-parameter('foo')</xpath>
                                             <element xpath="my:get-request-parameter('foo')"/>
@@ -1677,13 +1687,13 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="validities">false-true-false-true</xxf:control>
+                        <xxf:value id="validities">false-true-false-true</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1698,7 +1708,7 @@
                 <xh:head>
                     <xf:model id="form-model" xxf:expose-xpath-types="true">
                         <xf:instance id="values">
-                            <values xmlns="">
+                            <values>
                                 <value>foo</value>
                                 <constraint/>
                                 <relevant/>
@@ -1725,13 +1735,13 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output">false false true true</xxf:control>
+                        <xxf:value id="my-output">false false true true</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1795,7 +1805,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/>
+                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/><xxf:value id="my-input"/>
                     </xxf:control-values>
                     <xxf:message level="modal">added-errors: length-constraint | alert: &lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
                     <xxf:message level="modal">removed-errors: length-constraint | added-warnings: uppercase-constraint | alert: &lt;ul&gt;&lt;li&gt;Uppercase constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
@@ -1811,9 +1821,9 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model" xmlns:saxon="http://saxon.sf.net/">
+                    <xf:model xmlns:saxon="http://saxon.sf.net/" id="model">
                         <xf:instance id="instance">
-                            <items xmlns="" calculated="">
+                            <items calculated="">
                                 <item calculated="">
                                     <foo calculated=""/>
                                     <bar calculated=""/>
@@ -2071,18 +2081,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="col1-control⊙1">123</xxf:control>
-                        <xxf:control id="col2-control⊙1">456</xxf:control>
-                        <xxf:control id="rowsum-control⊙1" readonly="true">579</xxf:control>
-                        <xxf:control id="col1-control⊙2">1</xxf:control>
-                        <xxf:control id="col2-control⊙2">2</xxf:control>
-                        <xxf:control id="rowsum-control⊙2" readonly="true">3</xxf:control>
-                        <xxf:control id="totalsum-control" readonly="true">582</xxf:control>
-                        <xxf:control id="rowsum2-control⊙1" readonly="true">579</xxf:control>
-                        <xxf:control id="rowsum2-control⊙2" readonly="true">3</xxf:control>
-                        <xxf:control id="rowsum3-control⊙1" readonly="true">579</xxf:control>
-                        <xxf:control id="rowsum3-control⊙2" readonly="true">3</xxf:control>
-                        <xxf:control id="rowsum4-control" relevant="false"/>
+                        <xxf:value id="col1-control⊙1">123</xxf:value>
+                        <xxf:value id="col2-control⊙1">456</xxf:value>
+                        <xxf:control id="rowsum-control⊙1" readonly="true"/><xxf:value id="rowsum-control⊙1">579</xxf:value>
+                        <xxf:value id="col1-control⊙2">1</xxf:value>
+                        <xxf:value id="col2-control⊙2">2</xxf:value>
+                        <xxf:control id="rowsum-control⊙2" readonly="true"/><xxf:value id="rowsum-control⊙2">3</xxf:value>
+                        <xxf:control id="totalsum-control" readonly="true"/><xxf:value id="totalsum-control">582</xxf:value>
+                        <xxf:control id="rowsum2-control⊙1" readonly="true"/><xxf:value id="rowsum2-control⊙1">579</xxf:value>
+                        <xxf:control id="rowsum2-control⊙2" readonly="true"/><xxf:value id="rowsum2-control⊙2">3</xxf:value>
+                        <xxf:control id="rowsum3-control⊙1" readonly="true"/><xxf:value id="rowsum3-control⊙1">579</xxf:value>
+                        <xxf:control id="rowsum3-control⊙2" readonly="true"/><xxf:value id="rowsum3-control⊙2">3</xxf:value>
+                        <xxf:control id="rowsum4-control" relevant="false"/><xxf:value id="rowsum4-control"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2178,7 +2188,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Alert 1&lt;/li&gt;&lt;li&gt;Alert 2&lt;/li&gt;&lt;li&gt;Alert 3&lt;/li&gt;&lt;/ul&gt;" level="error"/>
+                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Alert 1&lt;/li&gt;&lt;li&gt;Alert 2&lt;/li&gt;&lt;li&gt;Alert 3&lt;/li&gt;&lt;/ul&gt;" level="error"/><xxf:value id="my-input"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2230,7 +2240,7 @@
                 <xh:body>
                     <xf:repeat ref="*">
                         <xf:input ref=".">
-                            <xf:alert validation="required-bind" >A valid value is required.</xf:alert>
+                            <xf:alert validation="required-bind">A valid value is required.</xf:alert>
                             <xf:alert validation="decimal-bind">Must be a decimal number.</xf:alert>
                             <xf:alert validation="min">Must be greater or equal to 1.</xf:alert>
                             <xf:alert validation="max">Must be less than or equal to 100.</xf:alert>
@@ -2295,9 +2305,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input-1" class="+fr-gaga-foo +fr-toto-bar">foo</xxf:control>
-                        <xxf:control id="my-input-2" class="+fr-gaga-foo +fr-toto-bar">bar</xxf:control>
-                        <xxf:control id="my-output-1">foo bar foo bar foo bar</xxf:control>
+                        <xxf:control id="my-input-1" class="+fr-gaga-foo +fr-toto-bar"/><xxf:value id="my-input-1">foo</xxf:value>
+                        <xxf:control id="my-input-2" class="+fr-gaga-foo +fr-toto-bar"/><xxf:value id="my-input-2">bar</xxf:value>
+                        <xxf:value id="my-output-1">foo bar foo bar foo bar</xxf:value>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

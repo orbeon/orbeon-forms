@@ -500,11 +500,17 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="input1" visited="true"/>
+                        <xxf:value id="input1"/>
+                        <xxf:value id="input2"/>
                         <xxf:control id="group1" visited="true"/>
                         <xxf:control id="input11" visited="true"/>
+                        <xxf:value id="input11"/>
                         <xxf:control id="input12" relevant="false"/>
+                        <xxf:value id="input12"/>
                         <xxf:control id="group2" visited="true"/>
+                        <xxf:value id="input21"/>
                         <xxf:control id="input22" relevant="false"/>
+                        <xxf:value id="input22"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

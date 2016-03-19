@@ -15,16 +15,16 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
+import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.xml.XMLReceiverHelper._
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.xml.sax.helpers.AttributesImpl
 
 /**
  * xxf:attribute control
@@ -99,31 +99,35 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
         super.getNonRelevantEscapedExternalValue
     }
 
-  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean) = {
 
-    import AjaxSupport._
+  override def outputAjaxDiffUseClientValue(
+    previousValue         : Option[String],
+    previousControl       : Option[XFormsValueControl],
+    isNewlyVisibleSubtree : Boolean)(implicit
+    ch                    : XMLReceiverHelper
+  ) = {
 
-    require(attributesImpl.getLength == 0)
+    import ControlAjaxSupport._
+
+    val attributesImpl = new AttributesImpl
 
     val attributeControl2 = this
 
     if (attributeName != "class") {
-      // Whether it is necessary to output information about this control
-      var doOutputElement = false
 
       // The client does not store an HTML representation of the xxf:attribute control, so we
       // have to output these attributes.
 
       // HTML element id
       val effectiveFor2 = attributeControl2.getEffectiveForAttribute
-      doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", namespaceId(containingDocument, effectiveFor2), newlyVisibleSubtree, isDefaultValue = false)
+      addOrAppendToAttributeIfNeeded(attributesImpl, "for", namespaceId(containingDocument, effectiveFor2), isNewlyVisibleSubtree, isDefaultValue = false)
 
       // Attribute name
       val name2 = attributeControl2.getAttributeName
-      doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, newlyVisibleSubtree, isDefaultValue = false)
+      addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, isDefaultValue = false)
 
       // Output element
-      outputValueElement(ch, attributeControl2, doOutputElement, newlyVisibleSubtree, attributesImpl, "attribute")
+      outputValueElement(isNewlyVisibleSubtree, attributesImpl, "attribute")
     } else {
       // Handle class separately
 
@@ -132,12 +136,12 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
       //val doOutputElement = AjaxSupport.addAjaxClasses(attributesImpl, newlyVisibleSubtree, other, attributeControl2)
 
       // The classes are stored as the control's value
-      val classes1 = Option(other.asInstanceOf[XXFormsAttributeControl]) flatMap (control ⇒ Option(control.getEscapedExternalValue)) getOrElse ""
+      val classes1 = previousControl flatMap (control ⇒ Option(control.getEscapedExternalValue)) getOrElse ""
       val classes2 = Option(attributeControl2.getEscapedExternalValue) getOrElse ""
 
-      if (newlyVisibleSubtree || classes1 != classes2) {
+      if (isNewlyVisibleSubtree || classes1 != classes2) {
         val attributeValue = diffClasses(classes1, classes2)
-        val doOutputElement = addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
+        val doOutputElement = addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, isNewlyVisibleSubtree, attributeValue == "")
 
         if (doOutputElement) {
           // Pass the HTML element id, not the control id, because that's what the client will expect

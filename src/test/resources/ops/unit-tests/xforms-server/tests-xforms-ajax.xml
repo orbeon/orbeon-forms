@@ -136,10 +136,10 @@
         </input>
         <output name="response">
             <responses>
-                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
-                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
-                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
-                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
+                <xxf:event-response/>
+                <xxf:event-response/>
+                <xxf:event-response/>
+                <xxf:event-response/>
             </responses>
         </output>
     </test>
@@ -242,24 +242,24 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="input1">true</xxf:control>
                             <xxf:control id="input2" readonly="true" relevant="true"/>
+                            <xxf:value id="input2"/>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="input1">false</xxf:control>
                             <xxf:control id="input2" readonly="false" relevant="false"/>
+                            <xxf:value id="input2"/>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="input1">true</xxf:control>
                             <xxf:control id="input2" readonly="true" relevant="true"/>
+                            <xxf:value id="input2"/>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
@@ -287,7 +287,8 @@
                                 </xf:model>
                             </xh:head>
                             <xh:body>
-                                <xf:input id="my-input" ref="."/>
+                                <xf:input  id="my-input" ref="."/>
+                                <xf:output id="my-output" ref="."/>
                             </xh:body>
                         </xh:html>
                     </p:input>
@@ -333,7 +334,7 @@
         </input>
         <output name="response">
             <xxf:control-values>
-                <xxf:control id="my-input">The external entity should be missing:</xxf:control>
+                <xxf:value id="my-output">The external entity should be missing:</xxf:value>
             </xxf:control-values>
         </output>
     </test>
@@ -383,7 +384,7 @@
 
                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="config">
-                        <xxf:event-request xsl:version="2.0" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+                        <xxf:event-request xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary" xsl:version="2.0">
                             <xxf:uuid><xsl:value-of select="//xh:input[@name = '$uuid']/@value"/></xxf:uuid>
                             <xxf:sequence>1</xxf:sequence>
                             <xxf:static-state><xsl:value-of select="//xh:input[@name = '$static-state']/@value"/></xxf:static-state>
@@ -395,7 +396,7 @@
                                 <xxf:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
-                                            <xxf:server-events xmlns="">
+                                            <xxf:server-events>
                                                 <xxf:event name="xxforms-value" source-control-id="input">2</xxf:event>
                                                 <xxf:event name="xxforms-value" source-control-id="input">3</xxf:event>
                                                 <xxf:event name="DOMActivate" source-control-id="trigger2"/>
@@ -409,7 +410,7 @@
                                 <xxf:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
-                                            <xxf:server-events xmlns="">
+                                            <xxf:server-events>
                                                 <xxf:event name="xxforms-value" source-control-id="input">5</xxf:event>
                                                 <xxf:event name="xxforms-value" source-control-id="input">6</xxf:event>
                                                 <xxf:event name="DOMActivate" source-control-id="trigger4"/>
@@ -450,9 +451,8 @@
         <output name="response">
             <!-- NOTE: Values 2-3 and 5-6 are compacted, which is what we expect -->
             <xxf:control-values>
-                <xxf:control id="input">7</xxf:control>
-                <xxf:control id="output1">1 3 4 6 7</xxf:control>
-                <xxf:control id="output2">trigger1 trigger2 trigger3 trigger4 trigger5</xxf:control>
+                <xxf:value id="output1">1 3 4 6 7</xxf:value>
+                <xxf:value id="output2">trigger1 trigger2 trigger3 trigger4 trigger5</xxf:value>
             </xxf:control-values>
         </output>
     </test>
@@ -689,24 +689,21 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="output1">42</xxf:control>
-                            <xxf:control id="input2">42</xxf:control>
+                            <xxf:value id="output1">42</xxf:value>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
                 <xxf:event-response>
                     <xxf:action>
-                        <xxf:control-values>
-                            <xxf:control id="input1">cat</xxf:control>
-                        </xxf:control-values>
+                        <xxf:control-values/>
                     </xxf:action>
                 </xxf:event-response>
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="output1">42</xxf:control>
-                            <xxf:control id="input1">cat</xxf:control>
-                            <xxf:control id="input2">42</xxf:control>
+                            <xxf:value id="output1">42</xxf:value>
+                            <xxf:value id="input1">cat</xxf:value>
+                            <xxf:value id="input2">42</xxf:value>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>

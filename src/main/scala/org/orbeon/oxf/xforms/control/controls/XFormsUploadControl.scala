@@ -206,10 +206,14 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   // Don't expose an external value
   override def evaluateExternalValue(): Unit = setExternalValue(null)
 
-  override def equalsExternal(other: XFormsControl) =
-    other match {
-      case other if this eq other ⇒ true
-      case other: XFormsUploadControl ⇒ compareFileMetadata(other) && super.equalsExternal(other)
+  override def compareExternalUseExternalValue(
+    previousExternalValue : String,
+    previousControl       : Option[XFormsValueControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XFormsUploadControl) ⇒
+        compareFileMetadata(other) &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒ false
     }
 

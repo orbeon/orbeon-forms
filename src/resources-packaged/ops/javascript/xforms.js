@@ -400,22 +400,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
-             * Nudge element after a short delay for IE6/7 to force IE to "do the right thing".
-             */
-            nudgeAfterDelay: function(element) {
-                if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7) {
-                    var tables = element.getElementsByTagName("table");
-                    window.setTimeout(function() {
-                        element.className = element.className;
-                        for (var tableIndex = 0; tableIndex < tables.length; tableIndex++) {
-                            var table = tables[tableIndex];
-                            table.className = table.className;
-                        }
-                    }, ORBEON.util.Properties.internalShortDelay.get());
-                }
-            },
-
-            /**
              * Similar to root.getElementsByTagName(tagName), but:
              *
              *    1. Returns root if root.tagName == tagName.
@@ -1965,7 +1949,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         if (isRelevant) {
                             YAHOO.util.Dom.removeClass(element, "xforms-disabled");
                             YAHOO.util.Dom.removeClass(element, "xforms-disabled-subsequent");
-                            ORBEON.util.Dom.nudgeAfterDelay(element);
                         } else {
                             YAHOO.util.Dom.addClass(element, "xforms-disabled-subsequent");
                         }
@@ -2346,7 +2329,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         }
                     } else {
                         updateClasses();
-                        ORBEON.util.Dom.nudgeAfterDelay(cursor);
                     }
                 }
             }
@@ -2533,7 +2515,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (isRelevant) {
                     YD.removeClass(node, "xforms-disabled");
                     YD.removeClass(node, "xforms-disabled-subsequent");
-                    OD.nudgeAfterDelay(node);
                 } else {
                     YD.addClass(node, "xforms-disabled-subsequent");
                 }

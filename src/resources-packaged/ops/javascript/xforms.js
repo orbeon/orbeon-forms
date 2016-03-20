@@ -1580,14 +1580,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 }
                 return selectValue;
-            } else if ($(control).is('.xforms-textarea')
-                    && ! $(control).is('.xforms-mediatype-text-html')) {
-                // Text area (not HTML)
+            } else if ($(control).is('.xforms-textarea')) {
+                // Text area
                 var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
                 return textarea.value
-            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                // HTML text area
-                return ORBEON.xforms.Page.getControl(control).getValue();
             } else if ($(control).is('.xforms-output, .xforms-input.xforms-static')) {
                 // Output and static input
                 var jControl = $(control);
@@ -1738,14 +1734,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         }
                     }
                 }
-            } else if ($(control).is('.xforms-textarea')
-                    && ! $(control).is('.xforms-mediatype-text-html')) {
+            } else if ($(control).is('.xforms-textarea')) {
                 // Text area
                 var textarea = control.getElementsByTagName("textarea")[0];
                 textarea.value = newControlValue;
-            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                // HTML area
-                ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
             } else if (typeof(control.value) == "string") {
                 // Textarea, password
                 control.value = newControlValue;
@@ -2031,9 +2023,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // XForms output and group
                 if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
                 else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                // XForms HTML area
-                ORBEON.xforms.Page.getControl(control).setReadonly(isReadonly);
             } else if ($(control).is('.xforms-upload')) {
                 // Upload control
                 ORBEON.xforms.Controls.setDisabledOnFormElement(
@@ -2158,9 +2147,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // Set focus on either selected item if we found one or on first item otherwise
                     ORBEON.util.Dom.focus(formInputs[foundSelected ? itemIndex : 0]);
                 }
-            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                // Special case for RTE
-                ORBEON.xforms.Page.getControl(control).setFocus();
             } else if ($(control).is('.xbl-component.xbl-focusable')) {
                 var instance = $(control).data('xforms-xbl-object');
                 if (_.isObject(instance) && _.isFunction(instance.setFocus))
@@ -2203,9 +2189,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         ORBEON.util.Dom.blur(formInput);
                     }
                 }
-            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                // Special case for RTE
-                ORBEON.xforms.Page.getControl(control).removeFocus();
             } else {
                 // Generic code to find focusable descendant-or-self HTML element and focus on it
                 var htmlControlNames = ["input", "textarea", "select", "button", "a"];
@@ -2582,14 +2565,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             return dialog.element;
                     }
                 } else if (element.className != null) {
-                    if (element.id
-                            && ORBEON.util.StringOps.endsWith(element.id, "_container")
-                            && $(element).is('.xforms-textarea.xforms-mediatype-text-html')
-                            && ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                        // We may get a focus event on the container created by YUI. Instead, find the
-                        // original nested textarea element.
-                        return ORBEON.util.Dom.getChildElementByClass(element, "xforms-textarea");
-                    } else if ($(element).is('.xforms-control, .xbl-component')) {
+                    if ($(element).is('.xforms-control, .xbl-component')) {
                         return element;
                     } else if ($(element).is('.xforms-dialog, .xforms-help, .xforms-alert')) {
                         return element;
@@ -2648,19 +2624,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
                     // Send focus events
                     var events = [];
-
-                    // Handle special value changes upon losing focus
-
-                    // HTML area does not throw value change event, so we send the value change to the server
-                    // when we get the focus on the next control
-                    var changeValue = false;
-                    if (currentFocusControlElement != null) { // Can be null on first focus
-                        if ($(currentFocusControlElement).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                            changeValue = true;
-                        }
-                        // Send value change if needed
-                        if (changeValue) xformsValueChanged(currentFocusControlElement);
-                    }
 
                     // Handle focus
                     events.push(new ORBEON.xforms.server.AjaxServer.Event(null, newFocusControlElement.id, null, "xforms-focus"));
@@ -4002,10 +3965,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             // TODO: Also need destructors for controls
             ORBEON.xforms.Init.insertedElementEvent.fire({element: element});
             if (element.nodeType == ORBEON.util.Dom.ELEMENT_TYPE) {
-                if ($(element).is('.xforms-textarea.xforms-mediatype-text-html')) {
-                    // HTML area
-                    ORBEON.xforms.Init._htmlArea(element);
-                } else if ($(element).is('.xforms-dialog')) {
+                if ($(element).is('.xforms-dialog')) {
                     // Dialog
                     ORBEON.xforms.Init._dialog(element);
                 }

@@ -194,10 +194,6 @@
   width: 100%;
   overflow: hidden;
 }
-.orbeon .xforms-mediatype-text-html textarea {
-  width: 550px;
-  height: 300px;
-}
 .orbeon .xforms-select1-appearance-full label {
   vertical-align: middle;
   margin-right: 0.5em;

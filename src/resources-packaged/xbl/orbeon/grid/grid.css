@@ -87,9 +87,6 @@
 .orbeon .xbl-fr-grid .fr-grid .xbl-fr-inplace-input input {
   width: 100%;
 }
-.orbeon .xbl-fr-grid .fr-grid .xforms-mediatype-text-html textarea {
-  height: 10.1em;
-}
 .orbeon .xbl-fr-grid .fr-grid .xforms-input input.xforms-type-date,
 .orbeon .xbl-fr-grid .fr-grid .xforms-input input.xforms-type-time {
   width: 7.5em;

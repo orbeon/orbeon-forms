@@ -21,17 +21,14 @@ var XF_REPEAT_INDEX_SEPARATOR = "-";
 var XF_COMPONENT_SEPARATOR = "\u2261";
 var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
 
-var XFORMS_SERVER_PATH = "/xforms-server";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
-var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_CLOSE_ANGLE = new RegExp(">", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
 var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", "g");
-var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
 var DEFAULT_LOADING_TEXT = "Loading...";
 
 // These variables are not set by default, but if set will be used by this code:
@@ -1267,7 +1264,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 var cursor = beginElement;
                 var cursorPosition = 0;
                 while (true) {
-                        while (cursor.nodeType != ELEMENT_TYPE || !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
+                        while (cursor.nodeType != ELEMENT_TYPE || !$(cursor).is('.xforms-repeat-delimiter')) {
                         cursor = cursor.nextSibling;
                         if (!cursor) return null;
                     }
@@ -1496,17 +1493,16 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
         // Returns MIP for a given control
         isRelevant: function (control) {
-            return !YAHOO.util.Dom.hasClass(control, "xforms-disabled")
-                    && !YAHOO.util.Dom.hasClass(control, "xforms-disabled-subsequent");
+            return !$(control).is('.xforms-disabled, .xforms-disabled-subsequent');
         },
         isReadonly: function (control) {
-            return YAHOO.util.Dom.hasClass(control, "xforms-readonly");
+            return $(control).is('.xforms-readonly');
         },
         isRequired: function (control) {
-            return YAHOO.util.Dom.hasClass(control, "xforms-required");
+            return $(control).is('.xforms-required');
         },
         isValid: function (control) {
-            return !YAHOO.util.Dom.hasClass(control, "xforms-invalid");
+            return !$(control).is('.xforms-invalid');
         },
 
         getForm: function (control) {
@@ -1525,15 +1521,15 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             ORBEON.xforms.Controls.getCurrentValueEvent.fire(event);
             if (!_.isUndefined(event.result)) {
                 return event.result;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
+            } else if ($(control).is('.xforms-input.xforms-type-time')) {
                 // Time control
                 var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
                 var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
                 return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-date")) {
+            } else if ($(control).is('.xforms-input.xforms-type-date')) {
                 // Date control
                 var dateInputValue;
-                if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+                if ($(control).is('.xforms-input-appearance-minimal')) {
                     var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
                     dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
                 } else {
@@ -1541,7 +1537,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
                 return dateJSDate == null ? dateInputValue : ORBEON.util.DateTime.jsDateToISODate(dateJSDate);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+            } else if ($(control).is('.xforms-input.xforms-type-dateTime')) {
                 // Date time control
                 var dateValue = YAHOO.util.Dom.getElementsByClassName("xforms-type-date", null, control)[0].value;
                 var jsDateDate = ORBEON.util.DateTime.magicDateToJSDate(dateValue);
@@ -1552,14 +1548,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 } else {
                     return ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
                 }
-            } else if ((YAHOO.util.Dom.hasClass(control, "xforms-input") && !YAHOO.util.Dom.hasClass(control, "xforms-type-boolean") && !YAHOO.util.Dom.hasClass(control, "xforms-static"))
-                    || YAHOO.util.Dom.hasClass(control, "xforms-secret")) {
+            } else if (($(control).is('.xforms-input') && !$(control).is('.xforms-type-boolean, .xforms-static'))
+                    || $(control).is('.xforms-secret')) {
                 // Simple input
                 var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
                 return input.value;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                    || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+            } else if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Checkboxes, radio buttons, boolean input
                 var inputs = control.getElementsByTagName("input");
                 var spanValue = "";
@@ -1571,14 +1565,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 }
                 // For boolean inputs, if the checkbox isn't checked, then the value is false
-                if (spanValue == "" && YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))
+                if (spanValue == "" && $(control).is('.xforms-input') && $(control).is('.xforms-type-boolean'))
                     spanValue = "false";
                 return spanValue;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
+            } else if ($(control).is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
                 // Drop-down and list
                 var options = control.getElementsByTagName("select")[0].options;
                 var selectValue = "";
@@ -1590,16 +1580,15 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 }
                 return selectValue;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
-                    && !YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea')
+                    && !$(control).is('.xforms-mediatype-text-html')) {
                 // Text area (not HTML)
                 var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
                 return textarea.value
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
-                    && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
                 // HTML text area
                 return ORBEON.xforms.Page.getControl(control).getValue();
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-static"))) {
+            } else if ($(control).is('.xforms-output, .xforms-input.xforms-static')) {
                 // Output and static input
                 var jControl = $(control);
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();
@@ -1614,7 +1603,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         return ORBEON.util.Dom.getStringValue(output[0]);
                     }
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-range")) {
+            } else if ($(control).is('.xforms-range')) {
                 var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
                 return value.toString();
             }
@@ -1622,7 +1611,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
         isInRepeatTemplate: function (element) {
             return ORBEON.util.Dom.existsAncestorOrSelf(element, function (node) {
-                return YAHOO.util.Dom.hasClass(node, "xforms-repeat-template")
+                return $(node).is('.xforms-repeat-template')
             });
         },
 
@@ -1639,8 +1628,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var customEvent = {control: control, newValue: newControlValue};
             ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
             ORBEON.xforms.Controls.valueChange.fire(customEvent);
-            var isStaticReadonly = YAHOO.util.Dom.hasClass(control, "xforms-static");
-            if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
+            var isStaticReadonly = $(control).is('.xforms-static');
+            if ($(control).is('.xforms-output-appearance-xxforms-download')) {
                 // XForms output with xxf:download appearance
                 var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
                 if (newControlValue == "") {
@@ -1650,7 +1639,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     anchor.setAttribute("href", newControlValue);
                     YAHOO.util.Dom.removeClass(anchor, "xforms-readonly");
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
+            } else if ($(control).is('.xforms-output') || isStaticReadonly) {
                 // XForms output or "static readonly" mode
                 var jControl = $(control);
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();
@@ -1666,23 +1655,21 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             } else if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {
                 // User has modified the value of this control since we sent our request:
                 // so don't try to update it
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-submit")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
+            } else if ($(control).is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
                 // No value
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
+            } else if ($(control).is('.xforms-type-time')) {
                 // Time control
                 if (! ORBEON.util.Utils.isIOS()) {
                     var inputField = control.getElementsByTagName("input")[0];
                     var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
                     inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date")) {
+            } else if ($(control).is('.xforms-type-date')) {
                 // Date control
                 if (! ORBEON.util.Utils.isIOS()) {
                     var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
                     var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
-                    if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+                    if ($(control).is('.xforms-input-appearance-minimal')) {
                         var imgElement = control.getElementsByTagName("img")[0];
                         ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
                     } else {
@@ -1690,7 +1677,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         inputField.value = displayDate;
                     }
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+            } else if ($(control).is('.xforms-type-dateTime')) {
                 // Only update value if different from the one we have. This handle the case where the fields contain invalid
                 // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
                 // to separate into 2 values.
@@ -1709,8 +1696,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToFormatDisplayTime(timePartJSDate);
                     }
                 }
-            } else if ((YAHOO.util.Dom.hasClass(control, "xforms-input") && !YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))
-                    || YAHOO.util.Dom.hasClass(control, "xforms-secret")) {
+            } else if (($(control).is('.xforms-input') && !$(control).is('.xforms-type-boolean')) || $(control).is('.xforms-secret')) {
                 // Regular XForms input (not boolean, date, time or dateTime) or secret
                 var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
                 if (control.value != newControlValue) {
@@ -1719,11 +1705,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 if (input.value != newControlValue)
                     input.value = newControlValue;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                    || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+            } else if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Handle checkboxes and radio buttons
-                var selectedValues = YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
+                var selectedValues = $(control).is('.xforms-select-appearance-full')
                         ? newControlValue.split(" ") : new Array(newControlValue);
                 var checkboxInputs = control.getElementsByTagName("input");
                 for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
@@ -1733,13 +1717,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
                 // Update classes on control
                 ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+            } else if ($(control).is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal, .xforms-input-appearance-compact, .xforms-input-appearance-minimal')) {
                 // Handle lists and comboboxes
-                var selectedValues = YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-compact") ? newControlValue.split(" ") : new Array(newControlValue);
+                var selectedValues = $(control).is('.xforms-select-appearance-compact') ? newControlValue.split(" ") : new Array(newControlValue);
                 var select = control.getElementsByTagName("select")[0];
                 var options = select.options;
                 if (options != null) {
@@ -1758,13 +1738,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         }
                     }
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
-                    && !YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea')
+                    && !$(control).is('.xforms-mediatype-text-html')) {
                 // Text area
                 var textarea = control.getElementsByTagName("textarea")[0];
                 textarea.value = newControlValue;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
-                    && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
                 // HTML area
                 ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
             } else if (typeof(control.value) == "string") {
@@ -1841,7 +1820,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             if (lhhaElement != null) {
                 lhhaElement.innerHTML = message;
                 if (message == "") {
-                    if (lhhaType == "help" && !YAHOO.util.Dom.hasClass(lhhaElement, "xforms-disabled")) {
+                    if (lhhaType == "help" && !$(lhhaElement).is('.xforms-disabled')) {
                         // Hide help with empty content
                         YAHOO.util.Dom.addClass(lhhaElement, "xforms-disabled-subsequent");
                         // If this is the help element, also disable help image
@@ -1868,16 +1847,15 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
         getLabelMessage: function (control) {
-            if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
+            if ($(control).is('.xforms-trigger, .xforms-submit')) {
                 // Element is "label" and "control" at the same time so use "control"
                 var labelElement = ORBEON.xforms.Controls.getControlLHHA(control, "control");
                 return labelElement.innerHTML;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
+            } else if ($(control).is('.xforms-dialog')) {
                 // Dialog
                 var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 return labelDiv.innerHTML;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-group-appearance-xxforms-fieldset")) {
+            } else if ($(control).is('.xforms-group-appearance-xxforms-fieldset')) {
                 // Group with fieldset/legend
                 var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 if (legend != null)
@@ -1889,20 +1867,19 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         },
 
         setLabelMessage: function (control, message) {
-            if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
+            if ($(control).is('.xforms-trigger, .xforms-submit')) {
                 // Element is "label" and "control" at the same time so use "control"
                 ORBEON.xforms.Controls._setMessage(control, "control", message);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
+            } else if ($(control).is('.xforms-dialog')) {
                 // Dialog
                 var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 labelDiv.innerHTML = message;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-group-appearance-xxforms-fieldset")) {
+            } else if ($(control).is('.xforms-group-appearance-xxforms-fieldset')) {
                 // Group with fieldset/legend
                 var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 if (legend != null)
                     legend.innerHTML = message;
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
+            } else if ($(control).is('.xforms-output-appearance-xxforms-download')) {
                 // Download link
                 var anchor = YAHOO.util.Dom.getChildren(control)[0];
                 anchor.innerHTML = message;
@@ -1973,7 +1950,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         setRelevant: function (control, isRelevant) {
             var FN = ORBEON.xforms.FlatNesting;
 
-            if (YAHOO.util.Dom.hasClass(control, "xforms-group-begin-end")) {
+            if ($(control).is('.xforms-group-begin-end')) {
                 // Case of group delimiters
                 FN.setRelevant(control, isRelevant);
             } else {
@@ -2022,7 +1999,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 YAHOO.util.Dom.removeClass(control, "xforms-readonly");
             }
 
-            if (YAHOO.util.Dom.hasClass(control, "xforms-group-begin-end")) {
+            if ($(control).is('.xforms-group-begin-end')) {
                 // Case of group delimiters
                 // Readonlyness is no inherited by controls inside the group, so we are just updating the class on the begin-marker
                 // to be consistent with the markup generated by the server.
@@ -2031,10 +2008,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 } else {
                     YAHOO.util.Dom.removeClass(control, "xforms-readonly");
                 }
-            } else if ((YAHOO.util.Dom.hasClass(control, "xforms-input"))
-                    || YAHOO.util.Dom.hasClass(control, "xforms-secret")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
+            } else if ($(control).is('.xforms-input, .xforms-secret, .xforms-select1-appearance-full, .xforms-select-appearance-full')) {
                 // Input fields, radio buttons, or checkboxes
 
                 // Add/remove xforms-readonly on span
@@ -2049,33 +2023,28 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 if (control.tagName.toLowerCase() == "input")
                     ORBEON.xforms.Controls.setDisabledOnFormElement(control, isReadonly);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
+            } else if ($(control).is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
                 // Lists
                 var select = control.getElementsByTagName("select")[0];
                 ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-output")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-group")) {
+            } else if ($(control).is('.xforms-output, .xforms-group')) {
                 // XForms output and group
                 if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
                 else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea") && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
                 // XForms HTML area
                 ORBEON.xforms.Page.getControl(control).setReadonly(isReadonly);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
+            } else if ($(control).is('.xforms-upload')) {
                 // Upload control
                 ORBEON.xforms.Controls.setDisabledOnFormElement(
                         YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, control)[0], isReadonly);
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")) {
+            } else if ($(control).is('.xforms-textarea')) {
                 // Textarea
                 var textarea = control.getElementsByTagName("textarea")[0];
                 ORBEON.xforms.Controls.setDisabledOnFormElement(textarea, isReadonly);
-            } else if ((YAHOO.util.Dom.hasClass(control, "xforms-trigger")
-                    && !YAHOO.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal"))
-                    || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
+            } else if (($(control).is('.xforms-trigger')
+                    && !$(control).is('.xforms-trigger-appearance-minimal'))
+                    || $(control).is('.xforms-submit')) {
                 // Button
                 var button = ORBEON.util.Dom.getElementByTagName(control, "button");
                 ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
@@ -2101,7 +2070,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         },
 
         getHintMessage: function (control) {
-            if (YAHOO.util.Dom.hasClass(control, "xforms-trigger") || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
+            if ($(control).is('.xforms-trigger, .xforms-submit')) {
                 var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
                 return formElement.title;
             } else {
@@ -2119,7 +2088,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     tooltips[control.id] = null
             }
 
-            if (YAHOO.util.Dom.hasClass(control, "xforms-trigger") || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
+            if ($(control).is('.xforms-trigger, .xforms-submit')) {
                 // For triggers, the value is stored in the title for the control
 
 
@@ -2173,9 +2142,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             ORBEON.xforms.Globals.currentFocusControlId = controlId;
             ORBEON.xforms.Globals.currentFocusControlElement = control;
             ORBEON.xforms.Globals.maskFocusEvents = true;
-            if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                    || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+            if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Look for radio button or check box that is is checked
                 var formInputs = ORBEON.util.Dom.getElementsByName(control, "input");
                 if (formInputs.length > 0) {
@@ -2191,8 +2158,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // Set focus on either selected item if we found one or on first item otherwise
                     ORBEON.util.Dom.focus(formInputs[foundSelected ? itemIndex : 0]);
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
-                    && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
                 // Special case for RTE
                 ORBEON.xforms.Page.getControl(control).setFocus();
             } else if ($(control).is('.xbl-component.xbl-focusable')) {
@@ -2226,9 +2192,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
             var control = ORBEON.util.Dom.get(controlId);
 
-            if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
-                    || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+            if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Radio button or checkbox
                 var formInputs = ORBEON.util.Dom.getElementsByName(control, "input");
                 if (formInputs.length > 0) {
@@ -2239,8 +2203,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         ORBEON.util.Dom.blur(formInput);
                     }
                 }
-            } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
-                    && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            } else if ($(control).is('.xforms-textarea.xforms-mediatype-text-html')) {
                 // Special case for RTE
                 ORBEON.xforms.Page.getControl(control).removeFocus();
             } else {
@@ -2293,7 +2256,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             }
 
             // Render the dialog if needed
-            if (YAHOO.util.Dom.hasClass(divElement, "xforms-initially-hidden")) {
+            if ($(divElement).is('.xforms-initially-hidden')) {
                 YAHOO.util.Dom.removeClass(divElement, "xforms-initially-hidden");
                 yuiDialog.render();
             }
@@ -2351,7 +2314,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          */
         isCaseSelected: function (controlId) {
             var caseBegin = ORBEON.xforms.Controls.findCaseBegin(controlId);
-            return YAHOO.util.Dom.hasClass(caseBegin, "xforms-case-selected");
+            return $(caseBegin).is('.xforms-case-selected');
         },
 
         /**
@@ -2376,7 +2339,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // Change visibility by switching class
                     if (cursor.id == "xforms-case-end-" + controlId) break;
                     var doAnimate = cursor.id != "xforms-case-begin-" + controlId &&    // Don't animate case-begin/end
-                            YAHOO.util.Dom.hasClass(cursor, "xxforms-animate") &&       // Only animate if class present
+                            $(cursor).is('.xxforms-animate') &&                         // Only animate if class present
                             YAHOO.env.ua.ie == 0;                                       // Simply disable animation for IE<=10 [1]
 
                     var updateClasses = _.partial(function (el) {
@@ -2433,7 +2396,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          */
 
         isGroupBeginEnd: function (node) {
-            return node.nodeType == ELEMENT_TYPE && YAHOO.util.Dom.hasClass(node, "xforms-group-begin-end");
+            return node.nodeType == ELEMENT_TYPE && $(node).is('.xforms-group-begin-end');
         },
         isGroupBegin: function (node) {
             return this.isGroupBeginEnd(node) && node.id.indexOf("group-begin-") == 0;
@@ -2442,7 +2405,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             return this.isGroupBeginEnd(node) && node.id.indexOf("group-end-") == 0;
         },
         isRepeatBeginEnd: function (node) {
-            return node.nodeType == ELEMENT_TYPE && YAHOO.util.Dom.hasClass(node, "xforms-repeat-begin-end");
+            return node.nodeType == ELEMENT_TYPE && $(node).is('.xforms-repeat-begin-end');
         },
         isRepeatBegin: function (node) {
             return this.isRepeatBeginEnd(node) && node.id.indexOf("repeat-begin-") == 0;
@@ -2451,7 +2414,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             return this.isRepeatBeginEnd(node) && node.id.indexOf("repeat-end-") == 0;
         },
         isRepeatDelimiter: function (node) {
-            return node.nodeType == ELEMENT_TYPE && YAHOO.util.Dom.hasClass(node, "xforms-repeat-delimiter");
+            return node.nodeType == ELEMENT_TYPE && $(node).is('.xforms-repeat-delimiter');
         },
         isBegin: function (node) {
             return this.isGroupBegin(node) || this.isRepeatBegin(node);
@@ -2577,7 +2540,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             // If this group/iteration becomes relevant, but has a parent that is non-relevant, we should not
             // remove xforms-disabled otherwise it will incorrectly show, so our job stops here
             if (isRelevant && FN.hasAncestor(node, function (node) {
-                        return YAHOO.util.Dom.hasClass(node, "xforms-disabled");
+                        return $(node).is('.xforms-disabled');
                     })) return;
 
             FN.foldDescendants(node, null, function (node, value) {
@@ -2621,17 +2584,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 } else if (element.className != null) {
                     if (element.id
                             && ORBEON.util.StringOps.endsWith(element.id, "_container")
-                            && YAHOO.util.Dom.hasClass(element, "xforms-textarea")
-                            && YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")
+                            && $(element).is('.xforms-textarea.xforms-mediatype-text-html')
                             && ORBEON.util.Properties.htmlEditor.get() == "yui") {
                         // We may get a focus event on the container created by YUI. Instead, find the
                         // original nested textarea element.
                         return ORBEON.util.Dom.getChildElementByClass(element, "xforms-textarea");
                     } else if ($(element).is('.xforms-control, .xbl-component')) {
                         return element;
-                    } else if (YAHOO.util.Dom.hasClass(element, "xforms-dialog")
-                            || YAHOO.util.Dom.hasClass(element, "xforms-help")
-                            || YAHOO.util.Dom.hasClass(element, "xforms-alert")) {
+                    } else if ($(element).is('.xforms-dialog, .xforms-help, .xforms-alert')) {
                         return element;
                     }
                 }
@@ -2648,7 +2608,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
                         // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
                         // prevents detection of value changes in focus() above.
-                    && !YAHOO.util.Dom.hasClass(ancestorControl, "xforms-dialog")
+                    && !$(ancestorControl).is('.xforms-dialog')
                         // Don't send focus for XBL component that are not focusable
                     && !$(ancestorControl).is('.xbl-component:not(.xbl-focusable)');
 
@@ -2676,8 +2636,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // Store initial value of control if we don't have a server value already, and if this is is not a list
                     // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
                     if (ORBEON.xforms.ServerValueStore.get(newFocusControlElement.id) == null
-                            && !YAHOO.util.Dom.hasClass(newFocusControlElement, "xforms-select-appearance-compact")
-                            && !YAHOO.util.Dom.hasClass(newFocusControlElement, "xforms-select1-appearance-compact")) {
+                            && !$(newFocusControlElement).is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact')) {
                         var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(newFocusControlElement);
                         ORBEON.xforms.ServerValueStore.set(newFocusControlElement.id, controlCurrentValue);
                     }
@@ -2696,8 +2655,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // when we get the focus on the next control
                     var changeValue = false;
                     if (currentFocusControlElement != null) { // Can be null on first focus
-                        if (YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
-                                && YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
+                        if ($(currentFocusControlElement).is('.xforms-textarea.xforms-mediatype-text-html')) {
                             changeValue = true;
                         }
                         // Send value change if needed
@@ -2750,7 +2708,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         change: function (event) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                if (YAHOO.util.Dom.hasClass(target, "xforms-upload")) {
+                if ($(target).is('.xforms-upload')) {
                     // Dispatch change event to upload control
                     ORBEON.xforms.Page.getControl(target).change();
                 } else {
@@ -2759,7 +2717,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[target.id]))
                         ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
 
-                    if (YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
+                    if ($(target).is('.xforms-select1-appearance-compact')) {
                         // For select1 list, make sure we have exactly one value selected
                         var select = ORBEON.util.Dom.getElementByTagName(target, "select");
                         if (select.value == "") {
@@ -2777,11 +2735,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             }
                         }
                     } else if (! ORBEON.util.Utils.isIOS() &&
-                            (
-                            YAHOO.util.Dom.hasClass(target, "xforms-type-time")
-                            || (YAHOO.util.Dom.hasClass(target, "xforms-type-date") && !YAHOO.util.Dom.hasClass(target, "xforms-input-appearance-minimal"))
-                            || YAHOO.util.Dom.hasClass(target, "xforms-type-dateTime")
-                            )
+                        (
+                            $(target).is('.xforms-type-time, .xforms-type-dateTime')
+                            || ($(target).is('.xforms-type-date') && !$(target).is('.xforms-input-appearance-minimal'))
+                        )
                     ) {
                         // For time, date, and dateTime fields, magic-parse field, and if recognized replace by display value
                         function toDisplayValue(input, magicToJSDate, jsDateToDisplay) {
@@ -2792,10 +2749,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
                         // Handle first text field (time or date)
                         toDisplayValue(YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[0],
-                                YAHOO.util.Dom.hasClass(target, "xforms-type-time") ? ORBEON.util.DateTime.magicTimeToJSDate : ORBEON.util.DateTime.magicDateToJSDate,
-                                YAHOO.util.Dom.hasClass(target, "xforms-type-time") ? ORBEON.util.DateTime.jsDateToFormatDisplayTime : ORBEON.util.DateTime.jsDateToFormatDisplayDate);
+                                $(target).is('.xforms-type-time') ? ORBEON.util.DateTime.magicTimeToJSDate : ORBEON.util.DateTime.magicDateToJSDate,
+                                $(target).is('.xforms-type-time') ? ORBEON.util.DateTime.jsDateToFormatDisplayTime : ORBEON.util.DateTime.jsDateToFormatDisplayDate);
                         // Handle second text field for dateTime
-                        if (YAHOO.util.Dom.hasClass(target, "xforms-type-dateTime"))
+                        if ($(target).is('.xforms-type-dateTime'))
                             toDisplayValue(YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[1],
                                     ORBEON.util.DateTime.magicTimeToJSDate, ORBEON.util.DateTime.jsDateToFormatDisplayTime);
                     }
@@ -2823,8 +2780,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         _isChangingKey: function (control, keyCode) {
             return !_.isUndefined(keyCode) &&
                     keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
-                    (YAHOO.util.Dom.hasClass(control, "xforms-input") || YAHOO.util.Dom.hasClass(control, "xforms-secret")
-                    || YAHOO.util.Dom.hasClass(control, "xforms-textarea"));
+                    ($(control).is('.xforms-input, .xforms-secret, .xforms-textarea'));
         },
 
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
@@ -2854,8 +2810,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             if (control != null) {
                 ORBEON.xforms.Events.keypressEvent.fire({control: control, target: target, keyCode: event.keyCode});
                 // Input field and auto-complete: trigger DOMActive when when enter is pressed
-                if ((YAHOO.util.Dom.hasClass(control, "xforms-input") && !YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))
-                        || YAHOO.util.Dom.hasClass(control, "xforms-secret")) {
+                if (($(control).is('.xforms-input') && !$(control).is('.xforms-type-boolean'))
+                        || $(control).is('.xforms-secret')) {
                     if (event.keyCode == 10 || event.keyCode == 13) {
                         // Send a value change and DOM activate
                         var events = [
@@ -2883,7 +2839,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode) && _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[target.id]))
                     ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
                 // Incremental control: treat keypress as a value change event
-                if (YAHOO.util.Dom.hasClass(target, "xforms-incremental")) {
+                if ($(target).is('.xforms-incremental')) {
                     var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
                     ORBEON.xforms.server.AjaxServer.fireEvents([event], true);
                 }
@@ -2939,7 +2895,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Hint tooltip
                 if (!$(target).closest(".xforms-disable-hint-as-tooltip").is("*")) {
                     var message = ORBEON.xforms.Controls.getHintMessage(target);
-                    if (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || YAHOO.util.Dom.hasClass(target, "xforms-submit")) {
+                    if ($(target).is('.xforms-trigger, .xforms-submit')) {
                         // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
                         var formElement = ORBEON.util.Dom.getElementByTagName(target, ["a", "button"]);
                         formElement.title = "";
@@ -2955,25 +2911,25 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     var control = ORBEON.xforms.Controls.getControlForLHHA(target, "alert");
                     if (control) {
                         // The 'for' can point to a form field which is inside the element representing the control
-                        if (!(YAHOO.util.Dom.hasClass(control, "xforms-control") || YAHOO.util.Dom.hasClass(control, "xforms-group")))
+                        if (!($(control).is('.xforms-control, .xforms-group')))
                             control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                         if (control) {
                             var message = ORBEON.xforms.Controls.getAlertMessage(control);
                             ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, 10, event);
                         }
                     }
-                } else if (YAHOO.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
+                } else if ($(target).is('.xforms-dialog-appearance-minimal')) {
                     // Minimal dialog: record more is back inside the dialog
                     ORBEON.xforms.Globals.dialogMinimalLastMouseOut[target.id] = -1;
                 }
 
                 // Help tooltip
-                if (ORBEON.util.Properties.helpTooltip.get() && YAHOO.util.Dom.hasClass(target, "xforms-help")) {
+                if (ORBEON.util.Properties.helpTooltip.get() && $(target).is('.xforms-help')) {
                     // Get control
                     var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                     if (control) {
                         // The xf:input is a unique case where the 'for' points to the input field, not the element representing the control
-                        if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                        if ($(control).is('.xforms-input-input'))
                             control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                         var message = ORBEON.xforms.Controls.getHelpMessage(control);
                         YAHOO.util.Dom.generateId(target);
@@ -2984,7 +2940,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Check if this control is inside a minimal dialog, in which case we are also inside that dialog
                 var current = target;
                 while (current != null && current != document) {
-                    if (YAHOO.util.Dom.hasClass(current, "xforms-dialog-appearance-minimal")) {
+                    if ($(current).is('.xforms-dialog-appearance-minimal')) {
                         ORBEON.xforms.Globals.dialogMinimalLastMouseOut[current.id] = -1;
                         break;
                     }
@@ -3021,10 +2977,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 return;
             }
 
-            if (target != null && (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || YAHOO.util.Dom.hasClass(target, "xforms-submit"))) {
+            if (target != null && ($(target).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger
                 YAHOO.util.Event.preventDefault(event);
-                if (!YAHOO.util.Dom.hasClass(target, "xforms-readonly")) {
+                if (!$(target).is('.xforms-readonly')) {
                     // If this is an anchor and we didn't get a chance to register the focus event,
                     // send the focus event here. This is useful for anchors (we don't listen on the
                     // focus event on those, and for buttons on Safari which does not dispatch the focus
@@ -3033,7 +2989,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, "DOMActivate");
                     ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
-                    if (YAHOO.util.Dom.hasClass(target, "xforms-trigger-appearance-modal") || YAHOO.util.Dom.hasClass(target, "xforms-submit-appearance-modal")) {
+                    if ($(target).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
                         // If click on a modal trigger, we want to prevent any further interaction with the form until
                         // we get a response to this Ajax request from the server.
                         // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
@@ -3043,10 +2999,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(target).id);
                     }
                 }
-            } else if (target != null && !YAHOO.util.Dom.hasClass(target, "xforms-static") &&
-                    (YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-full")
-                    || YAHOO.util.Dom.hasClass(target, "xforms-select-appearance-full")
-                    || (YAHOO.util.Dom.hasClass(target, "xforms-input") && YAHOO.util.Dom.hasClass(target, "xforms-type-boolean")))) {
+            } else if (target != null && !$(target).is('.xforms-static') &&
+                    $(target).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Click on checkbox or radio button
 
                 // Update classes right away to give user visual feedback
@@ -3054,11 +3008,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
-            } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-upload") && YAHOO.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
+            } else if (target != null && $(target).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
                 // Click on remove icon in upload control
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, "", "xxforms-value");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-            } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help")) {
+            } else if (target != null && $(target).is('.xforms-help')) {
                 // Help image
 
                 // Get control for this help image
@@ -3083,7 +3037,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             while (node != null && !(ORBEON.util.Dom.isElement(node) && node.tagName.toLowerCase() == "form")) {
 
                 // First check clickable group
-                if (YAHOO.util.Dom.hasClass(node, "xforms-activable")) {
+                if ($(node).is('.xforms-activable')) {
                     var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");
                     ORBEON.xforms.server.AjaxServer.fireEvents([event]);
                     break;
@@ -3105,7 +3059,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             ORBEON.xforms.server.AjaxServer.fireEvents([event]);
                             foundRepeatBegin = true;
                             break;
-                        } else if (YAHOO.util.Dom.hasClass(sibling, "xforms-repeat-delimiter")) {
+                        } else if ($(sibling).is('.xforms-repeat-delimiter')) {
                             delimiterCount++;
                         }
                     }
@@ -3288,7 +3242,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 var current = YAHOO.util.Event.getTarget(event);
                 var foundDropDownParent = false;
                 while (current != null && current != document) {
-                    if (YAHOO.util.Dom.hasClass(current, "xforms-dialog-appearance-minimal")) {
+                    if ($(current).is('.xforms-dialog-appearance-minimal')) {
                         foundDropDownParent = true;
                         break;
                     }
@@ -3327,7 +3281,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     var form;
                     for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
                         var candidateForm = document.forms[formIndex];
-                        if (YAHOO.util.Dom.hasClass(candidateForm, "xforms-form")) {
+                        if ($(candidateForm).is('.xforms-form')) {
                             form = candidateForm;
                             break;
                         }
@@ -3611,9 +3565,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
         registerDraggableListenersOnRepeatElement: function (repeatElement) {
             var draggableItem = new ORBEON.xforms.DnD.DraggableItem(repeatElement);
-            if (YAHOO.util.Dom.hasClass(repeatElement, "xforms-dnd-vertical"))
+            if ($(repeatElement).is('.xforms-dnd-vertical'))
                 draggableItem.setXConstraint(0, 0);
-            else if (YAHOO.util.Dom.hasClass(repeatElement, "xforms-dnd-horizontal"))
+            else if ($(repeatElement).is('.xforms-dnd-horizontal'))
                 draggableItem.setYConstraint(0, 0);
         },
 
@@ -3735,7 +3689,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
                 var formElement = document.forms[formIndex];
                 // If this is an XForms form, proceed with initialization
-                if (YAHOO.util.Dom.hasClass(formElement, "xforms-form")) {
+                if ($(formElement).is('.xforms-form')) {
                     var formID = document.forms[formIndex].id;
 
                     ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
@@ -3908,7 +3862,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                                 keyListener.isDialogListener = false;
                                 if (!keyListener.isDocumentListener) {
                                     keyListener.observerElement = ORBEON.util.Dom.get(keyListener.observer);
-                                    keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
+                                    keyListener.isDialogListener = $(keyListener.observerElement).is('.xforms-dialog');
                                 }
                                 if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
 
@@ -4048,11 +4002,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             // TODO: Also need destructors for controls
             ORBEON.xforms.Init.insertedElementEvent.fire({element: element});
             if (element.nodeType == ORBEON.util.Dom.ELEMENT_TYPE) {
-                if (YAHOO.util.Dom.hasClass(element, "xforms-textarea")
-                        && YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")) {
+                if ($(element).is('.xforms-textarea.xforms-mediatype-text-html')) {
                     // HTML area
                     ORBEON.xforms.Init._htmlArea(element);
-                } else if (YAHOO.util.Dom.hasClass(element, "xforms-dialog")) {
+                } else if ($(element).is('.xforms-dialog')) {
                     // Dialog
                     ORBEON.xforms.Init._dialog(element);
                 }
@@ -4133,11 +4086,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          * Initialize dialogs
          */
         _dialog: function (dialog) {
-            var isModal = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-modal");
-            var hasClose = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
-            var isDraggable = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
-            var isVisible = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-visible-true");
-            var isMinimal = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
+            var isModal = $(dialog).is('.xforms-dialog-modal');
+            var hasClose = $(dialog).is('.xforms-dialog-close-true');
+            var isDraggable = $(dialog).is('.xforms-dialog-draggable-true');
+            var isVisible = $(dialog).is('.xforms-dialog-visible-true');
+            var isMinimal = $(dialog).is('.xforms-dialog-appearance-minimal');
 
             // If we already have a dialog for the same id, first destroy it, as this is an object left behind
             // by a deleted repeat iteration
@@ -4292,7 +4245,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
             // Move the drag element under the form for our CSS rules to work
             var dragElement = this.getDragEl();
-            if (!YAHOO.util.Dom.hasClass(dragElement.parentNode, "xforms-form")) {
+            if (!$(dragElement.parentNode).is('.xforms-form')) {
                 var form = ORBEON.xforms.Controls.getForm(element);
                 form.appendChild(dragElement);
             }
@@ -4307,8 +4260,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var previousSibling = element;
             var position = 0;
             while (true) {
-                if (YAHOO.util.Dom.hasClass(previousSibling, "xforms-repeat-begin-end")) break;
-                if (YAHOO.util.Dom.hasClass(previousSibling, "xforms-repeat-delimiter")) position++;
+                if ($(previousSibling).is('.xforms-repeat-begin-end')) break;
+                if ($(previousSibling).is('.xforms-repeat-delimiter')) position++;
                 previousSibling = YAHOO.util.Dom.getPreviousSibling(previousSibling);
             }
             return position;
@@ -4354,9 +4307,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var newIndex = 0;
             while (true) {
                 currentElement = YAHOO.util.Dom.getNextSibling(currentElement);
-                if (currentElement == null || YAHOO.util.Dom.hasClass(currentElement, "xforms-repeat-begin-end")) break;
-                if (!YAHOO.util.Dom.hasClass(currentElement, "xforms-repeat-delimiter")
-                        && !YAHOO.util.Dom.hasClass(currentElement, "xforms-repeat-template")) {
+                if (currentElement == null || $(currentElement).is('.xforms-repeat-begin-end'))
+                    break;
+                if (!$(currentElement).is('.xforms-repeat-delimiter, .xforms-repeat-template')) {
                     newIndex++;
                     this._renumberIDsWorker(currentElement, repeatDepth, newIndex);
                 }
@@ -4405,7 +4358,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var srcDelimiter = YAHOO.util.Dom.getPreviousSibling(srcElement);
             var destElement = ORBEON.util.Dom.get(id)[0];
 
-            if (YAHOO.util.Dom.hasClass(srcElement, "xforms-dnd") && srcElement.nodeName.toLowerCase() == destElement.getEl().nodeName.toLowerCase()) {
+            if ($(srcElement).is('.xforms-dnd') && srcElement.nodeName.toLowerCase() == destElement.getEl().nodeName.toLowerCase()) {
                 var parent = destElement.getEl().parentNode;
                 this.overElement = destElement.getEl();
                 parent.removeChild(srcDelimiter);
@@ -4457,10 +4410,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         var newValue = ORBEON.xforms.Controls.getCurrentValue(target);
         var valueChanged = newValue != target.previousValue;
         // We don't send value change events for the XForms upload control
-        var isUploadControl = YAHOO.util.Dom.hasClass(target, "xforms-upload");
+        var isUploadControl = $(target).is('.xforms-upload');
         if (valueChanged && !isUploadControl) {
             target.previousValue = newValue;
-            var incremental = YAHOO.util.Dom.hasClass(target, "xforms-incremental");
+            var incremental = $(target).is('.xforms-incremental');
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, newValue, "xxforms-value");
             ORBEON.xforms.server.AjaxServer.fireEvents([event], incremental);
         }

@@ -1264,7 +1264,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 var cursor = beginElement;
                 var cursorPosition = 0;
                 while (true) {
-                        while (cursor.nodeType != ELEMENT_TYPE || ! $(cursor).is('.xforms-repeat-delimiter')) {
+                    while (cursor.nodeType != ELEMENT_TYPE || ! $(cursor).is('.xforms-repeat-delimiter')) {
                         cursor = cursor.nextSibling;
                         if (! cursor) return null;
                     }

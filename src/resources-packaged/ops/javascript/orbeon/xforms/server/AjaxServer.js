@@ -57,7 +57,7 @@
      */
     AjaxServer.showError = function(title, details, formID) {
         ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
-        if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get()) {
+        if (! ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get()) {
             var formErrorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
             if (formErrorPanel) {
                 // Render the dialog if needed
@@ -101,7 +101,7 @@
 
         // Fire them with a delay to give us a change to aggregate events together
         ORBEON.xforms.Globals.executeEventFunctionQueued++;
-        if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
+        if (incremental && ! (currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
                              ORBEON.util.Properties.delayBeforeIncrementalRequest.get())) {
             // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
             // if there are no other executeNextRequest() that have been added to the queue after this
@@ -154,7 +154,7 @@
         bypassRequestQueue = typeof(bypassRequestQueue) == "boolean" && bypassRequestQueue == true;
 
         ORBEON.xforms.Globals.executeEventFunctionQueued--;
-        if (!ORBEON.xforms.Globals.requestInProgress
+        if (! ORBEON.xforms.Globals.requestInProgress
                 && ORBEON.xforms.Globals.eventQueue.length > 0
                 && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
 
@@ -323,7 +323,7 @@
 
                     _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
                         // Figure out if we will be ignoring error during this request or not
-                        if (!event.ignoreErrors)
+                        if (! event.ignoreErrors)
                             ORBEON.xforms.Globals.requestIgnoreErrors = false;
                         // Figure out whether we need to send the initial dynamic state
                         if (event.eventName == "xxforms-all-events-required")
@@ -633,7 +633,7 @@
 
                 // Get existing div which is above the form that issued this request
                 var existingPortletDiv = ORBEON.xforms.Globals.requestForm;
-                while (existingPortletDiv != null && existingPortletDiv.className && !$(existingPortletDiv).is('.orbeon-portlet-div'))
+                while (existingPortletDiv != null && existingPortletDiv.className && ! $(existingPortletDiv).is('.orbeon-portlet-div'))
                     existingPortletDiv = existingPortletDiv.parentNode;
 
                 // Remove top-level event handlers in case the user interacts with newly added elements before
@@ -685,7 +685,7 @@
         } else {
             var responseXmlIsHTML = responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html";
             var formID = o.argument.formId;
-            var isResponseToBackgroundUpload = o.responseText && (!responseXML || responseXmlIsHTML);
+            var isResponseToBackgroundUpload = o.responseText && (! responseXML || responseXmlIsHTML);
             if (isResponseToBackgroundUpload) {
                 // Background uploads
                 //      In this case, the server sends a xxf:event-response embedded in an HTML document:
@@ -871,7 +871,7 @@
                                 var templateRepeatEnd = ORBEON.util.Dom.get("repeat-end-" + repeatId);
                                 var templateNode = templateRepeatEnd.previousSibling;
                                 var nestedRepeatLevel = 0;
-                                while (!(nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
+                                while (! (nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
                                         && $(templateNode).is('.xforms-repeat-delimiter'))) {
                                     var nodeCopy = templateNode.cloneNode(true);
                                     if (templateNode.nodeType == ELEMENT_TYPE) {
@@ -911,9 +911,9 @@
                                     // Top level repeat: contains a template
                                     var repeatEnd = ORBEON.util.Dom.get("repeat-end-" + repeatId);
                                     var cursor = repeatEnd.previousSibling;
-                                    while (!(cursor.nodeType == ELEMENT_TYPE
+                                    while (! (cursor.nodeType == ELEMENT_TYPE
                                             && $(cursor).is('.xforms-repeat-delimiter')
-                                            && !$(cursor).is('.xforms-repeat-template'))) {
+                                            && ! $(cursor).is('.xforms-repeat-template'))) {
                                         cursor = cursor.previousSibling;
                                     }
                                     afterInsertionPoint = cursor;
@@ -975,7 +975,7 @@
                                         // Look for delimiter that comes just before the template
                                         if (lastElementToDelete.nodeType == ELEMENT_TYPE
                                                 && $(lastElementToDelete).is('.xforms-repeat-delimiter')
-                                                && !$(lastElementToDelete).is('.xforms-repeat-template'))
+                                                && ! $(lastElementToDelete).is('.xforms-repeat-template'))
                                             break;
                                         lastElementToDelete = lastElementToDelete.previousSibling;
                                     }
@@ -1225,7 +1225,7 @@
 
                             // Handle migration of control from non-static to static if needed
                             var isStaticReadonly = $(documentElement).is('.xforms-static');
-                            if (!isStaticReadonly && staticReadonly == "true") {
+                            if (! isStaticReadonly && staticReadonly == "true") {
                                 if (isLeafControl) {
                                     // Replace existing element with span
                                     var parentElement = documentElement.parentNode;
@@ -1337,7 +1337,7 @@
                                             insertIntoDocument([newStringInput]);
                                             YAHOO.util.Dom.addClass(documentElement, "xforms-type-string");
                                             if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
-                                        } else if (newType.type == "date" && !isMinimal) {
+                                        } else if (newType.type == "date" && ! isMinimal) {
                                             var newDateInput = createInput("xforms-type-date", 1);
                                             insertIntoDocument([newDateInput]);
                                             YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
@@ -1423,7 +1423,7 @@
                             }
 
                             // Handle readonly
-                            if (readonly != null && !isStaticReadonly)
+                            if (readonly != null && ! isStaticReadonly)
                                 ORBEON.xforms.Controls.setReadonly(documentElement, readonly == "true");
 
                             // Handle updates to custom classes
@@ -1442,7 +1442,7 @@
                             // is not specified as the value may have changed
                             if (! isStaticReadonly) {
                                 var emptyAttr = controlElement.getAttribute("empty");
-                                if (!_.isNull(emptyAttr))
+                                if (! _.isNull(emptyAttr))
                                     ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, emptyAttr);
                             }
 
@@ -1837,7 +1837,7 @@
                                             if (children != null) { // test on null is a hack because repeatId may be trash when some libraries override Object
                                                 for (var childIndex in children) {
                                                     var child = children[childIndex];
-                                                    if (!newRepeatIndexes[child])
+                                                    if (! newRepeatIndexes[child])
                                                         newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
                                                 }
                                             }
@@ -1852,8 +1852,8 @@
                                                 if (oldItemDelimiter != null) {
                                                     var cursor = oldItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
-                                                           (!$(cursor).is('.xforms-repeat-delimiter')
-                                                                   && !$(cursor).is('.xforms-repeat-begin-end'))) {
+                                                           (! $(cursor).is('.xforms-repeat-delimiter')
+                                                                   && ! $(cursor).is('.xforms-repeat-begin-end'))) {
                                                         if (cursor.nodeType == ELEMENT_TYPE)
                                                             YAHOO.util.Dom.removeClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
                                                         cursor = cursor.nextSibling;
@@ -1875,8 +1875,8 @@
                                                 var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
                                                 var cursor = newItemDelimiter.nextSibling;
                                                 while (cursor.nodeType != ELEMENT_TYPE ||
-                                                       (!$(cursor).is('.xforms-repeat-delimiter')
-                                                               && !$(cursor).is('.xforms-repeat-begin-end'))) {
+                                                       (! $(cursor).is('.xforms-repeat-delimiter')
+                                                               && ! $(cursor).is('.xforms-repeat-begin-end'))) {
                                                     if (cursor.nodeType == ELEMENT_TYPE)
                                                         YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
                                                     cursor = cursor.nextSibling;

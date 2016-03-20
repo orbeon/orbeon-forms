@@ -25,10 +25,10 @@ import org.xml.sax.helpers.AttributesImpl
   * xhtml:title, for example. It is based on xf:output.
   */
 class XXFormsTextControl(
-  container: XBLContainer,
-  parent: XFormsControl,
-  element: Element,
-  effectiveId: String
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  effectiveId : String
 ) extends XFormsOutputControl(
   container,
   parent,

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,19 +11,21 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.control.controls;
+package org.orbeon.oxf.xforms.control.controls
 
-import org.dom4j.Element;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueFocusableControlBase;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.dom4j.Element
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueFocusableControlBase}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
-/**
- * Represents an xf:secret control.
- */
-public class XFormsSecretControl extends XFormsValueFocusableControlBase { // TODO: move to Scala
-
-    public XFormsSecretControl(XBLContainer container, XFormsControl parent, Element element, String id) {
-        super(container, parent, element, id);
-    }
-}
+// Represents an xf:secret control.
+class XFormsSecretControl(
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  effectiveId : String
+)  extends XFormsValueFocusableControlBase(
+  container,
+  parent,
+  element,
+  effectiveId
+)

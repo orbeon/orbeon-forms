@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.control.Controls;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.state.ControlState;
@@ -27,7 +29,7 @@ import java.util.*;
 /**
  * Represents a tree of XForms controls.
  */
-public class ControlTree implements ExternalCopyable {
+public class ControlTree {
 
     private final IndentedLogger indentedLogger;
 

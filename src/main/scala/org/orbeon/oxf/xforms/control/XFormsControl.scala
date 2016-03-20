@@ -57,7 +57,6 @@ class XFormsControl(
   with ControlXMLDumpSupport
   with XFormsEventTarget
   with XFormsEventObserver
-  with ExternalCopyable
   with Logging {
 
   // Type of the associated static control

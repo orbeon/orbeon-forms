@@ -131,7 +131,6 @@
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>
-    <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request"      value="2000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                   value="30000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"        value="2000"/>

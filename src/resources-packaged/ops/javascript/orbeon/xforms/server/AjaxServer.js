@@ -952,7 +952,6 @@
                                     ORBEON.xforms.Init.insertedElement(newTemplateNode);
                                 });
                             }
-                            ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                         });
 
                         _.each(childrenWithLocalName(controlValuesElement, 'delete-repeat-elements'), function(deleteElementElement) {

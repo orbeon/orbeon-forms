@@ -17,7 +17,10 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class XFormsProperties {
 
@@ -95,14 +98,9 @@ public class XFormsProperties {
     public static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
     public static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
-    public static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
-    public static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
-    public static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY = "delay-before-close-minimal-dialog";
     public static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
     public static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
     public static final String DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY = "delay-before-upload-progress-refresh";
-    public static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
-    public static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
     public static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
 
     public static final String REVISIT_HANDLING_PROPERTY = "revisit-handling";
@@ -237,15 +235,10 @@ public class XFormsProperties {
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),
-            new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
-            new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),
-            new PropertyDefinition(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY, 5000, true),
             new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, 30000, true),
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY, 10, true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY, 500, true),
             new PropertyDefinition(DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY, 2000, true),
-            new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
-            new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
             new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true),
             new PropertyDefinition(HELP_HANDLER_PROPERTY, false, true),// dynamic

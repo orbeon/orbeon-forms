@@ -172,7 +172,6 @@ In addition, this product includes the following software:
 - JFreeChart (<http://www.jfree.org/jfreechart/>)
 - JTidy (<http://jtidy.sourceforge.net/>)
 - JUnit (<http://junit.org/>)
-- PDFBox (<http://pdfbox.apache.org/>)
 - Rhino (<https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino>)
 - Saxon (<http://saxon.sourceforge.net/>)
 - SAXPath (<http://sourceforge.net/projects/saxpath/>)

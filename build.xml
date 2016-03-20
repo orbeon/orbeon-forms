@@ -177,8 +177,6 @@
         <include name="jms-api-1_1.jar"/>
         <include name="mail-1_3_2.jar"/>
 
-        <include name="pdfbox-0_7_1.jar"/>
-
         <!-- For directory scanner and SSH support -->
         <include name="ant-1_6_5.jar"/>
 

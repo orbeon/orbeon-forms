@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * Represents a tree of XForms controls.
  */
-public class ControlTree {
+public class ControlTree implements Cloneable {
 
     private final IndentedLogger indentedLogger;
 

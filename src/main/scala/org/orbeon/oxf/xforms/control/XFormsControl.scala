@@ -48,6 +48,7 @@ class XFormsControl(
     val element: Element,
     var effectiveId: String)        // var because can be updated upon iteration change
   extends ControlXPathSupport
+  with Cloneable
   with ControlAjaxSupport
   with ControlLHHASupport
   with ControlLocalSupport

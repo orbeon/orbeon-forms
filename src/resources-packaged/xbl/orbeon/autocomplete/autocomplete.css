@@ -4,6 +4,7 @@
 }
 .xbl-fr-autocomplete .fr-autocomplete-container {
   display: table;
+  width: 100%;
 }
 .xbl-fr-autocomplete .fr-autocomplete-container > .yui-ac {
   position: static;

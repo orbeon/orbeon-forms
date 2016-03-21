@@ -1288,7 +1288,7 @@
                                         // Find the position of the last label before the control "actual content" and remove all elements that are not labels
                                         // A value of -1 means that the content came before any label
                                         var lastLabelPosition = null;
-                                        _.each(YAHOO.util.Dom.getChildren(documentElement), function(childElement) {
+                                        _.each(YAHOO.util.Dom.getChildren(documentElement), function(childElement, childIndex) {
                                             if (! $(childElement).is('.xforms-label, .xforms-help, .xforms-hint, .xforms-alert')) {
                                                 documentElement.removeChild(childElement);
                                                 if (lastLabelPosition == null)

@@ -134,7 +134,7 @@
                                                 <xsl:when test="$is-repeat">
                                                     <fr:repeater
                                                         ref="*"
-                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance">
+                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance freeze">
 
                                                         <!-- Forward iteration events -->
                                                         <xf:action

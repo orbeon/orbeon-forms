@@ -279,8 +279,8 @@
                                     - if a `maxlength` or `xxf:maxlength` is placed on the bound element, that takes precedence
                                 - `min`: makes control natively invalid as the user types, if the value cannot be negative
                             -->
-                            <xh:span class="fr-width-10em {{(if ($prefix) then 'input-prepend' else (), if ($suffix) then 'input-append' else ())}}">
-                                <xf:group class="add-on" ref=".[$prefix]"><xf:output value="$prefix"/></xf:group>
+                            <xh:span class="fr-width-10em {{(if (xxf:non-blank($prefix)) then 'input-prepend' else (), if (xxf:non-blank($suffix)) then 'input-append' else ())}}">
+                                <xf:group class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
                                 <xh:input
                                     id="html-input"
                                     class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
@@ -300,7 +300,7 @@
                                     }}"
                                     maxlength="{{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}}"
                                     xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
-                                <xf:group class="add-on" ref=".[$suffix]"><xf:output value="$suffix"/></xf:group>
+                                <xf:group class="add-on" ref=".[xxf:non-blank($suffix)]"><xf:output value="$suffix"/></xf:group>
                             </xh:span>
                         </xf:group>
                         <!-- Static readonly mode -->

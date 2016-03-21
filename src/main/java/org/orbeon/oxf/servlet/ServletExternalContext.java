@@ -216,7 +216,7 @@ public class ServletExternalContext implements ExternalContext  {
         public String getUsername() {
             final String[] headers = getHeaderValuesMap().get(Headers.OrbeonUsernameLower());
             if (headers == null || headers.length == 0)
-                return nativeRequest.getRemoteUser();
+                return null;
             else
                 return headers[0];
         }
@@ -248,8 +248,7 @@ public class ServletExternalContext implements ExternalContext  {
                 if (r.equals(role))
                     return true;
 
-            // Delegate in last resort, but should we do it?
-            return nativeRequest.isUserInRole(role);
+            return false;
         }
 
         public ExternalContext.Session getSession(boolean create) {

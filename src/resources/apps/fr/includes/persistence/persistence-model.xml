@@ -43,16 +43,19 @@
             return xs:integer($d[. castable as xs:integer])"/>
 
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
-    <xf:var name="autosave-enabled"     value="frf:autosaveSupported($app, $form)
-                                           and $autosave-delay gt 0
-                                           and xxf:non-blank(xxf:username())
-                                           and frf:xpathAllAuthorizedOperations(
-                                                    xxf:instance('fr-form-metadata')/permissions,
-                                                    xxf:get-request-header('orbeon-username'),
-                                                    xxf:get-request-header('orbeon-group')
-                                               ) = ('*', 'update')
-                                           and $mode = ('new', 'edit')
-                                           and not($is-fb)"/>
+    <xf:var
+        name="autosave-enabled"
+        value="
+            frf:autosaveSupported($app, $form)                  and
+            $autosave-delay gt 0                                and
+            xxf:non-blank(xxf:username())                       and
+            frf:xpathAllAuthorizedOperations(
+                 xxf:instance('fr-form-metadata')/permissions,
+                 xxf:username(),
+                 xxf:user-group()
+            ) = ('*', 'update')                                 and
+            $mode = ('new', 'edit')                             and
+            not($is-fb)"/>
 
     <!-- NOTE: This value is only valid during form initialization, because the request attribute won't be present in
          subsequent updates. -->
@@ -489,7 +492,7 @@
              that case they might be able to see data based on ownership -->
         <xf:bind ref="can-access-summary"
                  relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')
-                           or xxf:non-blank(xxf:get-request-header('orbeon-username'))"/>
+                           or xxf:non-blank(xxf:username())"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
                  relevant="xxf:is-blank(xxf:instance('fr-form-attachments')/pdf) or version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"

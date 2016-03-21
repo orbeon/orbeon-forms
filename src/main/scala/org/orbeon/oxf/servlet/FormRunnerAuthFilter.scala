@@ -35,9 +35,9 @@ object FormRunnerAuthFilter {
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
-    val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeaders(
+    val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeadersUseSession(
       userRoles  = servletRequest,
-      sessionOpt = Some(servletRequest.getSession(true)),
+      session    = servletRequest.getSession(true),
       getHeader  = name ⇒
         servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
           case Array() ⇒ None

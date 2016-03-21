@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.portlet
 
-import java.util.Arrays
+import java.{util ⇒ ju}
 import javax.portlet.PortletRequest
 import javax.portlet.filter.PortletRequestWrapper
 
 import com.liferay.portal.model.{Group, Role, User}
 import org.junit.Test
 import org.mockito.Mockito
-import org.orbeon.oxf.fr.FormRunnerAuth._
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
@@ -59,7 +59,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     Mockito when mockUser.getScreenName   thenReturn "jsmith"
     Mockito when mockUser.getFullName     thenReturn "John Smith"
     Mockito when mockUser.getEmailAddress thenReturn "test@orbeon.com"
-    Mockito when mockUser.getRoles        thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
+    Mockito when mockUser.getRoles        thenReturn ju.Arrays.asList(mockRoleManager, mockRoleEmployee)
     Mockito when mockUser.getGroup        thenReturn mockGroup
 
     import FormRunnerAuthFilter._
@@ -76,9 +76,9 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         "orbeon-liferay-user-group-id"    → List("42"),
         "orbeon-liferay-user-group-name"  → List("universe"),
         "orbeon-liferay-user-roles"       → List("manager", "employee"),
-        OrbeonUsernameHeaderName          → List("test@orbeon.com"),
-        OrbeonGroupHeaderName             → List("universe"),
-        OrbeonRolesHeaderName             → List("manager", "employee")
+        Headers.OrbeonUsernameLower       → List("test@orbeon.com"),
+        Headers.OrbeonGroupLower          → List("universe"),
+        Headers.OrbeonRolesLower          → List("manager", "employee")
       )
 
     // NOTE: Don't use Array for comparison, because Array's == doesn't work as expected in Scala

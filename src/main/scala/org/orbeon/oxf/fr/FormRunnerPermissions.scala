@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fb.FormBuilder
-import org.orbeon.oxf.fr.FormRunnerAuth._
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -108,8 +108,8 @@ trait FormRunnerPermissions {
     rolesOperations match {
       case Seq("*") ⇒ List("*")
       case _ ⇒
-        val ownerOperations       = ownerGroupMemberOperations(OrbeonUsernameHeaderName, dataUsername,  "owner")
-        val groupMemberOperations = ownerGroupMemberOperations(OrbeonGroupHeaderName   , dataGroupname, "group-member")
+        val ownerOperations       = ownerGroupMemberOperations(Headers.OrbeonUsernameLower, dataUsername,  "owner")
+        val groupMemberOperations = ownerGroupMemberOperations(Headers.OrbeonGroupLower   , dataGroupname, "group-member")
 
         (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
@@ -123,8 +123,8 @@ trait FormRunnerPermissions {
   //@XPathFunction
   def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
     val headers  = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
-    val username = headers.get(OrbeonUsernameHeaderName).toSeq.flatten.headOption
-    val group    = headers.get(OrbeonGroupHeaderName   ).toSeq.flatten.headOption
+    val username = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
+    val group    = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
 
     allAuthorizedOperations(permissionsElement, username, group)
   }

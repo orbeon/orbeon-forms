@@ -23,16 +23,68 @@ import scala.util.control.NonFatal
 
 object FormRunnerAuth {
 
-  val LoggerName = "org.orbeon.auth"
-  val Logger     = LoggerFactory.getLogger(LoggerName)
+  val AllHeaderNamesLower = Set(
+    Headers.OrbeonUsernameLower,
+    Headers.OrbeonGroupLower,
+    Headers.OrbeonRolesLower
+  )
 
-  val OrbeonUsernameHeaderName = Headers.OrbeonUsernameLower
-  val OrbeonGroupHeaderName    = Headers.OrbeonGroupLower
-  val OrbeonRolesHeaderName    = Headers.OrbeonRolesLower
+  import Private._
 
-  val AllHeaderNamesLower = Set(OrbeonUsernameHeaderName, OrbeonGroupHeaderName, OrbeonRolesHeaderName)
+  type UserGroupRoles = (Option[String], Option[String], Option[Array[String]])
+
+  // Get the username, group and roles from the request, based on the Form Runner configuration.
+  // The first time this is called, the result is stored into the required session. The subsequent times,
+  // the value stored in the session is retrieved. This ensures that authentication information remains an
+  // invariant for a given session.
+  //
+  // See https://github.com/orbeon/orbeon-forms/issues/2464
+  // See also https://github.com/orbeon/orbeon-forms/issues/2632
+  def getUserGroupRolesUseSession(
+    userRoles  : UserRoles,
+    session    : Session,
+    getHeader  : String ⇒ Option[Array[String]]
+  ): UserGroupRoles =
+    Option(session.getAttribute(UserGroupRolesSessionKey).asInstanceOf[UserGroupRoles]) match {
+      case Some(sessionUserGroupRoles) ⇒
+        sessionUserGroupRoles
+      case None ⇒
+        val newSessionUserGroupRoles = getUserGroupRoles(userRoles, getHeader)
+        session.setAttribute(UserGroupRolesSessionKey, newSessionUserGroupRoles)
+        newSessionUserGroupRoles
+    }
+
+  def getUserGroupRolesAsHeadersUseSession(
+    userRoles  : UserRoles,
+    session    : Session,
+    getHeader  : String ⇒ Option[Array[String]]
+  ): List[(String, Array[String])] = {
+
+    val (usernameOpt, groupOpt, rolesOpt) = getUserGroupRolesUseSession(userRoles, session, getHeader)
+
+    def headersAsList =
+      (usernameOpt.toList map (Headers.OrbeonUsernameLower → Array(_))) :::
+      (groupOpt.toList    map (Headers.OrbeonGroupLower    → Array(_))) :::
+      (rolesOpt.toList    map (Headers.OrbeonRolesLower    →))
+
+    usernameOpt match {
+      case Some(username) ⇒
+        val result = headersAsList
+        Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
+        result
+      case None ⇒
+        // Don't set any headers in case there is no username
+        if (groupOpt.isDefined || (rolesOpt exists (_.nonEmpty)))
+          Logger.warn(s"not setting auth headers because username is missing: $headersAsList")
+        Nil
+    }
+  }
 
   private object Private {
+
+    val LoggerName = "org.orbeon.auth"
+    val Logger     = LoggerFactory.getLogger(LoggerName)
+
     val UserGroupRolesSessionKey            = "org.orbeon.auth.user-group-roles"
     val PropertyPrefix                      = "oxf.fr.authentication."
 
@@ -51,155 +103,100 @@ object FormRunnerAuth {
       def getRemoteUser(): String
       def isUserInRole(role: String): Boolean
     }
+
     type Session = {
       def getAttribute(name: String): AnyRef
       def setAttribute(name: String, value: AnyRef): Unit
     }
-  }
 
-  import Private._
+    def properties: PropertySet = Properties.instance.getPropertySet
 
-  def properties: PropertySet = Properties.instance.getPropertySet
+    def headersAsJSONString(headers: List[(String, Array[String])]) = {
 
-  type UserGroupRoles = (Option[String], Option[String], Option[Array[String]])
+      val headerAsJSONStrings =
+        headers map {
+          case (name, values) ⇒
+            val valuesAsString = values.mkString("""["""", """", """", """"]""")
+            s""""$name": $valuesAsString"""
+        }
 
-  // Get the username and roles from the request, based on the Form Runner configuration.
-  def getUserGroupRoles(
-    userRoles  : UserRoles,
-    sessionOpt : Option[Session],
-    getHeader  : String ⇒ Option[Array[String]]
-  ): UserGroupRoles = {
+      headerAsJSONStrings.mkString("{", ", ", "}")
+    }
 
-    val propertySet = properties
-    propertySet.getString(MethodPropertyName, "container") match {
+    def getUserGroupRoles(
+      userRoles : UserRoles,
+      getHeader : String ⇒ Option[Array[String]]
+    ) = {
+      val propertySet = properties
+      propertySet.getString(MethodPropertyName, "container") match {
 
-      case "container" ⇒
+        case "container" ⇒
 
-        val username    = Option(userRoles.getRemoteUser)
-        val rolesString = propertySet.getString(ContainerRolesPropertyName)
+          val usernameOpt    = Option(userRoles.getRemoteUser)
+          val rolesStringOpt = Option(propertySet.getString(ContainerRolesPropertyName))
 
-        val containerUserGroupRoles =
-          if (rolesString eq null) {
-            (username, None, None)
-          } else {
+          rolesStringOpt match {
+            case None ⇒
+              (usernameOpt, None, None)
+            case Some(rolesString) ⇒
 
-            // Wrap exceptions as Liferay throws if the role is not available instead of returning false
-            def isUserInRole(role: String) =
-              try userRoles.isUserInRole(role)
-              catch { case NonFatal(_) ⇒ false}
+              // Wrap exceptions as Liferay throws if the role is not available instead of returning false
+              def isUserInRole(role: String) =
+                try userRoles.isUserInRole(role)
+                catch { case NonFatal(_) ⇒ false}
 
-            val rolesSplit =
-              propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
+              val rolesSplit =
+                propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
-            val rolesArray =
-              for {
-                role ← rolesString split rolesSplit
-                if isUserInRole(role)
-              } yield
-                role
+              val rolesArray =
+                for {
+                  role ← rolesString split rolesSplit
+                  if isUserInRole(role)
+                } yield
+                  role
 
-            val roles = rolesArray match {
-              case Array() ⇒ None
-              case array   ⇒ Some(array)
-            }
+              val roles = rolesArray match {
+                case Array() ⇒ None
+                case array   ⇒ Some(array)
+              }
 
-            (username, rolesArray.headOption, roles)
+              (usernameOpt, rolesArray.headOption, roles)
           }
 
-        // See https://github.com/orbeon/orbeon-forms/issues/2464
-        sessionOpt match {
+        case "header" ⇒
 
-          // Nothing we can do with the session if none is available
-          case None ⇒ containerUserGroupRoles
+          val headerPropertyName =
+            propertySet.getString(HeaderRolesPropertyNamePropertyName).trimAllToOpt
 
-          case Some(session) ⇒
-            containerUserGroupRoles match {
+          def headerOption(name: String) =
+            Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
 
-              // Container doesn't know about the user, see if we had stored something in the session
-              case (None, None, None) ⇒
-                Option(session.getAttribute(UserGroupRolesSessionKey).asInstanceOf[UserGroupRoles]) match {
-                  case None ⇒ (None, None, None)
-                  case Some(sessionUserGroupRoles) ⇒ sessionUserGroupRoles
-                }
+          val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
+          def splitRoles(value: String) = value split rolesSplit
 
-              // Remember what the container told us, in case we need it later
-              case _ ⇒
-                session.setAttribute(UserGroupRolesSessionKey, containerUserGroupRoles)
-                containerUserGroupRoles
-            }
-        }
+          // If configured, a header can have the form `name=value` where `name` is specified in a property
+          def splitWithinRole(value: String) = headerPropertyName match {
+            case Some(propertyName) ⇒
+              value match {
+                case NameValueMatch(`propertyName`, value) ⇒ List(value)
+                case _                                     ⇒ Nil
+              }
+            case _ ⇒ List(value)
+          }
 
-      case "header" ⇒
+          // Username and group: take the first header
+          val username = headerOption(HeaderUsernamePropertyName) map (_.head)
+          val group    = headerOption(HeaderGroupPropertyName)    map (_.head)
 
-        val headerPropertyName =
-          propertySet.getString(HeaderRolesPropertyNamePropertyName).trimAllToOpt
+          // Roles: all headers with the given name are used, each header value is split, and result combined
+          // See also: https://github.com/orbeon/orbeon-forms/issues/1690
+          val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
 
-        def headerOption(name: String) =
-          Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
+          (username, group, roles)
 
-        val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
-        def splitRoles(value: String) = value split rolesSplit
-
-        // If configured, a header can have the form `name=value` where `name` is specified in a property
-        def splitWithinRole(value: String) = headerPropertyName match {
-          case Some(propertyName) ⇒
-            value match {
-              case NameValueMatch(`propertyName`, value) ⇒ List(value)
-              case _                                     ⇒ Nil
-            }
-          case _ ⇒ List(value)
-        }
-
-        // Username and group: take the first header
-        val username = headerOption(HeaderUsernamePropertyName) map (_.head)
-        val group    = headerOption(HeaderGroupPropertyName)    map (_.head)
-
-        // Roles: all headers with the given name are used, each header value is split, and result combined
-        // See also: https://github.com/orbeon/orbeon-forms/issues/1690
-        val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
-
-        (username, group, roles)
-
-      case other ⇒
-        throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")
-    }
-  }
-
-  private def headersAsJSONString(headers: List[(String, Array[String])]) = {
-
-    val headerAsJSONStrings =
-      headers map {
-        case (name, values) ⇒
-          val valuesAsString = values.mkString("""["""", """", """", """"]""")
-          s""""$name": $valuesAsString"""
+        case other ⇒
+          throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")
       }
-
-    headerAsJSONStrings.mkString("{", ", ", "}")
-  }
-
-  def getUserGroupRolesAsHeaders(
-    userRoles  : UserRoles,
-    sessionOpt : Option[Session],
-    getHeader  : String ⇒ Option[Array[String]]
-  ): List[(String, Array[String])] = {
-
-    val (usernameOpt, groupOpt, rolesOpt) = getUserGroupRoles(userRoles, sessionOpt, getHeader)
-
-    def headersAsList =
-      (usernameOpt.toList map (OrbeonUsernameHeaderName → Array(_))) :::
-      (groupOpt.toList    map (OrbeonGroupHeaderName    → Array(_))) :::
-      (rolesOpt.toList    map (OrbeonRolesHeaderName    →))
-
-    usernameOpt match {
-      case Some(username) ⇒
-        val result = headersAsList
-        Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
-        result
-      case None ⇒
-        // Don't set any headers in case there is no username
-        if (groupOpt.isDefined || (rolesOpt exists (_.nonEmpty)))
-          Logger.warn(s"not setting auth headers because username is missing: $headersAsList")
-        Nil
     }
   }
 }

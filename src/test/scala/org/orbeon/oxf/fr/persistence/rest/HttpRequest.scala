@@ -17,9 +17,8 @@ import java.io.ByteArrayOutputStream
 import java.net.URI
 
 import org.dom4j.Document
-import org.orbeon.oxf.fr.FormRunnerAuth._
 import org.orbeon.oxf.fr.relational._
-import org.orbeon.oxf.http.StreamedContent
+import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -59,9 +58,9 @@ private object HttpRequest {
       }
 
       val credentialHeaders = credentials.map(c ⇒ List(
-        OrbeonUsernameHeaderName → List(c.username),
-        OrbeonGroupHeaderName    → List(c.group),
-        OrbeonRolesHeaderName    → c.roles.to[List]
+        Headers.OrbeonUsernameLower → List(c.username),
+        Headers.OrbeonGroupLower    → List(c.group),
+        Headers.OrbeonRolesLower    → c.roles.to[List]
       )).to[List].flatten
 
       Connection.buildConnectionHeadersLowerIfNeeded(

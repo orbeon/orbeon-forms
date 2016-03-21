@@ -17,7 +17,7 @@ import java.util.{Enumeration ⇒ JEnumeration}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 
 import org.junit.Test
-import org.orbeon.oxf.fr.FormRunnerAuth._
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
@@ -27,7 +27,7 @@ import scala.collection.immutable.TreeMap
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
-  @Test def amendServletRequest() {
+  @Test def amendServletRequest(): Unit = {
 
     // Initial headers
     val initialHeaders = Map(
@@ -49,8 +49,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
     // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
     val expectedHeaders = initialHeaders ++ Map(
-      OrbeonUsernameHeaderName → Seq("test@orbeon.com"),
-      OrbeonRolesHeaderName    → Seq("manager", "employee")
+      Headers.OrbeonUsernameLower → Seq("test@orbeon.com"),
+      Headers.OrbeonRolesLower    → Seq("manager", "employee")
     )
 
     // NOTE: Use asInstanceOf because servlet API doesn't have generics

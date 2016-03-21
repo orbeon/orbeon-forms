@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.relational.crud
 
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
-import org.orbeon.oxf.fr.FormRunnerAuth._
 import org.orbeon.oxf.fr.relational._
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
@@ -47,8 +47,8 @@ trait RequestResponse {
   def httpRequest = NetUtils.getExternalContext.getRequest
   def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
 
-  def requestUsername : Option[String] = headerValue(OrbeonUsernameHeaderName)
-  def requestGroup: Option[String]     = headerValue(OrbeonGroupHeaderName)
+  def requestUsername : Option[String] = headerValue(Headers.OrbeonUsernameLower)
+  def requestGroup: Option[String]     = headerValue(Headers.OrbeonGroupLower)
   def requestFlatView                  = headerValue("orbeon-create-flat-view").contains("true")
 
   val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r

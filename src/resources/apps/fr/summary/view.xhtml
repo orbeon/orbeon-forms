@@ -259,7 +259,7 @@
                 <xf:var name="authorized-if-group-member" value="exists($search-permissions[group-member])"/>
 
                 <!-- Whether the current user is anonymous -->
-                <xf:var name="anonymous" value="normalize-space(xxf:get-request-header('orbeon-username')) = ''"/>
+                <xf:var name="anonymous" value="xxf:is-blank(xxf:username())"/>
 
                 <xf:message level="xxf:log-debug">
                     AUTHORIZED OPERATIONS ON FORM (SUMMARY MODE): <xf:output value="string-join($operations-from-role, ' ')"/>

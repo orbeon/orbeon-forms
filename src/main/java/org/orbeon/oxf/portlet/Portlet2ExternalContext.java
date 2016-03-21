@@ -138,7 +138,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         public String getUsername() {
             final String[] headers = getHeaderValuesMap().get(Headers.OrbeonUsernameLower());
             if (headers == null || headers.length == 0)
-                return portletRequest.getRemoteUser();
+                return null;
             else
                 return headers[0];
         }
@@ -170,8 +170,7 @@ public class Portlet2ExternalContext implements ExternalContext {
                 if (r.equals(role))
                     return true;
 
-            // Delegate in last resort, but should we do it?
-            return portletRequest.isUserInRole(role);
+            return false;
         }
 
         public String getCharacterEncoding() {

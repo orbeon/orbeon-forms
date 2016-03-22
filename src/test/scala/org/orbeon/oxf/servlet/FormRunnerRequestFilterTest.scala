@@ -14,9 +14,13 @@
 package org.orbeon.oxf.servlet
 
 import java.util.{Enumeration ⇒ JEnumeration}
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 
+import org.exist.http.servlets.HttpSessionWrapper
 import org.junit.Test
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
@@ -24,6 +28,7 @@ import org.scalatest.mock.MockitoSugar
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.TreeMap
+import scala.collection.mutable
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -37,12 +42,24 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
       "Orbeon-Liferay-User-Roles".toLowerCase → Seq("manager,employee")
     )
 
+    val sessionAttributes = mutable.Map[String, AnyRef]()
+    val mockSession = mock[HttpSession]
+    Mockito when mockSession.getAttribute(Matchers.anyString()) thenAnswer new Answer[AnyRef] {
+      def answer(invocation: InvocationOnMock) =
+        sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
+    }
+    Mockito when mockSession.setAttribute(Matchers.anyString(), Matchers.anyObject()) thenAnswer new Answer[Unit] {
+      def answer(invocation: InvocationOnMock) =
+        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] → invocation.getArguments()(1)
+    }
+
     // Request with initial headers
     val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
       override def getHeader(name: String) = initialHeaders.get(name) map (_.head) orNull
       override def getHeaders(name: String) =
         asJavaEnumeration(initialHeaders.get(name) map (_.iterator) getOrElse Iterator.empty)
       override def getHeaderNames= initialHeaders.keysIterator
+      override def getSession(create: Boolean) = mockSession
     }
 
     val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest)

@@ -14,12 +14,14 @@
 package org.orbeon.oxf.portlet
 
 import java.{util ⇒ ju}
-import javax.portlet.PortletRequest
 import javax.portlet.filter.PortletRequestWrapper
+import javax.portlet.{PortletRequest, PortletSession}
 
 import com.liferay.portal.model.{Group, Role, User}
 import org.junit.Test
-import org.mockito.Mockito
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter
 import org.orbeon.oxf.test.ResourceManagerTestBase
@@ -28,6 +30,7 @@ import org.scalatest.mock.MockitoSugar
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.TreeMap
+import scala.collection.mutable
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -36,12 +39,26 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     // Initial properties
     val initialProperties = Map("p1" → Seq("v1a", "v1b"))
 
+    // Session
+    val sessionAttributes = mutable.Map[String, AnyRef]()
+    val mockSession = mock[PortletSession]
+    Mockito when mockSession.getAttribute(Matchers.anyString()) thenAnswer new Answer[AnyRef] {
+      def answer(invocation: InvocationOnMock) =
+        sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
+    }
+    Mockito when mockSession.setAttribute(Matchers.anyString(), Matchers.anyObject()) thenAnswer new Answer[Unit] {
+      def answer(invocation: InvocationOnMock) =
+        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] → invocation.getArguments()(1)
+    }
+
     // Request with initial properties
     val mockRequest = new PortletRequestWrapper(mock[PortletRequest]) {
       override def getProperty(name: String) = initialProperties.get(name) map (_.head) orNull
       override def getProperties(name: String) =
         asJavaEnumeration(initialProperties.get(name) map (_.iterator) getOrElse Iterator.empty)
       override def getPropertyNames = initialProperties.keysIterator
+      override def getPortletSession = mockSession
+      override def getPortletSession(create: Boolean) = mockSession
     }
 
     val mockRoleManager = mock[Role]

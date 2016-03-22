@@ -879,6 +879,15 @@
         </copy>
     </target>
 
+    <target name="skip-selenium">
+        <property name="skip.selenium" value="true"/>
+    </target>
+    <target name="skip-database">
+        <property name="skip.database" value="true"/>
+    </target>
+
+    <target name="test-unit" depends="skip-selenium, skip-database, test"/>
+
     <target name="test" depends="test-expand-war, test-classes, test-classpath">
 
         <property name="tomcat-version" value="6.0.36"/>
@@ -1203,12 +1212,6 @@
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-checksum"/>
-
-    <target name="skip-selenium-database">
-        <property name="skip.selenium" value="true"/>
-        <property name="skip.database" value="true"/>
-    </target>
-    <target name="teamcity-release" depends="skip-selenium-database, clean, test, orbeon-dist"/>
 
     <target name="exist-task" depends="classpath">
         <!-- eXist tasks -->

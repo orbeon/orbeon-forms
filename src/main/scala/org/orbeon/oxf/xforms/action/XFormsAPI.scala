@@ -83,7 +83,8 @@ object XFormsAPI {
               nodeInfo           = nodeInfo,
               oldValue           = oldValue,
               newValue           = value,
-              isCalculate        = false)(
+              isCalculate        = false,
+              collector          = Dispatch.dispatchEvent)(
               logger             = action.indentedLogger
             )
 

@@ -574,10 +574,10 @@
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error2" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error3" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error4" (Non-numeric year component)</xxf:error>
-                <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error6" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error7" (Non-numeric year component)</xxf:error>

@@ -28,7 +28,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.StructuredQName
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
+import scala.collection.{mutable ⇒ m}
 
 abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: String, val staticModel: Model)
   extends Logging
@@ -90,13 +90,17 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
     val instances = getInstances.asScala
 
-    // Do the work if needed
-    // TODO: Ensure that there are no side effects via event dispatch.
+    // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
+    // so we collect them here and dispatch them altogether once everything is done.
+    val eventsToDispatch = m.ListBuffer[XFormsEvent]()
+    def collector(event: XFormsEvent): Unit =
+      eventsToDispatch += event
+
     def recalculateRevalidate: Option[collection.Set[String]] =
       if (deferredActionContext.recalculateRevalidate) {
         try {
 
-          doRecalculate(deferredActionContext.defaultsStrategy)
+          doRecalculate(deferredActionContext.defaultsStrategy, collector)
           containingDocument.getXPathDependencies.recalculateDone(staticModel)
 
           // Validate only if needed, including checking the flags, because if validation state is clean, validation
@@ -104,7 +108,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
           val mustRevalidate = instances.nonEmpty && (mustBindValidate || hasSchema)
 
           mustRevalidate option {
-            val invalidInstances = doRevalidate()
+            val invalidInstances = doRevalidate(collector)
             containingDocument.getXPathDependencies.revalidateDone(staticModel)
             invalidInstances
           }
@@ -151,11 +155,11 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
       recalculateRevalidate map createAndCommitValidationEvents getOrElse Nil
 
     // Dispatch all events
-    for (event ← validationEvents)
+    for (event ← eventsToDispatch.iterator ++ validationEvents.iterator)
       Dispatch.dispatchEvent(event)
   }
 
-  private def doRecalculate(defaultsStrategy: DefaultsStrategy): Unit =
+  private def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit =
     withDebug("performing recalculate", List("model" → effectiveId)) {
 
       val hasVariables = staticModel.variablesSeq.nonEmpty
@@ -166,14 +170,14 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
       // Apply calculate binds
       if (hasInstancesAndBinds)
-        getBinds.applyDefaultAndCalculateBinds(defaultsStrategy)
+        getBinds.applyDefaultAndCalculateBinds(defaultsStrategy, collector)
     }
 
-  private def doRevalidate(): collection.Set[String] =
+  private def doRevalidate(collector: XFormsEvent ⇒ Unit): collection.Set[String] =
     withDebug("performing revalidate", List("model" → effectiveId)) {
 
       val instances = getInstances.asScala
-      val invalidInstancesIds = mutable.LinkedHashSet[String]()
+      val invalidInstancesIds = m.LinkedHashSet[String]()
 
       // Clear schema validation state
       // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
@@ -198,7 +202,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
       // Validate using binds if needed
       if (mustBindValidate)
-        getBinds.applyValidationBinds(invalidInstancesIds)
+        getBinds.applyValidationBinds(invalidInstancesIds, collector)
 
       invalidInstancesIds
     }

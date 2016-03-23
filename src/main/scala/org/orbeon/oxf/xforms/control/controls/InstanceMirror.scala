@@ -283,7 +283,8 @@ object InstanceMirror {
               nodeInfo           = matchingNode,
               oldValue           = oldValue,
               newValue           = valueChanged.newValue,
-              isCalculate        = false
+              isCalculate        = false,
+              collector          = Dispatch.dispatchEvent
             ),
             reason ⇒ throw new OXFException(reason.message)
           )

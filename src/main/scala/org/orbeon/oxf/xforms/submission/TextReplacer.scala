@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.model.DataModel._
@@ -115,7 +116,8 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         nodeInfo           = destinationNodeInfo,
         oldValue           = oldValue,
         newValue           = responseBody,
-        isCalculate        = false)(
+        isCalculate        = false,
+        collector          = Dispatch.dispatchEvent)(
         containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)
       )
 

@@ -27,8 +27,8 @@ import org.orbeon.oxf.xforms.XFormsModelBinds._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
-import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.model._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, XMLParsing}
@@ -63,13 +63,19 @@ class XFormsModelBinds(protected val model: XFormsModel)
 
     val bindNode = bind.getOrCreateBindNode(position)
 
+    // We don't want to dispatch events while we are performing the actual recalculate/revalidate operation,
+    // so we collect them here and dispatch them altogether once everything is done.
+    val eventsToDispatch = m.ListBuffer[XFormsEvent]()
+    def collector(event: XFormsEvent): Unit =
+      eventsToDispatch += event
+
     def makeQNameValue(qName: QName) =
       new QNameValue(qName.getNamespacePrefix, qName.getNamespaceURI, qName.getName, null)
 
     def hasSuccessfulErrorConstraints =
       bind.staticBind.constraintsByLevel.nonEmpty option {
         bindNode.staticBind.constraintsByLevel.get(ErrorLevel).to[List] flatMap { mips ⇒
-          failedConstraintMIPs(mips, bindNode)
+          failedConstraintMIPs(mips, bindNode, collector)
         } isEmpty
       }
 
@@ -78,19 +84,27 @@ class XFormsModelBinds(protected val model: XFormsModel)
     def evaluateCustomMIPByName(mipType: QName) =
       evaluateCustomMIP(
         bindNode,
-        bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.getQualifiedName)).head
+        bindNode.staticBind.customMIPNameToXPathMIP(buildCustomMIPName(mipType.getQualifiedName)).head,
+        collector
       )
 
-    mipType match {
-      case TYPE_QNAME            ⇒ bind.staticBind.dataType                                 map makeQNameValue
-      case RELEVANT_QNAME        ⇒ evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT) map BooleanValue.get
-      case READONLY_QNAME        ⇒ evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY) map BooleanValue.get
-      case REQUIRED_QNAME        ⇒ evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED) map BooleanValue.get
-      case CONSTRAINT_QNAME      ⇒ hasSuccessfulErrorConstraints                            map BooleanValue.get
-      case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate)              map StringValue.makeStringValue
-      case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default)                map StringValue.makeStringValue
-      case mipType               ⇒ evaluateCustomMIPByName(mipType)                         map StringValue.makeStringValue
-    }
+    val result =
+      mipType match {
+        case TYPE_QNAME            ⇒ bind.staticBind.dataType                                            map makeQNameValue
+        case RELEVANT_QNAME        ⇒ evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map BooleanValue.get
+        case READONLY_QNAME        ⇒ evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map BooleanValue.get
+        case REQUIRED_QNAME        ⇒ evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map BooleanValue.get
+        case CONSTRAINT_QNAME      ⇒ hasSuccessfulErrorConstraints                                       map BooleanValue.get
+        case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate, collector)              map StringValue.makeStringValue
+        case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default, collector)                map StringValue.makeStringValue
+        case mipType               ⇒ evaluateCustomMIPByName(mipType)                                    map StringValue.makeStringValue
+      }
+
+    // Dispatch all events
+    for (event ← eventsToDispatch)
+      Dispatch.dispatchEvent(event)
+
+    result
   }
 }
 
@@ -193,69 +207,89 @@ trait CalculateBindOps {
   private var isFirstCalculate = model.containingDocument.isInitializing
 
   // Apply calculate binds
-  def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy): Unit = {
+  def applyDefaultAndCalculateBinds(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit = {
     if (! staticModel.mustRecalculate) {
         debug("skipping bind recalculate", List("model id" → model.getEffectiveId, "reason" → "no recalculation binds"))
     } else {
       withDebug("performing bind recalculate", List("model id" → model.getEffectiveId)) {
 
         if (staticModel.hasNonPreserveWhitespace)
-          applyWhitespaceBinds()
+          applyWhitespaceBinds(collector)
 
         if (staticModel.hasDefaultValueBind)
           (if (isFirstCalculate) AllDefaultsStrategy else defaultsStrategy) match {
             case strategy: SomeDefaultsStrategy ⇒
-              applyCalculatedBindsUseOrderIfNeeded(Model.Default, staticModel.defaultValueOrder, strategy)
+              applyCalculatedBindsUseOrderIfNeeded(
+                Model.Default,
+                staticModel.defaultValueOrder,
+                strategy,
+                collector
+              )
             case _ ⇒
           }
 
         if (staticModel.hasCalculateBind)
-          applyCalculatedBindsUseOrderIfNeeded(Model.Calculate, staticModel.recalculateOrder, AllDefaultsStrategy)
+          applyCalculatedBindsUseOrderIfNeeded(
+            Model.Calculate,
+            staticModel.recalculateOrder,
+            AllDefaultsStrategy,
+            collector
+          )
 
-        applyComputedExpressionBinds()
+        applyComputedExpressionBinds(collector)
       }
     }
     isFirstCalculate = false
   }
 
-  private def evaluateAndSetCustomMIPs(bindNode: BindNode): Unit =
+  private def evaluateAndSetCustomMIPs(
+    bindNode  : BindNode,
+    collector : XFormsEvent ⇒ Unit
+  ): Unit =
     if (bindNode.staticBind.customMIPNameToXPathMIP.nonEmpty) // in most cases there are no custom MIPs
       for {
         (name, mips) ← bindNode.staticBind.customMIPNameToXPathMIP
         mip          ← mips.headOption
-        result       ← evaluateCustomMIP(bindNode, mip)
+        result       ← evaluateCustomMIP(bindNode, mip, collector)
       } locally {
         bindNode.setCustom(name, result)
       }
 
-  protected def evaluateCustomMIP(bindNode: BindNode, mip: StaticXPathMIP): Option[String] = {
+  protected def evaluateCustomMIP(
+    bindNode  : BindNode,
+    mip       : StaticXPathMIP,
+    collector : XFormsEvent ⇒ Unit
+  ): Option[String] = {
     try {
       Option(evaluateStringExpression(model, bindNode, mip))
     } catch {
       case NonFatal(t) ⇒
-        handleMIPXPathException(t, bindNode, mip, "evaluating XForms custom bind")
+        handleMIPXPathException(t, bindNode, mip, "evaluating XForms custom bind", collector)
         None
     }
   }
 
-  private def applyComputedExpressionBinds(): Unit = {
+  private def applyComputedExpressionBinds(collector: XFormsEvent ⇒ Unit): Unit = {
     // Reset context stack just to re-evaluate the variables as instance values may have changed with @calculate
     model.resetAndEvaluateVariables()
     iterateBinds(topLevelBinds, bindNode ⇒
       if (bindNode.staticBind.hasCalculateComputedMIPs || bindNode.staticBind.hasCustomMIPs)
-        handleComputedExpressionBind(bindNode)
+        handleComputedExpressionBind(bindNode, collector)
     )
   }
 
-  private def handleComputedExpressionBind(bindNode: BindNode): Unit = {
+  private def handleComputedExpressionBind(
+    bindNode  : BindNode,
+    collector : XFormsEvent ⇒ Unit
+  ): Unit = {
     val staticBind = bindNode.staticBind
 
     if (staticBind.hasXPathMIP(Relevant) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Relevant, null))
-      evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT) foreach bindNode.setRelevant
+      evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) foreach bindNode.setRelevant
 
     if (staticBind.hasXPathMIP(Readonly) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Readonly, null) ||
         staticBind.hasXPathMIP(Calculate))
-      evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY) match {
+      evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) match {
         case Some(value) ⇒
           bindNode.setReadonly(value)
         case None if bindNode.staticBind.hasXPathMIP(Calculate) ⇒
@@ -265,24 +299,24 @@ trait CalculateBindOps {
       }
 
     if (staticBind.hasXPathMIP(Required) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Required, null))
-      evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED) foreach bindNode.setRequired
+      evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) foreach bindNode.setRequired
 
-    evaluateAndSetCustomMIPs(bindNode)
+    evaluateAndSetCustomMIPs(bindNode, collector)
   }
 
-  protected def evaluateBooleanMIP(bindNode: BindNode, mipType: BooleanMIP, defaultForMIP: Boolean): Option[Boolean] = {
+  protected def evaluateBooleanMIP(bindNode: BindNode, mipType: BooleanMIP, defaultForMIP: Boolean, collector: XFormsEvent ⇒ Unit): Option[Boolean] = {
     bindNode.staticBind.firstXPathMIP(mipType) map { mip ⇒
       try {
         evaluateBooleanExpression(model, bindNode, mip)
       } catch {
         case NonFatal(t) ⇒
-          handleMIPXPathException(t, bindNode, mip, s"evaluating XForms ${mipType.name} bind")
+          handleMIPXPathException(t, bindNode, mip, s"evaluating XForms ${mipType.name} bind", collector)
           ! defaultForMIP // https://github.com/orbeon/orbeon-forms/issues/835
       }
     }
   }
 
-  def applyWhitespaceBinds(): Unit = {
+  def applyWhitespaceBinds(collector: XFormsEvent ⇒ Unit): Unit = {
     iterateBinds(topLevelBinds, bindNode ⇒
       if (! bindNode.hasChildrenElements) { // quick test to rule out containing elements
         bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip ⇒
@@ -294,7 +328,8 @@ trait CalculateBindOps {
               nodeInfo           = bindNode.node,
               valueToSet         = applyPolicy(DataModel.getValue(bindNode.item), mip.policy),
               source             = "whitespace",
-              isCalculate        = true
+              isCalculate        = true,
+              collector          = collector
             )
           }
         }
@@ -309,11 +344,12 @@ trait CalculateBindOps {
   private def applyCalculatedBindsUseOrderIfNeeded(
     mip              : StringMIP,
     orderOpt         : Option[List[StaticBind]],
-    defaultsStrategy : SomeDefaultsStrategy
+    defaultsStrategy : SomeDefaultsStrategy,
+    collector        : XFormsEvent ⇒ Unit
   ): Unit = {
     orderOpt match {
       case Some(order) ⇒
-        applyCalculatedBindsFollowDependencies(order, mip, defaultsStrategy)
+        applyCalculatedBindsFollowDependencies(order, mip, defaultsStrategy, collector)
       case None ⇒
         iterateBinds(topLevelBinds, bindNode ⇒
           if (
@@ -321,7 +357,7 @@ trait CalculateBindOps {
             dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, mip, null) &&
             mustEvaluateNode(bindNode.node, defaultsStrategy)
           ) {
-            evaluateAndSetCalculatedBind(bindNode, mip)
+            evaluateAndSetCalculatedBind(bindNode, mip, collector)
           }
         )
     }
@@ -330,7 +366,8 @@ trait CalculateBindOps {
   private def applyCalculatedBindsFollowDependencies(
     order            : List[StaticBind],
     mip              : StringMIP,
-    defaultsStrategy : SomeDefaultsStrategy
+    defaultsStrategy : SomeDefaultsStrategy,
+    collector        : XFormsEvent ⇒ Unit
   ): Unit = {
     order foreach { staticBind ⇒
       val logger = DependencyAnalyzer.Logger
@@ -343,7 +380,7 @@ trait CalculateBindOps {
             // Skip if we must process only flagged nodes and the node is not flagged
             if (mustEvaluateNode(bindNode.node, defaultsStrategy)) {
               evaluationCount += 1
-              evaluateAndSetCalculatedBind(bindNode, mip)
+              evaluateAndSetCalculatedBind(bindNode, mip, collector)
             }
           }
         }
@@ -354,8 +391,12 @@ trait CalculateBindOps {
     }
   }
 
-  private def evaluateAndSetCalculatedBind(bindNode: BindNode, mip: StringMIP): Unit =
-    evaluateCalculatedBind(bindNode, mip) foreach { stringResult ⇒
+  private def evaluateAndSetCalculatedBind(
+    bindNode  : BindNode,
+    mip       : StringMIP,
+    collector : XFormsEvent ⇒ Unit
+  ): Unit =
+    evaluateCalculatedBind(bindNode, mip, collector) foreach { stringResult ⇒
 
       val valueToSet =
         bindNode.staticBind.nonPreserveWhitespaceMIPOpt match {
@@ -370,16 +411,17 @@ trait CalculateBindOps {
         nodeInfo           = bindNode.node,
         valueToSet         = valueToSet,
         source             = mip.name,
-        isCalculate        = true
+        isCalculate        = true,
+        collector          = collector
       )
     }
 
-  protected def evaluateCalculatedBind(bindNode: BindNode, mip: StringMIP): Option[String] =
+  protected def evaluateCalculatedBind(bindNode: BindNode, mip: StringMIP, collector: XFormsEvent ⇒ Unit): Option[String] =
     bindNode.staticBind.firstXPathMIP(mip) flatMap { xpathMIP ⇒
       try Option(evaluateStringExpression(model, bindNode, xpathMIP))
       catch {
         case NonFatal(t) ⇒
-          handleMIPXPathException(t, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP")
+          handleMIPXPathException(t, bindNode, xpathMIP, s"evaluating XForms ${xpathMIP.name} MIP", collector)
           // Blank value so we don't have stale calculated values
           Some("")
       }
@@ -396,7 +438,7 @@ trait ValidationBindOps extends Logging {
     validator
   }
 
-  def applyValidationBinds(invalidInstances: m.Set[String]): Unit = {
+  def applyValidationBinds(invalidInstances: m.Set[String], collector: XFormsEvent ⇒ Unit): Unit = {
     if (! staticModel.mustRevalidate) {
       debug("skipping bind revalidate", List("model id" → model.getEffectiveId, "reason" → "no validation binds"))
     } else {
@@ -415,7 +457,7 @@ trait ValidationBindOps extends Logging {
       if (staticModel.hasConstraintBind)
         iterateBinds(topLevelBinds, bindNode ⇒
           if (bindNode.staticBind.constraintsByLevel.nonEmpty)
-            validateConstraint(bindNode, invalidInstances)
+            validateConstraint(bindNode, invalidInstances, collector)
         )
     }
   }
@@ -620,7 +662,11 @@ trait ValidationBindOps extends Logging {
     }
   }
 
-  private def validateConstraint(bindNode: BindNode, invalidInstances: m.Set[String]): Unit = {
+  private def validateConstraint(
+    bindNode         : BindNode,
+    invalidInstances : m.Set[String],
+    collector        : XFormsEvent ⇒ Unit
+  ): Unit = {
 
     assert(bindNode.staticBind.constraintsByLevel.nonEmpty)
 
@@ -643,7 +689,7 @@ trait ValidationBindOps extends Logging {
     } locally {
       if (dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, Constraint, level)) {
         // Re-evaluate and set
-        val failedConstraints = failedConstraintMIPs(mips, bindNode)
+        val failedConstraints = failedConstraintMIPs(mips, bindNode, collector)
         if (failedConstraints.nonEmpty)
           bindNode.failedConstraints += level → failedConstraints
         else
@@ -660,17 +706,22 @@ trait ValidationBindOps extends Logging {
     }
   }
 
-  protected def failedConstraintMIPs(mips: List[StaticXPathMIP], bindNode: BindNode): List[StaticXPathMIP] =
+  protected def failedConstraintMIPs(
+    mips      : List[StaticXPathMIP],
+    bindNode  : BindNode,
+    collector : XFormsEvent ⇒ Unit
+  ): List[StaticXPathMIP] =
     for {
       mip       ← mips
-      succeeded = evaluateBooleanExpressionStoreProperties(bindNode, mip)
+      succeeded = evaluateBooleanExpressionStoreProperties(bindNode, mip, collector)
       if ! succeeded
     } yield
       mip
 
   private def evaluateBooleanExpressionStoreProperties(
-    bindNode : BindNode,
-    xpathMIP : StaticXPathMIP
+    bindNode  : BindNode,
+    xpathMIP  : StaticXPathMIP,
+    collector : XFormsEvent ⇒ Unit
   ): Boolean =
     try {
       // LATER: If we implement support for allowing binds to receive events, source must be bind id.
@@ -696,7 +747,7 @@ trait ValidationBindOps extends Logging {
       result
     } catch {
       case NonFatal(t) ⇒
-        handleMIPXPathException(t, bindNode, xpathMIP, "evaluating XForms constraint bind")
+        handleMIPXPathException(t, bindNode, xpathMIP, "evaluating XForms constraint bind", collector)
         ! Model.DEFAULT_VALID
     }
 }
@@ -777,7 +828,8 @@ object XFormsModelBinds {
     throwable : Throwable,
     bindNode  : BindNode,
     xpathMIP  : StaticXPathMIP,
-    message   : String)(implicit
+    message   : String,
+    collector : XFormsEvent ⇒ Unit)(implicit
     logger    : IndentedLogger
   ): Unit = {
     Exceptions.getRootThrowable(throwable) match {
@@ -803,7 +855,7 @@ object XFormsModelBinds {
           )
         )
 
-        Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(bindNode.parentBind.model, ve.getMessage, ve))
+        collector(new XXFormsXPathErrorEvent(bindNode.parentBind.model, ve.getMessage, ve))
     }
   }
 }

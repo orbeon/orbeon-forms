@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.event.Dispatch
 
 /**
  * 10.1.9 The setvalue Element
@@ -68,7 +69,8 @@ class XFormsSetvalueAction extends XFormsAction {
             nodeInfo           = nodeInfo,
             oldValue           = oldValue,
             newValue           = valueToSet,
-            isCalculate        = false)(
+            isCalculate        = false,
+            collector          = Dispatch.dispatchEvent)(
             logger             = indentedLogger
           ),
           reason ⇒ throw new OXFException(reason.message)

@@ -151,7 +151,8 @@ trait FileMetadata extends XFormsValueControl {
                 nodeInfo           = currentSingleItem,
                 oldValue           = oldValue,
                 newValue           = value,
-                isCalculate        = false
+                isCalculate        = false,
+                collector          = Dispatch.dispatchEvent
               ),
               reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self, self.getLocationData, reason))
             )

@@ -15,11 +15,12 @@ package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms._
 import event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
-import event.{Dispatch, XFormsEventTarget}
+import event.{Dispatch, XFormsEvent, XFormsEventTarget}
+import org.apache.lucene.search.Collector
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.dom4j.{Text ⇒ Text4j, Comment ⇒ Comment4j, _}
+import org.dom4j.{Comment ⇒ Comment4j, Text ⇒ Text4j, _}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node._
 import org.orbeon.saxon.om._
@@ -159,7 +160,8 @@ object DataModel {
     nodeInfo           : NodeInfo,
     valueToSet         : String,
     source             : String,
-    isCalculate        : Boolean)(implicit
+    isCalculate        : Boolean,
+    collector          : XFormsEvent ⇒ Unit = Dispatch.dispatchEvent)(implicit
     logger             : IndentedLogger
   ) = {
 
@@ -169,8 +171,8 @@ object DataModel {
     setValueIfChanged(
       nodeInfo  = nodeInfo,
       newValue  = valueToSet,
-      onSuccess = logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate),
-      onError   = reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
+      onSuccess = logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate, collector),
+      onError   = reason ⇒ collector(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
     )
   }
 
@@ -181,11 +183,12 @@ object DataModel {
     nodeInfo           : NodeInfo,
     oldValue           : String,
     newValue           : String,
-    isCalculate        : Boolean)(implicit
+    isCalculate        : Boolean,
+    collector          : XFormsEvent ⇒ Unit)(implicit
     logger             : IndentedLogger
   ) = {
     logValueChange(source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
-    notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate)
+    notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate, collector)
   }
 
   private def findInstanceEffectiveId(containingDocument: XFormsContainingDocument, nodeInfo: NodeInfo) =
@@ -208,7 +211,8 @@ object DataModel {
     nodeInfo           : NodeInfo,
     oldValue           : String,
     newValue           : String,
-    isCalculate        : Boolean
+    isCalculate        : Boolean,
+    collector          : XFormsEvent ⇒ Unit
   ) =
     Option(containingDocument.getInstanceForNode(nodeInfo)) match {
       case Some(modifiedInstance) ⇒
@@ -217,7 +221,7 @@ object DataModel {
         modifiedInstance.model.markValueChange(nodeInfo, isCalculate)
 
         // Dispatch extension event to instance
-        Dispatch.dispatchEvent(new XXFormsValueChangedEvent(modifiedInstance, nodeInfo, oldValue, newValue))
+        collector(new XXFormsValueChangedEvent(modifiedInstance, nodeInfo, oldValue, newValue))
       case None ⇒
         // Value modified is not in an instance
         // Q: Is the code below the right thing to do?

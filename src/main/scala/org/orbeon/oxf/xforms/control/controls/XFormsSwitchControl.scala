@@ -202,7 +202,8 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
             nodeInfo           = writableNode,
             oldValue           = oldValue,
             newValue           = newValue,
-            isCalculate        = false
+            isCalculate        = false,
+            collector          = Dispatch.dispatchEvent
           )
         )
       }

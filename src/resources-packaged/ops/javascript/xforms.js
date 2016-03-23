@@ -1497,12 +1497,16 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         beforeValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+
         setCurrentValue: function (control, newControlValue) {
             var customEvent = {control: control, newValue: newControlValue};
             ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
             ORBEON.xforms.Controls.valueChange.fire(customEvent);
-            var isStaticReadonly = $(control).is('.xforms-static');
-            if ($(control).is('.xforms-output-appearance-xxforms-download')) {
+
+            var jControl = $(control);
+
+            var isStaticReadonly = jControl.is('.xforms-static');
+            if (jControl.is('.xforms-output-appearance-xxforms-download')) {
                 // XForms output with xxf:download appearance
                 var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
                 if (newControlValue == "") {
@@ -1512,9 +1516,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     anchor.setAttribute("href", newControlValue);
                     YAHOO.util.Dom.removeClass(anchor, "xforms-readonly");
                 }
-            } else if ($(control).is('.xforms-output') || isStaticReadonly) {
+            } else if (jControl.is('.xforms-output') || isStaticReadonly) {
                 // XForms output or "static readonly" mode
-                var jControl = $(control);
+                var jControl = jControl;
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {
@@ -1528,21 +1532,21 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             } else if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {
                 // User has modified the value of this control since we sent our request:
                 // so don't try to update it
-            } else if ($(control).is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
+            } else if (jControl.is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
                 // No value
-            } else if ($(control).is('.xforms-type-time')) {
+            } else if (jControl.is('.xforms-type-time')) {
                 // Time control
                 if (! ORBEON.util.Utils.isIOS()) {
                     var inputField = control.getElementsByTagName("input")[0];
                     var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
                     inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
                 }
-            } else if ($(control).is('.xforms-type-date')) {
+            } else if (jControl.is('.xforms-type-date')) {
                 // Date control
                 if (! ORBEON.util.Utils.isIOS()) {
                     var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
                     var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
-                    if ($(control).is('.xforms-input-appearance-minimal')) {
+                    if (jControl.is('.xforms-input-appearance-minimal')) {
                         var imgElement = control.getElementsByTagName("img")[0];
                         ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
                     } else {
@@ -1550,7 +1554,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         inputField.value = displayDate;
                     }
                 }
-            } else if ($(control).is('.xforms-type-dateTime')) {
+            } else if (jControl.is('.xforms-type-dateTime')) {
                 // Only update value if different from the one we have. This handle the case where the fields contain invalid
                 // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
                 // to separate into 2 values.
@@ -1569,7 +1573,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToFormatDisplayTime(timePartJSDate);
                     }
                 }
-            } else if (($(control).is('.xforms-input') && ! $(control).is('.xforms-type-boolean')) || $(control).is('.xforms-secret')) {
+            } else if ((jControl.is('.xforms-input') && ! jControl.is('.xforms-type-boolean')) || jControl.is('.xforms-secret')) {
                 // Regular XForms input (not boolean, date, time or dateTime) or secret
                 var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
                 if (control.value != newControlValue) {
@@ -1578,9 +1582,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 if (input.value != newControlValue)
                     input.value = newControlValue;
-            } else if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
+            } else if (jControl.is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Handle checkboxes and radio buttons
-                var selectedValues = $(control).is('.xforms-select-appearance-full')
+                var selectedValues = jControl.is('.xforms-select-appearance-full')
                         ? newControlValue.split(" ") : new Array(newControlValue);
                 var checkboxInputs = control.getElementsByTagName("input");
                 for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
@@ -1590,9 +1594,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
                 // Update classes on control
                 ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
-            } else if ($(control).is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal, .xforms-input-appearance-compact, .xforms-input-appearance-minimal')) {
+            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal, .xforms-input-appearance-compact, .xforms-input-appearance-minimal')) {
                 // Handle lists and comboboxes
-                var selectedValues = $(control).is('.xforms-select-appearance-compact') ? newControlValue.split(" ") : new Array(newControlValue);
+                var selectedValues = jControl.is('.xforms-select-appearance-compact') ? newControlValue.split(" ") : new Array(newControlValue);
                 var select = control.getElementsByTagName("select")[0];
                 var options = select.options;
                 if (options != null) {
@@ -1611,10 +1615,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         }
                     }
                 }
-            } else if ($(control).is('.xforms-textarea')) {
+            } else if (jControl.is('.xforms-textarea')) {
                 // Text area
                 var textarea = control.getElementsByTagName("textarea")[0];
                 textarea.value = newControlValue;
+            } else if (jControl.is('.xbl-component')) {
+                var instance = jControl.data('xforms-xbl-object');
+                if (_.isObject(instance) && _.isFunction(instance.updateWithServerValue))
+                    instance.updateWithServerValue(newControlValue);
             } else if (typeof(control.value) == "string") {
                 // Textarea, password
                 control.value = newControlValue;

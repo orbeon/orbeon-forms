@@ -20,7 +20,7 @@ import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_FOCUS, XXFORMS_BLUR}
+import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.util.ScalaUtils._
@@ -65,14 +65,15 @@ case class AbstractBinding(
       "div"
 
   // XBL modes
-  private val xblMode = attSet(bindingElement, XXBL_MODE_QNAME)
-  def modeBinding     = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
-  def modeValue       = xblMode("value")
-  def modeLHHA        = xblMode("lhha")
-  def modeFocus       = xblMode("focus")
-  def modeLHHACustom  = modeLHHA && xblMode("custom-lhha")
-  def modeItemset     = xblMode("itemset") // NIY as of 2012-11-20
-  def modeHandlers    = ! xblMode("nohandlers")
+  private val xblMode   = attSet(bindingElement, XXBL_MODE_QNAME)
+  def modeBinding       = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
+  def modeValue         = xblMode("value")
+  def modeExternalValue = modeValue && xblMode("external-value")
+  def modeLHHA          = xblMode("lhha")
+  def modeFocus         = xblMode("focus")
+  def modeLHHACustom    = modeLHHA && xblMode("custom-lhha")
+  def modeItemset       = xblMode("itemset") // NIY as of 2012-11-20
+  def modeHandlers      = ! xblMode("nohandlers")
 
   val labelFor        = Option(bindingElement.attributeValue(XXBL_LABEL_FOR_QNAME))
 
@@ -87,7 +88,9 @@ case class AbstractBinding(
     attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
   val allowedExternalEvents =
-    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (if (modeFocus) List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil)
+    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++
+    (if (modeFocus) List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil)     ++
+    (modeValue      list XXFORMS_VALUE)
 
   // Constant instance DocumentInfo by model and instance index
   // We use the indexes because at this time, no id annotation has taken place yet

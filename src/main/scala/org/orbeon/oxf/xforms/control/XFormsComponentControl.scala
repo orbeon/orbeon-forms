@@ -41,12 +41,27 @@ class XFormsValueComponentControl(
   parent      : XFormsControl,
   element     : Element,
   effectiveId : String
-) extends XFormsComponentControl(container, parent, element, effectiveId) with XFormsValueControl {
+) extends XFormsComponentControl(
+  container,
+  parent,
+  element,
+  effectiveId
+) with XFormsValueControl {
 
   override type Control <: ComponentControl with ValueControl
 
-  // Don't expose an external value
-  override def evaluateExternalValue(): Unit = setExternalValue(null)
+  // Don't expose an external value unless explicitly allowed
+  // Q: Should throw if not allowed?
+  override def storeExternalValue(value: String): Unit =
+    if (staticControl.binding.abstractBinding.modeExternalValue)
+      super.storeExternalValue(value)
+
+  // Don't expose an external value unless explicitly allowed
+  override def evaluateExternalValue(): Unit =
+    if (staticControl.binding.abstractBinding.modeExternalValue)
+      super.evaluateExternalValue()
+    else
+      setExternalValue(null)
 
   // Because of the above, `super.equalsExternalUseExternalValue` returns `true`if just the value has changed, therefore it doesn't
   // catch and send changes to the `empty` property. So we override and check whether `empty` has changed.

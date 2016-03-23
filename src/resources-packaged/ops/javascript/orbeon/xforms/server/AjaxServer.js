@@ -1623,6 +1623,7 @@
                             // Update value
                             if (jDocumentElement.is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
                                // Should not happen
+                                ORBEON.util.Utils.logMessage("Got value from server for element with class: " + jDocumentElement.attr('class'));
                             } else if (jDocumentElement.is('.xforms-output, .xforms-static')) {
                                 // Output-only control, just set the value
                                 ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);

@@ -66,7 +66,10 @@ trait ControlBindingSupport {
     // Evaluate and set binding context as needed
     val pr = parentContentRelevant
     setBindingContext(
-      if (pr) computeBinding(parentContext) else BindingContext.empty(element, staticControl.scope),
+      if (pr)
+        computeBinding(parentContext)
+      else
+        BindingContext.empty(element, staticControl.scope),
       pr,
       update,
       restoreState,

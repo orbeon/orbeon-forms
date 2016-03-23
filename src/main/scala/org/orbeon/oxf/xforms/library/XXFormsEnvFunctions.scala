@@ -95,7 +95,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("binding-context", classOf[XXFormsBindingContext], op = 0, min = 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+    Fun("binding-context", classOf[XXFormsBindingContext], op = 0, min = 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)
     )
 

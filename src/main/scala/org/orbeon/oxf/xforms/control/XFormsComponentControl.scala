@@ -244,7 +244,7 @@ class XFormsComponentControl(
       // Reference node must be a wrapped element
       // Also support case where there is no binding, and in which case use the binding context. This is done
       // because Form Builder doesn't place a ref or bind on section template components as of 2013-01-17.
-      val referenceNode = (if (modeBinding) binding else contextForBinding).headOption collect {
+      val referenceNode = (if (modeBinding) binding.headOption else contextForBinding) collect {
         case node: VirtualNode if node.getNodeKind == ELEMENT_NODE ⇒ node
       }
 

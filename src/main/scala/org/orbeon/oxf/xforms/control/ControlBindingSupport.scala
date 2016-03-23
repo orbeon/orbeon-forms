@@ -30,10 +30,13 @@ trait ControlBindingSupport {
   def binding: Seq[Item] = Seq()
 
   // Find the control's binding context
-  final def contextForBinding: Seq[Item] = Option(_bindingContext) flatMap
-    (binding ⇒ Option(binding.parent)) map
-      (binding ⇒ binding.nodeset.asScala) getOrElse
-        Seq()
+  final def contextForBinding: Option[Item] =
+    for {
+      currentBinding ← Option(_bindingContext)
+      parentBinding  ← Option(currentBinding.parent)
+      singleItem     ← parentBinding.nodeset.asScala.lift(parentBinding.position - 1)
+    } yield
+      singleItem
 
   // Find the bind object for this control, if it has one
   final def bind = Option(_bindingContext.bind)

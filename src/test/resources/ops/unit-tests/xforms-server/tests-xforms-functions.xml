@@ -2318,4 +2318,47 @@
         </output>
     </test>
 
+    <test description="#2642: xxf:binding-context() function within repeat" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance>
+                                <item>1</item>
+                                <item>2</item>
+                                <item>3</item>
+                            </instance>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="my-repeat" ref="item">
+                        <xf:group id="my-group">
+                            <xf:message
+                                event="xforms-enabled"
+                                value="xxf:binding-context('my-group')/string()"/>
+                        </xf:group>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:dynamic-state>
+                <dynamic-state>
+                    <controls>
+                        <control effective-id="my-repeat" index="1"/>
+                    </controls>
+                </dynamic-state>
+            </xxf:dynamic-state>
+            <xxf:action>
+                <xxf:control-values/>
+                <xxf:message level="modal">1</xxf:message>
+                <xxf:message level="modal">2</xxf:message>
+                <xxf:message level="modal">3</xxf:message>
+            </xxf:action>
+        </xxf:event-response>
+    </test>
+
 </group>

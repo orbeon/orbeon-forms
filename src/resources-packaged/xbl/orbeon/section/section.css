@@ -50,7 +50,7 @@
   font-size: 18px;
 }
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label a,
-.orbeon .xbl-fr-section .fr-section-title .fr-section-label output {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label .xforms-output-output {
   display: block;
   min-height: 36px;
   overflow: hidden;

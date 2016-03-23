@@ -255,6 +255,11 @@
                             <xf:help>My help</xf:help>
                             <xf:alert>My alert</xf:alert>
                         </xf:output>
+                        <xf:output id="my-new-output-no-label" ref=".">
+                            <xf:hint>My hint</xf:hint>
+                            <xf:help>My help</xf:help>
+                            <xf:alert>My alert</xf:alert>
+                        </xf:output>
                     </xf:repeat>
                 </xh:body>
             </xh:html>
@@ -272,11 +277,25 @@
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span id="my-new-output-no-label⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                    <xh:span id="my-new-output-no-label≡≡c⊙1" class="xforms-output-output">Hello!</xh:span>
+                    <xh:span class="xforms-help">My help</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-hint">My hint</xh:span>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-output" class="xforms-control xforms-output xforms-repeat-template">
                     <xh:label class="xforms-label" for="my-new-output≡≡c"/>
                     <xh:output id="my-new-output≡≡c" class="xforms-output-output"/>
+                    <xh:span class="xforms-disabled xforms-help"/>
+                    <xh:span class="xforms-alert"/>
+                    <xh:span class="xforms-hint"/>
+                </xh:span>
+                <xh:span class="xforms-repeat-template"/>
+                <xh:span id="my-new-output-no-label" class="xforms-control xforms-output xforms-repeat-template">
+                    <xh:span id="my-new-output-no-label≡≡c" class="xforms-output-output"/>
                     <xh:span class="xforms-disabled xforms-help"/>
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
@@ -333,29 +352,29 @@
                 </xh:body>
             </xh:html>
         </input>
-        <output name="response">
+        <span name="response">
             <controls>
                 <xh:fieldset id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:fieldset class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:fieldset id="my-new-group⊙1" class="xforms-group xforms-invalid xforms-required xforms-repeat-selected-item-1">
                     <xh:legend class="xforms-label" id="my-new-group≡≡l⊙1">My label</xh:legend>
-                    <xh:span id="my-new-output-1⊙1" class="xforms-control xforms-output">
-                        <xh:output id="my-new-output-1≡≡c⊙1" class="xforms-output-output">Hello!</xh:output>
+                    <xh:span id="my-new-span-1⊙1" class="xforms-control xforms-span">
+                        <xh:span id="my-new-span-1≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
                     </xh:span>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:fieldset>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-output-2⊙1" class="xforms-control xforms-output xforms-repeat-selected-item-1">
-                    <xh:output id="my-new-output-2≡≡c⊙1" class="xforms-output-output">Hello!</xh:output>
+                <xh:span id="my-new-span-2⊙1" class="xforms-control xforms-span xforms-repeat-selected-item-1">
+                    <xh:span id="my-new-span-2≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:fieldset id="my-new-fieldset-group⊙1" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required xforms-repeat-selected-item-1">
                     <xh:legend class="xforms-label" id="my-new-fieldset-group≡≡l⊙1">My label</xh:legend>
-                    <xh:span id="my-new-output-3⊙1" class="xforms-control xforms-output">
-                        <xh:output id="my-new-output-3≡≡c⊙1" class="xforms-output-output">Hello!</xh:output>
+                    <xh:span id="my-new-span-3⊙1" class="xforms-control xforms-span">
+                        <xh:span id="my-new-span-3≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
                     </xh:span>
                     <xh:span class="xforms-help">My help</xh:span>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
@@ -366,8 +385,8 @@
                     <xh:tr id="group-begin-my-new-table-group⊙1" class="xforms-group-begin-end xforms-invalid xforms-required"/>
                     <xh:tr class="xforms-invalid xforms-required">
                         <xh:td>
-                            <xh:span id="my-new-output-4⊙1" class="xforms-control xforms-output">
-                                <xh:output id="my-new-output-4≡≡c⊙1" class="xforms-output-output">Hello!</xh:output>
+                            <xh:span id="my-new-span-4⊙1" class="xforms-control xforms-span">
+                                <xh:span id="my-new-span-4≡≡c⊙1" class="xforms-span-span">Hello!</xh:span>
                             </xh:span>
                         </xh:td>
                     </xh:tr>
@@ -378,22 +397,22 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:fieldset id="my-new-group" class="xforms-group xforms-repeat-template">
                     <xh:legend class="xforms-label" id="my-new-group≡≡l"/>
-                    <xh:span id="my-new-output-1" class="xforms-control xforms-output">
-                        <xh:output id="my-new-output-1≡≡c" class="xforms-output-output"/>
+                    <xh:span id="my-new-span-1" class="xforms-control xforms-span">
+                        <xh:span id="my-new-span-1≡≡c" class="xforms-span-span"/>
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help"/>
                     <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:fieldset>
                 <xh:span class="xforms-repeat-template"/>
-                <xh:span id="my-new-output-2" class="xforms-control xforms-output xforms-repeat-template">
-                    <xh:output id="my-new-output-2≡≡c" class="xforms-output-output"/>
+                <xh:span id="my-new-span-2" class="xforms-control xforms-span xforms-repeat-template">
+                    <xh:span id="my-new-span-2≡≡c" class="xforms-span-span"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-repeat-template">
                     <xh:legend class="xforms-label" id="my-new-fieldset-group≡≡l"/>
-                    <xh:span id="my-new-output-3" class="xforms-control xforms-output">
-                        <xh:output id="my-new-output-3≡≡c" class="xforms-output-output"/>
+                    <xh:span id="my-new-span-3" class="xforms-control xforms-span">
+                        <xh:span id="my-new-span-3≡≡c" class="xforms-span-span"/>
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help"/>
                     <xh:span class="xforms-alert"/>
@@ -404,8 +423,8 @@
                     <xh:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end"/>
                     <xh:tr>
                         <xh:td>
-                            <xh:span id="my-new-output-4" class="xforms-control xforms-output">
-                                <xh:output id="my-new-output-4≡≡c" class="xforms-output-output"/>
+                            <xh:span id="my-new-span-4" class="xforms-control xforms-span">
+                                <xh:span id="my-new-span-4≡≡c" class="xforms-span-span"/>
                             </xh:span>
                         </xh:td>
                     </xh:tr>
@@ -414,7 +433,7 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:fieldset id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
-        </output>
+        </span>
     </test>
 
     <test description="Layout for xf:trigger" name="oxf:pipeline">

@@ -3496,7 +3496,7 @@
             <controls>
                 <xh:span id="my-foo≡foo-group" class="xforms-group">
                     <xh:span id="my-foo≡my-output" class="xforms-control xforms-output">
-                        <xh:output id="my-foo≡my-output≡≡c" class="xforms-output-output">Hello</xh:output>
+                        <xh:span id="my-foo≡my-output≡≡c" class="xforms-output-output">Hello</xh:span>
                     </xh:span>
                 </xh:span>
             </controls>
@@ -4512,7 +4512,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dynamic≡my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic≡my-bar">&lt;span id="my-dynamic≡my-bar≡output2" class="xforms-control xforms-output"&gt;&lt;output id="my-dynamic≡my-bar≡output2≡≡c" class="xforms-output-output"&gt;Hello!&lt;/output&gt;&lt;/span&gt; &lt;span id="my-dynamic≡my-bar≡output1" class="xforms-control xforms-output"&gt;&lt;output id="my-dynamic≡my-bar≡output1≡≡c" class="xforms-output-output"&gt;42&lt;/output&gt;&lt;/span&gt;</xxf:inner-html>
+                        <xxf:inner-html id="my-dynamic≡my-bar">&lt;span id="my-dynamic≡my-bar≡output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output2≡≡c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic≡my-bar≡output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output1≡≡c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

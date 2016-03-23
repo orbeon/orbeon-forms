@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xml.{XMLUtils, SAXUtils, XMLReceiverHelper}
-import org.xml.sax.Attributes
+import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerSupport, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI,FORMATTING_URL_TYPE_QNAME}
-import org.apache.commons.lang3.StringUtils
-import XMLReceiverHelper._
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
+import org.orbeon.oxf.xml.XMLReceiverHelper._
+import org.orbeon.oxf.xml.{SAXUtils, XMLReceiverHelper, XMLUtils}
+import org.xml.sax.Attributes
 
 trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSupport {
 
@@ -63,7 +64,9 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
 
-    withElement("output", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+    val elementName = if (getStaticLHHA(getPrefixedId, LHHAC.LABEL) ne null) "output" else "span"
+
+    withElement(elementName, prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       if (isConcreteControl) {
         val mediatypeValue = attributes.getValue("mediatype")
         val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)

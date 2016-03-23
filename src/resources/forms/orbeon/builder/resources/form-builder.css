@@ -483,7 +483,7 @@ body {
   text-align: right;
   width: 1px;
 }
-.orbeon .fb-publish-dialog .table th .xforms-output output {
+.orbeon .fb-publish-dialog .table th .xforms-output .xforms-output-output {
   white-space: nowrap;
 }
 .orbeon .fb-publish-dialog .fb-publish-message {

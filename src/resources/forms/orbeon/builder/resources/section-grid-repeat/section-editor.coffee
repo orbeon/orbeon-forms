@@ -124,7 +124,7 @@ $ ->
                 f$.focus labelInput
 
         # Update highlight of section title, as a hint users can click to edit
-        updateHightlight = (updateClass, clickInterceptor) ->
+        updateHighlight = (updateClass, clickInterceptor) ->
             offset = Builder.adjustedOffset clickInterceptor
             section = Builder.findInCache sectionsCache, offset.top
             sectionTitle = f$.find '.fr-section-title:first', section.el
@@ -151,10 +151,10 @@ $ ->
                     f$.append container, $ '.fb-main'
                     container.on 'click', ({target}) -> showLabelEditor $ target
                     container.on 'mouseover', ({target}) ->
-                        updateHightlight f$.addClass, $ target
+                        updateHighlight f$.addClass, $ target
                         showClickHintIfTitleEmpty $ target
                     container.on 'mouseout', ({target}) ->
-                        updateHightlight f$.removeClass, $ target
+                        updateHighlight f$.removeClass, $ target
                         f$.text '', $ target
                     labelClickInterceptors.push container
                 # Hide interceptors we don't need

@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, Dispatch, XFormsCustomEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.itemset.Itemset
@@ -100,11 +101,22 @@ trait XFormsSupport extends MockitoSugar {
     document.endOutermostActionHandler()
   }
 
-  def setControlValueWithEvent(controlEffectiveId: String, value: String): Unit = {
-    ClientEvents.processEvent(document, new XXFormsValueEvent(getObject(controlEffectiveId).asInstanceOf[XFormsEventTarget], value))
-    document.afterExternalEvents()
-    document.afterUpdateResponse()
-    document.beforeExternalEvents(null)
+  def setControlValueWithEventSearchNested(controlEffectiveId: String, value: String): Unit = {
+
+    def process(target: XFormsEventTarget) = {
+      ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
+      document.afterExternalEvents()
+      document.afterUpdateResponse()
+      document.beforeExternalEvents(null)
+    }
+
+    getObject(controlEffectiveId) match {
+      case c: XFormsControl ⇒
+        ControlsIterator(c, includeSelf = true) collectFirst {
+          case vc: XFormsValueControl if vc.allowExternalEvent(XXFORMS_VALUE) ⇒  vc
+        } foreach process
+      case _ ⇒
+    }
   }
 
   def isRelevant(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsControl].isRelevant

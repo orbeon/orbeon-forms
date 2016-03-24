@@ -118,7 +118,7 @@ class DelayedEventsTest extends DocumentTestBase with AssertionsForJUnit {
       assert(! hasFocus("my-select1"))
       assert(! hasFocus("my-input"))
 
-      setControlValueWithEvent("my-select1", "")
+      setControlValueWithEventSearchNested("my-select1", "")
 
       assert(isRelevant("my-input"))
       assert(hasFocus("my-input"))

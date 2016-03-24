@@ -24,35 +24,28 @@
     <xbl:binding
         id="fr-code-mirror"
         element="fr|code-mirror"
-        xxbl:mode="lhha binding value focus"
+        xxbl:mode="lhha binding value external-value focus"
         xxf:external-events="fr-value-changed">
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-3.1/lib/codemirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
         </xbl:resources>
         <xbl:handlers>
-            <xbl:handler event="xforms-enabled xxforms-iteration-moved" type="javascript">
+            <xbl:handler event="xforms-enabled" type="javascript">
                 <xf:param
                     name="newValue"
                     value="xxf:binding('fr-code-mirror')"/>
                 <xf:body>
                     var instance = YAHOO.xbl.fr.CodeMirror.instance(this);
                     instance.enabled();
-                    instance.xformsValue(newValue);
+                    instance.updateWithServerValue(newValue);
                 </xf:body>
-            </xbl:handler>
-            <xbl:handler event="xforms-value-changed" type="javascript">
-                <xf:param name="newValue" value="xxf:binding('fr-code-mirror')"/>
-                <xf:body>YAHOO.xbl.fr.CodeMirror.instance(this).xformsValue(newValue);</xf:body>
             </xbl:handler>
             <xbl:handler event="xforms-readonly" type="javascript">
                 YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();
             </xbl:handler>
             <xbl:handler event="xforms-readwrite" type="javascript">
                 YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadwrite();
-            </xbl:handler>
-            <xbl:handler event="fr-value-changed">
-                <xf:setvalue ref="xxf:binding('fr-code-mirror')" value="event('value')"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template>

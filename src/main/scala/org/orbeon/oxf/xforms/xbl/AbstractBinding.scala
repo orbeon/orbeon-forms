@@ -88,9 +88,9 @@ case class AbstractBinding(
     attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
   val allowedExternalEvents =
-    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++
-    (if (modeFocus) List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil)     ++
-    (modeValue      list XXFORMS_VALUE)
+    attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)     ++
+    (if (modeFocus)         List(XFORMS_FOCUS, XXFORMS_BLUR) else Nil) ++
+    (if (modeExternalValue) List(XXFORMS_VALUE) else Nil)
 
   // Constant instance DocumentInfo by model and instance index
   // We use the indexes because at this time, no id annotation has taken place yet

@@ -115,7 +115,7 @@ trait FormRunnerSupport extends DocumentTestBase {
       dispatch(action, gridControl.effectiveId)
 
   def setFormRunnerLanguage(lang: String): Unit =
-    setControlValueWithEvent("fr-language-selector-select", lang)
+    setControlValueWithEventSearchNested("fr-language-selector-select", lang)
 }
 
 object FormRunnerSupport {

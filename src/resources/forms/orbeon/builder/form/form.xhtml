@@ -156,7 +156,7 @@
                             <!-- Edit Source -->
                             <xf:trigger appearance="minimal" class="fb-navbar-trigger pull-right" ref="instance('fb-metadata-instance')/toolbox/edit-source">
                                 <xf:label><xh:i class="icon-edit icon-white" title="{$form-resources/edit-source/label}"/></xf:label>
-                                <xxf:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
+                                <xxf:show ev:event="DOMActivate" dialog="dialog-edit-source"/>
                             </xf:trigger>
 
                             <!-- Add/remove language -->
@@ -356,6 +356,13 @@
                                 <fb:dialog-container-details   id="dialog-container-details" ref="$form"      resources-ref="$form-resources"/>
                                 <fb:dialog-help                id="dialog-help"              form-ref="$form" resources-ref="$form-resources"/>
                                 <fb:dialog-itemsets            id="dialog-itemsets"                           resources-ref="$form-resources"/>
+                                <fb:dialog-edit-source         id="dialog-edit-source"       ref="$form"      resources-ref="$form-resources"/>
+
+                                <xf:action event="fr-save" observer="dialog-edit-source">
+                                    <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
+                                        <xf:property name="data" value="event('value')"/>
+                                    </xf:dispatch>
+                                </xf:action>
 
                                 <fr:alert-dialog id="dialog-confirmation">
                                     <fr:label ref="$form-resources/dialog-confirmation/label"/>
@@ -650,7 +657,6 @@
         </xh:div>
 
         <fr:dialogs>
-            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-edit-source.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-language.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-pdf.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-publish.xml" xxi:omit-xml-base="true"/>

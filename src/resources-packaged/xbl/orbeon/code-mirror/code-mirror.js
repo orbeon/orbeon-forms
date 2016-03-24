@@ -21,8 +21,8 @@
     ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.CodeMirror, "xbl-fr-code-mirror");
     YAHOO.xbl.fr.CodeMirror.prototype = {
 
-        hasFocus: false,                // Heuristic: if has focus, don't update with value from server
-        userChangedSinceLastBlur: false,    // Use CodeMirror's own change event to track whether the value changed
+        hasFocus: false,                 // Heuristic: if has focus, don't update with value from server
+        userChangedSinceLastBlur: false, // Use CodeMirror's own change event to track whether the value changed
 
         init: function() {
             var form = ORBEON.xforms.Controls.getForm(this.container);
@@ -47,11 +47,10 @@
             this.hasFocus = false;
             if (this.userChangedSinceLastBlur) {
                 YD.addClass(this.container, "xforms-visited");
-                Document.dispatchEvent({
-                    targetId: this.container.id,
-                    eventName: 'fr-value-changed',
-                    properties: { value: this.editor.getValue() }
-                });
+                ORBEON.xforms.Document.setValue(
+                    this.container.id,
+                    this.editor.getValue()
+                );
                 this.userChangedSinceLastBlur = false;
             }
         },
@@ -65,7 +64,7 @@
         // https://github.com/orbeon/orbeon-forms/issues/1841
         xformsReadonly: function() { this.editor.setOption("readOnly", 'true'); },
         xformsReadwrite: function() { this.editor.setOption("readOnly", false); },
-        xformsValue: function(uriEncodedSource) {
+        updateWithServerValue: function(uriEncodedSource) {
             var newSource = decodeURIComponent(uriEncodedSource);
             var doUpdate =
                 // As a shortcut, don't update the control if the user is typing in it

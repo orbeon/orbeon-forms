@@ -73,8 +73,8 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
 
         val (cityControl, zipControl) = resolveCityAndZipControls(indexes)
 
-        setControlValueWithEvent(cityControl.getEffectiveId, cityToSet)
-        setControlValueWithEvent(zipControl.effectiveId, zipToSet)
+        setControlValueWithEventSearchNested(cityControl.getEffectiveId, cityToSet)
+        setControlValueWithEventSearchNested(zipControl.effectiveId, zipToSet)
 
         assertRowValues(indexes, cityToSet, zipToSet)
       }
@@ -89,7 +89,7 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
         assertRowItemsetsContain(List(sectionIndex, 1), None, None)
 
         // Switch to CA
-        setControlValueWithEvent(stateControl.getEffectiveId, stateValue)
+        setControlValueWithEventSearchNested(stateControl.getEffectiveId, stateValue)
         assert(stateValue === getControlValue(stateControl.effectiveId))
 
         // Set values and add iterations
@@ -114,7 +114,7 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
         }
 
         // Change state
-        setControlValueWithEvent(stateControl.getEffectiveId, "AK")
+        setControlValueWithEventSearchNested(stateControl.getEffectiveId, "AK")
         assert("AK" === getControlValue(stateControl.effectiveId))
 
         // Check that all values are cleared on all iterations, and that the city itemsets are updated

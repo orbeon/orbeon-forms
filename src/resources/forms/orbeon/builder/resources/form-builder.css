@@ -456,17 +456,17 @@ body {
   display: block;
   margin-left: 1em;
 }
-.orbeon #fb-source-editor-dialog,
+.orbeon .fb-edit-source-dialog,
 .orbeon .fb-custom-xml-dialog {
   width: 900px;
   max-width: none;
 }
-.orbeon #fb-source-editor-dialog .CodeMirror,
+.orbeon .fb-edit-source-dialog .CodeMirror,
 .orbeon .fb-custom-xml-dialog .CodeMirror {
   font-size: 12px;
   height: 100%;
 }
-.orbeon #fb-source-editor-dialog .xforms-alert.xforms-active,
+.orbeon .fb-edit-source-dialog .xforms-alert.xforms-active,
 .orbeon .fb-custom-xml-dialog .xforms-alert.xforms-active {
   display: block;
 }

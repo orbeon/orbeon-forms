@@ -1,0 +1,110 @@
+<!--
+  Copyright (C) 2016 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+
+    <xbl:binding
+        id="fb-dialog-edit-source"
+        element="fb|dialog-edit-source"
+        xxbl:mode="binding">
+
+        <xbl:handlers>
+            <xbl:handler event="xxforms-dialog-open">
+
+                <xf:setvalue
+                    ref="source"
+                    value="
+                        saxon:serialize(
+                            xxf:call-xpl(
+                                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                                'data',
+                                xxf:instance('fb-form-instance'),
+                                'data'
+                            ),
+                            xxf:instance('fr-xsl-output-instance')
+                        )"/>
+
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+
+            <xbl:handler event="DOMActivate" observer="apply-trigger" if="valid(source)">
+                <xf:dispatch targetid="fb-dialog-edit-source" name="fr-save">
+                    <xf:property name="value" value="saxon:parse(instance()/source)"/>
+                </xf:dispatch>
+            </xbl:handler>
+
+            <xbl:handler event="DOMActivate" observer="apply-trigger cancel-trigger">
+                <xf:setvalue ref="source"/>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model>
+
+                <xf:instance id="i">
+                    <source-editor>
+                        <source/>
+                    </source-editor>
+                </xf:instance>
+
+                <xf:bind
+                    ref="source"
+                    type="xxf:xml"
+                    required="true()"
+                    constraint="xxf:non-blank()"/>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <!-- Bindings specified on control -->
+            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+
+            <xxf:dialog
+                id="dialog"
+                level="modal"
+                close="true"
+                draggable="true"
+                class="fb-edit-source-dialog xxforms-set-height">
+
+                <xf:label ref="$resources/dialog-edit-source/label"/>
+
+                <xh:div class="fb-dialog-remaining-height">
+                    <fr:code-mirror ref="source">
+                        <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
+                    </fr:code-mirror>
+                </xh:div>
+                <xh:div class="fr-dialog-buttons">
+                    <xh:span>
+                        <xf:trigger appearance="xxf:primary" id="apply-trigger">
+                            <xf:label ref="$resources/apply/label"/>
+                        </xf:trigger>
+                        <xf:output value="$resources/or/label"/>
+                        <xf:trigger appearance="minimal" id="cancel-trigger">
+                            <xf:label ref="$resources/cancel/label"/>
+                        </xf:trigger>
+                    </xh:span>
+                </xh:div>
+            </xxf:dialog>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

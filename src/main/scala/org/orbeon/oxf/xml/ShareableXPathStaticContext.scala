@@ -61,6 +61,10 @@ class ShareableXPathStaticContext(
     // context. That uses slots however, which means we cannot resolve variables fully dynamically. So I think
     // our approach below is ok.
     def evaluateVariable(context: XPathContext) = {
+
+      if (context.getController eq null)
+        throw new NullPointerException
+
       val variableResolver =
         context.getController.getUserData(
           classOf[ShareableXPathStaticContext].getName,

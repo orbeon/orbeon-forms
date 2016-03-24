@@ -49,7 +49,7 @@
                 YD.addClass(this.container, "xforms-visited");
                 ORBEON.xforms.Document.setValue(
                     this.container.id,
-                    this.editor.getValue()
+                    this.getCurrentValue()
                 );
                 this.userChangedSinceLastBlur = false;
             }
@@ -74,6 +74,9 @@
             if (doUpdate) {
                 this.editor.setValue(newSource);
             }
+        },
+        getCurrentValue: function() {
+            return this.editor.getValue();
         }
     };
 })();

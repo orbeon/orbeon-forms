@@ -1396,17 +1396,20 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         getCurrentValue: function (control) {
             var event = {control: control};
             ORBEON.xforms.Controls.getCurrentValueEvent.fire(event);
+
+            var jControl = $(control);
+
             if (! _.isUndefined(event.result)) {
                 return event.result;
-            } else if ($(control).is('.xforms-input.xforms-type-time')) {
+            } else if (jControl.is('.xforms-input.xforms-type-time')) {
                 // Time control
                 var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
                 var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
                 return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
-            } else if ($(control).is('.xforms-input.xforms-type-date')) {
+            } else if (jControl.is('.xforms-input.xforms-type-date')) {
                 // Date control
                 var dateInputValue;
-                if ($(control).is('.xforms-input-appearance-minimal')) {
+                if (jControl.is('.xforms-input-appearance-minimal')) {
                     var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
                     dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
                 } else {
@@ -1414,7 +1417,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
                 return dateJSDate == null ? dateInputValue : ORBEON.util.DateTime.jsDateToISODate(dateJSDate);
-            } else if ($(control).is('.xforms-input.xforms-type-dateTime')) {
+            } else if (jControl.is('.xforms-input.xforms-type-dateTime')) {
                 // Date time control
                 var dateValue = YAHOO.util.Dom.getElementsByClassName("xforms-type-date", null, control)[0].value;
                 var jsDateDate = ORBEON.util.DateTime.magicDateToJSDate(dateValue);
@@ -1425,12 +1428,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 } else {
                     return ORBEON.util.DateTime.jsDateToISODateTime(jsDateDate, jsDateTime);
                 }
-            } else if (($(control).is('.xforms-input') && ! $(control).is('.xforms-type-boolean, .xforms-static'))
-                    || $(control).is('.xforms-secret')) {
+            } else if ((jControl.is('.xforms-input') && ! jControl.is('.xforms-type-boolean, .xforms-static'))
+                    || jControl.is('.xforms-secret')) {
                 // Simple input
                 var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
                 return input.value;
-            } else if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
+            } else if (jControl.is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Checkboxes, radio buttons, boolean input
                 var inputs = control.getElementsByTagName("input");
                 var spanValue = "";
@@ -1442,10 +1445,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 }
                 // For boolean inputs, if the checkbox isn't checked, then the value is false
-                if (spanValue == "" && $(control).is('.xforms-input') && $(control).is('.xforms-type-boolean'))
+                if (spanValue == "" && jControl.is('.xforms-input') && jControl.is('.xforms-type-boolean'))
                     spanValue = "false";
                 return spanValue;
-            } else if ($(control).is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
+            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
                 // Drop-down and list
                 var options = control.getElementsByTagName("select")[0].options;
                 var selectValue = "";
@@ -1457,13 +1460,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 }
                 return selectValue;
-            } else if ($(control).is('.xforms-textarea')) {
+            } else if (jControl.is('.xforms-textarea')) {
                 // Text area
                 var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
                 return textarea.value
-            } else if ($(control).is('.xforms-output, .xforms-input.xforms-static')) {
+            } else if (jControl.is('.xforms-output, .xforms-input.xforms-static')) {
                 // Output and static input
-                var jControl = $(control);
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {
@@ -1476,9 +1478,13 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         return ORBEON.util.Dom.getStringValue(output[0]);
                     }
                 }
-            } else if ($(control).is('.xforms-range')) {
+            } else if (jControl.is('.xforms-range')) {
                 var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
                 return value.toString();
+            } else if (jControl.is('.xbl-component')) {
+                var instance = jControl.data('xforms-xbl-object');
+                if (_.isObject(instance) && _.isFunction(instance.getCurrentValue))
+                    return instance.getCurrentValue();
             }
         },
 

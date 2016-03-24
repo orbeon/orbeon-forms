@@ -355,7 +355,6 @@ Inserting error information into error list:
                                     </xf:label>
                                 </xsl:for-each>
                                 <!-- Anchor for navigation -->
-                                <xh:a name="fr-errors"/>
                                 <xh:table class="fr-error-list">
 
                                     <xh:colgroup>

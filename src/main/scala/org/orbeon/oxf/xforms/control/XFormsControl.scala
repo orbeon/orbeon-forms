@@ -299,7 +299,7 @@ object XFormsControl {
         sb.append(localname)
         val attributeCount = attributes.getLength
 
-        for (i ← 0 to attributeCount -1) {
+        for (i ← 0 until attributeCount) {
           val currentName = attributes.getLocalName(i)
           val currentValue = attributes.getValue(i)
           sb.append(' ')

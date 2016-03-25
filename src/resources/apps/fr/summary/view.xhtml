@@ -625,8 +625,8 @@
                                 </xh:colgroup>
                                 <xh:thead>
                                     <xh:tr>
-                                        <xh:th/>
-                                        <xh:th/>
+                                        <xh:th class="fr-summary-repeat-selection-checkbox"/>
+                                        <xh:th class="{$labels-class}"/>
                                         <xf:group ref="''[$show-created]">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
@@ -704,7 +704,7 @@
                                                     "
                                             />
                                             <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
-                                                <xh:td>
+                                                <xh:td class="fr-summary-repeat-selection-checkbox">
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
                                                             <xf:label/>
@@ -712,9 +712,9 @@
                                                         </xf:item>
                                                     </xf:select>
                                                 </xh:td>
-                                                <xh:td>
-                                                    <xf:output ref="if ($document/@draft = 'true') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
-                                                    <xf:output ref="if (not(xxf:split($document/@operations) = ('*', 'update'))) then . else ()" value="$fr-resources/summary/labels/read-only" class="label"/>
+                                                <xh:td class="{$labels-class}">
+                                                    <xf:output ref=".[$document/@draft = 'true']" value="$fr-resources/summary/labels/draft" class="label"/>
+                                                    <xf:output ref=".[not(xxf:split($document/@operations) = ('*', 'update'))]" value="$fr-resources/summary/labels/read-only" class="label"/>
                                                 </xh:td>
                                                 <xf:group ref="''[$show-created]">
                                                     <xf:var

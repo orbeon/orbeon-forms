@@ -76,6 +76,9 @@
   float: none;
   margin: 0;
 }
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox label span {
+  display: none;
+}
 .orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox label .label {
   vertical-align: middle;
 }
@@ -101,5 +104,5 @@
 .orbeon .xforms-readonly input {
   background-color: white;
   background-image: none;
-  border: 0 solid #ffffff;
+  border: 0 solid white;
 }

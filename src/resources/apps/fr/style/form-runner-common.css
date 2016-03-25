@@ -20,6 +20,9 @@
   float: none;
   margin: 0;
 }
+.fr-plain-checkbox-container label span {
+  display: none;
+}
 .fr-plain-checkbox-container label .label {
   vertical-align: middle;
 }

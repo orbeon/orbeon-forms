@@ -276,10 +276,6 @@
                 <xf:setvalue ref="instance()/any-has-admin-permission" value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
             </xf:action>
 
-            <!-- Scope variable with Form Runner resources -->
-            <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
-            <xf:var name="fr-lang"      model="fr-resources-model" value="$fr-lang"/>
-
             <!-- Start process in reaction to action button -->
             <xf:action
                     event="DOMActivate"
@@ -292,25 +288,31 @@
             </xf:action>
 
             <!-- Open confirmation dialog in response to process event -->
-            <xxf:show
-                    event="
-                        confirm-local-publish   confirm-local-unpublish
-                        confirm-remote-publish  confirm-remote-unpublish
-                        confirm-local-to-remote confirm-remote-to-local
-                        confirm-local-upgrade   confirm-remote-upgrade"
-                    dialog="publish-confirmation-dialog">
+            <xf:action
+                event="
+                    confirm-local-publish   confirm-local-unpublish
+                    confirm-remote-publish  confirm-remote-unpublish
+                    confirm-local-to-remote confirm-remote-to-local
+                    confirm-local-upgrade   confirm-remote-upgrade">
 
-                <xf:property
-                    name="message"
-                    value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
-                               if (event('xxf:type') = ('confirm-local-upgrade', 'confirm-remote-upgrade'))
-                               then 2
-                               else if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish'))
-                               then 1
-                               else 0,
-                               count($selection)
-                           ))"/>
-            </xxf:show>
+                <xf:var
+                    name="fr-resources"
+                    model="fr-resources-model"
+                    value="$fr-fr-resources"/>
+
+                <xxf:show dialog="publish-confirmation-dialog">
+                    <xf:property
+                        name="message"
+                        value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
+                                   if (event('xxf:type') = ('confirm-local-upgrade', 'confirm-remote-upgrade'))
+                                   then 2
+                                   else if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish'))
+                                   then 1
+                                   else 0,
+                                   count($selection)
+                               ))"/>
+                </xxf:show>
+            </xf:action>
 
             <!-- Response to process event -->
             <xf:action
@@ -530,6 +532,11 @@
         </xf:model>
     </xh:head>
     <xh:body>
+
+        <!-- Scope variable with Form Runner resources -->
+        <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
+        <xf:var name="fr-lang"      model="fr-resources-model" value="$fr-lang"/>
+
         <fr:view fluid="true">
             <fr:navbar/>
             <fr:row>

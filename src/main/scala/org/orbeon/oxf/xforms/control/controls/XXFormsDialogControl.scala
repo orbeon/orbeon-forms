@@ -148,18 +148,16 @@ class XXFormsDialogControl(
     result
   }
 
-  override def equalsExternal(other: XFormsControl): Boolean = {
-    if (other == null)
-      return false
-
-    // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
-    // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
-
-    val otherDialog = other.asInstanceOf[XXFormsDialogControl]
-    if (otherDialog.wasVisible != isVisible)
-      return false
-
-    super.equalsExternal(other)
+  override def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XXFormsDialogControl) ⇒
+        // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
+        other.wasVisible == isVisible &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+      case _ ⇒ false
   }
 
   override def outputAjaxDiff(

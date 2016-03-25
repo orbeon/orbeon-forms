@@ -67,8 +67,8 @@ class XFormsValueComponentControl(
   // catch and send changes to the `empty` property. So we override and check whether `empty` has changed.
   // See: https://github.com/orbeon/orbeon-forms/issues/2310
   override def compareExternalUseExternalValue(
-    previousExternalValue : String,
-    previousControl       : Option[XFormsValueControl]
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
       case Some(other: XFormsValueComponentControl) ⇒

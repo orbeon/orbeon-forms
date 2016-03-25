@@ -212,21 +212,20 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     super.getBackCopy
   }
 
-  final def compareExternalMaybeClientValue(
-    clientValue     : Option[String],
-    previousControl : Option[XFormsValueControl]
+  final override def compareExternalMaybeClientValue(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsControl]
   ): Boolean =
-    (previousControl exists (_ eq this)) ||
-    compareExternalUseExternalValue(clientValue getOrElse getExternalValue, previousControl)
+    super.compareExternalMaybeClientValue(previousValue orElse externalValueOpt, previousControl)
 
-  def compareExternalUseExternalValue(
-    previousExternalValue : String,
-    previousControl       : Option[XFormsValueControl]
+  override def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
-      case Some(other) ⇒
-        previousExternalValue == other.getExternalValue &&
-        super.equalsExternal(other)
+      case Some(other: XFormsValueControl) ⇒
+        previousExternalValue == other.externalValueOpt &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒ false
     }
 

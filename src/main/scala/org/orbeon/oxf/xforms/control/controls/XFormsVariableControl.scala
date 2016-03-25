@@ -102,5 +102,9 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
   }
 
   // Variables don't support Ajax updates
-  override def equalsExternal(other: XFormsControl) = throw new IllegalStateException
+  override def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
+  ) =
+    throw new IllegalStateException
 }

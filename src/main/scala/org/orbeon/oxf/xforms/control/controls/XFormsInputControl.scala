@@ -210,8 +210,8 @@ class XFormsInputControl(
     if (getBuiltinTypeName == "dateTime") "time" else null
 
   override def compareExternalUseExternalValue(
-    previousExternalValue : String,
-    previousControl       : Option[XFormsValueControl]
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
       case Some(other: XFormsInputControl) ⇒

@@ -139,7 +139,7 @@ class ControlsComparator(
               controlValue1Opt
             )
         case c ⇒
-          if (! c.equalsExternal(control1Opt.orNull))
+          if (! c.compareExternalMaybeClientValue(None, control1Opt))
             c.outputAjaxDiff(
               new XMLReceiverHelper(receiver),
               control1Opt.orNull,

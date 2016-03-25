@@ -188,13 +188,22 @@ class XFormsControl(
     (localName, firstAppearance orElse mediatype orNull, getEffectiveId)
   }
 
+  def compareExternalMaybeClientValue(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsControl]
+  ): Boolean =
+    (previousControl exists (_ eq this)) && (getInitialLocal eq getCurrentLocal) ||
+    compareExternalUseExternalValue(previousValue, previousControl)
+
   // Compare this control with another control, as far as the comparison is relevant for the external world.
-  def equalsExternal(other: XFormsControl) =
-    other match {
-      case other if this eq other ⇒ true
-      case other: XFormsControl ⇒
+  def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other) ⇒
         isRelevant == other.isRelevant &&
-        compareLHHA(other) &&
+        compareLHHA(other)             &&
         compareExtensionAttributes(other)
       case _ ⇒ false
     }

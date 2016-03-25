@@ -236,8 +236,8 @@ class XFormsOutputControl(
   }
 
   override def compareExternalUseExternalValue(
-    previousExternalValue : String,
-    previousControl       : Option[XFormsValueControl]
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
   ): Boolean =
     previousControl match {
       case Some(other: XFormsOutputControl) ⇒

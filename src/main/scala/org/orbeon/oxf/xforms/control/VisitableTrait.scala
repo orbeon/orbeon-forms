@@ -77,12 +77,14 @@ trait VisitableTrait extends XFormsControl {
   }
 
   // Compare this control with another control, as far as the comparison is relevant for the external world.
-  override def equalsExternal(other: XFormsControl) =
-    other match {
-      case other if this eq other ⇒ true
-      case other: VisitableTrait ⇒
+  override def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: VisitableTrait) ⇒
         visited == other.visited &&
-        super.equalsExternal(other)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒ false
     }
 

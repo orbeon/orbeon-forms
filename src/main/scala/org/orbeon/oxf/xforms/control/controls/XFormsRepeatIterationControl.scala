@@ -70,18 +70,17 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     children foreach (_.updateEffectiveId())
   }
 
-  override def equalsExternal(other: XFormsControl): Boolean = {
-    if (other == null || ! other.isInstanceOf[XFormsRepeatIterationControl])
-      return false
-
-    if (this eq other)
-      return true
-
-    val otherRepeatIterationControl = other.asInstanceOf[XFormsRepeatIterationControl]
-
-    // Ad-hoc comparison, because we basically only care about relevance changes
-    ! mustSendIterationUpdate(otherRepeatIterationControl)
-  }
+  override def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XFormsRepeatIterationControl) ⇒
+        // Ad-hoc comparison, because we basically only care about relevance changes. So we don't delegate
+        // to `VisitableTrait` and `XFormsControl` implementations.
+        ! mustSendIterationUpdate(other)
+      case _ ⇒ false
+    }
 
   private def mustSendIterationUpdate(other: XFormsRepeatIterationControl) = {
     // NOTE: We only care about relevance changes. We should care about moving iterations around, but that's not

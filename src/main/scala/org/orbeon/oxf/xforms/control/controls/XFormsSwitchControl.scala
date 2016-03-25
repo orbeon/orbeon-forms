@@ -278,20 +278,16 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     else
       Iterator.empty
 
-  override def equalsExternal(other: XFormsControl): Boolean = {
-    if (! other.isInstanceOf[XFormsSwitchControl])
-      return false
-
-    // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
-
-    val otherSwitchControl = other.asInstanceOf[XFormsSwitchControl]
-
-    // Check whether selected case has changed
-    if (getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl))
-      return false
-
-    super.equalsExternal(other)
-  }
+  override def compareExternalUseExternalValue(
+    previousExternalValue : Option[String],
+    previousControl       : Option[XFormsControl]
+  ): Boolean =
+    previousControl match {
+      case Some(other: XFormsSwitchControl) ⇒
+        getSelectedCaseEffectiveId == getOtherSelectedCaseEffectiveId(other) &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+      case _ => false
+    }
 
   override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
 

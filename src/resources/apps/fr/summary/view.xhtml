@@ -16,7 +16,6 @@
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -606,10 +605,28 @@
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
+                                 <xh:colgroup>
+                                    <xh:col class="fr-summary-repeat-selection-checkbox"/>
+                                    <xh:col class="{$labels-class}"/>
+                                    <xf:group ref="''[$show-created]">
+                                        <xh:col/>
+                                    </xf:group>
+                                    <xf:group ref="''[$show-last-modified]">
+                                        <xh:col/>
+                                    </xf:group>
+                                    <!-- Empty column if no summary fields looks nicer -->
+                                    <xf:group ref="''[empty($detail-positions)]">
+                                        <xh:col/>
+                                    </xf:group>
+                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
+                                    <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']">
+                                        <xh:col/>
+                                    </xf:repeat>
+                                </xh:colgroup>
                                 <xh:thead>
                                     <xh:tr>
-                                        <xh:th class="fr-summary-repeat-selection-checkbox"/>
-                                        <xh:th class="{$labels-class}"/>
+                                        <xh:th/>
+                                        <xh:th/>
                                         <xf:group ref="''[$show-created]">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
@@ -620,11 +637,9 @@
                                                 <xf:output value="$fr-resources/summary/titles/last-modified"/>
                                             </xh:th>
                                         </xf:group>
-                                        <!-- Empty column if no summary fields looks nicer -->
-                                        <xf:repeat ref="if (empty($detail-positions)) then '' else ()">
+                                        <xf:group ref="''[empty($detail-positions)]">
                                             <xh:th/>
-                                        </xf:repeat>
-                                        <!-- Iterate through specially marked controls and derive resource id then resource -->
+                                        </xf:group>
                                         <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th>
                                                 <!-- Output showing as the header of the column -->
@@ -689,7 +704,7 @@
                                                     "
                                             />
                                             <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
-                                                <xh:td class="fr-summary-repeat-selection-checkbox">
+                                                <xh:td>
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
                                                             <xf:label/>
@@ -697,7 +712,7 @@
                                                         </xf:item>
                                                     </xf:select>
                                                 </xh:td>
-                                                <xh:td class="{$labels-class}">
+                                                <xh:td>
                                                     <xf:output ref="if ($document/@draft = 'true') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
                                                     <xf:output ref="if (not(xxf:split($document/@operations) = ('*', 'update'))) then . else ()" value="$fr-resources/summary/labels/read-only" class="label"/>
                                                 </xh:td>

@@ -37,12 +37,16 @@ import scala.util.matching.Regex
  * xf:input control
  */
 class XFormsInputControl(
-  container : XBLContainer,
-  parent    : XFormsControl,
-  element   : Element,
-  id        : String
-) extends XFormsSingleNodeControl(container, parent, element, id)
-  with XFormsValueControl
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  effectiveId : String
+) extends XFormsSingleNodeControl(
+  container,
+  parent,
+  element,
+  effectiveId
+) with XFormsValueControl
   with FocusableTrait {
 
   override type Control <: InputControl

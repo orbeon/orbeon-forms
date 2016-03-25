@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueFocusableControlBase}
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 // Represents an xf:secret control.
@@ -23,9 +23,10 @@ class XFormsSecretControl(
   parent      : XFormsControl,
   element     : Element,
   effectiveId : String
-)  extends XFormsValueFocusableControlBase(
+) extends XFormsSingleNodeControl(
   container,
   parent,
   element,
   effectiveId
-)
+) with XFormsValueControl
+  with FocusableTrait

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsModelBinds
@@ -23,7 +22,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om.NodeInfo
@@ -31,16 +29,6 @@ import org.orbeon.saxon.value._
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
-
-// For Java classes that can't directly implement XFormsValueControl
-abstract class XFormsValueControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-  extends XFormsSingleNodeControl(container, parent, element, effectiveId)
-  with XFormsValueControl
-
-// For Java classes that can't directly implement FocusableTrait
-abstract class XFormsValueFocusableControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-  extends XFormsValueControlBase(container, parent, element, effectiveId)
-  with FocusableTrait
 
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {

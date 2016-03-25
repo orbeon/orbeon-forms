@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControlBase}
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
 
@@ -26,12 +26,13 @@ class XFormsRangeControl(
   parent      : XFormsControl,
   element     : Element,
   effectiveId : String
-) extends XFormsValueControlBase(
+) extends XFormsSingleNodeControl(
   container,
   parent,
   element,
   effectiveId
-) {
+) with XFormsValueControl {
+
   private val start = element.attributeValue("start")
   private val end   = element.attributeValue("end")
 //  private val step  = element.attributeValue("step")

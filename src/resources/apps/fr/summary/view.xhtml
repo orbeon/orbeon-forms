@@ -594,7 +594,7 @@
                             value="xxf:format-message($fr-resources/summary/search/returned,
                                                       for $ v in (instance('fr-paging-instance')/search-total, instance('fr-paging-instance')/total) return xs:integer($v))"/>
 
-                        <xf:var name="show-created" value="xxf:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
+                        <xf:var name="show-created"       value="xxf:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
                         <xf:var name="show-last-modified" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
@@ -610,16 +610,16 @@
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
                                         <xh:th class="{$labels-class}"/>
-                                        <xf:repeat ref="if ($show-created) then '' else ()">
+                                        <xf:group ref="''[$show-created]">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
                                             </xh:th>
-                                        </xf:repeat>
-                                        <xf:repeat ref="if ($show-last-modified) then '' else ()">
+                                        </xf:group>
+                                        <xf:group ref="''[$show-last-modified]">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/last-modified"/>
                                             </xh:th>
-                                        </xf:repeat>
+                                        </xf:group>
                                         <!-- Empty column if no summary fields looks nicer -->
                                         <xf:repeat ref="if (empty($detail-positions)) then '' else ()">
                                             <xh:th/>
@@ -701,8 +701,7 @@
                                                     <xf:output ref="if ($document/@draft = 'true') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
                                                     <xf:output ref="if (not(xxf:split($document/@operations) = ('*', 'update'))) then . else ()" value="$fr-resources/summary/labels/read-only" class="label"/>
                                                 </xh:td>
-                                                <!-- Why repeat and not group? -->
-                                                <xf:repeat ref="if ($show-created) then '' else ()">
+                                                <xf:group ref="''[$show-created]">
                                                     <xf:var
                                                         name="created"
                                                         value="
@@ -724,9 +723,8 @@
                                                             <xf:output value="$created"/>
                                                         </xf:group>
                                                     </xh:td>
-                                                </xf:repeat>
-                                                <!-- Why repeat and not group? -->
-                                                <xf:repeat ref="if ($show-last-modified) then '' else ()">
+                                                </xf:group>
+                                                <xf:group ref="''[$show-last-modified]">
                                                     <xf:var
                                                         name="last-modified"
                                                         value="
@@ -748,11 +746,11 @@
                                                             <xf:output value="$last-modified"/>
                                                         </xf:group>
                                                     </xh:td>
-                                                </xf:repeat>
+                                                </xf:group>
                                                 <!-- Empty column if no summary fields looks nicer -->
-                                                <xf:repeat ref="if (empty($detail-positions)) then '' else ()">
+                                                <xf:group ref="if (empty($detail-positions)) then '' else ()">
                                                     <xh:td/>
-                                                </xf:repeat>
+                                                </xf:group>
                                                 <!-- Iterate over detail-positions so that repeat iterations are not recreated  -->
                                                 <xf:repeat ref="$detail-positions" id="document-details-repeat">
                                                     <xf:var name="detail-position" value="."/>

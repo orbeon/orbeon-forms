@@ -814,9 +814,25 @@
                                     <xf:var name="ops"                  value="xxf:split(@operations)"/>
                                     <xf:var name="can-navigate-summary" value="$local-available and $ops = ('*', 'update', 'read', 'delete')"/>
                                     <xf:var name="can-navigate-new"     value="$local-available and $ops = ('*', 'create')"/>
-                                    <xf:var name="link"                 value="if ($can-navigate-summary or $can-navigate-new)
-                                                                               then concat('/fr/', application-name, '/', form-name, '/', if ($can-navigate-summary) then 'summary' else 'new')
-                                                                               else ()"/>
+
+                                    <xf:var
+                                        name="link"
+                                        value="
+                                            if ($can-navigate-summary or $can-navigate-new) then
+                                                concat(
+                                                    '/fr/',
+                                                    application-name,
+                                                    '/',
+                                                    form-name,
+                                                    '/',
+                                                    if ($can-navigate-summary) then
+                                                        'summary'
+                                                    else
+                                                        'new'
+                                                )
+                                            else
+                                                ()"/>
+
                                     <xh:tr>
                                         <xf:group ref=".[$any-has-admin-permission]">
                                             <xh:td class="fr-home-select">

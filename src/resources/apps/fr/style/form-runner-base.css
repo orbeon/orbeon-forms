@@ -366,8 +366,8 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
-  word-break: break-all;
   word-wrap: break-word;
+  word-break: normal;
 }
 .orbeon .xforms-form .fr-mode-view .xforms-hint,
 .orbeon .xforms-form .fr-mode-pdf .xforms-hint,

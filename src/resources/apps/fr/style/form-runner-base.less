@@ -367,8 +367,8 @@
         white-space: -moz-pre-wrap;
         white-space: pre-wrap;
 
-        word-break: break-all; // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
         word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
+        word-break: normal;    // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
     }
 
     .xforms-form { // make rule a bit stronger to make sure hints are hidden

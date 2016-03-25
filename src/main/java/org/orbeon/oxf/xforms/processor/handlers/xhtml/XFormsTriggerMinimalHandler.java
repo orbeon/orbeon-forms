@@ -39,8 +39,8 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         final AttributesImpl htmlAnchorAttributes =
             getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true);
 
-        // TODO: needs f:url-norewrite="true"?
-        htmlAnchorAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#");
+        htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0"   );
+        htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "link");
 
         if (triggerControl != null) {
             // Output xxf:* extension attributes

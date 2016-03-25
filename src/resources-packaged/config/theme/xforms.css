@@ -121,6 +121,9 @@
 .orbeon .xforms-static {
   border: none;
 }
+.orbeon .xforms-trigger a {
+  cursor: pointer;
+}
 .orbeon .xforms-output {
   display: inline;
 }

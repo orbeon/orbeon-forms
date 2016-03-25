@@ -176,6 +176,10 @@
     // Prevent display of border when static read-only
     .xforms-static { border: none }
 
+    .xforms-trigger a {
+        cursor: pointer; // Isn't the default since we're not putting an href, per issue #2652
+    }
+
     .xforms-output {
         display: inline;
     }

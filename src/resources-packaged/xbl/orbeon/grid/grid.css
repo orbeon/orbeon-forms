@@ -39,10 +39,8 @@
   display: inline-block;
   width: auto;
   height: auto;
-  max-width: 14px;
+  max-width: 20px;
   max-height: 14px;
-  line-height: 14px;
-  vertical-align: text-top;
   background-image: url("../../../../resources/apps/fr/style/bootstrap/img/glyphicons-halflings.png");
   background-repeat: no-repeat;
   background-position: -120px -96px;

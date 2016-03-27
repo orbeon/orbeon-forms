@@ -13,6 +13,7 @@ $ ->
     sectionsCache = []
     frBodyLeft = 0;
     pageX = 0; pageY = 0
+    SectionTitleSelector = '.fr-section-title:first'
     SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first output'
 
     FSM.create
@@ -119,7 +120,7 @@ $ ->
                     left: interceptorOffset.left
                 f$.offset inputOffset, labelInput
                 f$.offset inputOffset, labelInput   # Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
-                f$.width (f$.width labelAnchor) - 10, labelInput
+                labelInput.width(clickInterceptor.width() - 10)
                 f$.focus labelInput
 
         # Update highlight of section title, as a hint users can click to edit
@@ -161,9 +162,12 @@ $ ->
                     labelClickInterceptors[pos].hide()
                 # Position interceptor for each section
                 _.each _.range(sections.length), (pos) ->
-                    title = f$.find SectionLabelSelector, $ sections[pos]
+                    sectionTitle = $(sections[pos]).find(SectionTitleSelector)
+                    sectionLabel = $(sections[pos]).find(SectionLabelSelector)
                     interceptor = labelClickInterceptors[pos]
-                    interceptor.show()                                          # Might be an interceptor that was previously hidden, and is now reused
-                    interceptor.offset title.offset()
-                    interceptor.height title.height()
-                    interceptor.width title.width()
+                    # Show, as this might be an interceptor that was previously hidden, and is now reused
+                    interceptor.show()
+                    # Start at the label, but extend all the way to the right to the end of the title
+                    interceptor.offset(sectionLabel.offset())
+                    interceptor.height(sectionTitle.height())
+                    interceptor.width(sectionTitle.width() - (sectionLabel.offset().left - sectionTitle.offset().left))

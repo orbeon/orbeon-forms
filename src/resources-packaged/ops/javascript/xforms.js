@@ -3276,9 +3276,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 "select": {
                     "compact": ORBEON.xforms.Init._list
                 },
-                "range": {"": ORBEON.xforms.Init._range},
-                "textarea": {
-                    "text/html": genericInit
+                "range": {
+                    "": ORBEON.xforms.Init._range
                 },
                 "dialog": {
                     "": ORBEON.xforms.Init._dialog,

@@ -2604,9 +2604,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:value id="g11"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -3427,21 +3425,51 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="name⊙1" required="true" empty="false"/><xxf:value id="name⊙1">Item 1</xxf:value>
-                        <xxf:control id="units⊙1" type="{http://www.w3.org/2001/XMLSchema}integer"/><xxf:value id="units⊙1">3</xxf:value>
-                        <xxf:control id="price⊙1" type="{http://www.w3.org/2001/XMLSchema}decimal"/><xxf:value id="price⊙1">60</xxf:value>
-                        <xxf:control id="line-total⊙1" readonly="true"/><xxf:value id="line-total⊙1">180.00</xxf:value>
-                        <xxf:control id="name⊙2" required="true" empty="false"/><xxf:value id="name⊙2">Item 2</xxf:value>
-                        <xxf:control id="units⊙2" type="{http://www.w3.org/2001/XMLSchema}integer"/><xxf:value id="units⊙2">1</xxf:value>
-                        <xxf:control id="price⊙2" type="{http://www.w3.org/2001/XMLSchema}decimal"/><xxf:value id="price⊙2">500</xxf:value>
-                        <xxf:control id="line-total⊙2" readonly="true"/><xxf:value id="line-total⊙2">500.00</xxf:value>
-                        <xxf:control id="name⊙3" required="true" empty="false"/><xxf:value id="name⊙3">Item 3</xxf:value>
-                        <xxf:control id="units⊙3" type="{http://www.w3.org/2001/XMLSchema}integer"/><xxf:value id="units⊙3">1</xxf:value>
-                        <xxf:control id="price⊙3" type="{http://www.w3.org/2001/XMLSchema}decimal"/><xxf:value id="price⊙3">1500</xxf:value>
-                        <xxf:control id="line-total⊙3" readonly="true"/><xxf:value id="line-total⊙3">1,500.00</xxf:value>
-                        <xxf:control id="subtotal" readonly="true"/><xxf:value id="subtotal">2,180.00</xxf:value>
-                        <xxf:control id="tax" readonly="true"/><xxf:value id="tax">479.60</xxf:value>
-                        <xxf:control id="total" readonly="true"/><xxf:value id="total">2,393.64</xxf:value>
+                        <xxf:control id="name⊙1" required="true" empty="false">
+                            <xxf:value>Item 1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="units⊙1" type="{http://www.w3.org/2001/XMLSchema}integer">
+                            <xxf:value>3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="price⊙1" type="{http://www.w3.org/2001/XMLSchema}decimal">
+                            <xxf:value>60</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="line-total⊙1" readonly="true">
+                            <xxf:value>180.00</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="name⊙2" required="true" empty="false">
+                            <xxf:value>Item 2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="units⊙2" type="{http://www.w3.org/2001/XMLSchema}integer">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="price⊙2" type="{http://www.w3.org/2001/XMLSchema}decimal">
+                            <xxf:value>500</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="line-total⊙2" readonly="true">
+                            <xxf:value>500.00</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="name⊙3" required="true" empty="false">
+                            <xxf:value>Item 3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="units⊙3" type="{http://www.w3.org/2001/XMLSchema}integer">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="price⊙3" type="{http://www.w3.org/2001/XMLSchema}decimal">
+                            <xxf:value>1500</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="line-total⊙3" readonly="true">
+                            <xxf:value>1,500.00</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="subtotal" readonly="true">
+                            <xxf:value>2,180.00</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="tax" readonly="true">
+                            <xxf:value>479.60</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="total" readonly="true">
+                            <xxf:value>2,393.64</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -7260,7 +7288,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output" readonly="true"/><xxf:value id="my-output">a b c</xxf:value>
+                        <xxf:control id="my-output" readonly="true">
+                            <xxf:value>a b c</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

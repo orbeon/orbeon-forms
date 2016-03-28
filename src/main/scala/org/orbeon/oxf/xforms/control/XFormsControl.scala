@@ -13,29 +13,25 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import org.dom4j.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
-import org.orbeon.oxf.util.{Logging, NetUtils}
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
-import org.orbeon.oxf.xforms.event.XFormsEventObserver
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.{XMLUtils, ForwardingXMLReceiver}
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.oxf.xml.dom4j.LocationData
-import org.xml.sax.Attributes
-import collection.Seq
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.BindingContext
-import org.dom4j.{QName, Element}
-import org.orbeon.saxon.om.Item
-import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, SingleNodeTrait, AppearanceTrait}
-import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{Logging, NetUtils}
+import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
+import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
+import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEventTarget}
+import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLUtils}
+import org.orbeon.saxon.om.Item
+import org.xml.sax.Attributes
+
+import scala.collection.JavaConverters._
+import scala.collection.Seq
 
 /**
  * Represents an XForms control.
@@ -177,29 +173,21 @@ class XFormsControl(
     case _ ⇒ None
   }
 
-  def getJavaScriptInitialization: (String, String, String) = null
-  def javaScriptInitialization: Option[(String, String, String)] = Option(getJavaScriptInitialization)
-
-  final def getCommonJavaScriptInitialization = {
-    // 2016-03-28: It is undefined which appearance is the "first"!
-    // First appearance only (should probably handle all of them, but historically only one appearance was handled)
-    val firstAppearance = appearances.headOption map Dom4jUtils.qNameToExplodedQName
-    (localName, firstAppearance orElse mediatype orNull, getEffectiveId)
-  }
+  def hasJavaScriptInitialization = false
 
   def compareExternalMaybeClientValue(
-    previousValue   : Option[String],
-    previousControl : Option[XFormsControl]
+    previousValueOpt   : Option[String],
+    previousControlOpt : Option[XFormsControl]
   ): Boolean =
-    (previousControl exists (_ eq this)) && (getInitialLocal eq getCurrentLocal) ||
-    compareExternalUseExternalValue(previousValue, previousControl)
+    (previousControlOpt exists (_ eq this)) && (getInitialLocal eq getCurrentLocal) ||
+    compareExternalUseExternalValue(previousValueOpt, previousControlOpt)
 
   // Compare this control with another control, as far as the comparison is relevant for the external world.
   def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousExternalValueOpt : Option[String],
+    previousControlOpt       : Option[XFormsControl]
   ): Boolean =
-    previousControl match {
+    previousControlOpt match {
       case Some(other) ⇒
         isRelevant == other.isRelevant &&
         compareLHHA(other)             &&

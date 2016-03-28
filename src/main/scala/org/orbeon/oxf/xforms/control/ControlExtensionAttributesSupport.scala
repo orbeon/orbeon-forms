@@ -72,12 +72,16 @@ trait ControlExtensionAttributesSupport {
       localName = name.getName
     } attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
 
-  final def addExtensionAttributesExceptClassAndAcceptForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: XMLReceiverHelper): Unit =
+  final def addExtensionAttributesExceptClassAndAcceptForAjax(
+    previousControl       : Option[XFormsControl],
+    namespaceURI          : String)(implicit
+    ch                    : XMLReceiverHelper
+  ): Unit =
     for {
       name ← staticControl.extensionAttributes.keys
       if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
     } locally {
-      outputAttributeElement(originalControl, name.getName, _.extensionAttributeValue(name).orNull, isNewlyVisibleSubtree)(ch)
+      outputAttributeElement(previousControl, name.getName, _.extensionAttributeValue(name).orNull)(ch)
     }
 }
 

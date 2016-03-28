@@ -31,9 +31,17 @@ import org.orbeon.oxf.xforms.BindingContext
  *
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
-class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId)
-    with NoLHHATrait {
+class XFormsRepeatIterationControl(
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  effectiveId : String
+) extends XFormsSingleNodeContainerControl(
+  container,
+  parent,
+  element,
+  effectiveId
+) with NoLHHATrait {
 
   override type Control <: RepeatIterationControl
 
@@ -71,39 +79,45 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
   }
 
   override def compareExternalUseExternalValue(
-    previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousExternalValueOpt : Option[String],
+    previousControlOpt       : Option[XFormsControl]
   ): Boolean =
-    previousControl match {
-      case Some(other: XFormsRepeatIterationControl) ⇒
+    previousControlOpt match {
+      case Some(previousRepeatIterationControl: XFormsRepeatIterationControl) ⇒
         // Ad-hoc comparison, because we basically only care about relevance changes. So we don't delegate
         // to `VisitableTrait` and `XFormsControl` implementations.
-        ! mustSendIterationUpdate(other)
+        ! mustSendIterationUpdate(Some(previousRepeatIterationControl))
       case _ ⇒ false
     }
 
-  private def mustSendIterationUpdate(other: XFormsRepeatIterationControl) = {
+  private def mustSendIterationUpdate(previousRepeatIterationControlOpt: Option[XFormsRepeatIterationControl]) = {
     // NOTE: We only care about relevance changes. We should care about moving iterations around, but that's not
     // handled that way yet!
 
     // NOTE: We output if we are NOT relevant as the client must mark non-relevant elements. Ideally, we should not
     // have non-relevant iterations actually present on the client.
-    (other eq null) && ! isRelevant || (other ne null) && other.isRelevant != isRelevant
+    previousRepeatIterationControlOpt.isEmpty && ! isRelevant || previousRepeatIterationControlOpt.exists(_.isRelevant != isRelevant)
   }
 
-  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
-    assert(attributesImpl.getLength == 0)
-    val repeatIterationControl1 = other.asInstanceOf[XFormsRepeatIterationControl]
-    if (mustSendIterationUpdate(repeatIterationControl1)) {
+  final override def outputAjaxDiff(
+    previousControlOpt    : Option[XFormsControl],
+    content               : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch                    : XMLReceiverHelper
+  ): Unit = {
+    val repeatIterationControl1Opt = previousControlOpt.asInstanceOf[Option[XFormsRepeatIterationControl]]
+    if (mustSendIterationUpdate(repeatIterationControl1Opt)) {
+
+      val atts = new AttributesImpl
+
       // Use the effective id of the parent repeat
-      attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
+      atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
 
       // Relevance
-      attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
-      attributesImpl.addAttribute("", "iteration", "iteration", XMLReceiverHelper.CDATA, iterationIndex.toString)
-      ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl)
-    }
+      atts.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
+      atts.addAttribute("", "iteration", "iteration", XMLReceiverHelper.CDATA, iterationIndex.toString)
 
+      ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", atts)
+    }
     // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
   }
 

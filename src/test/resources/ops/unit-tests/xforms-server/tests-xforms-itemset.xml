@@ -85,8 +85,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="select-control" label="Items"/><xxf:value id="select-control">1</xxf:value>
-                        <xxf:itemset id="select-control">[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</xxf:itemset>
+                        <xxf:control id="select-control" label="Items">
+                            <xxf:itemset>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</xxf:itemset>
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -151,8 +153,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="select-control" label="Items"/><xxf:value id="select-control"/>
-                        <xxf:itemset id="select-control">[{"label":"Encyclopedia","value":"en1","children":[{"label":"Science","value":"sc1"},{"label":"Culture","value":"cu1","children":[{"label":"Art","value":"ar1"},{"label":"Craft","value":"cr1"}]}]},{"label":"Encyclopedia","value":"en2","children":[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"}]}]}]</xxf:itemset>
+                        <xxf:control id="select-control" label="Items">
+                            <xxf:itemset>[{"label":"Encyclopedia","value":"en1","children":[{"label":"Science","value":"sc1"},{"label":"Culture","value":"cu1","children":[{"label":"Art","value":"ar1"},{"label":"Craft","value":"cr1"}]}]},{"label":"Encyclopedia","value":"en2","children":[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"}]}]}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -274,12 +277,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="select-1"/>
-                        <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:value id="select-2"/>
-                        <xxf:itemset id="select-2">[{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:value id="select-3"/>
-                        <xxf:itemset id="select-3">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"","children":[{"label":"2.3.2","value":"","children":[{"label":"2.three.4","value":"2.three.4"}]}]}]}]</xxf:itemset>
+                        <xxf:control id="select-1">
+                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
+                        </xxf:control>
+                        <xxf:control id="select-2">
+                            <xxf:itemset>[{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
+                        </xxf:control>
+                        <xxf:control id="select-3">
+                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"","children":[{"label":"2.3.2","value":"","children":[{"label":"2.three.4","value":"2.three.4"}]}]}]}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -340,8 +346,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="select-1"/>
-                        <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2.1","value":"2.1"},{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2.1","value":"2.2.2.1"}]</xxf:itemset>
+                        <xxf:control id="select-1">
+                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2.1","value":"2.1"},{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2.1","value":"2.2.2.1"}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -411,8 +418,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="select-1"/>
-                        <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</xxf:itemset>
+                        <xxf:control id="select-1">
+                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1116,8 +1124,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-select"/>
-                        <xxf:itemset id="my-select">[{"label":"foo","value":"foo"},{"label":"bar","value":"bar"},{"label":"42","value":"42"}]</xxf:itemset>
+                        <xxf:control id="my-select">
+                            <xxf:itemset>[{"label":"foo","value":"foo"},{"label":"bar","value":"bar"},{"label":"42","value":"42"}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1181,8 +1190,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-select"/>
-                        <xxf:itemset id="my-select">[{"label":"Apple","value":"1","attributes":{"xxforms-open":"false"}},{"label":"Banana","value":"2","attributes":{"xxforms-open":"true"}},{"label":"Orange","value":"3","attributes":{"xxforms-open":"false"}},{"label":"Kiwi","value":"4","attributes":{"xxforms-open":"true"}}]</xxf:itemset>
+                        <xxf:control id="my-select">
+                            <xxf:itemset>[{"label":"Apple","value":"1","attributes":{"xxforms-open":"false"}},{"label":"Banana","value":"2","attributes":{"xxforms-open":"true"}},{"label":"Orange","value":"3","attributes":{"xxforms-open":"false"}},{"label":"Kiwi","value":"4","attributes":{"xxforms-open":"true"}}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1259,9 +1269,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-select⊙1">1</xxf:value>
-                        <xxf:itemset id="my-select⊙1">[{"label":"Apple","value":"1"}]</xxf:itemset>
-                        <xxf:value id="my-output⊙1">1</xxf:value>
+                        <xxf:control id="my-select⊙1">
+                            <xxf:itemset>[{"label":"Apple","value":"1"}]</xxf:itemset>
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙1">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1337,9 +1351,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-select"/>
-                        <xxf:itemset id="my-select">[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"},{"label":"Art","value":"ar1"}]}]</xxf:itemset>
-                        <xxf:value id="my-output">sc2 - cu2 - ar2 - cr2 - ar1</xxf:value>
+                        <xxf:control id="my-select">
+                            <xxf:itemset>[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"},{"label":"Art","value":"ar1"}]}]</xxf:itemset>
+                        </xxf:control>
+                        <xxf:control id="my-output">
+                            <xxf:value>sc2 - cu2 - ar2 - cr2 - ar1</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1385,7 +1402,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-select" label="&lt;span class=&#34;question&#34;&gt;Dynamic label (value is 42)&lt;/span&gt;"/><xxf:value id="my-select"/>
+                        <xxf:control id="my-select" label="&lt;span class=&#34;question&#34;&gt;Dynamic label (value is 42)&lt;/span&gt;"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1445,8 +1462,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="select1">0</xxf:value>
-                        <xxf:itemset id="select1">[{"label":"favorite","value":"0"},{"label":"Cat","value":"1"},{"label":"Dog","value":"2"}]</xxf:itemset>
+                        <xxf:control id="select1">
+                            <xxf:itemset>[{"label":"favorite","value":"0"},{"label":"Cat","value":"1"},{"label":"Dog","value":"2"}]</xxf:itemset>
+                            <xxf:value>0</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

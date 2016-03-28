@@ -92,7 +92,7 @@
         },
 
         // The server tells us to set the focus on the TinyMCE
-        setFocus: function() {
+        xformsFocus: function() {
             this.myEditor.focus();
         },
 

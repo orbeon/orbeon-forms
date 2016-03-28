@@ -95,7 +95,7 @@
             }, this));
         },
 
-        setFocus: function() {
+        xformsFocus: function() {
             this.visibleInputElement.focus();
          },
 

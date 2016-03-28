@@ -67,7 +67,7 @@
             Recaptcha.reload();
         },
 
-        setFocus: function() {
+        xformsFocus: function() {
             this.recaptchaInput().focus();
         },
 

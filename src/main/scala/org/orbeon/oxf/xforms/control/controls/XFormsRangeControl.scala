@@ -37,8 +37,7 @@ class XFormsRangeControl(
   private val end   = element.attributeValue("end")
 //  private val step  = element.attributeValue("step")
 
-  override def getJavaScriptInitialization: (String, String, String) =
-    getCommonJavaScriptInitialization
+  override def hasJavaScriptInitialization = true
 
   override def translateExternalValue(externalValue: String) =
     Option(convertFromExternalValue(externalValue))

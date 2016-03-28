@@ -13,22 +13,20 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
-import org.orbeon.oxf.xforms.itemset.Item
-import org.orbeon.oxf.xforms.itemset.Itemset
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
-import org.orbeon.oxf.xml.XMLConstants._
-import org.xml.sax.Attributes
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
-import XFormsBaseHandlerXHTML._
-import XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
+import org.orbeon.oxf.xforms.control.controls.XFormsInputControl.PlaceHolderInfo
+import org.orbeon.oxf.xforms.itemset.{Item, Itemset}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
-
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
+import org.xml.sax.Attributes
 /**
  * Handle xf:input.
  *
@@ -36,11 +34,11 @@ import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
  */
 class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with HandlerSupport { // repeating = false
 
-  private var placeHolderInfo: XFormsInputControl.PlaceHolderInfo = _
+  private var placeHolderInfo: Option[PlaceHolderInfo] = None
 
   override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
     super.init(uri, localname, qName, attributes, matched)
-    this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(elementAnalysis, currentControlOrNull)
+    this.placeHolderInfo = XFormsInputControl.placeholderInfo(elementAnalysis, currentControlOrNull)
   }
 
   // TODO: Use type member instead
@@ -140,8 +138,10 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
             inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
 
           // Add attribute even if the control is not concrete
-          if ((placeHolderInfo ne null) && (placeHolderInfo.placeholder ne null))
-            reusableAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.placeholder)
+          placeHolderInfo foreach { placeHolderInfo ⇒
+            if (placeHolderInfo.value ne null) // unclear whether this can ever be null
+              reusableAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
+          }
 
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
 
@@ -227,10 +227,10 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
     isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, "0") getOrElse getFirstInputEffectiveId(getEffectiveId)
 
   protected override def handleLabel(): Unit =
-    if (! ((placeHolderInfo ne null) && placeHolderInfo.isLabelPlaceholder))
+    if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
       super.handleLabel()
 
   protected override def handleHint(): Unit =
-    if (! ((placeHolderInfo ne null) && placeHolderInfo.isHintPlaceholder))
+    if (! (placeHolderInfo exists (! _.isLabelPlaceholder)))
       super.handleHint()
 }

@@ -236,7 +236,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" label="Value:" readonly="true"/><xxf:value id="my-input">2</xxf:value>
+                        <xxf:control id="my-input" label="Value:" readonly="true">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -290,8 +292,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output-xinclude" readonly="true"/><xxf:value id="my-output-xinclude">Summary</xxf:value>
-                        <xxf:control id="my-output-no-xinclude" relevant="false"/><xxf:value id="my-output-no-xinclude"/>
+                        <xxf:control id="my-output-xinclude" readonly="true">
+                            <xxf:value>Summary</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output-no-xinclude" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1003,10 +1007,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="title1">Pale Blue Dot</xxf:value>
-                        <xxf:value id="lang1">en</xxf:value>
-                        <xxf:value id="title2">Jacques le fataliste et son maître</xxf:value>
-                        <xxf:value id="lang2">fr</xxf:value>
+                        <xxf:control id="title1">
+                            <xxf:value>Pale Blue Dot</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="lang1">
+                            <xxf:value>en</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="title2">
+                            <xxf:value>Jacques le fataliste et son maître</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="lang2">
+                            <xxf:value>fr</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1222,8 +1234,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-output-1">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:value>
-                        <xxf:value id="my-output-2">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:value>
+                        <xxf:control id="my-output-1">
+                            <xxf:value>http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output-2">
+                            <xxf:value>http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -72,7 +72,7 @@ class XFormsValueComponentControl(
   ): Boolean =
     previousControl match {
       case Some(other: XFormsValueComponentControl) ⇒
-        isEmpty == other.isEmpty &&
+        isEmptyValue == other.isEmptyValue &&
         super.compareExternalUseExternalValue(previousExternalValue, previousControl)
       case _ ⇒
         false
@@ -358,9 +358,21 @@ class XFormsComponentControl(
   private lazy val handleLHHA =
     staticControl.binding.abstractBinding.modeLHHA && ! staticControl.binding.abstractBinding.modeLHHACustom
 
+
+  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
+
+    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt)
+
+    // Whether to tell the client to initialize the control within a new iteration
+    if (previousControlOpt.isEmpty && isRelevant && staticControl.binding.abstractBinding.modeJavaScriptLifecycle)
+      added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, "init", "true", isNewRepeatIteration = false, isDefaultValue = false)
+
+    added
+  }
+
   // Don't add Ajax LHHA for custom-lhha mode
-  override def addAjaxLHHA(other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) =
-    handleLHHA && super.addAjaxLHHA(other, attributesImpl, isNewlyVisibleSubtree)
+  override def addAjaxLHHA(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) =
+    handleLHHA && super.addAjaxLHHA(attributesImpl, previousControlOpt)
 
   // Consider LHHA hasn't externally changed for custom-lhha mode
   override def compareLHHA(other: XFormsControl) =

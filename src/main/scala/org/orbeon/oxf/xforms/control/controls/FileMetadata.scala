@@ -100,19 +100,19 @@ trait FileMetadata extends XFormsValueControl {
   def setFileSize(size: String): Unit =
     setInfoValue(sizeElement, size)
 
-  def addFileMetadataAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: FileMetadata): Boolean = {
-    val uploadControl1 = other
+  def addFileMetadataAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[FileMetadata]): Boolean = {
+
     val uploadControl2 = self
 
     var added: Boolean = false
 
     def addAtt(name: String, getValue: FileMetadata ⇒ String): Unit = {
-      val value1 = Option(uploadControl1) map getValue orNull
+      val value1 = previousControlOpt map getValue orNull
       val value2 = getValue(uploadControl2)
 
       if (value1 != value2) {
-        val attributeValue = Option(value2) getOrElse ""
-        added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, name, attributeValue, isNewRepeatIteration, attributeValue == "")
+        val attributeValue = StringUtils.defaultString(value2)
+        added |= ControlAjaxSupport.addAttributeIfNeeded(attributesImpl, name, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
       }
     }
 

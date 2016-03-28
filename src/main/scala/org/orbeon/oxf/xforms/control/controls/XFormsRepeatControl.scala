@@ -13,33 +13,28 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import java.lang.{Integer ⇒ JInteger}
+import java.util.{ArrayList, Collections, Map ⇒ JMap}
+
 import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms._
-import analysis.controls.{RepeatIterationControl, RepeatControl}
-import analysis.ElementAnalysis
-import control._
-import event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction
-import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction
-import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
-import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent
-import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
-import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
+import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, RepeatIterationControl}
+import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl._
+import org.orbeon.oxf.xforms.event.events.{XXFormsDndEvent, XXFormsIndexChangedEvent, XXFormsNodesetChangedEvent, XXFormsSetindexEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.{NodeInfo, Item}
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.saxon.om.{Item, NodeInfo}
 
-import control.controls.XFormsRepeatControl._
-import java.lang.{Integer ⇒ JInteger}
-import java.util.{ArrayList, Map ⇒ JMap, Collections}
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.BindingContext
-import collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
+import scala.collection.JavaConverters._
+import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, ListBuffer}
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
@@ -66,8 +61,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
   override def children = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
 
   // If there is DnD, must tell the client to perform initialization
-  override def getJavaScriptInitialization =
-    if (isDnD) getCommonJavaScriptInitialization else null
+  override def hasJavaScriptInitialization = false // isDnD
 
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)

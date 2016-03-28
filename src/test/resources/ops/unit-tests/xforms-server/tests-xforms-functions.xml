@@ -107,9 +107,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="1">0</xxf:value>
-                        <xxf:control id="2" label="M:"/>
-                        <xxf:value id="2">12</xxf:value>
+                        <xxf:control id="1">
+                            <xxf:value>0</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="2" label="M:">
+                            <xxf:value>12</xxf:value>
+                        </xxf:control>
                         <xxf:control id="3" label="Clear"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -201,10 +204,12 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="group2" level="error"/>
-                        <xxf:control id="1" level="error"/>
-                        <xxf:value id="1">0</xxf:value>
-                        <xxf:control id="2" label="M:"/>
-                        <xxf:value id="2">12</xxf:value>
+                        <xxf:control id="1" level="error">
+                            <xxf:value>0</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="2" label="M:">
+                            <xxf:value>12</xxf:value>
+                        </xxf:control>
                         <xxf:control id="3" label="Clear"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -316,8 +321,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-select">2</xxf:value>
-                        <xxf:itemset id="my-select">[{"label":"Select...","value":""},{"label":"One","value":"1"},{"label":"Two","value":"2"},{"label":"Three","value":"3"}]</xxf:itemset>
+                        <xxf:control id="my-select">
+                            <xxf:itemset>[{"label":"Select...","value":""},{"label":"One","value":"1"},{"label":"Two","value":"2"},{"label":"Three","value":"3"}]</xxf:itemset>
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -465,61 +472,157 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-group⊙1" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙1">bloody</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙1">bloody</xxf:value>
-                        <xxf:value id="repeat-index-1⊙1">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙1">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙1">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙1">bloody</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙1">
+                            <xxf:value>bloody</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙1">
+                            <xxf:value>bloody</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙1">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙1">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙1">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙1">
+                            <xxf:value>bloody</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙2" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙2">valencia</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙2">valencia</xxf:value>
-                        <xxf:value id="repeat-index-1⊙2">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙2">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙2">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙2">valencia</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙2">
+                            <xxf:value>valencia</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙2">
+                            <xxf:value>valencia</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙2">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙2">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙2">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙2">
+                            <xxf:value>valencia</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙3" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙3">green</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙3">green</xxf:value>
-                        <xxf:value id="repeat-index-1⊙3">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙3">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙3">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙3">green</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙3">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙3">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙3">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙3">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙3">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙3">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙4" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙4">red</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙4">red</xxf:value>
-                        <xxf:value id="repeat-index-1⊙4">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙4">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙4">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙4">red</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙4">
+                            <xxf:value>red</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙4">
+                            <xxf:value>red</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙4">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙4">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙4">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙4">
+                            <xxf:value>red</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙5" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙5">iPod</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙5">iPod</xxf:value>
-                        <xxf:value id="repeat-index-1⊙5">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙5">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙5">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙5">iPod</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙5">
+                            <xxf:value>iPod</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙5">
+                            <xxf:value>iPod</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙5">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙5">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙5">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙5">
+                            <xxf:value>iPod</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙6" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙6">green</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙6">green</xxf:value>
-                        <xxf:value id="repeat-index-1⊙6">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙6">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙6">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙6">green</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙6">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙6">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙6">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙6">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙6">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙6">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙7" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙7">williams</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙7">williams</xxf:value>
-                        <xxf:value id="repeat-index-1⊙7">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙7">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙7">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙7">williams</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙7">
+                            <xxf:value>williams</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙7">
+                            <xxf:value>williams</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙7">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙7">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙7">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙7">
+                            <xxf:value>williams</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-group⊙8" readonly="true"/>
-                        <xxf:value id="repeat-current-output-1⊙8">yellow</xxf:value>
-                        <xxf:value id="repeat-current-output-2⊙8">yellow</xxf:value>
-                        <xxf:value id="repeat-index-1⊙8">5</xxf:value>
-                        <xxf:value id="repeat-index-2⊙8">5</xxf:value>
-                        <xxf:value id="repeat-context-1⊙8">fruits</xxf:value>
-                        <xxf:value id="repeat-context-2⊙8">yellow</xxf:value>
+                        <xxf:control id="repeat-current-output-1⊙8">
+                            <xxf:value>yellow</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙8">
+                            <xxf:value>yellow</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-1⊙8">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-index-2⊙8">
+                            <xxf:value>5</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-1⊙8">
+                            <xxf:value>fruits</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="repeat-context-2⊙8">
+                            <xxf:value>yellow</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -591,18 +694,42 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="exforms-sort-output⊙1">3-AAA</xxf:value>
-                        <xxf:value id="exforms-sort-output⊙2">2-BBB</xxf:value>
-                        <xxf:value id="exforms-sort-output⊙3">1-CCC</xxf:value>
-                        <xxf:value id="xxforms-sort-output⊙1">3-AAA</xxf:value>
-                        <xxf:value id="xxforms-sort-output⊙2">2-BBB</xxf:value>
-                        <xxf:value id="xxforms-sort-output⊙3">1-CCC</xxf:value>
-                        <xxf:value id="exforms-sort-v-output⊙1">3-AAA</xxf:value>
-                        <xxf:value id="exforms-sort-v-output⊙2">2-BBB</xxf:value>
-                        <xxf:value id="exforms-sort-v-output⊙3">1-CCC</xxf:value>
-                        <xxf:value id="xxforms-sort-v-output⊙1">3-AAA</xxf:value>
-                        <xxf:value id="xxforms-sort-v-output⊙2">2-BBB</xxf:value>
-                        <xxf:value id="xxforms-sort-v-output⊙3">1-CCC</xxf:value>
+                        <xxf:control id="exforms-sort-output⊙1">
+                            <xxf:value>3-AAA</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="exforms-sort-output⊙2">
+                            <xxf:value>2-BBB</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="exforms-sort-output⊙3">
+                            <xxf:value>1-CCC</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xxforms-sort-output⊙1">
+                            <xxf:value>3-AAA</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xxforms-sort-output⊙2">
+                            <xxf:value>2-BBB</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xxforms-sort-output⊙3">
+                            <xxf:value>1-CCC</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="exforms-sort-v-output⊙1">
+                            <xxf:value>3-AAA</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="exforms-sort-v-output⊙2">
+                            <xxf:value>2-BBB</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="exforms-sort-v-output⊙3">
+                            <xxf:value>1-CCC</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xxforms-sort-v-output⊙1">
+                            <xxf:value>3-AAA</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xxforms-sort-v-output⊙2">
+                            <xxf:value>2-BBB</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xxforms-sort-v-output⊙3">
+                            <xxf:value>1-CCC</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -645,10 +772,18 @@
             </xxf:dynamic-state>
             <xxf:action>
                 <xxf:control-values>
-                    <xxf:value id="output1">state=CA</xxf:value>
-                    <xxf:value id="output2">state=CA&amp;city=San Francisco</xxf:value>
-                    <xxf:value id="output3⊙1">position=1&amp;index=1</xxf:value>
-                    <xxf:value id="output3⊙2">position=2&amp;index=1</xxf:value>
+                    <xxf:control id="output1">
+                        <xxf:value>state=CA</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output2">
+                        <xxf:value>state=CA&amp;city=San Francisco</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output3⊙1">
+                        <xxf:value>position=1&amp;index=1</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output3⊙2">
+                        <xxf:value>position=2&amp;index=1</xxf:value>
+                    </xxf:control>
                 </xxf:control-values>
             </xxf:action>
         </xxf:event-response>
@@ -699,14 +834,30 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">42</xxf:value>
-                        <xxf:value id="output2">43</xxf:value>
-                        <xxf:value id="output3">44</xxf:value>
-                        <xxf:value id="output4">45</xxf:value>
-                        <xxf:value id="output5">42</xxf:value>
-                        <xxf:value id="output6">44</xxf:value>
-                        <xxf:value id="output7">42</xxf:value>
-                        <xxf:value id="output8">44</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4">
+                            <xxf:value>45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output6">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output7">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output8">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -744,17 +895,39 @@
             </xxf:dynamic-state>
             <xxf:action>
                 <xxf:control-values>
-                    <xxf:value id="output1">4fd0b215276ef12f2b3e4c8ecac2811498b656fc</xxf:value>
-                    <xxf:value id="output2">d2fe98063f876b03193afb49b4979591</xxf:value>
-                    <xxf:value id="output3">9c196e32dc0175f86f4b1cb89289d6619de6bee699e4c378e68309ed97a1a6ab</xxf:value>
-                    <xxf:value id="output4">T9CyFSdu8S8rPkyOysKBFJi2Vvw=</xxf:value>
-                    <xxf:value id="output5">0v6YBj+HawMZOvtJtJeVkQ==</xxf:value>
-                    <xxf:value id="output6">nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:value>
-                    <xxf:value id="output7">30ddb9c8f347cffbfb44e519d814f074cf4047a55d6f563324f1c6a33920e5edfb2a34bac60bdc96cd33a95623d7d638</xxf:value>
-                    <xxf:value id="output8">3926a207c8c42b0c41792cbd3e1a1aaaf5f7a25704f62dfc939c4987dd7ce060009c5bb1c2447355b3216f10b537e9afa7b64a4e5391b0d631172d07939e087a</xxf:value>
-                    <xxf:value id="output9">MN25yPNHz/v7ROUZ2BTwdM9AR6Vdb1YzJPHGozkg5e37KjS6xgvcls0zqVYj19Y4</xxf:value>
-                    <xxf:value id="output10">OSaiB8jEKwxBeSy9PhoaqvX3olcE9i38k5xJh9184GAAnFuxwkRzVbMhbxC1N+mvp7ZKTlORsNYxFy0Hk54Ieg==</xxf:value>
-                    <xxf:value id="output11">nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:value>
+                    <xxf:control id="output1">
+                        <xxf:value>4fd0b215276ef12f2b3e4c8ecac2811498b656fc</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output2">
+                        <xxf:value>d2fe98063f876b03193afb49b4979591</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output3">
+                        <xxf:value>9c196e32dc0175f86f4b1cb89289d6619de6bee699e4c378e68309ed97a1a6ab</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output4">
+                        <xxf:value>T9CyFSdu8S8rPkyOysKBFJi2Vvw=</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output5">
+                        <xxf:value>0v6YBj+HawMZOvtJtJeVkQ==</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output6">
+                        <xxf:value>nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output7">
+                        <xxf:value>30ddb9c8f347cffbfb44e519d814f074cf4047a55d6f563324f1c6a33920e5edfb2a34bac60bdc96cd33a95623d7d638</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output8">
+                        <xxf:value>3926a207c8c42b0c41792cbd3e1a1aaaf5f7a25704f62dfc939c4987dd7ce060009c5bb1c2447355b3216f10b537e9afa7b64a4e5391b0d631172d07939e087a</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output9">
+                        <xxf:value>MN25yPNHz/v7ROUZ2BTwdM9AR6Vdb1YzJPHGozkg5e37KjS6xgvcls0zqVYj19Y4</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output10">
+                        <xxf:value>OSaiB8jEKwxBeSy9PhoaqvX3olcE9i38k5xJh9184GAAnFuxwkRzVbMhbxC1N+mvp7ZKTlORsNYxFy0Hk54Ieg==</xxf:value>
+                    </xxf:control>
+                    <xxf:control id="output11">
+                        <xxf:value>nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:value>
+                    </xxf:control>
                 </xxf:control-values>
             </xxf:action>
         </xxf:event-response>
@@ -808,12 +981,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1" label="Test 1 : "/><xxf:value id="output1">true</xxf:value>
-                        <xxf:control id="output2" label="Test 2 : "/><xxf:value id="output2">true</xxf:value>
-                        <xxf:control id="output3" label="Test 3 : "/><xxf:value id="output3">true</xxf:value>
-                        <xxf:control id="output4" label="Test 4 : "/><xxf:value id="output4">false</xxf:value>
-                        <xxf:control id="output5" label="Test 5 : "/><xxf:value id="output5">false</xxf:value>
-                        <xxf:control id="output6" label="Test 6 : "/><xxf:value id="output6">false</xxf:value>
+                        <xxf:control id="output1" label="Test 1 : ">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2" label="Test 2 : ">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3" label="Test 3 : ">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4" label="Test 4 : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5" label="Test 5 : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output6" label="Test 6 : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -846,8 +1031,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1" label="power(2,3) : "/><xxf:value id="output1">8</xxf:value>
-                        <xxf:control id="output2" label="power(-1,0.5) : "/><xxf:value id="output2">NaN</xxf:value>
+                        <xxf:control id="output1" label="power(2,3) : ">
+                            <xxf:value>8</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2" label="power(-1,0.5) : ">
+                            <xxf:value>NaN</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -877,7 +1066,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1" label="local-date() : "/><xxf:value id="output1">2004-12-31-07:00</xxf:value>
+                        <xxf:control id="output1" label="local-date() : ">
+                            <xxf:value>2004-12-31-07:00</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -907,7 +1098,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1" label="local-dateTime() : "/><xxf:value id="output1">2004-12-31T12:00:00-07:00</xxf:value>
+                        <xxf:control id="output1" label="local-dateTime() : ">
+                            <xxf:value>2004-12-31T12:00:00-07:00</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -940,8 +1133,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1" label="Test 1 : "/><xxf:value id="output1">2002-01-01</xxf:value>
-                        <xxf:control id="output2" label="Test 2 : "/><xxf:value id="output2">1969-12-31</xxf:value>
+                        <xxf:control id="output1" label="Test 1 : ">
+                            <xxf:value>2002-01-01</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2" label="Test 2 : ">
+                            <xxf:value>1969-12-31</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -991,10 +1188,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-3⊙1" label="Nodeset : "/><xxf:value id="xf-3⊙1">Garfield</xxf:value>
-                        <xxf:control id="xf-3⊙2" label="Nodeset : "/><xxf:value id="xf-3⊙2">Heathcliff</xxf:value>
-                        <xxf:control id="xf-3⊙3" label="Nodeset : "/><xxf:value id="xf-3⊙3">Felix</xxf:value>
-                        <xxf:control id="xf-3⊙4" label="Nodeset : "/><xxf:value id="xf-3⊙4">Tom</xxf:value>
+                        <xxf:control id="xf-3⊙1" label="Nodeset : ">
+                            <xxf:value>Garfield</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-3⊙2" label="Nodeset : ">
+                            <xxf:value>Heathcliff</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-3⊙3" label="Nodeset : ">
+                            <xxf:value>Felix</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-3⊙4" label="Nodeset : ">
+                            <xxf:value>Tom</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1055,13 +1260,27 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-output-1" label="Safe Driver : "/><xxf:value id="xf-output-1">true</xxf:value>
-                        <xxf:control id="xf-output-2" label="Experienced Driver : "/><xxf:value id="xf-output-2">true</xxf:value>
-                        <xxf:control id="xf-output-3" label="Insured Driver : "/><xxf:value id="xf-output-3">true</xxf:value>
-                        <xxf:control id="xf-output-4" label="License Points : "/><xxf:value id="xf-output-4">false</xxf:value>
-                        <xxf:control id="xf-output-5" label="Accidents : "/><xxf:value id="xf-output-5">false</xxf:value>
-                        <xxf:control id="xf-output-6" label="Moving Violations : "/><xxf:value id="xf-output-6">false</xxf:value>
-                        <xxf:control id="xf-output-7" label="Junk Instance Data : "/><xxf:value id="xf-output-7">false</xxf:value>
+                        <xxf:control id="xf-output-1" label="Safe Driver : ">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-2" label="Experienced Driver : ">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-3" label="Insured Driver : ">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-4" label="License Points : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-5" label="Accidents : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-6" label="Moving Violations : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-7" label="Junk Instance Data : ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1098,8 +1317,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-output-1" label="Test 1 : "/><xxf:value id="xf-output-1">1970-01-01T00:00:00Z</xxf:value>
-                        <xxf:control id="xf-output-2" label="Test 2 : "/><xxf:value id="xf-output-2"/>
+                        <xxf:control id="xf-output-1" label="Test 1 : ">
+                            <xxf:value>1970-01-01T00:00:00Z</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-2" label="Test 2 : "/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1132,7 +1353,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-output-1" label="Test 1 : "/><xxf:value id="xf-output-1">ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0=</xxf:value>
+                        <xxf:control id="xf-output-1" label="Test 1 : ">
+                            <xxf:value>ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0=</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1159,8 +1382,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-output1">false</xxf:value>
-                        <xxf:value id="my-output2">true</xxf:value>
+                        <xxf:control id="my-output1">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1356,7 +1583,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output">C</xxf:value>
+                        <xxf:control id="output">
+                            <xxf:value>C</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1388,7 +1617,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output">C</xxf:value>
+                        <xxf:control id="output">
+                            <xxf:value>C</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1436,8 +1667,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">it</xxf:value>
-                        <xxf:value id="output2">zh</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>it</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>zh</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1479,8 +1714,12 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:attribute for="xf-1" name="xml:lang">it</xxf:attribute>
-                        <xxf:value id="output1">it</xxf:value>
-                        <xxf:value id="output2">zh</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>it</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>zh</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1525,12 +1764,24 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:attribute for="xf-1" name="xml:lang">it</xxf:attribute>
-                        <xxf:value id="my-foo-1≡output1">it</xxf:value>
-                        <xxf:value id="my-foo-1≡output2">it</xxf:value>
-                        <xxf:value id="my-foo-1≡output3">zh</xxf:value>
-                        <xxf:value id="my-foo-2≡output1">es</xxf:value>
-                        <xxf:value id="my-foo-2≡output2">es</xxf:value>
-                        <xxf:value id="my-foo-2≡output3">zh</xxf:value>
+                        <xxf:control id="my-foo-1≡output1">
+                            <xxf:value>it</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡output2">
+                            <xxf:value>it</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡output3">
+                            <xxf:value>zh</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡output1">
+                            <xxf:value>es</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡output2">
+                            <xxf:value>es</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡output3">
+                            <xxf:value>zh</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1575,10 +1826,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">At 7:25 PM on July 23, 2010, we detected 3 spaceships on the planet Mars.</xxf:value>
-                        <xxf:value id="output2⊙1">There are no files.</xxf:value>
-                        <xxf:value id="output2⊙2">There is one file.</xxf:value>
-                        <xxf:value id="output2⊙3">There are 1,273 files.</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>At 7:25 PM on July 23, 2010, we detected 3 spaceships on the planet Mars.</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2⊙1">
+                            <xxf:value>There are no files.</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2⊙2">
+                            <xxf:value>There is one file.</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2⊙3">
+                            <xxf:value>There are 1,273 files.</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1606,7 +1865,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">A 19:25 le 23 juillet 2010, nous avons détecté 3 vaisseaux spatiaux sur la planète Mars.</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>A 19:25 le 23 juillet 2010, nous avons détecté 3 vaisseaux spatiaux sur la planète Mars.</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1638,7 +1899,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:attribute for="xf-1" name="xml:lang">zh</xxf:attribute>
-                        <xxf:value id="output1">下午7:25 2010年7月23日</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>下午7:25 2010年7月23日</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1740,9 +2003,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="xf-output-1">0</xxf:value>
-                        <xxf:value id="xf-output-2">NaN</xxf:value>
-                        <xxf:value id="xf-output-3">2768461</xxf:value>
+                        <xxf:control id="xf-output-1">
+                            <xxf:value>0</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-2">
+                            <xxf:value>NaN</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-output-3">
+                            <xxf:value>2768461</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1793,13 +2062,27 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="o1⊙1">1</xxf:value>
-                        <xxf:value id="o2⊙1-1">1-1-1</xxf:value>
-                        <xxf:value id="o2⊙1-2">1-2-2</xxf:value>
-                        <xxf:value id="o1⊙2">2</xxf:value>
-                        <xxf:value id="o2⊙2-1">2-1-1</xxf:value>
-                        <xxf:value id="o2⊙2-2">2-2-2</xxf:value>
-                        <xxf:value id="o2⊙2-3">2-3-3</xxf:value>
+                        <xxf:control id="o1⊙1">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙1-1">
+                            <xxf:value>1-1-1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙1-2">
+                            <xxf:value>1-2-2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o1⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙2-1">
+                            <xxf:value>2-1-1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙2-2">
+                            <xxf:value>2-2-2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙2-3">
+                            <xxf:value>2-3-3</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1881,51 +2164,138 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="o1⊙1">true</xxf:value>
-                        <xxf:value id="o2⊙1">true</xxf:value>
-                        <xxf:value id="o3⊙1">true</xxf:value>
-                        <xxf:value id="o4⊙1">true</xxf:value>
-                        <xxf:value id="o1⊙2">false</xxf:value>
-                        <xxf:value id="o2⊙2">false</xxf:value>
-                        <xxf:value id="o3⊙2">false</xxf:value>
-                        <xxf:value id="o4⊙2">false</xxf:value>
-                        <xxf:value id="o1⊙3">true</xxf:value>
-                        <xxf:value id="o2⊙3">true</xxf:value>
-                        <xxf:value id="o3⊙3">true</xxf:value>
-                        <xxf:value id="o4⊙3">true</xxf:value>
-                        <xxf:value id="o1⊙4">false</xxf:value>
-                        <xxf:value id="o2⊙4">true</xxf:value>
-                        <xxf:value id="o3⊙4">false</xxf:value>
-                        <xxf:value id="o4⊙4">true</xxf:value>
-                        <xxf:value id="valid-attribute1">true</xxf:value>
-                        <xxf:value id="valid-descendant1">true</xxf:value>
-                        <xxf:value id="invalid-attribute1">false</xxf:value>
-                        <xxf:value id="invalid-descendant1">false</xxf:value>
-                        <xxf:value id="valid-atomic1">true</xxf:value>
-                        <xxf:value id="valid-empty1">true</xxf:value>
-
-                        <xxf:value id="o5⊙1">true</xxf:value>
-                        <xxf:value id="o6⊙1">true</xxf:value>
-                        <xxf:value id="o7⊙1">true</xxf:value>
-                        <xxf:value id="o8⊙1">true</xxf:value>
-                        <xxf:value id="o5⊙2">false</xxf:value>
-                        <xxf:value id="o6⊙2">false</xxf:value>
-                        <xxf:value id="o7⊙2">false</xxf:value>
-                        <xxf:value id="o8⊙2">false</xxf:value>
-                        <xxf:value id="o5⊙3">true</xxf:value>
-                        <xxf:value id="o6⊙3">true</xxf:value>
-                        <xxf:value id="o7⊙3">true</xxf:value>
-                        <xxf:value id="o8⊙3">true</xxf:value>
-                        <xxf:value id="o5⊙4">false</xxf:value>
-                        <xxf:value id="o6⊙4">true</xxf:value>
-                        <xxf:value id="o7⊙4">false</xxf:value>
-                        <xxf:value id="o8⊙4">true</xxf:value>
-                        <xxf:value id="valid-attribute2">true</xxf:value>
-                        <xxf:value id="valid-descendant2">true</xxf:value>
-                        <xxf:value id="invalid-attribute2">false</xxf:value>
-                        <xxf:value id="invalid-descendant2">false</xxf:value>
-                        <xxf:value id="valid-atomic2">true</xxf:value>
-                        <xxf:value id="valid-empty2">true</xxf:value>
+                        <xxf:control id="o1⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o3⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o4⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o1⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o3⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o4⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o1⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o3⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o4⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o1⊙4">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o2⊙4">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o3⊙4">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o4⊙4">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-attribute1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-descendant1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="invalid-attribute1">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="invalid-descendant1">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-atomic1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-empty1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o5⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o6⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o7⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o8⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o5⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o6⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o7⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o8⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o5⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o6⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o7⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o8⊙3">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o5⊙4">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o6⊙4">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o7⊙4">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="o8⊙4">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-attribute2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-descendant2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="invalid-attribute2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="invalid-descendant2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-atomic2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="valid-empty2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1971,14 +2341,30 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-output⊙1">is-not-g</xxf:value>
-                        <xxf:value id="my-output⊙2">is-not-g</xxf:value>
-                        <xxf:value id="my-output⊙3">is-g</xxf:value>
-                        <xxf:value id="my-output⊙4">is-not-g</xxf:value>
-                        <xxf:value id="my-output⊙5">is-not-g</xxf:value>
-                        <xxf:value id="my-output⊙6">is-g</xxf:value>
-                        <xxf:value id="my-output⊙7">is-not-g</xxf:value>
-                        <xxf:value id="my-output⊙8">is-not-g</xxf:value>
+                        <xxf:control id="my-output⊙1">
+                            <xxf:value>is-not-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙2">
+                            <xxf:value>is-not-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙3">
+                            <xxf:value>is-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙4">
+                            <xxf:value>is-not-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙5">
+                            <xxf:value>is-not-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙6">
+                            <xxf:value>is-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙7">
+                            <xxf:value>is-not-g</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙8">
+                            <xxf:value>is-not-g</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2014,9 +2400,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-case-2" visibility="visible"/>
-                        <xxf:div id="my-case-1" visibility="hidden"/>
-                        <xxf:value id="my-output">my-case-2</xxf:value>
+                        <xxf:control id="my-switch">
+                            <xxf:case id="my-case-2" visibility="visible"/>
+                            <xxf:case id="my-case-1" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-output">
+                            <xxf:value>my-case-2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2044,9 +2434,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">/doc/home-welcome</xxf:value>
-                        <xxf:value id="output2">12</xxf:value>
-                        <xxf:value id="output3">http://localhost:8080/orbeon/</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>/doc/home-welcome</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>12</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3">
+                            <xxf:value>http://localhost:8080/orbeon/</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2086,12 +2482,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">false - true - true - true</xxf:value>
-                        <xxf:value id="output2">false - false - true - false</xxf:value>
-                        <xxf:value id="output3">false - false - false - false</xxf:value>
-                        <xxf:value id="output4">false - true - true - true</xxf:value>
-                        <xxf:value id="output5">false - false - true - false</xxf:value>
-                        <xxf:value id="output6">false - false - false - false</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>false - true - true - true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>false - false - true - false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3">
+                            <xxf:value>false - false - false - false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4">
+                            <xxf:value>false - true - true - true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5">
+                            <xxf:value>false - false - true - false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output6">
+                            <xxf:value>false - false - false - false</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2127,8 +2535,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">foo - foo - bar - foo - bart</xxf:value>
-                        <xxf:value id="output2">foo - foo - bar - foo - bart</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>foo - foo - bar - foo - bart</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>foo - foo - bar - foo - bart</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2240,10 +2652,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">foo - bar - baz</xxf:value>
-                        <xxf:value id="output2">foo - bar - baz</xxf:value>
-                        <xxf:value id="output3">foo - bar - baz</xxf:value>
-                        <xxf:value id="output4">foo - bar - baz</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>foo - bar - baz</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>foo - bar - baz</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3">
+                            <xxf:value>foo - bar - baz</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4">
+                            <xxf:value>foo - bar - baz</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2275,8 +2695,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">true</xxf:value>
-                        <xxf:value id="output2">width: 400 | height: 368 | mediatype: image/jpeg</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>width: 400 | height: 368 | mediatype: image/jpeg</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2310,8 +2734,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">true</xxf:value>
-                        <xxf:value id="output2">true</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

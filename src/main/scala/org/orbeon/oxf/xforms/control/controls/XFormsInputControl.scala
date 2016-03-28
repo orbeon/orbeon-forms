@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.control.controls
 
 import java.util.{Calendar, GregorianCalendar}
 
+import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.ScalaUtils.{StringOps, _}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -25,7 +26,6 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.saxon.value.{CalendarValue, DateValue, StringValue, TimeValue}
 import org.xml.sax.helpers.AttributesImpl
@@ -58,17 +58,6 @@ class XFormsInputControl(
     case Some(expr) ⇒ evaluateAsString(expr, Seq(StringValue.makeStringValue(v)), 1) getOrElse ""
     case None       ⇒ v
   }
-
-  // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
-  // have the placeholder appearance, and those are not really controls.
-  override def getJavaScriptInitialization =
-    Option(getPlaceholderInfo(staticControl, this)) map { placeHolderInfo ⇒
-      (
-        if (placeHolderInfo.isLabelPlaceholder) "label" else "hint",
-        Dom4jUtils.qNameToExplodedQName(XFORMS_MINIMAL_APPEARANCE_QNAME),
-        getEffectiveId
-      )
-    } orNull
 
   override def evaluateExternalValue() : Unit = {
     assert(isRelevant)
@@ -221,23 +210,20 @@ class XFormsInputControl(
     }
 
   // Add type attribute if needed
-  override def addAjaxAttributes(
-    attributesImpl        : AttributesImpl,
-    isNewlyVisibleSubtree : Boolean,
-    other                 : XFormsControl
-  ): Boolean = {
+  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
 
-    var added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt)
 
-    val typeValue1 = if (isNewlyVisibleSubtree) null else other.asInstanceOf[XFormsInputControl].typeExplodedQName
+    val previousSingleNodeControlOpt = previousControlOpt.asInstanceOf[Option[XFormsSingleNodeControl]]
+
     val typeValue2 = typeExplodedQName
-    if (isNewlyVisibleSubtree || typeValue1 != typeValue2) {
-      val attributeValue = if (typeValue2 ne null) typeValue2 else ""
+    if (previousControlOpt.isEmpty || previousSingleNodeControlOpt.exists(_.typeExplodedQName != typeExplodedQName)) {
+      val attributeValue = StringUtils.defaultString(typeValue2)
       added |= ControlAjaxSupport.addOrAppendToAttributeIfNeeded(
         attributesImpl,
         "type",
         attributeValue,
-        isNewlyVisibleSubtree,
+        previousControlOpt.isEmpty,
         attributeValue == "" || StringQNames(attributeValue)
       )
     }
@@ -249,6 +235,8 @@ class XFormsInputControl(
 object XFormsInputControl {
 
   val StringQNames = Set(XS_STRING_EXPLODED_QNAME, XFORMS_STRING_EXPLODED_QNAME)
+
+  case class PlaceHolderInfo(isLabelPlaceholder: Boolean, value: String)
 
   // Anything but "true" is "false"
   private def normalizeBooleanString(s: String) = (s == "true").toString
@@ -281,10 +269,12 @@ object XFormsInputControl {
   def testParseTimeForNoscript(value: String) = parseForNoscript(TimeParsePatterns, value, dayMonth = false)
   def testParseDateForNoscript(value: String, dayMonth: Boolean) = parseForNoscript(DateParsePatterns, value, dayMonth)
 
-  def getPlaceholderInfo(elementAnalysis: ElementAnalysis, control: XFormsControl): PlaceHolderInfo = {
+  def placeholderInfo(elementAnalysis: ElementAnalysis, control: XFormsControl): Option[PlaceHolderInfo] = {
+
     val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "label")
-    val isHintPlaceholder = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "hint")
-    if (isLabelPlaceholder || isHintPlaceholder) {
+    val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "hint")
+
+    (isLabelPlaceholder || isHintPlaceholder) option {
       // null if no placeholder, "" if placeholder and non-concrete control, placeholder value otherwise
       val placeholderValue =
         if ((control ne null) && control.isRelevant) {
@@ -292,9 +282,8 @@ object XFormsInputControl {
         } else
           ""
 
-      new XFormsInputControl.PlaceHolderInfo(isLabelPlaceholder, isHintPlaceholder, placeholderValue)
-    } else
-      null
+      PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
+    }
   }
 
   private val DateComponentSeparators = "[./\\-\\s]"
@@ -384,6 +373,4 @@ object XFormsInputControl {
         hours
     }
   }
-
-  case class PlaceHolderInfo(isLabelPlaceholder: Boolean, isHintPlaceholder: Boolean, placeholder: String)
 }

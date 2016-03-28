@@ -12,7 +12,6 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-.xbl-fr-code-mirror .xforms-textarea { display: none }                          /* XForms text area we get the text from, write the text to */
 .xbl-fr-code-mirror .CodeMirror { background-color: white }                     /* If used in a container which has a background color, we still want the editable area to be white */
 .xbl-fr-code-mirror .xforms-readonly .CodeMirror-cursor { display: none }       /* Hide cursor in readonly mode (yes, CodeMirror doesn't do that by itself) */
 .xbl-fr-code-mirror .xforms-readonly .CodeMirror { background-color: #F7F7F7 }  /* If used in a container which has a background color, we still want the editable area to be white */

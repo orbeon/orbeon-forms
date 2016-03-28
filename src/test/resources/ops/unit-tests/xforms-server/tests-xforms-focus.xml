@@ -61,8 +61,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input-1" relevant="false"/><xxf:value id="my-input-1"/>
-                        <xxf:value id="my-input-2">Ada</xxf:value>
+                        <xxf:control id="my-input-1" relevant="false"/>
+                        <xxf:control id="my-input-2">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input-2"/>
                 </xxf:action>
@@ -122,14 +124,26 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-case-12" visibility="visible"/>
-                        <xxf:div id="my-case-11" visibility="hidden"/>
-                        <xxf:value id="my-input-11">Ada</xxf:value>
-                        <xxf:div id="my-case-21" visibility="visible"/>
-                        <xxf:div id="my-case-22" visibility="hidden"/>
-                        <xxf:value id="my-input-21">Ada</xxf:value>
-                        <xxf:value id="my-input-22">Ada</xxf:value>
-                        <xxf:value id="my-input-23">Ada</xxf:value>
+                        <xxf:control id="my-switch-1">
+                            <xxf:case id="my-case-12" visibility="visible"/>
+                            <xxf:case id="my-case-11" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-input-11">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-switch-2">
+                            <xxf:case id="my-case-21" visibility="visible"/>
+                            <xxf:case id="my-case-22" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-input-21">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input-22">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input-23">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input-21"/>
                 </xxf:action>
@@ -214,9 +228,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input⊙1">Ada</xxf:value>
-                        <xxf:value id="my-input⊙2">Marie</xxf:value>
-                        <xxf:value id="my-input⊙3">Clara</xxf:value>
+                        <xxf:control id="my-input⊙1">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input⊙2">
+                            <xxf:value>Marie</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input⊙3">
+                            <xxf:value>Clara</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input⊙2"/>
                 </xxf:action>
@@ -324,16 +344,11 @@
                         <xxf:control id="my-group-1" visited="true"/>
                         <xxf:control id="my-group-11" visited="true"/>
                         <xxf:control id="my-input-111" visited="true"/>
-                        <xxf:value id="my-input-111"/>
                         <xxf:control id="my-input-112" visited="true"/>
-                        <xxf:value id="my-input-112"/>
                         <xxf:control id="my-group-12" visited="true"/>
                         <xxf:control id="my-input-121" visited="true"/>
-                        <xxf:value id="my-input-121"/>
                         <xxf:control id="my-group-21" visited="true"/>
                         <xxf:control id="my-input-211" visited="true"/>
-                        <xxf:value id="my-input-211"/>
-                        <xxf:value id="my-input-2"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input-2"/>
                 </xxf:action>
@@ -473,10 +488,10 @@
                     <xxf:control-values>
                         <xxf:control id="my-group-1" visited="true"/>
                         <xxf:control id="my-group-11" visited="true"/>
-                        <xxf:control id="my-input-111" visited="true"/><xxf:value id="my-input-111"/>
+                        <xxf:control id="my-input-111" visited="true"/>
                         <xxf:control id="my-group-2" visited="true"/>
                         <xxf:control id="my-group-21" visited="true"/>
-                        <xxf:control id="my-input-211" visited="true" readonly="true"/><xxf:value id="my-input-211"/>
+                        <xxf:control id="my-input-211" visited="true" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -571,9 +586,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-input⊙1" visited="true"/>
-                        <xxf:value id="my-input⊙1"/>
-                        <xxf:value id="my-input⊙2"/>
-                        <xxf:value id="my-input⊙3"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input⊙1"/>
                 </xxf:action>
@@ -658,11 +670,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:value id="my-input⊙1"/>
-                        <xxf:value id="my-input⊙2"/>
-                        <xxf:value id="my-input⊙3"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                     <xxf:focus control-id="my-input⊙2"/>
                 </xxf:action>
             </xxf:event-response>
@@ -766,12 +774,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-input⊙1-1" visited="true"/>
-                        <xxf:value id="my-input⊙1-1"/>
-                        <xxf:value id="my-input⊙1-2"/>
                         <xxf:control id="my-input⊙2-1" visited="true"/>
-                        <xxf:value id="my-input⊙2-1"/>
-                        <xxf:value id="my-input⊙2-2"/>
-                        <xxf:value id="my-input⊙2-3"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -887,15 +890,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-switch" visited="true"/>
-                        <xxf:div id="case-3" visibility="visible"/>
-                        <xxf:div id="case-1" visibility="hidden"/>
-                        <xxf:div id="case-2" visibility="hidden"/>
+                        <xxf:control id="my-switch" visited="true">
+                            <xxf:case id="case-3" visibility="visible"/>
+                            <xxf:case id="case-1" visibility="hidden"/>
+                            <xxf:case id="case-2" visibility="hidden"/>
+                        </xxf:control>
                         <xxf:control id="my-input-1" visited="true"/>
-                        <xxf:value id="my-input-1"/>
                         <xxf:control id="my-input-2" visited="true"/>
-                        <xxf:value id="my-input-2"/>
-                        <xxf:value id="my-input-3"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input-3"/>
                 </xxf:action>
@@ -1013,17 +1014,13 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-input-1" visited="true"/>
-                        <xxf:value id="my-input-1"/>
                         <xxf:control id="my-dialog-1" visited="true"/>
-                        <xxf:div id="my-dialog-1" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog-1" visibility="hidden"/>
                         <xxf:control id="my-input-2" visited="true" relevant="false"/>
-                        <xxf:value id="my-input-2"/>
                         <xxf:control id="my-dialog-2" visited="true"/>
-                        <xxf:div id="my-dialog-2" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog-2" visibility="hidden"/>
                         <xxf:control id="my-input-3" relevant="false"/>
-                        <xxf:value id="my-input-3"/>
                         <xxf:control id="my-input-4" visited="true" relevant="false"/>
-                        <xxf:value id="my-input-4"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input-1"/>
                 </xxf:action>
@@ -1133,15 +1130,10 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-input-1" visited="true"/>
-                        <xxf:value id="my-input-1"/>
                         <xxf:control id="my-gaga" visited="true"/>
                         <xxf:control id="my-gaga≡gaga-1" visited="true"/>
-                        <xxf:value id="my-gaga≡gaga-1"/>
                         <xxf:control id="my-gaga≡gaga-2" visited="true"/>
-                        <xxf:value id="my-gaga≡gaga-2"/>
                         <xxf:control id="my-toto≡toto-1" visited="true"/>
-                        <xxf:value id="my-toto≡toto-1"/>
-                        <xxf:value id="my-toto≡toto-2"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-toto≡toto-2"/>
                 </xxf:action>
@@ -1203,8 +1195,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input⊙1">Ada</xxf:value>
-                        <xxf:value id="my-input⊙2">Marie</xxf:value>
+                        <xxf:control id="my-input⊙1">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input⊙2">
+                            <xxf:value>Marie</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input⊙2"/>
                 </xxf:action>
@@ -1287,8 +1283,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-gaga" visited="true"/>
-                        <xxf:value id="my-gaga≡gaga-1"/>
-                        <xxf:value id="my-toto≡toto-1"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-toto≡toto-1"/>
                 </xxf:action>

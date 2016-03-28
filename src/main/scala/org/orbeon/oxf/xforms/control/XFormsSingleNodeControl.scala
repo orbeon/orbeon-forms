@@ -255,16 +255,16 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // about value type changes.
   override def compareExternalUseExternalValue(
     previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousControlOpt    : Option[XFormsControl]
   ): Boolean =
-    previousControl match {
+    previousControlOpt match {
       case Some(other: XFormsSingleNodeControl) ⇒
         isReadonly == other.isReadonly &&
         isRequired == other.isRequired &&
         isValid    == other.isValid    &&
         alertLevel == other.alertLevel &&
         customMIPs == other.customMIPs &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+        super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt)
       case _ ⇒ false
     }
 
@@ -275,37 +275,43 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     containingDocument.staticReadonly ||
       XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
-  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
-    assert(attributesImpl.getLength == 0)
+  override def outputAjaxDiff(
+    previousControlOpt    : Option[XFormsControl],
+    content               : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch                    : XMLReceiverHelper
+  ): Unit = {
 
-    val control1 = other.asInstanceOf[XFormsSingleNodeControl]
-    val control2 = this
+    val atts = new AttributesImpl
 
     // Add attributes
-    val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+    val doOutputElement = addAjaxAttributes(atts, previousControlOpt)
 
-    if (doOutputElement)
-      ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
+    if (doOutputElement || content.isDefined) {
+      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "control", atts)
+      content foreach (_(ch))
+      ch.endElement()
+    }
 
-    // Output attributes (like style) in no namespace which must be output via xxf:attribute
-    // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
-    addExtensionAttributesExceptClassAndAcceptForAjax(control1, "", isNewlyVisibleSubtree)(ch)
+    addExtensionAttributesExceptClassAndAcceptForAjax(previousControlOpt, "")
   }
 
-  override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {
-    val control1 = other.asInstanceOf[XFormsSingleNodeControl]
-    val control2 = this
+  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControl: Option[XFormsControl]) = {
 
-    // Call base class for the standard stuff
-    var added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+    val control1Opt = previousControl.asInstanceOf[Option[XFormsSingleNodeControl]]
+    val control2    = this
 
-    // MIPs
-    added |= addAjaxMIPs(attributesImpl, isNewlyVisibleSubtree, control1, control2)
+    var added = super.addAjaxAttributes(attributesImpl, previousControl)
+
+    added |= addAjaxMIPs(attributesImpl, control1Opt, control2)
 
     added
   }
 
-  private def addAjaxMIPs(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, control1: XFormsSingleNodeControl, control2: XFormsSingleNodeControl): Boolean = {
+  private def addAjaxMIPs(
+    attributesImpl : AttributesImpl,
+    control1Opt    : Option[XFormsSingleNodeControl],
+    control2       : XFormsSingleNodeControl
+  ): Boolean = {
 
     var added = false
 
@@ -314,19 +320,19 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       added = true
     }
 
-    if (isNewlyVisibleSubtree && control2.isReadonly || control1 != null && control1.isReadonly != control2.isReadonly)
+    if (control1Opt.isEmpty && control2.isReadonly || control1Opt.exists(_.isReadonly != control2.isReadonly))
       addAttribute(READONLY_ATTRIBUTE_NAME, control2.isReadonly.toString)
 
-    if (isNewlyVisibleSubtree && control2.isRequired || control1 != null && control1.isRequired != control2.isRequired)
+    if (control1Opt.isEmpty && control2.isRequired || control1Opt.exists(_.isRequired != control2.isRequired))
       addAttribute(REQUIRED_ATTRIBUTE_NAME, control2.isRequired.toString)
 
-    if (isNewlyVisibleSubtree && ! control2.isRelevant || control1 != null && control1.isRelevant != control2.isRelevant)
+    if (control1Opt.isEmpty && ! control2.isRelevant || control1Opt.exists(_.isRelevant != control2.isRelevant))
       addAttribute(RELEVANT_ATTRIBUTE_NAME, control2.isRelevant.toString)
 
-    if (isNewlyVisibleSubtree && control2.alertLevel.isDefined || control1 != null && control1.alertLevel != control2.alertLevel)
+    if (control1Opt.isEmpty && control2.alertLevel.isDefined || control1Opt.exists(_.alertLevel != control2.alertLevel))
       addAttribute(CONSTRAINT_LEVEL_ATTRIBUTE_NAME, control2.alertLevel map (_.name) getOrElse "")
 
-    added |= addAjaxCustomMIPs(attributesImpl, isNewlyVisibleSubtree, control1, control2)
+    added |= addAjaxCustomMIPs(attributesImpl, control1Opt, control2)
 
     added
   }
@@ -436,41 +442,40 @@ object XFormsSingleNodeControl {
   def isRelevant(control: XFormsSingleNodeControl) = Option(control) exists (_.isRelevant)
 
   // NOTE: Similar to AjaxSupport.addAjaxClasses. Should unify handling of classes.
-  def addAjaxCustomMIPs(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsSingleNodeControl, control2: XFormsSingleNodeControl): Boolean = {
-
-    require(control2 ne null)
+  def addAjaxCustomMIPs(
+    attributesImpl : AttributesImpl,
+    control1Opt    : Option[XFormsSingleNodeControl],
+    control2       : XFormsSingleNodeControl
+  ): Boolean = {
 
     val customMIPs2 = control2.customMIPs
 
     def addOrAppend(s: String) =
-      ControlAjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "class", s, newlyVisibleSubtree, s == "")
+      ControlAjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "class", s, control1Opt.isEmpty, s == "")
 
     // This attribute is a space-separate list of class names prefixed with either '-' or '+'
-    if (newlyVisibleSubtree) {
-      // Control is newly shown (it may or may not be relevant!)
-      assert(control1 eq null)
+    control1Opt match {
+      case None ⇒
+        // Add all classes
+        addOrAppend(control2.customMIPsClasses map ('+' + _) mkString " ")
+      case Some(control1) if control1.customMIPs != customMIPs2 ⇒
+        // Custom MIPs changed
+        val customMIPs1 = control1.customMIPs
 
-      // Add all classes
-      addOrAppend(control2.customMIPsClasses map ('+' + _) mkString " ")
-    } else if (control1.customMIPs != customMIPs2) {
-      // Custom MIPs changed
-      assert(control1 ne null)
+        def diff(mips1: Map[String, String], mips2: Map[String, String], prefix: Char) =
+          for {
+            (name, value1) ← mips1
+            value2 = mips2.get(name)
+            if Option(value1) != value2
+          } yield
+            prefix + name + '-' + value1 // TODO: encode so that there are no spaces
 
-      val customMIPs1 = control1.customMIPs
+        val classesToRemove = diff(customMIPs1, customMIPs2, '-')
+        val classesToAdd    = diff(customMIPs2, customMIPs1, '+')
 
-      def diff(mips1: Map[String, String], mips2: Map[String, String], prefix: Char) =
-        for {
-          (name, value1) ← mips1
-          value2 = mips2.get(name)
-          if Option(value1) != value2
-        } yield
-          prefix + name + '-' + value1 // TODO: encode so that there are no spaces
-
-      val classesToRemove = diff(customMIPs1, customMIPs2, '-')
-      val classesToAdd    = diff(customMIPs2, customMIPs1, '+')
-
-      addOrAppend(classesToRemove ++ classesToAdd mkString " ")
-    } else
-      false
+        addOrAppend(classesToRemove ++ classesToAdd mkString " ")
+      case _ ⇒
+        false
+    }
   }
 }

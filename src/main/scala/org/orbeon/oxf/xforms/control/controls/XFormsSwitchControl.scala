@@ -280,59 +280,71 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   override def compareExternalUseExternalValue(
     previousExternalValue : Option[String],
-    previousControl       : Option[XFormsControl]
+    previousControlOpt    : Option[XFormsControl]
   ): Boolean =
-    previousControl match {
-      case Some(other: XFormsSwitchControl) ⇒
-        getSelectedCaseEffectiveId == getOtherSelectedCaseEffectiveId(other) &&
-        super.compareExternalUseExternalValue(previousExternalValue, previousControl)
+    previousControlOpt match {
+      case Some(previousSwitchControl: XFormsSwitchControl) ⇒
+        getSelectedCaseEffectiveId == getOtherSelectedCaseEffectiveId(Some(previousSwitchControl)) &&
+        super.compareExternalUseExternalValue(previousExternalValue, previousControlOpt)
       case _ => false
     }
 
-  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
+  final override def outputAjaxDiff(
+    previousControlOpt : Option[XFormsControl],
+    content            : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch                 : XMLReceiverHelper
+  ): Unit = {
 
-    // Output regular diff
-    super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree)
+    val otherSwitchControl = previousControlOpt.asInstanceOf[Option[XFormsSwitchControl]]
 
-    val otherSwitchControl = other.asInstanceOf[XFormsSwitchControl]
-    if (isRelevant && getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl)) {
+    val hasNestedContent =
+      isRelevant && getSelectedCaseEffectiveId != getOtherSelectedCaseEffectiveId(otherSwitchControl)
 
+    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
       // Output newly selected case id
       val selectedCaseEffectiveId = getSelectedCaseEffectiveId ensuring (_ ne null)
 
-      ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", Array(
+      ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
         "id", XFormsUtils.namespaceId(containingDocument, selectedCaseEffectiveId),
         "visibility", "visible")
       )
 
-      if ((otherSwitchControl ne null) && otherSwitchControl.isRelevant) {
-        // Used to be relevant, simply output deselected case ids
-        val previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl) ensuring (_ ne null)
+      otherSwitchControl match {
+        case Some(control) if control.isRelevant ⇒
+          // Used to be relevant, simply output deselected case ids
+          val previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl) ensuring (_ ne null)
 
-        ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", Array(
-          "id", XFormsUtils.namespaceId(containingDocument, previousSelectedCaseId),
-          "visibility", "hidden")
-        )
-      } else {
-        // Control was not relevant, send all deselected to be sure
-        // TODO: This should not be needed because the repeat template should have a reasonable default.
-        getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl ⇒
-          ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", Array(
-            "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),
+          ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
+            "id", XFormsUtils.namespaceId(containingDocument, previousSelectedCaseId),
             "visibility", "hidden")
           )
-        }
+        case _ ⇒
+          // Control was not relevant, send all deselected to be sure
+          // TODO: This should not be needed because the repeat template should have a reasonable default.
+          getChildrenCases filter (_.getEffectiveId != selectedCaseEffectiveId) foreach { caseControl ⇒
+            ch.element("xxf", XXFORMS_NAMESPACE_URI, "case", Array(
+              "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId ensuring (_ ne null)),
+              "visibility", "hidden")
+            )
+          }
       }
     }
+
+    super.outputAjaxDiff(
+      previousControlOpt,
+      hasNestedContent option outputNestedContent
+    )
   }
 
-  private def getOtherSelectedCaseEffectiveId(switchControl1: XFormsSwitchControl): String =
-    if ((switchControl1 ne null) && switchControl1.isRelevant) {
-      val selectedCaseId = switchControl1.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
-      assert(selectedCaseId ne null)
-      XFormsUtils.getRelatedEffectiveId(switchControl1.getEffectiveId, selectedCaseId)
-    } else
-      null
+  private def getOtherSelectedCaseEffectiveId(previousSwitchControl: Option[XFormsSwitchControl]): String =
+    previousSwitchControl match {
+      case Some(control) if control.isRelevant ⇒
+        val selectedCaseId = control.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
+        assert(selectedCaseId ne null)
+        XFormsUtils.getRelatedEffectiveId(control.getEffectiveId, selectedCaseId)
+      case _ ⇒
+        null
+    }
 
   def isXForms11Switch: Boolean = {
     val localXForms11Switch = element.attributeValue(XXFORMS_XFORMS11_SWITCH_QNAME)

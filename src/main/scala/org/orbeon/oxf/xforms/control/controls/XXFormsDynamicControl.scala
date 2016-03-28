@@ -36,7 +36,6 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.ELEMENT_NODE
-import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.generic.Growable
 import scala.collection.mutable.Buffer
@@ -375,7 +374,11 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   // For now we don't need to output anything particular
   // LATER: what about new scripts?
-  override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) = ()
+  final override def outputAjaxDiff(
+    previousControlOpt : Option[XFormsControl],
+    content            : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch                 : XMLReceiverHelper
+  ): Unit = ()
 
   // Only if we had a structural change
   override def supportFullAjaxUpdates = containingDocument.getControlsStructuralChanges.contains(prefixedId)

@@ -13,23 +13,22 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import collection.JavaConverters._
 import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
-import org.orbeon.oxf.externalcontext.ServletURLRewriter
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.{Connection, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsError
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsError, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.controls.OutputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
-import org.orbeon.oxf.xforms.submission.{SubmissionUtils, SubmissionHeaders}
+import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.exception.OrbeonFormatter
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 /**
@@ -229,9 +228,9 @@ class XFormsOutputControl(
   // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
   override def focusableControls = Iterator.empty
 
-  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
-    var added = super.addAjaxExtensionAttributes(attributesImpl, isNewRepeatIteration, other)
-    added |= addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
+  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
+    var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
+    added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
     added
   }
 

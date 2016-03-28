@@ -65,26 +65,28 @@ case class AbstractBinding(
       "div"
 
   // XBL modes
-  private val xblMode   = attSet(bindingElement, XXBL_MODE_QNAME)
-  def modeBinding       = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
-  def modeValue         = xblMode("value")
-  def modeExternalValue = modeValue && xblMode("external-value")
-  def modeLHHA          = xblMode("lhha")
-  def modeFocus         = xblMode("focus")
-  def modeLHHACustom    = modeLHHA && xblMode("custom-lhha")
-  def modeItemset       = xblMode("itemset") // NIY as of 2012-11-20
-  def modeHandlers      = ! xblMode("nohandlers")
+  private val xblMode         = attSet(bindingElement, XXBL_MODE_QNAME)
+  def modeBinding             = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
+  def modeValue               = xblMode("value")
+  def modeExternalValue       = modeValue && xblMode("external-value")
+  def modeJavaScriptLifecycle = xblMode("javascript-lifecycle")
+  def modeLHHA                = xblMode("lhha")
+  def modeFocus               = xblMode("focus")
+  def modeLHHACustom          = modeLHHA && xblMode("custom-lhha")
+  def modeItemset             = xblMode("itemset") // NIY as of 2012-11-20
+  def modeHandlers            = ! xblMode("nohandlers")
 
-  val labelFor        = Option(bindingElement.attributeValue(XXBL_LABEL_FOR_QNAME))
+  val labelFor                = Option(bindingElement.attributeValue(XXBL_LABEL_FOR_QNAME))
 
   // Printable name for the binding match
   def debugBindingName = bindingElement.getQualifiedName
 
   // CSS classes to put in the markup
   val cssClasses =
-    "xbl-component"                  ::
-    (cssName map ("xbl-" +) toList)  :::
-    (modeFocus list "xbl-focusable") :::
+    "xbl-component"                                           ::
+    (cssName                  map ("xbl-" +) toList)          :::
+    (modeFocus               list "xbl-focusable")            :::
+    (modeJavaScriptLifecycle list "xbl-javascript-lifecycle") :::
     attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
   val allowedExternalEvents =

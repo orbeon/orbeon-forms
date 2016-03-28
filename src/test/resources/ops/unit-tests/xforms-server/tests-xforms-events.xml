@@ -69,7 +69,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" label="My Data"/><xxf:value id="my-input">new</xxf:value>
+                        <xxf:control id="my-input" label="My Data">
+                            <xxf:value>new</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -136,8 +138,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input-1">New value</xxf:value>
-                        <xxf:value id="my-input-2">New value</xxf:value>
+                        <xxf:control id="my-input-1">
+                            <xxf:value>New value</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input-2">
+                            <xxf:value>New value</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -306,24 +312,60 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1⊙1">row2</xxf:value>
-                        <xxf:value id="output1⊙2">row1</xxf:value>
-                        <xxf:value id="output1⊙3">row3</xxf:value>
-                        <xxf:value id="output2⊙1">row2</xxf:value>
-                        <xxf:value id="output2⊙2">row3</xxf:value>
-                        <xxf:value id="output2⊙3">row1</xxf:value>
-                        <xxf:value id="output3⊙1">row2</xxf:value>
-                        <xxf:value id="output3⊙2">row1</xxf:value>
-                        <xxf:value id="output3⊙3">row3</xxf:value>
-                        <xxf:value id="output4⊙1">row1</xxf:value>
-                        <xxf:value id="output4⊙2">row3</xxf:value>
-                        <xxf:value id="output4⊙3">row2</xxf:value>
-                        <xxf:value id="output5⊙1">row3</xxf:value>
-                        <xxf:value id="output5⊙2">row1</xxf:value>
-                        <xxf:value id="output5⊙3">row2</xxf:value>
-                        <xxf:value id="output6⊙1">row1</xxf:value>
-                        <xxf:value id="output6⊙2">row3</xxf:value>
-                        <xxf:value id="output6⊙3">row2</xxf:value>
+                        <xxf:control id="output1⊙1">
+                            <xxf:value>row2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output1⊙2">
+                            <xxf:value>row1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output1⊙3">
+                            <xxf:value>row3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2⊙1">
+                            <xxf:value>row2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2⊙2">
+                            <xxf:value>row3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2⊙3">
+                            <xxf:value>row1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3⊙1">
+                            <xxf:value>row2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3⊙2">
+                            <xxf:value>row1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3⊙3">
+                            <xxf:value>row3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4⊙1">
+                            <xxf:value>row1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4⊙2">
+                            <xxf:value>row3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4⊙3">
+                            <xxf:value>row2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5⊙1">
+                            <xxf:value>row3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5⊙2">
+                            <xxf:value>row1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5⊙3">
+                            <xxf:value>row2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output6⊙1">
+                            <xxf:value>row1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output6⊙2">
+                            <xxf:value>row3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output6⊙3">
+                            <xxf:value>row2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -434,34 +476,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output-1-1"/>
-                        <xxf:value id="output-1-2"/>
-                        <xxf:value id="output-1-3"/>
-                        <xxf:value id="output-1-4"/>
                         <xxf:control id="group-2-1" relevant="false"/>
                         <xxf:control id="output-2-1" relevant="false"/>
-                        <xxf:value id="output-2-1"/>
                         <xxf:control id="output-2-2" relevant="false"/>
-                        <xxf:value id="output-2-2"/>
                         <xxf:control id="group-2-2" relevant="false"/>
                         <xxf:control id="output-2-3" relevant="false"/>
-                        <xxf:value id="output-2-3"/>
                         <xxf:control id="output-2-4" relevant="false"/>
-                        <xxf:value id="output-2-4"/>
-                        <xxf:value id="output-3-1"/>
-                        <xxf:value id="output-3-2"/>
                         <xxf:control id="group-3-2" relevant="false"/>
                         <xxf:control id="output-3-3" relevant="false"/>
-                        <xxf:value id="output-3-3"/>
                         <xxf:control id="output-3-4" relevant="false"/>
-                        <xxf:value id="output-3-4"/>
-                        <xxf:value id="output-4-1"/>
-                        <xxf:value id="output-4-2"/>
                         <xxf:control id="group-4-2" relevant="false"/>
                         <xxf:control id="output-4-3" relevant="false"/>
-                        <xxf:value id="output-4-3"/>
                         <xxf:control id="output-4-4" relevant="false"/>
-                        <xxf:value id="output-4-4"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -598,9 +624,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="case-1" visibility="visible"/>
-                        <xxf:div id="case-2" visibility="visible"/>
-                        <xxf:div id="case-3" visibility="visible"/>
+                        <xxf:control id="switch-1">
+                            <xxf:case id="case-1" visibility="visible"/>
+                        </xxf:control>
+                        <xxf:control id="switch-2">
+                            <xxf:case id="case-2" visibility="visible"/>
+                        </xxf:control>
+                        <xxf:control id="switch-3">
+                            <xxf:case id="case-3" visibility="visible"/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -668,10 +700,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output-1">new</xxf:value>
-                        <xxf:value id="output-2">new</xxf:value>
-                        <xxf:value id="output-3">constant</xxf:value>
-                        <xxf:value id="output-4">constant</xxf:value>
+                        <xxf:control id="output-1">
+                            <xxf:value>new</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-2">
+                            <xxf:value>new</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-3">
+                            <xxf:value>constant</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-4">
+                            <xxf:value>constant</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -963,11 +1003,21 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="plate⊙1">777</xxf:value>
-                        <xxf:value id="leased⊙1">leased</xxf:value>
-                        <xxf:value id="plate⊙2">666</xxf:value>
-                        <xxf:value id="plate⊙3">333</xxf:value>
-                        <xxf:value id="leased⊙3"/>
+                        <xxf:control id="plate⊙1">
+                            <xxf:value>777</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="leased⊙1">
+                            <xxf:value>leased</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="plate⊙2">
+                            <xxf:value>666</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="plate⊙3">
+                            <xxf:value>333</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="leased⊙3">
+                            <xxf:value/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1035,10 +1085,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input2" relevant="false"/>
-                        <xxf:value id="input2"/>
-                        <xxf:control id="input3" readonly="true"/>
-                        <xxf:value id="input3">Good value 3</xxf:value>
+                        <xxf:control id="input2" relevant="false">
+                            <xxf:value/>
+                        </xxf:control>
+                        <xxf:control id="input3" readonly="true">
+                            <xxf:value>Good value 3</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1144,7 +1196,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">Ada</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>Ada</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1192,7 +1246,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">42</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1296,7 +1352,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">42</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1409,8 +1467,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="minimal-dialog" visibility="visible" neighbor="show-minimal-dialog" constrain="true"/>
-                        <xxf:div id="default-dialog" visibility="visible" constrain="true"/>
+                        <xxf:dialog id="minimal-dialog" visibility="visible" neighbor="show-minimal-dialog" constrain="true"/>
+                        <xxf:dialog id="default-dialog" visibility="visible" constrain="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1445,8 +1503,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="second-case" visibility="visible"/>
-                        <xxf:div id="first-case" visibility="hidden"/>
+                        <xxf:control id="switch">
+                            <xxf:case id="second-case" visibility="visible"/>
+                            <xxf:case id="first-case" visibility="hidden"/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1519,10 +1579,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="case2" visibility="visible"/>
-                        <xxf:div id="case1" visibility="hidden"/>
-                        <xxf:control id="input1" relevant="false"/><xxf:value id="input1"/>
-                        <xxf:value id="input2">43</xxf:value>
+                        <xxf:control id="my-switch">
+                            <xxf:case id="case2" visibility="visible"/>
+                            <xxf:case id="case1" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="input1" relevant="false"/>
+                        <xxf:control id="input2">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1594,10 +1658,16 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="case2" visibility="visible"/>
-                        <xxf:div id="case1" visibility="hidden"/>
-                        <xxf:value id="input1">42</xxf:value>
-                        <xxf:value id="input2">43</xxf:value>
+                        <xxf:control id="my-switch">
+                            <xxf:case id="case2" visibility="visible"/>
+                            <xxf:case id="case1" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="input1">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input2">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1672,11 +1742,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dialog" visited="true"/>
-                        <xxf:div id="my-dialog" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog" visibility="hidden"/>
                         <xxf:control id="input1" visited="true" relevant="false"/>
-                        <xxf:value id="input1"/>
                         <xxf:control id="input2" relevant="false"/>
-                        <xxf:value id="input2"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1854,7 +1922,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">43</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1926,7 +1996,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">43</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2273,9 +2345,7 @@
                     <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:value id="my-foo≡my-input"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                     <xxf:message level="modal">target: my-foo, observer: #document, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: inner-group, observer: inner-group, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: inner-group, observer: my-template, event: xforms-enabled</xxf:message>
@@ -2347,7 +2417,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="case" visibility="visible"/>
+                        <xxf:control id="my-switch">
+                            <xxf:case id="case" visibility="visible"/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2539,9 +2611,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:value id="my-input⊙1"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                     <xxf:focus control-id="my-input⊙1"/>
                 </xxf:action>
             </xxf:event-response>

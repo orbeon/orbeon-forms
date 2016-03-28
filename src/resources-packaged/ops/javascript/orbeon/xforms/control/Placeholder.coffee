@@ -52,19 +52,15 @@ do ->
     if not browserSupportsPlaceholder
         Event.onDOMReady ->
             # Initial initialization of placeholders
-            for own formId, formInfo of orbeonInitData
-                controls = formInfo.controls
-                continue if not controls?
-                for labelHint in ["label", "hint"]
-                    continue if not controls[labelHint]?
-                    placeholders = controls[labelHint]["minimal"]
-                    continue if not placeholders?
-                    for id in placeholders
-                        control = YD.get id
-                        input = $(control).find('input')
-                        # Don't show the placeholder if the focus is already on this input
-                        if not input.is(document.activeElement)
-                            showPlaceholder control
+            for own formId, formInfo of orbeonInitData #xxx formId unused?
+                placeholders = formInfo.placeholders
+                continue if not placeholders?
+                for id in placeholders
+                    control = YD.get id
+                    input = $(control).find('input')
+                    # Don't show the placeholder if the focus is already on this input
+                    if not input.is(document.activeElement)
+                        showPlaceholder control
 
 # Call showPlaceholder/hidePlaceholder when users focus in and out of input
 do ->

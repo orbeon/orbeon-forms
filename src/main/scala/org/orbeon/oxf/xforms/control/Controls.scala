@@ -490,7 +490,7 @@ object Controls {
     visitSiblings(listener, tree.getChildren.asScala)
 
   // Iterator over the given control and its descendants
-  case class ControlsIterator( // Q: Should this be a case class? Probably not.
+  class ControlsIterator(
     private val start       : XFormsControl,
     private val includeSelf : Boolean
   ) extends Iterator[XFormsControl] {
@@ -528,6 +528,10 @@ object Controls {
     }
 
     def hasNext = current ne null
+  }
+
+  object ControlsIterator {
+    def apply(start: XFormsControl, includeSelf: Boolean) = new ControlsIterator(start, includeSelf)
   }
 
   // Evaluate the body with InstancesControls in scope

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsModelBinds
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
@@ -166,7 +167,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
    * Return the control's internal value.
    */
   final def getValue = _value
-  final def isEmpty = XFormsModelBinds.isEmptyValue(_value)
+  final def isEmptyValue = XFormsModelBinds.isEmptyValue(_value)
 
   /**
    * Return the control's external value is the value as exposed to the UI layer.
@@ -190,7 +191,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
    * Return the external value ready to be inserted into the client after an Ajax response.
    */
   def getRelevantEscapedExternalValue = getExternalValue
-  def getNonRelevantEscapedExternalValue: String =  ""
+  def getNonRelevantEscapedExternalValue = ""
 
   final def getEscapedExternalValue =
     if (isRelevant)
@@ -237,44 +238,52 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     outputAjaxDiffUseClientValue(
       clientValue orElse (previousControl map (_.getExternalValue)),
       previousControl,
-      previousControl.isEmpty)(
+      None)(
       new XMLReceiverHelper(receiver)
     )
 
   def outputAjaxDiffUseClientValue(
-    previousValue         : Option[String],
-    previousControl       : Option[XFormsValueControl],
-    isNewlyVisibleSubtree : Boolean)(implicit
-    ch                    : XMLReceiverHelper
+    previousValue   : Option[String],
+    previousControl : Option[XFormsValueControl],
+    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch              : XMLReceiverHelper
   ): Unit = {
-    super.outputAjaxDiff(ch, previousControl.orNull, new AttributesImpl, isNewlyVisibleSubtree)
 
-    if (! (previousValue contains getExternalValue)) {
+    val hasNestedValueContent =
+      previousControl.isEmpty && getEscapedExternalValue != getNonRelevantEscapedExternalValue ||
+      previousControl.nonEmpty && ! (previousValue contains getExternalValue)
 
-      val attributesImpl = new AttributesImpl
-      attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, this.getEffectiveId)
+    val hasNestedContent =
+      content.isDefined || hasNestedValueContent
 
-      outputValueElement(
-        isNewlyVisibleSubtree,
-        attributesImpl,
-        "value"
-      )
+    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
+
+      content foreach (_(ch))
+
+      if (hasNestedValueContent)
+        outputValueElement(
+          attributesImpl = new AttributesImpl,
+          elementName    = "value",
+          value          = getEscapedExternalValue
+        )(ch)
     }
+
+    super.outputAjaxDiff(
+      previousControl,
+      hasNestedContent option outputNestedContent
+    )
   }
 
   protected def outputValueElement(
-    isNewlyVisibleSubtree : Boolean,
-    attributesImpl        : AttributesImpl,
-    elementName           : String)(implicit
-    ch                    : XMLReceiverHelper
+    attributesImpl : AttributesImpl,
+    elementName    : String,
+    value          : String)(implicit
+    ch             : XMLReceiverHelper
   ): Unit = {
-    val value = getEscapedExternalValue
-    if (attributesImpl.getLength > 0 || ! isNewlyVisibleSubtree || value != "") {
-      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, elementName, attributesImpl)
-      if (value.nonEmpty)
-        ch.text(value)
-      ch.endElement()
-    }
+    ch.startElement("xxf", XXFORMS_NAMESPACE_URI, elementName, attributesImpl)
+    if (value.nonEmpty)
+      ch.text(value)
+    ch.endElement()
   }
 
   override def performDefaultAction(event: XFormsEvent): Unit = event match {
@@ -294,19 +303,20 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       write("required-and-empty", XFormsModelBinds.isEmptyValue(getValue).toString)
   }
 
-  override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {
-    var added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+  override def addAjaxAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
+
+    var added = super.addAjaxAttributes(attributesImpl, previousControlOpt)
 
     // NOTE: We should really have a general mechanism to add/remove/diff classes.
     if (isRequired) {
 
-      val control1 = other.asInstanceOf[XFormsValueControl]
-      val control2 = this
+      val control1Opt = previousControlOpt.asInstanceOf[Option[XFormsValueControl]]
+      val control2    = this
 
-      val empty = control2.isEmpty
+      val control2IsEmptyValue = control2.isEmptyValue
 
-      if (isNewlyVisibleSubtree || ! control1.isRequired || empty != control1.isEmpty) {
-        attributesImpl.addAttribute("", "empty", "empty", XMLReceiverHelper.CDATA, empty.toString)
+      if (control1Opt.isEmpty || control1Opt.exists(control1 ⇒ ! control1.isRequired || control1.isEmptyValue != control2IsEmptyValue)) {
+        attributesImpl.addAttribute("", "empty", "empty", XMLReceiverHelper.CDATA, control2IsEmptyValue.toString)
         added = true
       }
     }

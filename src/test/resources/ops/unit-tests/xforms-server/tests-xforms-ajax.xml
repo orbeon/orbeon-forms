@@ -160,8 +160,8 @@
                                 <xf:model id="model">
                                     <xf:instance id="instance">
                                         <instance>
-                                            <input1></input1>
-                                            <input2></input2>
+                                            <input1/>
+                                            <input2/>
                                         </instance>
                                     </xf:instance>
                                     <xf:bind ref="input2" readonly="true()" relevant="../input1 = 'true'"/>
@@ -242,24 +242,27 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="input2" readonly="true" relevant="true"/>
-                            <xxf:value id="input2"/>
+                            <xxf:control id="input2" readonly="true" relevant="true">
+                                <xxf:value/>
+                            </xxf:control>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="input2" readonly="false" relevant="false"/>
-                            <xxf:value id="input2"/>
+                            <xxf:control id="input2" readonly="false" relevant="false">
+                                <xxf:value/>
+                            </xxf:control>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="input2" readonly="true" relevant="true"/>
-                            <xxf:value id="input2"/>
+                            <xxf:control id="input2" readonly="true" relevant="true">
+                                <xxf:value/>
+                            </xxf:control>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
@@ -287,7 +290,7 @@
                                 </xf:model>
                             </xh:head>
                             <xh:body>
-                                <xf:input  id="my-input" ref="."/>
+                                <xf:input id="my-input" ref="."/>
                                 <xf:output id="my-output" ref="."/>
                             </xh:body>
                         </xh:html>
@@ -334,7 +337,9 @@
         </input>
         <output name="response">
             <xxf:control-values>
-                <xxf:value id="my-output">The external entity should be missing:</xxf:value>
+                <xxf:control id="my-output">
+                    <xxf:value>The external entity should be missing:</xxf:value>
+                </xxf:control>
             </xxf:control-values>
         </output>
     </test>
@@ -451,8 +456,12 @@
         <output name="response">
             <!-- NOTE: Values 2-3 and 5-6 are compacted, which is what we expect -->
             <xxf:control-values>
-                <xxf:value id="output1">1 3 4 6 7</xxf:value>
-                <xxf:value id="output2">trigger1 trigger2 trigger3 trigger4 trigger5</xxf:value>
+                <xxf:control id="output1">
+                    <xxf:value>1 3 4 6 7</xxf:value>
+                </xxf:control>
+                <xxf:control id="output2">
+                    <xxf:value>trigger1 trigger2 trigger3 trigger4 trigger5</xxf:value>
+                </xxf:control>
             </xxf:control-values>
         </output>
     </test>
@@ -689,7 +698,9 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:value id="output1">42</xxf:value>
+                            <xxf:control id="output1">
+                                <xxf:value>42</xxf:value>
+                            </xxf:control>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>
@@ -701,9 +712,15 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:value id="output1">42</xxf:value>
-                            <xxf:value id="input1">cat</xxf:value>
-                            <xxf:value id="input2">42</xxf:value>
+                            <xxf:control id="output1">
+                                <xxf:value>42</xxf:value>
+                            </xxf:control>
+                            <xxf:control id="input1">
+                                <xxf:value>cat</xxf:value>
+                            </xxf:control>
+                            <xxf:control id="input2">
+                                <xxf:value>42</xxf:value>
+                            </xxf:control>
                         </xxf:control-values>
                     </xxf:action>
                 </xxf:event-response>

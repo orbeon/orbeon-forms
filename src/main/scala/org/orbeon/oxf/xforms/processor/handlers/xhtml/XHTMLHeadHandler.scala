@@ -15,31 +15,33 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 
+import java.{lang ⇒ jl}
+
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.control.Controls
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XXFormsDialogControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLResources
 import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
-import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XINCLUDE_URI}
+import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 // Handler for <xh:head>
 class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
-  import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler._
+  import XHTMLHeadHandler._
 
   private var formattingPrefix: String = null
 
@@ -98,10 +100,10 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
       outputScriptDeclarations(xhtmlPrefix)
 
-      // Store information about "special" controls that need JavaScript initialization
-      // Gather information about appearances of controls which use Script
-      // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
-      outputJavaScriptInitialData(xhtmlPrefix, gatherJavascriptControls(containingDocument))
+      outputJavaScriptInitialData(
+        xhtmlPrefix,
+        gatherJavaScriptInitializations(containingDocument.getControls.getCurrentControlTree.getRoot)
+      )
     }
   }
 
@@ -223,7 +225,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         val heartbeatDelay =
           XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
 
-        dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[java.lang.Integer],
+        dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[jl.Integer],
           SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
       }
 
@@ -401,22 +403,25 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
   }
 
   private def outputJavaScriptInitialData(
-    xhtmlPrefix              : String,
-    jsControlsAppearancesMap : collection.Map[String, collection.Map[String, collection.Seq[String]]])(implicit
-    helper                   : XMLReceiverHelper
+    xhtmlPrefix               : String,
+    javaScriptInitializations : (List[String], List[(String, Option[String])]))(implicit
+    helper                    : XMLReceiverHelper
   ): Unit = {
 
     helper.startElement(xhtmlPrefix, XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
 
+    val (placeholders, controlsToInitialize) = javaScriptInitializations
+
     // Produce JSON output
-    val hasPaths = true
-    val hasInitControls = jsControlsAppearancesMap.nonEmpty
-    val hasKeyListeners = containingDocument.getStaticOps.keypressHandlers.nonEmpty
-    val hasServerEvents = containingDocument.delayedEvents.nonEmpty
-    val outputInitData = hasPaths || hasInitControls || hasKeyListeners || hasServerEvents
+    val hasPaths                = true
+    val hasPlaceholders         = placeholders.nonEmpty
+    val hasControlsToInitialize = controlsToInitialize.nonEmpty
+    val hasKeyListeners         = containingDocument.getStaticOps.keypressHandlers.nonEmpty
+    val hasServerEvents         = containingDocument.delayedEvents.nonEmpty
+    val outputInitData          = hasPaths || hasPlaceholders || hasControlsToInitialize || hasKeyListeners || hasServerEvents
 
     if (outputInitData) {
-      val sb = new java.lang.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
+      val sb = new jl.StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"")
       sb.append(XFormsUtils.getFormId(containingDocument))
       sb.append("\"] = {")
 
@@ -446,52 +451,12 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         sb.append('}')
       }
 
-      // Output controls initialization
-      if (hasInitControls) {
-        if (hasPaths)
-          sb.append(',')
-        sb.append("\"controls\":{")
-        locally {
-          val i = jsControlsAppearancesMap.iterator
-          while (i.hasNext) {
-            val (controlName, controlMap) = i.next()
-            sb.append("\"")
-            sb.append(controlName)
-            sb.append("\":{")
-            locally {
-              val j = controlMap.iterator
-              while (j.hasNext) {
-                val (controlAppearance, idsForAppearanceList) = j.next()
-                sb.append('"')
-                sb.append(if (controlAppearance ne null) controlAppearance else "")
-                sb.append("\":[")
-                locally {
-                  val k = idsForAppearanceList.iterator
-                  while (k.hasNext) {
-                    val controlId = k.next()
-                    sb.append('"')
-                    sb.append(controlId)
-                    sb.append('"')
-                    if (k.hasNext)
-                      sb.append(',')
-                  }
-                }
-                sb.append(']')
-                if (j.hasNext)
-                  sb.append(',')
-              }
-            }
-            sb.append("}")
-            if (i.hasNext)
-              sb.append(',')
-          }
-        }
-        sb.append('}')
-      }
+      if (hasPlaceholders || hasControlsToInitialize)
+        buildJavaScriptInitializations(hasPaths, javaScriptInitializations, sb)
 
       // Output key listener information
       if (hasKeyListeners) {
-        if (hasPaths || hasInitControls)
+        if (hasPaths || hasPlaceholders || hasControlsToInitialize)
           sb.append(',')
         sb.append("\"keylisteners\":[")
         var first = true
@@ -522,7 +487,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
       // Output server events
       if (hasServerEvents) {
-        if (hasPaths || hasInitControls || hasKeyListeners)
+        if (hasPaths || hasPlaceholders || hasControlsToInitialize || hasKeyListeners)
           sb.append(',')
         sb.append("\"server-events\":[")
         val currentTime = System.currentTimeMillis
@@ -544,6 +509,9 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
 object XHTMLHeadHandler {
 
+  def quoteString(s: String) =
+    s""""${escapeJavaScript(s)}""""
+
   def outputScripts(shareableScripts: Iterable[ShareableScript])(implicit helper: XMLReceiverHelper) =
     for (shareableScript ← shareableScripts) {
 
@@ -558,27 +526,82 @@ object XHTMLHeadHandler {
       helper.text("}\n")
     }
 
-  def gatherJavascriptControls(
-    containingDocument : XFormsContainingDocument
-  ): collection.Map[String, collection.Map[String, collection.Seq[String]]] = {
+  def buildJavaScriptInitializations(
+    prependComma              : Boolean,
+    javaScriptInitializations : (List[String], List[(String, Option[String])]),
+    sb                        : jl.StringBuilder
+  ): Unit = {
 
-    // control name → appearance or mediatype → ids
-    val result = mutable.HashMap[String, mutable.HashMap[String, mutable.Buffer[String]]]()
+    val (placeholders, controlsToInitialize) = javaScriptInitializations
 
-    val rootControl = containingDocument.getControls.getCurrentControlTree.getRoot
-
-    // NOTE: Don't run JavaScript initialization if the control is static readonly (could change in the
-    // future if some static readonly controls require JS initialization)
-    for {
-      control ← Controls.ControlsIterator(rootControl, includeSelf = false)
-      if ! control.isStaticReadonly
-      (localName, appearanceOrMediatype, effectiveId) ← control.javaScriptInitialization
-      appearanceToId = result.getOrElseUpdate(localName, mutable.HashMap[String, mutable.Buffer[String]]())
-      ids = appearanceToId.getOrElseUpdate(appearanceOrMediatype, mutable.Buffer[String]())
-    } locally {
-      ids += XFormsUtils.namespaceId(containingDocument, effectiveId)
+    if (placeholders.nonEmpty) {
+      if (prependComma)
+        sb.append(',')
+      sb.append("\"placeholders\":[")
+      val i = placeholders.iterator
+      while (i.hasNext) {
+        val controlId = i.next()
+        sb.append(quoteString(controlId))
+        if (i.hasNext)
+          sb.append(',')
+      }
+      sb.append(']')
     }
 
-    result // TODO: work w/ immutable stuff
+    if (controlsToInitialize.nonEmpty) {
+      if (prependComma || placeholders.nonEmpty)
+        sb.append(',')
+      sb.append("\"controls\":[")
+      val it = controlsToInitialize.iterator
+      while (it.hasNext) {
+        val (controlId, valueOpt) = it.next()
+        valueOpt match {
+          case Some(value) ⇒ sb.append(s"""{"id":${quoteString(controlId)},"value":${quoteString(value)}}""")
+          case None        ⇒ sb.append(s"""{"id":${quoteString(controlId)}}""")
+        }
+
+        if (it.hasNext)
+          sb.append(',')
+      }
+      sb.append(']')
+    }
+  }
+
+  def gatherJavaScriptInitializations(startControl: XFormsControl): (List[String], List[(String, Option[String])]) = {
+
+    val placeholders         = ListBuffer[String]()
+    val controlsToInitialize = ListBuffer[(String, Option[String])]()
+
+    def addControlToInitialize(effectiveId: String, value: Option[String]) =
+      controlsToInitialize += effectiveId → value
+
+    Controls.ControlsIterator(startControl, includeSelf = false) foreach {
+      case c: XFormsInputControl ⇒
+        // Special case of placeholders (useful only for IE8 and IE9)
+        XFormsInputControl.placeholderInfo(c.staticControl, c) foreach { placeHolderInfo ⇒
+          placeholders += c.getEffectiveId
+        }
+      case c: XFormsValueComponentControl ⇒
+        if (c.isRelevant) {
+          val abstractBinding = c.staticControl.binding.abstractBinding
+          if (abstractBinding.modeJavaScriptLifecycle)
+            addControlToInitialize(
+              c.getEffectiveId,
+              if (abstractBinding.modeExternalValue)
+                c.externalValueOpt
+              else
+                None
+            )
+        }
+      case c: XFormsComponentControl ⇒
+        if (c.isRelevant)
+          addControlToInitialize(c.getEffectiveId, None)
+      case c ⇒
+        // Legacy JavaScript initialization
+        if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
+          addControlToInitialize(c.getEffectiveId, None)
+    }
+
+    placeholders.result → controlsToInitialize.result
   }
 }

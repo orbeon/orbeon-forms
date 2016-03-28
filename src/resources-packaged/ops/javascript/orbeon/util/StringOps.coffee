@@ -26,12 +26,6 @@ ORBEON.util.StringOps = _.tap {}, (StringOps) -> _.extend StringOps,
             index += newToken.length
         text
 
-    # Evaluates JavaScript which can contain return characters we need to remove
-    # TODO: Why do we need to replace newline in JavaScript before it to eval()?
-    eval: (jsString) ->
-        replace = (text, token) -> StringOps.replace text, token, " "
-        eval (_.foldl ['\n', '\r'], replace, jsString)
-
     # Escape text that appears in an HTML attribute which we use in an innerHTML
     escapeForMarkup: (text) ->
         # List of characters to replace per http://stackoverflow.com/a/1091953/5295

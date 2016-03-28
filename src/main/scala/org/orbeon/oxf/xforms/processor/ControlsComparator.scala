@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import java.{util ⇒ ju}
+import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XXFormsDynamicControl}
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.processor.handlers._
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XXFormsAttributeHandler}
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XHTMLHeadHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
-import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable ⇒ i}
@@ -141,10 +141,9 @@ class ControlsComparator(
         case c ⇒
           if (! c.compareExternalMaybeClientValue(None, control1Opt))
             c.outputAjaxDiff(
-              new XMLReceiverHelper(receiver),
-              control1Opt.orNull,
-              new AttributesImpl,
-              isNewlyVisibleSubtree = control1Opt.isEmpty
+              previousControlOpt = control1Opt,
+              content            = None)(
+              ch                 = new XMLReceiverHelper(receiver)
             )
       }
 
@@ -273,19 +272,45 @@ class ControlsComparator(
       controller.setElementHandlerContext(handlerContext)
     }
 
-    // Setup everything and replay
     withElement(
       "inner-html",
       prefix = "xxf",
       uri    = XXFORMS_NAMESPACE_URI,
       atts   = List("id" → namespaceId(document, control.effectiveId))
     ) {
-      val controller = setupController
-      setupOutputPipeline(controller)
 
-      controller.startDocument()
-      replay(controller)
-      controller.endDocument()
+      // Setup everything and replay
+      withElement(
+        "value",
+        prefix = "xxf",
+        uri    = XXFORMS_NAMESPACE_URI
+      ) {
+        val controller = setupController
+        setupOutputPipeline(controller)
+
+        controller.startDocument()
+        replay(controller)
+        controller.endDocument()
+      }
+
+      val javaScriptInitializations @ (placeholders, controlsToInitialize) = XHTMLHeadHandler.gatherJavaScriptInitializations(control)
+      if (placeholders.nonEmpty || controlsToInitialize.nonEmpty) {
+        val sb = new jl.StringBuilder
+        sb.append('{')
+        XHTMLHeadHandler.buildJavaScriptInitializations(
+          prependComma              = false,
+          javaScriptInitializations = javaScriptInitializations,
+          sb                        = sb
+        )
+        sb.append('}')
+
+        element(
+          "init",
+          prefix = "xxf",
+          uri    = XXFORMS_NAMESPACE_URI,
+          text   = sb.toString
+        )
+      }
     }
   }
 

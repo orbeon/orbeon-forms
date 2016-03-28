@@ -55,6 +55,11 @@
                                                 </attribute>
                                             </optional>
                                             <optional>
+                                                <attribute name="init">
+                                                    <value>true</value>
+                                                </attribute>
+                                            </optional>
+                                            <optional>
                                                 <attribute name="hint"/>
                                             </optional>
                                             <optional>
@@ -180,22 +185,34 @@
                                                     </choice>
                                                 </attribute>
                                             </optional>
-                                            <optional>
-                                                <data type="string"/>
-                                            </optional>
+                                            <interleave>
+                                                <!-- For value controls only -->
+                                                <optional>
+                                                    <element name="xxf:value">
+                                                        <data type="string"/>
+                                                    </element>
+                                                </optional>
+                                                <!-- For selection controls only -->
+                                                <optional>
+                                                    <element name="xxf:itemset">
+                                                        <data type="string"/>
+                                                    </element>
+                                                </optional>
+                                                <zeroOrMore>
+                                                    <!-- For switch/case only -->
+                                                    <element name="xxf:case">
+                                                        <attribute name="id"/>
+                                                        <attribute name="visibility">
+                                                            <choice>
+                                                                <value>hidden</value>
+                                                                <value>visible</value>
+                                                            </choice>
+                                                        </attribute>
+                                                    </element>
+                                                </zeroOrMore>
+                                            </interleave>
                                         </element>
-                                        <!-- For value controls only -->
-                                        <element name="xxf:value">
-                                            <attribute name="id"/>
-                                            <data type="string"/>
-                                        </element>
-                                        <!-- For selection controls only -->
-                                        <element name="xxf:itemset">
-                                            <attribute name="id"/>
-                                            <data type="string"/>
-                                        </element>
-                                        <!-- For switch/case and dialog only -->
-                                        <element name="xxf:div">
+                                        <element name="xxf:dialog">
                                             <attribute name="id"/>
                                             <attribute name="visibility">
                                                 <choice>
@@ -278,7 +295,14 @@
                                             <attribute name="id">
                                                 <data type="string"/>
                                             </attribute>
-                                            <data type="string"/>
+                                            <element name="xxf:value">
+                                                <data type="string"/>
+                                            </element>
+                                            <optional>
+                                                <element name="xxf:init">
+                                                    <data type="string"/>
+                                                </element>
+                                            </optional>
                                         </element>
                                     </choice>
                                 </zeroOrMore>

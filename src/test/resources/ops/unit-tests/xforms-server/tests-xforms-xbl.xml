@@ -101,7 +101,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-foo≡xf-3" label="My label"/>
-                        <xxf:value id="my-foo≡my-input">43</xxf:value>
+                        <xxf:control id="my-foo≡my-input">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -410,26 +412,44 @@
                 <xxf:action>
                      <xxf:control-values>
                         <xxf:control id="fr-dropdown-date≡xf-25⊙1" label="Date: "/>
-                        <xxf:value id="fr-dropdown-date≡year-select⊙1">2009</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡year-select⊙1">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
-                        <xxf:value id="fr-dropdown-date≡month-select⊙1">1</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡month-select⊙1">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:value id="fr-dropdown-date≡day-select⊙1">2</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡day-select⊙1">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date≡year-select⊙1">
+                            <xxf:itemset>[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
+                            <xxf:value>2009</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="fr-dropdown-date≡month-select⊙1">
+                            <xxf:itemset>[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="fr-dropdown-date≡day-select⊙1">
+                            <xxf:itemset>[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
                         <xxf:control id="fr-dropdown-date≡xf-25⊙2" label="Date: "/>
-                        <xxf:value id="fr-dropdown-date≡year-select⊙2">2008</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡year-select⊙2">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
-                        <xxf:value id="fr-dropdown-date≡month-select⊙2">2</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡month-select⊙2">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:value id="fr-dropdown-date≡day-select⊙2">1</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡day-select⊙2">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date≡year-select⊙2">
+                            <xxf:itemset>[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
+                            <xxf:value>2008</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="fr-dropdown-date≡month-select⊙2">
+                            <xxf:itemset>[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="fr-dropdown-date≡day-select⊙2">
+                            <xxf:itemset>[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
                         <xxf:control id="fr-dropdown-date≡xf-25⊙3" label="Date: "/>
-                        <xxf:value id="fr-dropdown-date≡year-select⊙3">2008</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡year-select⊙3">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
-                        <xxf:value id="fr-dropdown-date≡month-select⊙3">2</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡month-select⊙3">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:value id="fr-dropdown-date≡day-select⊙3">1</xxf:value>
-                        <xxf:itemset id="fr-dropdown-date≡day-select⊙3">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date≡year-select⊙3">
+                            <xxf:itemset>[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
+                            <xxf:value>2008</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="fr-dropdown-date≡month-select⊙3">
+                            <xxf:itemset>[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="fr-dropdown-date≡day-select⊙3">
+                            <xxf:itemset>[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
                         <xxf:control id="add-row-trigger" label="Add"/>
                         <xxf:control id="remove-row-trigger" label="Remove"/>
                     </xxf:control-values>
@@ -551,13 +571,19 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="fr-super-control-1≡xf-9" label="Internal value 1: "/>
-                        <xxf:value id="fr-super-control-1≡my-input">foo-value</xxf:value>
+                        <xxf:control id="fr-super-control-1≡my-input">
+                            <xxf:value>foo-value</xxf:value>
+                        </xxf:control>
                         <xxf:control id="fr-super-control-2≡xf-21" label="Internal value 2: "/>
-                        <xxf:value id="fr-super-control-2≡my-input">bar-value</xxf:value>
-                        <xxf:control id="input-1" label="External value 1: "/>
-                        <xxf:value id="input-1">foo-value</xxf:value>
-                        <xxf:control id="input-2" label="External value 2: "/>
-                        <xxf:value id="input-2">bar-value</xxf:value>
+                        <xxf:control id="fr-super-control-2≡my-input">
+                            <xxf:value>bar-value</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input-1" label="External value 1: ">
+                            <xxf:value>foo-value</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input-2" label="External value 2: ">
+                            <xxf:value>bar-value</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -618,7 +644,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-component≡xbl-output">gotit</xxf:value>
+                        <xxf:control id="my-component≡xbl-output">
+                            <xxf:value>gotit</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -742,7 +770,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-component≡xbl-output">2</xxf:value>
+                        <xxf:control id="my-component≡xbl-output">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1016,8 +1046,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo≡clash" label="Read-only: "/><xxf:value id="my-foo≡clash">false</xxf:value>
-                        <xxf:control id="my-bar≡clash" label="Message: "/><xxf:value id="my-bar≡clash">Hello, world!</xxf:value>
+                        <xxf:control id="my-foo≡clash" label="Read-only: ">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar≡clash" label="Message: ">
+                            <xxf:value>Hello, world!</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1128,12 +1162,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-output⊙1">2</xxf:value>
-                        <xxf:value id="my-output⊙2">2</xxf:value>
-                        <xxf:value id="my-foo≡my-output-foo⊙1">2</xxf:value>
-                        <xxf:value id="my-foo≡my-output-foo⊙2">2</xxf:value>
-                        <xxf:value id="my-bar≡my-output-bar⊙1">2</xxf:value>
-                        <xxf:value id="my-bar≡my-output-bar⊙2">2</xxf:value>
+                        <xxf:control id="my-output⊙1">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡my-output-foo⊙1">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡my-output-foo⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar≡my-output-bar⊙1">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar≡my-output-bar⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1257,13 +1303,27 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-output⊙1">1</xxf:value>
-                        <xxf:value id="my-output⊙2">1</xxf:value>
-                        <xxf:value id="my-foo≡my-output-foo⊙1">2</xxf:value>
-                        <xxf:value id="my-foo≡my-output-foo⊙2">2</xxf:value>
-                        <xxf:value id="my-bar≡my-output-bar⊙1">2</xxf:value>
-                        <xxf:value id="my-bar≡my-output-bar⊙2">2</xxf:value>
-                        <xxf:value id="my-bar≡my-output-bar⊙3">2</xxf:value>
+                        <xxf:control id="my-output⊙1">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output⊙2">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡my-output-foo⊙1">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡my-output-foo⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar≡my-output-bar⊙1">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar≡my-output-bar⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar≡my-output-bar⊙3">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1333,18 +1393,42 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foobar≡xf-3">global-instance-1</xxf:value>
-                        <xxf:value id="my-foobar≡output-2">local-instance</xxf:value>
-                        <xxf:value id="my-foobar≡output-3">local-instance</xxf:value>
-                        <xxf:value id="my-foobar≡output-4">local-instance</xxf:value>
-                        <xxf:value id="my-foobar≡output-5">global-instance-1</xxf:value>
-                        <xxf:value id="my-foobar≡output-6">global-instance-2</xxf:value>
-                        <xxf:value id="my-foobar2≡xf-6">global-instance-2</xxf:value>
-                        <xxf:value id="my-foobar2≡output-2">local-instance</xxf:value>
-                        <xxf:value id="my-foobar2≡output-3">local-instance</xxf:value>
-                        <xxf:value id="my-foobar2≡output-4">local-instance</xxf:value>
-                        <xxf:value id="my-foobar2≡output-5">global-instance-1</xxf:value>
-                        <xxf:value id="my-foobar2≡output-6">global-instance-2</xxf:value>
+                        <xxf:control id="my-foobar≡xf-3">
+                            <xxf:value>global-instance-1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar≡output-2">
+                            <xxf:value>local-instance</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar≡output-3">
+                            <xxf:value>local-instance</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar≡output-4">
+                            <xxf:value>local-instance</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar≡output-5">
+                            <xxf:value>global-instance-1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar≡output-6">
+                            <xxf:value>global-instance-2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar2≡xf-6">
+                            <xxf:value>global-instance-2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar2≡output-2">
+                            <xxf:value>local-instance</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar2≡output-3">
+                            <xxf:value>local-instance</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar2≡output-4">
+                            <xxf:value>local-instance</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar2≡output-5">
+                            <xxf:value>global-instance-1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foobar2≡output-6">
+                            <xxf:value>global-instance-2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1475,10 +1559,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-bar-1≡input1">Red</xxf:value>
-                        <xxf:value id="my-bar-1≡input2">Blue</xxf:value>
-                        <xxf:value id="my-bar-2≡input1">Cat</xxf:value>
-                        <xxf:value id="my-bar-2≡input2">Mouse</xxf:value>
+                        <xxf:control id="my-bar-1≡input1">
+                            <xxf:value>Red</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar-1≡input2">
+                            <xxf:value>Blue</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar-2≡input1">
+                            <xxf:value>Cat</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-bar-2≡input2">
+                            <xxf:value>Mouse</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1552,10 +1644,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo≡xf-4≡xf-7" label="Life, etc.: "/><xxf:value id="my-foo≡xf-4≡xf-7">42</xxf:value>
-                        <xxf:control id="my-foo≡xf-4≡xf-9" label="Life, etc.: "/><xxf:value id="my-foo≡xf-4≡xf-9">42</xxf:value>
-                        <xxf:control id="my-foo≡xf-5≡xf-12" label="Life, etc.: "/><xxf:value id="my-foo≡xf-5≡xf-12">42</xxf:value>
-                        <xxf:control id="my-foo≡xf-5≡xf-14" label="Life, etc.: "/><xxf:value id="my-foo≡xf-5≡xf-14">42</xxf:value>
+                        <xxf:control id="my-foo≡xf-4≡xf-7" label="Life, etc.: ">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡xf-4≡xf-9" label="Life, etc.: ">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡xf-5≡xf-12" label="Life, etc.: ">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡xf-5≡xf-14" label="Life, etc.: ">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1820,7 +1920,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="level1-component≡level2-component≡level3-component≡title-control⊙1-1-1">Cool title</xxf:value>
+                        <xxf:control id="level1-component≡level2-component≡level3-component≡title-control⊙1-1-1">
+                            <xxf:value>Cool title</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:focus control-id="level1-component≡level2-component≡level3-component≡title-control⊙1-1-1"/>
                 </xxf:action>
@@ -1871,8 +1973,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-foobar≡my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foobar≡my-case-1" visibility="hidden"/>
+                        <xxf:control id="my-foobar≡my-switch">
+                            <xxf:case id="my-foobar≡my-case-2" visibility="visible"/>
+                            <xxf:case id="my-foobar≡my-case-1" visibility="hidden"/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1932,8 +2036,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-foo≡xf-5≡my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foo≡xf-5≡my-case-1" visibility="hidden"/>
+                        <xxf:control id="my-foo≡xf-5≡my-switch">
+                            <xxf:case id="my-foo≡xf-5≡my-case-2" visibility="visible"/>
+                            <xxf:case id="my-foo≡xf-5≡my-case-1" visibility="hidden"/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1982,15 +2088,33 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="xf-2">42</xxf:value>
-                        <xxf:value id="xf-3">42</xxf:value>
-                        <xxf:value id="xf-4">42</xxf:value>
-                        <xxf:value id="xf-5">42</xxf:value>
-                        <xxf:value id="xf-6">42</xxf:value>
-                        <xxf:value id="xf-7">42</xxf:value>
-                        <xxf:value id="xf-8">42</xxf:value>
-                        <xxf:value id="my-foo-1≡xf-11">42</xxf:value>
-                        <xxf:value id="my-foo-2≡xf-14">42</xxf:value>
+                        <xxf:control id="xf-2">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-3">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-4">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-5">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-6">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-7">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-8">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡xf-11">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡xf-14">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2059,21 +2183,32 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-foo-1≡my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foo-1≡my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-foo-1≡my-case-3" visibility="hidden"/>
-                        <xxf:div id="my-foo-2≡my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foo-2≡my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-foo-2≡my-case-3" visibility="hidden"/>
-                        <xxf:div id="my-bar-1≡my-case-3" visibility="visible"/>
-                        <xxf:div id="my-bar-1≡my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-bar-1≡my-case-2" visibility="hidden"/>
-                        <xxf:div id="my-bar-2≡my-case-3" visibility="visible"/>
-                        <xxf:div id="my-bar-2≡my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-bar-2≡my-case-2" visibility="hidden"/>
-                        <xxf:div id="my-case-1" visibility="visible"/>
-                        <xxf:div id="my-case-2" visibility="hidden"/>
-                        <xxf:div id="my-case-3" visibility="hidden"/>
+                        <xxf:control id="my-foo-1≡my-switch">
+                            <xxf:case id="my-foo-1≡my-case-2" visibility="visible"/>
+                            <xxf:case id="my-foo-1≡my-case-1" visibility="hidden"/>
+                            <xxf:case id="my-foo-1≡my-case-3" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡my-switch">
+                            <xxf:case id="my-foo-2≡my-case-2" visibility="visible"/>
+                            <xxf:case id="my-foo-2≡my-case-1" visibility="hidden"/>
+                            <xxf:case id="my-foo-2≡my-case-3" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-bar-1≡my-switch">
+                            <xxf:case id="my-bar-1≡my-case-3" visibility="visible"/>
+                            <xxf:case id="my-bar-1≡my-case-1" visibility="hidden"/>
+                            <xxf:case id="my-bar-1≡my-case-2" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-bar-2≡my-switch">
+                            <xxf:case id="my-bar-2≡my-case-3" visibility="visible"/>
+
+                            <xxf:case id="my-bar-2≡my-case-1" visibility="hidden"/>
+                            <xxf:case id="my-bar-2≡my-case-2" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-switch">
+                            <xxf:case id="my-case-1" visibility="visible"/>
+                            <xxf:case id="my-case-2" visibility="hidden"/>
+                            <xxf:case id="my-case-3" visibility="hidden"/>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2225,10 +2360,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:value id="my-foo≡my-foo-input"/>
-                        <xxf:value id="my-foo-2≡my-foo-input-2"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2282,10 +2414,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo-1≡xf-4">42</xxf:value>
-                        <xxf:value id="my-foo-1≡my-inner-output">42</xxf:value>
-                        <xxf:value id="my-foo-2≡xf-9">43</xxf:value>
-                        <xxf:value id="my-foo-2≡my-inner-output">43</xxf:value>
+                        <xxf:control id="my-foo-1≡xf-4">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡my-inner-output">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡xf-9">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡my-inner-output">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2376,12 +2516,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo-1≡xf-4">42</xxf:value>
-                        <xxf:value id="my-foo-1≡my-inner-select1"/>
-                        <xxf:itemset id="my-foo-1≡my-inner-select1">[{"label":"Apple","value":"apple"},{"label":"Banana","value":"banana"}]</xxf:itemset>
-                        <xxf:value id="my-foo-2≡xf-12">43</xxf:value>
-                        <xxf:value id="my-foo-2≡my-inner-select1"/>
-                        <xxf:itemset id="my-foo-2≡my-inner-select1">[{"label":"43","value":"","children":[{"label":"Pear","value":"pear"}]},{"label":"42","value":"","children":[{"label":"Orange","value":"orange"},{"label":"Kiwi","value":"kiwi"}]},{"label":"Apple","value":"apple"}]</xxf:itemset>
+                        <xxf:control id="my-foo-1≡xf-4">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡my-inner-select1">
+                            <xxf:itemset>[{"label":"Apple","value":"apple"},{"label":"Banana","value":"banana"}]</xxf:itemset>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡xf-12">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-2≡my-inner-select1">
+                            <xxf:itemset>[{"label":"43","value":"","children":[{"label":"Pear","value":"pear"}]},{"label":"42","value":"","children":[{"label":"Orange","value":"orange"},{"label":"Kiwi","value":"kiwi"}]},{"label":"Apple","value":"apple"}]</xxf:itemset>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2440,11 +2586,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo-1≡xf-4">42</xxf:value>
-                        <xxf:value id="my-foo-1≡xf-9">42</xxf:value>
-                        <xxf:value id="my-foo-1≡xf-10">42</xxf:value>
-                        <xxf:value id="my-foo-1≡my-output-1"/>
-                        <xxf:value id="my-foo-1≡my-output-2">42</xxf:value>
+                        <xxf:control id="my-foo-1≡xf-4">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡xf-9">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡xf-10">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo-1≡my-output-2">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2525,16 +2678,36 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">42, 43, 42, 43</xxf:value>
-                        <xxf:value id="output2">44, 45, 44, 45</xxf:value>
-                        <xxf:value id="output3">42, 43, 42, 43</xxf:value>
-                        <xxf:value id="output4">44, 45, 44, 45</xxf:value>
-                        <xxf:value id="output5">42, 43, 42, 43</xxf:value>
-                        <xxf:value id="my-foo≡output6">42, 43, 42, 43</xxf:value>
-                        <xxf:value id="my-foo≡output7">44, 45, 44, 45</xxf:value>
-                        <xxf:value id="my-foo≡output8">42, 43, 42, 43</xxf:value>
-                        <xxf:value id="my-foo≡output9">44, 45, 44, 45</xxf:value>
-                        <xxf:value id="my-foo≡output10">42, 43, 42, 43</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>42, 43, 42, 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>44, 45, 44, 45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output3">
+                            <xxf:value>42, 43, 42, 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output4">
+                            <xxf:value>44, 45, 44, 45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output5">
+                            <xxf:value>42, 43, 42, 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡output6">
+                            <xxf:value>42, 43, 42, 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡output7">
+                            <xxf:value>44, 45, 44, 45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡output8">
+                            <xxf:value>42, 43, 42, 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡output9">
+                            <xxf:value>44, 45, 44, 45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡output10">
+                            <xxf:value>42, 43, 42, 43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2607,20 +2780,48 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="foo10≡xf-8">42 43</xxf:value>
-                        <xxf:value id="foo11≡xf-11">43</xxf:value>
-                        <xxf:value id="foo12≡xf-14">43</xxf:value>
-                        <xxf:value id="foo13≡xf-17">42</xxf:value>
-                        <xxf:value id="foo14≡xf-20">43</xxf:value>
-                        <xxf:value id="foo15≡xf-23">44</xxf:value>
-                        <xxf:value id="foo16≡xf-26">45</xxf:value>
-                        <xxf:value id="foo20≡xf-29">44 45</xxf:value>
-                        <xxf:value id="foo21≡xf-32">45</xxf:value>
-                        <xxf:value id="foo22≡xf-35">45</xxf:value>
-                        <xxf:value id="foo23≡xf-38">42</xxf:value>
-                        <xxf:value id="foo24≡xf-41">43</xxf:value>
-                        <xxf:value id="foo25≡xf-44">44</xxf:value>
-                        <xxf:value id="foo26≡xf-47">45</xxf:value>
+                        <xxf:control id="foo10≡xf-8">
+                            <xxf:value>42 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo11≡xf-11">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo12≡xf-14">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo13≡xf-17">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo14≡xf-20">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo15≡xf-23">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo16≡xf-26">
+                            <xxf:value>45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo20≡xf-29">
+                            <xxf:value>44 45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo21≡xf-32">
+                            <xxf:value>45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo22≡xf-35">
+                            <xxf:value>45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo23≡xf-38">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo24≡xf-41">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo25≡xf-44">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="foo26≡xf-47">
+                            <xxf:value>45</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2678,7 +2879,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">43</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2738,7 +2941,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo≡my-input">43</xxf:value>
+                        <xxf:control id="my-foo≡my-input">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2844,7 +3049,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-input">43</xxf:value>
+                        <xxf:control id="my-input">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3089,7 +3296,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo≡gaga" label="My label"/><xxf:value id="my-foo≡gaga">42</xxf:value>
+                        <xxf:control id="my-foo≡gaga" label="My label">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3139,7 +3348,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo≡gaga" label="My label"/><xxf:value id="my-foo≡gaga">42</xxf:value>
+                        <xxf:control id="my-foo≡gaga" label="My label">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3184,7 +3395,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo≡gaga" label="My label"/><xxf:value id="my-foo≡gaga">42</xxf:value>
+                        <xxf:control id="my-foo≡gaga" label="My label">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3284,7 +3497,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo≡my-output">42</xxf:value>
+                        <xxf:control id="my-foo≡my-output">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3346,12 +3561,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo1≡my-output"/>
                         <xxf:control id="my-group1" relevant="false"/>
                         <xxf:control id="my-foo2" relevant="false"/>
                         <xxf:control id="my-foo2≡my-output" relevant="false"/>
-                        <xxf:value id="my-foo2≡my-output"/>
-                        <xxf:value id="my-foo3≡my-output"/>
                     </xxf:control-values>
                     <xxf:message level="modal">|instance|, |my-foo1≡my-xbl-instance|</xxf:message>
                     <xxf:message level="modal">|instance|, |my-foo1≡my-xbl-instance|, |my-foo3≡my-xbl-instance|</xxf:message>
@@ -3573,8 +3785,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-foo≡output-foo1">Nothing!</xxf:value>
-                        <xxf:value id="my-foo≡output-foo3">Something!</xxf:value>
+                        <xxf:control id="my-foo≡output-foo1">
+                            <xxf:value>Nothing!</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-foo≡output-foo3">
+                            <xxf:value>Something!</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3718,7 +3934,7 @@
                         <xxf:control id="my-foo1≡foo-trigger" label="Open me"/>
                         <xxf:control id="my-foo2≡foo-trigger" label="Open me"/>
                         <xxf:control id="my-dialog" label="My Dialog"/>
-                        <xxf:div id="my-dialog" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog" visibility="hidden"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3762,7 +3978,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-gaga≡my-output">1</xxf:value>
+                        <xxf:control id="my-gaga≡my-output">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3812,8 +4030,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-gaga≡o1">gaga</xxf:value>
-                        <xxf:value id="my-toto≡o2">gaga</xxf:value>
+                        <xxf:control id="my-gaga≡o1">
+                            <xxf:value>gaga</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-toto≡o2">
+                            <xxf:value>gaga</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3861,8 +4083,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-gaga≡gaga-output">Gaga</xxf:value>
-                        <xxf:value id="my-toto≡toto-output">Toto</xxf:value>
+                        <xxf:control id="my-gaga≡gaga-output">
+                            <xxf:value>Gaga</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-toto≡toto-output">
+                            <xxf:value>Toto</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:message level="modal">Hello gaga!</xxf:message>
                 </xxf:action>
@@ -3910,7 +4136,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-gaga≡my-toto≡toto-output">Toto</xxf:value>
+                        <xxf:control id="my-gaga≡my-toto≡toto-output">
+                            <xxf:value>Toto</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:message level="modal">Hello toto!</xxf:message>
                 </xxf:action>
@@ -3961,8 +4189,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-gaga≡gaga-output">42</xxf:value>
-                        <xxf:value id="my-toto≡toto-output">Oops!</xxf:value>
+                        <xxf:control id="my-gaga≡gaga-output">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-toto≡toto-output">
+                            <xxf:value>Oops!</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4007,19 +4239,40 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="gaga1≡binding">foo</xxf:value>
-                        <xxf:value id="gaga1≡binding-context">values</xxf:value>
-                        <xxf:value id="gaga1≡component-context">values</xxf:value>
-                        <xxf:value id="gaga2≡binding">foo</xxf:value>
-                        <xxf:value id="gaga2≡binding-context">values</xxf:value>
-                        <xxf:value id="gaga2≡component-context">values</xxf:value>
+                        <xxf:control id="gaga1≡binding">
+                            <xxf:value>foo</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga1≡binding-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga1≡component-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga2≡binding">
+                            <xxf:value>foo</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga2≡binding-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga2≡component-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
                         <xxf:control id="gaga3" readonly="true"/>
-                        <xxf:value id="gaga3≡binding">1</xxf:value>
-                        <xxf:value id="gaga3≡binding-context">values</xxf:value>
-                        <xxf:value id="gaga3≡component-context">values</xxf:value>
-                        <xxf:value id="gaga4≡binding"/>
-                        <xxf:value id="gaga4≡binding-context">values</xxf:value>
-                        <xxf:value id="gaga4≡component-context">values</xxf:value>
+                        <xxf:control id="gaga3≡binding">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga3≡binding-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga3≡component-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga4≡binding-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="gaga4≡component-context">
+                            <xxf:value>values</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4092,7 +4345,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-dynamic≡my-output">42</xxf:value>
+                        <xxf:control id="my-dynamic≡my-output">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4158,7 +4413,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic≡my-output" level="error"/><xxf:value id="my-dynamic≡my-output">42</xxf:value>
+                        <xxf:control id="my-dynamic≡my-output" level="error">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4236,8 +4493,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic≡output1" relevant="false"/><xxf:value id="my-dynamic≡output1"/>
-                        <xxf:value id="my-dynamic≡output2">42</xxf:value>
+                        <xxf:control id="my-dynamic≡output1" relevant="false"/>
+                        <xxf:control id="my-dynamic≡output2">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4354,7 +4613,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dynamic≡my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic≡my-bar">&lt;span id="my-dynamic≡my-bar≡input1" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic≡my-bar≡input1≡xforms-input-1" type="text" name="my-dynamic≡my-bar≡input1≡xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/span&gt;&lt;span id="my-dynamic≡my-bar≡input2" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic≡my-bar≡input2≡xforms-input-1" type="text" name="my-dynamic≡my-bar≡input2≡xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/span&gt;</xxf:inner-html>
+                        <xxf:inner-html id="my-dynamic≡my-bar">
+                            <xxf:value>&lt;span id="my-dynamic≡my-bar≡input1" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic≡my-bar≡input1≡xforms-input-1" type="text" name="my-dynamic≡my-bar≡input1≡xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/span&gt;&lt;span id="my-dynamic≡my-bar≡input2" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic≡my-bar≡input2≡xforms-input-1" type="text" name="my-dynamic≡my-bar≡input2≡xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/span&gt;</xxf:value>
+                        </xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4512,7 +4773,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dynamic≡my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic≡my-bar">&lt;span id="my-dynamic≡my-bar≡output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output2≡≡c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic≡my-bar≡output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output1≡≡c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:inner-html>
+                        <xxf:inner-html id="my-dynamic≡my-bar">
+                            <xxf:value>&lt;span id="my-dynamic≡my-bar≡output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output2≡≡c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic≡my-bar≡output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic≡my-bar≡output1≡≡c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:value>
+                        </xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4571,9 +4834,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="gaga1"/>
-                        <xxf:value id="gaga1≡gaga-output">42</xxf:value>
-                        <xxf:value id="toto1≡toto-output"/>
+                        <xxf:control id="gaga1≡gaga-output">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                     <xxf:message level="modal">fr:gaga changed!</xxf:message>
                 </xxf:action>

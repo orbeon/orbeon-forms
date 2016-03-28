@@ -217,9 +217,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       case _ ⇒ false
     }
 
-  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
-    var added = super.addAjaxExtensionAttributes(attributesImpl, isNewRepeatIteration, other)
-    added |= addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
+  override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]) = {
+    var added = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
+    added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])
     added
   }
 

@@ -17,11 +17,11 @@ import org.dom4j.QName
 import org.junit.Test
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xforms.{PartAnalysis, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
-import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.xforms.{PartAnalysis, XFormsContainingDocument}
 import org.scalatest.junit.AssertionsForJUnit
+import org.xml.sax.helpers.AttributesImpl
 
 class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
@@ -65,7 +65,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
         "name4" → "value4"
       )
     }
-    XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, false, control1, control2)
+    XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, Some(control1), control2)
     assert("-name2-value2 -name3-value3 +name3-newvalue3" === attributes.getValue("class"))
   }
 
@@ -79,7 +79,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
         "name4" → "value4"
       )
     }
-    XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, true, null, control2)
+    XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, None, control2)
     assert("+name1-value1 +name2-value2 +name3-value3 +name4-value4" === attributes.getValue("class"))
   }
 
@@ -91,7 +91,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
       override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
     }
-    ControlAjaxSupport.addAjaxClasses(attributes, false, control1, control2)
+    ControlAjaxSupport.addAjaxClasses(attributes, Some(control1), control2)
     assert("-foo -gaga +toto" === attributes.getValue("class"))
   }
 
@@ -100,7 +100,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
       override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
     }
-    ControlAjaxSupport.addAjaxClasses(attributes, false, null, control2)
+    ControlAjaxSupport.addAjaxClasses(attributes, None, control2)
     assert("foo bar" === attributes.getValue("class"))
   }
 

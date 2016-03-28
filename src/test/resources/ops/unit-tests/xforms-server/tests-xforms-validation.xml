@@ -70,10 +70,16 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="xf-1">One</xxf:value>
-                        <xxf:control id="xf-2" level="error"/><xxf:value id="xf-2"/>
-                        <xxf:value id="xf-3">Five</xxf:value>
-                        <xxf:value id="xf-4">Seven</xxf:value>
+                        <xxf:control id="xf-1">
+                            <xxf:value>One</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-2" level="error"/>
+                        <xxf:control id="xf-3">
+                            <xxf:value>Five</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-4">
+                            <xxf:value>Seven</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -121,11 +127,21 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-2" type="uwdcdate"/><xxf:value id="xf-2">2009</xxf:value>
-                        <xxf:control id="xf-3" type="uwdcdate"/><xxf:value id="xf-3">2009-03</xxf:value>
-                        <xxf:control id="xf-4" type="uwdcdate"/><xxf:value id="xf-4">2009-03-09</xxf:value>
-                        <xxf:control id="xf-5" level="error" type="uwdcdate"/><xxf:value id="xf-5">2009-13</xxf:value>
-                        <xxf:control id="xf-6" level="error" type="uwdcdate"/><xxf:value id="xf-6">2009-03-32</xxf:value>
+                        <xxf:control id="xf-2" type="uwdcdate">
+                            <xxf:value>2009</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-3" type="uwdcdate">
+                            <xxf:value>2009-03</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-4" type="uwdcdate">
+                            <xxf:value>2009-03-09</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-5" level="error" type="uwdcdate">
+                            <xxf:value>2009-13</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="xf-6" level="error" type="uwdcdate">
+                            <xxf:value>2009-03-32</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -83,7 +83,7 @@ class XXFormsDialogControl(
     }
   }
 
-  override def getJavaScriptInitialization = getCommonJavaScriptInitialization
+  override def hasJavaScriptInitialization = true
 
   private def dialogCurrentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
 
@@ -161,49 +161,50 @@ class XXFormsDialogControl(
   }
 
   override def outputAjaxDiff(
-    ch                    : XMLReceiverHelper,
-    other                 : XFormsControl,
-    attributesImpl        : AttributesImpl,
-    isNewlyVisibleSubtree : Boolean
+    previousControl : Option[XFormsControl],
+    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch              : XMLReceiverHelper
   ): Unit = {
 
     locally {
-      val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+      val atts = new AttributesImpl
+      val doOutputElement = addAjaxAttributes(atts, previousControl)
       if (doOutputElement)
-        ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
+        ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", atts)
     }
 
     locally {
       // NOTE: This uses visible/hidden. But we could also handle this with relevant="true|false".
       // 2015-04-01: Unsure if note above still makes sense.
-      val otherDialog = other.asInstanceOf[XXFormsDialogControl]
+      val previousDialog = previousControl.asInstanceOf[Option[XXFormsDialogControl]]
       var doOutputElement = false
 
       val atts = new AttributesImpl
       atts.addAttribute("", "id", "id", CDATA, namespaceId(containingDocument, getEffectiveId))
 
       val visible = isVisible
-      if (isNewlyVisibleSubtree || visible != otherDialog.wasVisible) {
+      if (previousControl.isEmpty || previousDialog.exists(_.wasVisible != visible)) {
         atts.addAttribute("", "visibility", "visibility", CDATA, if (visible) "visible" else "hidden")
         doOutputElement = true
       }
       if (visible) {
-        val neighborOpt = neighborControlId
-        if (isNewlyVisibleSubtree || neighborOpt != otherDialog.neighborControlId) {
-          neighborOpt foreach { neighbor ⇒
-            atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
-            doOutputElement = true
+        neighborControlId foreach { neighbor ⇒
+          if (previousControl.isEmpty || previousDialog.exists(_.neighborControlId != neighborControlId)) {
+              atts.addAttribute("", "neighbor", "neighbor", CDATA, namespaceId(containingDocument, neighbor))
+              doOutputElement = true
           }
         }
+
         val constrain = isConstrainToViewport
-        if (isNewlyVisibleSubtree || constrain != otherDialog.isConstrainToViewport) {
+        if (previousControl.isEmpty || previousDialog.exists(_.isConstrainToViewport != constrain)) {
           atts.addAttribute("", "constrain", "constrain", CDATA, constrain.toString)
           doOutputElement = true
         }
       }
       if (doOutputElement)
-        ch.element("xxf", XXFORMS_NAMESPACE_URI, "div", atts)
+        ch.element("xxf", XXFORMS_NAMESPACE_URI, "dialog", atts)
     }
+
   }
 
   override def contentVisible = isVisible

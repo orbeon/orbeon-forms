@@ -74,7 +74,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id2" label="test noFoundData:" readonly="true"/><xxf:value id="id2">1</xxf:value>
+                        <xxf:control id="id2" label="test noFoundData:" readonly="true">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -118,9 +120,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="id2"/>
                         <xxf:control id="id3" relevant="false"/>
-                        <xxf:value id="id3"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -174,9 +174,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="id1">gigi1</xxf:value>
-                        <xxf:control id="id2" relevant="false"/><xxf:value id="id2"/>
-                        <xxf:control id="id3" readonly="true"/><xxf:value id="id3">gigi3</xxf:value>
+                        <xxf:control id="id1">
+                            <xxf:value>gigi1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="id2" relevant="false"/>
+                        <xxf:control id="id3" readonly="true">
+                            <xxf:value>gigi3</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -403,14 +407,30 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-control⊙1" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙1">bloody</xxf:value>
-                        <xxf:control id="my-control⊙2" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙2">valencia</xxf:value>
-                        <xxf:control id="my-control⊙3" class="+foo-bar-is-g"/><xxf:value id="my-control⊙3">green</xxf:value>
-                        <xxf:control id="my-control⊙4" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙4">red</xxf:value>
-                        <xxf:control id="my-control⊙5" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙5">iPod</xxf:value>
-                        <xxf:control id="my-control⊙6" class="+foo-bar-is-g"/><xxf:value id="my-control⊙6">green</xxf:value>
-                        <xxf:control id="my-control⊙7" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙7">williams</xxf:value>
-                        <xxf:control id="my-control⊙8" class="+foo-bar-is-not-g"/><xxf:value id="my-control⊙8">yellow</xxf:value>
+                        <xxf:control id="my-control⊙1" class="+foo-bar-is-not-g">
+                            <xxf:value>bloody</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙2" class="+foo-bar-is-not-g">
+                            <xxf:value>valencia</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙3" class="+foo-bar-is-g">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙4" class="+foo-bar-is-not-g">
+                            <xxf:value>red</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙5" class="+foo-bar-is-not-g">
+                            <xxf:value>iPod</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙6" class="+foo-bar-is-g">
+                            <xxf:value>green</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙7" class="+foo-bar-is-not-g">
+                            <xxf:value>williams</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-control⊙8" class="+foo-bar-is-not-g">
+                            <xxf:value>yellow</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -472,13 +492,27 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output-readonly-1">I am readonly</xxf:value>
-                        <xxf:control id="output-readonly-2" readonly="true"/><xxf:value id="output-readonly-2">I am readonly</xxf:value>
-                        <xxf:value id="output-required-1">I am required</xxf:value>
-                        <xxf:control id="output-required-2" required="true" level="error" empty="false"/><xxf:value id="output-required-2">I am required</xxf:value>
-                        <xxf:value id="output-relevant">I am not relevant</xxf:value>
-                        <xxf:value id="output-valid-1">I am not valid</xxf:value>
-                        <xxf:control id="output-valid-2" level="error"/><xxf:value id="output-valid-2">I am not valid</xxf:value>
+                        <xxf:control id="output-readonly-1">
+                            <xxf:value>I am readonly</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-readonly-2" readonly="true">
+                            <xxf:value>I am readonly</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-required-1">
+                            <xxf:value>I am required</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-required-2" required="true" level="error" empty="false">
+                            <xxf:value>I am required</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-relevant">
+                            <xxf:value>I am not relevant</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-valid-1">
+                            <xxf:value>I am not valid</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-valid-2" level="error">
+                            <xxf:value>I am not valid</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -565,7 +599,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="first-name-control" label="First name" level="error"/>
-                        <xxf:value id="first-name-control"/>
                         <xxf:control id="submit-trigger" label="Submit" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -695,13 +728,27 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output-string">Lucy</xxf:value>
-                        <xxf:value id="output-integer">36</xxf:value>
-                        <xxf:value id="output-boolean">false</xxf:value>
-                        <xxf:value id="output-date">1980-01-02</xxf:value>
-                        <xxf:value id="output-time">22:30:00</xxf:value>
-                        <xxf:value id="output-double">13</xxf:value>
-                        <xxf:value id="output-string-2">Lucy</xxf:value>
+                        <xxf:control id="output-string">
+                            <xxf:value>Lucy</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-integer">
+                            <xxf:value>36</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-boolean">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-date">
+                            <xxf:value>1980-01-02</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-time">
+                            <xxf:value>22:30:00</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-double">
+                            <xxf:value>13</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-string-2">
+                            <xxf:value>Lucy</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -769,7 +816,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" required="true" empty="false"/><xxf:value id="my-input">42</xxf:value>
+                        <xxf:control id="my-input" required="true" empty="false">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -853,20 +902,42 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output-relevant">true</xxf:value>
-                        <xxf:value id="output-readonly">false</xxf:value>
-                        <xxf:value id="output-required">true</xxf:value>
-                        <xxf:value id="output-type">xs:integer</xxf:value>
-                        <xxf:value id="output-constraint"/>
-                        <xxf:value id="output-calculate">86</xxf:value>
-                        <xxf:value id="output-default">42</xxf:value>
-                        <xxf:value id="output-relevant2">true</xxf:value>
-                        <xxf:value id="output-readonly2">false</xxf:value>
-                        <xxf:value id="output-required2">true</xxf:value>
-                        <xxf:value id="output-type2">xs:integer</xxf:value>
-                        <xxf:value id="output-constraint2"/>
-                        <xxf:value id="output-calculate2">86</xxf:value>
-                        <xxf:value id="output-default2">42</xxf:value>
+                        <xxf:control id="output-relevant">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-readonly">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-required">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-type">
+                            <xxf:value>xs:integer</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-calculate">
+                            <xxf:value>86</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-default">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-relevant2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-readonly2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-required2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-type2">
+                            <xxf:value>xs:integer</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-calculate2">
+                            <xxf:value>86</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-default2">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -938,22 +1009,54 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output-relevant⊙1">true</xxf:value>
-                        <xxf:value id="output-readonly⊙1">true</xxf:value>
-                        <xxf:value id="output-required⊙1">true</xxf:value>
-                        <xxf:value id="output-type⊙1">xs:integer</xxf:value>
-                        <xxf:value id="output-constraint⊙1">true</xxf:value>
-                        <xxf:value id="output-default⊙1">42</xxf:value>
-                        <xxf:value id="output-custom⊙1">42, 43</xxf:value>
-                        <xxf:value id="output-calculate⊙1">43</xxf:value>
-                        <xxf:value id="output-relevant⊙2">true</xxf:value>
-                        <xxf:value id="output-readonly⊙2">false</xxf:value>
-                        <xxf:value id="output-required⊙2">false</xxf:value>
-                        <xxf:value id="output-type⊙2">xs:integer</xxf:value>
-                        <xxf:value id="output-constraint⊙2">false</xxf:value>
-                        <xxf:value id="output-default⊙2">44</xxf:value>
-                        <xxf:value id="output-custom⊙2">44, 45</xxf:value>
-                        <xxf:value id="output-calculate⊙2">45</xxf:value>
+                        <xxf:control id="output-relevant⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-readonly⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-required⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-type⊙1">
+                            <xxf:value>xs:integer</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-constraint⊙1">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-default⊙1">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-custom⊙1">
+                            <xxf:value>42, 43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-calculate⊙1">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-relevant⊙2">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-readonly⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-required⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-type⊙2">
+                            <xxf:value>xs:integer</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-constraint⊙2">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-default⊙2">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-custom⊙2">
+                            <xxf:value>44, 45</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output-calculate⊙2">
+                            <xxf:value>45</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1057,8 +1160,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-input" label="Note"/>
-                        <xxf:value id="title-input">Cool title</xxf:value>
+                        <xxf:control id="title-input" label="Note">
+                            <xxf:value>Cool title</xxf:value>
+                        </xxf:control>
                         <xxf:control id="save-trigger" label="Save" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -1127,13 +1231,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="input1" relevant="false"/>
-                        <xxf:value id="input1"/>
                         <xxf:control id="input2" relevant="false"/>
-                        <xxf:value id="input2"/>
-                        <xxf:value id="input3"/>
                         <xxf:control id="group2" relevant="false"/>
                         <xxf:control id="input4" relevant="false"/>
-                        <xxf:value id="input4"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1198,11 +1298,21 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="input1⊙1-1">Mickey</xxf:value>
-                        <xxf:value id="input1⊙1-2">Minnie</xxf:value>
-                        <xxf:value id="input1⊙2-1">Donald</xxf:value>
-                        <xxf:value id="input1⊙2-2">Daisy</xxf:value>
-                        <xxf:value id="input2">Mickey</xxf:value>
+                        <xxf:control id="input1⊙1-1">
+                            <xxf:value>Mickey</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input1⊙1-2">
+                            <xxf:value>Minnie</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input1⊙2-1">
+                            <xxf:value>Donald</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input1⊙2-2">
+                            <xxf:value>Daisy</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input2">
+                            <xxf:value>Mickey</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1306,7 +1416,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" type="{http://www.w3.org/2001/XMLSchema}date"/><xxf:value id="my-input">2001-01-01</xxf:value>
+                        <xxf:control id="my-input" type="{http://www.w3.org/2001/XMLSchema}date">
+                            <xxf:value>2001-01-01</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1346,8 +1458,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="output1">required-bind1</xxf:value>
-                        <xxf:value id="output2">required-bind2</xxf:value>
+                        <xxf:control id="output1">
+                            <xxf:value>required-bind1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="output2">
+                            <xxf:value>required-bind2</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1522,8 +1638,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input1" type="{http://www.w3.org/2001/XMLSchema}boolean"/><xxf:value id="input1">false</xxf:value>
-                        <xxf:control id="input2" type="{http://www.w3.org/2001/XMLSchema}boolean"/><xxf:value id="input2">true</xxf:value>
+                        <xxf:control id="input1" type="{http://www.w3.org/2001/XMLSchema}boolean">
+                            <xxf:value>false</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="input2" type="{http://www.w3.org/2001/XMLSchema}boolean">
+                            <xxf:value>true</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1693,7 +1813,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="validities">false-true-false-true</xxf:value>
+                        <xxf:control id="validities">
+                            <xxf:value>false-true-false-true</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1741,7 +1863,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="my-output">false false true true</xxf:value>
+                        <xxf:control id="my-output">
+                            <xxf:value>false false true true</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1805,7 +1929,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/><xxf:value id="my-input"/>
+                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/>
                     </xxf:control-values>
                     <xxf:message level="modal">added-errors: length-constraint | alert: &lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
                     <xxf:message level="modal">removed-errors: length-constraint | added-warnings: uppercase-constraint | alert: &lt;ul&gt;&lt;li&gt;Uppercase constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
@@ -2081,18 +2205,40 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:value id="col1-control⊙1">123</xxf:value>
-                        <xxf:value id="col2-control⊙1">456</xxf:value>
-                        <xxf:control id="rowsum-control⊙1" readonly="true"/><xxf:value id="rowsum-control⊙1">579</xxf:value>
-                        <xxf:value id="col1-control⊙2">1</xxf:value>
-                        <xxf:value id="col2-control⊙2">2</xxf:value>
-                        <xxf:control id="rowsum-control⊙2" readonly="true"/><xxf:value id="rowsum-control⊙2">3</xxf:value>
-                        <xxf:control id="totalsum-control" readonly="true"/><xxf:value id="totalsum-control">582</xxf:value>
-                        <xxf:control id="rowsum2-control⊙1" readonly="true"/><xxf:value id="rowsum2-control⊙1">579</xxf:value>
-                        <xxf:control id="rowsum2-control⊙2" readonly="true"/><xxf:value id="rowsum2-control⊙2">3</xxf:value>
-                        <xxf:control id="rowsum3-control⊙1" readonly="true"/><xxf:value id="rowsum3-control⊙1">579</xxf:value>
-                        <xxf:control id="rowsum3-control⊙2" readonly="true"/><xxf:value id="rowsum3-control⊙2">3</xxf:value>
-                        <xxf:control id="rowsum4-control" relevant="false"/><xxf:value id="rowsum4-control"/>
+                        <xxf:control id="col1-control⊙1">
+                            <xxf:value>123</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="col2-control⊙1">
+                            <xxf:value>456</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum-control⊙1" readonly="true">
+                            <xxf:value>579</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="col1-control⊙2">
+                            <xxf:value>1</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="col2-control⊙2">
+                            <xxf:value>2</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum-control⊙2" readonly="true">
+                            <xxf:value>3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="totalsum-control" readonly="true">
+                            <xxf:value>582</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum2-control⊙1" readonly="true">
+                            <xxf:value>579</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum2-control⊙2" readonly="true">
+                            <xxf:value>3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum3-control⊙1" readonly="true">
+                            <xxf:value>579</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum3-control⊙2" readonly="true">
+                            <xxf:value>3</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="rowsum4-control" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2188,7 +2334,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Alert 1&lt;/li&gt;&lt;li&gt;Alert 2&lt;/li&gt;&lt;li&gt;Alert 3&lt;/li&gt;&lt;/ul&gt;" level="error"/><xxf:value id="my-input"/>
+                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Alert 1&lt;/li&gt;&lt;li&gt;Alert 2&lt;/li&gt;&lt;li&gt;Alert 3&lt;/li&gt;&lt;/ul&gt;" level="error"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2305,9 +2451,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input-1" class="+fr-gaga-foo +fr-toto-bar"/><xxf:value id="my-input-1">foo</xxf:value>
-                        <xxf:control id="my-input-2" class="+fr-gaga-foo +fr-toto-bar"/><xxf:value id="my-input-2">bar</xxf:value>
-                        <xxf:value id="my-output-1">foo bar foo bar foo bar</xxf:value>
+                        <xxf:control id="my-input-1" class="+fr-gaga-foo +fr-toto-bar">
+                            <xxf:value>foo</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-input-2" class="+fr-gaga-foo +fr-toto-bar">
+                            <xxf:value>bar</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="my-output-1">
+                            <xxf:value>foo bar foo bar foo bar</xxf:value>
+                        </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

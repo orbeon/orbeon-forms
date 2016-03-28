@@ -1476,10 +1476,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             } else if (jControl.is('.xforms-range')) {
                 var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
                 return value.toString();
-            } else if (jControl.is('.xbl-component')) {
-                var instance = jControl.data('xforms-xbl-object');
-                if (_.isObject(instance) && _.isFunction(instance.getCurrentValue))
-                    return instance.getCurrentValue();
+            } else if (ORBEON.xforms.XBL.isComponent(control)) {
+                var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                if (_.isObject(instance) && _.isFunction(instance.xformsGetValue))
+                    return instance.xformsGetValue();
             }
         },
 
@@ -1620,10 +1620,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Text area
                 var textarea = control.getElementsByTagName("textarea")[0];
                 textarea.value = newControlValue;
-            } else if (jControl.is('.xbl-component')) {
-                var instance = jControl.data('xforms-xbl-object');
-                if (_.isObject(instance) && _.isFunction(instance.updateWithServerValue))
-                    instance.updateWithServerValue(newControlValue);
+            } else if (ORBEON.xforms.XBL.isComponent(control)) {
+                var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                if (_.isObject(instance) && _.isFunction(instance.xformsUpdateValue))
+                    instance.xformsUpdateValue(newControlValue);
             } else if (typeof(control.value) == "string") {
                 // Textarea, password
                 control.value = newControlValue;
@@ -1785,7 +1785,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             function toggleCommonClasses(element) {
                 $(element).toggleClass("xforms-invalid", newLevel == "error");
                 $(element).toggleClass("xforms-warning", newLevel == "warning");
-                $(element).toggleClass("xforms-info", newLevel == "info");
+                $(element).toggleClass("xforms-info",    newLevel == "info");
             }
 
             // Classes on control
@@ -1828,11 +1828,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         setRelevant: function (control, isRelevant) {
             var FN = ORBEON.xforms.FlatNesting;
 
-            if ($(control).is('.xforms-group-begin-end')) {
+            var jControl = $(control);
+
+            if (jControl.is('.xforms-group-begin-end')) {
                 // Case of group delimiters
                 FN.setRelevant(control, isRelevant);
             } else {
-                var elementsToUpdate = [control,
+                var elementsToUpdate = [
+                    control,
                     ORBEON.xforms.Controls.getControlLHHA(control, "label"),
                     ORBEON.xforms.Controls.getControlLHHA(control, "alert")
                 ];
@@ -1845,8 +1848,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     elementsToUpdate.push(ORBEON.xforms.Controls.getControlLHHA(control, "hint"));
 
                 // Go through elements to update, and update classes
-                for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
-                    var element = elementsToUpdate[elementIndex];
+                _.each(elementsToUpdate, function(element) {
                     if (element != null) {
                         if (isRelevant) {
                             YAHOO.util.Dom.removeClass(element, "xforms-disabled");
@@ -1854,6 +1856,20 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         } else {
                             YAHOO.util.Dom.addClass(element, "xforms-disabled-subsequent");
                         }
+                    }
+                });
+
+                if (ORBEON.xforms.XBL.isJavaScriptLifecycle(control)) {
+                    var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                    if (! isRelevant && _.isObject(instance)) {
+
+                        if (_.isFunction(instance.destroy))
+                            instance.destroy();
+
+                        // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
+                        // `destroy()` should only be called from there, and so the nulling of `xforms-xbl-object` should
+                        // take place here as well.
+                        jControl.data('xforms-xbl-object', null);
                     }
                 }
             }
@@ -1869,6 +1885,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
         setReadonly: function (control, isReadonly) {
 
+            var jControl = $(control);
+
             // Update class
             if (isReadonly) {
                 YAHOO.util.Dom.addClass(control, "xforms-readonly");
@@ -1876,7 +1894,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 YAHOO.util.Dom.removeClass(control, "xforms-readonly");
             }
 
-            if ($(control).is('.xforms-group-begin-end')) {
+            if (jControl.is('.xforms-group-begin-end')) {
                 // Case of group delimiters
                 // Readonlyness is no inherited by controls inside the group, so we are just updating the class on the begin-marker
                 // to be consistent with the markup generated by the server.
@@ -1885,7 +1903,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 } else {
                     YAHOO.util.Dom.removeClass(control, "xforms-readonly");
                 }
-            } else if ($(control).is('.xforms-input, .xforms-secret, .xforms-select1-appearance-full, .xforms-select-appearance-full')) {
+            } else if (jControl.is('.xforms-input, .xforms-secret, .xforms-select1-appearance-full, .xforms-select-appearance-full')) {
                 // Input fields, radio buttons, or checkboxes
 
                 // Add/remove xforms-readonly on span
@@ -1900,28 +1918,33 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 }
                 if (control.tagName.toLowerCase() == "input")
                     ORBEON.xforms.Controls.setDisabledOnFormElement(control, isReadonly);
-            } else if ($(control).is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
+            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
                 // Lists
                 var select = control.getElementsByTagName("select")[0];
                 ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);
-            } else if ($(control).is('.xforms-output, .xforms-group')) {
+            } else if (jControl.is('.xforms-output, .xforms-group')) {
                 // XForms output and group
                 if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
                 else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-            } else if ($(control).is('.xforms-upload')) {
+            } else if (jControl.is('.xforms-upload')) {
                 // Upload control
                 ORBEON.xforms.Controls.setDisabledOnFormElement(
                         YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, control)[0], isReadonly);
-            } else if ($(control).is('.xforms-textarea')) {
+            } else if (jControl.is('.xforms-textarea')) {
                 // Textarea
                 var textarea = control.getElementsByTagName("textarea")[0];
                 ORBEON.xforms.Controls.setDisabledOnFormElement(textarea, isReadonly);
-            } else if (($(control).is('.xforms-trigger')
-                    && ! $(control).is('.xforms-trigger-appearance-minimal'))
-                    || $(control).is('.xforms-submit')) {
+            } else if ((jControl.is('.xforms-trigger')
+                    && ! jControl.is('.xforms-trigger-appearance-minimal'))
+                    || jControl.is('.xforms-submit')) {
                 // Button
                 var button = ORBEON.util.Dom.getElementByTagName(control, "button");
                 ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
+            } else if (ORBEON.xforms.XBL.isJavaScriptLifecycle(control)) {
+                var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                if (_.isObject(instance) && _.isFunction(instance.xformsUpdateReadonly)) {
+                    instance.xformsUpdateReadonly(isReadonly);
+                }
             }
         },
 
@@ -2024,10 +2047,14 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // Set focus on either selected item if we found one or on first item otherwise
                     ORBEON.util.Dom.focus(formInputs[foundSelected ? itemIndex : 0]);
                 }
-            } else if ($(control).is('.xbl-component.xbl-focusable')) {
-                var instance = $(control).data('xforms-xbl-object');
-                if (_.isObject(instance) && _.isFunction(instance.setFocus))
-                    instance.setFocus();
+            } else if (ORBEON.xforms.XBL.isFocusable(control)) {
+                var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                if (_.isObject(instance)) {
+                    if (_.isFunction(instance.xformsFocus))
+                        instance.xformsFocus();
+                    else if (_.isFunction(instance.setFocus))
+                        instance.setFocus();
+                }
             } else {
                 // Generic code to find focusable descendant-or-self HTML element and focus on it
                 var htmlControl = $(control).find('input:visible, textarea:visible, select:visible, button:visible, a:visible');
@@ -2065,6 +2092,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         var formInput = formInputs[itemIndex];
                         ORBEON.util.Dom.blur(formInput);
                     }
+                }
+            } else if (ORBEON.xforms.XBL.isFocusable(control)) {
+                var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                if (_.isObject(instance)) {
+                    if (_.isFunction(instance.xformsBlur))
+                        instance.xformsBlur();
                 }
             } else {
                 // Generic code to find focusable descendant-or-self HTML element and focus on it
@@ -2854,7 +2887,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
                 // First check clickable group
                 if ($(node).is('.xforms-activable')) {
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");//xxx `form` might not have been initialized
+                    var form = ORBEON.xforms.Controls.getForm(node);
+                    var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");
                     ORBEON.xforms.server.AjaxServer.fireEvents([event]);
                     break;
                 }
@@ -3097,25 +3131,33 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * @return {void}
              */
             onComponentInitialized: function (component) {
-                if (! this._knownComponents[component.container.id]) {
+                if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(component.container)) {
+                    console.log('xxx onComponentInitialized ' + component.container.id);
+                    if (! this._knownComponents[component.container.id]) {
 
-                    // Find if this instance is in a full update container
-                    /** @type {HTMLElement} */ var fullUpdate = null;
-                    ORBEON.util.Dom.existsAncestorOrSelf(component.container, function (node) {
-                        return $(node).is('.xforms-update-full, .xxforms-dynamic-control') ? (fullUpdate = node, true) : false;//xxx comma expression
-                    });
+                        // Find if this instance is in a full update container
+                        /** @type {HTMLElement} */ var fullUpdate = null;
+                        ORBEON.util.Dom.existsAncestorOrSelf(component.container, function (node) {
+                            if ($(node).is('.xforms-update-full, .xxforms-dynamic-control')) {
+                                fullUpdate = node;
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        });
 
-                    // This component is inside a full update
-                    if (fullUpdate != null) {
-                        // Remember that component is associated with full update
-                        if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
-                        this._fullUpdateToComponents[fullUpdate.id].push(component.container.id);
-                        // Remember factory for this component
-                        this._componentsXblClass[component.container.id] = component.xblClass;
+                        // This component is inside a full update
+                        if (fullUpdate != null) {
+                            // Remember that component is associated with full update
+                            if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
+                            this._fullUpdateToComponents[fullUpdate.id].push(component.container.id);
+                            // Remember factory for this component
+                            this._componentsXblClass[component.container.id] = component.xblClass;
+                        }
+
+                        // Remember we looked at this one, so we don't have to do it again
+                        this._knownComponents[component.container.id] = true;
                     }
-
-                    // Remember we looked at this one, so we don't have to do it again
-                    this._knownComponents[component.container.id] = true;
                 }
             },
 
@@ -3135,7 +3177,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         if (componentContainer != null) {
                             // Call instance which will call init if necessary
                             var component = me._componentsXblClass[componentId].instance(componentContainer);
-                            if (component.enabled) component.enabled();
+
+                            // Legacy
+                            if (_.isFunction(component.enabled))
+                                component.enabled();
                         }
                     });
                 }
@@ -3165,12 +3210,53 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             }
         }(),
 
+        isComponent: function(control) {
+            return $(control).is('.xbl-component');
+        },
+
+        isJavaScriptLifecycle: function(control) {
+            return $(control).is('.xbl-component.xbl-javascript-lifecycle');
+        },
+
+        isFocusable: function(control) {
+            return $(control).is('.xbl-component.xbl-focusable');
+        },
+
+        // Map the XBL CSS class to the JavaScript class
+        _cssClassesToConstructors: {},
+
+        // Get or create an instance of the JavaScript companion class for the given control
+        instanceForControl: function(control) {
+
+            var identifyingCssClass =
+                _.find(control.className.split(" "), function(clazz) {
+                    // The "identifying class" should be the the first after `xbl-component`, but filter known classes just in case
+                    return clazz.indexOf("xbl-") == 0 &&
+                           clazz != "xbl-component"   &&
+                           clazz != "xbl-focusable"   &&
+                           clazz != "xbl-javascript-lifecycle";
+                });
+
+            if (identifyingCssClass) {
+                var factory = this._cssClassesToConstructors[identifyingCssClass];
+                if (factory) {
+                    return factory.instance(control);
+                } else {
+                    return null;
+                }
+            }
+        },
+
         /**
-         * To be documented on Wiki.
+         *  Called by JavaScript companion code upon load.
+         *
+         *  This adds an `instance(target)` function to `xblClass`.
          */
         declareClass: function (xblClass, cssClass) {
             var doNothingSingleton = null;
             var instanceAlreadyCalled = false;
+
+            this._cssClassesToConstructors[cssClass] = xblClass;
 
             // Define factory function for this class
             xblClass.instance = function (target) {
@@ -3252,36 +3338,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
     };
 
     ORBEON.xforms.Init = {
-
-        /**
-         * Functions used to initialize special controls
-         */
-        _specialControlsInitFunctions: null,
-        _getSpecialControlsInitFunctions: function () {
-
-            // As moves the code for all the controls to classes, they will all use this genericInit().
-            function genericInit(container) {
-                ORBEON.xforms.Page.getControl(container);
-            }
-
-            ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
-                "select1": {
-                    "compact": ORBEON.xforms.Init._list
-                },
-                "select": {
-                    "compact": ORBEON.xforms.Init._list
-                },
-                "range": {
-                    "": ORBEON.xforms.Init._range
-                },
-                "dialog": {
-                    "": ORBEON.xforms.Init._dialog,
-                    "full": ORBEON.xforms.Init._dialog,
-                    "minimal": ORBEON.xforms.Init._dialog
-                }
-            };
-            return ORBEON.xforms.Init._specialControlsInitFunctions;
-        },
 
         document: function () {
 
@@ -3398,248 +3454,232 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 $(document.body).addClass('xforms-mobile');
 
             // Initialize attributes on form
-            for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
-                var formElement = document.forms[formIndex];
-                // If this is an XForms form, proceed with initialization
-                if ($(formElement).is('.xforms-form')) {
-                    var formID = document.forms[formIndex].id;
+            var xformsForms = _.filter(document.forms, function(formElement) {
+                return $(formElement).is('.xforms-form');
+            });
 
-                    ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
+            _.each(xformsForms, function(formElement, formIndex) {
 
-                    // Initialize XForms server URL
-                    ORBEON.xforms.Init._setBasePaths(formID, document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get());
+                var formID = formElement.id;
 
-                    // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
-                    // interaction with the form before it is initialized
-                    YAHOO.util.Dom.removeClass(formElement, "xforms-initially-hidden");
+                ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
 
-                    // Create Orbeon Form object, which give it a change to perform its own initialization
-                    ORBEON.xforms.Page.getForm(formID);
+                // Initialize XForms server URL
+                ORBEON.xforms.Init._setBasePaths(formID, document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get());
 
-                    // Initialize loading and error indicator
-                    ORBEON.xforms.Globals.formErrorPanel[formID] = null;
+                // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
+                // interaction with the form before it is initialized
+                YAHOO.util.Dom.removeClass(formElement, "xforms-initially-hidden");
 
-                    _.each($(formElement).find('.xforms-error-dialogs > .xforms-error-panel'), function (errorPanelEl) {
-                        // Create and store error panel
-                        YAHOO.util.Dom.generateId(errorPanelEl);
-                        YAHOO.util.Dom.removeClass(errorPanelEl, "xforms-initially-hidden");
-                        var errorPanel = new YAHOO.widget.Panel(errorPanelEl.id, {
-                            modal: true,
-                            fixedcenter: false,
-                            underlay: "shadow",
-                            visible: false,
-                            constraintoviewport: true,
-                            draggable: true
-                        });
-                        errorPanel.render();
-                        ORBEON.util.Utils.overlayUseDisplayHidden(errorPanel);
-                        errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
-                        ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
+                // Create Orbeon Form object, which give it a change to perform its own initialization
+                ORBEON.xforms.Page.getForm(formID);
 
-                        // Find reference to elements in the details hidden section
-                        var titleDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "hd");
-                        var bodyDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "bd");
-                        var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
-                        var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
-                        YAHOO.util.Dom.generateId(showDetailsA);
+                // Initialize loading and error indicator
+                ORBEON.xforms.Globals.formErrorPanel[formID] = null;
 
-                        // Find reference to elements in the details shown section
-                        var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
-                        var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
-                        YAHOO.util.Dom.generateId(hideDetailsA);
-                        errorPanel.errorTitleDiv = titleDiv;
-                        errorPanel.errorBodyDiv = bodyDiv;
-                        errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
-
-                        // Register listener that will show/hide the detail section
-                        YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
-                        YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
-
-                        // Handle listeners on error panel
-                        var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, errorPanelEl);
-                        if (closeA.length != 0) {
-                            YAHOO.util.Dom.generateId(closeA[0]);
-                            YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
-                        }
-
-                        var reloadA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-reload", null, errorPanelEl);
-                        if (reloadA.length != 0) {
-                            YAHOO.util.Dom.generateId(reloadA[0]);
-                            YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
-                        }
+                _.each($(formElement).find('.xforms-error-dialogs > .xforms-error-panel'), function (errorPanelEl) {
+                    // Create and store error panel
+                    YAHOO.util.Dom.generateId(errorPanelEl);
+                    YAHOO.util.Dom.removeClass(errorPanelEl, "xforms-initially-hidden");
+                    var errorPanel = new YAHOO.widget.Panel(errorPanelEl.id, {
+                        modal: true,
+                        fixedcenter: false,
+                        underlay: "shadow",
+                        visible: false,
+                        constraintoviewport: true,
+                        draggable: true
                     });
+                    errorPanel.render();
+                    ORBEON.util.Utils.overlayUseDisplayHidden(errorPanel);
+                    errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
+                    ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
-                    var elements = formElement.elements;
-                    var xformsRepeatTree;
-                    var xformsRepeatIndices;
-                    for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-                        var element = elements[elementIndex];
-                        if (element.name.indexOf("$uuid") != -1) {
-                            ORBEON.xforms.Globals.formUUID[formID] = element;
-                        } else if (element.name.indexOf("$static-state") != -1) {
-                            ORBEON.xforms.Globals.formStaticState[formID] = element;
-                        } else if (element.name.indexOf("$dynamic-state") != -1) {
-                            ORBEON.xforms.Globals.formDynamicState[formID] = element;
-                        } else if (element.name.indexOf("$server-events") != -1) {
-                            ORBEON.xforms.Globals.formServerEvents[formID] = element;
-                        } else if (element.name.indexOf("$client-state") != -1) {
-                            ORBEON.xforms.Globals.formClientState[formID] = element;
-                            if (element.value == "") {
-                                // If the client state is empty, store the initial dynamic state (old system) or UUID (new system).
-                                // If it is not empty, this means that we already have an initial state stored there, and that this
-                                // function runs because the user reloaded or navigated back to this page.
-                                ORBEON.xforms.Document.storeInClientState(formID, "initial-dynamic-state",
-                                        ORBEON.xforms.Globals.formDynamicState[formID].value);
-                                ORBEON.xforms.Document.storeInClientState(formID, "uuid",
-                                        ORBEON.xforms.Globals.formUUID[formID].value);
-                            } else {
-                                // The user reloaded or navigated back to this page. Reset the value of the $uuid field to
-                                // the value found in the client state, because the browser sometimes restores the value of
-                                // hidden fields in an erratic way, for example from the value the hidden field had from
-                                // the same URL loaded in another tab (e.g. Chrome, Firefox).
-                                ORBEON.xforms.Globals.formUUID[formID].value = ORBEON.xforms.Document.getFromClientState(formID, "uuid");
-                            }
-                        } else if (element.name.indexOf("$repeat-tree") != -1) {
-                            xformsRepeatTree = element;
-                        } else if (element.name.indexOf("$repeat-indexes") != -1) {
-                            xformsRepeatIndices = element;
-                            // This is the last input field we are interested in
-                            break;
-                        }
+                    // Find reference to elements in the details hidden section
+                    var titleDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "hd");
+                    var bodyDiv = ORBEON.util.Dom.getChildElementByClass(errorPanelEl, "bd");
+                    var detailsHiddenDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-hidden");
+                    var showDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsHiddenDiv, 0), 0);
+                    YAHOO.util.Dom.generateId(showDetailsA);
+
+                    // Find reference to elements in the details shown section
+                    var detailsShownDiv = ORBEON.util.Dom.getChildElementByClass(bodyDiv, "xforms-error-panel-details-shown");
+                    var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
+                    YAHOO.util.Dom.generateId(hideDetailsA);
+                    errorPanel.errorTitleDiv = titleDiv;
+                    errorPanel.errorBodyDiv = bodyDiv;
+                    errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
+
+                    // Register listener that will show/hide the detail section
+                    YAHOO.util.Event.addListener(showDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
+                    YAHOO.util.Event.addListener(hideDetailsA.id, "click", ORBEON.xforms.Events.errorShowHideDetails);
+
+                    // Handle listeners on error panel
+                    var closeA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-close", null, errorPanelEl);
+                    if (closeA.length != 0) {
+                        YAHOO.util.Dom.generateId(closeA[0]);
+                        YAHOO.util.Event.addListener(closeA[0].id, "click", ORBEON.xforms.Events.errorCloseClicked, errorPanel);
                     }
 
-                    ORBEON.xforms.Globals.processRepeatHierarchy(xformsRepeatTree.value);
-
-                    // Parse and store initial repeat indexes
-                    var repeatIndexesString = xformsRepeatIndices.value;
-                    var repeatIndexes = repeatIndexesString.split(",");
-                    for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
-                        var repeatInfo = repeatIndexes[repeatIndex].split(" ");
-                        var id = repeatInfo[0];
-                        var index = repeatInfo[repeatInfo.length - 1];
-                        ORBEON.xforms.Globals.repeatIndexes[id] = index;
+                    var reloadA = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel-reload", null, errorPanelEl);
+                    if (reloadA.length != 0) {
+                        YAHOO.util.Dom.generateId(reloadA[0]);
+                        YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
                     }
+                });
 
-                    // Ask server to resend events if this is not the first time load is called
-                    if (ORBEON.xforms.Document.getFromClientState(formID, "load-did-run") == null) {
-                        ORBEON.xforms.Document.storeInClientState(formID, "load-did-run", "true");
-                        ORBEON.xforms.Document.storeInClientState(formID, "sequence", "1");
-                    } else {
-                        if (ORBEON.util.Properties.revisitHandling.get() == "reload") {
-                            ORBEON.xforms.Globals.isReloading = true;
-                            window.location.reload(true);
-                            //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
+                var elements = formElement.elements;
+                var xformsRepeatTree;
+                var xformsRepeatIndices;
+                for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+                    var element = elements[elementIndex];
+                    if (element.name.indexOf("$uuid") != -1) {
+                        ORBEON.xforms.Globals.formUUID[formID] = element;
+                    } else if (element.name.indexOf("$static-state") != -1) {
+                        ORBEON.xforms.Globals.formStaticState[formID] = element;
+                    } else if (element.name.indexOf("$dynamic-state") != -1) {
+                        ORBEON.xforms.Globals.formDynamicState[formID] = element;
+                    } else if (element.name.indexOf("$server-events") != -1) {
+                        ORBEON.xforms.Globals.formServerEvents[formID] = element;
+                    } else if (element.name.indexOf("$client-state") != -1) {
+                        ORBEON.xforms.Globals.formClientState[formID] = element;
+                        if (element.value == "") {
+                            // If the client state is empty, store the initial dynamic state (old system) or UUID (new system).
+                            // If it is not empty, this means that we already have an initial state stored there, and that this
+                            // function runs because the user reloaded or navigated back to this page.
+                            ORBEON.xforms.Document.storeInClientState(formID, "initial-dynamic-state",
+                                    ORBEON.xforms.Globals.formDynamicState[formID].value);
+                            ORBEON.xforms.Document.storeInClientState(formID, "uuid",
+                                    ORBEON.xforms.Globals.formUUID[formID].value);
                         } else {
-                            var event = new ORBEON.xforms.server.AjaxServer.Event(formElement, null, null, "xxforms-all-events-required");
-                            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
+                            // The user reloaded or navigated back to this page. Reset the value of the $uuid field to
+                            // the value found in the client state, because the browser sometimes restores the value of
+                            // hidden fields in an erratic way, for example from the value the hidden field had from
+                            // the same URL loaded in another tab (e.g. Chrome, Firefox).
+                            ORBEON.xforms.Globals.formUUID[formID].value = ORBEON.xforms.Document.getFromClientState(formID, "uuid");
+                        }
+                    } else if (element.name.indexOf("$repeat-tree") != -1) {
+                        xformsRepeatTree = element;
+                    } else if (element.name.indexOf("$repeat-indexes") != -1) {
+                        xformsRepeatIndices = element;
+                        // This is the last input field we are interested in
+                        break;
+                    }
+                }
+
+                ORBEON.xforms.Globals.processRepeatHierarchy(xformsRepeatTree.value);
+
+                // Parse and store initial repeat indexes
+                var repeatIndexesString = xformsRepeatIndices.value;
+                var repeatIndexes = repeatIndexesString.split(",");
+                for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
+                    var repeatInfo = repeatIndexes[repeatIndex].split(" ");
+                    var id = repeatInfo[0];
+                    var index = repeatInfo[repeatInfo.length - 1];
+                    ORBEON.xforms.Globals.repeatIndexes[id] = index;
+                }
+
+                // Ask server to resend events if this is not the first time load is called
+                if (ORBEON.xforms.Document.getFromClientState(formID, "load-did-run") == null) {
+                    ORBEON.xforms.Document.storeInClientState(formID, "load-did-run", "true");
+                    ORBEON.xforms.Document.storeInClientState(formID, "sequence", "1");
+                } else {
+                    if (ORBEON.util.Properties.revisitHandling.get() == "reload") {
+                        ORBEON.xforms.Globals.isReloading = true;
+                        window.location.reload(true);
+                        //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
+                    } else {
+                        var event = new ORBEON.xforms.server.AjaxServer.Event(formElement, null, null, "xxforms-all-events-required");
+                        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
+                    }
+                }
+
+                // Initialize controls, listeners, server-events
+                if (! (window.orbeonInitData === undefined)) {
+
+                    var formInitData = window.orbeonInitData[formID];
+
+                    // Iterate over controls
+                    ORBEON.xforms.Init.initializeJavaScriptControls(formInitData);
+
+                    // Register key listeners
+                    var keyListeners = formInitData["keylisteners"];
+                    if (YAHOO.lang.isArray(keyListeners)) {
+                        for (var keyListenerIndex = 0; keyListenerIndex < keyListeners.length; keyListenerIndex++) {
+                            var keyListener = keyListeners[keyListenerIndex];
+
+                            // When listening on events from the document, the server gives us the id of the form
+                            keyListener.isDocumentListener = keyListener.observer == "#document";
+                            keyListener.isDialogListener = false;
+                            if (! keyListener.isDocumentListener) {
+                                keyListener.observerElement = ORBEON.util.Dom.get(keyListener.observer);
+                                keyListener.isDialogListener = $(keyListener.observerElement).is('.xforms-dialog');
+                            }
+                            if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
+
+                            // Save current form, which we'll need when creating an event
+                            keyListener.form = formElement;
+
+                            // Handle optional modifiers
+                            var keyData = {};
+                            if (YAHOO.lang.isString(keyListener.modifier)) {
+                                var modifiers = keyListener.modifier.split(" ");
+                                for (var modifierIndex = 0; modifierIndex < modifiers.length; modifierIndex++) {
+                                    var modifier = modifiers[modifierIndex];
+                                    if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
+                                    if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
+                                    if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
+                                }
+                            }
+                            // Handle text string by building array of key codes
+                            keyData["keys"] = [];
+                            var text = keyListener.text.toUpperCase();
+                            for (var textIndex = 0; textIndex < text.length; textIndex++)
+                                keyData["keys"].push(text.charCodeAt(textIndex));
+
+                            // Create YUI listener
+                            var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
+                                scope: keyListener,
+                                correctScope: false,
+                                fn: function (eventName, eventObject, keyListener) {
+                                    // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
+                                    var targetId = keyListener.observer;
+                                    var additionalAttributes = ["text", keyListener.text];
+                                    if (! _.isUndefined(keyListener.modifier)) {
+                                        additionalAttributes.push("modifiers");
+                                        additionalAttributes.push(keyListener.modifier);
+                                    }
+                                    var event = new ORBEON.xforms.server.AjaxServer.Event(keyListener.form, targetId, null, "keypress",
+                                            null, null, null, null, null, additionalAttributes);
+                                    ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
+                                }
+                            });
+
+                            // Register listener on dialog or enable
+                            if (keyListener.isDialogListener) {
+                                var yuiDialog = ORBEON.xforms.Globals.dialogs[keyListener.observer];
+                                var dialogKeyListeners = yuiDialog.cfg.getProperty("keylisteners");
+                                if (_.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
+                                dialogKeyListeners.push(yuiKeyListener);
+                                yuiDialog.cfg.setProperty("keylisteners", dialogKeyListeners);
+                            } else {
+                                yuiKeyListener.enable();
+                            }
                         }
                     }
 
-                    // Initialize controls, listeners, server-events
-                    if (! (window.orbeonInitData === undefined)) {
-
-                        var formInitData = window.orbeonInitData[formID];
-
-                        var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
-                        // Iterate over controls
-                        for (var controlType in formInitData["controls"]) {
-                            if (initFunctions[controlType]) {
-                                var controlAppearances = formInitData["controls"][controlType];
-                                // Iterate over appearance for current control
-                                for (var controlAppearance in controlAppearances) {
-                                    var initFunction = initFunctions[controlType][controlAppearance];
-                                    if (initFunction) {
-                                        var controlIds = controlAppearances[controlAppearance];
-                                        // Iterate over controls
-                                        for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
-                                            var control = ORBEON.util.Dom.get(controlIds[controlIndex]);
-                                            initFunction(control);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Register key listeners
-                        var keyListeners = formInitData["keylisteners"];
-                        if (YAHOO.lang.isArray(keyListeners)) {
-                            for (var keyListenerIndex = 0; keyListenerIndex < keyListeners.length; keyListenerIndex++) {
-                                var keyListener = keyListeners[keyListenerIndex];
-
-                                // When listening on events from the document, the server gives us the id of the form
-                                keyListener.isDocumentListener = keyListener.observer == "#document";
-                                keyListener.isDialogListener = false;
-                                if (! keyListener.isDocumentListener) {
-                                    keyListener.observerElement = ORBEON.util.Dom.get(keyListener.observer);
-                                    keyListener.isDialogListener = $(keyListener.observerElement).is('.xforms-dialog');
-                                }
-                                if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
-
-                                // Save current form, which we'll need when creating an event
-                                keyListener.form = formElement;
-
-                                // Handle optional modifiers
-                                var keyData = {};
-                                if (YAHOO.lang.isString(keyListener.modifier)) {
-                                    var modifiers = keyListener.modifier.split(" ");
-                                    for (var modifierIndex = 0; modifierIndex < modifiers.length; modifierIndex++) {
-                                        var modifier = modifiers[modifierIndex];
-                                        if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
-                                        if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
-                                        if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
-                                    }
-                                }
-                                // Handle text string by building array of key codes
-                                keyData["keys"] = [];
-                                var text = keyListener.text.toUpperCase();
-                                for (var textIndex = 0; textIndex < text.length; textIndex++)
-                                    keyData["keys"].push(text.charCodeAt(textIndex));
-
-                                // Create YUI listener
-                                var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
-                                    scope: keyListener,
-                                    correctScope: false,
-                                    fn: function (eventName, eventObject, keyListener) {
-                                        // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
-                                        var targetId = keyListener.observer;
-                                        var additionalAttributes = ["text", keyListener.text];
-                                        if (! _.isUndefined(keyListener.modifier)) {
-                                            additionalAttributes.push("modifiers");
-                                            additionalAttributes.push(keyListener.modifier);
-                                        }
-                                        var event = new ORBEON.xforms.server.AjaxServer.Event(keyListener.form, targetId, null, "keypress",
-                                                null, null, null, null, null, additionalAttributes);
-                                        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-                                    }
-                                });
-
-                                // Register listener on dialog or enable
-                                if (keyListener.isDialogListener) {
-                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[keyListener.observer];
-                                    var dialogKeyListeners = yuiDialog.cfg.getProperty("keylisteners");
-                                    if (_.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
-                                    dialogKeyListeners.push(yuiKeyListener);
-                                    yuiDialog.cfg.setProperty("keylisteners", dialogKeyListeners);
-                                } else {
-                                    yuiKeyListener.enable();
-                                }
-                            }
-                        }
-
-                        // Handle server events
-                        var serverEvents = formInitData["server-events"];
-                        if (YAHOO.lang.isArray(serverEvents)) {
-                            // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
-                            for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
-                                var serverEvent = serverEvents[serverEventIndex];
-                                var discardable = ! _.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
-                                ORBEON.xforms.server.AjaxServer.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
-                                        serverEvent["show-progress"], serverEvent["progress-message"], discardable, formElement.id);
-                            }
+                    // Handle server events
+                    var serverEvents = formInitData["server-events"];
+                    if (YAHOO.lang.isArray(serverEvents)) {
+                        // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
+                        for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
+                            var serverEvent = serverEvents[serverEventIndex];
+                            var discardable = ! _.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
+                            ORBEON.xforms.server.AjaxServer.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
+                                    serverEvent["show-progress"], serverEvent["progress-message"], discardable, formElement.id);
                         }
                     }
                 }
-            }
+            });
 
             // Special registration for focus, blur, and change events
             $(document).on('focusin', ORBEON.xforms.Events.focus);
@@ -3742,6 +3782,34 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             ORBEON.xforms.Globals.calendarImageURL[formID] = calendarImageURL;
         },
 
+        initializeJavaScriptControls: function (formInitData) {
+            _.each(formInitData.controls, function(idValueOpt) {
+                var control = document.getElementById(idValueOpt.id);
+                if (control) {
+                    var jControl = $(control);
+                    if (ORBEON.xforms.XBL.isComponent(control)) {
+                        // Custom XBL component initialization
+                        var instance = ORBEON.xforms.XBL.instanceForControl(control);
+                        if (_.isObject(instance)) {
+                            if (_.isString(idValueOpt.value)) {
+                                ORBEON.xforms.Controls.setCurrentValue(control, idValueOpt.value);
+                            }
+                        }
+                    } else if (jControl.is('.xforms-dialog')) {
+                        // Special case for dialogs
+                        ORBEON.xforms.Init._dialog(control);
+                    } else if (jControl.is('.xforms-select1-appearance-compact, .xforms-select-appearance-compact')) {
+                        // Legacy JavaScript initialization
+                        ORBEON.xforms.Init._compactSelect(control);
+                    } else if (jControl.is('.xforms-range')) {
+                        // Legacy JavaScript initialization
+                        ORBEON.xforms.Init._range(control);
+                    }
+                }
+            });
+        },
+
+        // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.
         _range: function (range) {
             range.tabIndex = 0;
             ORBEON.xforms.ServerValueStore.set(range.id, 0);
@@ -3761,8 +3829,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          * For all the controls except list, we figure out the initial value of the control when
          * receiving the first focus event. For the lists on Firefox, the value has already changed
          * when we receive the focus event. So here we save the value for lists when the page loads.
+         *
+         * Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2657.
          */
-        _list: function (list) {
+        _compactSelect: function (list) {
             var value = "";
             list = ORBEON.util.Dom.getElementByTagName(list, "select");
             for (var i = 0; i < list.options.length; i++) {

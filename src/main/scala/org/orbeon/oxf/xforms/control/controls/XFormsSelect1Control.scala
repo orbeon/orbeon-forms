@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
@@ -49,8 +50,6 @@ class XFormsSelect1Control(
 ) with XFormsValueControl
   with FocusableTrait {
 
-  import XFormsSelect1Control._
-
   override type Control <: SelectionControl
 
   // This is a var just for getBackCopy
@@ -71,10 +70,8 @@ class XFormsSelect1Control(
   def getGroupName: String =
     extensionAttributeValue(XXFORMS_GROUP_QNAME) getOrElse getEffectiveId
 
-  override def getJavaScriptInitialization = {
-    val hasInitialization = staticControl.appearances exists AppearancesWithInitialization
-    if (hasInitialization) getCommonJavaScriptInitialization else null
-  }
+  override def hasJavaScriptInitialization =
+    staticControl.appearances contains XFORMS_COMPACT_APPEARANCE_QNAME
 
   override def markDirtyImpl(): Unit = {
     super.markDirtyImpl()
@@ -227,19 +224,18 @@ class XFormsSelect1Control(
     }
   }
 
-  override def outputAjaxDiffUseClientValue(
-    previousValue         : Option[String],
-    previousControl       : Option[XFormsValueControl],
-    isNewlyVisibleSubtree : Boolean)(implicit
-    ch                    : XMLReceiverHelper
+  final override def outputAjaxDiffUseClientValue(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsValueControl],
+    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch              : XMLReceiverHelper
   ) = {
 
-    // Output regular diff
-    super.outputAjaxDiffUseClientValue(previousValue, previousControl, isNewlyVisibleSubtree)
+    val hasNestedContent =
+      mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)
 
-    // Output itemset diff
-    if (mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)) {
-      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", Array("id", XFormsUtils.namespaceId(containingDocument, getEffectiveId)))
+    val outputNestedContent = (ch: XMLReceiverHelper) ⇒ {
+      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", Array[String]())
 
       val itemset = getItemset
       if (itemset ne null) {
@@ -250,6 +246,13 @@ class XFormsSelect1Control(
 
       ch.endElement()
     }
+
+    // Output regular diff
+    super.outputAjaxDiffUseClientValue(
+      previousValue,
+      previousControl,
+      hasNestedContent option outputNestedContent
+    )
   }
 
   // Don't accept focus if we have the internal appearance
@@ -264,8 +267,6 @@ class XFormsSelect1Control(
 }
 
 object XFormsSelect1Control {
-
-  private val AppearancesWithInitialization = Set(XFORMS_COMPACT_APPEARANCE_QNAME)
 
   // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
   // lookup by id takes place and the control must have a static itemset or otherwise null is returned.

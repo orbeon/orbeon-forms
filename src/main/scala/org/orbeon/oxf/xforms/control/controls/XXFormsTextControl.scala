@@ -42,27 +42,35 @@ class XXFormsTextControl(
   def getEffectiveForAttribute =
     forAttribute + getEffectiveId.substring(getId.length)
 
-  override def outputAjaxDiffUseClientValue(
-    previousValue         : Option[String],
-    previousControl       : Option[XFormsValueControl],
-    isNewlyVisibleSubtree : Boolean)(implicit
-    ch                    : XMLReceiverHelper
+  final override def outputAjaxDiffUseClientValue(
+    previousValue   : Option[String],
+    previousControl : Option[XFormsValueControl],
+    content         : Option[XMLReceiverHelper ⇒ Unit])(implicit
+    ch              : XMLReceiverHelper
   ) = {
 
-    val attributesImpl = new AttributesImpl
+    // If we get here, it means that `super.compareExternalUseExternalValue()` returned `false`, which means that either
+    // `previousControl.isEmpty == true` or that there is a difference in value (or other aspects which don't matter here).
+
+    val atts = new AttributesImpl
 
     // The client does not store an HTML representation of the xxf:text control, so we
     // have to output these attributes.
     ControlAjaxSupport.addOrAppendToAttributeIfNeeded(
-      attributesImpl,
-      "for",
-      this.getEffectiveForAttribute,
-      isNewlyVisibleSubtree,
-      isDefaultValue = false
+      attributesImpl       = atts,
+      name                 = "for",
+      value                = this.getEffectiveForAttribute,
+      isNewRepeatIteration = false, // doesn't matter because `isDefaultValue == false`
+      isDefaultValue       = false
     )
 
-    attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, this.getEffectiveId)
-    outputValueElement(isNewlyVisibleSubtree, attributesImpl, "text")
+    atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, this.getEffectiveId)
+
+    outputValueElement(
+      attributesImpl = atts,
+      elementName    = "text",
+      value          = getEscapedExternalValue
+    )
   }
 
   override def supportFullAjaxUpdates = false

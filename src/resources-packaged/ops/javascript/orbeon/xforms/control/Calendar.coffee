@@ -115,7 +115,11 @@ Event.onDOMReady ->
         Events.clickEvent.subscribe (event) ->
 
             # Show date picker on click on the input of type dates
-            isDate = $(event.target).is('input.xforms-type-date')
+            # The xforms-input-input class is on:
+            # - the input with the non-minimal appearance,
+            # - the calendar image with the minimal appearance.
+            isDate = $(event.target).is('.xforms-input-input.xforms-type-date')
+
             canWrite = not f$.is '.xforms-readonly', $ event.control
             if isDate and canWrite
 

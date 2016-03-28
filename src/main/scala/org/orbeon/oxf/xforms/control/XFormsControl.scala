@@ -43,22 +43,22 @@ import org.orbeon.oxf.util.ScalaUtils._
  * The implementation is split into a series of traits to make each chunk more palatable.
  */
 class XFormsControl(
-    val container: XBLContainer,
-    var parent: XFormsControl,      // var just so we can null it upon clone
-    val element: Element,
-    var effectiveId: String)        // var because can be updated upon iteration change
-  extends ControlXPathSupport
-  with Cloneable
-  with ControlAjaxSupport
-  with ControlLHHASupport
-  with ControlLocalSupport
-  with ControlExtensionAttributesSupport
-  with ControlEventSupport
-  with ControlBindingSupport
-  with ControlXMLDumpSupport
-  with XFormsEventTarget
-  with XFormsEventObserver
-  with Logging {
+    val container   : XBLContainer,
+    var parent      : XFormsControl, // var just so we can null it upon clone
+    val element     : Element,
+    var effectiveId : String         // var because can be updated upon iteration change
+) extends ControlXPathSupport
+     with Cloneable
+     with ControlAjaxSupport
+     with ControlLHHASupport
+     with ControlLocalSupport
+     with ControlExtensionAttributesSupport
+     with ControlEventSupport
+     with ControlBindingSupport
+     with ControlXMLDumpSupport
+     with XFormsEventTarget
+     with XFormsEventObserver
+     with Logging {
 
   // Type of the associated static control
   type Control <: ElementAnalysis // TODO: Use more specific to represent controls. Note that those can also be actions.

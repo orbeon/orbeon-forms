@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
@@ -227,7 +228,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
 
         public boolean hasAppearance(ElementAnalysis elementAnalysis, QName appearance) {
-            return XFormsControl.jAppearances(elementAnalysis).contains(appearance);
+            return XFormsControl$.MODULE$.appearances(elementAnalysis).contains(appearance);
         }
 
         public final ElementAnalysis match(Attributes attributes, Object handlerContext) {

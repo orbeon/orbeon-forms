@@ -87,7 +87,7 @@ class XFormsOutputControl(
     assert(internalValue ne null)
 
     val updatedValue =
-      if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
+      if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
         // Download appearance
         // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
         proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatype)
@@ -198,7 +198,7 @@ class XFormsOutputControl(
     }
 
   override def getRelevantEscapedExternalValue =
-    if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatype exists (_.startsWith("image/")))) {
+    if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatype exists (_.startsWith("image/")))) {
       val externalValue = getExternalValue
       if (StringUtils.isNotBlank(externalValue)) {
         // External value is not blank, rewrite as absolute path. Two cases:

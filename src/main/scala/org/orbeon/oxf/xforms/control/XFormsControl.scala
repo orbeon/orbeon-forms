@@ -168,9 +168,8 @@ class XFormsControl(
     previousEffectiveIdCommit()
   }
 
-  final def appearances    = XFormsControl.appearances(staticControl)
-  final def getAppearances = XFormsControl.jAppearances(staticControl)
-  def isStaticReadonly = false
+  final def appearances = XFormsControl.appearances(staticControl)
+  def isStaticReadonly  = false
 
   // Optional mediatype
   final def mediatype = staticControl match {
@@ -182,9 +181,9 @@ class XFormsControl(
   def javaScriptInitialization: Option[(String, String, String)] = Option(getJavaScriptInitialization)
 
   final def getCommonJavaScriptInitialization = {
-    val appearances = getAppearances
+    // 2016-03-28: It is undefined which appearance is the "first"!
     // First appearance only (should probably handle all of them, but historically only one appearance was handled)
-    val firstAppearance = if (! appearances.isEmpty) Some(Dom4jUtils.qNameToExplodedQName(appearances.iterator.next)) else None
+    val firstAppearance = appearances.headOption map Dom4jUtils.qNameToExplodedQName
     (localName, firstAppearance orElse mediatype orNull, getEffectiveId)
   }
 
@@ -414,8 +413,6 @@ object XFormsControl {
     case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.appearances
     case _                                ⇒ Set.empty[QName]
   }
-
-  def jAppearances(elementAnalysis: ElementAnalysis) = appearances(elementAnalysis).asJava
 
   // Whether the given control has the text/html mediatype
   private val HTMLMediatype = Some("text/html")

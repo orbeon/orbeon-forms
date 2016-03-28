@@ -50,7 +50,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
   private def controlHas(predicate: XFormsInputControl ⇒ Boolean) = currentControlOpt exists predicate
 
   private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
-  private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.getAppearances.contains(XFORMS_MINIMAL_APPEARANCE_QNAME))
+  private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
   private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
 
   protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {

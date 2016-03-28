@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -51,7 +52,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
             final String level; {
                 final String explicitLevel = attributes.getValue("level");
                 if (explicitLevel == null) {
-                    level = XFormsControl.jAppearances(elementAnalysis).contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) ? "modeless" : "modal";
+                    level = XFormsControl$.MODULE$.appearances(elementAnalysis).contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) ? "modeless" : "modal";
                 } else {
                     level = explicitLevel;
                 }

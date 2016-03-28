@@ -34,6 +34,6 @@ class XFormsGroupControl(
   // Static readonly doesn't seem to make much sense for xf:group, and we don't want to see the
   // `xforms-static` class in the resulting HTML
   override def isStaticReadonly   = false
-  override def supportAjaxUpdates = ! getAppearances.contains(XXFORMS_INTERNAL_APPEARANCE_QNAME)
+  override def supportAjaxUpdates = ! appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)
   override def valueType          = null
 }

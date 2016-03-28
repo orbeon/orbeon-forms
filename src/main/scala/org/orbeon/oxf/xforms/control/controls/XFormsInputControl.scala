@@ -146,7 +146,7 @@ class XFormsInputControl(
         getBuiltinTypeName match {
           case "date" | "time" ⇒ formatSubValue(getFirstValueType, getValue)
           case "dateTime"      ⇒ formatSubValue(getFirstValueType, getDateTimeDatePart(getValue, 'T'))
-          case _               ⇒ Option(getExternalValue)
+          case _               ⇒ externalValueOpt
         }
       } else
         None

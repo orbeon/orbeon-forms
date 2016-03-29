@@ -93,7 +93,7 @@
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
-                                                <xsl:apply-templates select="@* except @collapse | node()"/>
+                                                <xsl:apply-templates select="@* except (@collapse | @open) | node()"/>
                                             </xsl:copy>
                                         </xf:group>
                                     </xf:case>

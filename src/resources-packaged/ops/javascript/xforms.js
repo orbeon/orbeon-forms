@@ -31,11 +31,6 @@ var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
 var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", "g");
 var DEFAULT_LOADING_TEXT = "Loading...";
 
-// These variables are not set by default, but if set will be used by this code:
-//
-//     YUI_RTE_CUSTOM_CONFIG
-//     USER_LANGUAGE
-
 (function() {
 
     var $ = ORBEON.jQuery;

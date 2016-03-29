@@ -359,7 +359,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         // Remove control information for iterations that move or just disappear
         val oldChildren = children
 
-        for (i ← 0 to newIndexes.length - 1) {
+        for (i ← newIndexes.indices) {
           val currentNewIndex = newIndexes(i)
           if (currentNewIndex != i) {
             // Node has moved or is removed

@@ -292,10 +292,12 @@ object SchemaGenerator {
 
           // Find the <xbl:xbl> XBL container, as we might have two (one for the orbeon library, one for the app library)
           val xblEl = {
-            val xblEls = formSource.rootElement \ "*:head" \ "*:xbl"
-            val xblEl = xblEls filter { xblEl ⇒
-              val componentNamespace = xblEl.namespaces.filter(_.getLocalPart == "component")
-              componentNamespace.head.getStringValue == componentNode.namespaceURI
+              val xblEl = for {
+                  xblEl ← formSource.rootElement \ "*:head" \ "*:xbl"
+                  componentNamespace = xblEl.namespaces.find(_.getLocalPart == "component")
+                  if componentNamespace.exists(_.getStringValue == componentNode.namespaceURI)
+              } yield {
+                  xblEl
             }
             assert(xblEl.length == 1, "expect exactly one <xbl:xbl> container for given namespace")
             xblEl.head

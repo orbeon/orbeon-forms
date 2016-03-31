@@ -109,6 +109,10 @@ Event.onDOMReady ->
             jsDate = yuiCalendar.getSelectedDates()[0]
             formattedDate = DateTime.jsDateToFormatDisplayDate(jsDate)
             setValue(control, formattedDate)
+            # Set the back focus on the input field, as:
+            # - there is no reason after selecting a date the current control should loose the focus
+            # - if it looses the focus, with a required date-time control, an error will be shown
+            $(control).children('input.xforms-input-input').first().focus()
             closeCalendar()
 
         # Open calendar on click

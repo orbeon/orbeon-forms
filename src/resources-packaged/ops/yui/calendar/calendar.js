@@ -2016,9 +2016,6 @@ Calendar.prototype = {
 
                     } else {
                         link = cell.getElementsByTagName("a")[0];
-                        if (link) {
-                            link.blur();
-                        }
                         cal.selectCell(index);
                     }
                 }
@@ -3326,9 +3323,11 @@ Calendar.prototype = {
         if (calendarContainer.has(activeElement).is('*')) {
             // The active element is inside the calendar container, which content we're rebuilding
             // No need to remove the handler, since the element will be removed from the DOM
-            activeElement.on('focusout', function(event) {
+            console.log("registered handler on", activeElement);
+            activeElement.on('focusout blur', function(event) {
                 // The active element got a focusout, which will bubble, but is spurious since the element will be recreated
                 // So prevent that event propagation
+                console.trace("stopPropagation");
                 event.stopPropagation();
             });
         }

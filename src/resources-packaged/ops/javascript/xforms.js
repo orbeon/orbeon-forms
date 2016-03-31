@@ -3132,7 +3132,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              */
             onComponentInitialized: function (component) {
                 if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(component.container)) {
-                    console.log('xxx onComponentInitialized ' + component.container.id);
                     if (! this._knownComponents[component.container.id]) {
 
                         // Find if this instance is in a full update container

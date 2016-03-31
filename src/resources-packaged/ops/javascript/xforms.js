@@ -1504,9 +1504,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
             ORBEON.xforms.Controls.valueChange.fire(customEvent);
 
-            var jControl = $(control);
-
+            var jControl         = $(control);
             var isStaticReadonly = jControl.is('.xforms-static');
+
+            // Can be set below by an XBL component's `xformsUpdateValue()` result
+            var result = undefined;
+
             if (jControl.is('.xforms-output-appearance-xxforms-download')) {
                 // XForms output with xxf:download appearance
                 var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
@@ -1622,8 +1625,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 textarea.value = newControlValue;
             } else if (ORBEON.xforms.XBL.isComponent(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
-                if (_.isObject(instance) && _.isFunction(instance.xformsUpdateValue))
-                    instance.xformsUpdateValue(newControlValue);
+                if (_.isObject(instance) && _.isFunction(instance.xformsUpdateValue)) {
+                    // Return `undefined` or a jQuery `Promise` once the value is actually set
+                    result = instance.xformsUpdateValue(newControlValue);
+                }
             } else if (typeof(control.value) == "string") {
                 // Textarea, password
                 control.value = newControlValue;
@@ -1631,6 +1636,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             }
 
             ORBEON.xforms.Controls.afterValueChange.fire(customEvent);
+
+            return result;
         },
 
         _setRadioCheckboxClasses: function (target) {

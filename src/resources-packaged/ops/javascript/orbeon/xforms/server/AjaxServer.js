@@ -1228,7 +1228,7 @@
                                         );
 
                                     if (doUpdate) {
-                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                        var promiseOrUndef = ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
 
                                         // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
                                         //
@@ -1241,7 +1241,21 @@
                                         // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
                                         // value for the field, since the current value is different from the server value, we will incorrectly think that the
                                         // user modified the field, and won't update the field with the value provided by the AjaxServer.
-                                        ORBEON.xforms.ServerValueStore.set(documentElement.id, ORBEON.xforms.Controls.getCurrentValue(documentElement));
+
+                                        // `setCurrentValue()` may return a jQuery `Promise` and if it does we update the server value only once it is resolved.
+                                        // For details see https://github.com/orbeon/orbeon-forms/issues/2670.
+
+                                        function setServerValue() {
+                                            ORBEON.xforms.ServerValueStore.set(
+                                                controlId,
+                                                ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.get(controlId))
+                                            );
+                                        }
+
+                                        if (_.isObject(promiseOrUndef) && _.isFunction(promiseOrUndef.done))
+                                            promiseOrUndef.done(setServerValue);
+                                        else
+                                            setServerValue();
                                     }
                                 }
                             }

@@ -868,20 +868,22 @@
         </yui-compressor>
 
         <!-- Minimize JavaScript-->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="${resources-packaged.dir}/ops" todir="${war.dir}/WEB-INF/resources/ops">
+        <yui-compressor warn="false" charset="UTF-8" fromdir="${resources-packaged.dir}" todir="${war.dir}/WEB-INF/resources">
 
             <!-- Orbeon JavaScript code -->
-            <include name="javascript/xforms.js"/>
-            <include name="javascript/orbeon/**/*.js"/>
+            <include name="ops/javascript/xforms.js"/>
+            <include name="ops/javascript/orbeon/**/*.js"/>
 
             <!-- YUI file we changed -->
-            <include name="yui/button/button.js"/>
-            <include name="yui/container/container.js"/>
-            <include name="yui/connection/connection.js"/>
-            <include name="yui/calendar/calendar.js"/>
-            <include name="yui/treeview/treeview.js"/>
-            <include name="yui/examples/treeview/assets/js/TaskNode.js"/>
-            <include name="yui/examples/treeview/assets/js/CheckOnClickNode.js"/>
+            <include name="ops/yui/button/button.js"/>
+            <include name="ops/yui/container/container.js"/>
+            <include name="ops/yui/connection/connection.js"/>
+            <include name="ops/yui/calendar/calendar.js"/>
+            <include name="ops/yui/treeview/treeview.js"/>
+            <include name="ops/yui/examples/treeview/assets/js/TaskNode.js"/>
+            <include name="ops/yui/examples/treeview/assets/js/CheckOnClickNode.js"/>
+
+            <!-- Other files  -->
 
         </yui-compressor>
 

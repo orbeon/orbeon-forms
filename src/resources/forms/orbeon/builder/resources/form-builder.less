@@ -567,7 +567,10 @@ body {
     }
 
     h2 .fr-section-label {
-        min-height: 36px;                           // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
+        height: 36px;                               // So the title takes space even when empty; 36px is line-height in bootstrap.css
+                                                    // Defined as height, not max-height, as Firefox doesn't support max-height on
+                                                    // tables, table rows, or table cells; the browser will expand it anyway as needed,
+                                                    // so in this case height is equivalent to max-height.
     }
 
     // ***** Grid ******************************************************************************************************

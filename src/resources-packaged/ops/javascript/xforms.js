@@ -4161,27 +4161,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
     });
 
-    /**
-     * Value change handling for all the controls. It is assumed that the "value" property of "target"
-     * contain the current value for the control.
-     *
-     * This function is in general called by xformsHandleValueChange(), and will be called directly by
-     * other event handler for less usual events (e.g. slider, HTML area).
-     */
-    function xformsValueChanged(target) {
-        var newValue = ORBEON.xforms.Controls.getCurrentValue(target);
-        var valueChanged = newValue != target.previousValue;
-        // We don't send value change events for the XForms upload control
-        var isUploadControl = $(target).is('.xforms-upload');
-        if (valueChanged && ! isUploadControl) {
-            target.previousValue = newValue;
-            var incremental = $(target).is('.xforms-incremental');
-            var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, newValue, "xxforms-value");
-            ORBEON.xforms.server.AjaxServer.fireEvents([event], incremental);
-        }
-        return valueChanged;
-    }
-
     // Run xformsPageLoaded when the browser has finished loading the page
     // In case this script is loaded twice, we still want to run the initialization only once
     if (! ORBEON.xforms.Globals.pageLoadedRegistered) {

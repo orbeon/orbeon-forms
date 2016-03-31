@@ -116,7 +116,7 @@ $ ->
                         # Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
                         Builder.scrollTop() +
                         # Vertically center input inside click interceptor
-                        ((f$.height clickInterceptor) - (f$.height labelInput)) / 2
+                        ((f$.height clickInterceptor) - (f$.outerHeight labelInput)) / 2
                     left: interceptorOffset.left
                 f$.offset inputOffset, labelInput
                 f$.offset inputOffset, labelInput   # Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572

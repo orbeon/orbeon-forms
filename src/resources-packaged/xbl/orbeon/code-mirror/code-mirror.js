@@ -109,7 +109,15 @@
                 // It seems that we need a delay refresh otherwise sometimes the content doesn't appear when in a dialog
                 // which is just shown. However, this doesn't work 100% of the time it seems.
                 var editor = this.editor;
-                setTimeout(function() { editor.setValue(newSource); }, 0);
+
+                var deferred = $.Deferred();
+
+                setTimeout(function() {
+                    editor.setValue(newSource);
+                    deferred.resolve();
+                }, 0);
+
+                return deferred.promise();
             }
         },
         xformsGetValue: function() {

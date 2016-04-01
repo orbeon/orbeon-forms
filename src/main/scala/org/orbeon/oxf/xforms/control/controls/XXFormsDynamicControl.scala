@@ -222,7 +222,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         List(
           instanceListener,
           changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
-          changeListener(recordChanges(findBindChange, bindChanges)),
+          changeListener(recordChanges(findBindChange,                 bindChanges)),
           unknownChange)
         )
       )

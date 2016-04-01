@@ -60,7 +60,7 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
         EventHandlerImpl.isEventHandler map
           annotateChild
     else
-      Seq()
+      Nil
 
   // Directly nested LHHA (if enabled)
   private def directlyNestedLHHA =
@@ -69,8 +69,8 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
         (e ⇒ LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null)) map
           annotateChild
     else
-      Seq()
-  
+      Nil
+
   // Return all the children to consider, including relevant shadow tree elements
   override def findRelevantChildrenElements =
     directlyNestedHandlers ++ directlyNestedLHHA ++ binding.handlers ++ binding.models :+ binding.compactShadowTree.getRootElement map ((_, binding.innerScope))

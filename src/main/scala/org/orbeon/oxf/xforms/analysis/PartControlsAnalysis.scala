@@ -48,11 +48,11 @@ trait PartControlsAnalysis extends TransientState {
 
     // Register special controls
     elementAnalysis match {
-      case lhha: LHHAAnalysis ⇒ lhhas += lhha
+      case lhha: LHHAAnalysis             ⇒ lhhas         += lhha
       case eventHandler: EventHandlerImpl ⇒ eventHandlers += eventHandler
-      case model: Model ⇒ models += model
-      case attribute: AttributeControl ⇒ attributes += attribute
-      case _ ⇒
+      case model: Model                   ⇒ models        += model
+      case attribute: AttributeControl    ⇒ attributes    += attribute
+      case _                              ⇒
     }
   }
 

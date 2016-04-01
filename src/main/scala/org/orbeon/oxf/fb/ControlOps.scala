@@ -577,7 +577,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val control = findControlByName(inDoc, controlName).get
 
     val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha))
-    val removedLHHA    = delete(control child ((if (lhha=="text") FR else XF) → lhha))
+    val removedLHHA    = delete(control child ((if (lhha == "text") FR else XF) → lhha))
 
     removedHolders ++ removedLHHA
   }

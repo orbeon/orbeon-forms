@@ -97,14 +97,12 @@
                 this.editor.setOption('readOnly', false);
             }
         },
-        xformsUpdateValue: function(uriEncodedSource) {
-            var newSource = decodeURIComponent(uriEncodedSource);
-            //var newSource = uriEncodedSource;
+        xformsUpdateValue: function(newValue) {
             var doUpdate =
                 // As a shortcut, don't update the control if the user is typing in it
                 ! this.hasFocus &&
                 // Don't update if the new value is the same as the current one, as doing so resets the editor position
-                newSource != this.editor.getValue();
+                newValue != this.editor.getValue();
             if (doUpdate) {
                 // It seems that we need a delay refresh otherwise sometimes the content doesn't appear when in a dialog
                 // which is just shown. However, this doesn't work 100% of the time it seems.
@@ -113,7 +111,7 @@
                 var deferred = $.Deferred();
 
                 setTimeout(function() {
-                    editor.setValue(newSource);
+                    editor.setValue(newValue);
                     deferred.resolve();
                 }, 0);
 

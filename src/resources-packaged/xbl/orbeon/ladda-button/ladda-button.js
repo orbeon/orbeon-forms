@@ -15,7 +15,7 @@
 
     var $ = ORBEON.jQuery;
     var Document = ORBEON.xforms.Document;
-    var AjaxServer = ORBEON.xforms.server.AjaxServer
+    var AjaxServer = ORBEON.xforms.server.AjaxServer;
 
     var STATE_BEGIN   = 0;
     var STATE_CLICKED = 1;
@@ -41,8 +41,12 @@
 
             // Events
             this.button.on('click',             _.bind(this.click    , this));
-            AjaxServer.beforeSendingEvent.add  (_.bind(this.sending  , this))
-            AjaxServer.ajaxResponseReceived.add(_.bind(this.receiving, this))
+            AjaxServer.beforeSendingEvent.add  (_.bind(this.sending  , this));
+            AjaxServer.ajaxResponseReceived.add(_.bind(this.receiving, this));
+        },
+
+        destroy: function () {
+            // TODO: remove event handlers, destroy component
         },
 
         click: function() {

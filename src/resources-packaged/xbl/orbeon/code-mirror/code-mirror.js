@@ -15,10 +15,7 @@
 
     var $ = ORBEON.jQuery;
 
-    YAHOO.namespace('xbl.fr');
-    YAHOO.xbl.fr.CodeMirror = function() {};
-    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.CodeMirror, 'xbl-fr-code-mirror');
-    YAHOO.xbl.fr.CodeMirror.prototype = {
+    ORBEON.xforms.XBL.declareCompanion('xbl-fr-code-mirror', {
 
         editor: null,
         handlers: {},
@@ -46,9 +43,9 @@
             );
 
             this.handlers = {
-                'change': _.bind(this.codeMirrorChange),
-                'focus' : _.bind(this.codeMirrorFocus),
-                'blur'  : _.bind(this.codeMirrorBlur)
+                'change': _.bind(this.codeMirrorChange, this),
+                'focus' : _.bind(this.codeMirrorFocus, this),
+                'blur'  : _.bind(this.codeMirrorBlur, this)
             };
 
             var editor = this.editor;
@@ -121,5 +118,5 @@
         xformsGetValue: function() {
             return this.editor.getValue();
         }
-    };
+    });
 })();

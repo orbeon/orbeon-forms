@@ -3231,26 +3231,44 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         // Map the XBL CSS class to the JavaScript class
         _cssClassesToConstructors: {},
 
-        // Get or create an instance of the JavaScript companion class for the given control
-        instanceForControl: function(control) {
+        // Get or create an instance of the JavaScript companion class for the given element, which must be
+        // an XBL control element or a descendant of an XBL control element.
+        instanceForControl: function(elem) {
 
-            var identifyingCssClass =
-                _.find(control.className.split(" "), function(clazz) {
-                    // The "identifying class" should be the the first after `xbl-component`, but filter known classes just in case
-                    return clazz.indexOf("xbl-") == 0 &&
-                           clazz != "xbl-component"   &&
-                           clazz != "xbl-focusable"   &&
-                           clazz != "xbl-javascript-lifecycle";
-                });
+            var xblControlElem = $(elem).closest('.xbl-component')[0];
 
-            if (identifyingCssClass) {
-                var factory = this._cssClassesToConstructors[identifyingCssClass];
-                if (factory) {
-                    return factory.instance(control);
-                } else {
-                    return null;
+            if (xblControlElem) {
+
+                var identifyingCssClass =
+                    _.find(xblControlElem.className.split(" "), function(clazz) {
+                        // The "identifying class" should be the the first after `xbl-component`, but filter
+                        // known classes just in case
+                        return clazz.indexOf("xbl-") == 0 &&
+                               clazz != "xbl-component"   &&
+                               clazz != "xbl-focusable"   &&
+                               clazz != "xbl-javascript-lifecycle";
+                    });
+
+                if (identifyingCssClass) {
+                    var factory = this._cssClassesToConstructors[identifyingCssClass];
+                    if (factory) {
+                        return factory.instance(xblControlElem);
+                    } else {
+                        return null;
+                    }
                 }
+            } else {
+                return null;
             }
+        },
+
+        // Declare a companion JavaScript class. The class is defined by a simple prototype and will map
+        // to elements with the given CSS class.
+        declareCompanion: function(cssClass, prototype) {
+            var xblClass = function() {};
+            this.declareClass(xblClass, cssClass);
+            xblClass.prototype = prototype;
+            return xblClass;
         },
 
         /**
@@ -3258,7 +3276,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          *
          *  This adds an `instance(target)` function to `xblClass`.
          */
-        declareClass: function (xblClass, cssClass) {
+        declareClass: function(xblClass, cssClass) {
             var doNothingSingleton = null;
             var instanceAlreadyCalled = false;
 

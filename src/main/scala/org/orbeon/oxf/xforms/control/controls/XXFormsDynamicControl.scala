@@ -411,6 +411,10 @@ object XXFormsDynamicControl {
     if (node.getNodeKind == SaxonType.NAMESPACE)
       None // can't find ancestors of namespace nodes with dom4j
     else {
+
+      val isNodeLHHA =
+        isElement(node) && org.orbeon.oxf.xforms.analysis.controls.LHHA.isLHHA(unsafeUnwrapElement(node))
+
       // Go from root to leaf
       val ancestorsFromRoot = node ancestor * reverse
 
@@ -422,6 +426,7 @@ object XXFormsDynamicControl {
           if id.nonEmpty
           prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
           binding ← partAnalysis.getBinding(prefixedId)
+          if ! (isNodeLHHA && ancestor == node.getParent)
         } yield
           prefixedId → unsafeUnwrapElement(ancestor)
 

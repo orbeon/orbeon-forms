@@ -594,7 +594,7 @@ object XHTMLHeadHandler {
             )
         }
       case c: XFormsComponentControl ⇒
-        if (c.isRelevant)
+        if (c.isRelevant && c.staticControl.binding.abstractBinding.modeJavaScriptLifecycle)
           addControlToInitialize(c.getEffectiveId, None)
       case c ⇒
         // Legacy JavaScript initialization

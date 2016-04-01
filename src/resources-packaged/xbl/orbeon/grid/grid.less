@@ -33,8 +33,12 @@
             table-layout: fixed;
             width: 100%;
 
-            tr {
-                page-break-inside: auto;
+            @media print {
+                // NOTE: This is a tentative fix, but it causes other issues. So commenting out for now.
+                // https://github.com/orbeon/orbeon-forms/issues/2573
+                //tr {
+                //    page-break-inside: auto;
+                //}
             }
 
             thead tr th {

@@ -12,9 +12,6 @@
   table-layout: fixed;
   width: 100%;
 }
-.orbeon .xbl-fr-grid .fr-grid tr {
-  page-break-inside: auto;
-}
 .orbeon .xbl-fr-grid .fr-grid thead tr th {
   text-align: left;
 }

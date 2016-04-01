@@ -104,6 +104,7 @@
   .orbeon .xbl-fr-section .fr-section-content {
     padding-left: 0;
     padding-right: 0;
+    page-break-before: avoid;
   }
   .orbeon #xforms-form .fr-section-title .xforms-help {
     display: none;

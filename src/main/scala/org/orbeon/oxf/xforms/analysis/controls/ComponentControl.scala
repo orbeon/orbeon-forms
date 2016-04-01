@@ -33,10 +33,10 @@ class ComponentControl(
   }
 
   // Set the component's binding
-  def setBinding(element: Element): Unit = {
+  def setBinding(elementInSource: Element): Unit = {
     assert(! part.isTopLevel)
 
-    _binding = part.xblBindings.processElementIfNeeded(element, prefixedId, locationData, scope)
+    _binding = part.xblBindings.processElementIfNeeded(elementInSource, prefixedId, locationData, scope)
   }
 
   // Only support binding if the control defines it has a binding

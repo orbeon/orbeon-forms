@@ -287,7 +287,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     val tree = containingDocument.getControls.getCurrentControlTree
 
-    for ((prefixedId, element) ← groupChanges(xblChanges)) {
+    for ((prefixedId, elementInSource) ← groupChanges(xblChanges)) {
       // Get control
       val control = tree.getControl(prefixedId) // TODO: should use effective id if in repeat and process all
 
@@ -309,7 +309,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             componentControl.clearChildren()
 
             // Update the shadow tree
-            val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, element)
+            val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, elementInSource)
 
             // Create the new models and new concrete subtree rooted at xbl:template
             componentControl.recreateNestedContainer()

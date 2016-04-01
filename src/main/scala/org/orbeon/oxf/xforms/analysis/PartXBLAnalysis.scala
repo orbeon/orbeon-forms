@@ -44,7 +44,7 @@ trait PartXBLAnalysis extends TransientState {
 
     registerScope(startScope)
   }
-  
+
   def dumpScopes(): Unit = {
     println("scopes:")
     println(
@@ -120,7 +120,7 @@ trait PartXBLAnalysis extends TransientState {
 
   // For the given bound node prefixed id, remove the current shadow tree and create a new one
   // NOTE: Can be used only in a sub-part, as this mutates the tree
-  def updateShadowTree(prefixedId: String, element: Element) = {
+  def updateShadowTree(prefixedId: String, elementInSource: Element) = {
     assert(! isTopLevel)
     getControlAnalysis(prefixedId) match {
       case existingComponent: ComponentControl ⇒
@@ -129,7 +129,7 @@ trait PartXBLAnalysis extends TransientState {
         existingComponent.removeBinding()
 
         // Create new ConcreteBinding
-        existingComponent.setBinding(element)
+        existingComponent.setBinding(elementInSource)
 
         // Rebuild subtree
         analyzeSubtree(existingComponent)

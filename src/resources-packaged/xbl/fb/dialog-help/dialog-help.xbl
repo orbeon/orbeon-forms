@@ -11,82 +11,65 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-help" element="fb|dialog-help">
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
-                <xf:setvalue ref="@relevant" value="'true'"/>
 
                 <xf:setvalue ref="control-name" value="fbf:controlNameFromId(event('control-id'))"/>
-                <xf:setvalue ref="help" value="fbf:getControlHelpOrEmpty(../control-name)"/>
+                <xf:setvalue ref="help"         value="fbf:getControlHelpOrEmpty(../control-name)"/>
 
-                <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
+            </xbl:handler>
+            <!-- Close dialog upon cancel -->
+            <xbl:handler event="DOMActivate" observer="cancel-trigger" >
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <!-- Save data upon close if valid -->
+            <xbl:handler event="DOMActivate" observer="save-trigger" if="valid($i)">
+                <xf:action type="xpath">
+                    fbf:setControlHelp($i/control-name, $i/help)
+                </xf:action>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger" if="not(valid($i))">
+                <xxf:setvisited
+                    control="dialog"
+                    recurse="true"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
-                <xf:instance id="local">
-                    <!-- TODO: Relevance must be handled automatically by the XForms engine! -->
-                    <local relevant="" valid="true">
+                <xf:instance id="i">
+                    <local>
                         <control-name/>
                         <help/>
-
-                        <save-trigger/>
                     </local>
                 </xf:instance>
 
-                <!-- Enable/disable trigger -->
-                <xf:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="@valid">false</xf:setvalue>
-                <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
-
-                <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
+                <xf:var name="i" value="instance()"/>
 
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:group id="container" ref=".[@relevant = 'true']" appearance="xxf:internal">
+            <xf:group id="container" appearance="xxf:internal">
 
                 <!-- Bindings specified on control -->
                 <xf:var name="form"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
                 <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
-                <xf:var name="local" value="instance('local')"/>
-
-                <!-- Close dialog upon cancel -->
-                <xxf:hide ev:event="DOMActivate" ev:observer="cancel-trigger" dialog="dialog"/>
-
-                <!-- Save data upon close -->
-                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/@valid = 'true'">
-
-                    <xf:action type="xpath">
-                        fbf:setControlHelp($local/control-name, $local/help)
-                    </xf:action>
-
-                    <xxf:hide dialog="dialog"/>
-                </xf:action>
-
-                <!-- Make ourselves non-relevant when the dialog closes -->
-                <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>
-
-                <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-section-help-dialog">
                     <xf:label ref="$resources/dialog-help/label"/>
 
@@ -94,7 +77,7 @@
                         <xh:div class="fr-grid">
                             <xh:div class="fr-grid-content">
                                 <xf:group class="fb-hide-alert">
-                                    <xf:textarea ref="$local/help" id="fb-edit-help-dialog-text">
+                                    <xf:textarea ref="$i/help" id="fb-edit-help-dialog-text">
                                         <xf:label ref="$resources/dialog-help/help-message/label"/>
                                     </xf:textarea>
                                 </xf:group>
@@ -102,7 +85,7 @@
                         </xh:div>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <xf:trigger ref="save-trigger" id="save-trigger" appearance="xxf:primary">
+                                <xf:trigger id="save-trigger" appearance="xxf:primary">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>

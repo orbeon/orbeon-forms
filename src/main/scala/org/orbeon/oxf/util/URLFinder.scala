@@ -75,6 +75,7 @@ object URLFinder {
   // - can also contain numbers
   // - also unclear: they could also appear in text with actual Unicode characters
 
+  private val IPv4                       = """(?:[\d]{1,3}[.][\d]{1,3}[.][\d]{1,3}[.][\d]{1,3})"""
   private val RegexpDomains              = """[a-z]{2,25}"""
   private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
   private val BalancedParens             = """\([^\s]+?\)"""
@@ -107,22 +108,42 @@ object URLFinder {
         (?:
           https?:
           /{1,3}
-          $DomainPart
-          /
-        )
-        (?:
-          [^\\s()<>{}\\[\\]]+
-          |
-          $BalancedParensOneLevelDeep
-          |
-          $BalancedParens
-        )+
-        (?:
-          $BalancedParensOneLevelDeep
-          |
-          $BalancedParens
-          |
-          [^\\s`!()\\[\\]{};:'".,<>?«»“”‘’]
+            (?:                   # Optional security part
+              [^:\\s/]+           # Username
+              :
+              [^@\\s/]+           # Password
+              @
+            )?
+          (?:                     # IPv4 address or domain
+            $IPv4
+            |
+            $DomainPart
+          )
+          (?:                     # Optional port number
+            :
+            [0-9]{1,5}
+          )?
+          (?:
+            (?:                   # Path etc.
+              /
+              (?:
+                [^\\s()<>{}\\[\\]]+
+                |
+                $BalancedParensOneLevelDeep
+                |
+                $BalancedParens
+              )+
+              (?:
+                $BalancedParensOneLevelDeep
+                |
+                $BalancedParens
+                |
+                [^\\s`!()\\[\\]{};:'".,<>?«»“”‘’]
+              )
+            )
+            |
+            /?                    # Or an optional trailing /
+          )
         )
         |
         # Naked domain

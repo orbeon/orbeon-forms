@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
+import org.orbeon.oxf.xml.XMLUtils.escapeXMLForAttribute
 
 object URLFinder {
 
@@ -30,14 +30,14 @@ object URLFinder {
     for (currentMatch ← URLMatchRegex.findAllMatchIn(s)) {
       val before = currentMatch.before
       val precedingUnmatched = before.subSequence(afterPreviousMatch, before.length)
-      
-      sb append escapeXMLMinimal(precedingUnmatched.toString)
-      sb append replace(escapeXMLMinimal(currentMatch.toString))
+
+      sb append escapeXMLForAttribute(precedingUnmatched.toString)
+      sb append replace(escapeXMLForAttribute(currentMatch.toString))
 
       afterPreviousMatch = currentMatch.end
     }
 
-    sb append escapeXMLMinimal(s.substring(afterPreviousMatch))
+    sb append escapeXMLForAttribute(s.substring(afterPreviousMatch))
     sb append "</span>"
 
     sb.toString
@@ -45,10 +45,10 @@ object URLFinder {
 
   def findURLs(s: String) =
     URLMatchRegex.findAllIn(s)
-  
+
   def isEmail(s: String) =
     EmailMatchOnly.findFirstIn(s).isDefined
-  
+
   private def adjustProtocol(s: String) =
     if (isEmail(s)) {
       if (s.startsWith("mailto:")) s else s"mailto:$s"
@@ -78,21 +78,23 @@ object URLFinder {
   private val RegexpDomains              = """[a-z]{2,25}"""
   private val BalancedParensOneLevelDeep = """\([^\s()]*?\([^\s()]+\)[^\s()]*?\)"""
   private val BalancedParens             = """\([^\s]+?\)"""
-  
-  private val DomainPart = 
+
+  private val DomainPart =
     s"""
-      [a-z0-9]+               # lowercase ASCII and numbers for first part
-      (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
-      [.]                     # followed by .
-      (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+      (?:
+        [a-z0-9]+               # lowercase ASCII and numbers for first part
+        (?:[.\\-][a-z0-9]+)*    # followed by . or - groups (non-capturing group)
+        [.]                     # followed by .
+        (?:$RegexpDomains)      # match TLD which is letters only (non-capturing group)
+      )
      """
-  
+
   private val EmailMatch =
     s"""
       [a-z0-9._%+-]+@         # simplified local part
       $DomainPart
     """
-  
+
   private val EmailMatchOnly =
     s"""(?xi)^($EmailMatch)$$""".r
 
@@ -103,47 +105,41 @@ object URLFinder {
       (
         # Domain with explicit http or https protocol
         (?:
-        https?:
-        (?:
+          https?:
           /{1,3}
-          |
-          [a-z0-9%]
-        )
-        |
-        [a-z0-9.\\-]+[.]
-        (?:$RegexpDomains)
-        /
+          $DomainPart
+          /
         )
         (?:
-        [^\\s()<>{}\\[\\]]+
-        |
-        $BalancedParensOneLevelDeep
-        |
-        $BalancedParens
+          [^\\s()<>{}\\[\\]]+
+          |
+          $BalancedParensOneLevelDeep
+          |
+          $BalancedParens
         )+
         (?:
-        $BalancedParensOneLevelDeep
-        |
-        $BalancedParens
-        |
-        [^\\s`!()\\[\\]{};:'".,<>?«»“”‘’]
+          $BalancedParensOneLevelDeep
+          |
+          $BalancedParens
+          |
+          [^\\s`!()\\[\\]{};:'".,<>?«»“”‘’]
         )
         |
         # Naked domain
         (?:                       # non-capturing group
-        (?<![@.])               # not preceded by @ or .
-        $DomainPart
-        \\b                     # word boundary (0-length match)
-        /?                      # optional trailing /
-        (?!@)                   # not followed by @
+          (?<![@.])               # not preceded by @ or .
+          $DomainPart
+          \\b                     # word boundary (0-length match)
+          /?                      # optional trailing /
+          (?!@)                   # not followed by @
         )
         |
         # Email address
         (?:                       # non-capturing group
-        (?<![@.])               # not preceded by @ or .
-        $EmailMatch             # email address proper
-        \\b                     # word boundary (0-length match)
-        (?!@)                   # not followed by @
+          (?<![@.])               # not preceded by @ or .
+          $EmailMatch             # email address proper
+          \\b                     # word boundary (0-length match)
+          (?!@)                   # not followed by @
         )
       )""".r
 }

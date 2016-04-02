@@ -54,27 +54,31 @@ class URLFinderTest extends AssertionsForJUnit {
       """- Music is an art (https://en.wikipedia.org/wiki/Art).
         |- URL with parameters: http://example.org/a=1&b=2.
         |- Dungeons & Dragons
-        |- Email info@orbeon.com
+        |- Emails info@orbeon.com, hello@example.com.
         |- if (a < b) 42 else 0
         |- From Wikipedia (https://en.wikipedia.org/wiki/Music).
         |- Some naked domain is www.orbeon.com
+        |- For some reason allow naked domain ending with a `/` www.orbeon.com/.
+        |- d1api.com/",k
         |- if (a < b) 42 else 0""".stripMargin
 
     val expected =
       """<span>- Music is an art (<a href="https://en.wikipedia.org/wiki/Art">https://en.wikipedia.org/wiki/Art</a>).
         |- URL with parameters: <a href="http://example.org/a=1&amp;b=2">http://example.org/a=1&amp;b=2</a>.
         |- Dungeons &amp; Dragons
-        |- Email <a href="mailto:info@orbeon.com">info@orbeon.com</a>
+        |- Emails <a href="mailto:info@orbeon.com">info@orbeon.com</a>, <a href="mailto:hello@example.com">hello@example.com</a>.
         |- if (a &lt; b) 42 else 0
         |- From Wikipedia (<a href="https://en.wikipedia.org/wiki/Music">https://en.wikipedia.org/wiki/Music</a>).
         |- Some naked domain is <a href="http://www.orbeon.com">www.orbeon.com</a>
+        |- For some reason allow naked domain ending with a `/` <a href="http://www.orbeon.com/">www.orbeon.com/</a>.
+        |- <a href="http://d1api.com/">d1api.com/</a>&quot;,k
         |- if (a &lt; b) 42 else 0</span>""".stripMargin
 
     assert(expected === replaceURLs(input, replaceWithHyperlink))
   }
-  
+
   @Test def testEmail(): Unit = {
-    
+
     val expected = List(
       """www.google.com"""         → false,
       """info@orbeon.com"""        → true,

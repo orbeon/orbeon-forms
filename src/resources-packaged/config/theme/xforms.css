@@ -77,8 +77,8 @@
   display: inline-block;
   margin-left: 0;
   vertical-align: middle;
-  width: 16px;
-  height: 16px;
+  max-width: 16px;
+  max-height: 16px;
   text-indent: 20px;
   overflow: hidden;
   cursor: pointer;

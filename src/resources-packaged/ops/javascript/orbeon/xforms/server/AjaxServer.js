@@ -886,8 +886,7 @@
                                         var nodeCopyNewClasses =
                                             _.filter(nodeCopyClasses, function(currentClass) {
                                                 return currentClass != "xforms-repeat-template" &&
-                                                       currentClass != "xforms-disabled"        &&
-                                                       currentClass != "xforms-disabled-subsequent";
+                                                       currentClass != "xforms-disabled";
                                             });
                                         nodeCopy.className = nodeCopyNewClasses.join(" ");
                                     }

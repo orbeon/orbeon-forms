@@ -122,8 +122,8 @@ trait XForms extends AssertionsForJUnit with FormRunnerOps {
 
     // Hide content again
     clickCheckbox()
-    liGroupElements foreach (_.classes should contain ("xforms-disabled-subsequent"))
-    cssSelector("#div-group").element.classes should contain ("xforms-disabled-subsequent")
+    liGroupElements foreach (_.classes should contain ("xforms-disabled"))
+    cssSelector("#div-group").element.classes should contain ("xforms-disabled")
 
     checkNonRelevantClasses(liGroupElements)
     checkNonRelevantClasses(divGroupElements)

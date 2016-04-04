@@ -23,7 +23,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
     testHiddenTemplateShowsWhenInserted: ->
         isCatVisible = (position) ->
             cat = YD.get ("cat" + XF_REPEAT_SEPARATOR + position)
-            not (_.any ["xforms-disabled", "xforms-disabled-subsequent"], (c) -> YD.hasClass cat.parentElement, c)
+            not (YD.hasClass cat.parentElement "xforms-disabled")
 
         Test.runMayCauseXHR this,
             -> Test.click "show"
@@ -33,6 +33,6 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
             -> Test.click "hide"
             -> Test.click "show"
             -> Test.click "add"
-            -> Assert.isTrue (isCatVisible 3), "The copy of a template with xforms-disabled-subsequent must be visible"
+            -> Assert.isTrue (isCatVisible 3), "The copy of a template with xforms-disabled must be visible"
 
 Test.onOrbeonLoadedRunTest()

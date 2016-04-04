@@ -1365,7 +1365,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
         // Returns MIP for a given control
         isRelevant: function (control) {
-            return ! $(control).is('.xforms-disabled, .xforms-disabled-subsequent');
+            return ! $(control).is('.xforms-disabled');
         },
         isReadonly: function (control) {
             return $(control).is('.xforms-readonly');
@@ -1704,27 +1704,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var lhhaElement = ORBEON.xforms.Controls.getControlLHHA(control, lhhaType);
             if (lhhaElement != null) {
                 lhhaElement.innerHTML = message;
-                if (message == "") {
-                    if (lhhaType == "help" && ! $(lhhaElement).is('.xforms-disabled')) {
-                        // Hide help with empty content
-                        YAHOO.util.Dom.addClass(lhhaElement, "xforms-disabled-subsequent");
-                        // If this is the help element, also disable help image
-                        var help = ORBEON.xforms.Controls.getControlLHHA(control, "help");
-                        YAHOO.util.Dom.addClass(help, "xforms-disabled-subsequent");
-                    }
-                } else {
-                    // We show LHHA with non-empty content, but ONLY if the control is relevant
-                    if (ORBEON.xforms.Controls.isRelevant(control)) {
-                        YAHOO.util.Dom.removeClass(lhhaElement, "xforms-disabled");
-                        YAHOO.util.Dom.removeClass(lhhaElement, "xforms-disabled-subsequent");
-                        // If this is the help element, also enable the help image
-                        if (lhhaType == "help") {
-                            var help = ORBEON.xforms.Controls.getControlLHHA(control, "help");
-                            YAHOO.util.Dom.removeClass(help, "xforms-disabled");
-                            YAHOO.util.Dom.removeClass(help, "xforms-disabled-subsequent");
-                        }
-                    }
-                }
             }
             ORBEON.xforms.Controls.lhhaChangeEvent.fire({control: control, type: lhhaType, message: message});
         },
@@ -1844,6 +1823,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 var elementsToUpdate = [
                     control,
                     ORBEON.xforms.Controls.getControlLHHA(control, "label"),
+                    ORBEON.xforms.Controls.getControlLHHA(control, "help"),
+                    ORBEON.xforms.Controls.getControlLHHA(control, "hint"),
                     ORBEON.xforms.Controls.getControlLHHA(control, "alert")
                 ];
                 // Also show help if message is not empty
@@ -1859,9 +1840,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     if (element != null) {
                         if (isRelevant) {
                             YAHOO.util.Dom.removeClass(element, "xforms-disabled");
-                            YAHOO.util.Dom.removeClass(element, "xforms-disabled-subsequent");
                         } else {
-                            YAHOO.util.Dom.addClass(element, "xforms-disabled-subsequent");
+                            YAHOO.util.Dom.addClass(element, "xforms-disabled");
                         }
                     }
                 });
@@ -2435,9 +2415,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Update disabled class on node
                 if (isRelevant) {
                     YD.removeClass(node, "xforms-disabled");
-                    YD.removeClass(node, "xforms-disabled-subsequent");
                 } else {
-                    YD.addClass(node, "xforms-disabled-subsequent");
+                    YD.addClass(node, "xforms-disabled");
                 }
                 return false;
             }, true);
@@ -3022,13 +3001,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
             var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
             if (this.className == "xforms-error-panel-show-details") {
-                YAHOO.util.Dom.addClass(detailsHidden, "xforms-disabled-subsequent");
-                YAHOO.util.Dom.removeClass(detailsShown, "xforms-disabled");
-                YAHOO.util.Dom.removeClass(detailsShown, "xforms-disabled-subsequent");
+                YAHOO.util.Dom.addClass   (detailsHidden, "xforms-disabled");
+                YAHOO.util.Dom.removeClass(detailsShown , "xforms-disabled");
             } else {
                 YAHOO.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-                YAHOO.util.Dom.removeClass(detailsHidden, "xforms-disabled-subsequent");
-                YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled-subsequent");
+                YAHOO.util.Dom.addClass   (detailsShown , "xforms-disabled");
             }
         },
 
@@ -3040,10 +3017,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
 
             if (detailsHidden != null)
-                YAHOO.util.Dom.addClass(detailsHidden, "xforms-disabled-subsequent");
+                YAHOO.util.Dom.addClass(detailsHidden, "xforms-disabled");
 
             if (detailsShown != null)
-                YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled-subsequent");
+                YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled");
         },
 
         /**
@@ -3056,8 +3033,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
             var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
             YAHOO.util.Dom.removeClass(detailsHidden, "xforms-disabled");
-            YAHOO.util.Dom.removeClass(detailsHidden, "xforms-disabled-subsequent");
-            YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled-subsequent");
+            YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled");
         },
 
         errorCloseClicked: function (event, errorPanel) {

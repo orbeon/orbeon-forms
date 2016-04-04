@@ -31,8 +31,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                     // Check that the tr visibility is as expected
                     for (var position = 0; position < 2; position++) {
                         var trID = "tr-" + (position + 1);
-                        var trIsEnabled = ! YAHOO.util.Dom.hasClass(trID, "xforms-disabled")
-                                       && ! YAHOO.util.Dom.hasClass(trID, "xforms-disabled-subsequent");
+                        var trIsEnabled = ! YAHOO.util.Dom.hasClass(trID, "xforms-disabled");
                         var trShouldBeEnabled = enabled[0] && enabled[1] && enabled[2 + position];
                         YAHOO.util.Assert.areEqual(trShouldBeEnabled, trIsEnabled);
                     }

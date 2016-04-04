@@ -40,7 +40,7 @@
                         var domButton = OUD.getElementByTagName(OUD.get(buttonId), "button");
                         YUA.areEqual(readonly, domButton.disabled,
                             buttonId + ": disabled attribute is not in the expected state");
-                        YUA.isFalse(YUD.hasClass(domButton, "xforms-disabled-subsequent"),
+                        YUA.isFalse(YUD.hasClass(domButton, "xforms-disabled"),
                             buttonId + ": relevant button must not have disabled class");
                     }
                 }, this);

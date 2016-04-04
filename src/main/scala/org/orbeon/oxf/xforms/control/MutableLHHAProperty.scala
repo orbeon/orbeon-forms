@@ -115,7 +115,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
 
     val lhhaElement = lhhaAnalysis.element
 
-    val tempContainsHTML = Array(false)
+    val tempContainsHTML = Array[Boolean](false)
 
     val result =
       if (lhhaAnalysis.isLocal) {

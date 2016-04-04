@@ -15,7 +15,7 @@
 
     var $ = ORBEON.jQuery;
 
-    ORBEON.xforms.XBL.declareCompanion('xbl-fr-code-mirror', {
+    ORBEON.xforms.XBL.declareCompanion('fr|code-mirror', {
 
         editor: null,
         handlers: {},

@@ -3272,8 +3272,15 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         },
 
         // Declare a companion JavaScript class. The class is defined by a simple prototype and will map
-        // to elements with the given CSS class.
-        declareCompanion: function(cssClass, prototype) {
+        // to elements with the CSS class inferred from the binding name.
+        declareCompanion: function(bindingName, prototype) {
+
+            var parts = bindingName.split("|");
+            var head = parts[0];
+            var tail = bindingName.substring(head.length + 1);
+
+            var cssClass = "xbl-" + head + "-" + tail;
+
             var xblClass = function() {};
             this.declareClass(xblClass, cssClass);
             xblClass.prototype = prototype;

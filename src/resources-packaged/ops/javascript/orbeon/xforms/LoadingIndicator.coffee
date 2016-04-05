@@ -90,6 +90,8 @@ class LoadingIndicator
         message ?= DEFAULT_LOADING_TEXT
         OD.setStringValue @loadingOverlay.element, message
         @loadingOverlay.show()
+        # Get loading indicator to show above other dialogs or elements
+        $(@loadingOverlay.element).css('z-index', Globals.lastDialogZIndex + 1)
         @_updateLoadingPosition()
 
     # Actually hides the loading indicator (no counter)

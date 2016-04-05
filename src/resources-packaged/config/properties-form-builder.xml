@@ -82,23 +82,25 @@
         http://orbeon.org/oxf/xml/form-builder
     </property>
 
-    <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.custom-xml"                          value="false"/>
-    <property as="xs:boolean" name="oxf.fb.menu.permissions"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.services.http"                       value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.services.database"                   value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.actions"                             value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.schema"                                         value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.pdf"                                            value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.edit-source"                                    value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.custom-xml"                                     value="false"/>
+    <property as="xs:boolean" name="oxf.fb.menu.permissions"                                    value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.services.http"                                  value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.services.database"                              value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.actions"                                        value="true"/>
 
-    <property as="xs:string"  name="oxf.fb.publish.buttons"                          value="new summary"/>
+    <property as="xs:string"  name="oxf.fb.publish.buttons"                                     value="new summary"/>
 
 
-    <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
-    <property as="xs:integer" name="oxf.fb.grid.max-columns"                         value="4"/>
-    <property as="xs:integer" name="oxf.fb.section.close"                            value="100"/>
+    <property as="xs:boolean" name="oxf.fb.metadata.logo"                                       value="true"/>
+    <property as="xs:integer" name="oxf.fb.grid.max-columns"                                    value="4"/>
+    <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>
 
     <!-- Form Builder detail page buttons -->
+    <property as="xs:boolean" name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="true"/>
+    <property as="xs:boolean" name="oxf.fr.detail.loading-indicator.publish.orbeon.builder"     value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.builder">
         summary new test publish save
     </property>
@@ -109,7 +111,7 @@
     </property>
 
     <!-- Available languages -->
-    <property as="xs:string"  name="oxf.fr.available-languages.orbeon.builder"       value="en es fr it de pt sv fi"/>
+    <property as="xs:string"  name="oxf.fr.available-languages.orbeon.builder"                  value="en es fr it de pt sv fi"/>
 
     <!-- Processes associated with Form Builder buttons -->
     <property as="xs:string"  name="oxf.fr.detail.process.close.orbeon.builder">
@@ -136,7 +138,7 @@
         save-final
     </property>
 
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.orbeon.builder"     value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.orbeon.builder"  value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.orbeon.builder"           value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.orbeon.builder"        value=""/>
 
 </properties>

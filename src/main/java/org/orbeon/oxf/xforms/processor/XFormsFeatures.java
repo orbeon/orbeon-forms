@@ -30,7 +30,8 @@ public class XFormsFeatures {
             new ResourceConfig("/apps/fr/style/bootstrap/css/bootstrap.css", "/apps/fr/style/bootstrap/css/bootstrap.min.css"),
             new ResourceConfig("/apps/fr/style/form-runner-bootstrap-override.css", null),
             new ResourceConfig("/config/theme/xforms.css", null),
-            new ResourceConfig("/config/theme/error.css", null)
+            new ResourceConfig("/config/theme/error.css", null),
+            new ResourceConfig("/ops/nprogress-0.2.0/nprogress.css", null)
     };
 
     private static final ResourceConfig[] scripts = {
@@ -40,6 +41,7 @@ public class XFormsFeatures {
             new ResourceConfig("/apps/fr/style/bootstrap/js/bootstrap.js", "/apps/fr/style/bootstrap/js/bootstrap.min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/jquery-orbeon.js", "/ops/javascript/orbeon/util/jquery-orbeon-min.js"),
             new ResourceConfig("/ops/javascript/autosize/autosize.js", "/ops/javascript/autosize/autosize.min.js"),
+            new ResourceConfig("/ops/nprogress-0.2.0/nprogress.js", "/ops/nprogress-0.2.0/nprogress-min.js"),
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),

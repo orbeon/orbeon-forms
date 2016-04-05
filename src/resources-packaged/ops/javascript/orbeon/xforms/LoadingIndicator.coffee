@@ -25,6 +25,9 @@ class LoadingIndicator
     constructor: (@form) ->
         @shownCounter = 0
 
+        # Don't show NProgress spinner
+        NProgress.configure({ showSpinner: false })
+
         # For now hide the loading indicator (use jQuery to fix #403)
         @loadingSpan = (f$.children '.xforms-loading-loading', $ @form)[0]
         @loadingSpan.style.display = "none"
@@ -86,18 +89,20 @@ class LoadingIndicator
 
     # Actually shows the loading indicator (no delay or counter)
     show: (message) ->
-        @_initLoadingOverlay()
-        message ?= DEFAULT_LOADING_TEXT
-        OD.setStringValue @loadingOverlay.element, message
-        @loadingOverlay.show()
-        # Get loading indicator to show above other dialogs or elements
-        $(@loadingOverlay.element).css('z-index', Globals.lastDialogZIndex + 1)
-        @_updateLoadingPosition()
+        NProgress.start()
+        #@_initLoadingOverlay()
+        #message ?= DEFAULT_LOADING_TEXT
+        #OD.setStringValue @loadingOverlay.element, message
+        #@loadingOverlay.show()
+        ## Get loading indicator to show above other dialogs or elements
+        #$(@loadingOverlay.element).css('z-index', Globals.lastDialogZIndex + 1)
+        #@_updateLoadingPosition()
 
     # Actually hides the loading indicator (no counter)
     hide: ->
         if not Globals.loadingOtherPage
-            @loadingOverlay.cfg.setProperty "visible", false
+            NProgress.done()
+            #@loadingOverlay.cfg.setProperty "visible", false
 
     _initLoadingOverlay: () ->
         # Initialize @loadingOverlay if not done already

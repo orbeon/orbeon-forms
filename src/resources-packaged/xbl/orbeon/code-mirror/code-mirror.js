@@ -49,7 +49,7 @@
             };
 
             var editor = this.editor;
-            _.each(this.handlers, function(key, value) {
+            _.each(this.handlers, function(value, key) {
                 editor.on(key, value);
             });
 

@@ -35,14 +35,10 @@
         <xbl:template>
             <xf:group>
 
-                <!-- Evaluate loading-indicator attribute provided by the user -->
-                <xf:var name="loading-indicator-avt" xbl:attr="xbl:text=loading-indicator" xxbl:scope="outer">true</xf:var>
-                <xf:var name="loading-indicator">
-                    <xxf:value xbl:attr="model context ref bind" value="xxf:evaluate-avt($loading-indicator-avt)" xxbl:scope="outer"/>
-                </xf:var>
-
-                <!-- Init JavaScript, unless user specified loading-indicator="false" -->
-                <xf:action type="javascript" if="not(string($loading-indicator) = 'false')" event="xforms-enabled xxforms-iteration-moved" id="xf-init">
+                <xf:action
+                        id="xf-init"
+                        type="javascript"
+                        event="xforms-enabled xxforms-iteration-moved">
                     YAHOO.xbl.fr.LaddaButton.instance(this);
                 </xf:action>
 

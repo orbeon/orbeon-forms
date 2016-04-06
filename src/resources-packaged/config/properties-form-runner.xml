@@ -104,7 +104,9 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
         refresh summary clear pdf save-final review
     </property>
-    <property as="xs:boolean" name="oxf.fr.detail.loading-indicator.save-final.*.*"             value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-draft.*.*"             value="inline"/>
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-final.*.*"             value="inline"/>
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.submit.*.*"                 value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/>
@@ -175,7 +177,7 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w9"                                value="-1"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
-    
+
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w9">
         refresh wizard-prev wizard-next review

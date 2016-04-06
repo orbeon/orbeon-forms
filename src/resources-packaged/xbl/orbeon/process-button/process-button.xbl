@@ -25,37 +25,45 @@
 
         <xbl:template>
 
+            <!-- Figure button label -->
             <xf:var name="button-name-avt" xbl:attr="xbl:text=name" xxbl:scope="outer">save</xf:var>
             <xf:var name="button-name">
                 <xxf:value xbl:attr="model context ref bind" value="xxf:evaluate-avt($button-name-avt)" xxbl:scope="outer"/>
             </xf:var>
-
             <xf:var name="fr-resources"><xxf:value xxbl:scope="outer" value="$fr-resources"/></xf:var>
-            <!-- Q: Should modality be configured in properties? oxf.fr.detail.process.home.modal = false -->
-            <xf:var name="modal"
-                    value="not($button-name = (
-                                   'collapse-all', 'expand-all', 'home', 'summary', 'new', 'close', 'clear', 'validate',
-                                   'wizard-prev', 'wizard-next', 'test', 'publish', 'edit', 'review'))"/>
+            <xf:var name="button-label" value="$fr-resources/buttons/*[name() = $button-name]"/>
 
-            <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
+            <!-- Figure what, if any, loading indicator to use -->
+            <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app /string()"/>
             <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
             <xf:var name="loading-indicator-property"
                     value="string-join(('oxf.fr.detail.loading-indicator', $button-name, $app, $form), '.')"/>
-            <xf:var name="show-loading-indicator"
-                    value="(xxf:property($loading-indicator-property), false())[1]"/>
-            <fr:ladda-button
-                    loading-indicator="{$show-loading-indicator}"
-                    ref="xxf:binding('fr-process-button')"
-                    class="fr-{$button-name}-button {if ($modal) then 'xforms-trigger-appearance-modal' else ''}">
-                <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
-                <!-- Run process action within context item of xxf:instance('fr-form-instance'). This is not the full
-                     context, meaning that we are not in the XForms context of that model/instance (which would
-                     determine the current model, for example), or even the full XPath context, which would expose
-                     variables. -->
-                <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                    xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
-                </xf:action>
-            </fr:ladda-button>
+            <xf:var name="loading-indicator"
+                    value="(xxf:property($loading-indicator-property), '')[1]"/>
+            <xf:var name="is-inline"
+                    value="$loading-indicator = 'inline'"/>
+            <xf:var name="is-modal"
+                    value="$loading-indicator = 'modal'"/>
+
+            <!-- React to button pressed -->
+            <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
+            </xf:action>
+
+            <!-- Inline: use Ladda button -->
+            <xf:group ref=".[$is-inline]" xxf:internal="true">
+                <fr:ladda-button ref=".">
+                    <xf:label mediatype="text/html" value="$button-label"/>
+                </fr:ladda-button>
+            </xf:group>
+
+            <!-- Not inline: use XForms trigger, maybe marked as modal -->
+            <xf:group ref=".[not($is-inline)]" xxf:internal="true">
+                <xf:trigger ref="." class="{if ($is-modal) then 'xforms-trigger-appearance-modal' else ''}">
+                    <xf:label mediatype="text/html" value="$button-label"/>
+                </xf:trigger>
+            </xf:group>
+
         </xbl:template>
     </xbl:binding>
 

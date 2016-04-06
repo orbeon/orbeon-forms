@@ -99,8 +99,8 @@
     <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>
 
     <!-- Form Builder detail page buttons -->
-    <property as="xs:boolean" name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.loading-indicator.publish.orbeon.builder"     value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="inline"/>
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.publish.orbeon.builder"     value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.builder">
         summary new test publish save
     </property>

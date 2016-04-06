@@ -20,16 +20,16 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xbl:script src="/xbl/orbeon/ladda-button/ladda-0.9.8/spin.min.js"/>
-    <xbl:script src="/xbl/orbeon/ladda-button/ladda-0.9.8/ladda.min.js"/>
-    <xbl:script src="/xbl/orbeon/ladda-button/ladda-0.9.8/ladda.jquery.min.js"/>
+    <xbl:script src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/spin.min.js"/>
+    <xbl:script src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.min.js"/>
+    <xbl:script src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.jquery.min.js"/>
     <xbl:script src="/xbl/orbeon/ladda-button/ladda-button.js"/>
     <xbl:binding
             id="fr-ladda-button"
             element="fr|ladda-button"
             xxbl:mode="binding lhha custom-lhha">
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/ladda-button/ladda-0.9.8/ladda-themeless.min.css"/>
+            <xbl:style src="/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda-themeless.min.css"/>
             <xbl:style src="/xbl/orbeon/ladda-button/ladda-button.css"/>
         </xbl:resources>
         <xbl:template>

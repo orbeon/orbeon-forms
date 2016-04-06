@@ -50,18 +50,22 @@
                 xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
             </xf:action>
 
-            <!-- Inline: use Ladda button -->
-            <xf:group ref=".[$is-inline]" xxf:internal="true">
-                <fr:ladda-button ref=".">
-                    <xf:label mediatype="text/html" value="$button-label"/>
-                </fr:ladda-button>
-            </xf:group>
+            <xf:group ref="xxf:binding('fr-process-button')">
 
-            <!-- Not inline: use XForms trigger, maybe marked as modal -->
-            <xf:group ref=".[not($is-inline)]" xxf:internal="true">
-                <xf:trigger ref="." class="{if ($is-modal) then 'xforms-trigger-appearance-modal' else ''}">
-                    <xf:label mediatype="text/html" value="$button-label"/>
-                </xf:trigger>
+                <!-- Inline: use Ladda button -->
+                <xf:group ref=".[$is-inline]" xxf:internal="true">
+                    <fr:ladda-button ref=".">
+                        <xf:label mediatype="text/html" value="$button-label"/>
+                    </fr:ladda-button>
+                </xf:group>
+
+                <!-- Not inline: use XForms trigger, maybe marked as modal -->
+                <xf:group ref=".[not($is-inline)]" xxf:internal="true">
+                    <xf:trigger ref="." class="{if ($is-modal) then 'xforms-trigger-appearance-modal' else ''}">
+                        <xf:label mediatype="text/html" value="$button-label"/>
+                    </xf:trigger>
+                </xf:group>
+
             </xf:group>
 
         </xbl:template>

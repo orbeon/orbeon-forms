@@ -34,7 +34,7 @@ class PathMapXPathDependencies(
 
   import PathMapXPathDependencies._
 
-  private implicit val logger = containingDocument.indentedLogger
+  private implicit val logger = containingDocument.getIndentedLogger("dependencies")
 
   // Represent the state of changes to a model
   private class ModelState(val modelKey: ModelOrInstanceKey, val model: XFormsModel) {
@@ -342,15 +342,18 @@ class PathMapXPathDependencies(
 
   def refreshDone(): Unit = {
 
-    if (logger.isDebugEnabled)
-      logger.logDebug("dependencies", "refresh done",
-        Array("bindings updated", bindingUpdateCount.toString,
-            "values updated", valueUpdateCount.toString,
-            "MIPs updated", mipUpdateCount.toString,
-            "Binding XPath optimized", bindingXPathOptimizedCount.toString,
-            "Value XPath optimized", valueXPathOptimizedCount.toString,
-            "MIP XPath optimized", mipXPathOptimizedCount.toString,
-            "Total XPath optimized", (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString): _*)
+    debug(
+      "refresh done",
+      List(
+        "bindings updated"        → bindingUpdateCount.toString,
+        "values updated"          → valueUpdateCount.toString,
+        "MIPs updated"            → mipUpdateCount.toString,
+        "Binding XPath optimized" → bindingXPathOptimizedCount.toString,
+        "Value XPath optimized"   → valueXPathOptimizedCount.toString,
+        "MIP XPath optimized"     → mipXPathOptimizedCount.toString,
+        "Total XPath optimized"   → (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString
+      )
+    )
 
     for (modelState ← modelStates.values)
       modelState.refreshDone()
@@ -401,18 +404,20 @@ class PathMapXPathDependencies(
   def notifyOptimizeItemset(): Unit = itemsetOptimizedCount += 1
 
   private def outputLHHAItemsetStats(): Unit = {
-    if (logger.isDebugEnabled)
-      logger.logDebug("dependencies", "summary after response",
-        Array("LHHA evaluations", lhhaEvaluationCount.toString,
-            "LHHA optimized", lhhaOptimizedCount.toString,
-            "LHHA unknown dependencies", lhhaUnknownDependencies.toString,
-            "LHHA intersections", lhhaHitCount.toString,
-            "LHHA disjoints", lhhaMissCount.toString,
-            "Itemset evaluations", itemsetEvaluationCount.toString,
-            "Itemset optimized", itemsetOptimizedCount.toString,
-            "Itemset unknown dependencies", itemsetUnknownDependencies.toString,
-            "Itemset intersections", itemsetHitCount.toString,
-            "Itemset disjoints", itemsetMissCount.toString): _*)
+      debug("summary after response",
+        List(
+          "LHHA evaluations"             → lhhaEvaluationCount.toString,
+          "LHHA optimized"               → lhhaOptimizedCount.toString,
+          "LHHA unknown dependencies"    → lhhaUnknownDependencies.toString,
+          "LHHA intersections"           → lhhaHitCount.toString,
+          "LHHA disjoints"               → lhhaMissCount.toString,
+          "Itemset evaluations"          → itemsetEvaluationCount.toString,
+          "Itemset optimized"            → itemsetOptimizedCount.toString,
+          "Itemset unknown dependencies" → itemsetUnknownDependencies.toString,
+          "Itemset intersections"        → itemsetHitCount.toString,
+          "Itemset disjoints"            → itemsetMissCount.toString
+        )
+      )
   }
 
   // For unit tests only
@@ -491,9 +496,14 @@ class PathMapXPathDependencies(
               )
           }
 
-          if (tempResult.requireUpdate && logger.isDebugEnabled)
-            logger.logDebug("dependencies", "binding requires update",
-                Array("effective id", controlEffectiveId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
+          if (tempResult.requireUpdate)
+            debug(
+              "binding requires update",
+              List(
+                "effective id" → controlEffectiveId,
+                "XPath"        → control.getBindingAnalysis.get.xpathString
+              )
+            )
 
           resultCacheKey foreach { key ⇒
             modifiedBindingCacheForRepeats += key → tempResult
@@ -543,9 +553,14 @@ class PathMapXPathDependencies(
                   intersectsValue(controlEffectiveId, analysis, refreshChangeset),
                 if (control.value.isDefined) 1 else 0)
           }
-          if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && logger.isDebugEnabled)
-            logger.logDebug("dependencies", "value requires update",
-                Array("effective id", controlEffectiveId, "XPath", tempValueAnalysis.get.xpathString): _*)
+          if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined)
+            debug(
+              "value requires update",
+              List(
+                "effective id" → controlEffectiveId,
+                "XPath"        → tempValueAnalysis.get.xpathString
+              )
+            )
 
           resultCacheKey foreach { key ⇒
             modifiedValueCacheForRepeats += key → tempUpdateResult
@@ -692,9 +707,15 @@ class PathMapXPathDependencies(
             throw new IllegalStateException(s"No value analysis found for `xf:bind` with name = ${mip.name}")
         }
 
-        if (updateResult.requireUpdate && logger.isDebugEnabled)
-          logger.logDebug("dependencies", "MIP requires update",
-            Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
+        if (updateResult.requireUpdate)
+          debug(
+            "MIP requires update",
+            List(
+              "prefixed id" → bind.prefixedId,
+              "MIP name"    → mip.name,
+              "XPath"       → valueAnalysis.get.xpathString
+            )
+          )
 
         updateResult
       }

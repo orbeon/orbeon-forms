@@ -22,7 +22,7 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         script-type="application/xhtml+xml">
+        >
 
     <xbl:script type="text/javascript" src="/ops/yui/element/element-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>

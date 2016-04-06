@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl script-type="application/xhtml+xml"
+<xbl:xbl
             xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:xh="http://www.w3.org/1999/xhtml"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"

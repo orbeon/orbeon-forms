@@ -25,7 +25,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         script-type="application/xhtml+xml">
+        >
     <xbl:binding id="fb-permissions" element="fb|permissions">
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">

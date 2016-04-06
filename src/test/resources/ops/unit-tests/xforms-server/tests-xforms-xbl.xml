@@ -1080,7 +1080,7 @@
 
                                 </xf:model>
 
-                                <xbl:xbl script-type="application/xhtml+xml">
+                                <xbl:xbl>
                                     <xbl:binding id="fr-foo" element="fr|foo">
                                         <xbl:template>
                                             <xbl:content/>
@@ -1088,7 +1088,7 @@
                                     </xbl:binding>
                                 </xbl:xbl>
 
-                                <xbl:xbl script-type="application/xhtml+xml">
+                                <xbl:xbl>
                                     <xbl:binding id="fr-bar" element="fr|bar">
                                         <xbl:template>
                                             <xf:model id="model">
@@ -1213,7 +1213,7 @@
 
                                 </xf:model>
 
-                                <xbl:xbl script-type="application/xhtml+xml">
+                                <xbl:xbl>
                                     <xbl:binding id="fr-foo" element="fr|foo">
                                         <xbl:template>
                                             <xbl:content/>
@@ -1221,7 +1221,7 @@
                                     </xbl:binding>
                                 </xbl:xbl>
 
-                                <xbl:xbl script-type="application/xhtml+xml">
+                                <xbl:xbl>
                                     <xbl:binding id="fr-bar" element="fr|bar">
                                         <xbl:template>
                                             <xf:model id="model">
@@ -1349,7 +1349,7 @@
                                     </xf:instance>
                                 </xf:model>
 
-                                <xbl:xbl script-type="application/xhtml+xml">
+                                <xbl:xbl>
                                     <xbl:binding id="fr-foobar" element="fr|foobar">
                                         <xbl:template>
                                             <xf:model id="local-model">
@@ -1463,7 +1463,7 @@
 
                                 </xf:model>
 
-                                <xbl:xbl script-type="application/xhtml+xml">
+                                <xbl:xbl>
                                     <xbl:binding id="fr-bar" element="fr|bar">
 
                                         <xbl:handlers>
@@ -1593,7 +1593,7 @@
                                         </xf:instance>
                                     </xf:model>
 
-                                    <xbl:xbl script-type="application/xhtml+xml">
+                                    <xbl:xbl>
                                         <xbl:binding id="fr-foo" element="fr|foo">
                                             <xbl:template>
                                                 <xh:fieldset>
@@ -1606,7 +1606,7 @@
                                         </xbl:binding>
                                     </xbl:xbl>
 
-                                    <xbl:xbl script-type="application/xhtml+xml">
+                                    <xbl:xbl>
                                         <xbl:binding id="fr-bar" element="fr|bar">
                                             <xbl:template>
                                                 <xh:fieldset>

@@ -37,7 +37,7 @@
                 </xs:element>
             </xs:schema>
         </xf:model>
-        <xbl:xbl script-type="application/xhtml+xml">
+        <xbl:xbl>
             <xbl:binding id="dateTime-component" element="foo|dateTime">
                 <xbl:template>
                     <xf:instance id="instance-in-xbl">

@@ -23,7 +23,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         script-type="application/xhtml+xml">
+        >
 
     <xbl:binding id="fr-image-attachment" element="fr|image-attachment" xxbl:mode="binding lhha" xxbl:container="span">
 

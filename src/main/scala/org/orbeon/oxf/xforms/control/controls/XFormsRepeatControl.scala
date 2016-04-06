@@ -37,9 +37,17 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, ListBuffer}
 
 // Represents an xf:repeat container control.
-class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
-    with NoLHHATrait {
+class XFormsRepeatControl(
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  effectiveId : String
+) extends XFormsNoSingleNodeContainerControl(
+  container,
+  parent,
+  element,
+  effectiveId
+) with NoLHHATrait {
 
   override type Control <: RepeatControl
 
@@ -376,6 +384,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
                 // Indicate to iteration that it is being removed
                 // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
+                // This also removes the nested models from XPath dependencies
                 movedOrRemovedIteration.iterationRemoved()
               }
             }
@@ -562,7 +571,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         clearChildren()
         setIndexInternal(0)
 
-        (Seq(), Seq(), Seq(), None)
+        (Nil, Nil, Nil, None)
       }
 
     // Keep information available until refresh events are dispatched, which must happen soon after this method was
@@ -571,9 +580,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
       if (updated || oldRepeatIndex != getIndex)
         RefreshInfo(
           updated,
-          if (updated) newIterations else Seq(),
-          if (updated) movedIterationsOldPositions else Seq(),
-          if (updated) movedIterationsNewPositions else Seq(),
+          if (updated) newIterations else Nil,
+          if (updated) movedIterationsOldPositions else Nil,
+          if (updated) movedIterationsNewPositions else Nil,
           oldRepeatIndex
         )
       else

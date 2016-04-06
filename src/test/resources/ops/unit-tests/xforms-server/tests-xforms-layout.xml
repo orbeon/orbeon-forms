@@ -1984,6 +1984,7 @@
                 <xh:link href="/apps/fr/style/form-runner-bootstrap-override.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
+                <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/button/assets/skins/sam/button.css" class="xforms-baseline"/>
@@ -1994,6 +1995,7 @@
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/autosize/autosize.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/nprogress-0.2.0/nprogress-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dom/dom-min.js" class="xforms-baseline"/>

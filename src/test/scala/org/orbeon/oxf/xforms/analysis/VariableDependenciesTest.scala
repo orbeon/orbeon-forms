@@ -21,7 +21,7 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class VariableDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def variableWithIntermediateControl() {
+  @Test def variableWithIntermediateControl(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     this setupDocument

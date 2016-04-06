@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
@@ -23,9 +24,10 @@ import org.orbeon.saxon.om.NodeInfo
 class DumbXPathDependencies extends XPathDependencies {
   def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) = ()
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]) = ()
-  def rebuildDone(model: Model) = ()
-  def recalculateDone(model: Model) = ()
-  def revalidateDone(model: Model) = ()
+  def rebuildDone(model: XFormsModel) = ()
+  def recalculateDone(model: XFormsModel) = ()
+  def revalidateDone(model: XFormsModel) = ()
+  def modelDestruct(model: XFormsModel) = ()
   def refreshStart() = ()
   def refreshDone() = ()
   def bindingUpdateStart() = ()
@@ -37,11 +39,11 @@ class DumbXPathDependencies extends XPathDependencies {
   def notifyOptimizeLHHA() = ()
   def notifyComputeItemset() = ()
   def notifyOptimizeItemset() = ()
-  def requireBindingUpdate(controlPrefixedId: String) = true
-  def requireValueUpdate(controlPrefixedId: String) = true
-  def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String) = true
-  def requireItemsetUpdate(controlPrefixedId: String) = true
+  def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String) = true
+  def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String) = true
+  def requireLHHAUpdate(control: ElementAnalysis, lhhaName: String, controlEffectiveId: String) = true
+  def requireItemsetUpdate(control: SelectionControlTrait, controlPrefixedId: String) = true
+  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel) = true
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
   def hasAnyValidationBind(model: Model, instancePrefixedId: String) = true
-  def requireModelMIPUpdate(model: Model, bind: StaticBind, mip: MIP, level: ValidationLevel) = true
 }

@@ -95,7 +95,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
   }
 
   protected def requireUpdate =
-    control.containingDocument.getXPathDependencies.requireLHHAUpdate(lhhaType.name, control.getPrefixedId)
+    control.containingDocument.getXPathDependencies.requireLHHAUpdate(control.staticControl, lhhaType.name, control.effectiveId)
 
   protected def notifyCompute() =
     control.containingDocument.getXPathDependencies.notifyComputeLHHA()

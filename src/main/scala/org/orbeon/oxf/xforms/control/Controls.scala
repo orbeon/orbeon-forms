@@ -381,7 +381,7 @@ object Controls {
       // - or the control has a @model attribute (TODO TEMP HACK: because that causes model variable evaluation!)
       def mustReEvaluateBinding =
         (relevanceChangeLevel != -1 && level > relevanceChangeLevel)   ||
-        xpathDependencies.requireBindingUpdate(control.prefixedId) ||
+        xpathDependencies.requireBindingUpdate(control.staticControl, control.effectiveId) ||
         (control.staticControl.element.attribute(XFormsConstants.MODEL_QNAME) ne null)
 
       // Only update the binding if needed

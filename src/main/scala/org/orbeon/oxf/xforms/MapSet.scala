@@ -14,15 +14,16 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.common.OXFException
-import collection.mutable.{LinkedHashSet, LinkedHashMap}
-import collection.generic.Growable
+
+import scala.collection.generic.Growable
+import scala.collection.mutable.{LinkedHashMap, LinkedHashSet}
 
 /**
  * Collection containing a number of distinct sets indexed by a map.
  */
 class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
 
-  private val map = new LinkedHashMap[A, LinkedHashSet[B]]
+  val map = new LinkedHashMap[A, LinkedHashSet[B]]
 
   def put(a: A, b: B): Unit = {
     (map.get(a) match {
@@ -33,22 +34,6 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
         newSet
     }) += b
   }
-
-  def intersects(other: MapSet[A, B]): Boolean = {
-
-    val intersection = map.keySet & other.map.keySet
-
-    if (intersection.isEmpty)
-      return false
-
-    for (key ← intersection)
-      if ((map.get(key).get & other.map.get(key).get).nonEmpty)
-        return true
-
-    false
-  }
-
-  def keys = map.keys
 
   // NOTE: should use ++ operator, but harder to implement properly
   def combine(other: MapSet[A, B]): MapSet[A, B] = {

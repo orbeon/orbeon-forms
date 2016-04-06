@@ -108,7 +108,7 @@ class PathMapXPathAnalysis(
 
     toXML(dependentModels, "dependent-models", "model")
     toXML(dependentInstances, "dependent-instances", "instance")
-    toXML(returnablePaths.keys, "returnable-instances", "instance")
+    toXML(returnablePaths.map.keys, "returnable-instances", "instance")
 
     helper.endElement()
   }
@@ -515,7 +515,7 @@ object PathMapXPathAnalysis {
             }
           case Axis.PARENT ⇒ // don't test fingerprint as we could handle /a/*/..
             // Parent axis
-              if (stack.size >= 1) {
+              if (stack.nonEmpty) {
               val parentNodeArc = stack.top
               moveArc(newNodeArc, parentNodeArc.node)
               return true
@@ -595,7 +595,7 @@ object PathMapXPathAnalysis {
   /**
    * Given a display path, get an internal path (for unit tests).
    */
-  def getInternalPath(namespaces: JMap[String, String], path: String): String = {
+  def getInternalPath(namespaces: Map[String, String], path: String): String = {
 
     // Special case of empty path
     if (path.isEmpty) return path
@@ -616,7 +616,7 @@ object PathMapXPathAnalysis {
             val localname = XMLUtils.localNameFromQName(qName)
 
             // Get number from pool based on QName
-            pool.allocate(prefix, namespaces.get(prefix), localname)
+            pool.allocate(prefix, namespaces(prefix), localname)
           }
         }
       }

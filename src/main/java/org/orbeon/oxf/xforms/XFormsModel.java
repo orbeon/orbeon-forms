@@ -400,6 +400,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             // 4.3.7 The xforms-rebuild Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             doRebuild();
+        } else if (XFormsEvents.XFORMS_MODEL_DESTRUCT.equals(eventName)) {
+            containingDocument().getXPathDependencies().modelDestruct(this);
         } else if (XFormsEvents.XFORMS_RECALCULATE.equals(eventName)) {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None

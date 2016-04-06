@@ -74,6 +74,14 @@ trait ContainingDocumentMisc {
         XFORMS_READY
       )
     )
+
+  // A sequence number used for dependencies
+  // This doesn't need to be serialized/deserialized as it's only used internally
+  private var _lastModelSequenceNumber = 0
+  def nextModelSequenceNumber() = {
+    _lastModelSequenceNumber += 1
+    _lastModelSequenceNumber
+  }
 }
 
 trait ContainingDocumentTemplate extends Logging {

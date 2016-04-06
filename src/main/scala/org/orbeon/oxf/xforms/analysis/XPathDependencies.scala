@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
@@ -21,12 +22,14 @@ import org.orbeon.saxon.om.NodeInfo
 
 // Interface to dependencies implementation.
 trait XPathDependencies {
+
   def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo)
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance])
 
-  def rebuildDone(model: Model)
-  def recalculateDone(model: Model)
-  def revalidateDone(model: Model)
+  def rebuildDone(model: XFormsModel) // called even if no work was done during `doRebuild()`
+  def recalculateDone(model: XFormsModel)
+  def revalidateDone(model: XFormsModel)
+  def modelDestruct(model: XFormsModel)
 
   def refreshStart()
   def refreshDone()
@@ -44,13 +47,13 @@ trait XPathDependencies {
   def notifyComputeItemset()
   def notifyOptimizeItemset()
 
-  def requireBindingUpdate(controlPrefixedId: String): Boolean
-  def requireValueUpdate(controlPrefixedId: String): Boolean
-  def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String): Boolean
-  def requireItemsetUpdate(controlPrefixedId: String): Boolean
+  def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean
+  def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean
+  def requireLHHAUpdate(control: ElementAnalysis, lhhaName: String, controlEffectiveId: String): Boolean
+  def requireItemsetUpdate(control: SelectionControlTrait, controlEffectiveId: String): Boolean
+
+  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean
 
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
   def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean
-
-  def requireModelMIPUpdate(model: Model, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean
 }

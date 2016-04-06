@@ -35,6 +35,8 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
   with ListenersTrait {
 
   val containingDocument = container.getContainingDocument
+  val sequenceNumber = containingDocument.nextModelSequenceNumber()
+
   implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
 
   val deferredActionContext = new DeferredActionContext(container)
@@ -81,7 +83,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
         deferredActionContext.resetRebuild()
       }
     }
-    containingDocument.getXPathDependencies.rebuildDone(staticModel)
+    containingDocument.getXPathDependencies.rebuildDone(selfModel)
   }
 
   // Recalculate and revalidate are a combined operation
@@ -101,7 +103,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
         try {
 
           doRecalculate(deferredActionContext.defaultsStrategy, collector)
-          containingDocument.getXPathDependencies.recalculateDone(staticModel)
+          containingDocument.getXPathDependencies.recalculateDone(selfModel)
 
           // Validate only if needed, including checking the flags, because if validation state is clean, validation
           // being idempotent, revalidating is not needed.
@@ -109,7 +111,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
           mustRevalidate option {
             val invalidInstances = doRevalidate(collector)
-            containingDocument.getXPathDependencies.revalidateDone(staticModel)
+            containingDocument.getXPathDependencies.revalidateDone(selfModel)
             invalidInstances
           }
         } finally {

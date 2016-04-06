@@ -284,10 +284,10 @@ trait CalculateBindOps {
   ): Unit = {
     val staticBind = bindNode.staticBind
 
-    if (staticBind.hasXPathMIP(Relevant) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Relevant, null))
+    if (staticBind.hasXPathMIP(Relevant) && dependencies.requireModelMIPUpdate(model, staticBind, Relevant, null))
       evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) foreach bindNode.setRelevant
 
-    if (staticBind.hasXPathMIP(Readonly) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Readonly, null) ||
+    if (staticBind.hasXPathMIP(Readonly) && dependencies.requireModelMIPUpdate(model, staticBind, Readonly, null) ||
         staticBind.hasXPathMIP(Calculate))
       evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) match {
         case Some(value) ⇒
@@ -298,7 +298,7 @@ trait CalculateBindOps {
         case None ⇒
       }
 
-    if (staticBind.hasXPathMIP(Required) && dependencies.requireModelMIPUpdate(staticModel, staticBind, Required, null))
+    if (staticBind.hasXPathMIP(Required) && dependencies.requireModelMIPUpdate(model, staticBind, Required, null))
       evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) foreach bindNode.setRequired
 
     evaluateAndSetCustomMIPs(bindNode, collector)
@@ -320,7 +320,7 @@ trait CalculateBindOps {
     iterateBinds(topLevelBinds, bindNode ⇒
       if (! bindNode.hasChildrenElements) { // quick test to rule out containing elements
         bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip ⇒
-          if (dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, Model.Whitespace, null)) {
+          if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, Model.Whitespace, null)) {
             DataModel.setValueIfChangedHandleErrors(
               containingDocument = containingDocument,
               eventTarget        = model,
@@ -354,7 +354,7 @@ trait CalculateBindOps {
         iterateBinds(topLevelBinds, bindNode ⇒
           if (
             bindNode.staticBind.hasXPathMIP(mip)                                            &&
-            dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, mip, null) &&
+            dependencies.requireModelMIPUpdate(model, bindNode.staticBind, mip, null) &&
             mustEvaluateNode(bindNode.node, defaultsStrategy)
           ) {
             evaluateAndSetCalculatedBind(bindNode, mip, collector)
@@ -372,7 +372,7 @@ trait CalculateBindOps {
     order foreach { staticBind ⇒
       val logger = DependencyAnalyzer.Logger
       val isDebug = logger.isDebugEnabled
-      if (dependencies.requireModelMIPUpdate(staticModel, staticBind, mip, null)) {
+      if (dependencies.requireModelMIPUpdate(model, staticBind, mip, null)) {
         var evaluationCount = 0
         BindVariableResolver.resolveNotAncestorOrSelf(this, None, staticBind) foreach { runtimeBindIt ⇒
           runtimeBindIt flatMap (_.bindNodes) foreach { bindNode ⇒
@@ -500,8 +500,8 @@ trait ValidationBindOps extends Logging {
     val typeValidity =
       staticBind.dataType match {
         case Some(_) ⇒
-          if (dependencies.requireModelMIPUpdate(staticModel, staticBind, Type, null) ||
-            requiredMIPOpt.isDefined && dependencies.requireModelMIPUpdate(staticModel, staticBind, Required, null)) {
+          if (dependencies.requireModelMIPUpdate(model, staticBind, Type, null) ||
+            requiredMIPOpt.isDefined && dependencies.requireModelMIPUpdate(model, staticBind, Required, null)) {
             // Compute new type validity if the value of the node might have changed OR the value of requiredness
             // might have changed
             val typeValidity = validateType(bindNode.parentBind, currentNodeInfo, isRequired)
@@ -687,7 +687,7 @@ trait ValidationBindOps extends Logging {
     for {
       (level, mips) ← bindNode.staticBind.constraintsByLevel
     } locally {
-      if (dependencies.requireModelMIPUpdate(staticModel, bindNode.staticBind, Constraint, level)) {
+      if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, Constraint, level)) {
         // Re-evaluate and set
         val failedConstraints = failedConstraintMIPs(mips, bindNode, collector)
         if (failedConstraints.nonEmpty)

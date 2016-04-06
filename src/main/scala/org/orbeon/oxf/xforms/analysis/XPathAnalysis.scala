@@ -25,20 +25,13 @@ abstract class XPathAnalysis extends DebugXML  {
   val xpathString: String
   val figuredOutDependencies: Boolean
 
-  val valueDependentPaths: MapSet[String, String]
-  val returnablePaths: MapSet[String, String]
+  val valueDependentPaths: MapSet[String, String] // instance prefixed id → paths
+  val returnablePaths: MapSet[String, String]     // instance prefixed id → paths
 
   val dependentModels: collection.Set[String]
   val dependentInstances: collection.Set[String]
 
-  def returnableInstances = returnablePaths.keys
-
-  // For all those, return true if any path matches
-  // NOTE: For now just check exact paths. Later must be smarter?
-
-  def intersectsBinding(touchedPaths:  MapSet[String, String]) = valueDependentPaths intersects touchedPaths
-  def intersectsModels (touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains)
-  def intersectsValue  (touchedPaths:  MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
+  def returnableInstances = returnablePaths.map.keys
 
   // Combine this analysis with another one and return a new analysis
   def combine(other: XPathAnalysis): XPathAnalysis

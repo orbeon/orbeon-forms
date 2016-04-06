@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.util.{Map ⇒ JMap}
-
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
@@ -25,17 +24,20 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.w3c.dom.Node._
+import scala.collection.JavaConverters._
 
 import scala.collection.{mutable ⇒ m}
 
-class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument)
-    extends XPathDependencies
-       with Logging {
+class PathMapXPathDependencies(
+  containingDocument: XFormsContainingDocument
+) extends XPathDependencies with Logging {
+
+  import PathMapXPathDependencies._
 
   private implicit val logger = containingDocument.indentedLogger
 
   // Represent the state of changes to a model
-  private class ModelState(private val modelPrefixedId: String) {
+  private class ModelState(val modelKey: ModelOrInstanceKey, val model: XFormsModel) {
 
     var hasStructuralChanges = false
 
@@ -43,8 +45,23 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     var validateMIPsEvaluatedOnce  = false  // start dirty
 
     // Meaning of a change: "the string value of the node has changed"
-    var recalculateChangeset = new MapSet[String, String]   // changeset for recalculate MIPs
-    var revalidateChangeset  = recalculateChangeset         // changeset for revalidate MIPs
+    var recalculateChangeset = new MapSet[ModelOrInstanceKey, String]   // changeset for recalculate MIPs
+    var revalidateChangeset  = recalculateChangeset                     // changeset for revalidate MIPs
+
+    def markValueChangedForTests(instance: XFormsInstance, path: String): Unit = {
+      if (! hasStructuralChanges) {
+
+        val instanceKey  = ModelOrInstanceKey(instance)
+        val instancePath = instanceKey → path
+
+        recalculateChangeset += instancePath
+        if (revalidateChangeset ne recalculateChangeset)
+          revalidateChangeset += instancePath // also add to revalidate changeset if it is different
+
+        RefreshState.instancesByKey   += instanceKey → instance
+        RefreshState.refreshChangeset += instancePath
+      }
+    }
 
     def markValueChanged(node: NodeInfo): Unit = {
       // Only care about path changes if there is no structural change for this model, since structural changes
@@ -54,19 +71,19 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         // Create instance/path combo
         val instance = containingDocument.getInstanceForNode(node)
 
-        val instancePrefixedId = instance.getPrefixedId
-
         def processNode(n: NodeInfo): Unit = {
-          val path = PathMapXPathDependencies.createFingerprintedPath(n)
+          val path = createFingerprintedPath(n)
 
-          val instancePath = instancePrefixedId → path
+          val instanceKey  = ModelOrInstanceKey(instance)
+          val instancePath = instanceKey → path
 
           // Update model and view changesets
           recalculateChangeset += instancePath
           if (revalidateChangeset ne recalculateChangeset)
             revalidateChangeset += instancePath // also add to revalidate changeset if it is different
 
-          RefreshState.changeset += instancePath
+          RefreshState.instancesByKey   += instanceKey → instance
+          RefreshState.refreshChangeset += instancePath
 
           // Add parent elements as well. The idea is that if the string value of /a/b/c changed, then the
           // string value of /a/b did as well, and so did /a's.
@@ -85,7 +102,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
       // Update model and view information
       hasStructuralChanges = true
-      RefreshState.structuralChangeModels += modelPrefixedId
+      RefreshState.structuralChangeModelKeys += modelKey
 
       markBindsDirty()
     }
@@ -119,10 +136,14 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     // Return an empty changeset, trying to point to the empty right changeset if possible
     // This is so that we can try to avoid adding changes to both changesets later
-    private def clearChangeset(left: MapSet[String, String], right: MapSet[String, String]) =
-      if (right isEmpty) right
-      else if (left ne right) { left.clear(); left }
-      else new MapSet[String, String]
+    private def clearChangeset(left: MapSet[ModelOrInstanceKey, String], right: MapSet[ModelOrInstanceKey, String]) =
+      if (right isEmpty)
+        right
+      else if (left ne right) {
+        left.clear()
+        left
+      } else
+        new MapSet[ModelOrInstanceKey, String]
 
     def refreshDone() = ()
 
@@ -130,29 +151,32 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
       mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
   }
 
-  // State of models
-  private val modelStates = new m.HashMap[String, ModelState]
-
-  private def getModelState(modelPrefixedId: String) =
-    modelStates.getOrElseUpdate(modelPrefixedId, new ModelState(modelPrefixedId))
-
-  // Used between refresh/binding update start/done
-  private var inRefresh = false
-  private var inBindingUpdate = false
-
   // Keep state related to the view
   private object RefreshState {
-    // Structural changes
-    val structuralChangeModels = new m.HashSet[String]
 
-    // Modified paths by instance
-    val changeset = new MapSet[String, String]
+    val modelStates = new m.HashMap[ModelOrInstanceKey, ModelState]
+
+    def getOrCreateModelState(model: XFormsModel) = {
+      val modelKey = ModelOrInstanceKey(model)
+      modelStates.getOrElseUpdate(modelKey, new ModelState(modelKey, model))
+    }
+
+    // Used between refresh/binding update start/done
+    var inRefresh = false
+    var inBindingUpdate = false
+
+    // Structural changes
+    val structuralChangeModelKeys = new m.HashSet[ModelOrInstanceKey]
+
+    // Modified paths by instance key
+    val refreshChangeset = new MapSet[ModelOrInstanceKey, String]
+    val instancesByKey   = m.Map[ModelOrInstanceKey, XFormsInstance]()
 
     // Caches to speedup checks on repeated items
-    val modifiedBindingCacheForRepeats = new m.HashMap[String, UpdateResult]
-    val modifiedValueCacheForRepeats   = new m.HashMap[String, UpdateResult]
-    val modifiedLHHACacheForRepeats    = new m.HashMap[String, Boolean]
-    val modifiedItemsetCacheForRepeats = new m.HashMap[String, Boolean]
+    val modifiedBindingCacheForRepeats = new m.HashMap[RepeatCacheKey, UpdateResult]
+    val modifiedValueCacheForRepeats   = new m.HashMap[RepeatCacheKey, UpdateResult]
+    val modifiedLHHACacheForRepeats    = new m.HashMap[RepeatCacheKey, Boolean]
+    val modifiedItemsetCacheForRepeats = new m.HashMap[RepeatCacheKey, Boolean]
 
     // Statistics
     var bindingUpdateCount: Int = 0
@@ -161,15 +185,101 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     var bindingXPathOptimizedCount: Int = 0
     var valueXPathOptimizedCount: Int = 0
 
-    def getStructuralChangeModels = structuralChangeModels
+    private def compareWithPredicate(
+      firstWithPrefixedIds   : collection.Iterable[String],
+      secondWithInstanceKeys : collection.Iterable[ModelOrInstanceKey],
+      predicate              : ModelOrInstanceKey ⇒ Boolean
+    ): Boolean =
+      firstWithPrefixedIds exists { firstPrefixedId ⇒
+        secondWithInstanceKeys exists { secondInstanceKey ⇒
+          secondInstanceKey.prefixedId == firstPrefixedId && predicate(secondInstanceKey)
+        }
+      }
+
+    private def setsHaveIntersection(
+      first  : collection.Set[String],
+      second : collection.Set[String]
+    ) =
+      first exists (second contains)
+
+    private def searchMatchesForInstances(
+      controlEffectiveId     : String,
+      firstWithPrefixedIds   : MapSet[String, String],
+      secondWithInstanceKeys : MapSet[ModelOrInstanceKey, String]
+    ) = {
+
+      val controlIndexes        = getEffectiveIdSuffixParts(controlEffectiveId)
+      val controlIsWithinRepeat = controlIndexes.nonEmpty
+
+      compareWithPredicate(
+        firstWithPrefixedIds.map.keys,
+        secondWithInstanceKeys.map.keys,
+        instanceKey ⇒ {
+
+          val matchesRepeatIterations =
+            ! controlIsWithinRepeat ||
+            controlIndexes.startsWith(getEffectiveIdSuffixParts(instancesByKey(instanceKey).getEffectiveId))
+
+          matchesRepeatIterations &&
+            setsHaveIntersection(
+              firstWithPrefixedIds.map(instanceKey.prefixedId),
+              secondWithInstanceKeys.map(instanceKey)
+            )
+        }
+      )
+    }
+
+    def intersectsStructuralChangeModel(controlEffectiveId: String, analysis: XPathAnalysis) = {
+
+      val controlIndexes        = getEffectiveIdSuffixParts(controlEffectiveId)
+      val controlIsWithinRepeat = controlIndexes.nonEmpty
+
+      val touchedModelsEffectiveIds = structuralChangeModelKeys
+
+      // Assumption: a given analysis typically has only one dependent model
+      compareWithPredicate(
+        analysis.dependentModels,
+        touchedModelsEffectiveIds,
+        modelKey ⇒ {
+          ! controlIsWithinRepeat ||
+          // If there is a match we know that the control depends on the given model, and we
+          // know that this means the control statically share the model's ancestor repeats,
+          // because it's not possible to cross an XBL boundary as models are always in a shadow
+          // tree's inner scope. So here we want the shared repeat ancestors' iterations to match.
+          controlIndexes.startsWith(getEffectiveIdSuffixParts(modelStates(modelKey).model.effectiveId))
+        }
+      )
+    }
+
+    def intersectsBinding(
+      controlEffectiveId : String,
+      bindingAnalysis    : XPathAnalysis,
+      changes            : MapSet[ModelOrInstanceKey, String]
+    ) =
+      searchMatchesForInstances(
+        controlEffectiveId,
+        bindingAnalysis.valueDependentPaths,
+        changes
+      )
+
+    def intersectsValue(
+      controlEffectiveId : String,
+      bindingAnalysis    : XPathAnalysis,
+      changes            : MapSet[ModelOrInstanceKey, String]
+    ) =
+      intersectsBinding(controlEffectiveId, bindingAnalysis, refreshChangeset) ||
+        searchMatchesForInstances(
+          controlEffectiveId,
+          bindingAnalysis.returnablePaths,
+          changes
+        )
 
     def refreshDone(): Unit = {
-      structuralChangeModels.clear()
-      changeset.clear()
+      structuralChangeModelKeys.clear()
+      refreshChangeset.clear()
 
       modifiedBindingCacheForRepeats.clear()
       modifiedValueCacheForRepeats.clear()
-
       modifiedLHHACacheForRepeats.clear()
       modifiedItemsetCacheForRepeats.clear()
 
@@ -181,20 +291,25 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     }
   }
 
-  private var mipUpdateCount: Int = 0
-  private var mipXPathOptimizedCount: Int = 0
+  private object Stats {
+    var mipUpdateCount             = 0
+    var mipXPathOptimizedCount     = 0
 
-  private var lhhaEvaluationCount: Int = 0
-  private var lhhaOptimizedCount: Int = 0
-  private var lhhaUnknownDependencies: Int = 0
-  private var lhhaMissCount: Int = 0
-  private var lhhaHitCount: Int = 0
+    var lhhaEvaluationCount        = 0
+    var lhhaOptimizedCount         = 0
+    var lhhaUnknownDependencies    = 0
+    var lhhaMissCount              = 0
+    var lhhaHitCount               = 0
 
-  private var itemsetEvaluationCount: Int = 0
-  private var itemsetOptimizedCount: Int = 0
-  private var itemsetUnknownDependencies: Int = 0
-  private var itemsetMissCount: Int = 0
-  private var itemsetHitCount: Int = 0
+    var itemsetEvaluationCount     = 0
+    var itemsetOptimizedCount      = 0
+    var itemsetUnknownDependencies = 0
+    var itemsetMissCount           = 0
+    var itemsetHitCount            = 0
+  }
+
+  import RefreshState._
+  import Stats._
 
   def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo): Unit = {
 
@@ -202,15 +317,24 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     require(nodeInfo.isInstanceOf[VirtualNode])
     require(model.getInstanceForNode(nodeInfo).model == model)
 
-    getModelState(model.getPrefixedId).markValueChanged(nodeInfo)
+    getOrCreateModelState(model).markValueChanged(nodeInfo)
   }
 
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit =
-    getModelState(model.getPrefixedId).markStructuralChange()
+    getOrCreateModelState(model).markStructuralChange()
 
-  def rebuildDone(model: Model)     = getModelState(model.prefixedId).rebuildDone()
-  def recalculateDone(model: Model) = getModelState(model.prefixedId).recalculateDone()
-  def revalidateDone(model: Model)  = getModelState(model.prefixedId).revalidateDone()
+  def rebuildDone(model: XFormsModel)     = getOrCreateModelState(model).rebuildDone()
+  def recalculateDone(model: XFormsModel) = getOrCreateModelState(model).recalculateDone()
+  def revalidateDone(model: XFormsModel)  = getOrCreateModelState(model).revalidateDone()
+
+  def modelDestruct(model: XFormsModel) = {
+
+    // Remove all references to concrete models and instances
+    modelStates -= getOrCreateModelState(model).modelKey
+
+    for (instance ← model.getInstances.asScala if instance ne null)
+      instancesByKey -= ModelOrInstanceKey(instance)
+  }
 
   def refreshStart(): Unit = {
     inRefresh = true
@@ -220,13 +344,13 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     if (logger.isDebugEnabled)
       logger.logDebug("dependencies", "refresh done",
-        Array("bindings updated", RefreshState.bindingUpdateCount.toString,
-            "values updated", RefreshState.valueUpdateCount.toString,
+        Array("bindings updated", bindingUpdateCount.toString,
+            "values updated", valueUpdateCount.toString,
             "MIPs updated", mipUpdateCount.toString,
-            "Binding XPath optimized", RefreshState.bindingXPathOptimizedCount.toString,
-            "Value XPath optimized", RefreshState.valueXPathOptimizedCount.toString,
+            "Binding XPath optimized", bindingXPathOptimizedCount.toString,
+            "Value XPath optimized", valueXPathOptimizedCount.toString,
             "MIP XPath optimized", mipXPathOptimizedCount.toString,
-            "Total XPath optimized", (RefreshState.bindingXPathOptimizedCount + RefreshState.valueXPathOptimizedCount + mipXPathOptimizedCount).toString): _*)
+            "Total XPath optimized", (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString): _*)
 
     for (modelState ← modelStates.values)
       modelState.refreshDone()
@@ -291,16 +415,14 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             "Itemset disjoints", itemsetMissCount.toString): _*)
   }
 
-  // For unit tests
-  def markStructuralChangeTest(modelPrefixedId: String): Unit = {
-    getModelState(modelPrefixedId).markStructuralChange()
+  // For unit tests only
+  def markStructuralChangeTest(model: XFormsModel): Unit = {
+    getOrCreateModelState(model).markStructuralChange()
   }
 
-  // For unit tests
-  def setModifiedPathTest(instance: String, namespaces: JMap[String, String], path: String): Unit = {
-    assert(RefreshState.changeset.isEmpty)
-
-    RefreshState.changeset += instance → PathMapXPathAnalysis.getInternalPath(namespaces, path)
+  // For unit tests only
+  def markValueChangedTest(instance: XFormsInstance, namespaces: Map[String, String], path: String): Unit = {
+    getOrCreateModelState(instance.model).markValueChangedForTests(instance, PathMapXPathAnalysis.getInternalPath(namespaces, path))
   }
 
   private case class UpdateResult(requireUpdate: Boolean, savedEvaluations: Int)
@@ -308,16 +430,51 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
   private val MustUpdateResultNA      = UpdateResult(requireUpdate = true,  savedEvaluations = 0)
   private val MustNotUpdateResultZero = UpdateResult(requireUpdate = false, savedEvaluations = 0)
 
-  def requireBindingUpdate(controlPrefixedId: String): Boolean = {
+  private def buildRepeatResultCacheKey(
+    control            : ElementAnalysis,
+    analyses           : List[XPathAnalysis],
+    controlEffectiveId : String
+  ): Option[RepeatCacheKey] = {
+    if (control.isWithinRepeat) {
+      analyses match {
+        case analyses if analyses.nonEmpty && (analyses forall(_.figuredOutDependencies)) ⇒
+
+          val allDependentModelsPrefixedIdsIt = analyses.iterator flatMap(_.dependentModels.iterator)
+
+          // TODO: This could be cached in the ElementAnalysis. Would need for binding, value, LHHA, itemset.
+          val maxDependentModelDepth =
+            if (allDependentModelsPrefixedIdsIt.nonEmpty)
+              allDependentModelsPrefixedIdsIt map { modelPrefixedId ⇒
+                containingDocument.getStaticOps.getControlAnalysis(modelPrefixedId).ancestorRepeatsAcrossParts.size
+              } max
+            else
+              0
+
+          Some(
+            RepeatCacheKey(
+              control.prefixedId,
+              getEffectiveIdSuffixParts(controlEffectiveId) take maxDependentModelDepth toList
+            )
+          )
+        case _ ⇒
+          None
+      }
+    } else
+      None
+  }
+
+  def requireBindingUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
 
-    val cached = RefreshState.modifiedBindingCacheForRepeats.get(controlPrefixedId)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.getBindingAnalysis.toList, controlEffectiveId: String)
+
+    val cached = resultCacheKey flatMap modifiedBindingCacheForRepeats.get
     val updateResult: UpdateResult =
       cached match {
-        case Some(result) ⇒ result
+        case Some(result) ⇒
+          result
         case None ⇒
-          val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
           val tempResult = control.getBindingAnalysis match {
             case None ⇒
               // Control does not have an XPath binding
@@ -328,43 +485,49 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             case Some(analysis) ⇒
               // Binding dependencies are known
               UpdateResult(
-                analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsBinding(RefreshState.changeset),
-                control.bindingXPathEvaluations)
+                intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
+                  intersectsBinding(controlEffectiveId, analysis, refreshChangeset),
+                control.bindingXPathEvaluations
+              )
           }
 
           if (tempResult.requireUpdate && logger.isDebugEnabled)
             logger.logDebug("dependencies", "binding requires update",
-                Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
+                Array("effective id", controlEffectiveId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
-          if (control.isWithinRepeat)
-            RefreshState.modifiedBindingCacheForRepeats += controlPrefixedId → tempResult
+          resultCacheKey foreach { key ⇒
+            modifiedBindingCacheForRepeats += key → tempResult
+          }
 
           tempResult
       }
 
     if (updateResult.requireUpdate)
-      RefreshState.bindingUpdateCount += 1
+      bindingUpdateCount += 1
     else
-      // Update not required
-      RefreshState.bindingXPathOptimizedCount += updateResult.savedEvaluations
+      bindingXPathOptimizedCount += updateResult.savedEvaluations
 
     updateResult.requireUpdate
   }
 
-  def requireValueUpdate(controlPrefixedId: String): Boolean = {
+  def requireValueUpdate(control: ElementAnalysis, controlEffectiveId: String): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
 
-    val cached = RefreshState.modifiedValueCacheForRepeats.get(controlPrefixedId)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.getBindingAnalysis.toList, controlEffectiveId: String)
+
+    val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =
       cached match {
         case Some(result) ⇒
           (
             result,
-            if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null
+            if (result.requireUpdate)
+              control.getValueAnalysis
+            else
+              null
           )
         case None ⇒
-          val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
           val tempValueAnalysis = control.getValueAnalysis
           val tempUpdateResult = tempValueAnalysis match {
             case None ⇒
@@ -376,45 +539,49 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             case Some(analysis) ⇒
               // Value dependencies are known
               UpdateResult(
-                analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset),
+                intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
+                  intersectsValue(controlEffectiveId, analysis, refreshChangeset),
                 if (control.value.isDefined) 1 else 0)
           }
           if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && logger.isDebugEnabled)
             logger.logDebug("dependencies", "value requires update",
-                Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
+                Array("effective id", controlEffectiveId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
-          if (control.isWithinRepeat)
-            RefreshState.modifiedValueCacheForRepeats += controlPrefixedId → tempUpdateResult
+          resultCacheKey foreach { key ⇒
+            modifiedValueCacheForRepeats += key → tempUpdateResult
+          }
 
           (tempUpdateResult, tempValueAnalysis)
       }
 
-    if (updateResult.requireUpdate && valueAnalysis.isDefined) // TODO: see above, check on valueAnalysis only because non-value controls still call this method
-      RefreshState.valueUpdateCount += 1
+    // TODO: see above, check on valueAnalysis only because non-value controls still call this method
+    if (updateResult.requireUpdate && valueAnalysis.isDefined)
+      valueUpdateCount += 1
     else
       // Update not required
-      RefreshState.valueXPathOptimizedCount += updateResult.savedEvaluations
+      valueXPathOptimizedCount += updateResult.savedEvaluations
 
     updateResult.requireUpdate
   }
 
-  def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String): Boolean = {
+  def requireLHHAUpdate(control: ElementAnalysis, lhhaName: String, controlEffectiveId: String): Boolean = {
 
-    assert(inRefresh || inBindingUpdate) // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
+    // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
+    assert(inRefresh || inBindingUpdate)
 
-    val control = (
-      containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId)
-      flatMap collectByErasedType[StaticLHHASupport]
-      getOrElse (throw new OXFException(s"Control $controlPrefixedId not found or doesn't support LHHA"))
-    )
+    val analyses = {
+
+      val lhhaControl = {
+        collectByErasedType[StaticLHHASupport](control) getOrElse
+        (throw new OXFException(s"Control $controlEffectiveId not found or doesn't support LHHA"))
+      }
+
+      lhhaControl.lhhaValueAnalyses(lhhaName) ensuring
+        (_.nonEmpty, s"Control $controlEffectiveId doesn't have LHHA $lhhaName")
+    }
 
     // NOTE: No side-effects except for stats
     def requireUpdate = {
-
-      val analyses = (
-        control.lhhaValueAnalyses(lhhaName)
-        ensuring (_.nonEmpty, s"Control $controlPrefixedId doesn't have LHHA $lhhaName")
-      )
 
       def requireUpdateForAnalysis(analysis: XPathAnalysis) =
         analysis match {
@@ -422,7 +589,9 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             lhhaUnknownDependencies += 1
             true
           case analysis ⇒ // dependencies are known
-            val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
+            val result =
+              intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
+                intersectsValue(controlEffectiveId, analysis, refreshChangeset)
             if (result) lhhaHitCount += 1 else lhhaMissCount += 1
             result
         }
@@ -431,21 +600,15 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
       analyses exists requireUpdateForAnalysis
     }
 
-    if (control.isWithinRepeat)
-      RefreshState.modifiedLHHACacheForRepeats.getOrElseUpdate(controlPrefixedId, requireUpdate)
-    else
-      requireUpdate
+    buildRepeatResultCacheKey(control, analyses, controlEffectiveId: String) match {
+      case Some(key) ⇒ modifiedLHHACacheForRepeats.getOrElseUpdate(key, requireUpdate)
+      case None      ⇒ requireUpdate
+    }
   }
 
-  def requireItemsetUpdate(controlPrefixedId: String): Boolean = {
+  def requireItemsetUpdate(control: SelectionControlTrait, controlEffectiveId: String): Boolean = {
 
     assert(inRefresh || inBindingUpdate)
-
-    val control = (
-      containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId)
-      flatMap collectByErasedType[SelectionControlTrait]
-      getOrElse (throw new OXFException(s"Control $controlPrefixedId not found or is not a selection control"))
-    )
 
     def requireUpdate =
       control.getItemsetAnalysis match {
@@ -453,17 +616,19 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
           itemsetUnknownDependencies += 1
           true
         case Some(analysis) ⇒ // dependencies are known
-          val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
+          val result =
+            intersectsStructuralChangeModel(controlEffectiveId, analysis) ||
+              intersectsValue(controlEffectiveId, analysis, refreshChangeset)
           if (result) itemsetHitCount += 1 else itemsetMissCount += 1
           result
         case None ⇒
           throw new IllegalStateException("Itemset not analyzed")
       }
 
-    if (control.isWithinRepeat)
-      RefreshState.modifiedItemsetCacheForRepeats.getOrElseUpdate(controlPrefixedId, requireUpdate)
-    else
-      requireUpdate
+    buildRepeatResultCacheKey(control, control.getItemsetAnalysis.toList, controlEffectiveId: String) match {
+      case Some(key) ⇒ modifiedItemsetCacheForRepeats.getOrElseUpdate(key, requireUpdate)
+      case None      ⇒ requireUpdate
+    }
   }
 
   def hasAnyCalculationBind(model: Model, instancePrefixedId: String) =
@@ -472,7 +637,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
   def hasAnyValidationBind(model: Model, instancePrefixedId: String) =
     ! model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
 
-  def requireModelMIPUpdate(model: Model, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean = {
+  def requireModelMIPUpdate(model: XFormsModel, bind: StaticBind, mip: MIP, level: ValidationLevel): Boolean = {
 
     // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
 
@@ -484,7 +649,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
       case _                ⇒ bind.getXPathMIPs(mip.name)
     }
 
-    val modelState = getModelState(model.prefixedId)
+    val modelState = getOrCreateModelState(model)
 
     def resultForMIP(mip: StaticBind#MIP): UpdateResult =
       if (modelState.isMIPInitiallyDirty(mip)) {
@@ -504,7 +669,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         }
 
         def dependsOnOtherModel(analysis: XPathAnalysis) =
-          analysis.dependentModels exists (_ != model.prefixedId)
+          analysis.dependentModels exists (_ != model.getPrefixedId)
 
         val updateResult = valueAnalysis match {
           case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
@@ -515,7 +680,14 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             MustUpdateResultOne
           case Some(analysis) ⇒
             // Value dependencies are known
-            UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
+            UpdateResult(
+              intersectsValue(
+                model.effectiveId,
+                analysis,
+                if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset
+              ),
+              1
+            )
           case _ ⇒
             throw new IllegalStateException(s"No value analysis found for `xf:bind` with name = ${mip.name}")
         }
@@ -540,10 +712,26 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
   }
 }
 
-object PathMapXPathDependencies {
+private object PathMapXPathDependencies {
+
+  case class RepeatCacheKey(prefixedId: String, commonIndexes: List[Int])
+
+  // We use this custom key because we cannot index by effective id as effective ids can be updated when
+  // iterations move. The sequence number on the other hand doesn't change for a concrete model or instance
+  // for its lifetime.
+  case class ModelOrInstanceKey(prefixedId: String, sequence: Int)
+
+  object ModelOrInstanceKey {
+
+    def apply(model: XFormsModel): ModelOrInstanceKey =
+      ModelOrInstanceKey(model.getPrefixedId, model.sequenceNumber)
+
+    def apply(instance: XFormsInstance): ModelOrInstanceKey =
+      ModelOrInstanceKey(instance.getPrefixedId, instance.model.sequenceNumber)
+  }
 
   // Create a fingerprinted path of the form: `3142/1425/@1232` from a node.
-  private def createFingerprintedPath(node: NodeInfo): String = {
+  def createFingerprintedPath(node: NodeInfo): String = {
 
     // Create an immutable list with ancestor-or-self nodes up to but not including the document node
     var ancestorOrSelf: List[NodeInfo] = Nil

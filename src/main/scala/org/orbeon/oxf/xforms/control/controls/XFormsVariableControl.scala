@@ -65,7 +65,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
 
     if (relevant) {
       // Evaluate variable value if needed if relevant
-      if ((_value eq null) || containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
+      if ((_value eq null) || containingDocument.getXPathDependencies.requireValueUpdate(staticControl, effectiveId)) {
         variable.markDirty()
         val contextStack = getContextStack
         contextStack.setBinding(bindingContext)

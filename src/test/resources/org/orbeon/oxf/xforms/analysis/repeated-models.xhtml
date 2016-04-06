@@ -1,0 +1,60 @@
+<!--
+  Copyright (C) 2016 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:acme="http://www.acme.com/xbl">
+
+    <xh:head>
+        <xf:model id="model" xxf:xpath-analysis="true">
+            <xf:instance id="instance">
+                <instance>
+                    <company>
+                        <employee/>
+                    </company>
+                </instance>
+            </xf:instance>
+        </xf:model>
+
+        <xbl:xbl>
+            <xbl:binding id="acme-foo" element="acme|foo" xxbl:mode="binding">
+                <xbl:implementation>
+                    <xf:model id="acme-foo-model">
+                        <xf:instance id="acme-foo-instance">
+                            <acme/>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:input ref="." id="acme-foo-input"/>
+                    <!-- Dependency on internal and external model -->
+                    <xf:var name="outer">
+                        <xxf:value xxbl:scope="outer" value="."/>
+                    </xf:var>
+                    <xf:output value="concat(., $outer)" id="acme-foo-output"/>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <xf:repeat ref="company" id="company-repeat">
+            <xf:repeat ref="employee" id="employee-repeat">
+                <acme:foo ref="." id="foo-1"/>
+            </xf:repeat>
+        </xf:repeat>
+    </xh:body>
+</xh:html>

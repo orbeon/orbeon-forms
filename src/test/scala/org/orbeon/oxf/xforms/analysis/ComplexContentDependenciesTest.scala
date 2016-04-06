@@ -23,7 +23,7 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
 
   // See: [ #315535 ] XPath analysis: xxf:serialize() support: detect changes to nested elements
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315535&group_id=168&atid=350207
-  @Test def serializeFunction() {
+  @Test def serializeFunction(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     this setupDocument
@@ -63,7 +63,7 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
 
   // See: [ #315525 ] XPath analysis: bug with xf:output pointing to complex content
   //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315525&group_id=168&atid=350207
-  @Test def outputComplexContent() {
+  @Test def outputComplexContent(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
     this setupDocument

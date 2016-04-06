@@ -1005,9 +1005,11 @@ public class XFormsUtils {
         if (prefixIndex != -1) {
             return StringUtils.split(effectiveId.substring(0, prefixIndex), XFormsConstants.COMPONENT_SEPARATOR);
         } else {
-            return new String[0];
+            return EMPTY_STRING_ARRAY;
         }
     }
+
+    private static String[] EMPTY_STRING_ARRAY = new String[0];
 
     /**
      * Given a repeat control's effective id, compute the effective id of an iteration.
@@ -1048,9 +1050,11 @@ public class XFormsUtils {
             }
             return result;
         } else {
-            return new int[0];
+            return EMPTY_INT_ARRAY;
         }
     }
+
+    private static int[] EMPTY_INT_ARRAY = new int[0];
 
     public static String buildEffectiveId(String prefixedId, Object[] iterations) {
         if (iterations.length == 0)

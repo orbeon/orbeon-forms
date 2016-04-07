@@ -603,11 +603,14 @@ body {
 
     // Simply styling for file select to just show "x"
     #fr-form-group .fb-static-upload {
-        background-color: none;
+        background: none;
         position: absolute; // show upload UI at the bottom of the cell and remove file upload indicator
         left: 32px;
         bottom: .5em;
         .xforms-upload-info, .xforms-upload-size, .xforms-upload-remove { padding: 0 }
+        .xforms-upload-info {
+            background: none;
+        }
     }
 
     .fr-grid .fb-grid-td .fb-grid-control-icons img { display: inline }

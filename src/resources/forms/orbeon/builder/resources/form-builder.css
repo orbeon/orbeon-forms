@@ -581,7 +581,7 @@ body {
   font-size: smaller;
 }
 .orbeon h2 .fr-section-label {
-  min-height: 36px;
+  height: 36px;
 }
 .orbeon .fb .xbl-fr-section .fr-section-content {
   padding: 10px;

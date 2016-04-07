@@ -108,7 +108,7 @@
 }
 .orbeon .xbl-fr-grid .fr-repeat-table .fr-grid-content {
   padding-top: 0;
-  padding-bottom: 0;
+  padding-bottom: 0.1px;
 }
 .orbeon .xbl-fr-grid .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-label,
 .orbeon .xbl-fr-grid .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-label,

@@ -165,7 +165,7 @@
             .fr-grid-content {
                 // No top/bottom padding in repeated grid cells
                 padding-top: 0;
-                padding-bottom: 0;
+                padding-bottom: 0.1px;                  // should be 0, but that causes https://github.com/orbeon/orbeon-forms/issues/2690
             }
 
             &.fr-repeat-single-row {

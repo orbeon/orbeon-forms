@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.junit.Assert.{assertFalse, assertTrue}
 import org.junit.{Assume, Test}
-import org.mockito.Mockito
+import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
@@ -97,8 +97,11 @@ class XFormsStaticStateTest extends ResourceManagerTestBase {
     Mockito.when(mockDocument.indentedLogger).thenReturn(staticState.getIndentedLogger)
 
     val ops = new StaticStateGlobalOps(staticState.topLevelPart)
+
     Mockito.when(mockDocument.getStaticOps).thenReturn(ops)
     Mockito.when(mockDocument.getControls).thenReturn(mockControls)
+    Mockito.when(mockDocument.getIndentedLogger(Matchers.anyString)).thenReturn(staticState.getIndentedLogger)
+
     Mockito.when(mockControls.getIndentedLogger).thenReturn(staticState.getIndentedLogger)
 
     mockDocument

@@ -67,6 +67,11 @@ $ ->
             $(gridThTd).append(hoverDiv)
         hoverDiv
 
+    tidyTriggerGroups = (triggerGroups) ->
+        $(triggerGroups).hide()
+        $('.fb-cell-editor').append(triggerGroups)
+        lastPositionTriggers = null
+
     Builder.mouseEntersGridTdEvent.subscribe ({triggers, triggerGroups, gridTd}) ->
         gridTdId = gridTd.id
         lastPositionTriggers = ->
@@ -81,6 +86,8 @@ $ ->
                     rule = relevanceRules[trigger.id]
                     triggerRelevant = if rule? then rule gridTd else true
                     trigger.style.display = if triggerRelevant then '' else 'none'
+            else
+                tidyTriggerGroups(triggerGroups)
         lastPositionTriggers()
 
     # Normally, we add the div.fb-hover when the mouse first enters the td.fb-grid-td, but for the TinyMCE, if we do
@@ -97,9 +104,7 @@ $ ->
     # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control
     # See: https://github.com/orbeon/orbeon-forms/issues/44
     Builder.mouseExitsGridTdEvent.subscribe ({triggerGroups, gridTd}) ->
-        $(triggerGroups).hide()
-        $('.fb-cell-editor').append(triggerGroups)
-        lastPositionTriggers = null
+        tidyTriggerGroups(triggerGroups)
 
     # Change current cell on click on trigger
     Builder.triggerClickEvent.subscribe ({trigger}) ->

@@ -622,7 +622,7 @@ body {
   padding: 0;
 }
 .orbeon #fr-form-group .fb-static-upload {
-  background-color: none;
+  background: none;
   position: absolute;
   left: 32px;
   bottom: .5em;
@@ -631,6 +631,9 @@ body {
 .orbeon #fr-form-group .fb-static-upload .xforms-upload-size,
 .orbeon #fr-form-group .fb-static-upload .xforms-upload-remove {
   padding: 0;
+}
+.orbeon #fr-form-group .fb-static-upload .xforms-upload-info {
+  background: none;
 }
 .orbeon .fr-grid .fb-grid-td .fb-grid-control-icons img {
   display: inline;

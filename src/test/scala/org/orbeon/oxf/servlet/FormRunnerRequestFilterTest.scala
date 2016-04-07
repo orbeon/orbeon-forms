@@ -16,7 +16,6 @@ package org.orbeon.oxf.servlet
 import java.util.{Enumeration ⇒ JEnumeration}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 
-import org.exist.http.servlets.HttpSessionWrapper
 import org.junit.Test
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -44,11 +43,11 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
     val sessionAttributes = mutable.Map[String, AnyRef]()
     val mockSession = mock[HttpSession]
-    Mockito when mockSession.getAttribute(Matchers.anyString()) thenAnswer new Answer[AnyRef] {
+    Mockito when mockSession.getAttribute(Matchers.anyString) thenAnswer new Answer[AnyRef] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
     }
-    Mockito when mockSession.setAttribute(Matchers.anyString(), Matchers.anyObject()) thenAnswer new Answer[Unit] {
+    Mockito when mockSession.setAttribute(Matchers.anyString, Matchers.anyObject) thenAnswer new Answer[Unit] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] → invocation.getArguments()(1)
     }

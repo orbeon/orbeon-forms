@@ -42,11 +42,11 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     // Session
     val sessionAttributes = mutable.Map[String, AnyRef]()
     val mockSession = mock[PortletSession]
-    Mockito when mockSession.getAttribute(Matchers.anyString()) thenAnswer new Answer[AnyRef] {
+    Mockito when mockSession.getAttribute(Matchers.anyString) thenAnswer new Answer[AnyRef] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
     }
-    Mockito when mockSession.setAttribute(Matchers.anyString(), Matchers.anyObject()) thenAnswer new Answer[Unit] {
+    Mockito when mockSession.setAttribute(Matchers.anyString, Matchers.anyObject) thenAnswer new Answer[Unit] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] → invocation.getArguments()(1)
     }

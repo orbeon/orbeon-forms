@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms._
+import org.scalatest.junit.AssertionsForJUnit
 
 object XFormsStaticStateTest {
 
@@ -34,7 +35,7 @@ object XFormsStaticStateTest {
   }
 }
 
-class XFormsStaticStateTest extends ResourceManagerTestBase {
+class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
   import XFormsStaticStateTest._
 
@@ -399,33 +400,31 @@ class XFormsStaticStateTest extends ResourceManagerTestBase {
 
     val acmeFooModel1         = mockModel(buildEffectiveId("foo-1≡acme-foo-model", List(1)), nextSeq())
     val acmeFooInstance1      = mockInstance(buildEffectiveId("foo-1≡acme-foo-instance", List(1)), acmeFooModel1)
-    val fooInputEffectiveId1  = buildEffectiveId("foo-1≡acme-foo-input", List(1))
-    val fooOutputEffectiveId1 = buildEffectiveId("foo-1≡acme-foo-output", List(1))
 
     val acmeFooModel2         = mockModel(buildEffectiveId("foo-1≡acme-foo-model", List(2)), nextSeq())
     val acmeFooInstance2      = mockInstance(buildEffectiveId("foo-1≡acme-foo-instance", List(2)), acmeFooModel2)
-    val fooInputEffectiveId2  = buildEffectiveId("foo-1≡acme-foo-input", List(2))
-    val fooOutputEffectiveId2 = buildEffectiveId("foo-1≡acme-foo-output", List(2))
 
-    staticState.dumpAnalysis()//xxx
+    def assertMatrix(expectedValues: List[Boolean]) = {
 
-    def assertNoFooInputUpdates() = {
-      assertFalse(requireBindingUpdate(fooInputEffectiveId1))
-      assertFalse(requireValueUpdate(fooInputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooInputEffectiveId2))
-      assertFalse(requireValueUpdate(fooInputEffectiveId2))
-    }
+      assert(8 === expectedValues.size)
 
-    def assertNoFooOutputUpdates() = {
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId1))
-      assertFalse(requireValueUpdate(fooOutputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId2))
-      assertFalse(requireValueUpdate(fooOutputEffectiveId2))
+      val results =
+        for {
+          prefixedId  ← List("foo-1≡acme-foo-input", "foo-1≡acme-foo-output")
+          iteration   ← 1 to 2
+          fn          ← List(requireBindingUpdate(_), requireValueUpdate(_))
+          effectiveId = buildEffectiveId(prefixedId, List(iteration))
+        } yield
+          fn(effectiveId)
+
+      assert(8 === results.size)
+
+      for ((e, a) ← expectedValues.zip(results))
+        assertTrue(e === a)
     }
 
     def assertNoUpdates() = {
-      assertNoFooInputUpdates()
-      assertNoFooOutputUpdates()
+      assertMatrix(List.fill(8)(false))
     }
 
     withRefresh {
@@ -436,15 +435,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase {
     dependencies.markValueChangedTest(acmeFooInstance1, namespaces, "")
 
     withRefresh {
-      assertFalse(requireBindingUpdate(fooInputEffectiveId1))
-      assertTrue(requireValueUpdate(fooInputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooInputEffectiveId2))
-      assertFalse(requireValueUpdate(fooInputEffectiveId2))
-
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId1))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId2))
-      assertFalse(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(false, true, false, false, false, true, false, false))
     }
 
     withRefresh {
@@ -455,15 +446,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase {
     dependencies.markValueChangedTest(acmeFooInstance2, namespaces, "")
 
     withRefresh {
-      assertFalse(requireBindingUpdate(fooInputEffectiveId1))
-      assertFalse(requireValueUpdate(fooInputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooInputEffectiveId2))
-      assertTrue(requireValueUpdate(fooInputEffectiveId2))
-
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId1))
-      assertFalse(requireValueUpdate(fooOutputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId2))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(false, false, false, true, false, false, false, true))
     }
 
     // Value in model within iteration 1 and 2
@@ -471,45 +454,21 @@ class XFormsStaticStateTest extends ResourceManagerTestBase {
     dependencies.markValueChangedTest(acmeFooInstance2, namespaces, "")
 
     withRefresh {
-      assertFalse(requireBindingUpdate(fooInputEffectiveId1))
-      assertTrue(requireValueUpdate(fooInputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooInputEffectiveId2))
-      assertTrue(requireValueUpdate(fooInputEffectiveId2))
-
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId1))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId2))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(false, true, false, true, false, true, false, true))
     }
 
     // Structural change in model within iteration 1
     dependencies.markStructuralChangeTest(acmeFooModel1)
 
     withRefresh {
-      assertTrue(requireBindingUpdate(fooInputEffectiveId1))
-      assertTrue(requireValueUpdate(fooInputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooInputEffectiveId2))
-      assertFalse(requireValueUpdate(fooInputEffectiveId2))
-
-      assertTrue(requireBindingUpdate(fooOutputEffectiveId1))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId2))
-      assertFalse(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(true, true, false, false, true, true, false, false))
     }
 
     // Structural change in model within iteration 2
     dependencies.markStructuralChangeTest(acmeFooModel2)
 
     withRefresh {
-      assertFalse(requireBindingUpdate(fooInputEffectiveId1))
-      assertFalse(requireValueUpdate(fooInputEffectiveId1))
-      assertTrue(requireBindingUpdate(fooInputEffectiveId2))
-      assertTrue(requireValueUpdate(fooInputEffectiveId2))
-
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId1))
-      assertFalse(requireValueUpdate(fooOutputEffectiveId1))
-      assertTrue(requireBindingUpdate(fooOutputEffectiveId2))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(false, false, true, true, false, false, true, true))
     }
 
     // Structural change in model within iteration 1 and 2
@@ -517,30 +476,14 @@ class XFormsStaticStateTest extends ResourceManagerTestBase {
     dependencies.markStructuralChangeTest(acmeFooModel2)
 
     withRefresh {
-      assertTrue(requireBindingUpdate(fooInputEffectiveId1))
-      assertTrue(requireValueUpdate(fooInputEffectiveId1))
-      assertTrue(requireBindingUpdate(fooInputEffectiveId2))
-      assertTrue(requireValueUpdate(fooInputEffectiveId2))
-
-      assertTrue(requireBindingUpdate(fooOutputEffectiveId1))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId1))
-      assertTrue(requireBindingUpdate(fooOutputEffectiveId2))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(true, true, true, true, true, true, true, true))
     }
 
     // Change to outer value
     dependencies.markValueChangedTest(topLevelInstance, namespaces, "company/employee")
 
     withRefresh {
-      assertFalse(requireBindingUpdate(fooInputEffectiveId1))
-      assertFalse(requireValueUpdate(fooInputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooInputEffectiveId2))
-      assertFalse(requireValueUpdate(fooInputEffectiveId2))
-
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId1))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId1))
-      assertFalse(requireBindingUpdate(fooOutputEffectiveId2))
-      assertTrue(requireValueUpdate(fooOutputEffectiveId2))
+      assertMatrix(List(false, false, false, false, false, true, false, true))
     }
   }
 }

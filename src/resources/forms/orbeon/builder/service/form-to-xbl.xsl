@@ -274,7 +274,6 @@
                             <!-- RRR with defaults -->
                             <xf:rebuild/>
                             <xf:recalculate xxf:defauls="true"/>
-                            <xf:revalidate/>
                         </xf:action>
                     </xf:action>
 

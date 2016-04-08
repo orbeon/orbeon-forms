@@ -1094,7 +1094,6 @@
                         <xf:action ev:event="xforms-ready">
                             <xf:rebuild/>
                             <xf:recalculate/>
-                            <xf:revalidate/>
                             <xf:refresh/>
 
                             <xf:setvalue ref="instance('fr-persistence-instance')/data-status" value="'clean'"/>

@@ -1302,7 +1302,6 @@
                                 <xf:insert ref="instance()" origin="instance('template')"/>
                                 <xf:rebuild/>
                                 <xf:recalculate/>
-                                <xf:revalidate/>
                                 <!-- setvalue: expecting just recalculate -->
                                 <xf:setvalue ref="instance()/source">888</xf:setvalue>
                                 <xf:setvalue ref="instance()/position">2</xf:setvalue>
@@ -1332,7 +1331,6 @@
                                 <xf:insert ref="instance()" origin="instance('template')"/>
                                 <xf:rebuild/>
                                 <xf:recalculate/>
-                                <xf:revalidate/>
                                 <!-- NOT expecting rebuild or recalculate, binds point to new instance -->
                                 <xf:setvalue ref="instance()/source">888</xf:setvalue>
                                 <xf:setvalue ref="instance()/position">2</xf:setvalue>
@@ -1478,7 +1476,6 @@
                                 <xf:insert ref="instance()" origin="instance('template')"/>
                                 <xf:rebuild/>
                                 <xf:recalculate/>
-                                <xf:revalidate/>
                                 <!-- setvalue: expecting just revalidate; integer type points to value[1] -->
                                 <xf:setvalue ref="instance()/position">2</xf:setvalue>
                             </xf:action>
@@ -1512,7 +1509,6 @@
                                 <xf:insert ref="instance()" origin="instance('template')"/>
                                 <xf:rebuild/>
                                 <xf:recalculate/>
-                                <xf:revalidate/>
                                 <!-- NOT expecting rebuild or revalidate, binds point to new instance -->
                                 <xf:setvalue ref="instance()/position">2</xf:setvalue>
                             </xf:action>

@@ -209,7 +209,6 @@
                                                                        origin="instance('fr-form-template')/*"/>&gt;
                             <xf:rebuild/>
                             <xf:recalculate xxf:defauls="true"/>
-                            <xf:revalidate/>
                         </xf:action>
                     </xf:action>
                 </xf:model>
@@ -412,7 +411,6 @@
                                                                        origin="instance('fr-form-template')/*"/>&gt;
                             <xf:rebuild/>
                             <xf:recalculate xxf:defauls="true"/>
-                            <xf:revalidate/>
                         </xf:action>
                     </xf:action>
                 </xf:model>
@@ -605,7 +603,6 @@
                                                                        origin="instance('fr-form-template')/*"/>&gt;
                             <xf:rebuild/>
                             <xf:recalculate xxf:defauls="true"/>
-                            <xf:revalidate/>
                         </xf:action>
                     </xf:action>
                 </xf:model>

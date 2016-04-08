@@ -82,7 +82,6 @@
                         <xf:action model="fr-form-model">
                             <xf:rebuild/>
                             <xf:recalculate/>
-                            <xf:revalidate/>
                         </xf:action>
                     </xf:action>
                 </xf:trigger>

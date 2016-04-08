@@ -111,7 +111,6 @@
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
         <xf:rebuild/>
         <xf:recalculate/>
-        <xf:revalidate/>
 
     </xf:action>
 
@@ -147,7 +146,6 @@
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
         <xf:rebuild/>
         <xf:recalculate/>
-        <xf:revalidate/>
 
     </xf:action>
 
@@ -236,7 +234,6 @@
 
         <xf:rebuild/>
         <xf:recalculate/>
-        <xf:revalidate/>
 
     </xf:action>
 

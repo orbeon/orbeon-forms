@@ -311,7 +311,6 @@
         <!-- Force all this so we can safely set the data status -->
         <xf:rebuild/>
         <xf:recalculate/>
-        <xf:revalidate/>
         <xf:refresh/>
         <!-- Set the initial data status -->
         <xf:setvalue iterate="($persistence-instance/data-status, $autosave-elem/status)"

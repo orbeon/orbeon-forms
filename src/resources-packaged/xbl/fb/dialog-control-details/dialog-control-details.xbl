@@ -707,7 +707,8 @@
                                             <xf:label ref="$resources/dialog-control-details/use-global-alert/label"/>
                                             <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
                                             <xf:action event="xforms-value-changed">
-                                                <xf:rebuild/><xf:recalculate/><xf:revalidate/>
+                                                <xf:rebuild/>
+                                                <xf:recalculate/>
                                             </xf:action>
                                         </fr:checkbox-input>
                                     </xh:td>

@@ -248,7 +248,7 @@
         <xsl:if test="$is-noscript and $mode = ('edit', 'new')">
             <!-- Only display this section if there is at least one non-empty nested help text -->
             <xf:group
-                ref=".[normalize-space(string-join(({string-join(($body//(fr:section | xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
+                ref=".[xxf:non-blank(string-join(({string-join(($body//(fr:section | xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
                 <xh:div class="xforms-help-panel">
                     <xh:h2>
                         <xf:output value="$fr-resources/summary/titles/help"/>
@@ -279,7 +279,7 @@
             value="({if (@paths) then concat(@paths, ', ') else ''}xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
                         xxf:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
 
-        <xf:group xxf:element="div" ref=".[normalize-space($description)]" class="alert fr-form-description">
+        <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="alert fr-form-description">
             <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
                  xf:output, which will cause an error. -->
             <xf:output value="$description"/>
@@ -303,7 +303,15 @@
 
             <!-- Don't display language selector if there is only one language -->
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
-            <xf:group id="fr-language-selector" model="fr-resources-model" ref=".[count($available-languages) gt 1 and normalize-space(xxf:get-request-header('orbeon-liferay-language')) = '']">
+            <!-- FIXME: This logic is duplicated in dialog-itemset.xbl -->
+            <xf:group
+                id="fr-language-selector"
+                model="fr-resources-model"
+                ref="
+                    .[
+                        count($available-languages) gt 1 and
+                        xxf:is-blank(xxf:get-request-header('orbeon-liferay-language'))
+                    ]">
                 <xf:select1 ref="$fr-selector-lang" appearance="bootstrap" id="fr-language-selector-select">
                     <xf:itemset ref="$available-languages">
                         <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
@@ -431,9 +439,9 @@
 
         <!-- Only display this <li> if there is at least one non-empty nested help text -->
         <xf:group
-            ref=".[normalize-space(string-join(({string-join(((descendant-or-self::fr:section | .//xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
+            ref=".[xxf:non-blank(string-join(({string-join(((descendant-or-self::fr:section | .//xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
             <xh:li class="xforms-help-group">
-                <xf:var name="section-has-help" value="normalize-space({xf:help/@ref}) != ''" as="xs:boolean"/>
+                <xf:var name="section-has-help" value="xxf:non-blank({xf:help/@ref})" as="xs:boolean"/>
                 <!-- Case where current section has help -->
                 <xf:group ref=".[$section-has-help]">
                     <!-- Linked reachable from help icon -->
@@ -449,7 +457,7 @@
                     <xf:output class="xforms-label" value="{xf:label/@ref}"/>
                 </xf:group>
                 <!-- Recurse into nested controls if there is at least one non-empty nested help text -->
-                <xf:group ref=".[normalize-space(string-join(({string-join((.//(fr:section | xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
+                <xf:group ref=".[xxf:non-blank(string-join(({string-join((.//(fr:section | xf:*)[@id]/xf:help/@ref), ',')}), ''))]">
                     <xh:ul>
                         <xsl:apply-templates mode="#current"/>
                     </xh:ul>
@@ -460,7 +468,7 @@
 
     <!-- Noscript control help entry -->
     <xsl:template match="xf:*[@id and xf:help]" mode="noscript-help">
-        <xf:group ref=".[normalize-space(({xf:help/@ref})[1])]">
+        <xf:group ref=".[xxf:non-blank(({xf:help/@ref})[1])]">
             <!-- (...)[1] protects against incorrect form where more than one node is returned -->
             <xh:li class="xforms-help-group">
                 <!-- Linked reachable from help icon -->

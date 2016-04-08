@@ -80,6 +80,18 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
     assert("fr" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "es").asJava))
   }
 
+  // Test for https://github.com/orbeon/orbeon-forms/issues/2688
+  @Test def languageIssue2688(): Unit = {
+
+    val App  = "acme"
+    val Form = "order"
+
+    for (lang ← List("zh-Hans", "zh-Hant"))
+      assert(lang === selectFormRunnerLang(App, Form, lang, List("en", "zh-Hans", "zh-Hant", "es").asJava))
+
+    assert("en" === selectFormRunnerLang(App, Form, "en_US", List("en", "zh-Hans", "zh-Hant", "es").asJava))
+  }
+
   @Test def errorSummarySortString(): Unit = {
 
     def source: JDocument =

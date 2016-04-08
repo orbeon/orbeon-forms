@@ -94,21 +94,20 @@
             xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))
         </xf:action>
 
-        <xf:action if="$old-lang != $lang/string() or $old-fr-lang != $fr-lang/string()">
-            <!-- So that model variables are updated in case another model uses them -->
-            <xf:rebuild/>
-            <xf:recalculate/>
-            <xf:revalidate/>
+        <!-- So that model variables are updated in case another model uses them -->
+        <xf:rebuild/>
+        <xf:recalculate/>
+        <xf:revalidate/>
 
-            <!-- So the error summary, which gets the alert right away, obtains the
-                 resource in the new language, see:
-                 https://github.com/orbeon/orbeon-forms/issues/2505 -->
-            <xf:rebuild     model="fr-form-model"/>
-            <!-- So binds which depend on language are updated at a later time, see:
-                 https://github.com/orbeon/orbeon-forms/issues/1500 -->
-            <xf:recalculate model="fr-form-model" xxf:deferred="true"/>
-            <xf:revalidate  model="fr-form-model" xxf:deferred="true"/>
-        </xf:action>
+        <!-- So the error summary, which gets the alert right away, obtains the
+             resource in the new language, see:
+             https://github.com/orbeon/orbeon-forms/issues/2505 -->
+        <xf:rebuild     model="fr-form-model"/>
+        <!-- So binds which depend on language are updated at a later time, see:
+             https://github.com/orbeon/orbeon-forms/issues/1500 -->
+        <xf:recalculate model="fr-form-model" xxf:deferred="true"/>
+        <xf:revalidate  model="fr-form-model" xxf:deferred="true"/>
+
     </xf:action>
 
     <!-- Respond to language change in the UI -->

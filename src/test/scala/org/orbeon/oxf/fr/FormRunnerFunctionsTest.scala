@@ -41,43 +41,43 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
   @Test def language(): Unit = {
 
-    val app  = "acme"
-    val form = "order"
+    val App  = "acme"
+    val Form = "order"
 
     // oxf.fr.default-language not set so "en" is the default
-    assert("en" === getDefaultLang(getAppForm(app, form)))
+    assert("en" === getDefaultLang(getAppForm(App, Form)))
 
     // oxf.fr.available-languages not set so all languages are allowed
-    assert(isAllowedLang(getAppForm(app, form))("en"))
-    assert(isAllowedLang(getAppForm(app, form))("foo"))
+    assert(isAllowedLang(getAppForm(App, Form))("en"))
+    assert(isAllowedLang(getAppForm(App, Form))("foo"))
 
     // Requested language
-    assert(Some("en") === findRequestedLang(getAppForm(app, form), null))
-    assert(Some("en") === findRequestedLang(getAppForm(app, form), "   "))
+    assert(Some("en") === findRequestedLang(getAppForm(App, Form), null))
+    assert(Some("en") === findRequestedLang(getAppForm(App, Form), "   "))
 
-    assert(Some("es") === findRequestedLang(getAppForm(app, form), "es"))
-    assert(Some("en") === findRequestedLang(getAppForm(app, form), "en"))
+    assert(Some("es") === findRequestedLang(getAppForm(App, Form), "es"))
+    assert(Some("en") === findRequestedLang(getAppForm(App, Form), "en"))
 
     NetUtils.getExternalContext.getRequest.getSession(true).getAttributesMap.put("fr-language", "fr")
 
-    assert(Some("fr") === findRequestedLang(getAppForm(app, form), null))
-    assert(Some("it") === findRequestedLang(getAppForm(app, form), "it"))
+    assert(Some("fr") === findRequestedLang(getAppForm(App, Form), null))
+    assert(Some("it") === findRequestedLang(getAppForm(App, Form), "it"))
 
     // Language selector
-    assert(Seq("en", "fr", "it") === getFormLangSelection(app, form, Seq("fr", "it", "en").asJava))
-    assert(Seq("fr", "it", "es") === getFormLangSelection(app, form, Seq("fr", "it", "es").asJava))
-    assert(Seq.empty[String]     === getFormLangSelection(app, form, Seq.empty[String].asJava))
+    assert(List("en", "fr", "it") === getFormLangSelection(App, Form, List("fr", "it", "en").asJava))
+    assert(List("fr", "it", "es") === getFormLangSelection(App, Form, List("fr", "it", "es").asJava))
+    assert(Nil                    === getFormLangSelection(App, Form, Nil.asJava))
 
     // Select form language
-    assert("it" === selectFormLang(app, form, "it", Seq("fr", "it", "en").asJava))
-    assert("en" === selectFormLang(app, form, "zh", Seq("fr", "it", "en").asJava))
-    assert("fr" === selectFormLang(app, form, "zh", Seq("fr", "it", "es").asJava))
-    assert(null eq  selectFormLang(app, form, "fr", Seq.empty[String].asJava))
+    assert("it" === selectFormLang(App, Form, "it", List("fr", "it", "en").asJava))
+    assert("en" === selectFormLang(App, Form, "zh", List("fr", "it", "en").asJava))
+    assert("fr" === selectFormLang(App, Form, "zh", List("fr", "it", "es").asJava))
+    assert(null eq  selectFormLang(App, Form, "fr", Nil.asJava))
 
     // Select Form Runner language
-    assert("it" === selectFormRunnerLang(app, form, "it", Seq("fr", "it", "en").asJava))
-    assert("en" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "en").asJava))
-    assert("fr" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "es").asJava))
+    assert("it" === selectFormRunnerLang(App, Form, "it", List("fr", "it", "en").asJava))
+    assert("en" === selectFormRunnerLang(App, Form, "zh", List("fr", "it", "en").asJava))
+    assert("fr" === selectFormRunnerLang(App, Form, "zh", List("fr", "it", "es").asJava))
   }
 
   // Test for https://github.com/orbeon/orbeon-forms/issues/2688

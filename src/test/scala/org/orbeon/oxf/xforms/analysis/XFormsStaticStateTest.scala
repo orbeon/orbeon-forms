@@ -46,6 +46,8 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     // val staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xhtml")
   }
 
+  private val EmptyNamespaces = Map("" → "")
+
   @Test def bindAnalysis(): Unit = {
     Assume.assumeTrue(Version.isPE)
 
@@ -134,7 +136,6 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
   @Test def xpathAnalysis(): Unit = {
     Assume.assumeTrue(Version.isPE)
 
-    val namespaces = Map("" → "")
     val staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xhtml")
 
     implicit val dependencies = new PathMapXPathDependencies(mockDocument(staticState))
@@ -147,7 +148,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     val instance2 = mockInstance("instance2", model2)
 
     // == Value change to default ==================================================================================
-    dependencies.markValueChangedTest(instanceDefault, namespaces, "a")
+    dependencies.markValueChangedTest(instanceDefault, EmptyNamespaces, "a")
 
     withRefresh {
       assertFalse(requireBindingUpdate("trigger1"))
@@ -166,7 +167,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     }
 
     // == Value change to default ==================================================================================
-    dependencies.markValueChangedTest(instanceDefault, namespaces, "b")
+    dependencies.markValueChangedTest(instanceDefault, EmptyNamespaces, "b")
 
     withRefresh {
       assertFalse(requireBindingUpdate("trigger1"))
@@ -185,7 +186,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     }
 
     // == Value change to instance2 ================================================================================
-    dependencies.markValueChangedTest(instance2, namespaces, "a")
+    dependencies.markValueChangedTest(instance2, EmptyNamespaces, "a")
 
     withRefresh {
       assertFalse(requireBindingUpdate("trigger1"))
@@ -204,7 +205,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     }
 
     // == Value change to instance2 ================================================================================
-    dependencies.markValueChangedTest(instance2, namespaces, "b")
+    dependencies.markValueChangedTest(instance2, EmptyNamespaces, "b")
 
     withRefresh {
       assertFalse(requireBindingUpdate("trigger1"))
@@ -264,7 +265,6 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
   @Test def variables(): Unit = {
     Assume.assumeTrue(Version.isPE)
 
-    val namespaces = Map("" → "")
     val staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xhtml")
 
     implicit val dependencies = new PathMapXPathDependencies(mockDocument(staticState))
@@ -274,7 +274,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
     val instanceDefault = mockInstance("default", model1)
 
     // == Value change to default ==================================================================================
-    dependencies.markValueChangedTest(instanceDefault, namespaces, "value")
+    dependencies.markValueChangedTest(instanceDefault, EmptyNamespaces, "value")
 
     withRefresh {
       assertFalse(requireBindingUpdate("values"))
@@ -290,7 +290,6 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
   @Test def modelVariables(): Unit = {
     Assume.assumeTrue(Version.isPE)
 
-    val namespaces = Map("" → "")
     val staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml")
 
     implicit val dependencies = new PathMapXPathDependencies(mockDocument(staticState))
@@ -304,7 +303,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
     // == Value change to instance1 ============================================================================
 
-    dependencies.markValueChangedTest(instance1, namespaces, "")
+    dependencies.markValueChangedTest(instance1, EmptyNamespaces, "")
 
     withRefresh {
       // No binding update
@@ -337,7 +336,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
     // == Value change to instance2 ============================================================================
 
-    dependencies.markValueChangedTest(instance2, namespaces, "")
+    dependencies.markValueChangedTest(instance2, EmptyNamespaces, "")
 
     withRefresh {
       // No binding update
@@ -379,7 +378,6 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
   @Test def repeatedModels(): Unit = {
     Assume.assumeTrue(Version.isPE)
 
-    val namespaces = Map("" → "")
     val staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/repeated-models.xhtml")
 
     implicit val dependencies = new PathMapXPathDependencies(mockDocument(staticState))
@@ -395,95 +393,76 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
     import ModelSeq._
 
-    val topLevelModel         = mockModel("model", nextSeq())
-    val topLevelInstance      = mockInstance("instance", topLevelModel)
+    val topLevelModel    = mockModel("model", nextSeq())
+    val topLevelInstance = mockInstance("instance", topLevelModel)
 
-    val acmeFooModel1         = mockModel(buildEffectiveId("foo-1≡acme-foo-model", List(1)), nextSeq())
-    val acmeFooInstance1      = mockInstance(buildEffectiveId("foo-1≡acme-foo-instance", List(1)), acmeFooModel1)
+    val acmeFooModel1    = mockModel(buildEffectiveId("foo-1≡acme-foo-model", List(1)), nextSeq())
+    val acmeFooInstance1 = mockInstance(buildEffectiveId("foo-1≡acme-foo-instance", List(1)), acmeFooModel1)
 
-    val acmeFooModel2         = mockModel(buildEffectiveId("foo-1≡acme-foo-model", List(2)), nextSeq())
-    val acmeFooInstance2      = mockInstance(buildEffectiveId("foo-1≡acme-foo-instance", List(2)), acmeFooModel2)
+    val acmeFooModel2    = mockModel(buildEffectiveId("foo-1≡acme-foo-model", List(2)), nextSeq())
+    val acmeFooInstance2 = mockInstance(buildEffectiveId("foo-1≡acme-foo-instance", List(2)), acmeFooModel2)
 
-    def assertMatrix(expectedValues: List[Boolean]) = {
+    def assertMatrix(expectedValues: List[Boolean]) =
+      withRefresh {
+        assert(8 === expectedValues.size)
 
-      assert(8 === expectedValues.size)
+        val results =
+          for {
+            prefixedId  ← List("foo-1≡acme-foo-input", "foo-1≡acme-foo-output")
+            iteration   ← 1 to 2
+            fn          ← List(requireBindingUpdate(_), requireValueUpdate(_))
+            effectiveId = buildEffectiveId(prefixedId, List(iteration))
+          } yield
+            fn(effectiveId)
 
-      val results =
-        for {
-          prefixedId  ← List("foo-1≡acme-foo-input", "foo-1≡acme-foo-output")
-          iteration   ← 1 to 2
-          fn          ← List(requireBindingUpdate(_), requireValueUpdate(_))
-          effectiveId = buildEffectiveId(prefixedId, List(iteration))
-        } yield
-          fn(effectiveId)
+        assert(8 === results.size)
 
-      assert(8 === results.size)
-
-      for ((e, a) ← expectedValues.zip(results))
-        assertTrue(e === a)
-    }
+        for ((e, a) ← expectedValues.zip(results))
+          assertTrue(e === a)
+      }
 
     def assertNoUpdates() = {
       assertMatrix(List.fill(8)(false))
     }
 
-    withRefresh {
-      assertNoUpdates()
-    }
+    assertNoUpdates()
 
     // Value in model within iteration 1
-    dependencies.markValueChangedTest(acmeFooInstance1, namespaces, "")
+    dependencies.markValueChangedTest(acmeFooInstance1, EmptyNamespaces, "")
 
-    withRefresh {
-      assertMatrix(List(false, true, false, false, false, true, false, false))
-    }
-
-    withRefresh {
-      assertNoUpdates()
-    }
+    assertMatrix(List(false, true, false, false, false, true, false, false))
+    assertNoUpdates()
 
     // Value in model within iteration 2
-    dependencies.markValueChangedTest(acmeFooInstance2, namespaces, "")
+    dependencies.markValueChangedTest(acmeFooInstance2, EmptyNamespaces, "")
 
-    withRefresh {
-      assertMatrix(List(false, false, false, true, false, false, false, true))
-    }
+    assertMatrix(List(false, false, false, true, false, false, false, true))
 
     // Value in model within iteration 1 and 2
-    dependencies.markValueChangedTest(acmeFooInstance1, namespaces, "")
-    dependencies.markValueChangedTest(acmeFooInstance2, namespaces, "")
+    dependencies.markValueChangedTest(acmeFooInstance1, EmptyNamespaces, "")
+    dependencies.markValueChangedTest(acmeFooInstance2, EmptyNamespaces, "")
 
-    withRefresh {
-      assertMatrix(List(false, true, false, true, false, true, false, true))
-    }
+    assertMatrix(List(false, true, false, true, false, true, false, true))
 
     // Structural change in model within iteration 1
     dependencies.markStructuralChangeTest(acmeFooModel1)
 
-    withRefresh {
-      assertMatrix(List(true, true, false, false, true, true, false, false))
-    }
+    assertMatrix(List(true, true, false, false, true, true, false, false))
 
     // Structural change in model within iteration 2
     dependencies.markStructuralChangeTest(acmeFooModel2)
 
-    withRefresh {
-      assertMatrix(List(false, false, true, true, false, false, true, true))
-    }
+    assertMatrix(List(false, false, true, true, false, false, true, true))
 
     // Structural change in model within iteration 1 and 2
     dependencies.markStructuralChangeTest(acmeFooModel1)
     dependencies.markStructuralChangeTest(acmeFooModel2)
 
-    withRefresh {
-      assertMatrix(List(true, true, true, true, true, true, true, true))
-    }
+    assertMatrix(List(true, true, true, true, true, true, true, true))
 
     // Change to outer value
-    dependencies.markValueChangedTest(topLevelInstance, namespaces, "company/employee")
+    dependencies.markValueChangedTest(topLevelInstance, EmptyNamespaces, "company/employee")
 
-    withRefresh {
-      assertMatrix(List(false, false, false, false, false, true, false, true))
-    }
+    assertMatrix(List(false, false, false, false, false, true, false, true))
   }
 }

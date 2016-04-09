@@ -61,9 +61,6 @@
 
     <xf:action event="fr-update-language">
 
-        <xf:var name="old-lang"    value="$lang/string()"/>
-        <xf:var name="old-fr-lang" value="$fr-lang/string()"/>
-
         <!-- Find form language -->
         <xf:setvalue
             if="$app != '*'"

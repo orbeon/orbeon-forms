@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.scaxon.XML
 import org.scalatest.junit.AssertionsForJUnit
 
 class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFormsSupport with AssertionsForJUnit {
@@ -79,6 +80,43 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
         assertRowValues(indexes, cityToSet, zipToSet)
       }
 
+      object Counts {
+
+        import XML._
+
+        def attributesValues(name: String) =
+          instance("fr-form-instance").get.rootElement descendantOrSelf * att s"*:$name" map (_.stringValue)
+
+        def countAttributes(name: String) = attributesValues(name).size
+
+        def checkWidowsAndOrphans() = {
+
+          val instanceRootElement = instance("fr-form-instance").get.rootElement
+
+          def metadataItemsetIds =
+            instanceRootElement child "*:metadata" descendantOrSelf * att "id" map (_.stringValue)
+
+          val uniqueIdsInUse           = FormRunner.itemsetIdsInUse(instanceRootElement)
+          val uniqueMetadataItemsetIds = metadataItemsetIds.to[Set]
+
+          assert(uniqueIdsInUse == uniqueMetadataItemsetIds)
+        }
+
+        def withAssertNewCountsAndWindowsAndOrphans[T](counts: List[(String, Int)])(thunk: ⇒ T): T = {
+          val before = counts map { case (name, _) ⇒ countAttributes(name) }
+          val result = thunk
+          val after  = counts map { case (name, _) ⇒ countAttributes(name) }
+          counts.zip(before.zip(after)) foreach { case ((_, expected), (before, after)) ⇒
+            val newCount = after - before
+            assert(expected === newCount)
+          }
+          checkWidowsAndOrphans()
+          result
+        }
+      }
+
+      import Counts._
+
       def assertSectionIteration(stateControl: XFormsComponentControl, stateValue: String, expected: List[(List[Int], String, String)]) = {
 
         val sectionIndex = expected.head._1.head
@@ -89,24 +127,28 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
         assertRowItemsetsContain(List(sectionIndex, 1), None, None)
 
         // Switch to CA
-        setControlValueWithEventSearchNested(stateControl.getEffectiveId, stateValue)
-        assert(stateValue === getControlValue(stateControl.effectiveId))
+        withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" → 1, "itemsetmap" → 1)) {
+          setControlValueWithEventSearchNested(stateControl.getEffectiveId, stateValue)
+          assert(stateValue === getControlValue(stateControl.effectiveId))
+        }
 
         // Set values and add iterations
-        for ((indexes @ List(sectionIndex, gridIndex), city, zip) ← expected) {
+        withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" → (expected.size * 2), "itemsetmap" → 0)) {
+          for ((indexes @ List(sectionIndex, gridIndex), city, zip) ← expected) {
 
-          assertEmptyRowValues(indexes)
-          assertItemsetsChange(indexes, city, zip)
+            assertEmptyRowValues(indexes)
+            assertItemsetsChange(indexes, city, zip)
 
-          performGridAction(
-            resolveObject[XFormsControl]("city-zip-grid-control", indexes = indexes take 1).get,
-            "fr-insert-below"
-          )
+            performGridAction(
+              resolveObject[XFormsControl]("city-zip-grid-control", indexes = indexes take 1).get,
+              "fr-insert-below"
+            )
 
-          val newRowIndexes = sectionIndex :: (gridIndex + 1) :: Nil
+            val newRowIndexes = sectionIndex :: (gridIndex + 1) :: Nil
 
-          assertEmptyRowValues(newRowIndexes)
-          assertRowItemsetsContain(newRowIndexes, Some(city), None)
+            assertEmptyRowValues(newRowIndexes)
+            assertRowItemsetsContain(newRowIndexes, Some(city), None)
+          }
         }
 
         for ((indexes, city, zip) ← expected) {
@@ -123,6 +165,10 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
           assertRowItemsetsContain(indexes, Some("Anchorage"), None)
         }
       }
+
+      // One top-level map after initial state
+      assert(1 === countAttributes("itemsetid"))
+      assert(1 === countAttributes("itemsetmap"))
 
       assertSectionIteration(
         stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(1)).get,
@@ -165,7 +211,13 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
       // Check that state names have switched
       assertStateItemsetsContain("Californie")
 
-      // TODO: check data for fr:itemsetid, fr:itemsetmap, fr:metadata
+      // Remove 2nd iteration
+      withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" → -8, "itemsetmap" → -1)) {
+        performSectionAction(
+          resolveObject[XFormsControl]("states-section-control").get,
+          "fr-remove"
+        )
+      }
     }
   }
 }

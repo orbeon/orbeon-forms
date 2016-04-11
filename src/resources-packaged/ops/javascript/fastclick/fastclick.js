@@ -557,8 +557,11 @@
 		}
 
 		targetTagName = targetElement.tagName.toLowerCase();
-		if (targetTagName === 'label') {
-			forElement = this.findControl(targetElement);
+		var parentNode = targetElement.parentNode;
+		var parentIsLabel = parentNode.tagName.toLowerCase() === 'label';
+		if (targetTagName === 'label' || (targetTagName !== 'input' && parentIsLabel)) {
+		    var labelElement = parentIsLabel ? parentNode : targetElement;
+			forElement = this.findControl(labelElement);
 			if (forElement) {
 				this.focus(targetElement);
 				if (deviceIsAndroid) {

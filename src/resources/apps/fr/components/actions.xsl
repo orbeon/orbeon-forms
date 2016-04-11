@@ -360,17 +360,8 @@
             </xf:action>
 
             <!-- Garbage-collect unused itemsets and metadata -->
-            <xf:action>
-                <xf:var
-                    name="in-use-itemset-ids"
-                    value="distinct-values(instance('fr-form-instance')//(@fr:itemsetid/string(), @fr:itemsetmap/frf:itemsetIdsFromItemsetMap(.)))"/>
-
-                <xf:delete
-                    ref="instance('fr-form-instance')/fr:metadata/itemset[not(@id = $in-use-itemset-ids)]"/>
-
-                <xf:delete
-                    if="empty(instance('fr-form-instance')/fr:metadata)"
-                    ref="instance('fr-form-instance')/fr:metadata"/>
+            <xf:action type="xpath">
+                frf:garbageCollectMetadataItemsets(instance('fr-form-instance'))
             </xf:action>
 
             <!-- Filter item values that are out of range -->

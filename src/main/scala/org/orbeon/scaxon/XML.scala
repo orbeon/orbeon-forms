@@ -512,8 +512,9 @@ object XML {
 //        def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
 //        def \\@(test: Test): Seq[NodeInfo] = seq flatMap (_ \\@ test)
 
-    def att(attName: String) = /@(attName)
-    def child(test: Test) = /(test)
+    def att(attName: String)   = /@(attName)
+    def att(test: Test)        = /@(test)
+    def child(test: Test)      = /(test)
     def descendant(test: Test) = \\(test)
 
     def attValue(attName: String) = /@(attName) map (_.stringValue)

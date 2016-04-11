@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.oxf.xforms.{BindVariableResolver, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{SequenceIterator, Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.XML._
 
@@ -186,10 +186,6 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   def removeFromItemsetMap(map: String, controlName: String): String =
     encodeSimpleQuery(decodeSimpleQuery(map) filterNot (_._1 == controlName))
 
-  //@XPathFunction
-  def itemsetIdsFromItemsetMap(map: String): SequenceIterator =
-    decodeSimpleQuery(map) map (_._2)
-
   // Check all ancestors of `startNode` to find all itemset mappings. If the result is not empty, update elements
   // with matching names in the given template to add an `fr:itemsetid` attribute.
   //@XPathFunction
@@ -223,4 +219,28 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       newDoc
     }
   }
+
+  // All itemset ids referenced either by `@fr:itemsetid` or `@fr:itemsetmap`
+  def itemsetIdsInUse(instance: NodeInfo) = {
+
+    def attributesValues(test: Test) =
+      instance.rootElement descendantOrSelf * att test map (_.stringValue)
+
+    val uniqueIdsFromItemsetIds  = attributesValues(XMLNames.FRItemsetId).to[Set]
+    val uniqueIdsFromItemsetMaps = (attributesValues(XMLNames.FRItemsetMap) flatMap (mapValue ⇒ decodeSimpleQuery(mapValue) map (_._2))).to[Set]
+
+    uniqueIdsFromItemsetIds ++ uniqueIdsFromItemsetMaps
+  }
+
+  //@XPathFunction
+  def garbageCollectMetadataItemsets(instance: NodeInfo): Unit =
+    (instance.rootElement child XMLNames.FRMetadata headOption) foreach { metadataElem ⇒
+
+      val uniqueIdsInUse = itemsetIdsInUse(instance)
+
+      XFormsAPI.delete(metadataElem child "itemset" filterNot (uniqueIdsInUse contains _.id))
+
+      if (! hasChildElement(metadataElem))
+        XFormsAPI.delete(metadataElem)
+    }
 }

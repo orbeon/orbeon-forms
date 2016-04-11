@@ -423,20 +423,27 @@
                                                             if="concat('can-', substring-after(event('xxf:type'), 'fr-')) = xxf:split(xxf:avt-value('fr-tr', 'class'))">
 
                                                             <!-- Make sure we have stable references -->
-                                                            <xf:var name="context" value="$repeat-context"/>
-                                                            <xf:var name="items"   value="xxf:repeat-items()"/>
-                                                            <xf:var name="p"       value="xxf:repeat-position()"/>
-                                                            <xf:var name="source"  value="$items[$p]"/>
+                                                            <xf:var name="context"  value="$repeat-context"/>
+                                                            <xf:var name="items"    value="xxf:repeat-items()"/>
+                                                            <xf:var name="p"        value="xxf:repeat-position()"/>
+                                                            <xf:var name="source"   value="$items[$p]"/>
+                                                            <xf:var name="instance" value="$source/root()"/>
 
                                                             <!-- Delete source node in any case. It's ok because we have a
                                                                  reference to it for operations that still require it. -->
                                                             <xf:delete ref="$source"/>
 
-                                                            <!-- Let the outside world know -->
-                                                            <xf:dispatch
-                                                                if="event('xxf:type') = 'fr-remove'"
-                                                                targetid="fr-grid-binding"
-                                                                name="fr-iteration-removed"/>
+                                                            <xf:action if="event('xxf:type') = 'fr-remove'">
+                                                                <!-- Handle itemset metadata -->
+                                                                <xf:action type="xpath">
+                                                                    frf:garbageCollectMetadataItemsets($instance)
+                                                                </xf:action>
+
+                                                                <!-- Let the outside world know -->
+                                                                <xf:dispatch
+                                                                    targetid="fr-grid-binding"
+                                                                    name="fr-iteration-removed"/>
+                                                            </xf:action>
 
                                                             <!-- NOTES:
 

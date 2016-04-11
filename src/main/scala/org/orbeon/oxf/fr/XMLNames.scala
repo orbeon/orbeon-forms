@@ -36,6 +36,10 @@ object XMLNames {
   val XFBindTest            : Test = XF → "bind"
   val XFGroupTest           : Test = XF → "group"
 
+  val FRMetadata            : Test = FR → "metadata"
+  val FRItemsetId           : Test = FR → "itemsetid"
+  val FRItemsetMap          : Test = FR → "itemsetmap"
+
   val FRContainerTest = FRSectionTest || FRGridTest
 
   val FRNamespace     = new Namespace("fr", FR)

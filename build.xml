@@ -888,6 +888,12 @@
 
         </yui-compressor>
 
+        <!-- Form Runner JavaScript -->
+        <yui-compressor warn="false" charset="UTF-8" fromdir="${resources.dir}" todir="${war.dir}/WEB-INF/resources">
+            <include name="ops/javascript/fastclick/fastclick.js"/>
+            <include name="apps/fr/script/form-runner.js"/>
+        </yui-compressor>
+
     </target>
 
     <target name="test-expand-war" depends="orbeon-dist-war">

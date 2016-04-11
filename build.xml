@@ -885,12 +885,12 @@
 
             <!-- Other files  -->
             <include name="ops/nprogress-0.2.0/nprogress.js"/>
+            <include name="ops/javascript/fastclick/fastclick.js"/>
 
         </yui-compressor>
 
         <!-- Form Runner JavaScript -->
         <yui-compressor warn="false" charset="UTF-8" fromdir="${resources.dir}" todir="${war.dir}/WEB-INF/resources">
-            <include name="ops/javascript/fastclick/fastclick.js"/>
             <include name="apps/fr/script/form-runner.js"/>
         </yui-compressor>
 

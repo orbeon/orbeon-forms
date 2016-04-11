@@ -127,30 +127,32 @@ trait FormRunnerLang {
 
   private val OldLocaleRe = "([a-z|A-Z]{2,3})(?:_.*)?".r
 
-  // See https://github.com/orbeon/orbeon-forms/issues/2688
-  // and https://docs.oracle.com/javase/7/docs/api/java/util/Locale.html
-  private def cleanLanguage(lang: String) = {
-
-    // We support incoming languages of the form `en_US` (not in the IETF BCP 47 format) for backward compatibility reasons.
-    // For historical reasons Java's `Locale.toString` produces that kind of strings containing an underscore.
-
-    // The proxy portlet passes the result of `LanguageUtil.getLanguageId`, which is in `Locale.toString` format. Since
-    // Liferay 6.2, there is a `LanguageUtil.getBCP47LanguageId` method which we should use when possible. See:
-    //
-    // https://docs.liferay.com/portal/6.1/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getLanguageId(javax.servlet.http.HttpServletRequest)
-    // https://docs.liferay.com/portal/6.2/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getBCP47LanguageId(javax.servlet.http.HttpServletRequest)
-
-    // The case of the old format is tricky. Should `zh_CN` map to `zh-Hans`? Java 1.7's yields:
-    //
-    //     Locale.CHINA.getScript == ""
-    //
-    // So we don't make an assumption on script and just return the language, and recommend using IETF BCP 47 instead.
-
+  // We support incoming languages of the form `en_US` (not in the IETF BCP 47 format) for backward compatibility reasons
+  // and because for historical reasons Java's `Locale.toString` produces that kind of strings containing an underscore.
+  //
+  // The proxy portlet passes the result of `LanguageUtil.getLanguageId`, which is in `Locale.toString` format. Since
+  // Liferay 6.2, there is a `LanguageUtil.getBCP47LanguageId` method which we should use if possible.
+  //
+  // The only language codes currently in use in `languages.xml` which have an associated country are `zh_CN` and `zh_TW`.
+  // So we explicitly map those to `zh-Hans` and `zh-Hant` even though Java 1.7's doesn't do this:
+  //
+  //     Locale.CHINA.getScript == ""
+  //
+  // References:
+  //
+  // - https://github.com/orbeon/orbeon-forms/issues/2688
+  // - https://github.com/orbeon/orbeon-forms/issues/2700
+  // - https://docs.oracle.com/javase/7/docs/api/java/util/Locale.html
+  // - https://docs.liferay.com/portal/6.1/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getLanguageId(javax.servlet.http.HttpServletRequest)
+  // - https://docs.liferay.com/portal/6.2/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getBCP47LanguageId(javax.servlet.http.HttpServletRequest)
+  //
+  private def cleanLanguage(lang: String) =
     lang.trimAllToEmpty match {
+      case OldLocaleRe("zh_CN") ⇒ "zh-Hans"
+      case OldLocaleRe("zh_TW") ⇒ "zh-Hant"
       case OldLocaleRe(oldLang) ⇒ oldLang
       case newLang              ⇒ newLang
     }
-  }
 
   private def selectLangUseDefault(appForm: Option[AppForm], requestedLang: Option[String], availableLangs: List[String]) = {
 

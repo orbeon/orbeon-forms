@@ -113,10 +113,6 @@
   font-size: inherit;
   padding: 0 0 2px 0;
 }
-.orbeon .xforms-type-boolean input {
-  background: none;
-  border: none;
-}
 .orbeon .xforms-upload-info {
   display: block;
   width: 100%;

@@ -153,7 +153,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     selectString,
                     getInterpreterContext().getPrefixesMap(),
                     SQLFunctionLibrary.instance(),
-                    getInterpreterContext().getFunctionContext()
+                    getInterpreterContext().getFunctionContextOrNull()
                 );
         }
         // Get debug attribute
@@ -230,14 +230,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         // Read the expression as a string if there is a select, otherwise get parameter value as string
                                         Object objectValue;
                                         if (select != null) {
-                                            objectValue = XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
+                                            objectValue = XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull());
                                         } else {
                                             objectValue = (parameter.getValue() == null) ? null : parameter.getValue().toString();
                                         }
                                         values = Collections.singletonList(objectValue);
                                     } else {
                                         // Accept only a node or node-set if there is a separator, in which case a select is mandatory
-                                        Object objectValue = XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
+                                        Object objectValue = XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull());
                                         if (objectValue instanceof List) {
                                             values = (List) objectValue;
                                         } else if (objectValue instanceof Node) {
@@ -320,7 +320,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                     }
 
                                     boolean doSetNull = parameter.getNullIf() != null
-                                            && XPathUtils.selectBooleanValue(currentNode, parameter.getNullIf(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
+                                            && XPathUtils.selectBooleanValue(currentNode, parameter.getNullIf(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull());
 
                                     if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME).equals(xmlType) || Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                                         // Set a string or XML Fragment
@@ -330,7 +330,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         if (parameter.getValues() != null)
                                             values = parameter.getValues();
                                         else if (select != null)
-                                            values = Collections.singletonList(XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext()));
+                                            values = Collections.singletonList(XPathUtils.selectObjectValue(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull()));
                                         else
                                             values = Collections.singletonList(parameter.getValue());
 
@@ -472,7 +472,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                             xpathReceiver.selectContentHandler(parameter.getSelect(), new Base64XMLReceiver(blobOutputStream));
                                             blobOutputStream.close();
                                         } else {
-                                            String base64Value = XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext());
+                                            String base64Value = XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull());
                                             getInterpreterContext().getDelegate().setBlob(stmt, index, NetUtils.base64StringToByteArray(base64Value));
                                         }
                                     } else {
@@ -483,7 +483,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         if (parameter.getValues() != null)
                                             values = parameter.getValues();
                                         else if (select != null)
-                                            values = Collections.singletonList(XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContext()));
+                                            values = Collections.singletonList(XPathUtils.selectStringValueOrNull(currentNode, parameter.getSelect(), prefixesMap, SQLFunctionLibrary.instance(), getInterpreterContext().getFunctionContextOrNull()));
                                         else
                                             values = Collections.singletonList(parameter.getValue());
 

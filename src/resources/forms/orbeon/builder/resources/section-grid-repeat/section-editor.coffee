@@ -144,7 +144,7 @@ $ ->
         do ->
             labelClickInterceptors = []
             Builder.onOffsetMayHaveChanged ->
-                sections = $('.xbl-fr-section')
+                sections = $('.xbl-fr-section:visible:not(.xforms-disabled)')
                 # Create interceptor divs, so we have enough to cover all the sections
                 _.each _.range(sections.length - labelClickInterceptors.length), ->
                     container = $ '<div class="fb-section-label-editor-click-interceptor">'

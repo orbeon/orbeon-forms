@@ -204,8 +204,8 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         return functionContextStack.remove(functionContextStack.size() - 1);
     }
 
-    public SQLFunctionLibrary.SQLFunctionContext getFunctionContext() {
-        return functionContextStack.get(functionContextStack.size() - 1);
+    public SQLFunctionLibrary.SQLFunctionContext getFunctionContextOrNull() {
+        return functionContextStack.isEmpty() ? null : functionContextStack.get(functionContextStack.size() - 1);
     }
 
     public void setResultSet(ResultSet resultSet) {

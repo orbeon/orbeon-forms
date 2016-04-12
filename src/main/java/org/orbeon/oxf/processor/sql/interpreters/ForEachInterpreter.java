@@ -48,17 +48,20 @@ public class ForEachInterpreter extends SQLProcessor.InterpreterContentHandler {
                 interpreterContext.getCurrentNode(),
                 select,
                 interpreterContext.getPrefixesMap(),
-                SQLFunctionLibrary.instance(), interpreterContext.getFunctionContext()
+                SQLFunctionLibrary.instance(),
+                interpreterContext.getFunctionContextOrNull()
             );
 
         for (; it.hasNext(); currentPosition++) {
             final Node currentNode  = it.next();
 
+            final SQLFunctionLibrary.SQLFunctionContext functionContextOrNull = interpreterContext.getFunctionContextOrNull();
+
             interpreterContext.pushFunctionContext(
                 new SQLFunctionLibrary.SQLFunctionContext(
                     currentNode,
                     currentPosition,
-                    interpreterContext.getFunctionContext().getColumn()
+                    functionContextOrNull == null ? null : functionContextOrNull.getColumn()
                 )
             );
             try {

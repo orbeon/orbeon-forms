@@ -60,11 +60,13 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
             // Iterate through the result set
             while (hasNext) {
 
+                final SQLFunctionLibrary.SQLFunctionContext functionContextOrNull = interpreterContext.getFunctionContextOrNull();
+
                 interpreterContext.pushFunctionContext(
                     new SQLFunctionLibrary.SQLFunctionContext(
-                        interpreterContext.getFunctionContext().currentNode(),
+                        functionContextOrNull == null ? null : functionContextOrNull.currentNode(),
                         rowNum,
-                        interpreterContext.getFunctionContext().getColumn()
+                        functionContextOrNull == null ? null : functionContextOrNull.getColumn()
                     )
                 );
 
@@ -94,11 +96,13 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                 rowNum++;
             }
 
+            final SQLFunctionLibrary.SQLFunctionContext functionContextOrNull = interpreterContext.getFunctionContextOrNull();
+
             interpreterContext.pushFunctionContext(
                 new SQLFunctionLibrary.SQLFunctionContext(
-                    interpreterContext.getFunctionContext().currentNode(),
+                    functionContextOrNull == null ? null : functionContextOrNull.currentNode(),
                     rowNum,
-                    interpreterContext.getFunctionContext().getColumn()
+                    functionContextOrNull == null ? null : functionContextOrNull.getColumn()
                 )
             );
             try {

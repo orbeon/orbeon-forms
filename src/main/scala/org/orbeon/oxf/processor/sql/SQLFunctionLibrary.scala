@@ -51,7 +51,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
       def wrap(node: d4j.Node) =
         new DocumentWrapper(node.getDocument, null, XPath.GlobalConfiguration).wrap(node)
 
-      functionContextOpt map (_.currentNode) map wrap orNull
+      functionContextOpt flatMap (c ⇒ Option(c.currentNode)) map wrap orNull
     }
   }
 
@@ -68,7 +68,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
       val colName = stringArgument(0)
       val level   = arguments.lift(1) flatMap evaluateAsLong filter (_ >= 1) getOrElse 1L
 
-      functionContextOpt map (_.getColumn(colName, level.toInt))
+      functionContextOpt flatMap (c ⇒ Option(c.getColumn) map (_.apply(colName, level.toInt)))
     }
   }
 

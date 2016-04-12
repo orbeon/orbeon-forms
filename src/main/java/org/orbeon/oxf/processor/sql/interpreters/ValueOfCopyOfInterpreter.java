@@ -56,8 +56,13 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
             String selectString = attributes.getValue("select");
 
             // Interpret expression
-            Object result = XPathUtils.selectObjectValue(interpreterContext.getCurrentNode(), selectString,
-                    interpreterContext.getPrefixesMap(), SQLFunctionLibrary.instance(), interpreterContext.getFunctionContext());
+            final Object result = XPathUtils.selectObjectValue(
+                interpreterContext.getCurrentNode(),
+                selectString,
+                interpreterContext.getPrefixesMap(),
+                SQLFunctionLibrary.instance(),
+                interpreterContext.getFunctionContextOrNull()
+            );
             if (wrapper == null)
                 wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPath.GlobalConfiguration());
 

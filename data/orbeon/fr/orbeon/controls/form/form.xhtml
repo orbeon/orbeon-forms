@@ -32,35 +32,37 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <datetime>2009-10-16T17:48:03</datetime>
                         <dropdown-date>2009-10-16</dropdown-date>
                         <fields-date>2009-10-16</fields-date>
-
                     </date-time-controls>
                     <selection-controls>
                         <dropdown>cat</dropdown>
-                        <radio-buttons>cat</radio-buttons>
+                        <dynamic-data-dropdown itemset-empty="false"/>
                         <checkboxes>cat bird</checkboxes>
-                        <single-list>cat</single-list>
                         <multiple-list>cat bird</multiple-list>
+
+
+                        <radio-buttons>cat</radio-buttons>
                         <open-select1>Pistachio</open-select1>
+
+
+
                         <yesno-input>false</yesno-input>
                         <checkbox-input>false</checkbox-input>
-                        <boolean-input>false</boolean-input>
-                        <dynamic-data-dropdown itemset-empty="false"/>
+
+
                         <autocomplete label="United States">us</autocomplete>
-                        <autocomplete-result/>
+
                     </selection-controls>
                     <attachment-controls>
-                        <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
-
+                        <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon/controls/form/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
                         <image-attachments>
                             <image-attachments-iteration>
-                                <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
-                              <file-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</file-attachment>
+                                <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
+                                <file-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</file-attachment>
                             </image-attachments-iteration>
                             <image-attachments-iteration>
-                                <image-attachment filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg" size="117440">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</image-attachment>
-                                <file-attachment filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg" size="117440">/fr/service/persistence/crud/orbeon/builder/data/417b8b4473f6db9e0f94b05ccb9208be/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</file-attachment>
+                                <image-attachment filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg" size="117440">/fr/service/persistence/crud/orbeon/controls/form/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</image-attachment>
+                                <file-attachment filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg" size="117440">/fr/service/persistence/crud/orbeon/controls/form/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</file-attachment>
                             </image-attachments-iteration>
-
                         </image-attachments>
                     </attachment-controls>
                     <buttons>
@@ -97,24 +99,27 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
                     <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"/>
                     <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
-
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
-                    <xf:bind id="dropdown-bind" ref="dropdown" type="xf:string" name="dropdown"/>
-                    <xf:bind id="radio-buttons-bind" ref="radio-buttons" type="xf:string" name="radio-buttons"/>
-                    <xf:bind id="checkboxes-bind" ref="checkboxes" type="xf:string" name="checkboxes"/>
-                    <xf:bind id="single-list-bind" ref="single-list" type="xf:string" name="single-list"/>
-                    <xf:bind id="multiple-list-bind" ref="multiple-list" name="multiple-list"/>
+
+
+
+
+
                     <xf:bind id="autocomplete-bind" ref="autocomplete" name="autocomplete"/>
-                    <xf:bind name="dynamic-data-dropdown" id="dynamic-data-dropdown-bind" ref="dynamic-data-dropdown" type="xf:string"/>
-                    <xf:bind name="autocomplete-result" id="autocomplete-result-bind" ref="autocomplete-result" relevant="normalize-space($autocomplete)" calculate="$autocomplete"/>
-                    <xf:bind id="boolean-input-bind" ref="boolean-input" type="xf:boolean" name="boolean-input"/>
+
+
+
                     <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                     <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean" name="checkbox-input"/>
+                    <xf:bind id="radio-buttons-bind" ref="radio-buttons" type="xf:string" name="radio-buttons"/>
                     <xf:bind id="open-select1-bind" ref="open-select1" name="open-select1" required="true()" xxf:whitespace="trim"/>
+                    <xf:bind id="dropdown-bind" ref="dropdown" type="xf:string" name="dropdown"/>
+                    <xf:bind name="dynamic-data-dropdown" id="dynamic-data-dropdown-bind" ref="dynamic-data-dropdown" type="xf:string"/>
+                    <xf:bind id="checkboxes-bind" ref="checkboxes" type="xf:string" name="checkboxes"/>
+                    <xf:bind id="multiple-list-bind" ref="multiple-list" name="multiple-list"/>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
-
                     <xf:bind id="image-attachments-bind" ref="image-attachments" name="image-attachments">
                         <xf:bind id="image-attachments-iteration-bind" ref="image-attachments-iteration" name="image-attachments-iteration">
                             <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI"/>
@@ -145,7 +150,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <title xml:lang="fr">Contrôles de Form Builder</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
                     <singleton>false</singleton>
-                </metadata>
+                <migration version="4.8.0">[{ "path": "(attachment-controls)/(image-attachments)", "iteration-name": "image-attachments-iteration" }]</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -156,6 +161,74 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
+                        <dropdown>
+                            <label>Dropdown Menu</label>
+                            <hint>Standard dropdown</hint>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </dropdown>
+                        <dynamic-data-dropdown>
+                            <label>Dynamic Data Dropdown</label>
+                            <hint/>
+                        </dynamic-data-dropdown>
+                        <checkboxes>
+                            <label>Checkboxes</label>
+                            <hint>Standard checkboxes</hint>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </checkboxes>
+                        <multiple-list>
+                            <label>Scrollable Checkboxes</label>
+                            <hint>Scrollable selector with checkboxes</hint>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </multiple-list>
+                        <handwritten-signature>
+                            <label>Handwritten Signature</label>
+                            <hint/>
+                        </handwritten-signature>
                         <image-attachment>
                             <label>Image Attachment</label>
                             <hint/>
@@ -167,8 +240,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <buttons>
                             <label>Buttons</label>
                         </buttons>
-
-
                         <email>
                             <label>Email Address</label>
                             <hint>Email field with validation</hint>
@@ -204,26 +275,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <selection-controls>
                             <label>Selection Controls</label>
                         </selection-controls>
-                        <dropdown>
-                            <label>Dropdown Menu</label>
-                            <hint>Standard dropdown</hint>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-                            </item>
-                        </dropdown>
+
+
                         <radio-buttons>
                             <label>Radio Buttons</label>
                             <hint>Standard radio buttons</hint>
@@ -244,66 +297,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </radio-buttons>
-                        <checkboxes>
-                            <label>Checkboxes</label>
-                            <hint>Standard checkboxes</hint>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-                            </item>
-                        </checkboxes>
-                        <single-list>
-                            <label>Scrollable List</label>
-                            <hint>Standard single-selection list</hint>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-                            </item>
-                        </single-list>
-                        <multiple-list>
-                            <label>Scrollable Checkboxes</label>
-                            <hint>Scrollable selector with checkboxes</hint>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-                            </item>
-                        </multiple-list>
                         <open-select1>
                             <label>Ice Cream Flavor</label>
                             <hint/>
@@ -320,6 +313,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>strawberry</value>
                             </item>
                         </open-select1>
+
+
+
                         <yesno-input>
                             <label>Yes/No Answer</label>
                             <hint/>
@@ -328,6 +324,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Single Checkbox</label>
                             <hint>An input which captures "true" or "false"</hint>
                         </checkbox-input>
+<<<<<<< HEAD
                         <boolean-input>
                             <label>Boolean Input (deprecated)</label>
                             <hint>An input which captures "true" or "false"</hint>
@@ -336,6 +333,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Dynamic Data Dropdown</label>
                             <hint/>
                         </dynamic-data-dropdown>
+=======
+
+
+                        <signature-controls>
+                            <label>Signature</label>
+                            <help/>
+                        </signature-controls>
+>>>>>>> 59364a5... For #2360: remove scrollable list from Controls form
                         <date>
                             <label>Date</label>
                             <hint>Standard date field</hint>
@@ -356,7 +361,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Fields Date</label>
                             <hint>Date selector with separate fields</hint>
                         </fields-date>
-
                         <htmlarea>
                             <label>Formatted Text</label>
                             <hint>Rich text editor</hint>
@@ -407,12 +411,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <hint>Enter the name of a country</hint>
                             <code>Country code</code>
                         </autocomplete>
-                        <autocomplete-result>
-                            <label>Autocomplete Selection</label>
-                            <hint/>
-                        </autocomplete-result>
+
                     </resource>
                     <resource xml:lang="fr">
+<<<<<<< HEAD
                         <image-attachment>
                             <label>Image jointe</label>
                             <hint/>
@@ -461,6 +463,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <selection-controls>
                             <label>Contrôles de sélection</label>
                         </selection-controls>
+=======
+>>>>>>> 59364a5... For #2360: remove scrollable list from Controls form
                         <dropdown>
                             <label>Menu déroulant</label>
                             <hint>Menu standard</hint>
@@ -481,26 +485,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </dropdown>
-                        <radio-buttons>
-                            <label>Boutons radio</label>
-                            <hint>Boutons radio standards</hint>
-                            <item>
-                                <label>Chat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Chien</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
-                            </item>
-                        </radio-buttons>
+                        <dynamic-data-dropdown>
+                            <label>Dynamic Data Dropdown</label>
+                            <hint/>
+                        </dynamic-data-dropdown>
                         <checkboxes>
                             <label>Cases à cocher</label>
                             <hint>Cases à cocher standards</hint>
@@ -521,26 +509,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </checkboxes>
-                        <single-list>
-                            <label>Liste défilante</label>
-                            <hint>Liste de sélection simple standard</hint>
-                            <item>
-                                <label>Chat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Chien</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
-                            </item>
-                        </single-list>
                         <multiple-list>
                             <label>Cases à cocher défilantes</label>
                             <hint>Composant cases à cocher avec ascenseur</hint>
@@ -561,6 +529,78 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>fish</value>
                             </item>
                         </multiple-list>
+                        <handwritten-signature>
+                            <label>Signature manuscrite</label>
+                            <hint/>
+                        </handwritten-signature>
+                        <image-attachment>
+                            <label>Image jointe</label>
+                            <hint/>
+                        </image-attachment>
+                        <file-attachment>
+                            <label>Fichier joint</label>
+                            <hint/>
+                        </file-attachment>
+                        <buttons>
+                            <label>Boutons</label>
+                        </buttons>
+                        <email>
+                            <label>Adresse email</label>
+                            <hint>Email field with validation</hint>
+                        </email>
+                        <us-phone>
+                            <label>Téléphone US</label>
+                            <hint>US phone number field</hint>
+                        </us-phone>
+                        <number>
+                            <label>Nombre</label>
+                            <hint>Number field with validation</hint>
+                        </number>
+                        <currency>
+                            <label>Devise</label>
+                            <hint>Currency field</hint>
+                        </currency>
+                        <us-state>
+                            <label>Etat US</label>
+                            <hint>US state selector</hint>
+                        </us-state>
+                        <standard-button>
+                            <label>Bouton</label>
+                            <hint>Bouton navigateur standard</hint>
+                        </standard-button>
+                        <link-button>
+                            <label>Bouton lien</label>
+                            <hint>Lien agissant comme un bouton</hint>
+                        </link-button>
+                        <static-image>
+                            <label>Image fixe</label>
+                            <hint/>
+                        </static-image>
+                        <selection-controls>
+                            <label>Contrôles de sélection</label>
+                        </selection-controls>
+
+
+                        <radio-buttons>
+                            <label>Boutons radio</label>
+                            <hint>Boutons radio standards</hint>
+                            <item>
+                                <label>Chat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Chien</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Oiseau</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Poisson</label>
+                                <value>fish</value>
+                            </item>
+                        </radio-buttons>
                         <open-select1>
                             <label>Arome de glace</label>
                             <hint/>
@@ -577,6 +617,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <value>strawberry</value>
                             </item>
                         </open-select1>
+
+
+
                         <yesno-input>
                             <label>Réponse oui/non</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
@@ -585,6 +628,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Case à cocher unique</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
                         </checkbox-input>
+<<<<<<< HEAD
                         <boolean-input>
                             <label>Champ booléen (déprécié)</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
@@ -593,6 +637,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Dynamic Data Dropdown</label>
                             <hint/>
                         </dynamic-data-dropdown>
+=======
+
+
+                        <signature-controls>
+                            <label>Signature</label>
+                            <help/>
+                        </signature-controls>
+>>>>>>> 59364a5... For #2360: remove scrollable list from Controls form
                         <date>
                             <label>Date</label>
                             <hint>Champ date standard</hint>
@@ -613,7 +665,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Date avec champs</label>
                             <hint>Sélecteur de date avec champs séparés</hint>
                         </fields-date>
-
                         <htmlarea>
                             <label>Texte formatté</label>
                             <hint>Editeur de texte enrichi</hint>
@@ -664,10 +715,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <hint>Entrez le nom d'un pays</hint>
                             <code>Code du pays</code>
                         </autocomplete>
-                        <autocomplete-result>
-                            <label>Résultat de la complétion</label>
-                            <hint/>
-                        </autocomplete-result>
+
                     </resource>
                 </resources>
             </xf:instance>
@@ -690,41 +738,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     </country>
                 </countries>
             </xf:instance>
-
             <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="image-attachments-template"><image-attachments-iteration><image-attachment filename="" mediatype="" size=""/><file-attachment filename="" mediatype="" size=""/></image-attachments-iteration></xf:instance>
             <xf:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')" validate="false" method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="autocomplete-itemset-instance"/>
-        </xf:model>
-        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
-            <xbl:binding id="orbeon-address-component" element="component|address" class="fr-section-component">
-                <xbl:implementation>
-                    <xf:model id="address-model">
-                        <xf:instance id="fr-form-instance" xxbl:mirror="true">
-                            <empty/>
-                        </xf:instance>
-                        <xf:instance id="fr-form-template">
-                            <address>
+        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder"><xbl:binding id="orbeon-address-component" element="component|address" class="fr-section-component"><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><address>
                         <street-number/>
                         <street-name/>
                         <apt-suite/>
                         <city/>
                         <state/>
                         <zip/>
-                    </address></xf:instance><xf:bind id="fr-form-binds"
-                     ref="instance('fr-form-instance')">
-                            <xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim" ref="street-number">
-                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer"
-                                       level="warning" xxf:whitespace="trim"/>
-                    </xf:bind>
-                    <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/>
-                    <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/>
-                    <xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"/>
-                    <xf:bind id="state-bind" name="state" ref="state" required="true()"/>
-                    <xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"/>
-                </xf:bind>
-                        <xf:instance id="fr-form-resources">
-                            <resources>
-                                <resource xml:lang="en">
-                                    <address>
+                    </address></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim" ref="street-number">
+                        <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer" level="warning" xxf:whitespace="trim"/>
+                    </xf:bind><xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/><xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/><xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"/><xf:bind id="state-bind" name="state" ref="state" required="true()"/><xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"/></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><address>
                             <label>US Address</label>
                             <help/>
                         </address><street-number>
@@ -784,39 +809,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </state><zip>
                             <label>Code postal</label>
                             <hint/>
-                                    </zip>
-                                </resource>
-                            </resources>
-                        </xf:instance>
-                        <xf:instance id="readonly">
-                            <readonly/>
-                        </xf:instance>
-                        <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
-                        <xf:var name="fr-mode" value="$fr-params/mode"/>
-                        <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
-                        <xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
-                            <xf:action if="empty(instance()/*)">
-                                <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
+                        </zip></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')                                or instance('readonly') = 'true'                                or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:action if="empty(instance()/*)"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
 
-                            <xf:rebuild/>
-                                <xf:recalculate xxf:defauls="true"/>
-                                <xf:revalidate/>
-                            </xf:action>
-                        </xf:action>
-                    </xf:model>
-                </xbl:implementation>
-                <xbl:template>
-                    <xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/>
-                    <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
-                        <xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/>
-                    </xf:var>
-                    <xf:var name="fr-resources" as="element()?">
-                        <xxf:value value="$fr-resources" xxbl:scope="outer"/>
-                    </xf:var>
-                    <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
-                    <xf:group appearance="xxf:internal">
-                        <xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/address/label"/>
-                        <fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
+                            <xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action></xf:action></xf:model></xbl:implementation><xbl:template><xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:group appearance="xxf:internal"><xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/address/label"/><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="street-number-control" bind="street-number-bind">
@@ -868,7 +863,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xf:label ref="$form-resources/text-controls/label"/>
                     <fr:grid columns="3">
@@ -976,7 +971,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
                     <xf:label ref="$form-resources/date-time-controls/label"/>
-
                     <fr:grid columns="3">
                         <xh:tr>
                             <xh:td>
@@ -1032,15 +1026,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </xf:select1>
                             </xh:td>
                             <xh:td>
-                                <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
-                                    <xf:label ref="$form-resources/radio-buttons/label"/>
-                                    <xf:hint ref="$form-resources/radio-buttons/hint"/>
-                                    <xf:itemset ref="$form-resources/radio-buttons/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
+                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-data-dropdown-bind">
+                                    <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
+                                    <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:itemset ref="/*/country">
+                                        <xf:label ref="name"/>
+                                        <xf:value ref="us-code"/>
                                     </xf:itemset>
-                                </xf:select1>
+                                </fr:databound-select1>
                             </xh:td>
+                        </xh:tr>
+                        <xh:tr>
                             <xh:td>
                                 <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
                                     <xf:label ref="$form-resources/checkboxes/label"/>
@@ -1050,18 +1047,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </xf:select>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:select1 appearance="compact" bind="single-list-bind" id="single-list-control">
-                                    <xf:label ref="$form-resources/single-list/label"/>
-                                    <xf:hint ref="$form-resources/single-list/hint"/>
-                                    <xf:itemset ref="$form-resources/single-list/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
-                                    </xf:itemset>
-                                </xf:select1>
+
                             </xh:td>
                             <xh:td>
                                 <xf:select bind="multiple-list-bind" id="multiple-list-control" appearance="scroll">
@@ -1073,6 +1059,21 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </xf:select>
+
+                            </xh:td>
+
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
+                                    <xf:label ref="$form-resources/radio-buttons/label"/>
+                                    <xf:hint ref="$form-resources/radio-buttons/hint"/>
+                                    <xf:itemset ref="$form-resources/radio-buttons/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+
                             </xh:td>
                             <xh:td>
                                 <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="open-select1-control" bind="open-select1-bind">
@@ -1084,7 +1085,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                         <xf:value ref="value"/>
                                     </xf:itemset>
                                 </fr:open-select1>
+
                             </xh:td>
+
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
@@ -1101,13 +1104,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:checkbox-input>
                             </xh:td>
-                            <xh:td>
-                                <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="boolean-input-bind" id="boolean-input-control">
-                                    <xf:label ref="$form-resources/boolean-input/label"/>
-                                    <xf:hint ref="$form-resources/boolean-input/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
+
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
@@ -1127,25 +1124,30 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 </fr:autocomplete>
                             </xh:td>
                             <xh:td>
-                                <xf:output id="autocomplete-result-control" bind="autocomplete-result-bind">
-                                    <xf:label ref="$form-resources/autocomplete-result/label"/>
-                                    <xf:hint ref="$form-resources/autocomplete-result/hint"/>
-                                </xf:output>
+
                             </xh:td>
-                            <xh:td>
-                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-data-dropdown-bind">
-                                    <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
-                                    <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="/*/country">
-                                        <xf:label ref="name"/>
-                                        <xf:value ref="us-code"/>
-                                    </xf:itemset>
-                                </fr:databound-select1>
-                            </xh:td>
+
                         </xh:tr>
                     </fr:grid>
                 </fr:section>
+<<<<<<< HEAD
+=======
+                <fr:section id="signature-controls-control" bind="signature-controls-bind">
+                    <xf:label ref="$form-resources/signature-controls/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <fr:handwritten-signature xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="handwritten-signature-control" bind="handwritten-signature-bind">
+                                    <xf:label ref="$form-resources/handwritten-signature/label"/>
+                                    <xf:hint ref="$form-resources/handwritten-signature/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:handwritten-signature>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+>>>>>>> 59364a5... For #2360: remove scrollable list from Controls form
                 <fr:section id="attachment-controls-section" bind="attachment-controls-bind">
                     <xf:label ref="$form-resources/attachment-controls/label"/>
                     <fr:grid>
@@ -1164,7 +1166,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                     <xf:label ref="$form-resources/image-attachment/label"/>
                                     <xf:hint ref="$form-resources/image-attachment/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
                                     <xf:filename ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
@@ -1173,9 +1174,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <xh:td>
                                 <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">
                                     <xf:label ref="$form-resources/file-attachment/label"/>
-                                    <xf:hint ref="$form-resources/file-attachment/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
+                                    <xf:hint ref="$form-resources/file-attachment/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                     <xf:filename ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
@@ -1183,7 +1183,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>
-
                 </fr:section>
                 <fr:section id="buttons-section" bind="buttons-bind">
                     <xf:label ref="$form-resources/buttons/label"/>
@@ -1192,7 +1191,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <xh:td>
                                 <xf:trigger bind="standard-button-bind" id="standard-button-control">
                                     <xf:label ref="$form-resources/standard-button/label"/>
-                                    <xf:hint ref="$form-resources/standard-button/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:hint ref="$form-resources/standard-button/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:trigger>
                             </xh:td>
                             <xh:td>

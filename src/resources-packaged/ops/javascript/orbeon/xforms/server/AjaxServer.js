@@ -826,24 +826,26 @@
                         return ORBEON.util.Utils.getLocalName(childElement) == "control-values";
                     });
 
-                    function findDialogsToShow(actionElement) {
+                    function findDialogsToShow() {
 
                         var result = [];
 
-                        _.each(childrenWithLocalName(controlValuesElements, 'div'), function(divElement) {
+                        _.each(controlValuesElements, function(controlValuesElement) {
+                            _.each(childrenWithLocalName(controlValuesElement, 'dialog'), function(elem) {
 
-                            var id        = ORBEON.util.Dom.getAttribute(divElement, "id");
-                            var visible   = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
+                                var id      = ORBEON.util.Dom.getAttribute(elem, "id");
+                                var visible = ORBEON.util.Dom.getAttribute(elem, "visibility") == "visible";
 
-                            if (visible)
-                                result.push(id);
+                                if (visible)
+                                    result.push(id);
+                            });
                         });
 
                         return result;
                     }
 
                     if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
-                        var dialogsToShowArray = findDialogsToShow(actionElement);
+                        var dialogsToShowArray = findDialogsToShow();
                         if (dialogsToShowArray.length > 0) {
                             responseDialogIdsToShowAsynchronously = dialogsToShowArray;
                             ORBEON.util.Utils.resetIOSZoom();

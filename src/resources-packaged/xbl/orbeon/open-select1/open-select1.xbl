@@ -45,7 +45,7 @@
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
             </icon>
-            <editors static-itemset="true"/>
+            <editors static-itemset="true" item-hint="true"/>
             <templates>
                 <view>
                     <fr:open-select1 id="" ref="" xmlns="">
@@ -56,6 +56,7 @@
                         <xf:itemset ref="">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
+                            <xf:hint  ref="hint"/>
                         </xf:itemset>
                     </fr:open-select1>
                 </view>
@@ -82,6 +83,7 @@
                 <xf:select1 id="select1" ref="$binding" appearance="full" xbl:attr="appearance xxf:encrypt-item-values">
                     <xf:itemset ref="$items">
                         <xf:label ref="label"/>
+                        <xf:hint  ref="hint"/>
                         <xf:value ref="value"/>
                     </xf:itemset>
                     <xf:item>

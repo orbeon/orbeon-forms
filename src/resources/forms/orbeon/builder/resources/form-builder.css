@@ -10,7 +10,7 @@ body {
   position: absolute;
   top: 50px;
   right: 10px;
-  left: 207px;
+  left: 223px;
   bottom: 64px;
   overflow-y: auto;
 }
@@ -111,7 +111,7 @@ body {
   left: 10px;
   top: 50px;
   bottom: 64px;
-  width: 192px;
+  width: 208px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;

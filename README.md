@@ -57,7 +57,7 @@ Orbeon Forms comes in two editions:
 For more information and downloadable binaries, see the [download](http://www.orbeon.com/download) page.
 
 The system requirements and installation procedure are detailed on
-[Installing Orbeon Forms](http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing).
+[Installing Orbeon Forms](http://doc.orbeon.com/installation/).
 
 
 Community and support
@@ -79,9 +79,8 @@ Documentation
 
 All documentation is available online:
 
-- [Wiki on Google Sites](http://wiki.orbeon.com/forms/)
-- [Wiki on github](https://github.com/orbeon/orbeon-forms/wiki/)
-- [Frequently Asked Questions (FAQ)](https://github.com/orbeon/orbeon-forms/wiki/FAQ)
+- [Orbeon Forms documentation](http://doc.orbeon.com/)
+- [Frequently Asked Questions (FAQ)](http://doc.orbeon.com/faq/)
 
 
 What's happening?
@@ -97,7 +96,7 @@ Compiling Orbeon Forms
 ----------------------
 
 You usually don't have to compile Orbeon Forms yourself. But if you want to, see
-[Building Orbeon Forms](https://github.com/orbeon/orbeon-forms/wiki/Contributors-~-Building-Orbeon-Forms).
+[Building Orbeon Forms](http://doc.orbeon.com/contributors/building-orbeon-forms.html).
 The source code is available on [github](https://github.com/orbeon/orbeon-forms/).
 
 Orbeon Forms is written mainly using the following languages and technologies:

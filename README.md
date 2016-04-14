@@ -21,7 +21,7 @@ What's new
 ----------
 
 - [Orbeon Forms 2016.1](http://blog.orbeon.com/2016/04/orbeon-forms-20161.html)
-- [Orbeon Forms 4.10.2](http://blog.orbeon.com/2015/11/orbeon-forms-4102.html)
+- [Orbeon Forms 4.10.2](http://blog.orbeon.com/2015/12/orbeon-forms-4102.html)
 - [Orbeon Forms 4.10.1](http://blog.orbeon.com/2015/11/orbeon-forms-4101.html)
 - [Orbeon Forms 4.10](http://blog.orbeon.com/2015/08/orbeon-forms-410.html)
 - [Orbeon Forms 4.9](http://blog.orbeon.com/2015/05/orbeon-forms-49.html)

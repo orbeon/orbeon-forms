@@ -225,10 +225,11 @@
         -webkit-appearance: none;
     }
 
-    .xforms-type-dateTime input.xforms-type-date {
-        margin-right: 11px; // make a tad narrower for Form Builder
+    .xforms-type-dateTime, .xbl-fr-datetime { // including .xbl-fr-datetime as temporary fix for #2720
+        input.xforms-type-date {
+            margin-right: 11px; // make a tad narrower for Form Builder
+        }
     }
-
 
     .xforms-input input {
         -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;

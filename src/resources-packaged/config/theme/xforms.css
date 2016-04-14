@@ -170,7 +170,7 @@
   -webkit-appearance: none;
 }
 .orbeon .xforms-type-dateTime input.xforms-type-date {
-  margin-right: 1em;
+  margin-right: 11px;
 }
 .orbeon .xforms-input input {
   -moz-box-sizing: border-box;

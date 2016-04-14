@@ -217,7 +217,7 @@ class XFormsInputControl(
     val previousSingleNodeControlOpt = previousControlOpt.asInstanceOf[Option[XFormsSingleNodeControl]]
 
     val typeValue2 = typeExplodedQName
-    if (previousControlOpt.isEmpty || previousSingleNodeControlOpt.exists(_.typeExplodedQName != typeExplodedQName)) {
+    if (previousControlOpt.isEmpty || previousSingleNodeControlOpt.exists(_.typeExplodedQName != typeValue2)) {
       val attributeValue = StringUtils.defaultString(typeValue2)
       added |= ControlAjaxSupport.addOrAppendToAttributeIfNeeded(
         attributesImpl,

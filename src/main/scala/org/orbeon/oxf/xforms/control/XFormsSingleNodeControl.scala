@@ -210,22 +210,22 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   def isValueChangedCommit() = false // TODO: move this to trait shared by value control and variable
   def typeExplodedQName = Dom4jUtils.qNameToExplodedQName(valueType)
 
-  /**
-   * Convenience method to return the local name of a built-in XML Schema or XForms type.
-   *
-   * @return the local name of the built-in type, or null if not found
-   */
-  def getBuiltinTypeName =
+  // Convenience method to return the local name of a built-in XML Schema or XForms type.
+  def getBuiltinTypeNameOpt =
     Option(valueType) filter
     (valueType ⇒ Set(XSD_URI, XFORMS_NAMESPACE_URI)(valueType.getNamespaceURI)) map
-    (_.getName) orNull
+    (_.getName)
 
-  /**
-   * Convenience method to return the local name of the XML Schema type.
-   *
-   * @return the local name of the type, or null if not found
-   */
-  def getTypeLocalName = Option(valueType) map (_.getName) orNull
+  def getBuiltinTypeName = getBuiltinTypeNameOpt.orNull
+
+  // Convenience method to return the local name of the XML Schema type.
+  def getTypeLocalNameOpt = Option(valueType) map (_.getName)
+
+  def getBuiltinOrCustomTypeCSSClassOpt =
+    (getBuiltinTypeNameOpt map ("xforms-type-" +)) orElse (getTypeLocalNameOpt map ("xforms-type-custom-" +))
+
+  def getBuiltinOrCustomTypeCSSClassOrNull =
+    getBuiltinOrCustomTypeCSSClassOpt.orNull
 
   override def computeRelevant: Boolean = {
     // If parent is not relevant then we are not relevant either
@@ -350,18 +350,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       write(name, value)
 
     // Output type class
-    val typeName = getBuiltinTypeName
-    if (typeName ne null) {
-      // Control is bound to built-in schema type
-      write("xforms-type", typeName)
-    } else {
-      // Output custom type class
-       val customTypeName = getTypeLocalName
-       if (customTypeName ne null) {
-         // Control is bound to a custom schema type
-         write("xforms-type-custom", customTypeName)
-       }
-    }
+    (getBuiltinTypeNameOpt map ("xforms-type" →))        orElse
+      (getTypeLocalNameOpt map ("xforms-type-custom" →)) foreach
+      write.tupled
   }
 
   // Dispatch creation events

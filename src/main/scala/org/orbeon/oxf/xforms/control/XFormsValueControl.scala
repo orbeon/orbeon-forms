@@ -156,7 +156,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
        )
 
     for {
-      typeName ← Option(getBuiltinTypeName)
+      typeName ← getBuiltinTypeNameOpt
       format   ← containingDocument.getTypeOutputFormat(typeName)
       value    ← evaluateFormat(format)
     } yield

@@ -112,25 +112,11 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 }
 
                 // Output type class
-                final String typeName = singleNodeControl.getBuiltinTypeName();
-                if (typeName != null) {
-                    // Control is bound to built-in schema type
+                final String typeCSSClass = singleNodeControl.getBuiltinOrCustomTypeCSSClassOrNull();
+                if (typeCSSClass != null) {
                     if (sb.length() > 0)
                         sb.append(' ');
-
-                    sb.append("xforms-type-");
-                    sb.append(typeName);
-                } else {
-                    // Output custom type class
-                   final String customTypeName = singleNodeControl.getTypeLocalName();
-                   if (customTypeName != null) {
-                       // Control is bound to a custom schema type
-                       if (sb.length() > 0)
-                           sb.append(' ');
-
-                       sb.append("xforms-type-custom-");
-                       sb.append(customTypeName);
-                   }
+                    sb.append(typeCSSClass);
                 }
             }
         }

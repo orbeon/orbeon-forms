@@ -113,7 +113,7 @@ trait FormRunnerMetadata {
           <control
             name={controlName}
             type={staticControl.localName}
-            datatype={control.getTypeLocalName}>{
+            datatype={control.getTypeLocalNameOpt.orNull}>{
             for ((lang, resourcesRoot) ← iterateResources(resourcesInstance))
             yield
               <resources lang={lang}>{resourcesForControl(staticControl, lang, resourcesRoot, controlName)}</resources>

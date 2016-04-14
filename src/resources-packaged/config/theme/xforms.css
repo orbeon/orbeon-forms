@@ -169,7 +169,8 @@
   display: none;
   -webkit-appearance: none;
 }
-.orbeon .xforms-type-dateTime input.xforms-type-date {
+.orbeon .xforms-type-dateTime input.xforms-type-date,
+.orbeon .xbl-fr-datetime input.xforms-type-date {
   margin-right: 11px;
 }
 .orbeon .xforms-input input {

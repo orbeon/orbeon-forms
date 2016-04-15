@@ -884,6 +884,7 @@
             <include name="ops/yui/examples/treeview/assets/js/CheckOnClickNode.js"/>
 
             <!-- Other files  -->
+            <include name="xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
             <include name="ops/nprogress-0.2.0/nprogress.js"/>
             <include name="ops/javascript/fastclick/fastclick.js"/>
 

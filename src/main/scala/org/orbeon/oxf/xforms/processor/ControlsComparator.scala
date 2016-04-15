@@ -298,6 +298,7 @@ class ControlsComparator(
         val sb = new jl.StringBuilder
         sb.append('{')
         XHTMLHeadHandler.buildJavaScriptInitializations(
+          containingDocument        = document,
           prependComma              = false,
           javaScriptInitializations = javaScriptInitializations,
           sb                        = sb

@@ -3865,11 +3865,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
          * Initialize dialogs
          */
         _dialog: function (dialog) {
-            var isModal = $(dialog).is('.xforms-dialog-modal');
-            var hasClose = $(dialog).is('.xforms-dialog-close-true');
+
+            var isModal     = $(dialog).is('.xforms-dialog-modal');
+            var hasClose    = $(dialog).is('.xforms-dialog-close-true');
             var isDraggable = $(dialog).is('.xforms-dialog-draggable-true');
-            var isVisible = $(dialog).is('.xforms-dialog-visible-true');
-            var isMinimal = $(dialog).is('.xforms-dialog-appearance-minimal');
+            var isVisible   = $(dialog).is('.xforms-dialog-visible-true');
+            var isMinimal   = $(dialog).is('.xforms-dialog-appearance-minimal');
 
             // If we already have a dialog for the same id, first destroy it, as this is an object left behind
             // by a deleted repeat iteration

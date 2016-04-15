@@ -1,6 +1,20 @@
 body.orbeon {
   background-color: #f3f3f3;
 }
+.aui .orbeon [class|=icon]:before {
+  content: "";
+}
+.aui .orbeon .row [class*="span"] {
+  min-height: 1px;
+}
+@media (min-width: 1200px) {
+  .aui .orbeon .row [class*="span"]:first-child {
+    margin-left: 20px;
+  }
+  .aui .orbeon .span12 {
+    width: 940px;
+  }
+}
 .orbeon h2,
 .orbeon h3 {
   background-color: #f8f8f8;

@@ -452,7 +452,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
       }
 
       if (hasPlaceholders || hasControlsToInitialize)
-        buildJavaScriptInitializations(hasPaths, javaScriptInitializations, sb)
+        buildJavaScriptInitializations(containingDocument, hasPaths, javaScriptInitializations, sb)
 
       // Output key listener information
       if (hasKeyListeners) {
@@ -527,6 +527,7 @@ object XHTMLHeadHandler {
     }
 
   def buildJavaScriptInitializations(
+    containingDocument        : XFormsContainingDocument,
     prependComma              : Boolean,
     javaScriptInitializations : (List[String], List[(String, Option[String])]),
     sb                        : jl.StringBuilder
@@ -555,9 +556,12 @@ object XHTMLHeadHandler {
       val it = controlsToInitialize.iterator
       while (it.hasNext) {
         val (controlId, valueOpt) = it.next()
+
+        val namespacedId = namespaceId(containingDocument, controlId)
+
         valueOpt match {
-          case Some(value) ⇒ sb.append(s"""{"id":${quoteString(controlId)},"value":${quoteString(value)}}""")
-          case None        ⇒ sb.append(s"""{"id":${quoteString(controlId)}}""")
+          case Some(value) ⇒ sb.append(s"""{"id":${quoteString(namespacedId)},"value":${quoteString(value)}}""")
+          case None        ⇒ sb.append(s"""{"id":${quoteString(namespacedId)}}""")
         }
 
         if (it.hasNext)

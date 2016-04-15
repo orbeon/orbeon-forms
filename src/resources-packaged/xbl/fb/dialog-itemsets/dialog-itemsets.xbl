@@ -23,7 +23,7 @@
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
-    <xbl:script src="/xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
+    <xbl:script src="/xbl/fb/dialog-itemsets/dialog-itemsets-min.js"/>
     <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">

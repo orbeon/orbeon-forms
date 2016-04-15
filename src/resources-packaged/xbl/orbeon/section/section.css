@@ -64,6 +64,7 @@
   background-repeat: no-repeat;
   background-position: 5px 15px;
   cursor: pointer;
+  border-collapse: separate;
 }
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open {
   background-image: url(arrow-down.png);

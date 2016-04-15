@@ -89,6 +89,7 @@
                                                                                                              // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
                                                                                                              // to be aligned on the first line, not the middle of the section area
                     cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
+                    border-collapse: separate;  // For Liferay, see https://github.com/orbeon/orbeon-forms/issues/2716
                 }
                 &.fr-section-open {
                     background-image: url(arrow-down.png);

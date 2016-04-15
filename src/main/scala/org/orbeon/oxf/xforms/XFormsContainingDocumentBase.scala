@@ -501,7 +501,7 @@ case class DelayedEvent(
     import org.orbeon.oxf.xml.Dom4j._
 
     XFormsUtils.encodeXML(
-      <xxf:events>
+      <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
         <xxf:event
           name={eventName}
           source-control-id={targetEffectiveId}

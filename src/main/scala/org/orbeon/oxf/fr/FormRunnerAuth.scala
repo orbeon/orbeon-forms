@@ -49,8 +49,13 @@ object FormRunnerAuth {
       case Some(sessionUserGroupRoles) ⇒
         sessionUserGroupRoles
       case None ⇒
-        val newSessionUserGroupRoles = getUserGroupRoles(userRoles, getHeader)
-        session.setAttribute(UserGroupRolesSessionKey, newSessionUserGroupRoles)
+        val newSessionUserGroupRoles @ (usernameOpt, _, _) = getUserGroupRoles(userRoles, getHeader)
+
+        // Only store the information into the session if we get a user. This handles the case of the initial
+        // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
+        if (usernameOpt.isDefined)
+          session.setAttribute(UserGroupRolesSessionKey, newSessionUserGroupRoles)
+
         newSessionUserGroupRoles
     }
 

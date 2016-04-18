@@ -229,14 +229,14 @@
                 <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
                 <xsl:if test="$captcha-type = 'reCAPTCHA'">
                     <fr:recaptcha id="captcha" theme="clean" ref="$captcha">
-                        <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                        <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
+                        <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
+                        <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
                     </fr:recaptcha>
                 </xsl:if>
                 <xsl:if test="$captcha-type = 'SimpleCaptcha'">
                     <fr:simple-captcha id="captcha" ref="$captcha">
-                        <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                        <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
+                        <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
+                        <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
                     </fr:simple-captcha>
                 </xsl:if>
             </xf:group>

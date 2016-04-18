@@ -38,29 +38,30 @@ trait PermissionsOps {
       (new DocumentWrapper(_, null, XPath.GlobalConfiguration))
   }
 
-  private def findConfiguredRoles(configuration: NodeInfo) =
-    configuration.root \ * \ "role"
+  private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
+    case Some(configuration) ⇒ configuration.root / * / "role" toList
+    case None                ⇒ Nil
+  }
 
   // Result document contains a tree structure of apps and forms if roles are configured
   // NOTE: The result is sorted by app name first, then form name.
   //@XPathFunction
-  def formBuilderPermissionsForCurrentUserAsXML(configuration: Option[NodeInfo]): NodeInfo =
-    formBuilderPermissions(configuration, orbeonRoles).to[List] match {
-      case Nil ⇒
-        <apps has-roles="false"/>
-      case permissionsList ⇒
-        <apps has-roles="true">{
-          permissionsList.sortBy(_._1) map { case (app, forms) ⇒
-            <app name={app}>{ forms.to[List].sorted map { form ⇒ <form name={form}/> } }</app>
-          }
-        }</apps>
+  def formBuilderPermissionsForCurrentUserAsXML(configurationOpt: Option[NodeInfo]): NodeInfo =
+    if (findConfiguredRoles(configurationOpt).isEmpty) {
+      <apps has-roles="false"/>
+    } else {
+      <apps has-roles="true">{
+        formBuilderPermissions(configurationOpt, orbeonRoles).to[List].sortBy(_._1) map { case (app, forms) ⇒
+          <app name={app}>{ forms.to[List].sorted map { form ⇒ <form name={form}/> } }</app>
+        }
+      }</apps>
     }
 
-  def formBuilderPermissions(configuration: Option[NodeInfo], incomingRoleNames: Set[String]): Map[String, Set[String]] =
-    configuration map findConfiguredRoles getOrElse Nil match {
-      case Seq() ⇒
+  def formBuilderPermissions(configurationOpt: Option[NodeInfo], incomingRoleNames: Set[String]): Map[String, Set[String]] =
+    findConfiguredRoles(configurationOpt) match {
+      case Nil ⇒
         // No role configured
-        Map()
+        Map.empty
       case configuredRoles ⇒
         // Roles configured
         val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet

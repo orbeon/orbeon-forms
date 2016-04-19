@@ -21,54 +21,60 @@
     var STATE_CLICKED = 1;
     var STATE_SENT    = 2;
 
-    YAHOO.namespace("xbl.fr");
-    YAHOO.xbl.fr.LaddaButton = function() {};
-    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.LaddaButton, "xbl-fr-ladda-button");
-    YAHOO.xbl.fr.LaddaButton.prototype = {
+    // Ladda button uses document.createRange, which isn't supported on IE8, so we don't do anything if that
+    // function isn't available.
+    if (_.isFunction(document.createRange)) {
 
-        button: null,
-        state: STATE_BEGIN,
+        YAHOO.namespace("xbl.fr");
+        YAHOO.xbl.fr.LaddaButton = function() {};
+        ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.LaddaButton, "xbl-fr-ladda-button");
+        YAHOO.xbl.fr.LaddaButton.prototype = {
 
-        init: function() {
+            button: null,
+            state: STATE_BEGIN,
 
-            // Init buttons
-            this.button = $(this.container).find('button');
-            this.button.attr('data-style', 'slide-left');
-            var isPrimary = this.button.parents('.xforms-trigger-appearance-xxforms-primary').is('*');
-            this.button.attr('data-spinner-color', isPrimary ? 'white' : 'black');
-            this.button.addClass('ladda-button');
-            this.button.ladda();
+            init: function() {
 
-            // Events
-            this.button.on('click',             _.bind(this.click    , this));
-            AjaxServer.beforeSendingEvent.add  (_.bind(this.sending  , this));
-            AjaxServer.ajaxResponseReceived.add(_.bind(this.receiving, this));
-        },
+                // Init buttons
+                this.button = $(this.container).find('button');
+                this.button.attr('data-style', 'slide-left');
+                var isPrimary = this.button.parents('.xforms-trigger-appearance-xxforms-primary').is('*');
+                this.button.attr('data-spinner-color', isPrimary ? 'white' : 'black');
+                this.button.addClass('ladda-button');
+                this.button.ladda();
 
-        destroy: function () {
-            // TODO: remove event handlers, destroy component
-        },
+                // Events
+                this.button.on('click',             _.bind(this.click    , this));
+                AjaxServer.beforeSendingEvent.add  (_.bind(this.sending  , this));
+                AjaxServer.ajaxResponseReceived.add(_.bind(this.receiving, this));
+            },
 
-        click: function() {
-            if (this.state == STATE_BEGIN) {
-                // Defer changing the button, not to prevent other listeners on the click event from being called
-                _.defer(_.bind(function() {
-                    this.button.ladda('start');
-                    this.state = STATE_CLICKED;
-                }, this));
+            destroy: function () {
+                // TODO: remove event handlers, destroy component
+            },
+
+            click: function() {
+                if (this.state == STATE_BEGIN) {
+                    // Defer changing the button, not to prevent other listeners on the click event from being called
+                    _.defer(_.bind(function() {
+                        this.button.ladda('start');
+                        this.state = STATE_CLICKED;
+                    }, this));
+                }
+            },
+
+            sending: function() {
+                if (this.state == STATE_CLICKED)
+                    this.state = STATE_SENT;
+            },
+
+            receiving: function() {
+                if (this.state == STATE_SENT) {
+                    this.button.ladda('stop');
+                    this.state = STATE_BEGIN;
+                }
             }
-        },
+        };
+    }
 
-        sending: function() {
-            if (this.state == STATE_CLICKED)
-                this.state = STATE_SENT;
-        },
-
-        receiving: function() {
-            if (this.state == STATE_SENT) {
-                this.button.ladda('stop');
-                this.state = STATE_BEGIN;
-            }
-        }
-    };
 })();

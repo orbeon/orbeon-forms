@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
 
 class PermissionsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -64,5 +64,19 @@ class PermissionsTest extends DocumentTestBase with AssertionsForJUnit {
     // Empty roles
     val emptyRoles = Some(<roles/>: NodeInfo)
     assert(formBuilderPermissions(emptyRoles, Set("some")) === Map())
+  }
+
+  @Test def issue2737And1963(): Unit = {
+
+     val frRoles: NodeInfo =
+      <roles>
+        <role name="orbeon-sales" app="sales" form="*"/>
+        <role name="dummy"        app="*"     form="*"/>
+      </roles>
+
+    val frRolesOpt = Some(frRoles)
+
+    assert(formBuilderPermissions(frRolesOpt, Set("foo-role", "bar-role"))              === Map.empty)
+    assert((formBuilderPermissionsForCurrentUserAsXML(frRolesOpt) attValue "has-roles") === "true")
   }
 }

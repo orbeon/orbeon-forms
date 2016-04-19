@@ -158,8 +158,8 @@
             </messages>
             <labels>
                 <draft>Draft</draft>
-                <read-only>Read-only</read-only>
-                <language-choice>Choose language</language-choice>
+                <read-only>Read-Only</read-only>
+                <language-choice>Choose Language</language-choice>
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
                 <any>[Any]</any>

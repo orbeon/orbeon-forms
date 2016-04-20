@@ -11,16 +11,14 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:p="http://www.orbeon.com/oxf/pipeline"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
     <xbl:binding id="fr-process-button" element="fr|process-button" xxbl:container="span" xxbl:mode="binding">
 
         <xbl:template>
@@ -36,6 +34,7 @@
             <!-- Figure what, if any, loading indicator to use -->
             <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app /string()"/>
             <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
+
             <xf:var name="loading-indicator-property"
                     value="string-join(('oxf.fr.detail.loading-indicator', $button-name, $app, $form), '.')"/>
             <xf:var name="loading-indicator"
@@ -46,7 +45,7 @@
                     value="$loading-indicator = 'modal'"/>
 
             <!-- React to button pressed -->
-            <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+            <xf:action event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                 xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
             </xf:action>
 

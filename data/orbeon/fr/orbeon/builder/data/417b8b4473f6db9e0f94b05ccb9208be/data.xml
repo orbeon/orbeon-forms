@@ -48,7 +48,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     </date-time-controls>
                     <selection-controls>
                         <dropdown>cat</dropdown>
-                        <dynamic-data-dropdown itemset-empty="false"/>
+                        <dynamic-data-dropdown itemset-empty="false">ca</dynamic-data-dropdown>
                         <checkboxes>cat bird</checkboxes>
                         <multiple-list>cat bird</multiple-list>
 

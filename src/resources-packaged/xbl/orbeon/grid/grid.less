@@ -44,6 +44,12 @@
             thead tr th {
                 text-align: left;
 
+                .xforms-output {
+                    // We want the block for the label in the header to "go around" its content, so the help
+                    // popover is correctly positioned.
+                    display: block;
+                }
+
                 // If there is a group with a label in a grid th, remove the border added by Bootstrap
                 legend.xforms-label {
                     border-bottom: none;

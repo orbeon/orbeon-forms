@@ -15,6 +15,9 @@
 .orbeon .xbl-fr-grid .fr-grid thead tr th {
   text-align: left;
 }
+.orbeon .xbl-fr-grid .fr-grid thead tr th .xforms-output {
+  display: block;
+}
 .orbeon .xbl-fr-grid .fr-grid thead tr th legend.xforms-label {
   border-bottom: none;
   margin: 0;

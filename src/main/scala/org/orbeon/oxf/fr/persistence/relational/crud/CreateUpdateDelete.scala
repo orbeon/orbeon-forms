@@ -191,8 +191,8 @@ trait CreateUpdateDelete extends RequestResponse with Common {
 
     // Do insert
     locally {
-      val xmlCol = if (req.provider == "oracle") "xml_clob" else "xml"
-      val xmlVal = if (req.provider == "postgresql") "XMLPARSE( DOCUMENT ? )" else "?"
+      val xmlCol = if (req.provider == Oracle) "xml_clob" else "xml"
+      val xmlVal = if (req.provider == PostgreSQL) "XMLPARSE( DOCUMENT ? )" else "?"
       val isFormDefinition = req.forForm && ! req.forAttachment
       val now = new Timestamp(System.currentTimeMillis())
 

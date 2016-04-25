@@ -53,21 +53,21 @@ class ReindexProcessor extends ProcessorImpl {
     RelationalUtils.withConnection { connection ⇒
 
       // Clean index
-      connection.prepareStatement("delete from orbeon_i_current").execute()
-      connection.prepareStatement("delete from orbeon_i_control_text").execute()
+      connection.prepareStatement("DELETE FROM orbeon_i_current").execute()
+      connection.prepareStatement("DELETE FROM orbeon_i_control_text").execute()
 
       // Get all the row from orbeon_form_data that are "latest" and not deleted
       val currentData = connection.prepareStatement(
-        """select   id, created, last_modified, username, app, form, document_id, xml
-          |  from   orbeon_form_data
-          | where   (app, form, document_id, last_modified) in
+        """  SELECT id, created, last_modified, username, app, form, document_id, xml
+          |    FROM orbeon_form_data
+          |   WHERE (app, form, document_id, last_modified) IN
           |         (
-          |               select app, form, document_id, max(last_modified) last_modified
-          |                 from orbeon_form_data
-          |             group by app, form, document_id
+          |               SELECT app, form, document_id, max(last_modified) last_modified
+          |                 FROM orbeon_form_data
+          |             GROUP BY app, form, document_id
           |         )
-          |   and   deleted = 'N'
-          |order by app, form
+          |     AND deleted = 'N'
+          |ORDER BY app, form
           |""".stripMargin).executeQuery()
 
       // Info on indexed controls for a given app/form
@@ -98,9 +98,9 @@ class ReindexProcessor extends ProcessorImpl {
 
         // Insert into the "current data" table
         val insert = connection.prepareStatement(
-          """insert into orbeon_i_current
+          """INSERT INTO orbeon_i_current
             |           (data_id, document_id, created, last_modified, username, app, form)
-            |    values (?, ?, ?, ?, ?, ?, ?)
+            |    VALUES (?, ?, ?, ?, ?, ?, ?)
           """.stripMargin)
         insert.setInt      (1, currentData.getInt      ("id"))
         insert.setString   (2, currentData.getString   ("document_id"))

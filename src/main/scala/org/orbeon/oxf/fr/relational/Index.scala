@@ -65,13 +65,24 @@ object Index {
 
       val controlName    = getControlName(control)
       val bindForControl = findBindByName(formDoc, controlName).get
-      val binds          = (bindForControl ancestorOrSelf "*:bind").reverse.tail // skip instance root bind
-      val bindRefs       = binds map (_.attValue("ref")) toList
+      val bindsToControl = bindForControl.ancestorOrSelf("*:bind").reverse.tail // skip instance root bind
+      val bindRefs       =
+        for (bind ← bindsToControl) yield {
+          val bindRef = bind.attValue("ref")
+          val FBLangPredicate = "[@xml:lang = $fb-lang]"
+          // Specific case for Form Builder: drop language predicate, as we want to index/return
+          // values for all languages. So far, this is handled as a special case, as this is not
+          // something that happens in other forms.
+          if (bindRef.endsWith(FBLangPredicate))
+            bindRef.dropRight(FBLangPredicate.length)
+          else
+            bindRef
+        }
 
       // Adjust the search paths if data migration is present by dropping the repeated grid iteration element
       val adjustedBindRefs =
         if (migrationPaths exists (bindRefs.startsWith(_)))
-          bindRefs.dropRight(2) ::: bindRefs.last :: Nil
+          bindRefs.toList.dropRight(2) ::: bindRefs.last :: Nil
         else
           bindRefs
 
@@ -79,7 +90,7 @@ object Index {
         name      = controlName,
         inSearch  = control.attClasses("fr-search"),
         inSummary = control.attClasses("fr-summary"),
-        xpath     = adjustedBindRefs map (_ + "[1]") mkString "/",
+        xpath     = adjustedBindRefs mkString "/",
         xsType    = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
         htmlLabel = hasHTMLMediatype(control \ (XF → "label"))

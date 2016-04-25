@@ -38,7 +38,6 @@ class ReindexProcessor extends ProcessorImpl {
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[ReindexProcessor]))
 
   private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
-  private val XPathPredicateRegex = """\[[^\]]*\]""".r
 
   // Prefixes used in Form Builder; prefixes in other documents, for now, are not supported
   val FbNamespaceMapping = new NamespaceMapping(Map(
@@ -124,13 +123,7 @@ class ReindexProcessor extends ProcessorImpl {
         // Extract and insert value for each indexed control
         for (control ← indexedControls) {
 
-          // Remove predicates from XPath expression; applies to:
-          // - the [1] added by `Index.findIndexedControls` for the summary page;
-          //   those will go away when the search will return multiple values per control
-          // - in the FB form, the predicate for the language
-          val xpath = XPathPredicateRegex.replaceAllIn(control.xpath, "")
-
-          val values = XML.eval(dataRootElement, xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
+          val values = XML.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
           for ((value, position) ← values.zipWithIndex) {
             val insert = connection.prepareStatement(
               """insert into orbeon_i_control_text

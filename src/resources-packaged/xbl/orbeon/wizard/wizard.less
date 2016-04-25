@@ -52,6 +52,12 @@
             a {
                 text-decoration: none;
                 .text-overflow();
+
+                .label {
+                    float: right;
+                    width: 70px;
+                    text-align: center;
+                }
             }
 
             .invalid > span > a {
@@ -67,6 +73,11 @@
                 color: @white;
             }
 
+            .incomplete > span > a {
+                //color: @white;
+                //background-color: green;
+            }
+
             li {
                 // Make li the same height as section title
                 line-height: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
@@ -75,8 +86,6 @@
             ul ul {
                 list-style-type: none;
             }
-
-            margin-bottom: 15px;
         }
     }
 

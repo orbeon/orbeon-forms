@@ -97,7 +97,9 @@
                     <!-- NOTE: Once we support XBL matching on @appearance, use instead
                          <fr:view appearance="{$view-appearance}">. -->
                     <xsl:element name="fr:{$view-appearance}">
-                        <xsl:attribute name="id" select="concat('fr-view-', $view-appearance)"/>
+                        <xsl:attribute name="id"   select="concat('fr-view-', $view-appearance)"/>
+                        <xsl:attribute name="app"  select="$app"/>
+                        <xsl:attribute name="form" select="$form"/>
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
                         <!-- Optional inner buttons -->
                         <xsl:if test="exists($inner-buttons)">

@@ -19,4 +19,8 @@ trait FormRunnerWizard extends FormRunnerBaseOps {
   def isWizardValidate =
     formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) contains "true"
 
+  //@XPathFunction
+  def isWizardSeparateToc =
+    formRunnerProperty("oxf.xforms.xbl.fr.wizard.separate-toc")(FormRunnerParams()) contains "true"
+
 }

@@ -41,14 +41,14 @@
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">
                 <!-- Mark all controls as visited -->
-                <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
+                <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="true" recurse="true" xxbl:scope="outer"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
-                <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split(instance('fr-state-instance')/observers)" xxbl:scope="inner"/></xf:var>
+                <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="false" recurse="true" xxbl:scope="outer"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
@@ -68,6 +68,15 @@
                     <xf:setvalue ref="@alert" value="xxf:alert(../@absolute-id)"/>
                     <xf:setvalue ref="@label" value="xxf:label(../@absolute-id)"/>
                 </xf:action>
+            </xbl:handler>
+            <xbl:handler event="fr-hide" phase="target">
+                <!-- Hide the error summary entirely -->
+                <xf:setvalue ref="$state/show"         value="false()"/>
+            </xbl:handler>
+            <xbl:handler event="fr-show" phase="target">`
+                <!-- Show the error summary, possibly for specific sections -->
+                <xf:setvalue ref="$state/section-name" value="event('section-name')"/>
+                <xf:setvalue ref="$state/show"         value="true()"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -91,6 +100,10 @@
                 <!-- State instance -->
                 <xf:instance id="fr-state-instance">
                     <state xmlns="">
+                        <!-- Whether to be visible or not -->
+                        <show>true</show>
+                        <!-- Filter on section for which to show errors -->
+                        <section-name/>
                         <!-- Whether errors are shown incrementally or not -->
                         <incremental>true</incremental>
                         <!-- Absolute ids of observers -->
@@ -103,17 +116,34 @@
                     </state>
                 </xf:instance>
 
+                <xf:var name="state"        value="instance('fr-state-instance')"/>
+                <xf:var name="incremental"  value="$state/incremental != 'false'"/>
+                <xf:var name="section-name" value="$state/section-name[xxf:non-blank()]"/>
+
                 <!-- Errors for controls that have been visited AND which have a non-blank alert message -->
                 <xf:var
                     name="visible-errors"
                     as="element(error)*"
-                    value="for $e in instance(if (instance('fr-state-instance')/incremental != 'false') then 'fr-errors-instance' else 'fr-snapshot-instance')/error
-                           return
-                               if (xxf:visited($e/@absolute-id))
-                               then $e
-                               else ()"/>
+                    value="
+                        for $e in
+                            instance(
+                                if ($incremental) then
+                                    'fr-errors-instance'
+                                else
+                                    'fr-snapshot-instance'
+                            )/error
+                        return
+                            if (xxf:visited($e/@absolute-id)) then
+                                $e
+                            else
+                                ()"/>
 
-                <xf:bind ref="instance('fr-state-instance')">
+                <xf:var
+                    name="visible-errors-for-section"
+                    as="element(error)*"
+                    value="$visible-errors[empty($section-name) or $section-name = @section-name]"/>
+
+                <xf:bind ref="$state">
                     <xf:bind ref="counts/@alert"                     calculate="count(instance('fr-errors-instance')/error)"/>
                     <xf:bind ref="counts/(@* except @alert)"         calculate="for $n in name() return count(instance('fr-errors-instance')/error[@level = $n])"/>
                     <xf:bind ref="visible-counts/@alert"             calculate="count($visible-errors)"/>
@@ -183,13 +213,13 @@ Inserting error information into error list:
                             -->
                             <xf:setvalue
                                 xxbl:scope="inner"
-                                ref="instance('fr-state-instance')/incremental"
+                                ref="$state/incremental"
                                 xbl:attr="xbl:text=incremental"/>
 
                             <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
                             <xf:setvalue
                                 xxbl:scope="inner"
-                                ref="instance('fr-state-instance')/observers"
+                                ref="$state/observers"
                                 xbl:attr="xbl:text=observer"/>
                         </xf:action>
 
@@ -249,7 +279,7 @@ Inserting error information into error list:
 
                                 <!-- Update validity -->
                                 <xf:setvalue
-                                    ref="instance('fr-state-instance')/valid"
+                                    ref="$state/valid"
                                     value="count(instance('fr-errors-instance')/error[@level = 'error']) = 0"/>
 
                             </xf:action>
@@ -295,7 +325,7 @@ Inserting error information into error list:
 
                             <!-- Write out the alerts counts -->
                             <xf:group ref="()" xbl:attr="model context ref={$level}s-count-ref" appearance="xxf:internal">
-                                <xf:group ref="instance('fr-state-instance')/counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
+                                <xf:group ref="$state/counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
                                     <xf:var name="ref" as="item()?">
                                         <xxf:value value="." xxbl:scope="outer"/>
                                     </xf:var>
@@ -307,7 +337,7 @@ Inserting error information into error list:
 
                             <!-- Write out the visible alerts counts -->
                             <xf:group ref="()" xbl:attr="model context ref=visible-{$level}s-count-ref" appearance="xxf:internal">
-                                <xf:group ref="instance('fr-state-instance')/visible-counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
+                                <xf:group ref="$state/visible-counts/@{$level}" xxbl:scope="inner" appearance="xxf:internal">
                                     <xf:var name="ref" as="item()?">
                                         <xxf:value value="." xxbl:scope="outer"/>
                                     </xf:var>
@@ -320,7 +350,7 @@ Inserting error information into error list:
 
                         <!-- Write out the validity -->
                         <xf:group ref="()" xbl:attr="model context ref=valid-ref" appearance="xxf:internal">
-                            <xf:group ref="instance('fr-state-instance')/valid" xxbl:scope="inner" appearance="xxf:internal">
+                            <xf:group ref="$state/valid" xxbl:scope="inner" appearance="xxf:internal">
                                 <xf:var name="ref" as="item()?">
                                     <xxf:value value="." xxbl:scope="outer"/>
                                 </xf:var>
@@ -340,8 +370,17 @@ Inserting error information into error list:
                             </xf:var>
                         </xsl:if>
 
-                        <!-- Only show this section if there are any visible errors -->
-                        <xf:group ref=".[exists($visible-errors){if (exists($fr-errors)) then ' or exists($global-errors)' else ''}]" xxbl:scope="inner" id="ig">
+                        <!-- Only show this group if `show` is true and there are any visible errors -->
+                        <xf:group
+                            xxbl:scope="inner"
+                            id="ig"
+                            ref=".[
+                                $state/show = 'true' and (
+                                    exists($visible-errors-for-section){
+                                        ' or exists($global-errors)'[exists($fr-errors)]
+                                    }
+                                )
+                            ]">
 
                             <!-- Include optional header -->
                             <xbl:content includes=":root > fr|header > *"/>
@@ -391,7 +430,7 @@ Inserting error information into error list:
 
                                     <!-- Display control errors -->
                                     <xf:var name="noscript" value="property('xxf:noscript')"/>
-                                    <xf:repeat ref="$visible-errors" id="er">
+                                    <xf:repeat ref="$visible-errors-for-section" id="er">
                                         <xh:tr>
                                             <!-- Clickable / linkable label -->
                                             <xf:var

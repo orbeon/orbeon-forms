@@ -52,11 +52,11 @@ trait FormRunnerErrorSummary {
 
   // Return the subset of section names passed which contain errors in the global error summary
   //@XPathFunction
-  def topLevelSectionsWithErrors(sectionIds: String, onlyVisible: Boolean): Seq[String] =
+  def topLevelSectionsWithErrors(sectionNames: String, onlyVisible: Boolean): Seq[String] =
     findErrorsInstance match {
       case Some(errorsInstance) ⇒
 
-        val sectionNamesSet = split[Set](sectionIds)
+        val sectionNamesSet = split[Set](sectionNames)
 
         def allErrorsIt =
           (errorsInstance.rootElement / "error").iterator

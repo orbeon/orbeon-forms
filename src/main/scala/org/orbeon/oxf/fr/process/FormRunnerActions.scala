@@ -51,8 +51,6 @@ trait FormRunnerActions {
     "collapse-all"     → tryCollapseSections,
     "result-dialog"    → tryShowResultDialog,
     "captcha"          → tryCaptcha,
-    "wizard-prev"      → tryWizardPrev,
-    "wizard-next"      → tryWizardNext,
     "set-data-status"  → trySetDataStatus
   )
 

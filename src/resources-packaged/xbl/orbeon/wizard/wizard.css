@@ -25,14 +25,16 @@
   margin-bottom: 0;
   border-bottom: 1px solid #e3e3e3;
 }
-.orbeon .xbl-fr-wizard .fr-wizard-toc .nav {
-  margin-bottom: 15px;
-}
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav a {
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav a .label {
+  float: right;
+  width: 70px;
+  text-align: center;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav .invalid > span > a {
   color: #b94a48;

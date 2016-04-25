@@ -100,6 +100,12 @@
                 <month>Month</month>
                 <day>Day</day>
             </date-time>
+            <wizard>
+                <errors>Errors</errors>
+                <incomplete>Incomplete</incomplete>
+                <complete>Complete</complete>
+                <not-started>Not Started</not-started>
+            </wizard>
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
@@ -402,6 +408,12 @@
                 <month>Mois</month>
                 <day>Jour</day>
             </date-time>
+            <wizard>
+                <errors>Erreurs</errors>
+                <incomplete>En cours</incomplete>
+                <complete>Rempli</complete>
+                <not-started>A remplir</not-started>
+            </wizard>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
@@ -708,6 +720,12 @@
                 <month>Mes</month>
                 <day>Día</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
@@ -1000,6 +1018,12 @@
                 <month todo="true">Month</month>
                 <day todo="true">Day</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -1290,6 +1314,12 @@
                 <month todo="true">Month</month>
                 <day todo="true">Day</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -1578,6 +1608,12 @@
                 <month>Mese</month>
                 <day>Giorno</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
         <errors>
@@ -1879,6 +1915,12 @@
                 <month>Monat</month>
                 <day>Tag</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
@@ -2180,6 +2222,12 @@
                 <month>Kuukausi</month>
                 <day>Päivä</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
         <errors>
@@ -2481,6 +2529,12 @@
                 <month>Månad</month>
                 <day>Dag</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
         <errors>
@@ -2782,6 +2836,12 @@
                 <month>Maand</month>
                 <day>Dag</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Naamloos form</untitled-form>
         <errors>
@@ -3083,6 +3143,12 @@
                 <month>Mês</month>
                 <day>Dia</day>
             </date-time>
+            <wizard>
+                <errors todo="true">[Errors]</errors>
+                <incomplete todo="true">[Incomplete]</incomplete>
+                <complete todo="true">[Complete]</complete>
+                <not-started todo="true">[Not Started]</not-started>
+            </wizard>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
         <errors>

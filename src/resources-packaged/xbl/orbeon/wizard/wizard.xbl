@@ -34,26 +34,106 @@
             <xbl:handler event="fr-next" phase="target">
                 <xf:dispatch name="DOMActivate" targetid="fr-wizard-next" xxbl:scope="outer"/>
             </xbl:handler>
+            <xbl:handler event="fr-show-toc" phase="target">
+                <xf:action if="$local/separate-toc/data(.)">
+                    <xf:setvalue
+                        ref="$local/show-toc"
+                        value="true()"/>
+                    <xf:setvalue
+                        ref="$local/show-body"
+                        value="false()"/>
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model>
-                <xf:instance id="local">
+                <xf:instance id="local" xxf:expose-xpath-types="true">
                     <local>
+                        <current-case-id/>
+                        <show-toc/>
+                        <show-body/>
                         <readwrite/>
                         <validate/>
+                        <separate-toc/>
                     </local>
                 </xf:instance>
-                <xf:bind ref="validate" xxf:default="frf:isWizardValidate()"/>
+
+                <xf:var name="local" value="instance('local')"/>
+
+                <xf:bind ref="validate"     type="xs:boolean" xxf:default="frf:isWizardValidate()"/>
+                <xf:bind ref="separate-toc" type="xs:boolean" xxf:default="frf:isWizardSeparateToc()"/>
+                <xf:bind ref="show-toc"     type="xs:boolean" xxf:default="true()"/>
+                <xf:bind ref="show-body"    type="xs:boolean" xxf:default="not(frf:isWizardSeparateToc())"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
+                <!-- `app` and `form` must be passed as attributes (see view.xsl) -->
+                <xsl:variable name="static-app"  select="/*/@app/string()"/>
+                <xsl:variable name="static-form" select="/*/@form/string()"/>
+
+                <xsl:variable
+                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    name="static-subsections-nav"
+                    select="p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-nav', $static-app, $static-form), '.')) = true()"
+                    as="xs:boolean"/>
+
+                <!-- `all | active | none` -->
+                <xsl:variable
+                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    name="static-subsections-toc"
+                    select="
+                        (
+                            p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-toc', $static-app, $static-form), '.'))[. = ('all', 'none')],
+                            'active'
+                        )[1]"
+                    as="xs:string"/>
+
+                <xsl:variable
+                    name="static-nav-sections"
+                    select="
+                        if ($static-subsections-nav) then
+                            /*//fr:section[
+                                (
+                                    (: Top-level section without subsections :)
+                                    count(ancestor::fr:section) = 0 and
+                                    empty(fr:section)
+                                ) or (
+                                    (: Subsection :)
+                                    count(ancestor::fr:section) = 1
+                                )
+                            ]
+                        else
+                            (: Top-level sections :)
+                            /*/fr:section
+                "/>
+
+                <xsl:variable
+                    name="static-matching-top-level-section-ids"
+                    select="
+                        (
+                            for $s in $static-nav-sections
+                            return $s/ancestor-or-self::fr:section[last()]
+                        )/@id
+                "/>
+
+                <xsl:variable
+                    name="static-nav-section-ids"
+                    select="$static-nav-sections/@id/string()"/>
+
+                <xsl:variable
+                    name="static-top-level-section-ids"
+                    select="/*/fr:section/@id/string()
+                "/>
+
                 <xsl:template match="/*">
-                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                        <xh:div class="fr-wizard-body">
-                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" >
+                    <xf:group appearance="xxf:internal">
+
+                        <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
+                            <!-- FIXME: Don't like that this is a top-level `switch` id! -->
+                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" >
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <xf:action type="javascript" event="fr-section-scroll" target="#observer">
@@ -72,11 +152,12 @@
                                 </xf:action>
                                 <!-- Wrap each top-level fr:section within each own case -->
                                 <xsl:for-each select="fr:section">
-                                    <xf:case id="{@id}-case">
+                                    <xsl:variable name="static-section-id" select="@id"/>
+                                    <xf:case id="{$static-section-id}-case">
                                         <xsl:if test="/*/@sectionref">
                                             <xsl:attribute
                                                 name="value"
-                                                select="concat('''', frf:controlNameFromId(@id), '''')"
+                                                select="concat('''', frf:controlNameFromId($static-section-id), '''')"
                                                 xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                                         </xsl:if>
                                         <xxf:setvisited
@@ -85,168 +166,329 @@
                                             control="{{event('xxf:targetid')}}"
                                             visited="true"
                                             recurse="true"/>
-                                        <xf:dispatch
-                                            event="xforms-select"
-                                            target="#observer"
-                                            name="fr-section-scroll"
-                                            targetid="switch"/>
+                                        <xf:action event="xforms-select" target="#observer">
+                                            <xf:dispatch name="fr-section-scroll" targetid="switch"/>
+
+                                            <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
+                                                <xf:property name="section-name" value="frf:controlNameFromIdOpt(replace(event('xxf:targetid'), '-case$', ''))"/>
+                                                <xf:property name="validate"     value="$local/validate/data(.)"/>
+                                                <xf:property name="separate-toc" value="$local/separate-toc/data(.)"/>
+                                            </xf:dispatch>
+
+                                        </xf:action>
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
-                                                <xsl:apply-templates select="@* except (@collapse | @open) | node()"/>
+                                                <xsl:apply-templates select="@* except (@collapse | @open)"/>
+                                                <xsl:choose>
+                                                    <xsl:when test="$static-subsections-nav and exists(fr:section)">
+                                                        <!-- Subsection nav enabled -->
+
+                                                        <!-- Don't forget the enclosing section lHHA -->
+                                                        <xsl:apply-templates select="xf:label | xf:help | xf:hint | xf:alert"/>
+
+                                                        <!-- Subsections -->
+                                                        <xf:switch id="{$static-section-id}-switch" xxf:element="div">
+                                                            <xsl:for-each select="fr:section">
+                                                                <xsl:variable name="static-subsection-id" select="@id"/>
+                                                                <xf:case id="{$static-subsection-id}-case">
+                                                                    <xxf:setvisited
+                                                                        event="xforms-deselect"
+                                                                        target="#observer"
+                                                                        control="{{event('xxf:targetid')}}"
+                                                                        visited="true"
+                                                                        recurse="true"/>
+                                                                    <xf:action event="xforms-select" target="#observer">
+                                                                        <xf:dispatch name="fr-section-scroll" targetid="switch"/>
+                                                                    </xf:action>
+                                                                    <xf:group appearance="xxf:internal">
+                                                                        <xsl:copy>
+                                                                            <xsl:attribute name="collapse">false</xsl:attribute>
+                                                                            <xsl:apply-templates select="@* except (@collapse | @open) | node()"/>
+                                                                        </xsl:copy>
+                                                                    </xf:group>
+                                                                </xf:case>
+                                                            </xsl:for-each>
+                                                        </xf:switch>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <!-- No subsection nav -->
+                                                        <xsl:apply-templates select="node()"/>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
                                             </xsl:copy>
                                         </xf:group>
                                     </xf:case>
                                 </xsl:for-each>
                             </xf:switch>
                         </xh:div>
-                        <xh:div class="fr-wizard-toc">
+                        <xf:group class="fr-wizard-toc{{if ($local/show-toc/data(.)) then '' else ' xforms-hidden'}}">
 
-                            <xf:var
-                                name="relevant-cases"
-                                value="
-                                    xxf:cases('switch')[
-                                        for $c in replace(., '-case$', '')
-                                        return exists(xxf:binding($c)) and xxf:relevant(xxf:binding($c))
-                                    ]"/>
-
-                            <xf:var
-                                name="sections-with-visible-errors"
-                                value="
-                                    frf:topLevelSectionsWithErrors(
-                                        string-join(
-                                            for $c in $relevant-cases
-                                            return frf:controlNameFromIdOpt(replace($c, '-case$', '')),
-                                            ' '
-                                        ),
-                                        true()
-                                     )"/>
-
-                            <xf:var
-                                name="current-case"
-                                value="case('switch')"/>
-
-                            <xf:var
-                                name="case-index"
-                                value="index-of($relevant-cases, $current-case)"/>
-
-                            <xf:var
-                                name="prev-cases"
-                                value="$relevant-cases[position() lt $case-index]"/>
-
-                            <xf:var
-                                name="next-cases"
-                                value="$relevant-cases[position() gt $case-index]"/>
-
-                            <xf:var
-                                name="validated-mode"
-                                value="xxf:instance('local')/validate = 'true'"/>
-
-                            <!-- See https://github.com/orbeon/orbeon-forms/issues/2602 -->
-                            <xf:var
-                                name="is-edit-final"
-                                value="$fr-mode = 'edit' and not(xxf:get-request-parameter('draft') = 'true')"/>
-
-                            <xf:var
-                                name="allow-next"
-                                value=
-                                    "not($validated-mode)
-                                     or $is-edit-final
-                                     or xxf:visited($next-cases[1])
-                                     or not(
-                                        exists(
-                                            frf:topLevelSectionsWithErrors(
-                                                string-join(
-                                                    for $c in ($prev-cases, $current-case)
-                                                    return frf:controlNameFromIdOpt(replace($c, '-case$', '')),
-                                                    ' '
-                                                ),
-                                                false()
-                                            )
-                                        )
-                                     )"/>
-
-                            <xf:var
-                                name="is-last-page"
-                                value="empty($next-cases)"/>
-
-                            <xf:var name="prev-button-ref" value="if (exists($prev-cases)) then xxf:instance('local')/readwrite else ''"/>
-                            <xf:var name="next-button-ref" value="if (not($is-last-page))  then xxf:instance('local')/readwrite else ''"/>
-
-                            <xf:group id="fr-wizard-prev-hide"   ref="$prev-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
-                            <xf:group id="fr-wizard-next-hide"   ref="$next-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
-                            <xf:group id="fr-wizard-submit-hide" ref="xxf:instance('local')/readwrite[not($validated-mode) or $is-last-page]"/>
-
-                            <xh:ul class="nav nav-list">
-                                <xsl:apply-templates mode="toc-sections"/>
-                            </xh:ul>
-                            <xh:div class="fr-wizard-navigation">
-
-                                <!-- Make sure the first relevant case is shown initially -->
-                                <!-- NOTE: Ideally, we should also handle the case where the fr:section in the
-                                     currently-selected case becomes non-relevant. However, this should not happen
-                                     in a well-designed form (that would be very user unfriendly). If xf:case supported
-                                     relevance, we might be able to let this behavior be handled by the XForms engine.
-                                 -->
-                                <xf:toggle
+                            <!-- Dispatch fr-toc-shown event as needed -->
+                            <xf:group appearance="xxf:internal" ref=".[$local/show-toc/data(.)]">
+                                <xf:dispatch
                                     event="xforms-enabled"
                                     target="#observer"
-                                    case="{{$relevant-cases[1]}}"/>
+                                    name="fr-toc-shown"
+                                    targetid="fr-wizard">
+                                    <xf:property name="validate"     value="$local/validate/data(.)"/>
+                                    <xf:property name="separate-toc" value="$local/separate-toc/data(.)"/>
+                                </xf:dispatch>
+                            </xf:group>
 
-                                <xh:div class="pagination pagination-centered">
-                                    <xh:ul>
-                                        <xh:li class="{{if ($prev-button-ref instance of xs:string) then 'disabled' else ''}}">
-                                            <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
-                                                <!-- https://github.com/orbeon/orbeon-forms/issues/723
-                                                     https://github.com/orbeon/orbeon-forms/issues/1042 -->
-                                                <xf:label>
-                                                    <xh:i class="icon-chevron-left"/>&#x200b;
-                                                </xf:label>
-                                                <xf:action event="DOMActivate">
-                                                    <xf:toggle case="{{$prev-cases[last()]}}"/>
-                                                    <xf:setfocus control="{{$prev-cases[last()]}}" input-only="true"/>
-                                                </xf:action>
-                                            </xf:trigger>
-                                        </xh:li>
-                                        <xh:li>
-                                            <xh:span class="fr-page-number">
-                                                <xf:output value="$case-index"/>
-                                                <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
-                                                <xf:output value="count($relevant-cases)"/>
-                                            </xh:span>
-                                        </xh:li>
-                                        <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
-                                            <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
-                                                <xf:label>
-                                                    <xh:i class="icon-chevron-right"/>&#x200b;
-                                                </xf:label>
-                                                <xf:action event="DOMActivate">
+                            <xf:group appearance="xxf:internal" xxbl:scope="outer">
 
-                                                    <!-- NOTE: We visit the current page upon xforms-deselect too. -->
-                                                    <xxf:setvisited
-                                                        if="$validated-mode"
-                                                        iterate="$prev-cases, $current-case"
-                                                        control="{{.}}"
-                                                        visited="true"
-                                                        recurse="true"/>
+                                <!-- Statically-known section ids -->
+                                <xf:var
+                                    name="nav-section-ids"
+                                    value="{string-join(for $id in $static-nav-section-ids return concat('''', $id, ''''), ',')}"/>
 
-                                                    <xf:action if="$allow-next">
-                                                        <xf:toggle case="{{$next-cases[1]}}"/>
-                                                        <xf:setfocus control="{{$next-cases[1]}}" input-only="true"/>
+                                <xf:var
+                                    name="nav-matching-top-level-section-ids"
+                                    value="{string-join(for $id in $static-matching-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
+
+                                <xf:var
+                                    name="top-level-section-ids"
+                                    value="{string-join(for $id in $static-top-level-section-ids return concat('''', $id, ''''), ',')}"/>
+
+                                <xf:var
+                                    name="validated-mode"
+                                    value="xxf:instance('local')/validate/data(.)"/>
+
+                                <xf:var
+                                    name="separate-toc-mode"
+                                    value="xxf:instance('local')/separate-toc/data(.)"/>
+
+                                <xf:var
+                                    name="relevant-nav-section-ids"
+                                    value="
+                                        $nav-section-ids[
+                                            exists(xxf:binding(.)) and xxf:relevant(xxf:binding(.))
+                                        ]"/>
+
+                                <xf:var
+                                    name="relevant-top-level-section-ids"
+                                    value="
+                                        $top-level-section-ids[
+                                            exists(xxf:binding(.)) and xxf:relevant(xxf:binding(.))
+                                        ]"/>
+
+                                <xf:var
+                                    name="relevant-nav-case-ids"
+                                    value="
+                                        for $section-id in $relevant-nav-section-ids
+                                        return concat($section-id, '-case')"/>
+
+                                <xf:var
+                                    name="relevant-top-level-case-ids"
+                                    value="
+                                        for $section-id in $relevant-top-level-section-ids
+                                        return concat($section-id, '-case')"/>
+
+                                <xf:var
+                                    name="top-level-sections-with-visible-errors"
+                                    value="
+                                        frf:topLevelSectionsWithErrors(
+                                            string-join(
+                                                for $id in $relevant-top-level-section-ids
+                                                return frf:controlNameFromIdOpt($id),
+                                                ' '
+                                            ),
+                                            true()
+                                         )"/>
+
+                                <xf:var
+                                    name="top-level-sections-with-errors"
+                                    value="
+                                        frf:topLevelSectionsWithErrors(
+                                            string-join(
+                                                for $id in $relevant-top-level-section-ids
+                                                return frf:controlNameFromIdOpt($id),
+                                                ' '
+                                            ),
+                                            false()
+                                         )"/>
+
+                                <xf:var
+                                    name="current-top-level-case-id"
+                                    value="case('switch')"/>
+
+                                <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
+                                <xf:var
+                                    name="current-nav-case-id"
+                                    value="(xxf:instance('local')/current-case-id[xxf:non-blank()]/string(), $relevant-nav-case-ids)[1]"/>
+
+                                <xf:var
+                                    name="nav-case-index"
+                                    value="index-of($relevant-nav-case-ids, $current-nav-case-id)"/>
+
+                                <xf:var
+                                    name="top-level-case-index"
+                                    value="index-of($relevant-top-level-case-ids, $current-top-level-case-id)"/>
+
+                                <xf:var
+                                    name="prev-nav-case-ids"
+                                    value="$relevant-nav-case-ids[position() lt $nav-case-index]"/>
+
+                                <xf:var
+                                    name="prev-top-level-case-ids"
+                                    value="$relevant-top-level-case-ids[position() lt $top-level-case-index]"/>
+
+                                <xf:var
+                                    name="next-nav-case-ids"
+                                    value="$relevant-nav-case-ids[position() gt $nav-case-index]"/>
+
+                                <xf:var
+                                    name="next-top-level-case-ids"
+                                    value="$relevant-top-level-case-ids[position() gt $top-level-case-index]"/>
+
+                                <!-- See https://github.com/orbeon/orbeon-forms/issues/2602 -->
+                                <xf:var
+                                    name="is-edit-final"
+                                    value="$fr-mode = 'edit' and not(xxf:get-request-parameter('draft') = 'true')"/>
+
+                                <xf:var
+                                    name="allow-next-top-level"
+                                    value=
+                                        "not($validated-mode)
+                                         or $is-edit-final
+                                         or xxf:visited($next-top-level-case-ids[1])
+                                         or not(
+                                            exists(
+                                                frf:topLevelSectionsWithErrors(
+                                                    string-join(
+                                                        for $c in ($prev-top-level-case-ids, $current-top-level-case-id)
+                                                        return frf:controlNameFromIdOpt(replace($c, '-case$', '')),
+                                                        ' '
+                                                    ),
+                                                    false()
+                                                )
+                                            )
+                                         )"/>
+
+                                <!-- True if we can go to the next top-level section OR if next is not in different top-level section -->
+                                <xf:var
+                                    name="allow-next"
+                                    value="
+                                        $allow-next-top-level or
+                                        replace($current-top-level-case-id, '-case$', '') =
+                                        $nav-matching-top-level-section-ids[
+                                            index-of($nav-section-ids, replace($next-nav-case-ids[1], '-case$', ''))
+                                        ]"/>
+
+                                <xf:var
+                                    name="is-last-nav"
+                                    value="empty($next-nav-case-ids)"/>
+
+                                <xf:var
+                                    name="is-last-page"
+                                    value="empty($next-top-level-case-ids)"/>
+
+                                <xf:var name="prev-button-ref" value="if (exists($prev-nav-case-ids)) then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="next-button-ref" value="if (not($is-last-nav))          then xxf:instance('local')/readwrite else ''"/>
+
+                                <!-- This ids are used to expose visibility to buttons outside the wizard -->
+                                <xf:group id="fr-wizard-prev-hide"   ref="$prev-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
+                                <xf:group id="fr-wizard-next-hide"   ref="$next-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
+                                <xf:group id="fr-wizard-submit-hide" ref="xxf:instance('local')/readwrite[not($validated-mode) or $is-last-page]"/>
+
+                                <xh:ul class="nav nav-list">
+                                    <xsl:apply-templates mode="toc-sections"/>
+                                </xh:ul>
+                                <xh:div class="fr-wizard-navigation{{if (xxf:instance('local')/separate-toc/data(.)) then ' xforms-hidden' else ''}}">
+
+                                    <xf:action event="xforms-enabled" target="#observer">
+
+                                        <!-- Make sure the first relevant case is shown initially -->
+                                        <!-- NOTE: Ideally, we should also handle the case where the fr:section in the
+                                             currently-selected case becomes non-relevant. However, this should not happen
+                                             in a well-designed form (that would be very user unfriendly). If xf:case supported
+                                             relevance, we might be able to let this behavior be handled by the XForms engine.
+                                         -->
+                                        <xf:setvalue
+                                            ref="xxf:instance('local')/current-case-id"
+                                            value="$relevant-nav-case-ids[1]"/>
+                                        <xf:toggle
+                                            case="{{$relevant-nav-case-ids[1]}}"/>
+
+                                        <!-- Initial event to indicate which top-level section is shown first. This is used
+                                             by Form Runner to tell the error summary which errors to filter on. -->
+                                        <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
+                                            <xf:property name="section-name" value="frf:controlNameFromIdOpt($relevant-top-level-section-ids[1])" xxbl:scope="outer"/>
+                                            <xf:property name="validate"     value="$local/validate/data(.)"/>
+                                            <xf:property name="separate-toc" value="$local/separate-toc/data(.)"/>
+                                        </xf:dispatch>
+                                    </xf:action>
+
+                                    <xh:div class="pagination pagination-centered">
+                                        <xh:ul>
+                                            <xh:li class="{{if ($prev-button-ref instance of xs:string) then 'disabled' else ''}}">
+                                                <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
+                                                    <!-- https://github.com/orbeon/orbeon-forms/issues/723
+                                                         https://github.com/orbeon/orbeon-forms/issues/1042 -->
+                                                    <xf:label>
+                                                        <xh:i class="icon-chevron-left"/>&#x200b;
+                                                    </xf:label>
+                                                    <xf:action event="DOMActivate">
+                                                        <xf:setvalue
+                                                            ref="xxf:instance('local')/current-case-id"
+                                                            value="$prev-nav-case-ids[last()]"/>
+                                                        <xf:toggle
+                                                            case="{{$prev-nav-case-ids[last()]}}"/>
+                                                        <xf:setfocus
+                                                            control="{{$prev-nav-case-ids[last()]}}"
+                                                            input-only="true"/>
                                                     </xf:action>
-                                                    <xf:action if="not($allow-next)">
-                                                        <xf:setfocus control="{{$current-case}}" input-only="true"/>
+                                                </xf:trigger>
+                                            </xh:li>
+                                            <xh:li>
+                                                <xh:span class="fr-page-number">
+                                                    <xf:output value="$nav-case-index"/>
+                                                    <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
+                                                    <xf:output value="count($relevant-nav-case-ids)"/>
+                                                </xh:span>
+                                            </xh:li>
+                                            <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
+                                                <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
+                                                    <xf:label>
+                                                        <xh:i class="icon-chevron-right"/>&#x200b;
+                                                    </xf:label>
+                                                    <xf:action event="DOMActivate">
+
+                                                        <!-- NOTE: We visit the current page upon xforms-deselect too. -->
+                                                        <xxf:setvisited
+                                                            if="$validated-mode"
+                                                            iterate="$prev-nav-case-ids, $current-nav-case-id"
+                                                            control="{{.}}"
+                                                            visited="true"
+                                                            recurse="true"/>
+
+                                                        <xf:action if="$allow-next">
+                                                            <xf:setvalue
+                                                                ref="xxf:instance('local')/current-case-id"
+                                                                value="$next-nav-case-ids[1]"/>
+                                                            <xf:toggle
+                                                                case="{{$next-nav-case-ids[1]}}"/>
+                                                            <xf:setfocus
+                                                                control="{{$next-nav-case-ids[1]}}"
+                                                                input-only="true"/>
+                                                        </xf:action>
+                                                        <xf:action if="not($allow-next)">
+                                                            <xf:setfocus control="{{$current-nav-case-id}}" input-only="true"/>
+                                                        </xf:action>
                                                     </xf:action>
-                                                </xf:action>
-                                            </xf:trigger>
-                                        </xh:li>
-                                    </xh:ul>
+                                                </xf:trigger>
+                                            </xh:li>
+                                        </xh:ul>
+                                    </xh:div>
                                 </xh:div>
-                            </xh:div>
-                        </xh:div>
+                            </xf:group>
+                        </xf:group>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
-                        <xh:div class="fr-wizard-other">
-                            <xsl:apply-templates select="* except fr:section"/>
+                        <xh:div class="fr-wizard-other{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
+                            <xf:group appearance="xxf:internal" xxbl:scope="outer">
+                                <xsl:apply-templates select="* except fr:section"/>
+                            </xf:group>
                         </xh:div>
                     </xf:group>
                 </xsl:template>
@@ -259,61 +501,167 @@
 
                 <!-- TOC: handle section -->
                 <xsl:template match="fr:section" mode="toc-sections">
+                    <xsl:variable name="static-section-id" select="@id"/>
                     <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
                     <xf:group>
                         <xsl:copy-of select="@model | @context | @bind | @ref"/>
+
                         <xsl:variable
-                            name="top-level-section-id"
-                            select="(ancestor-or-self::fr:section/@id)[1]"/>
+                            name="static-current-section"
+                            select="."/>
                         <xsl:variable
-                            name="top-level-section-case-id"
-                            select="concat($top-level-section-id, '-case')"/>
+                            name="static-is-top-level-section"
+                            select="empty($static-current-section/ancestor::fr:section)"/>
+                        <xsl:variable
+                            name="static-top-level-section-id"
+                            select="($static-current-section/ancestor-or-self::fr:section/@id)[1]"/>
+                        <xsl:variable
+                            name="static-top-level-section-case-id"
+                            select="concat($static-top-level-section-id, '-case')"/>
+
                         <!-- NOTE: Only make active top-level sections -->
                         <xf:var
-                            name="active"
-                            value="$current-case = '{concat(@id, '-case')}'"/>
+                            name="top-level-section-active"
+                            value="not($separate-toc-mode) and $current-top-level-case-id = '{concat($static-section-id, '-case')}'"/>
 
                         <xf:var
-                            name="visited"
-                            value="$is-edit-final or xxf:visited('{$top-level-section-case-id}')"/>
+                            name="top-level-section-name"
+                            value="frf:controlNameFromId('{$static-top-level-section-id}')"/>
 
                         <xf:var
-                            name="valid"
-                            value="not($sections-with-visible-errors = frf:controlNameFromId('{$top-level-section-id}'))"/>
+                            name="top-level-section-visited"
+                            value="$is-edit-final or xxf:visited('{$static-top-level-section-case-id}')"/>
 
                         <xf:var
-                            name="disabled"
+                            name="top-level-section-has-visible-errors"
+                            value="$top-level-sections-with-visible-errors = $top-level-section-name"/>
+
+                        <xf:var
+                            name="top-level-section-has-any-errors"
+                            value="$top-level-sections-with-errors = $top-level-section-name"/>
+
+                        <xf:var
+                            name="top-level-section-incomplete"
+                            value="$top-level-section-visited and not($top-level-section-has-visible-errors) and $top-level-section-has-any-errors"/>
+
+                        <xf:var
+                            name="top-level-section-not-started"
+                            value="not($top-level-section-visited)"/>
+
+                        <xf:var
+                            name="top-level-section-disabled"
                             value="
                                 not(
-                                    not($validated-mode)                           or
-                                    $visited                                       or
-                                    $current-case = '{$top-level-section-case-id}' or
-                                    $allow-next and $next-cases[1] = '{$top-level-section-case-id}'
+                                    not($validated-mode)                                               or
+                                    $top-level-section-visited                                         or
+                                    $current-top-level-case-id = '{$static-top-level-section-case-id}' or (
+                                        $allow-next-top-level and
+                                        $next-top-level-case-ids[1] = '{$static-top-level-section-case-id}'
+                                    )
                                 )
                             "/>
 
-                        <xh:li class="{{'active'[$active], 'invalid'[$visited and not($valid)], 'disabled'[$disabled]}}">
+                        <xh:li class="{{
+                            'has-errors' [$top-level-section-has-any-errors],
+                            'invalid'    [$top-level-section-has-visible-errors],
+                            'incomplete' [$top-level-section-incomplete],
+                            'not-started'[$top-level-section-not-started],
+
+                            'disabled'   [$top-level-section-disabled],
+                            'active'     [$top-level-section-active]
+                        }}">
 
                             <xf:var
                                 name="section-label"
-                                value="xxf:label('{@id}')"/>
+                                value="xxf:label('{$static-section-id}')"/>
 
                             <xf:trigger appearance="minimal">
-                                <xf:label value="$section-label"/>
-                                <xf:hint  value="$section-label"/>
-                                <xf:action event="DOMActivate" if="not($disabled)">
-                                    <!-- Toggle to top-level section... -->
-                                    <xf:toggle case="{$top-level-section-case-id}"/>
-                                    <!-- ...but focus on specific sub-section -->
-                                    <xf:setfocus control="{@id}" input-only="true"/>
+                                <xf:label>
+                                    <xf:output value="$section-label"/>
+                                    <xsl:if test="$static-is-top-level-section">
+                                        <!-- NOTE: Hide labels when not in separate-toc mode as they take a lot of space -->
+                                        <xh:span class="{{'xforms-hidden'[not(xxf:instance('local')/separate-toc/data(.))]}} label label-{{
+                                            if ($top-level-section-has-visible-errors) then
+                                                'important'
+                                            else if ($top-level-section-incomplete) then
+                                                'warning'
+                                            else if ($top-level-section-not-started) then
+                                                ''
+                                            else
+                                                'success'
+                                        }}"><xf:output value="
+                                                xxf:r(
+                                                    if ($top-level-section-has-visible-errors) then
+                                                        'components.wizard.errors'
+                                                    else if ($top-level-section-incomplete) then
+                                                        'components.wizard.incomplete'
+                                                    else if ($top-level-section-not-started) then
+                                                        'components.wizard.not-started'
+                                                    else
+                                                        'components.wizard.complete',
+                                                    '|fr-fr-resources|'
+                                                )"/></xh:span>
+                                    </xsl:if>
+                                </xf:label>
+                                <xf:hint value="$section-label"/>
+                                <xf:action event="DOMActivate" if="not($top-level-section-disabled)">
+
+                                    <!-- Figure out the nav section id based on whether we support subsection navigation AND where in the hierarchy
+                                         the clicked TOC section is. -->
+                                    <xsl:variable
+                                        name="static-nav-section-id"
+                                        select="
+                                            if ($static-subsections-nav) then
+                                                (
+                                                    if ($static-is-top-level-section) then
+                                                        (: Current section is a top-level section. Try first subsection if any, otherwise top-level section. :)
+                                                        ($static-current-section/fr:section[1], $static-current-section)[1]
+                                                    else
+                                                        (: Current section is a subsection. Take first subsection. :)
+                                                        ($static-current-section/ancestor-or-self::fr:section)[2]
+                                                )/@id
+                                            else
+                                                $static-top-level-section-id
+                                    "/>
+
+                                    <!-- Remember where we are toggling to, toggle... -->
+                                    <xf:setvalue
+                                        ref="xxf:instance('local')/current-case-id"
+                                        value="'{$static-nav-section-id}-case'"/>
+                                    <xf:toggle
+                                        case="{$static-nav-section-id}-case"/>
+
+                                    <!-- ...and always focus on specific sub-section -->
+                                    <xf:setfocus control="{$static-section-id}" input-only="true"/>
+
+                                    <!-- Show body if needed -->
+                                    <xf:var name="local" value="xxf:instance('local')"/>
+                                    <xf:action if="$local/separate-toc/data(.)">
+                                        <xf:setvalue
+                                            ref="$local/show-toc"
+                                            value="false()"/>
+                                        <xf:setvalue
+                                            ref="$local/show-body"
+                                            value="true()"/>
+                                    </xf:action>
                                 </xf:action>
                             </xf:trigger>
 
-                            <xsl:if test="exists(.//fr:section)">
-                                <xh:ul class="nav nav-list{{if ($active) then '' else ' xforms-hidden'}}">
-                                    <xsl:apply-templates mode="toc-sections"/>
-                                </xh:ul>
-                            </xsl:if>
+                            <xsl:choose>
+                                <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">
+                                    <xh:ul class="nav nav-list">
+                                        <xsl:apply-templates mode="toc-sections"/>
+                                    </xh:ul>
+                                </xsl:when>
+                                <xsl:when test="$static-subsections-toc = 'active' and exists(.//fr:section)">
+                                    <xh:ul class="nav nav-list{{' xforms-hidden'[not($top-level-section-active)]}}">
+                                        <xsl:apply-templates mode="toc-sections"/>
+                                    </xh:ul>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <!-- No content -->
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xh:li>
                     </xf:group>
                 </xsl:template>

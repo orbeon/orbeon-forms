@@ -35,7 +35,7 @@
     <xsl:import href="legacy-repeat.xsl"/>    <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
-    <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>
+    <xsl:variable name="app"  select="doc('input:instance')/*/app" as="xs:string"/>
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
@@ -367,6 +367,25 @@
                 </xsl:if>
                 <xf:dispatch name="fr-update-lang" targetid="error-summary-control-bottom"/>
             </xf:action>
+
+            <xf:action observer="fr-form-group" event="fr-toc-shown" if="event('separate-toc')">
+                <xsl:if test="$error-summary-top">
+                    <xf:dispatch name="fr-hide" targetid="error-summary-control-top"/>
+                </xsl:if>
+                <xf:dispatch name="fr-hide" targetid="error-summary-control-bottom"/>
+            </xf:action>
+
+            <xf:action observer="fr-form-group" event="fr-section-shown">
+                <xsl:if test="$error-summary-top">
+                    <xf:dispatch name="fr-show" targetid="error-summary-control-top">
+                        <xf:property name="section-name" value="event('section-name')[event('separate-toc')]"/>
+                    </xf:dispatch>
+                </xsl:if>
+                <xf:dispatch name="fr-show" targetid="error-summary-control-bottom">
+                    <xf:property name="section-name" value="event('section-name')[event('separate-toc')]"/>
+                </xf:dispatch>
+            </xf:action>
+
         </xf:model>
 
         <xf:model id="fr-pdf-model">

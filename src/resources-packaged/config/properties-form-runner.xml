@@ -212,8 +212,6 @@
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.refresh.*.*"                          value='visit-all'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.wizard-prev.*.*"                      value='wizard-prev'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.wizard-next.*.*"                      value='wizard-next'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >
         if ("not(property('xxf:noscript'))")
@@ -307,6 +305,10 @@
     <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
 
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                  value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.subsections-nav.*.*"               value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"               value="active"/>
+
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="true"/>
 
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.animate.*.*"                      value="true"/>

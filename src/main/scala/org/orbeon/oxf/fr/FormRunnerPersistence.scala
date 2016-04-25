@@ -33,6 +33,10 @@ trait FormRunnerPersistence {
 
   import org.orbeon.oxf.fr.FormRunner._
 
+  sealed abstract class FormOrData(val token: String)
+  case object Form extends FormOrData("form")
+  case object Data extends FormOrData("data")
+
   val CRUDBasePath                       = "/fr/service/persistence/crud"
   val FormMetadataBasePath               = "/fr/service/persistence/form"
   val PersistencePropertyPrefix          = "oxf.fr.persistence"

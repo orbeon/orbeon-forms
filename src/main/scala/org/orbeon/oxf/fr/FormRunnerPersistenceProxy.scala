@@ -178,16 +178,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
           FormRunner.findProvider(appName, formName, "form").toList
         case _ ⇒
           // Get providers independently from app/form
-          // NOTE: Could also optimize case where only app is provided, but no callers as of 2013-10-21.
-          def providersUsedInPropertiesForFormDefinition = (
-            propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix, matchWildcards = false)
-            filterNot (_ endsWith ".data") // exclude `.data` to handle the case of `.*` which covers both `.data` and `.form` endings
-            map       propertySet.getString
-            distinct
-          )
-
-          // See https://github.com/orbeon/orbeon-forms/issues/1186
-          providersUsedInPropertiesForFormDefinition filter FormRunner.isActiveProvider
+          // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
+          getProviders(FormRunner.Form)
       }
     }
 
@@ -213,5 +205,16 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
     response.setContentType("application/xml")
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
+  }
+
+  // Get all providers that can be used either for form data or for form definitions
+  private def getProviders(usableFor: FormRunner.FormOrData): List[String] = {
+    val propertySet = Properties.instance.getPropertySet
+    propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix, matchWildcards = false)
+      .filter (propName ⇒ propName.endsWith(".*") ||
+                          propName.endsWith(s".${usableFor.token}"))
+      .map(propertySet.getString)
+      .distinct
+      .filter(FormRunner.isActiveProvider)
   }
 }

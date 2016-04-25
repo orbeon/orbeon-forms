@@ -117,7 +117,7 @@ class ReindexProcessor extends ProcessorImpl {
           val dataClob = currentData.getClob("xml")
           val source = new StreamSource(dataClob.getCharacterStream)
           val document = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)
-          document \\ * head
+          document.descendant(*).head
         }
 
         // Extract and insert value for each indexed control

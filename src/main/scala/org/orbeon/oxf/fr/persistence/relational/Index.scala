@@ -23,6 +23,8 @@ import org.orbeon.scaxon.XML._
 
 object Index {
 
+  val ProvidersWithIndexSupport = Set(Oracle)
+
   def updateIndex(
     connection : Connection,
     appName    : String,

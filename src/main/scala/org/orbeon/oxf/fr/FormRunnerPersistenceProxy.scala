@@ -19,6 +19,7 @@ import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.fr.persistence.relational.Index
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}
@@ -48,6 +49,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
   private val DataCollectionPath         = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
   private val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
   private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
+  private val ReindexPath                =   "/fr/service/persistence/reindex"
 
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
@@ -64,6 +66,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       case DataCollectionPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, "data", path)
       case SearchPath(path, app, form)                 ⇒ proxyRequest(request, response, app, form, "data", path)
       case PublishedFormsMetadataPath(path, app, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
+      case ReindexPath                                 ⇒ proxyReindex(request, response)
       case _                                           ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
     }
   }
@@ -85,7 +88,10 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
     assert(persistenceBaseURL ne null, "no base URL specified for persistence provider, check properties")
     val serviceURI = NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString)
+    proxyRequest(request, serviceURI, headers, response)
+  }
 
+  private def proxyRequest(request: Request, serviceURI: String, headers: Map[String, String], response: Response): Unit = {
     val cxr = proxyEstablishConnection(request, serviceURI, headers)
 
     useAndClose(cxr) { cxr ⇒
@@ -96,9 +102,10 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
       copyStream(cxr.content.inputStream, response.getOutputStream)
     }
+
   }
 
-  private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]) = {
+  private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]): ConnectionResult = {
     // Create the absolute outgoing URL
     val outgoingURL =
       new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
@@ -179,7 +186,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         case _ ⇒
           // Get providers independently from app/form
           // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
-          getProviders(FormRunner.Form)
+          getProviders(usableFor = FormRunner.Form)
       }
     }
 
@@ -205,6 +212,19 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
     response.setContentType("application/xml")
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
+  }
+
+  private def proxyReindex(
+    request  : Request,
+    response : Response
+  ): Unit = {
+    getProviders(usableFor = FormRunner.Data)
+        .filter  (provider ⇒ Index.ProvidersWithIndexSupport.map(_.token).contains(provider))
+        .map     (FormRunner.getPersistenceURLHeadersFromProvider)
+        .foreach { case (baseURI, headers) ⇒
+          val serviceURI = baseURI + "/reindex"
+          proxyRequest(request, serviceURI, headers, response)
+        }
   }
 
   // Get all providers that can be used either for form data or for form definitions

@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational
+package org.orbeon.oxf.fr.persistence.relational
 
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -21,7 +21,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.fr.relational.Index.IndexedControl
+import org.orbeon.oxf.fr.persistence.relational.Index.IndexedControl
 import org.orbeon.oxf.xforms.XFormsConstants
 import collection.JavaConverters._
 import org.orbeon.scaxon.XML
@@ -70,7 +70,11 @@ class ReindexProcessor extends ProcessorImpl {
           |""".stripMargin).executeQuery()
 
       // Info on indexed controls for a given app/form
-      case class FormIndexedControls(app: String, form: String, indexedControls: Seq[IndexedControl])
+      case class FormIndexedControls(
+        app             : String,
+        form            : String,
+        indexedControls : Seq[IndexedControl]
+      )
 
       // Go through each data document
       // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them

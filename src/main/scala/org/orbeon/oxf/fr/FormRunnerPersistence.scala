@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import java.net.URI
 
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.fr.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._

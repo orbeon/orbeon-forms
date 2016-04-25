@@ -11,11 +11,11 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.fr.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.Connection
 
-import org.orbeon.oxf.fr.relational._
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException

@@ -11,14 +11,14 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.Connection
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.relational.crud.RequestReader._
+import org.orbeon.oxf.fr.persistence.relational.crud.RequestReader._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 

@@ -209,7 +209,7 @@
                                                                          $exist-result/metadata,
                                                                          $exist-result/data-exists = 'true',
                                                                          $request-description/method)"
-                                        xmlns:ep="org.orbeon.oxf.fr.existdb.Permissions"/>
+                                        xmlns:ep="org.orbeon.oxf.fr.persistence.existdb.Permissions"/>
                             </root>
                         </xsl:template>
                     </xsl:stylesheet>

@@ -11,10 +11,10 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.crud
 
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
-import org.orbeon.oxf.fr.relational._
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._

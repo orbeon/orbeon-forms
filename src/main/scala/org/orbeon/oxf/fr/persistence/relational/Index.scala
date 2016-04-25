@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational
+package org.orbeon.oxf.fr.persistence.relational
 
 import java.sql.Connection
 

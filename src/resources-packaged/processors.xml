@@ -766,10 +766,10 @@
         <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>
     </processor>
     <processor name="fr:relational-persistence-reindex">
-        <class name="org.orbeon.oxf.fr.relational.ReindexProcessor"/>
+        <class name="org.orbeon.oxf.fr.persistence.relational.ReindexProcessor"/>
     </processor>
     <processor name="fr:relational-crud">
-        <class name="org.orbeon.oxf.fr.relational.crud.CRUD"/>
+        <class name="org.orbeon.oxf.fr.persistence.relational.crud.CRUD"/>
     </processor>
     <processor name="fr:xforms-to-schema">
         <class name="org.orbeon.oxf.fr.schema.XFormsToSchema"/>

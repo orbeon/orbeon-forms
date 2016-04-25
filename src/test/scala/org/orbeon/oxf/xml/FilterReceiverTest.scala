@@ -19,7 +19,7 @@ import org.junit.Test
 import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
 import org.orbeon.scaxon.SAXEvents._
 import JXQName._
-import org.orbeon.oxf.fr.relational.crud.RequestReader
+import org.orbeon.oxf.fr.persistence.relational.crud.RequestReader
 import org.orbeon.scaxon.DocumentAndElementsCollector
 
 class FilterReceiverTest extends ResourceManagerTestBase with AssertionsForJUnit {
@@ -39,7 +39,7 @@ class FilterReceiverTest extends ResourceManagerTestBase with AssertionsForJUnit
 
     val XMLLang    = JXQName("http://www.w3.org/XML/1998/namespace" → "lang")
     val Operations = JXQName("operations")
-    
+
     val expected = Seq(
       StartDocument,
         StartPrefixMapping("sql", "http://orbeon.org/oxf/xml/sql"),

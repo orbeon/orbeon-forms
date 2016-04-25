@@ -1,4 +1,4 @@
-package org.orbeon.oxf.fr.existdb
+package org.orbeon.oxf.fr.persistence.existdb
 
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.{NetUtils, IndentedLogger, LoggerFactory}
@@ -22,10 +22,10 @@ object Permissions {
         case Some(permissionsEl) ⇒
           if (metadataFromDB != null) {
             def dataUserGroupName(elName: String): Option[String] = {
-              val elStringValue = metadataFromDB.child(elName) .stringValue
+              val elStringValue = metadataFromDB.child(elName).stringValue
               if (elStringValue == "") None else Some(elStringValue)
             }
-            val dataUsername  = dataUserGroupName("username")
+            val dataUsername = dataUserGroupName("username")
             val dataGroupname = dataUserGroupName("groupname")
             FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname).toSet
           } else {
@@ -35,13 +35,13 @@ object Permissions {
     }
 
     val authorized = method match {
-      case "GET"                    ⇒ authorizedOperations("read")
-      case "DELETE"                 ⇒ authorizedOperations("delete")
-      case "PUT"    if dataExists   ⇒ authorizedOperations("update")
-      case "PUT"    if ! dataExists ⇒ authorizedOperations("create")
+      case "GET"                ⇒ authorizedOperations("read")
+      case "DELETE"             ⇒ authorizedOperations("delete")
+      case "PUT" if dataExists  ⇒ authorizedOperations("update")
+      case "PUT" if !dataExists ⇒ authorizedOperations("create")
     }
 
-    if (! authorized) throw HttpStatusCodeException(403)
+    if (!authorized) throw HttpStatusCodeException(403)
     def httpResponse = NetUtils.getExternalContext.getResponse
     httpResponse.setHeader("Orbeon-Operations", authorizedOperations.mkString(" "))
   }

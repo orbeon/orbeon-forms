@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.io.{ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array ⇒ _, _}
@@ -20,8 +20,8 @@ import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.fr.FormRunner.{XF, XH}
-import org.orbeon.oxf.fr.relational.Version._
-import org.orbeon.oxf.fr.relational.{ForDocument, Specific, _}
+import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.ScalaUtils._

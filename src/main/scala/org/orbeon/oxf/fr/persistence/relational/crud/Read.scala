@@ -11,12 +11,12 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 import org.orbeon.oxf.fr.FormRunnerPersistence
-import org.orbeon.oxf.fr.relational.Version._
-import org.orbeon.oxf.fr.relational.{Specific, Next, Unspecified, RelationalUtils}
+import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.{Specific, Next, Unspecified, RelationalUtils}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils

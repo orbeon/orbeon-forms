@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream
 import org.dom4j.Document
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.relational.{ForDocument, Next, Specific, Unspecified}
+import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Next, Specific, Unspecified}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}

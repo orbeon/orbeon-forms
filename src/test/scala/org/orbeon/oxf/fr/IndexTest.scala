@@ -3,8 +3,8 @@ package org.orbeon.oxf.fr
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fr.relational.Index
-import org.orbeon.oxf.fr.relational.Index.IndexedControl
+import org.orbeon.oxf.fr.persistence.relational.Index
+import org.orbeon.oxf.fr.persistence.relational.Index.IndexedControl
 import org.orbeon.oxf.test.DocumentTestBase
 
 class IndexTest extends DocumentTestBase with AssertionsForJUnit {

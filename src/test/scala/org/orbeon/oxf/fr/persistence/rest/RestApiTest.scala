@@ -17,8 +17,9 @@ import java.io.ByteArrayInputStream
 
 import org.dom4j.Document
 import org.junit.Test
+import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Next, Specific, Unspecified}
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -42,13 +43,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   val AllOperations = Set("create", "read", "update", "delete")
 
-  private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"
-  private def metadataURL(provider: Provider) = s"form/${provider.name}/my-form"
+  private def crudURLPrefix(provider: Provider) = s"crud/${provider.token}/my-form/"
+  private def metadataURL(provider: Provider) = s"form/${provider.token}/my-form"
 
   private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T): Unit = {
     withDebug(message) {
-      Provider.ProvidersTestedAutomatically.foreach { provider ⇒
-        withDebug("on database", List("provider" → provider.name)) {
+      ProvidersTestedAutomatically.foreach { provider ⇒
+        withDebug("on database", List("provider" → provider.token)) {
           Connect.asTomcat(provider) { connection ⇒
             val statement = connection.createStatement
             try {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,16 +11,12 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.db
+package org.orbeon.oxf.fr
 
-private[persistence] sealed abstract class Provider(val name: String)
+import org.orbeon.oxf.fr.persistence.relational._
 
-object Provider {
+package object persistence {
+
   val ProvidersTestedAutomatically: List[Provider] = List(Oracle, MySQL, SQLServer, PostgreSQL)
-}
 
-private[persistence] case object Oracle     extends Provider("oracle")
-private[persistence] case object MySQL      extends Provider("mysql")
-private[persistence] case object SQLServer  extends Provider("sqlserver")
-private[persistence] case object PostgreSQL extends Provider("postgresql")
-private[persistence] case object DB2        extends Provider("db2")
+}

@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
-import java.sql.{DriverManager, Connection}
+import java.sql.{Connection, DriverManager}
+
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
@@ -57,7 +59,7 @@ private[persistence] object Connect {
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""
       case provider ⇒
-        throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
+        throw new IllegalArgumentException(s"unsupported provider `${provider.token}`")
     }
     val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
     val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList

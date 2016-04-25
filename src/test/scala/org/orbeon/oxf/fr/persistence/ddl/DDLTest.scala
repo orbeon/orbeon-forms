@@ -16,7 +16,9 @@ package org.orbeon.oxf.fr.persistence.ddl
 import java.sql.Connection
 
 import org.junit.Test
+import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -83,7 +85,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
             |    WHERE table_name = ?
             | ORDER BY ordinal_position"""
         case provider ⇒
-          throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
+          throw new IllegalArgumentException(s"unsupported provider `${provider.token}`")
       }
       Connect.getTableNames(provider, connection).map { tableName ⇒
         val tableInfoResultSet = {
@@ -106,7 +108,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   }
 
   private def assertSameTable(provider: Provider, from: String, to: String): Unit = {
-    val name = provider.name
+    val name = provider.token
     withDebug("comparing upgrade to straight", List("provider" → name, "from" → from, "to" → to)) {
       val upgrade  = sqlToTableInfo(provider, SQL.read(s"$name-$from.sql") ++ SQL.read(s"$name-$from-to-$to.sql"))
       val straight = sqlToTableInfo(provider, SQL.read(s"$name-$to.sql"))
@@ -115,7 +117,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   }
 
   @Test def createAndUpgradeTest(): Unit = {
-    Provider.ProvidersTestedAutomatically.foreach {
+    ProvidersTestedAutomatically.foreach {
       case Oracle ⇒
         assertSameTable(Oracle, "4_3", "4_4" )
         assertSameTable(Oracle, "4_4", "4_5" )

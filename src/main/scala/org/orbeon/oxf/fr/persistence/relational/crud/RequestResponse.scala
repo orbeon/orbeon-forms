@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 case class DataPart(isDraft: Boolean, documentId: String)
 
 case class Request(
-  provider : String,
+  provider : Provider,
   app      : String,
   form     : String,
   filename : Option[String],
@@ -61,14 +61,19 @@ trait RequestResponse {
     val version =
       Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
 
+    def providerFromToken(token: String): Provider = {
+      val providerOpt = AllProviders.find(_.token == token)
+      providerOpt.getOrElse(throw new IllegalStateException)
+    }
+
     httpRequest.getRequestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(provider, app, form, file, version, None)
+        Request(providerFromToken(provider), app, form, file, version, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId)
-        Request(provider, app, form, file, version, Some(dataPart))
+        Request(providerFromToken(provider), app, form, file, version, Some(dataPart))
     }
   }
 

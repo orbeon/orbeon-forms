@@ -313,7 +313,9 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.collapsible.*.*"                  value="true"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.noscript.collapsible.*.*"         value="true"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.section.appearance.*.*"                   value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.section.insert.*.*"                       value="index"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                      value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.insert.*.*"                          value="index"/>
 
 </properties>

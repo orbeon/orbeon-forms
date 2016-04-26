@@ -37,6 +37,14 @@
                     $section-appearance != 'full'">
                 <xsl:attribute name="appearance" select="$section-appearance"/>
             </xsl:if>
+            <xsl:if
+                test="
+                    frf:isRepeat(.)             and
+                    empty(@insert)              and
+                    exists($section-insert)     and
+                    $section-insert != 'index'">
+                <xsl:attribute name="insert" select="$section-insert"/>
+            </xsl:if>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
@@ -51,6 +59,14 @@
                     exists($grid-appearance) and
                     $grid-appearance != 'full'">
                 <xsl:attribute name="appearance" select="$grid-appearance"/>
+            </xsl:if>
+            <xsl:if
+                test="
+                    frf:isRepeat(.)          and
+                    empty(@insert)           and
+                    exists($grid-insert)     and
+                    $grid-insert != 'index'">
+                <xsl:attribute name="insert" select="$grid-insert"/>
             </xsl:if>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="node()"/>

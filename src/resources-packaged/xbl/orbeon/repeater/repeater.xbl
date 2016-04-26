@@ -83,6 +83,7 @@
                 <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
 
                 <xsl:variable name="appearance"         select="($root/@appearance, 'full')[1]"/>
+                <xsl:variable name="insert"             select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
                 <xsl:variable name="remove-at-bottom"   select="false()"/>
 
                 <xsl:template match="/*">
@@ -126,8 +127,19 @@
                         <xf:var name="can-add"
                                 value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
 
-                        <xf:action event="DOMActivate" observer="fr-repeater-add">
-                            <xf:var name="p" value="max(($repeat-index, {$freeze}))"/>
+                        <xf:action event="DOMActivate" observer="fr-repeater-add fr-repeater-add-bottom">
+                            <xsl:choose>
+                                <xsl:when test="$insert = 'index'">
+                                    <xf:var
+                                        name="p"
+                                        value="max(($repeat-index, {$freeze}))"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xf:var
+                                        name="p"
+                                        value="count($repeat-sequence)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xf:insert
                                 context="$repeat-context"
                                 ref="$repeat-sequence"
@@ -136,19 +148,6 @@
                                 xxf:defaults="{$apply-defaults}"/>
                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
                             <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
-                            <!-- Let the outside world know -->
-                            <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added"/>
-                        </xf:action>
-
-                        <xf:action event="DOMActivate" observer="fr-repeater-add-bottom">
-                            <xf:var name="p" value="count($repeat-sequence)"/>
-                            <xf:insert
-                                context="$repeat-context"
-                                ref="$repeat-sequence"
-                                origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
-                                xxf:defaults="{$apply-defaults}"/>
-                            <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf5"/>
                             <!-- Let the outside world know -->
                             <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added"/>
                         </xf:action>

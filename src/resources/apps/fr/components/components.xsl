@@ -143,6 +143,16 @@
         select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'))[normalize-space()]"
         as="xs:string?"/>
 
+    <xsl:variable
+        name="section-insert"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.insert', $app, $form), '.'))[normalize-space()]"
+        as="xs:string?"/>
+
+    <xsl:variable
+        name="grid-insert"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.insert', $app, $form), '.'))[normalize-space()]"
+        as="xs:string?"/>
+
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"

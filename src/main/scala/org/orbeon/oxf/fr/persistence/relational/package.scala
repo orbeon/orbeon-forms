@@ -25,4 +25,8 @@ package object relational {
 
   val AllProviders = List(Oracle, MySQL, SQLServer, PostgreSQL, DB2)
 
+  def providerFromToken(token: String): Provider = {
+    val providerOpt = AllProviders.find(_.token == token)
+    providerOpt.getOrElse(throw new IllegalStateException)
+  }
 }

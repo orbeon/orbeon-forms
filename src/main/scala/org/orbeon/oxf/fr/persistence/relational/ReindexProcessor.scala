@@ -47,7 +47,8 @@ class ReindexProcessor extends ProcessorImpl {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    val ReindexPathRegex(provider) = NetUtils.getExternalContext.getRequest.getRequestPath
+    val ReindexPathRegex(providerToken) = NetUtils.getExternalContext.getRequest.getRequestPath
+    val provider = providerFromToken(providerToken)
 
     RelationalUtils.withConnection { connection ⇒
 
@@ -56,18 +57,19 @@ class ReindexProcessor extends ProcessorImpl {
       connection.prepareStatement("DELETE FROM orbeon_i_control_text").execute()
 
       // Get all the row from orbeon_form_data that are "latest" and not deleted
+      val xmlCol = RelationalUtils.xmlCol(provider, "d")
       val currentData = connection.prepareStatement(
-        """  SELECT id, created, last_modified, username, app, form, document_id, xml
-          |    FROM orbeon_form_data
-          |   WHERE (app, form, document_id, last_modified) IN
-          |         (
-          |               SELECT app, form, document_id, max(last_modified) last_modified
-          |                 FROM orbeon_form_data
-          |             GROUP BY app, form, document_id
-          |         )
-          |     AND deleted = 'N'
-          |ORDER BY app, form
-          |""".stripMargin).executeQuery()
+        s"""  SELECT id, created, last_modified_time, username, app, form, document_id, $xmlCol
+           |    FROM orbeon_form_data d
+           |   WHERE (app, form, document_id, last_modified_time) IN
+           |         (
+           |               SELECT app, form, document_id, max(last_modified_time) last_modified_time
+           |                 FROM orbeon_form_data
+           |             GROUP BY app, form, document_id
+           |         )
+           |     AND deleted = 'N'
+           |ORDER BY app, form
+           |""".stripMargin).executeQuery()
 
       // Info on indexed controls for a given app/form
       case class FormIndexedControls(
@@ -102,13 +104,13 @@ class ReindexProcessor extends ProcessorImpl {
         // Insert into the "current data" table
         val insert = connection.prepareStatement(
           """INSERT INTO orbeon_i_current
-            |           (data_id, document_id, created, last_modified, username, app, form)
+            |           (data_id, document_id, created, last_modified_time, username, app, form)
             |    VALUES (?, ?, ?, ?, ?, ?, ?)
           """.stripMargin)
         insert.setInt      (1, currentData.getInt      ("id"))
         insert.setString   (2, currentData.getString   ("document_id"))
         insert.setTimestamp(3, currentData.getTimestamp("created"))
-        insert.setTimestamp(4, currentData.getTimestamp("last_modified"))
+        insert.setTimestamp(4, currentData.getTimestamp("last_modified_time"))
         insert.setString   (5, currentData.getString   ("username"))
         insert.setString   (6, app)
         insert.setString   (7, form)
@@ -127,21 +129,22 @@ class ReindexProcessor extends ProcessorImpl {
         // Extract and insert value for each indexed control
         for (control ← indexedControls) {
 
-          val values = XML.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
-          for ((value, position) ← values.zipWithIndex) {
-            val insert = connection.prepareStatement(
-              """insert into orbeon_i_control_text
-                |           (data_id, username, app, form, control, pos, val)
-                |    values (?, ?, ?, ?, ?, ?, ?)
-              """.stripMargin)
-            insert.setInt      (1, currentData.getInt("id"))
-            insert.setString   (2, currentData.getString("username"))
-            insert.setString   (3, app)
-            insert.setString   (4, form)
-            insert.setString   (5, control.name)
-            insert.setInt      (6, position + 1)
-            insert.setString   (7, truncateValue(provider, value.getStringValue))
-            insert.execute()
+          val nodes = XML.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
+          for ((node, position) ← nodes.zipWithIndex) {
+            val nodeValue = truncateValue(provider, node.getStringValue)
+            // For indexing, we are not interested in empty values
+            if (! nodeValue.isEmpty) {
+              val insert = connection.prepareStatement(
+                """INSERT INTO orbeon_i_control_text
+                  |           (data_id, pos, control, val)
+                  |    VALUES (?      , ?  , ?      , ?  )
+                """.stripMargin)
+              insert.setInt      (1, currentData.getInt("id"))
+              insert.setInt      (2, position + 1)
+              insert.setString   (3, control.name)
+              insert.setString   (4, nodeValue)
+              insert.execute()
+            }
           }
         }
 
@@ -163,11 +166,11 @@ class ReindexProcessor extends ProcessorImpl {
    *   [MySQL text]: http://dev.mysql.com/doc/refman/5.6/en/storage-requirements.html#idp59499472
    *   [MySQL utf]: http://dev.mysql.com/doc/refman/5.6/en/charset-unicode-utf8mb3.html
    */
-  private def truncateValue(provider: String, value: String): String = {
+  private def truncateValue(provider: Provider, value: String): String = {
     // Limit, if any, based on the provider
     val limit: Option[Int] = provider match {
-      case "mysql" ⇒ Option(math.floor((math.pow(2, 16) - 1) / 4).toInt)
-      case _       ⇒ None
+      case MySQL ⇒ Option(math.floor((math.pow(2, 16) - 1) / 4).toInt)
+      case _     ⇒ None
     }
     limit match {
       case Some(l) if l < value.length ⇒ value.substring(0, l)

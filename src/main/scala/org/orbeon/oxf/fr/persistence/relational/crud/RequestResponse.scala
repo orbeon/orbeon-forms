@@ -61,11 +61,6 @@ trait RequestResponse {
     val version =
       Version(headerValue(OrbeonForDocumentIdLower), headerValue(OrbeonFormDefinitionVersionLower))
 
-    def providerFromToken(token: String): Provider = {
-      val providerOpt = AllProviders.find(_.token == token)
-      providerOpt.getOrElse(throw new IllegalStateException)
-    }
-
     httpRequest.getRequestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)

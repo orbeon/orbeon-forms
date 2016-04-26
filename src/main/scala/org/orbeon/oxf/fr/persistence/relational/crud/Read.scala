@@ -47,15 +47,10 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
       val resultSet = {
         val table  = tableName(req)
         val idCols = idColumns(req)
-        val xmlCol = req.provider match {
-          case Oracle     ⇒ "t.xml.getClobVal()"
-          case DB2        ⇒ "xml2clob(t.xml)"
-          case PostgreSQL ⇒ "t.xml as"
-          case _          ⇒ "t.xml"
-        }
+        val xmlCol = RelationalUtils.xmlCol(req.provider, "t")
         val ps = connection.prepareStatement(
           s"""|SELECT  t.last_modified_time
-            |        ${if (req.forAttachment) ", t.file_content"            else s", $xmlCol xml"}
+            |        ${if (req.forAttachment) ", t.file_content"            else s", $xmlCol"}
             |        ${if (req.forData)       ", t.username, t.groupname"   else ""}
             |        , t.form_version, t.deleted
             |FROM    $table t,

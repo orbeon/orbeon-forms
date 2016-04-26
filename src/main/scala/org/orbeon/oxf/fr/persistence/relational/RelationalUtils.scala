@@ -44,6 +44,14 @@ object RelationalUtils extends Logging {
       }
     }
 
+  def xmlCol(provider: Provider, tableName: String) =
+    provider match {
+      case Oracle     ⇒ s"$tableName.xml.getClobVal() xml"
+      case DB2        ⇒ s"xml2clob($tableName.xml) xml"
+      case PostgreSQL ⇒ s"$tableName.xml as xml"
+      case _          ⇒ s"$tableName.xml xml"
+    }
+
   /**
     * For cases where we can't use `setString` on a prepared statement
     * - Apache Commons Lang had a `StringEscapeUtils.escapeSql` [1] but it has been deprecated in Commons Lang 3 [2]

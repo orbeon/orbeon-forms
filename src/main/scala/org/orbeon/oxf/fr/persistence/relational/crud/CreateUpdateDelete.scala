@@ -183,7 +183,7 @@ trait CreateUpdateDelete extends RequestResponse with Common {
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 
     val table = tableName(req)
-    val versionToSet = existingRow.map(_.formVersion).flatten.getOrElse(requestedFormVersion(connection, req))
+    val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
 
     def param[T](setter: (PreparedStatement) ⇒ ((Int, T) ⇒ Unit), value: ⇒ T): (PreparedStatement, Int) ⇒ Unit = {
       (ps: PreparedStatement, i: Int) ⇒ setter(ps)(i, value)
@@ -217,8 +217,8 @@ trait CreateUpdateDelete extends RequestResponse with Common {
         req.forAttachment     → "file_name"          → "?"    → param(_.setString   , req.filename.get),
         req.forAttachment     → "file_content"       → "?"    → param(_.setBytes    , RequestReader.bytes()),
         isFormDefinition      → "form_metadata"      → "?"    → param(_.setString   , metadataOpt.orNull),
-        req.forData           → "username"           → "?"    → param(_.setString   , existingRow.map(_.username).flatten.getOrElse(requestUsername.orNull)),
-        req.forData           → "groupname"          → "?"    → param(_.setString   , existingRow.map(_.group   ).flatten.getOrElse(requestGroup   .orNull)),
+        req.forData           → "username"           → "?"    → param(_.setString   , existingRow.flatMap(_.username).getOrElse(requestUsername.orNull)),
+        req.forData           → "groupname"          → "?"    → param(_.setString   , existingRow.flatMap(_.group).getOrElse(requestGroup   .orNull)),
         ! req.forAttachment   → xmlCol               → xmlVal → param(_.setString   , xmlOpt.orNull)
       )
 

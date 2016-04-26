@@ -2465,7 +2465,7 @@
                 <section-name>Sektionsnamn</section-name>
                 <yes>Ja</yes>
                 <no>Nej</no>
-                <other todo="true">[Other]</other>
+                <other>Annat</other>
             </labels>
             <grid>
                 <insert-above>Infoga ovanför</insert-above>
@@ -2474,7 +2474,7 @@
                 <move-down>Flytta ned</move-down>
                 <remove>Ta bort</remove>
                 <menu>Meny</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <add-another>Lägg till rad</add-another>
             </grid>
             <date-time>
                 <year>År</year>

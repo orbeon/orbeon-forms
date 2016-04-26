@@ -8335,10 +8335,10 @@
             <hint>Bild som visas överst på formuläret</hint>
         </logo>
         <general-settings>
-            <label todo="true">[General Settings]</label>
+            <label>Inställningar</label>
         </general-settings>
         <custom-settings>
-            <label todo="true">[Custom Settings]</label>
+            <label>Speciella inställningar</label>
         </custom-settings>
         <!-- Toolbox -->
         <cut>
@@ -8586,7 +8586,7 @@
                     <value>fr-email-subject</value>
                 </item>
                 <item>
-                    <label todo="true">[Include as Email Attachment]</label>
+                    <label>Lägg till som mejlbilaga</label>
                     <value>fr-email-attachment</value>
                 </item>
             </options>
@@ -8595,7 +8595,7 @@
             </control-appearance>
             <whitespace>
                 <item>
-                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <label>Ta bort blanka i början och slutet</label>
                     <value>trim</value>
                 </item>
             </whitespace>
@@ -8690,11 +8690,11 @@
                 <item id="formula">Formel</item>
                 <item id="max-length">Har största längd</item>
                 <item id="min-length">Har minsta längd</item>
-                <item id="positive" todo="true">[Positive]</item>
-                <item id="non-negative" todo="true">[Positive or Zero]</item>
-                <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Negative]</item>
-                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="positive">Positivt</item>
+                <item id="non-negative">Positivt eller noll</item>
+                <item id="non-positive">Negativt eller noll</item>
+                <item id="negative">Negativt</item>
+                <item id="fraction-digits">Decimaler max</item>
             </constraint>
             <formula>
                 <label>Formel</label>
@@ -8758,7 +8758,7 @@
             <options>
                 <label>Val</label>
                 <item>
-                    <label todo="true">[Initially Open]</label>
+                    <label>Expanderad från början</label>
                     <value>fr-initially-open</value>
                 </item>
                 <item>
@@ -8767,17 +8767,17 @@
                 </item>
             </options>
             <collapsible>
-                <label todo="true">[Collapsible]</label>
+                <label>Hopfällbar</label>
                 <item>
-                    <label todo="true">[Use Default]</label>
+                    <label>Använd standard</label>
                     <value>default</value>
                 </item>
                 <item>
-                    <label todo="true">[Always]</label>
+                    <label>Alltid</label>
                     <value>true</value>
                 </item>
                 <item>
-                    <label todo="true">[Never]</label>
+                    <label>Aldrig</label>
                     <value>false</value>
                 </item>
             </collapsible>
@@ -8814,10 +8814,10 @@
                 <hint>Ett positivt heltal eller ett XPath-uttryck</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label>Tillämpa startvärdesformlerna när upprepning läggs till</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label>Ursprungligt antal upprepningar använder mall</label>
             </initial-iterations>
             <other>Specificera</other>
             <one>En upprepning</one>
@@ -8941,13 +8941,13 @@
         </dialog-itemsets>
         <dialog-http-services>
             <label>HTTP-tjänster</label>
-            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
-            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
-            <tab-test todo="true"><label>[Test Results]</label></tab-test>
-            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
-            <parameter-name todo="true"><label>[Name]</label></parameter-name>
-            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
-            <no-headers todo="true">[No headers received].</no-headers>
+            <tab-definition><label>Definition</label></tab-definition>
+            <tab-advanced><label>Avancerat</label></tab-advanced>
+            <tab-test><label>Testresultat</label></tab-test>
+            <url-parameters><label>URL-parametrar</label></url-parameters>
+            <parameter-name><label>Namn</label></parameter-name>
+            <parameter-default-value><label>Standardvärde</label></parameter-default-value>
+            <no-headers>Inga headers mottagna</no-headers>
             <service-name>
                 <label>Namn</label>
                 <hint>Definiera ett unikt namn för denna HTTP-tjänst</hint>
@@ -9070,19 +9070,19 @@
                 <label>Reagera på</label>
                 <hint>Händelse som ska trigga kommandot</hint>
                 <item>
-                    <label>Värdeändring</label>
+                    <label>kontroll ändrar värde</label>
                     <value>xforms-value-changed</value>
                 </item>
                 <item>
-                    <label todo="true">Värdeändring eller formulär laddas in</label>
+                    <label>kontroll visas eller ändrar värde</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
                 <item>
-                    <label>Aktivering</label>
+                    <label>aktivering</label>
                     <value>DOMActivate</value>
                 </item>
                 <item>
-                    <label>Formulär inladdat</label>
+                    <label>formulär inladdat</label>
                     <value>xforms-ready</value>
                 </item>
             </event-type>

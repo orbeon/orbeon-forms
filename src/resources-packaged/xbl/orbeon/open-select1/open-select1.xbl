@@ -40,7 +40,7 @@
             <display-name lang="it" todo="true">[Radio Buttons with "Other"]</display-name>
             <display-name lang="nl" todo="true">[Radio Buttons with "Other"]</display-name>
             <display-name lang="pt" todo="true">[Radio Buttons with "Other"]</display-name>
-            <display-name lang="sv" todo="true">[Radio Buttons with "Other"]</display-name>
+            <display-name lang="sv">Enkelval med "Annat"</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>

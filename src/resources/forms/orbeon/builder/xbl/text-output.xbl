@@ -22,7 +22,7 @@
             <display-name lang="de" todo="true">Textausgabe</display-name>
             <display-name lang="it" todo="true">Testo statico</display-name>
             <display-name lang="nl" todo="true">Tekstuitvoer</display-name>
-            <display-name lang="sv" todo="true">Fast text</display-name>
+            <display-name lang="sv">Beräknat värde</display-name>
             <display-name lang="pt" todo="true">Saída de Texto</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/other/calculator-16.png</small-icon>

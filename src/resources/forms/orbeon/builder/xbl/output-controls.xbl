@@ -22,7 +22,7 @@
         <display-name lang="de" todo="true">[Output Controls]</display-name>
         <display-name lang="it" todo="true">[Output Controls]</display-name>
         <display-name lang="nl" todo="true">[Output Controls]</display-name>
-        <display-name lang="sv" todo="true">[Output Controls]</display-name>
+        <display-name lang="sv">Enbart utmatning</display-name>
         <display-name lang="pt" todo="true">[Output Controls]</display-name>
     </metadata>
 

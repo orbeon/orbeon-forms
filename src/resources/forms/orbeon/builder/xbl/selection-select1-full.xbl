@@ -24,7 +24,7 @@
             <display-name lang="de">Exklusive Auswahl</display-name>
             <display-name lang="it">Scelta unica</display-name>
             <display-name lang="nl">Keuzerondje</display-name>
-            <display-name lang="sv">Exklusivt val</display-name>
+            <display-name lang="sv">Enkelval</display-name>
             <display-name lang="pt">Botões de Opção</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>

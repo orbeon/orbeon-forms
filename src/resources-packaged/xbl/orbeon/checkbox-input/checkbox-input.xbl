@@ -34,7 +34,7 @@
             <display-name lang="ru" todo="true">[Single Checkbox]</display-name>
             <display-name lang="it" todo="true">[Single Checkbox]</display-name>
             <display-name lang="de" todo="true">[Single Checkbox]</display-name>
-            <display-name lang="sv" todo="true">[Single Checkbox]</display-name>
+            <display-name lang="sv">Ensam kryssruta</display-name>
             <display-name lang="nl" todo="true">[Single Checkbox]</display-name>
             <display-name lang="pt" todo="true">[Single Checkbox]</display-name>
             <toolbox show="false"/>

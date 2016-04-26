@@ -37,7 +37,7 @@
             <display-name lang="ru">Один из диалога</display-name>
             <display-name lang="de" todo="true">[Dialog Single Selector]</display-name>
             <display-name lang="it" todo="true">[Dialog Single Selector]</display-name>
-            <display-name lang="sv">Dialogruta med val</display-name>
+            <display-name lang="sv">Dialog med enkelt val</display-name>
             <display-name lang="nl">Dialoog enkelvoudige selectie</display-name>
             <display-name lang="pt">Diálogo Selecção Simples</display-name>
             <icon lang="en">

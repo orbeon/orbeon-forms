@@ -262,10 +262,13 @@ public class Dom4jUtils {
      * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it creates work for GC
      * (because it relies on JAXP).
      */
-    public static Document readDom4j(String xmlString, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
+    private static Document readDom4j(String xmlString, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader(parserConfiguration);
         final StringReader stringReader = new StringReader(xmlString);
-        return saxReader.read(stringReader);
+
+        final Document result = saxReader.read(stringReader);
+        normalizeTextNodes(result);
+        return result;
     }
 
     public static Document readDom4j(String xmlString) throws SAXException, DocumentException {

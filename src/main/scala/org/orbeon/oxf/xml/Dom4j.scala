@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xml
 
-import java.util.{List => JList, Map => JMap}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils._
 import org.dom4j._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -23,6 +24,7 @@ import org.orbeon.saxon.value.Whitespace
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.collection.mutable.Buffer
 import scala.xml.{Elem, XML}
 
@@ -152,6 +154,35 @@ object Dom4j {
                 parent
 
         insertIfNeeded(root, path.iterator)
+    }
+
+    // NOTE: Assume that there are no contiguous text nodes in the data model.
+    def removeWhitespaceBetweenElementsCommentsPIs(nodeToNormalize: Node): Node = {
+
+        val nodesToDetach = mutable.ArrayBuffer[CharacterData]()
+
+        nodeToNormalize.accept(new VisitorSupport {
+            override def visit(element: Element): Unit = {
+
+                val children = element.content
+
+                val hasNonTextContent =
+                    children exists {
+                        case _: Element | _:Comment | _:ProcessingInstruction ⇒ true
+                        case _                                                ⇒ false
+                    }
+
+                if (hasNonTextContent)
+                    nodesToDetach ++= children collect {
+                        case t: CharacterData if StringUtils.isBlank(t.getText) ⇒ t
+                    }
+            }
+        })
+
+        for (currentNode ← nodesToDetach)
+            currentNode.detach()
+
+        nodeToNormalize
     }
 
     implicit def elemToDocument(e: Elem)    = Dom4jUtils.readDom4j(e.toString)

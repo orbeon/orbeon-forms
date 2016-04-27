@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML
 import org.orbeon.scaxon.XML._
@@ -112,6 +112,7 @@ object DataMigration {
 
     val mutableData = TransformerUtils.extractAsMutableDocument(data)
 
+
     partitionNodes(mutableData, decodeMigrationsFromJSON(jsonMigrationMap)) foreach {
       case (parentNode, iterations, repeatName, iterationName) ⇒
 
@@ -145,6 +146,8 @@ object DataMigration {
         }
     }
 
+    Dom4j.removeWhitespaceBetweenElementsCommentsPIs(XML.unwrapDocument(mutableData))
+
     mutableData
   }
 
@@ -168,6 +171,8 @@ object DataMigration {
 
         delete(container, doDispatch = false)
     }
+
+    Dom4j.removeWhitespaceBetweenElementsCommentsPIs(XML.unwrapDocument(mutableData))
 
     mutableData
   }

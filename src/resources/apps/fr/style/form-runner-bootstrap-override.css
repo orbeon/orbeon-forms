@@ -110,6 +110,9 @@ body.orbeon {
   height: 28px;
   background-image: none;
 }
+.orbeon input:-ms-input-placeholder {
+  color: #777 !important;
+}
 .orbeon .xforms-output label {
   cursor: default;
 }

@@ -114,6 +114,11 @@ body.orbeon {
         background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
     }
 
+    input:-ms-input-placeholder {
+        color: #777 !important;         // On IE11, the above color overrides the color of the placeholder,
+                                        // reset it to a value similar the initial value (IE11 doesn't support initial)
+    }
+
     .xforms-output label {
         cursor: default;
     }

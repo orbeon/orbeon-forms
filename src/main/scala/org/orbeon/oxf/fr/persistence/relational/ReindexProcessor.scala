@@ -141,7 +141,7 @@ class ReindexProcessor extends ProcessorImpl {
                 """.stripMargin)
               insert.setInt      (1, currentData.getInt("id"))
               insert.setInt      (2, position + 1)
-              insert.setString   (3, control.name)
+              insert.setString   (3, control.xpath)
               insert.setString   (4, nodeValue)
               insert.execute()
             }

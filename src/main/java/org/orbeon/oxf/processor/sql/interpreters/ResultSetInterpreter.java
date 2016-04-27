@@ -57,10 +57,11 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
                     final boolean hasNext = !interpreterContext.isEmptyResultSet();
 
                     if (SQLProcessor.logger.isDebugEnabled()) {
-                        SQLProcessor.logger.debug("Preparing to execute result set: hasMoreResultSets = " + hasMoreResultSets
-                                + ", hasNext = " + hasNext
-                                + ", statement = " + interpreterContext.getStatementString()
-                                + ", currentCount = " + currentCount);
+                        SQLProcessor.logger.debug("Preparing to execute result set: " +
+                                "statement = "         + interpreterContext.getStatementSHA() + ", " +
+                                "hasMoreResultSets = " + hasMoreResultSets + ", " +
+                                "hasNext = "           + hasNext + ", " +
+                                "currentCount = "      + currentCount);
                     }
 
                     if (hasMoreResultSets) {
@@ -102,7 +103,9 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
             closeStatement(interpreterContext, stmt);
 
             if (SQLProcessor.logger.isDebugEnabled())
-                SQLProcessor.logger.debug("ResultSet info: no more result set, update count = " + updateCount);
+                SQLProcessor.logger.debug("ResultSet info: no more result set, " +
+                        "statement = "    + interpreterContext.getStatementSHA() + ", " +
+                        "update count = " + updateCount);
 
             return false;
         } else {
@@ -114,7 +117,9 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
             interpreterContext.setGotResults(hasNext || interpreterContext.isGotResults());
 
             if (SQLProcessor.logger.isDebugEnabled())
-                SQLProcessor.logger.debug("ResultSet info: more result set, hasNext = " + hasNext);
+                SQLProcessor.logger.debug("ResultSet info: more result set, " +
+                        "statement = " + interpreterContext.getStatementSHA() + ", " +
+                        "hasNext = "   + hasNext);
 
             return true;
         }
@@ -124,7 +129,7 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
         // TODO: temporarily disabled as Oracle doesn't like it as is
         /*
             final ResultSet resultSet = stmt.getGeneratedKeys();
-            
+
             final boolean hasNext = resultSet.next();
             interpreterContext.setEmptyResultSet(!hasNext);
             interpreterContext.setResultSet(resultSet);
@@ -133,10 +138,10 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
             if (SQLProcessor.logger.isDebugEnabled())
                 SQLProcessor.logger.debug("GeneratedKeysResultSet info: more result set, hasNext = " + hasNext);
         */
-		
+
 		return true;
     }
-    
+
     public static void closeStatement(SQLProcessorInterpreterContext interpreterContext, PreparedStatement stmt) throws SQLException {
         stmt.close();
         interpreterContext.setStatement(null);

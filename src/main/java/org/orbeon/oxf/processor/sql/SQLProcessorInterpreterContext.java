@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJDBC4Delegate;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorStandardDelegate;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -71,6 +72,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         public ResultSet resultSet;
         public PreparedStatement preparedStatement;
         public String statementString;
+        public String statementSHA;
         public boolean emptyResultSet;
         public boolean gotResults;
         public int updateCount;
@@ -272,6 +274,19 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
 
     public String getStatementString() {
         return getStatementString(0);
+    }
+
+    public String getStatementSHA(int level) {
+        final ExecutionContext executionContext = getExecutionContext(level);
+        if (executionContext.statementSHA == null) {
+            final String fullSHA = SecureUtils.digestString(executionContext.statementString, "SHA1", "hex");
+            executionContext.statementSHA = fullSHA.substring(0, 7);
+        }
+        return executionContext.statementSHA;
+    }
+
+    public String getStatementSHA() {
+        return getStatementSHA(0);
     }
 
     public Connection getConnection() {

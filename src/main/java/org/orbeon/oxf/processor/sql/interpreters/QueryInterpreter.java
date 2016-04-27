@@ -304,8 +304,15 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                         getInterpreterContext().setStatementString(replacedQueryString);
                     }
                     // Output debug if needed
-                    if (debugString != null)
-                        SQLProcessor.logger.info("PreparedStatement (debug=\"" + debugString + "\"):\n" + getInterpreterContext().getStatementString());
+                    if (debugString != null || SQLProcessor.logger.isDebugEnabled()) {
+                        String logMessage = "SQL statement ("
+                                + getInterpreterContext().getStatementSHA() + "): "
+                                + getInterpreterContext().getStatementString();
+                        if (debugString != null)
+                            SQLProcessor.logger.info(logMessage);
+                        else
+                            SQLProcessor.logger.debug(logMessage);
+                    }
                     // Set prepared statement parameters
                     if (queryParameters != null) {
                         int index = 1;
@@ -570,7 +577,8 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                         throw new ValidationException("More than one iteration on sql:query or sql:call element", new LocationData(getDocumentLocator()));
                     // Execute
                     if (SQLProcessor.logger.isDebugEnabled())
-                        SQLProcessor.logger.debug("Executing query/call for statement: " + getInterpreterContext().getStatementString());
+                        SQLProcessor.logger.debug("Executing query/call, " +
+                                "statement = " + getInterpreterContext().getStatementSHA());
                     final boolean hasResultSet = stmt.execute();
                     ResultSetInterpreter.setResultSetInfo(getInterpreterContext(), stmt, hasResultSet);
                 } else if (type == UPDATE) {

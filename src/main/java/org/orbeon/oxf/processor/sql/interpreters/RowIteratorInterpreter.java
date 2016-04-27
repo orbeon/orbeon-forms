@@ -55,7 +55,9 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
             boolean hasNext = !interpreterContext.isEmptyResultSet();
 
             if (SQLProcessor.logger.isDebugEnabled())
-                SQLProcessor.logger.debug("Preparing to execute row: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
+                SQLProcessor.logger.debug("Preparing to execute row: " +
+                        "statement = " + interpreterContext.getStatementSHA() + ", " +
+                        "hasNext = "   + hasNext);
 
             // Iterate through the result set
             while (hasNext) {
@@ -84,7 +86,9 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                     }
 
                     if (SQLProcessor.logger.isDebugEnabled())
-                        SQLProcessor.logger.debug("Execute row: rowNum = " + rowNum);
+                        SQLProcessor.logger.debug("Execute row: " +
+                                "statement = " + interpreterContext.getStatementSHA() + ", " +
+                                "rowNum = " + rowNum);
 
                     // Interpret row
                     repeatBody();

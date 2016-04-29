@@ -70,8 +70,8 @@ CREATE TABLE orbeon_i_current (
 
 CREATE TABLE orbeon_i_control_text (
     data_id            NUMBER        NOT NULL,
-    pos                NUMBER        NOT NULL,
     control            VARCHAR(255)  NOT NULL,
+    pos                NUMBER        NOT NULL,
     val                CLOB          NOT NULL,
     FOREIGN KEY        (data_id)     REFERENCES orbeon_form_data(id)
 );

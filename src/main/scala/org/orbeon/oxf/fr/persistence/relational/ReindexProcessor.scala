@@ -136,8 +136,11 @@ class ReindexProcessor extends ProcessorImpl {
             if (! nodeValue.isEmpty) {
               val insert = connection.prepareStatement(
                 """INSERT INTO orbeon_i_control_text
-                  |           (data_id, pos, control, val)
-                  |    VALUES (?      , ?  , ?      , ?  )
+                  |           (data_id,
+                  |            pos,
+                  |            control,
+                  |            val)
+                  |    VALUES (? , ? , ? , ? )
                 """.stripMargin)
               insert.setInt      (1, currentData.getInt("id"))
               insert.setInt      (2, position + 1)

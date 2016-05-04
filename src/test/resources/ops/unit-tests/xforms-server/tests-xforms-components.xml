@@ -440,15 +440,19 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
                                 <errors>
-                                    <error absolute-id="|first-name-control|" position="152" label="First name" alert="Invalid first name" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙1|" position="157" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙2|" position="157" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙3|" position="157" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|last-name-control|" position="160" label="Last name" alert="Invalid last name" level="error" section-name=""/>
+                                    <error absolute-id="|first-name-control|" position="157" label="First name" alert="Invalid first name" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙1|" position="162" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙2|" position="162" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙3|" position="162" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|last-name-control|" position="165" label="Last name" alert="Invalid last name" level="error" section-name=""/>
                                 </errors>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">
                                 <state>
+                                    <!-- Whether to be visible or not -->
+                                    <show>true</show>
+                                    <!-- Filter on section for which to show errors -->
+                                    <section-name/>
                                     <!-- Whether errors are shown incrementally or not -->
                                     <incremental/>
                                     <!-- Absolute ids of observers -->

@@ -26,6 +26,8 @@ import org.orbeon.scaxon.XML._
 
 import scala.collection.mutable.ListBuffer
 
+// TODO: remove this, and any references, since this is now implemented in SearchProcessor
+
 /**
  * Implementation of the persistence API for relational databases.
  */

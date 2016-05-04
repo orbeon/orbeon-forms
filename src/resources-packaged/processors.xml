@@ -771,6 +771,9 @@
     <processor name="fr:relational-crud">
         <class name="org.orbeon.oxf.fr.persistence.relational.crud.CRUD"/>
     </processor>
+    <processor name="fr:relational-search">
+        <class name="org.orbeon.oxf.fr.persistence.relational.search.SearchProcessor"/>
+    </processor>
     <processor name="fr:xforms-to-schema">
         <class name="org.orbeon.oxf.fr.schema.XFormsToSchema"/>
     </processor>

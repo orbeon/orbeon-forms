@@ -19,7 +19,7 @@ import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.fr.persistence.relational.Index
+import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}

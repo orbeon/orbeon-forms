@@ -766,7 +766,7 @@
         <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>
     </processor>
     <processor name="fr:relational-persistence-reindex">
-        <class name="org.orbeon.oxf.fr.persistence.relational.ReindexProcessor"/>
+        <class name="org.orbeon.oxf.fr.persistence.relational.index.ReindexProcessor"/>
     </processor>
     <processor name="fr:relational-crud">
         <class name="org.orbeon.oxf.fr.persistence.relational.crud.CRUD"/>

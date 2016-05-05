@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,12 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational
+package org.orbeon.oxf.fr.persistence.relational.index
 
 import java.sql.Connection
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
+import org.orbeon.oxf.fr.persistence.relational.Oracle
 import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,20 +11,23 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational
+package org.orbeon.oxf.fr.persistence.relational.index
 
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, TransformerUtils}
 import javax.xml.transform.stream.StreamSource
-import org.orbeon.oxf.util._
-import org.orbeon.scaxon.XML._
+
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.fr.persistence.relational.Index.IndexedControl
+import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexedControl
+import org.orbeon.oxf.fr.persistence.relational.{MySQL, Provider, RelationalUtils, _}
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants
-import collection.JavaConverters._
+import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLConstants}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
 
 /**
  * Processor repopulating the relational indices. This doesn't create the tables, but deletes their content

@@ -129,9 +129,10 @@ object RequestReader {
     TransformerUtils.readTinyTree(XPath.GlobalConfiguration, requestInputStream(), "", false, false)
 }
 
-trait CreateUpdateDelete extends RequestResponse with Common {
-
-  private case class Row(created: Timestamp, username: Option[String], group: Option[String], formVersion: Option[Int])
+trait CreateUpdateDelete
+  extends RequestResponse
+    with Common
+  with CreateCols {
 
   private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
@@ -179,63 +180,27 @@ trait CreateUpdateDelete extends RequestResponse with Common {
     }
   }
 
-
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 
     val table = tableName(req)
     val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
 
-    def param[T](setter: (PreparedStatement) ⇒ ((Int, T) ⇒ Unit), value: ⇒ T): (PreparedStatement, Int) ⇒ Unit = {
-      (ps: PreparedStatement, i: Int) ⇒ setter(ps)(i, value)
-    }
-
     // Do insert
     locally {
-      val xmlCol = if (req.provider == Oracle) "xml_clob" else "xml"
-      val xmlVal = if (req.provider == PostgreSQL) "XMLPARSE( DOCUMENT ? )" else "?"
-      val isFormDefinition = req.forForm && ! req.forAttachment
-      val now = new Timestamp(System.currentTimeMillis())
 
-      val (xmlOpt, metadataOpt) =
-        if (! delete && ! req.forAttachment) {
-          val (xml, metadataOpt) = RequestReader.dataAndMetadataAsString(metadata = !req.forData)
-          (Some(xml), metadataOpt)
-        } else {
-          (None, None)
-        }
-
-      val possibleCols = List(
-        true                  → "created"            → "?"    → param(_.setTimestamp, existingRow.map(_.created).getOrElse(now)),
-        true                  → "last_modified_time" → "?"    → param(_.setTimestamp, now),
-        true                  → "last_modified_by"   → "?"    → param(_.setString   , requestUsername.orNull),
-        true                  → "app"                → "?"    → param(_.setString   , req.app),
-        true                  → "form"               → "?"    → param(_.setString   , req.form),
-        true                  → "form_version"       → "?"    → param(_.setInt      , versionToSet),
-        req.forData           → "document_id"        → "?"    → param(_.setString   , req.dataPart.get.documentId),
-        true                  → "deleted"            → "?"    → param(_.setString   , if (delete) "Y" else "N"),
-        req.forData           → "draft"              → "?"    → param(_.setString   , if (req.dataPart.get.isDraft) "Y" else "N"),
-        req.forAttachment     → "file_name"          → "?"    → param(_.setString   , req.filename.get),
-        req.forAttachment     → "file_content"       → "?"    → param(_.setBytes    , RequestReader.bytes()),
-        isFormDefinition      → "form_metadata"      → "?"    → param(_.setString   , metadataOpt.orNull),
-        req.forData           → "username"           → "?"    → param(_.setString   , existingRow.flatMap(_.username).getOrElse(requestUsername.orNull)),
-        req.forData           → "groupname"          → "?"    → param(_.setString   , existingRow.flatMap(_.group).getOrElse(requestGroup   .orNull)),
-        ! req.forAttachment   → xmlCol               → xmlVal → param(_.setString   , xmlOpt.orNull)
-      )
-
-      val includedCols =
-        for {
-          (((included, col), placeholder), param) ← possibleCols
-          if included
-        } yield col → placeholder → param
+      val possibleCols = insertCols(req, existingRow, delete, versionToSet)
+      val includedCols = possibleCols.filter(_.included)
 
       val ps = connection.prepareStatement(
         s"""|INSERT INTO $table
-          |            ( ${includedCols.map(_._1._1).mkString(", ")} )
-          |     VALUES ( ${includedCols.map(_._1._2).mkString(", ")} )
+          |            ( ${includedCols.map(_.name       ).mkString(", ")} )
+          |     VALUES ( ${includedCols.map(_.placeholder).mkString(", ")} )
           |""".stripMargin)
 
-      for ((((_, _), param), i) ← includedCols.zipWithIndex)
-        param(ps, i + 1)
+      includedCols
+        .zipWithIndex
+        .foreach{ case (col, index) ⇒ col.paramSetter(ps, index + 1)}
+
       ps.executeUpdate()
     }
 
@@ -244,11 +209,11 @@ trait CreateUpdateDelete extends RequestResponse with Common {
       for (table ←  Set("orbeon_form_data", "orbeon_form_data_attach")) {
         val ps = connection.prepareStatement(
           s"""|DELETE FROM $table
-            |WHERE  app             = ?
-            |       AND form        = ?
-            |       AND document_id = ?
-            |       AND draft       = 'Y'
-            |""".stripMargin)
+              |WHERE      app         = ?
+              |       AND form        = ?
+              |       AND document_id = ?
+              |       AND draft       = 'Y'
+              |""".stripMargin)
         val position = Iterator.from(1)
         ps.setString(position.next(), req.app)
         ps.setString(position.next(), req.form)

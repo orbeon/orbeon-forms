@@ -669,18 +669,18 @@
             <summary>&lt;i class="icon-list"/&gt; Resumen</summary>
             <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
             <clear>&lt;i class="icon-remove-sign"/&gt; Limpiar</clear>
-            <cancel>Cancel</cancel>
-            <save-locally>Save Locally</save-locally>
+            <cancel>Cancelar</cancel>
+            <save-locally>Guardar Localmente</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
             <refresh>&lt;i class="icon-refresh" aria-label="Actualizar"/&gt;</refresh>
-            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
+            <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
             <submit-dialog-keep>Mantener valores y cerrar</submit-dialog-keep>
-            <submit-dialog-go>OK</submit-dialog-go>
+            <submit-dialog-go>Aceptar</submit-dialog-go>
             <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
 
             <!-- Warning dialog -->
@@ -693,7 +693,7 @@
 
             <yes>&lt;i class="icon-ok"/&gt; Sí</yes>
             <no>&lt;i class="icon-remove"/&gt; No</no>
-            <ok todo="true">OK</ok>
+            <ok>Aceptar</ok>
             <previous>Previo</previous>
             <next>Próximo</next>
         </buttons>
@@ -704,7 +704,7 @@
                 <section-name>Nombre de Sección</section-name>
                 <yes>Sí</yes>
                 <no>No</no>
-                <other todo="true">[Other]</other>
+                <other>Otro</other>
             </labels>
             <grid>
                 <insert-above>Insertar Arriba</insert-above>
@@ -712,8 +712,8 @@
                 <move-up>Mover Arriba</move-up>
                 <move-down>Mover Debajo</move-down>
                 <remove>Remover</remove>
-                <menu todo="true">Menu</menu>
-                <add-another todo="true">[Add Another]</add-another>
+                <menu>Menú</menu>
+                <add-another>[Agregar Otro]</add-another>
             </grid>
             <date-time>
                 <year>Año</year>
@@ -721,19 +721,19 @@
                 <day>Día</day>
             </date-time>
             <wizard>
-                <errors todo="true">[Errors]</errors>
-                <incomplete todo="true">[Incomplete]</incomplete>
-                <complete todo="true">[Complete]</complete>
-                <not-started todo="true">[Not Started]</not-started>
+                <errors>Errores</errors>
+                <incomplete>Incompleto</incomplete>
+                <complete>Completar</complete>
+                <not-started>No iniciado</not-started>
             </wizard>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
             <summary-title>Su formulario {1,choice,0#no tiene ningún mensaje|1#tiene los siguientes '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;tiene los siguientes '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
-            <form-title todo="true">[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
+            <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
             <none>No hay errores en el formulario</none>
             <unsaved>Cambios sin salvar</unsaved>
-            <canvas-not-supported todo="true">[To do image annotations, your browser needs to support the HTML5 canvas]</canvas-not-supported>
+            <canvas-not-supported>Para realizar anotaciones en imagenes, su explorador tiene que soportar HTML5</canvas-not-supported>
         </errors>
         <email>
             <subject>Confirmación de formulario Orbeon</subject>
@@ -774,7 +774,7 @@
             </paging>
             <messages>
                 <no-form-found>No se encontró el formulario.</no-form-found>
-                <delete-confirmation>Esta seguro que desea borrar uno o más formularios? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
+                <delete-confirmation>Esta seguro que desea borrar uno o más formularios? Nota cuando borra un formulario guardado, se borrarán los formularios en estado borrador también.</delete-confirmation>
             </messages>
             <labels>
                 <draft>Borradores</draft>
@@ -782,11 +782,11 @@
                 <language-choice>Seleccione Idioma</language-choice>
                 <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
-                <any>[Cualquiera]</any>
-                <script>Versión Complete</script>
+                <any>Cualquiera</any>
+                <script>Versión Completa</script>
                 <noscript>Version Accesible</noscript>
                 <refresh>Actualizar</refresh>
-                <close-box>[cerrar]</close-box>
+                <close-box>Cerrar</close-box>
                 <help-back>Anterior</help-back>
                 <goto-content>Ir al Contenido</goto-content>
             </labels>
@@ -805,7 +805,7 @@
                 <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente</form-validation-error>
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
-                <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino guarda los datos.</clear-confirm-message>
+                <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino los guarda.</clear-confirm-message>
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
                 <confirmation-dialog-title>Confirmación</confirmation-dialog-title>
                 <confirmation-dialog-message>Ésta seguro de continuar ?</confirmation-dialog-message>
@@ -832,12 +832,12 @@
                 <open-draft>Abrir borrador auto-guardado</open-draft>
                 <view-drafts>Ver borrador auto-guardado</view-drafts>
                 <start-new>Empezar con un formulario en blanco</start-new>
-                <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
-                <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
-                <multiple-docs-view-data todo="true">[View existing form data]</multiple-docs-view-data>
+                <multiple-docs-title>Se ha encontrado un formulario con estos mismos datos</multiple-docs-title>
+                <multiple-docs-explanation>No se puede crear nuevos datos para este Formulario, de todas forma puede editar los existentes.</multiple-docs-explanation>
+                <multiple-docs-view-data>Ver datos existentes</multiple-docs-view-data>
             </draft-singleton>
             <labels>
-                <language-choice todo="true">[Language]</language-choice>
+                <language-choice>Lenguaje</language-choice>
                 <errors>Resumen de errores</errors>
                 <check-errors-in-form>Este formulario tiene errores</check-errors-in-form>
                 <error-details>Ver detalle de los errores</error-details>
@@ -874,7 +874,7 @@
             </dialog-body>
         </save-locally>
         <home>
-            <title>Incio Form Runner</title>
+            <title>Inicio Form Runner</title>
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Despublicar</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Publicar</publish>
@@ -898,8 +898,8 @@
                 <pull-from-remote>Sacar Remoto</pull-from-remote>
                 <navigate-summary>Ir al resumen</navigate-summary>
                 <navigate-new>Ir a nuevo</navigate-new>
-                <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
-                <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <upgrade-local>Actualizar Formularios locales</upgrade-local>
+                <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>
@@ -917,14 +917,14 @@
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
-                <publish-confirmation todo="true">Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
+                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
                 <unavailable>No Disponibile</unavailable>
                 <library>Librería</library>
                 <newer>Más Nuevos</newer>
-                <remote-server todo="true">[Remote server]</remote-server>
+                <remote-server>Servidor Remoto</remote-server>
                 <username>Usuario</username>
                 <password>Contraseña</password>
             </labels>

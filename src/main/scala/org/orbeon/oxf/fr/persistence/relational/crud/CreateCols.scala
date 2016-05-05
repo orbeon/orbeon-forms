@@ -30,11 +30,21 @@ trait CreateCols extends RequestResponse with Common {
     formVersion  : Option[Int]
   )
 
+  abstract class ColValue
+
+  case class StaticColValue (
+    value: String
+  ) extends ColValue
+
+  case class DynamicColValue (
+    placeholder  : String,
+    paramSetter  : ParamSetterFunc
+  ) extends ColValue
+
   case class Col(
     included     : Boolean,
     name         : String,
-    placeholder  : String,
-    paramSetter  : ParamSetterFunc
+    value        : ColValue
   )
 
   def insertCols(
@@ -59,85 +69,130 @@ trait CreateCols extends RequestResponse with Common {
 
     List(
       Col(
-        included    = req.forData && req.provider == Oracle,
-        name        = "id",
-        placeholder = "?",
-        paramSetter = param(_.setTimestamp, existingRow.map(_.created).getOrElse(now))),
+        included      = req.forData && req.provider == Oracle,
+        name          = "id",
+        value         = StaticColValue("orbeon_seq.NEXTVAL")
+      ),
       Col(
-        included    = true,
-        name        = "created",
-        placeholder = "?",
-        paramSetter = param(_.setTimestamp, existingRow.map(_.created).getOrElse(now))),
+        included      = true,
+        name          = "created",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setTimestamp, existingRow.map(_.created).getOrElse(now))
+        )
+      ),
       Col(
-        included    = true,
-        name        = "last_modified_time",
-        placeholder = "?",
-        paramSetter = param(_.setTimestamp, now)),
+        included      = true,
+        name          = "last_modified_time",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setTimestamp, now)
+        )
+      ),
       Col(
-        included    = true,
-        name        = "last_modified_by",
-        placeholder = "?",
-        paramSetter = param(_.setString, requestUsername.orNull)),
+        included      = true,
+        name          = "last_modified_by",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, requestUsername.orNull)
+        )
+      ),
       Col(
-        included    = true,
-        name        = "app",
-        placeholder = "?",
-        paramSetter = param(_.setString, req.app)),
+        included      = true,
+        name          = "app",
+        value         = DynamicColValue(
+          placeholder  = "?",
+          paramSetter  = param(_.setString, req.app)
+        )
+      ),
       Col(
-        included    = true,
-        name        = "form",
-        placeholder = "?",
-        paramSetter = param(_.setString, req.form)),
+        included      = true,
+        name          = "form",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, req.form)
+        )
+      ),
       Col(
-        included    = true,
-        name        = "form_version",
-        placeholder = "?",
-        paramSetter = param(_.setInt, versionToSet)),
+        included      = true,
+        name          = "form_version",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setInt, versionToSet)
+        )
+      ),
       Col(
-        included    = req.forData,
-        name        = "document_id",
-        placeholder = "?",
-        paramSetter = param(_.setString, req.dataPart.get.documentId)),
+        included      = req.forData,
+        name          = "document_id",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, req.dataPart.get.documentId)
+        )
+      ),
       Col(
-        included    = true,
-        name        = "deleted",
-        placeholder = "?",
-        paramSetter = param(_.setString, if (delete) "Y" else "N")),
+        included      = true,
+        name          = "deleted",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, if (delete) "Y" else "N")
+        )
+      ),
       Col(
-        included    = req.forData,
-        name        = "draft",
-        placeholder = "?",
-        paramSetter = param(_.setString, if (req.dataPart.get.isDraft) "Y" else "N")),
+        included      = req.forData,
+        name          = "draft",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, if (req.dataPart.get.isDraft) "Y" else "N")
+        )
+      ),
       Col(
-        included    = req.forAttachment,
-        name        = "file_name",
-        placeholder = "?",
-        paramSetter = param(_.setString, req.filename.get)),
+        included      = req.forAttachment,
+        name          = "file_name",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, req.filename.get)
+        )
+      ),
       Col(
-        included    = req.forAttachment,
-        name        = "file_content",
-        placeholder = "?",
-        paramSetter = param(_.setBytes, RequestReader.bytes())),
+        included      = req.forAttachment,
+        name          = "file_content",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setBytes, RequestReader.bytes())
+        )
+      ),
       Col(
-        included    = isFormDefinition,
-        name        = "form_metadata",
-        placeholder = "?",
-        paramSetter = param(_.setString, metadataOpt.orNull)),
+        included      = isFormDefinition,
+        name          = "form_metadata",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, metadataOpt.orNull)
+        )
+      ),
       Col(
-        included    = req.forData,
-        name        = "username",
-        placeholder = "?" ,
-        paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))),
+        included      = req.forData,
+        name          = "username",
+        value         = DynamicColValue(
+          placeholder = "?" ,
+          paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))
+        )
+      ),
       Col(
-        included    = req.forData,
-        name        = "groupname",
-        placeholder = "?",
-        paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestGroup.orNull))),
+        included      = req.forData,
+        name          = "groupname",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestGroup.orNull))
+        )
+      ),
       Col(
-        included    = ! req.forAttachment ,
-        name        = xmlCol,
-        placeholder = xmlVal,
-        paramSetter = param(_.setString, xmlOpt.orNull))
+        included      = ! req.forAttachment ,
+        name          = xmlCol,
+        value         = DynamicColValue(
+          placeholder = xmlVal,
+          paramSetter = param(_.setString, xmlOpt.orNull)
+        )
+      )
     )
   }
 

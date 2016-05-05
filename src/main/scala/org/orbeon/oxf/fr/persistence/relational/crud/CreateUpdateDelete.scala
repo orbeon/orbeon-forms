@@ -190,16 +190,26 @@ trait CreateUpdateDelete
 
       val possibleCols = insertCols(req, existingRow, delete, versionToSet)
       val includedCols = possibleCols.filter(_.included)
+      val colNames     = includedCols.map(_.name).mkString(", ")
+      val colValues    =
+        includedCols
+          .map(_.value match {
+            case StaticColValue(value)           ⇒ value
+            case DynamicColValue(placeholder, _) ⇒ placeholder})
+          .mkString(", ")
 
       val ps = connection.prepareStatement(
         s"""|INSERT INTO $table
-          |            ( ${includedCols.map(_.name       ).mkString(", ")} )
-          |     VALUES ( ${includedCols.map(_.placeholder).mkString(", ")} )
+          |            ( $colNames  )
+          |     VALUES ( $colValues )
           |""".stripMargin)
 
+      // Set parameters in prepared statement for the dynamic values
       includedCols
+        .map(_.value)
+        .collect({ case DynamicColValue(_, paramSetter) ⇒ paramSetter })
         .zipWithIndex
-        .foreach{ case (col, index) ⇒ col.paramSetter(ps, index + 1)}
+        .foreach{ case (paramSetter, index) ⇒ paramSetter(ps, index + 1)}
 
       ps.executeUpdate()
     }

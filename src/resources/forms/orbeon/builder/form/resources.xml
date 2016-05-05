@@ -6469,7 +6469,7 @@
         <form-name>
             <label>Nombre del formulario</label>
             <hint>Identifica el formulario especifico (e.g. "denuncias" or "consulta"). Este nombre se muestra en la URL del formulario públicado, se recomienda usar minúsculas.</hint>
-            <alert>Usar caracteres ASCII , numeros, "-" o "_"</alert>
+            <alert>Usar caracteres ASCII , números, "-" o "_"</alert>
         </form-name>
         <title>
             <label>Título del Formulario</label>
@@ -6480,18 +6480,18 @@
             <hint>Descripción del Formulario en el idioma configurado</hint>
         </description>
         <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            <label todo="true">Es Formulario único</label>
+            <hint todo="true">Impide que los usuarios ingresen nuevos formularios si existen formularios ingresados.</hint>
         </singleton>
         <logo>
             <label>Logo</label>
             <hint>El logo se desplega en la parte superior del formulario</hint>
         </logo>
         <general-settings>
-            <label todo="true">[General Settings]</label>
+            <label todo="true">Configuración General</label>
         </general-settings>
         <custom-settings>
-            <label todo="true">[Custom Settings]</label>
+            <label todo="true">Configuración Personalizada</label>
         </custom-settings>
         <!-- Toolbox -->
         <cut>
@@ -6723,7 +6723,7 @@
             <options>
                 <label>Página de Resumen</label>
                 <item>
-                    <label>Mostar en Resumen</label>
+                    <label>Mostar en el Resumen</label>
                     <value>fr-summary</value>
                 </item>
                 <item>
@@ -6735,20 +6735,20 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
-                    <label>Mostrar en Asunto del EMail</label>
+                    <label>Mostrar en Asunto del Mail</label>
                     <value>fr-email-subject</value>
                 </item>
                 <item>
-                    <label todo="true">[Include as Email Attachment]</label>
+                    <label todo="true">Incluir como Adjuntos al Mail</label>
                     <value>fr-email-attachment</value>
                 </item>
             </options>
             <control-appearance>
-                <label todo="true">[Control Appearance]</label>
+                <label todo="true">Presentación del Control</label>
             </control-appearance>
             <whitespace>
                 <item>
-                    <label todo="true">[Trim leading and trailing spaces]</label>
+                    <label todo="true">Recortar espacios iniciales y finales</label>
                     <value>trim</value>
                 </item>
             </whitespace>
@@ -6840,23 +6840,23 @@
                 <item id="2" todo="true">XPath</item>
             </required>
             <constraint>
-                <item id="formula" todo="true">[Formula]</item>
-                <item id="max-length" todo="true">[Maximum Length]</item>
-                <item id="min-length" todo="true">[Minimum Length]</item>
-                <item id="positive" todo="true">[Positive]</item>
-                <item id="non-negative" todo="true">[Positive or Zero]</item>
-                <item id="non-positive" todo="true">[Negative or Zero]</item>
-                <item id="negative" todo="true">[Negative]</item>
-                <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="formula" todo="true">Formula</item>
+                <item id="max-length" todo="true">Largo Máximo</item>
+                <item id="min-length" todo="true">Largo Mínimo</item>
+                <item id="positive" todo="true">Positivo</item>
+                <item id="non-negative" todo="true">Positivo o Cero</item>
+                <item id="non-positive" todo="true">Negativo o Cero]</item>
+                <item id="negative" todo="true">Negativo</item>
+                <item id="fraction-digits" todo="true">Máximo de dígitos para fracciones</item>
             </constraint>
             <formula>
-                <label todo="true">[Formula]</label>
+                <label todo="true">Formula</label>
                 <alert>Expresión XPath incorrecta</alert>
-                <hint>Expresión XPath booleana</hint>
+                <hint>Expresión XPath debe ser booleana</hint>
             </formula>
             <integer-argument>
-                <label todo="true">[Integer Value]</label>
-                <alert todo="true">[Incorrect Value]</alert>
+                <label todo="true">Valor Enterio</label>
+                <alert todo="true">Valor Incorrecto</alert>
             </integer-argument>
             <visibility>
                 <label>Visibilidad</label>
@@ -6866,7 +6866,7 @@
             <readonly>
                 <label>Sólo-Lectura</label>
                 <alert>Expresión XPath incorrecta</alert>
-                <hint>Expresión XPath booleana</hint>
+                <hint>Expresión XPath debe ser booleana</hint>
             </readonly>
             <default>
                 <label>Valor Inicial</label>
@@ -6920,17 +6920,17 @@
                 </item>
             </options>
             <collapsible>
-                <label todo="true">[Collapsible]</label>
+                <label todo="true">Plegable</label>
                 <item>
-                    <label todo="true">[Use Default]</label>
+                    <label todo="true">Usar por Defecto</label>
                     <value>default</value>
                 </item>
                 <item>
-                    <label todo="true">[Always]</label>
+                    <label todo="true">Siempre</label>
                     <value>true</value>
                 </item>
                 <item>
-                    <label todo="true">[Never]</label>
+                    <label todo="true">Nunca</label>
                     <value>false</value>
                 </item>
             </collapsible>
@@ -6967,10 +6967,10 @@
                 <hint>Número positivo o expresión XPath</hint>
             </max>
             <apply-defaults>
-                <label todo="true">[Apply Initial Value Formulas when Adding Iterations]</label>
+                <label todo="true">Aplicar Formulas de cálculo inicial cuando se agregan iteraciones.</label>
             </apply-defaults>
             <initial-iterations>
-                <label todo="true">[Initial Number of Iterations Uses Template]</label>
+                <label todo="true">Número inicial de iteraciones usa Plantilla.</label>
             </initial-iterations>
             <other>Otro</other>
             <one>Una Repetición</one>
@@ -6993,21 +6993,14 @@
             <publish>Publicar</publish>
             <publish-success todo="true">El formulario fue publicado satisfactoriamente [as version {1,number,integer}]. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
             <publish-error>Hubo un error durante la publicación.</publish-error>
-            <latest-published-version todo="true">Latest published version</latest-published-version>
-            <create-new-version-item todo="true">create a new form definition with version number {0,number,integer}</create-new-version-item>
-            <overwrite-version-item todo="true">write over the current form definition with version number {0,number,integer}</overwrite-version-item>
+            <latest-published-version todo="true">Última versión publicada</latest-published-version>
+            <create-new-version-item todo="true">crear una nueva versión con número de versión {0,number,integer}</create-new-version-item>
+            <overwrite-version-item todo="true">sobre escribir la definición actual con número de versión {0,number,integer}</overwrite-version-item>
             <create-new-version-help todo="true">
-                PLEASE NOTE: Publishing this form definition will create a new version of the form definition in the
-                database. Data which already exists in the database will still be viewed and edited with the previous
-                versions of this form definition which are associated with that data. The new form definition version
-                will be used to create new data.
+                NOTA: Al publicar esta definición del formulario se creará una nueva versión en la base de datos. Los datos de los formularios existentes en la base de datos serán vistos y editados en sus versiones correspondientes. Esta nueva versión se usará para crear los nuevos formularios.
             </create-new-version-help>
             <overwrite-version-help todo="true">
-                PLEASE NOTE: This will overwrite the existing form definition. If the changes you have made to the form
-                definition are small, such as changing control labels, the form definition will be compatible with
-                existing form data. But if you have made structural changes, such as adding, removing, renaming, or
-                moving controls, the form definition might be incompatible with existing data. We recommend being
-                careful when overwriting an existing form definition version.
+                NOTA: Se sobre-escribirá la definición actual del formulario. Si los cambios realizados son chicos, como ser cambio de etiquetas, la nueva definición será compatible con la actual. Pero si se han realizado cambios estructurales, como ser, agregar, eliminar, renombrar o mover controles, la nueva versión puede ser incompatible con la actual. Se recomienda ser cauteloso al realizar esta operación. 
             </overwrite-version-help>
             <open-summary>Abrir Página de Resumen del Formulario Publicado</open-summary>
             <open-new>Abrir nueva instancia del Formulario</open-new>
@@ -7089,18 +7082,18 @@
                 <label>Ayuda</label>
             </hint-header>
             <clear-value>
-                <label todo="true">[Clear Value]</label>
+                <label todo="true">Limpiar Valor</label>
             </clear-value>
         </dialog-itemsets>
         <dialog-http-services>
             <label>Editor de Servicios HTTP</label>
-            <tab-definition todo="true"><label>[Definition]</label></tab-definition>
-            <tab-advanced todo="true"><label>[Advanced]</label></tab-advanced>
-            <tab-test todo="true"><label>[Test Results]</label></tab-test>
-            <url-parameters todo="true"><label>[URL Parameters]</label></url-parameters>
-            <parameter-name todo="true"><label>[Name]</label></parameter-name>
-            <parameter-default-value todo="true"><label>[Default Value]</label></parameter-default-value>
-            <no-headers todo="true">[No headers received].</no-headers>
+            <tab-definition todo="true"><label>Definición</label></tab-definition>
+            <tab-advanced todo="true"><label>Avanzado</label></tab-advanced>
+            <tab-test todo="true"><label>Probar Resultados</label></tab-test>
+            <url-parameters todo="true"><label>Parámetros del la URL</label></url-parameters>
+            <parameter-name todo="true"><label>Nombre</label></parameter-name>
+            <parameter-default-value todo="true"><label>Valor por Defecto</label></parameter-default-value>
+            <no-headers todo="true">No se recibieron los cabezales.</no-headers>
             <service-name>
                 <label>Nombre del Servicio</label>
                 <hint>Ingrese un nombre único para este Servicio</hint>
@@ -7135,7 +7128,7 @@
             </password>
             <request-body>
                 <label>Cuerpo de la Solicitud</label>
-                <hint>Datos XML (pueder ser una SOAP envelope)</hint>
+                <hint>Datos XML (pueder ser un "SOAP envelope")</hint>
             </request-body>
             <response>
                 <label>Respuesta</label>

@@ -716,7 +716,7 @@
                 <move-down>Mover Debajo</move-down>
                 <remove>Remover</remove>
                 <menu>Menú</menu>
-                <add-another>[Agregar Otro]</add-another>
+                <add-another>Agregar Otro</add-another>
             </grid>
             <date-time>
                 <year>Año</year>

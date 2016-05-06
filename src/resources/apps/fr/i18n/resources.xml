@@ -56,7 +56,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Refresh"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
-            <wizard-toc>&lt;i class="icon-list"/&gt; Back to Content</wizard-toc>
+            <wizard-toc>&lt;i class="icon-list"/&gt; Content</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Clear and close</submit-dialog-clear>
@@ -678,7 +678,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Actualizar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
@@ -977,7 +977,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Oppdater"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
@@ -1274,7 +1274,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Обновить"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
@@ -1569,7 +1569,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Aggiorna"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Cancella e chiudi</submit-dialog-clear>
@@ -1877,7 +1877,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Aktualisieren"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
@@ -2185,7 +2185,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Lataa sivu uudelleen"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Seuraava</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Edellinen</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
@@ -2493,7 +2493,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Visa på nytt"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nästa</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Föreg</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
@@ -2801,7 +2801,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Verversen"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Volgende</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorige</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
@@ -3109,7 +3109,7 @@
             <refresh>&lt;i class="icon-refresh" aria-label="Refrescar"/&gt;</refresh>
             <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
             <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
-            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Back to Content]</wizard-toc>
+            <wizard-toc todo="true">&lt;i class="icon-list"/&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Apagar e fechar</submit-dialog-clear>

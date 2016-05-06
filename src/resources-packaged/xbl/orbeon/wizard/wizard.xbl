@@ -132,8 +132,22 @@
                     <xf:group appearance="xxf:internal">
 
                         <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
+
+                            <!-- Dispatch fr-section-shown the first the body is shown -->
+                            <xf:group appearance="xxf:internal" ref=".[$local/show-body/data(.)]">
+                                <xf:dispatch
+                                    event="xforms-enabled"
+                                    target="#observer"
+                                    name="fr-section-shown"
+                                    targetid="fr-wizard">
+                                    <xf:property name="section-name" value="frf:controlNameFromIdOpt(replace(case('switch'), '-case$', ''))" xxbl:scope="outer" />
+                                    <xf:property name="validate"     value="$local/validate/data(.)"/>
+                                    <xf:property name="separate-toc" value="$local/separate-toc/data(.)"/>
+                                </xf:dispatch>
+                            </xf:group>
+
                             <!-- FIXME: Don't like that this is a top-level `switch` id! -->
-                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" >
+                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <xf:action type="javascript" event="fr-section-scroll" target="#observer">
@@ -410,14 +424,6 @@
                                             value="$relevant-nav-case-ids[1]"/>
                                         <xf:toggle
                                             case="{{$relevant-nav-case-ids[1]}}"/>
-
-                                        <!-- Initial event to indicate which top-level section is shown first. This is used
-                                             by Form Runner to tell the error summary which errors to filter on. -->
-                                        <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
-                                            <xf:property name="section-name" value="frf:controlNameFromIdOpt($relevant-top-level-section-ids[1])" xxbl:scope="outer"/>
-                                            <xf:property name="validate"     value="$local/validate/data(.)"/>
-                                            <xf:property name="separate-toc" value="$local/separate-toc/data(.)"/>
-                                        </xf:dispatch>
                                     </xf:action>
 
                                     <xh:div class="pagination pagination-centered">

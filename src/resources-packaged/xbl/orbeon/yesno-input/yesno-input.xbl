@@ -28,7 +28,7 @@
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Yes/No Answer</display-name>
-            <display-name lang="es" todo="true">[Yes/No Answer]</display-name>
+            <display-name lang="es">Componente Si/No</display-name>
             <display-name lang="fi" todo="true">[Yes/No Answer]</display-name>
             <display-name lang="fr">Réponse oui/non</display-name>
             <display-name lang="ru" todo="true">[Yes/No Answer]</display-name>

@@ -18,7 +18,7 @@
     <xbl:binding id="fb-textarea-autosize" element="xf|textarea[appearance ~= 'xxf:autosize']">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Resizing</display-name>
-            <display-name lang="es" todo="true">[With Resizing]</display-name>
+            <display-name lang="es">Con Redimensionamiento</display-name>
             <display-name lang="fi" todo="true">[With Resizing]</display-name>
             <display-name lang="fr">Avec redimensionnement</display-name>
             <display-name lang="ru" todo="true">[With Resizing]</display-name>

@@ -35,7 +35,7 @@
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">With Character Counter</display-name>
-            <display-name lang="es" todo="true">[With Character Counter]</display-name>
+            <display-name lang="es">Con Contador de Caracteres</display-name>
             <display-name lang="fi" todo="true">[With Character Counter]</display-name>
             <display-name lang="fr">Avec compteur de charactères</display-name>
             <display-name lang="ru" todo="true">[With Character Counter]</display-name>

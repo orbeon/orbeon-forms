@@ -17,6 +17,7 @@
     <xbl:binding id="fb-output" element="xf|output">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en" todo="true">Calculated Value</display-name>
+            <display-name lang="es">Valor Calculado</display-name>
             <display-name lang="fr" todo="true">Valeur calculée</display-name>
             <display-name lang="ru" todo="true">Неизменяемый текст</display-name>
             <display-name lang="de" todo="true">Textausgabe</display-name>

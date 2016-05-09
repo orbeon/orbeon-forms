@@ -218,11 +218,11 @@ object XFormsResourceRewriter extends Logging {
     combinedLastModified: Long,
     isCSS               : Boolean,
     isMinimal           : Boolean
-  ): File = {
+  ): Option[File] = {
 
     implicit val indentedLogger = XFormsResourceServer.indentedLogger
     val rm = ResourceManagerWrapper.instance
-    
+
     Option(rm.getRealPath(resourcePath)) match {
       case Some(realPath) ⇒
         // We hope to be able to cache as a resource
@@ -247,10 +247,10 @@ object XFormsResourceRewriter extends Logging {
           val fos = new FileOutputStream(resourceFile)
           generateAndClose(resources, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
         }
-        resourceFile
+        Some(resourceFile)
       case None ⇒
         debug("unable to locate real path for cached combined resources, not saving", Seq("resource path" → resourcePath))
-        null
+        None
     }
   }
 }

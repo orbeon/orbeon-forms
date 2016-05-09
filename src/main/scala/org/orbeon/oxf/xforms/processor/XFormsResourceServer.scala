@@ -190,23 +190,31 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     def debugParameters = Seq("request path" → requestPath)
 
     if (XFormsProperties.isCacheCombinedResources) {
+
       // Caching requested
-      val resourceFile = XFormsResourceRewriter.cacheResources(resources, requestPath, namespaceOpt, combinedLastModified, isCSS, isMinimal)
-      if (resourceFile ne null) {
-        // Caching could take place, send out cached result
-        debug("serving from cache ", debugParameters)
-        useAndClose(response.getOutputStream) { os ⇒
-          copyStream(new FileInputStream(resourceFile), os)
-        }
-      } else {
-        // Was unable to cache, just serve
-        debug("caching requested but not possible, serving directly", debugParameters)
-        XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)(indentedLogger)
+      XFormsResourceRewriter.cacheResources(
+        resources,
+        requestPath,
+        namespaceOpt,
+        combinedLastModified,
+        isCSS,
+        isMinimal
+      ) match {
+        case Some(resourceFile) ⇒
+          // Caching could take place, send out cached result
+          debug("serving from cache ", debugParameters)
+          useAndClose(response.getOutputStream) { os ⇒
+            copyStream(new FileInputStream(resourceFile), os)
+          }
+        case None ⇒
+          // Was unable to cache, just serve
+          debug("caching requested but not possible, serving directly", debugParameters)
+          XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
       }
     } else {
       // Should not cache, just serve
       debug("caching not requested, serving directly", debugParameters)
-      XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)(indentedLogger)
+      XFormsResourceRewriter.generateAndClose(resources, namespaceOpt, response.getOutputStream, isCSS, isMinimal)
     }
   }
 }

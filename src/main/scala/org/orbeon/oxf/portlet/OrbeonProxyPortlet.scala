@@ -165,8 +165,20 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         else
             None
 
-    private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) =
-        preferenceFromPublicRenderParameter(request, pref) getOrElse (preferenceFromPortalQuery(request, pref) getOrElse getPreference(request, pref))
+    private def preferenceFromSessionParameter(request: PortletRequest, pref: Pref) = {
+        val sessionParametersEnabled = getBooleanPreference(request, EnableSessionParameters)
+        APISupport.Logger.debug("preferenceFromSessionParameter - sessionParametersEnabled={}", sessionParametersEnabled)
+        if (sessionParametersEnabled)
+            sessionParameters(request) collectFirst { case (pref.nameLabel.publicName, value) ⇒ value }
+        else
+            None
+    }
+
+    private def getPreferenceOrRequested(request: PortletRequest, pref: Pref) = {
+        preferenceFromSessionParameter(request, pref) getOrElse
+                (preferenceFromPublicRenderParameter(request, pref) getOrElse
+                        (preferenceFromPortalQuery(request, pref) getOrElse getPreference(request, pref)))
+    }
 
     private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
         // Determine URL based on preferences and request
@@ -225,6 +237,21 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
              if keyVal._2(0).nonEmpty)
             yield
             (keyVal._1, keyVal._2(0))
+
+    private def sessionParameters(request: PortletRequest) = {
+
+        val documentId: String = request.getPortletSession.getAttribute("LIFERAY_SHARED_ORBEON_DOCUMENT_ID", PortletSession.APPLICATION_SCOPE).asInstanceOf[String]
+        val app: String = request.getPortletSession.getAttribute("LIFERAY_SHARED_ORBEON_APP", PortletSession.APPLICATION_SCOPE).asInstanceOf[String]
+        val form: String = request.getPortletSession.getAttribute("LIFERAY_SHARED_ORBEON_FORM", PortletSession.APPLICATION_SCOPE).asInstanceOf[String]
+        val page: String = request.getPortletSession.getAttribute("LIFERAY_SHARED_ORBEON_PAGE", PortletSession.APPLICATION_SCOPE).asInstanceOf[String]
+
+        APISupport.Logger.debug("sessionParameters - documentId={}, app={}, form={}, page={}", documentId, app, form, page)
+
+        Map(DocumentId.nameLabel.publicName -> documentId,
+            AppName.nameLabel.publicName -> app,
+            FormName.nameLabel.publicName -> form,
+            Page.nameLabel.publicName -> page)
+    }
 
     private def newRequestDetails(
         settings: PortletSettings,

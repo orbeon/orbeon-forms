@@ -20,6 +20,10 @@
             <value>false</value>
         </init-param>
         <init-param>
+            <name>enable-session-parameters</name>
+            <value>false</value>
+        </init-param>
+        <init-param>
             <name>app-name</name>
             <value>orbeon</value>
         </init-param>

@@ -12,6 +12,10 @@
             <value>http://localhost:8080/orbeon/</value>
         </init-param>
         <init-param>
+            <name>use-short-namespaces</name>
+            <value>true</value>
+        </init-param>
+        <init-param>
             <name>enable-url-parameters</name>
             <value>false</value>
         </init-param>
@@ -137,7 +141,7 @@
         <lifecycle>RESOURCE_PHASE</lifecycle>
         <lifecycle>EVENT_PHASE</lifecycle>
     </filter>
-    
+
     <filter-mapping>
         <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>

@@ -83,7 +83,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   override def render(request: RenderRequest, response: RenderResponse): Unit =
     ProcessorService.withProcessorService(processorService) {
       withRootException("render", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
+        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null, useShortNamespaces = true)
         bufferedRender(request, response, callService(directContext(request)))
       }
     }
@@ -92,7 +92,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   override def processAction(request: ActionRequest, response: ActionResponse): Unit =
     ProcessorService.withProcessorService(processorService) {
       withRootException("action", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null)
+        implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null, useShortNamespaces = true)
         bufferedProcessAction(request, response, callService(directContext(request)))
       }
     }
@@ -101,7 +101,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   override def serveResource(request: ResourceRequest, response: ResourceResponse) =
     ProcessorService.withProcessorService(processorService) {
       withRootException("resource", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
+        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null, useShortNamespaces = true)
         directServeResource(request, response)
       }
     }

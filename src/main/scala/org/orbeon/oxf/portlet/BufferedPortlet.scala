@@ -27,15 +27,20 @@ import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.JavaConverters._
 
 class PortletEmbeddingContext(
-  context        : PortletContext,
-  request        : PortletRequest,
-  response       : PortletResponse,
-  val httpClient : HttpClient
+  context            : PortletContext,
+  request            : PortletRequest,
+  response           : PortletResponse,
+  val httpClient     : HttpClient,
+  useShortNamespaces : Boolean
 ) extends EmbeddingContext {
 
   private val session = request.getPortletSession(true) ensuring (_ ne null)
 
-  val namespace = BufferedPortlet.shortIdNamespace(response.getNamespace, context) ensuring (_ ne null)
+  val namespace =
+    if (useShortNamespaces)
+      BufferedPortlet.shortIdNamespace(response.getNamespace, context) ensuring (_ ne null)
+    else
+      response.getNamespace
 
   def getSessionAttribute(name: String)                = session.getAttribute(name)
   def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
@@ -43,15 +48,17 @@ class PortletEmbeddingContext(
 }
 
 class PortletEmbeddingContextWithResponse(
-  context    : PortletContext,
-  request    : PortletRequest,
-  response   : MimeResponse,
-  httpClient : HttpClient
+  context            : PortletContext,
+  request            : PortletRequest,
+  response           : MimeResponse,
+  httpClient         : HttpClient,
+  useShortNamespaces : Boolean
 ) extends PortletEmbeddingContext(
   context,
   request,
   response,
-  httpClient
+  httpClient,
+  useShortNamespaces
 ) with EmbeddingContextWithResponse {
 
   def writer                     = response.getWriter

@@ -32,7 +32,7 @@
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons with "Other"</display-name>
-            <display-name lang="es" todo="true">[Radio Buttons with "Other"]</display-name>
+            <display-name lang="es">Botones de Radio con "Otros"</display-name>
             <display-name lang="fi" todo="true">[Radio Buttons with "Other"]</display-name>
             <display-name lang="fr">Boutons radio avec "Autre"</display-name>
             <display-name lang="ru" todo="true">[Radio Buttons with "Other"]</display-name>

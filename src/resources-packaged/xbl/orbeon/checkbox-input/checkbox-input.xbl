@@ -28,7 +28,7 @@
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single Checkbox</display-name>
-            <display-name lang="es" todo="true">[Single Checkbox]</display-name>
+            <display-name lang="es">Casilla de Verificación</display-name>
             <display-name lang="fi" todo="true">[Single Checkbox]</display-name>
             <display-name lang="fr">Case à cocher unique</display-name>
             <display-name lang="ru" todo="true">[Single Checkbox]</display-name>

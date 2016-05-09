@@ -95,7 +95,7 @@
                 month: "Mes",
                 year: "A\xf1o",
                 submit: "OK",
-                cancel: "Aancelar",
+                cancel: "Cancelar",
                 invalidYear: "A\xf1o debe ser un n\xfamero"
             }
         },

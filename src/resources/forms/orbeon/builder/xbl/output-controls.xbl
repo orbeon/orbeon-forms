@@ -15,7 +15,7 @@
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Output Controls</display-name>
-        <display-name lang="es" todo="true">Output Controls</display-name>
+        <display-name lang="es">Controles de Salida</display-name>
         <display-name lang="fi" todo="true">[Output Controls]</display-name>
         <display-name lang="fr">Contrôles de sortie</display-name>
         <display-name lang="ru" todo="true">[Output Controls]</display-name>

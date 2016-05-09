@@ -22,6 +22,16 @@
         <add>Add</add>
         <remove>Remove</remove>
     </resource>
+    <resource xml:lang="es">
+        <select>...</select>
+        <title>Selección</title>
+        <available>Disponible</available>
+        <selected>Seleccionado</selected>
+        <confirm>Confirmar</confirm>
+        <cancel>Cancelar</cancel>
+        <add>Agregar</add>
+        <remove>Eliminar</remove>
+    </resource>    
     <resource xml:lang="fi">
         <select>...</select>
         <title>Valinta</title>

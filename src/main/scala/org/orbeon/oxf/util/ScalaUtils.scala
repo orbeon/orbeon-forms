@@ -91,9 +91,11 @@ object ScalaUtils extends PathOps {
 
   implicit class PipeOps[A](val a: A) extends AnyVal {
     // Pipe operator
-    def |>[B] (f: A ⇒ B) = f(a)
+    def pipe[B] (f: A ⇒ B) = f(a)
+    def |>  [B] (f: A ⇒ B) = pipe(f)
     // Kestrel / K Combinator (known as tap in Ruby/Underscore)
-    def |!>[B](f: A ⇒ B): A = { f(a); a }
+    def kestrel[B](f: A ⇒ B): A = { f(a); a }
+    def |!>    [B](f: A ⇒ B): A = kestrel(f)
   }
 
   implicit class OptionOps[A](val a: Option[A]) extends AnyVal {

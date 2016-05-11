@@ -569,14 +569,6 @@
         <class name="org.orbeon.oxf.processor.ImageServer"/>
     </processor>
 
-    <processor name="oxf:struts">
-        <class name="org.orbeon.oxf.processor.generator.StrutsActionFormGenerator"/>
-    </processor>
-
-    <processor name="oxf:struts-errors-generator">
-        <class name="org.orbeon.oxf.processor.generator.StrutsActionErrorsGenerator"/>
-    </processor>
-
     <processor name="oxf:xls-generator">
         <class name="org.orbeon.oxf.processor.generator.XLSGenerator"/>
     </processor>

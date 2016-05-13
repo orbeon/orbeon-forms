@@ -407,8 +407,7 @@ trait ContainingDocumentDelayedEvents {
     cancelable        : Boolean,
     time              : Long,
     discardable       : Boolean,
-    showProgress      : Boolean,
-    progressMessage   : String
+    showProgress      : Boolean
   ): Unit = {
     _delayedEvents += DelayedEvent(
       eventName,
@@ -417,8 +416,7 @@ trait ContainingDocumentDelayedEvents {
       cancelable,
       time,
       discardable,
-      showProgress,
-      progressMessage
+      showProgress
     )
   }
 
@@ -492,8 +490,7 @@ case class DelayedEvent(
   cancelable        : Boolean,
   time              : Long,
   discardable       : Boolean, // whether the client can discard the event past the delay (see AjaxServer.js)
-  showProgress      : Boolean, // whether to show the progress indicator when submitting the event
-  progressMessage   : String   // message to show if the progress indicator is visible
+  showProgress      : Boolean  // whether to show the progress indicator when submitting the event
 ) {
 
   private def asEncodedDocument: String = {
@@ -520,11 +517,11 @@ case class DelayedEvent(
       localName = "server-events",
       prefix    = "xxf",
       uri       = XXFORMS_NAMESPACE_URI,
-      atts      =
-        ("delay"            → (time - currentTime).toString) ::
-        ("discardable"      → discardable.toString)          ::
-        ("show-progress"    → showProgress.toString)         :: (showProgress list
-        ("progress-message" → progressMessage)),
+      atts      = List(
+        "delay"         → (time - currentTime).toString,
+        "discardable"   → discardable.toString,
+        "show-progress" → showProgress.toString
+      ),
       text      = asEncodedDocument
     )
   }
@@ -538,11 +535,6 @@ case class DelayedEvent(
     }
     sb.append(",\"show-progress\":")
     sb.append(showProgress)
-    if (showProgress) {
-      sb.append(",\"progress-message\":\"")
-      XFormsUtils.escapeJavaScript(progressMessage)
-      sb.append('"')
-    }
     sb.append(",\"event\":\"")
     sb.append(asEncodedDocument)
     sb.append('"')

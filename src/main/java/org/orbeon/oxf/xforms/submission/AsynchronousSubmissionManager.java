@@ -62,8 +62,7 @@ public class AsynchronousSubmissionManager {
                 false,
                 System.currentTimeMillis() + containingDocument.getSubmissionPollDelay(),
                 true,
-                false,
-                null
+                false
             );
         }
     }

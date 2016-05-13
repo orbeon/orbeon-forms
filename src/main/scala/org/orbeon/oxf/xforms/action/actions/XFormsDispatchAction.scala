@@ -77,9 +77,6 @@ class XFormsDispatchAction extends XFormsAction {
     val showProgress =
       actionInterpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != "false"
 
-    val progressMessage =
-      if (showProgress) actionInterpreter.resolveAVT(actionElement, XXFORMS_PROGRESS_MESSAGE_QNAME) else null
-
     // Find actual target
     actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
       case xformsEventTarget: XFormsEventTarget ⇒
@@ -90,8 +87,7 @@ class XFormsDispatchAction extends XFormsAction {
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
           properties      = XFormsAction.eventProperties(actionInterpreter, actionElement),
-          delayOpt        = resolvedDelayOpt,
-          progressMessage = progressMessage
+          delayOpt        = resolvedDelayOpt
         )
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
@@ -112,8 +108,7 @@ object XFormsDispatchAction {
     cancelable      : Boolean        = true,
     properties      : PropertyGetter = EmptyGetter,
     delayOpt        : Option[Int]    = None,
-    showProgress    : Boolean        = true,
-    progressMessage : String         = null
+    showProgress    : Boolean        = true
   ): Unit =
     delayOpt match {
       case Some(delay) if delay >= 0 ⇒
@@ -137,8 +132,7 @@ object XFormsDispatchAction {
           cancelable        = cancelable,
           time              = System.currentTimeMillis + delay,
           discardable       = false,
-          showProgress      = showProgress,
-          progressMessage   = progressMessage
+          showProgress      = showProgress
         )
       case _ ⇒
         // Event is dispatched immediately

@@ -28,16 +28,6 @@ class LoadingIndicator
         # Don't show NProgress spinner
         NProgress.configure({ showSpinner: false })
 
-        # For now hide the loading indicator (use jQuery to fix #403)
-        @loadingSpan = (f$.children '.xforms-loading-loading', $ @form)[0]
-        @loadingSpan.style.display = "none"
-
-        # Differ creation of the overlay to the first time we need it
-        @loadingOverlay = null
-        # On scroll or resize, move the overlay so it stays visible
-        Overlay.windowScrollEvent.subscribe => @_updateLoadingPosition()
-        Overlay.windowResizeEvent.subscribe => @_updateLoadingPosition()
-
         # Extract whether this is an upload from the object passed to the callback
         # This, because we only want the loading indicator to show for Ajax request, not uploads,
         # for which we have a different way of indicating the upload is in progress.
@@ -51,7 +41,7 @@ class LoadingIndicator
                     # Show the indicator after a delay
                     afterDelay = =>
                         @shownCounter++
-                        @show(@nextConnectMessage) if @shownCounter == 1
+                        @show() if @shownCounter == 1
                     _.delay afterDelay, Properties.delayBeforeDisplayLoading.get()
                 else
                     # Indicator already shown, just increment counter
@@ -67,7 +57,6 @@ class LoadingIndicator
                     @hide() if @shownCounter == 0
                 # Reset show and message
                 @nextConnectShow = true
-                @nextConnectMessage = DEFAULT_LOADING_TEXT
 
         Events.ajaxResponseProcessedEvent.subscribe (type, args) ->
             requestEnded(args[0])
@@ -77,7 +66,6 @@ class LoadingIndicator
 
     setNextConnectProgressShown: (shown) ->
         @nextConnectShow = shown
-    setNextConnectProgressMessage: (message) -> @nextConnectMessage = message
 
     runShowing: (f) ->
         @shownCounter++
@@ -88,46 +76,13 @@ class LoadingIndicator
             @hide() if @shownCounter == 0
 
     # Actually shows the loading indicator (no delay or counter)
-    show: (message) ->
+    show: ->
         NProgress.start()
-        #@_initLoadingOverlay()
-        #message ?= DEFAULT_LOADING_TEXT
-        #OD.setStringValue @loadingOverlay.element, message
-        #@loadingOverlay.show()
-        ## Get loading indicator to show above other dialogs or elements
-        #$(@loadingOverlay.element).css('z-index', Globals.lastDialogZIndex + 1)
-        #@_updateLoadingPosition()
 
     # Actually hides the loading indicator (no counter)
     hide: ->
         if not Globals.loadingOtherPage
             NProgress.done()
-            #@loadingOverlay.cfg.setProperty "visible", false
 
-    _initLoadingOverlay: () ->
-        # Initialize @loadingOverlay if not done already
-        if not @loadingOverlay?
-            # On scroll, we might need to move the overlay
-            @loadingSpan.style.display = "block"
-            @initialRight = YD.getViewportWidth() - YD.getX @loadingSpan
-            @initialTop = YD.getY @loadingSpan
-            # Create a YUI overlay after showing the span
-            @loadingOverlay = new YAHOO.widget.Overlay @loadingSpan, { visible: false, monitorresize: true }
-            Utils.overlayUseDisplayHidden @loadingOverlay
-            @loadingSpan.style.right = "auto"
-
-    _updateLoadingPosition: () ->
-        @_initLoadingOverlay()
-        @loadingOverlay.cfg.setProperty "x", do =>
-            # Keep the distance to the right border of the viewport the same
-            scrollX = YD.getDocumentScrollLeft()
-            scrollX + YD.getViewportWidth() - @initialRight
-        @loadingOverlay.cfg.setProperty "y", do =>
-            scrollY = YD.getDocumentScrollTop()
-            if scrollY + Properties.loadingMinTopPadding.get() > @initialTop
-            # Place indicator at a few pixels from the top of the viewport
-            then scrollY + Properties.loadingMinTopPadding.get()
-            # Loading is visible at its initial position, so leave it there
-            else @initialTop
 
 ORBEON.xforms.LoadingIndicator = LoadingIndicator

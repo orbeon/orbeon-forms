@@ -30,14 +30,13 @@ AjaxServer.Event = (args) ->
         cancelable:         bool   -> null
         ignoreErrors:       bool   -> null
         showProgress:       bool   -> true
-        progressMessage:    string -> null
         additionalAttribs:  object -> null
         properties:         object -> {}
 
     # Backward compatibility: support arguments passed as a series of parameters
     if arguments.length > 1
         oldParams = ['form', 'targetId', 'value', 'eventName', 'bubbles', 'cancelable',
-                     'ignoreErrors', 'showProgress', 'progressMessage', 'additionalAttribs']
+                     'ignoreErrors', 'showProgress', 'additionalAttribs']
         newArgs = {}
         newArgs[name] = arguments[i] for name, i in oldParams
         args = newArgs

@@ -29,7 +29,6 @@ var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_CLOSE_ANGLE = new RegExp(">", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
 var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", "g");
-var DEFAULT_LOADING_TEXT = "Loading...";
 
 (function() {
 
@@ -3665,7 +3664,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                                         additionalAttributes.push(keyListener.modifier);
                                     }
                                     var event = new ORBEON.xforms.server.AjaxServer.Event(keyListener.form, targetId, null, "keypress",
-                                            null, null, null, null, null, additionalAttributes);
+                                            null, null, null, null, additionalAttributes);
                                     ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
                                 }
                             });
@@ -3691,7 +3690,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                             var serverEvent = serverEvents[serverEventIndex];
                             var discardable = ! _.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
                             ORBEON.xforms.server.AjaxServer.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
-                                    serverEvent["show-progress"], serverEvent["progress-message"], discardable, formElement.id);
+                                    serverEvent["show-progress"], discardable, formElement.id);
                         }
                     }
                 }
@@ -4170,7 +4169,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             var endPosition = this._getPosition(srcElement);
             if (endPosition != this._startPosition) {
                 var form = ORBEON.xforms.Controls.getForm(srcElement);
-                var event = new ORBEON.xforms.server.AjaxServer.Event(form, this.sourceControlID, null, "xxforms-dnd", null, null, null, null, null,
+                var event = new ORBEON.xforms.server.AjaxServer.Event(form, this.sourceControlID, null, "xxforms-dnd", null, null, null, null,
                         ["dnd-start", this._startPosition, "dnd-end", endPosition]);
                 this._renumberIDs(this.sourceControlID);
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);

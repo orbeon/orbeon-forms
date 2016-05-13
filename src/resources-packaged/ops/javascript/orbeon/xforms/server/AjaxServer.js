@@ -126,10 +126,10 @@
     /**
      * Create a timer which after the specified delay will fire a server event.
      */
-    AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, progressMessage, discardable, formID) {
+    AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, discardable, formID) {
         var timerId = window.setTimeout(function () {
             var event = new AjaxServer.Event(ORBEON.util.Dom.get(formID), null,
-                    serverEvents, "xxforms-server-events", null, null, null, showProgress, progressMessage);
+                    serverEvents, "xxforms-server-events", null, null, null, showProgress);
             AjaxServer.fireEvents([event]);
         }, delay);
         // Save timer id for this discardable timer
@@ -318,7 +318,6 @@
                     ORBEON.xforms.Globals.requestIgnoreErrors = true;
                     var sendInitialDynamicState = false;
                     var showProgress = false;
-                    var progressMessage = null;
                     var foundEventOtherThanHeartBeat = false;
 
                     _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
@@ -333,15 +332,6 @@
                         // Figure out if any of the events asks for the progress to be shown (the default)
                         if (event.showProgress)
                             showProgress = true;
-                        // Figure out if all the events have the same progress message
-                        if (YAHOO.lang.isString(event.progressMessage)) {
-                            // Only use the event's progressMessage if it is equal to the value of progressMessage we already have
-                            progressMessage = eventIndex == 0 ? event.progressMessage
-                                    : progressMessage == event.progressMessage ? event.progressMessage
-                                    : null;
-                        } else {
-                            progressMessage = null;
-                        }
                     });
 
                     // Get events to send, filtering out those that are not for the form we chose
@@ -372,7 +362,6 @@
                     // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
                     var loadingIndicator = ORBEON.xforms.Page.getForm(formID).getLoadingIndicator();
                     loadingIndicator.setNextConnectProgressShown(showProgress);
-                    loadingIndicator.setNextConnectProgressMessage(progressMessage);
 
                     // Build request
                     var requestDocumentString = [];
@@ -1953,7 +1942,6 @@
                                     showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
                                     var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
                                     discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
-                                    var progressMessage = ORBEON.util.Dom.getAttribute(serverEventsElement, "progress-message");
                                     if (delay == null) {
                                         // Case of 2-phase submission: store value and later when we process the submission element, we'll store the value of
                                         // server-events in the $server-events form field, which will be submitted to the server by POSTing the form.
@@ -1962,7 +1950,7 @@
                                         // Case where we need to send those events to the server with a regular Ajax request
                                         // after the given delay.
                                         var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                        AjaxServer.createDelayedServerEvent(serverEvents, delay, showProgress, progressMessage, discardable, formID);
+                                        AjaxServer.createDelayedServerEvent(serverEvents, delay, showProgress, discardable, formID);
                                     }
                                     break;
                                 }

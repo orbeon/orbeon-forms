@@ -251,8 +251,7 @@ object XFormsAPI {
     cancelable      : Boolean = true,
     properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
     delay           : Option[Int] = None,
-    showProgress    : Boolean = true,
-    progressMessage : String = null
+    showProgress    : Boolean = true
   ): Unit =
     resolveAs[XFormsEventTarget](targetId) foreach {
       XFormsDispatchAction.dispatch(
@@ -262,8 +261,7 @@ object XFormsAPI {
         cancelable,
         properties,
         delay,
-        showProgress,
-        progressMessage
+        showProgress
       )
     }
 

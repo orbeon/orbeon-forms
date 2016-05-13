@@ -163,16 +163,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                     "value", XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)
             });
 
-            // Ajax loading indicator
-            if (containingDocument.isAjaxShowLoadingIcon()) {
-
-                helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-loading" });
-                helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed
-                helper.endElement();
-
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{ "class", "xforms-loading-none" });
-            }
-
             // Ajax error panel
             XFormsError.outputAjaxErrorPanel(containingDocument, helper, htmlPrefix);
 

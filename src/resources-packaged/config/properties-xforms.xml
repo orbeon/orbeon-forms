@@ -100,7 +100,6 @@
     <property as="xs:string"  name="oxf.xforms.alert-element"                               value="span"/>
 
     <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="2000"/>
-    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="inline"/>
     <property as="xs:string"  name="oxf.xforms.help.appearance"                             value="dialog"/>

@@ -68,7 +68,6 @@ public class XFormsProperties {
 //    public static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
 
     public static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
-    public static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     public static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
     public static final String NO_UPDATES = "no-updates";
 
@@ -209,7 +208,6 @@ public class XFormsProperties {
             new PropertyDefinition(LOCAL_SUBMISSION_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
-            new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(SHOW_RECOVERABLE_ERRORS_PROPERTY, 10, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),

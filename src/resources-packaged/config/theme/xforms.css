@@ -340,17 +340,6 @@
 .orbeon .yui-tt-shadow {
   display: none;
 }
-.orbeon .xforms-loading-loading {
-  background-color: #c44;
-  color: #fff;
-  padding: 2px;
-  position: absolute;
-  right: 2em;
-}
-.orbeon .xforms-loading-none {
-  display: block;
-  height: 0;
-}
 .orbeon .xforms-error-panel .bd {
   background-image: url(../../ops/images/xforms/warning_64.png);
   background-position: 20px 20px;
@@ -437,10 +426,6 @@
   background-image: url(../../ops/images/xforms/processing.gif);
 }
 @media print {
-  html body.orbeon .xforms-loading-loading,
-  html body .orbeon .xforms-loading-loading {
-    display: none;
-  }
   html body .xforms-initially-hidden {
     display: block;
   }

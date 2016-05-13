@@ -222,7 +222,6 @@ trait ContainingDocumentProperties {
   def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)
   def isLocalSubmissionInclude              = staticBooleanProperty(LOCAL_SUBMISSION_INCLUDE_PROPERTY)
   def isLocalInstanceInclude                = staticBooleanProperty(LOCAL_INSTANCE_INCLUDE_PROPERTY)
-  def isAjaxShowLoadingIcon                 = staticBooleanProperty(AJAX_SHOW_LOADING_ICON_PROPERTY)
   def isExposeXPathTypes                    = staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
   def isSessionHeartbeat                    = staticBooleanProperty(SESSION_HEARTBEAT_PROPERTY)
   def isXForms11Switch                      = staticBooleanProperty(XFORMS11_SWITCH_PROPERTY)

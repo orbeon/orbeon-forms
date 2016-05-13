@@ -16,16 +16,16 @@ $ ->
                     offset: Builder.adjustedOffset grid
                     height: f$.outerHeight grid                                                                         # Include grid padding
                 if f$.is '.fr-repeat', table
-                    head = f$.find 'thead', table
+                    head = f$.find '.fr-grid-head', table
                     gridInfo.head =
                         offset: Builder.adjustedOffset head
                         height: f$.height head
-                gridInfo.rows = _.map (f$.find '.fb-grid-tr', grid), (tr) ->                                            # .fb-grid-tr leaves out the header row in the repeat
+                gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                            # .fr-grid-tr leaves out the header row in the repeat
                     grid: gridInfo
                     el: $ tr
                     offset: Builder.adjustedOffset $ tr
                     height: f$.height $ tr
-                gridInfo.cols = _.map (f$.find '.fb-grid-tr:first .fb-grid-td', grid), (td) ->
+                gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', grid), (td) ->
                     grid: gridInfo
                     el: $ td
                     offset: Builder.adjustedOffset $ td
@@ -49,7 +49,7 @@ $ ->
                     f$.offset offset, deleteIcon
                 if grid.head?
                     f$.show detailsIcon
-                    head = f$.find 'thead', table
+                    head = f$.find '.fr-grid-head', table
                     offset =
                         top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Builder.scrollTop()
                         left: grid.offset.left
@@ -126,7 +126,7 @@ $ ->
         # Functions maintaining current row/col position
         resetPos = (pos) -> -> current[pos] = -1
         setPos = (pos) -> (rowCol) ->
-            selector = '.fb-grid-' + rowCol.el[0].nodeName.toLowerCase()
+            selector = '.fr-grid-' + (if pos == 'rowPos' then 'tr' else 'td')
             current[pos] = f$.length f$.prevAll selector, rowCol.el
 
         Builder.currentRowColChanged gridsCache,

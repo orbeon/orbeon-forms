@@ -305,7 +305,7 @@ trait FormBuilderOps extends FormRunnerOps {
       cssSelector(".fb-tool > .fb-add-control").findAllElements.size
 
     def countCurrentGridRows =
-      executeScript("return ORBEON.jQuery('.fb-selected').closest('.fr-grid').find('.fb-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
+      executeScript("return ORBEON.jQuery('.fb-selected').closest('.fr-grid').find('.fr-grid-tr:not(.xforms-repeat-template)').size()").asInstanceOf[Long]
 
     def countSections =
       executeScript("return ORBEON.jQuery('.xbl-fr-section').size()").asInstanceOf[Long]

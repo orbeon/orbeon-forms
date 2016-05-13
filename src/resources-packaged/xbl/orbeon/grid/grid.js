@@ -69,7 +69,7 @@ ORBEON.jQuery(function() {
     }
 
     function gridRow(e) {
-        return $(e.target).closest('.fb-grid-tr')[0];
+        return $(e.target).closest('.fr-grid-tr')[0];
     }
 
     function gridIteration(e) {

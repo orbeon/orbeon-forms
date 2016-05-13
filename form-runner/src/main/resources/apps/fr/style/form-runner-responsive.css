@@ -15,10 +15,10 @@
     width: 100%;
     margin-left: 0;
   }
-  .orbeon .fr-grid:not(.fr-repeat-table) {
+  .orbeon .fr-grid:not(.fr-repeat) {
     table-layout: inherit;
   }
-  .orbeon .fr-grid:not(.fr-repeat-table) > tbody > tr > td {
+  .orbeon .fr-grid:not(.fr-repeat) > .fr-grid-body > .fr-grid-tr > .fr-grid-td {
     display: block;
   }
   .orbeon.xforms-mobile select,

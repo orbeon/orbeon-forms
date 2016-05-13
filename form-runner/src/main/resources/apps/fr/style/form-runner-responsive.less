@@ -31,12 +31,12 @@
             }
         }
 
-        .fr-grid:not(.fr-repeat-table) {
+        .fr-grid:not(.fr-repeat) {
 
             // Instead of fixed, so each cell doesn't take 1/x of the width of the table
             table-layout: inherit;
 
-            & > tbody > tr >  td {
+            & > .fr-grid-body > .fr-grid-tr > .fr-grid-td  {
                 // The main thing this CSS does: change table cells into blocks
                 display: block;
             }

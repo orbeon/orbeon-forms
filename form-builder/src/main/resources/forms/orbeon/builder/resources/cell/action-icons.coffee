@@ -34,11 +34,11 @@ relevanceRules = do ->
                                         noDelimiter = ':not(.xforms-repeat-delimiter):not(.xforms-repeat-template):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end)'
                                         grid = $(gridTd).closest('.fr-grid')
                                         if grid.hasClass('fr-norepeat')                                                                     # Regular table
-                                            gridTd.rowSpan <= $(gridTd).parent().nextAll('tr' + noDelimiter).length                         #   Based on number of following non-internal rows
+                                            (if gridTd.rowSpan? then gridTd.rowSpan else 1) <= $(gridTd).parent().nextAll('*' + noDelimiter).length                          #   Based on number of following non-internal rows
                                         else if grid.hasClass('fr-repeat-multiple-rows')                                                    # Repeat with multiple rows in each iteration
                                             gridTr =$(gridTd).parent()                                                                      #   Based on number of following row with the same parity
                                             oddEvenClass = if gridTr.hasClass('yui-dt-even') then 'yui-dt-even' else 'yui-dt-odd'           #   Rows with a different parity belong to a different iteration
-                                            gridTd.rowSpan <= gridTr.next('.' + oddEvenClass).length
+                                            (if gridTd.rowSpan? then gridTd.rowSpan else 1) <= gridTr.next('.' + oddEvenClass).length
                                         else if grid.hasClass('fr-repeat-single-row') then false                                            # Repeat with single row: no expansion possible
                                         else false                                                                                          # Catch all, which shouldn't happen
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
@@ -90,15 +90,15 @@ $ ->
                 tidyTriggerGroups(triggerGroups)
         lastPositionTriggers()
 
-    # Normally, we add the div.fb-hover when the mouse first enters the td.fb-grid-td, but for the TinyMCE, if we do
+    # Normally, we add the div.fb-hover when the mouse first enters the .fr-grid-td, but for the TinyMCE, if we do
     # this after the TinyMCE is initialized, the TinyMCE looses its state as we need to wrap the TinyMCE iframe,
-    # which require us to detach the TinyMCE iframe from the DOM. So here we preempltively add the td.fb-grid-td around
+    # which require us to detach the TinyMCE iframe from the DOM. So here we preemptively add the .fr-grid-td around
     # the TinyMCE just before it is initialized.
     tinyMCE.onAddEditor.add (sender, editor) ->
         Builder.beforeAddingEditorCallbacks.fire $ document.getElementById editor.id
 
     Builder.beforeAddingEditorCallbacks.add (editor) ->
-        gridThTd = f$.closest 'th.fb-grid-th, td.fb-grid-td', editor
+        gridThTd = f$.closest '.fr-grid-th, .fr-grid-td', editor
         createHoverDiv gridThTd
 
     # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control

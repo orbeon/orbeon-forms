@@ -64,9 +64,9 @@ $ ->
                 # Give up we we're not in an editable grid, e.g. section template
                 if not $(target).closest('.fr-grid').is('.fr-editable') then null
                 # Target is the grid td, we're good
-                else if $(target).is('.fb-grid-th, .fb-grid-td') then target
+                else if $(target).is('.fr-grid-th, .fr-grid-td') then target
                 # Try finding a grid td parent of the target
-                else $(target).closest('.fb-grid-th, .fb-grid-td')[0]
+                else $(target).closest('.fr-grid-th, .fr-grid-td')[0]
             if gridThTd?
                 if currentMouseOverGridThTd
                     if gridThTd isnt currentMouseOverGridThTd

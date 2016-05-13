@@ -15,6 +15,13 @@
 .orbeon {
     .xbl-fr-grid {
 
+        .fr-table {
+          max-width: 100%;
+          background-color: @tableBackground;
+          border-collapse: collapse;
+          border-spacing: 0;
+        }
+
         margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
 
         // Minimal appearance buttons
@@ -28,8 +35,9 @@
             }
         }
 
-        .fr-grid { // this is the <table> element, so everything within the grid proper
+        .fr-grid { // this is the <div> or <table> element, so everything within the grid proper
 
+            display: table;
             table-layout: fixed;
             width: 100%;
 
@@ -41,23 +49,45 @@
                 //}
             }
 
-            thead tr th {
-                text-align: left;
+            .fr-grid-head {
+                display: table-header-group;
+            }
 
-                .xforms-output {
-                    // We want the block for the label in the header to "go around" its content, so the help
-                    // popover is correctly positioned.
-                    display: block;
-                }
+            .fr-grid-body {
+                display: table-row-group;
+            }
 
-                // If there is a group with a label in a grid th, remove the border added by Bootstrap
-                legend.xforms-label {
-                    border-bottom: none;
-                    margin: 0;
+            .fr-grid-tr {
+                display: table-row;
+
+                &> .fr-grid-td {
+                    display: table-cell;
+                    vertical-align: top;
                 }
             }
 
-            tbody tr td {
+            .fr-grid-master-row {
+                display: table-row;
+
+                &> .fr-grid-th {
+                    display: table-cell;
+                    text-align: left;
+
+                    .xforms-output {
+                        // We want the block for the label in the header to "go around" its content, so the help
+                        // popover is correctly positioned.
+                        display: block;
+                    }
+
+                    // If there is a group with a label in a grid th, remove the border added by Bootstrap
+                    legend.xforms-label {
+                        border-bottom: none;
+                        margin: 0;
+                    }
+                }
+            }
+
+            .fr-grid-body .fr-grid-tr > .fr-grid-th {
                 vertical-align: top;
                 width: auto;
                 // Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
@@ -70,10 +100,10 @@
             // or less vertical space.
             // NOTE: This should be extended to repeated grids as well, but they interleave `<tr>`s which makes it harder.
             &:not(.fr-repeat) {
-                tbody tr {
+                .fr-grid-body .fr-grid-tr {
                     height: 1px;
                 }
-                tbody tr:last-of-type {
+                .fr-grid-body tr:last-of-type {
                     height: auto;
                 }
             }
@@ -99,7 +129,7 @@
             // Controls
             select,
             textarea,
-            input[type="text"],             // Like Bootstrap, use all the specific types to exclude checkbox/radio
+            input[type="text"],                             // Like Bootstrap, use all the specific types to exclude checkbox/radio
             input[type="password"],
             input[type="datetime"],
             input[type="datetime-local"],
@@ -162,40 +192,40 @@
 
             // Cell content
             .fr-grid-content {
-                padding: @frGridCellPadding;                // Add some space around control
+                padding: @frGridCellPadding;                                        // Add some space around control
             }
         }
 
-        .fr-repeat-table {
+        .fr-grid.fr-repeat {
 
             .fr-grid-content {
                 // No top/bottom padding in repeated grid cells
                 padding-top: 0;
-                padding-bottom: 0.1px;                  // should be 0, but that causes https://github.com/orbeon/orbeon-forms/issues/2690
+                padding-bottom: 0.1px;                                              // should be 0, but that causes https://github.com/orbeon/orbeon-forms/issues/2690
             }
 
             &.fr-repeat-single-row {
-                td, td > .fb-hover {                    // Don't show label, help, hint for controls inside a repeat-table
-                    &> .fr-grid-content > * {           // which repeats over a single row only (they are shown in the
-                        &> .xforms-label,               // column header). But only do this for the top-level control within
-                        &> .xforms-help,                // a cell.
+                .fr-grid-tr > .fr-grid-td, .fr-grid-tr > .fr-grid-td > .fb-hover {                    // Don't show label, help, hint for controls inside a repeat-table
+                    &> .fr-grid-content > * {                                       // which repeats over a single row only (they are shown in the
+                        &> .xforms-label,                                           // column header). But only do this for the top-level control within
+                        &> .xforms-help,                                            // a cell.
                         &> .xforms-hint {
                             display: none;
                         }
                     }
                 }
-                th span.xforms-group                    // So the group that contains the control label is sized, to allow
-                    { display: block }                  // the help popover to be correctly positioned
+                .fr-grid-master-row > .fr-grid-th span.xforms-group                         // So the group that contains the control label is sized, to allow
+                    { display: block }                                              // the help popover to be correctly positioned
             }
 
             // But if there is a nested table, show those in the label in the column header of that table
-            tr th {
-                .xforms-label { display: block }        // Label in repeat table header is block so yellow background in FB takes the whole width
+            .fr-grid-master-row > .fr-grid-th {
+                .xforms-label { display: block }                                    // Label in repeat table header is block so yellow background in FB takes the whole width
                 .xforms-help { margin-top: 4px }
             }
 
             .fr-repeat-column-left, .fr-repeat-column-right {
-                //width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
+                //width: @frGridPlusMinusIconWidth + 5px*2 + 1px;                   // 5px padding from tables.less (no variable), 1px for the border
                 width: 35px;
                 text-align: left;
 

@@ -90,24 +90,24 @@ $ ->
     FSM.create
 
         transitions: [
-            { events: [ 'mouseEntersGridTd' ],      elements: 'elementsInContainer',  from: [ 'initial' ],                          conditions: [ 'isEmpty' ],                          to: 'placeholder',              actions: [ 'removeFor', 'createMock', 'showPlaceholder' ]   }
-            { events: [ 'mouseEntersGridTd' ],      elements: 'elementsInContainer',  from: [ 'initial' ],                          conditions: [ 'isNonEmpty' ],                       to: 'mock',                     actions: [ 'removeFor', 'createMock' ]                      }
-            { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'mock' ],                                                                                 to: 'initial',                  actions: [ 'removeMock' ]                                   }
-            { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'placeholder' ],                                                                          to: 'initial',                  actions: [ 'hidePlaceholder', 'removeMock'  ]               }
-            { events: [ 'click' ],                  elements: 'elementClosest',       from: [ 'placeholder', 'mock' ],                                                                  to: 'wait-xhr-to-edit',         actions: [ 'storeSeqNo' ]                                   }
+            { events: [ 'mouseEntersGridTd' ],     elements: 'elementsInContainer', from: [ 'initial' ],                conditions: [ 'isEmpty' ],                         to: 'placeholder',            actions: [ 'removeFor', 'createMock', 'showPlaceholder' ]   }
+            { events: [ 'mouseEntersGridTd' ],     elements: 'elementsInContainer', from: [ 'initial' ],                conditions: [ 'isNonEmpty' ],                      to: 'mock',                   actions: [ 'removeFor', 'createMock' ]                      }
+            { events: [ 'mouseExistsGridTd' ],     elements: 'elementsInContainer', from: [ 'mock' ],                                                                      to: 'initial',                actions: [ 'removeMock' ]                                   }
+            { events: [ 'mouseExistsGridTd' ],     elements: 'elementsInContainer', from: [ 'placeholder' ],                                                               to: 'initial',                actions: [ 'hidePlaceholder', 'removeMock'  ]               }
+            { events: [ 'click' ],                 elements: 'elementClosest',      from: [ 'placeholder', 'mock' ],                                                       to: 'wait-xhr-to-edit',       actions: [ 'storeSeqNo' ]                                   }
             # This transition is for the case where in one server response we get two controls added. In the case
             # we want to make sure we end the edit on the first control, before we add the second one. If we don't
             # when moving the editor for the second control, the blur event from the first editor runs and gives us
             # a DOM Exception 8 on Chrome. See bugs #247 and #839, as well as
             # http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Chrome-s-DOM-Exception-8
-            { events: [ 'controlAdded' ],           elements: 'elementsAll',          from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
-            { events: [ 'controlAdded' ],           elements: 'labelsInContainer',    from: [ 'initial' ],                                                                              to: 'edit',                     actions: [ 'removeFor', 'createMock', 'startEdit' ]         }
-            { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'wait-xhr-to-edit' ],                 conditions: [ 'isNextSeqNo' ],                      to: 'edit',                     actions: [ 'startEdit' ]                                    }
-            { events: [ 'enterKey', 'lostFocus' ],  elements: 'elementClosest',       from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
-            { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerOutsideCell' ],               to: 'initial'                                                                               }
-            { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerInsideCell', 'isEmpty' ],     to: 'placeholder-after-edit',   actions: [ 'storeSeqNo', 'createMock', 'showPlaceholder' ]  }
-            { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerInsideCell', 'isNonEmpty' ],  to: 'mock',                     actions: [ 'createMock' ]                                   }
-            { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'placeholder-after-edit' ],           conditions: [ 'isNextSeqNo' ],                      to: 'placeholder',              actions: [ 'showPlaceholder' ]                              }
+            { events: [ 'controlAdded' ],          elements: 'elementsAll',         from: [ 'edit' ],                                                                      to: 'edit-done',              actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
+            { events: [ 'controlAdded' ],          elements: 'labelsInContainer',   from: [ 'initial' ],                                                                   to: 'edit',                   actions: [ 'removeFor', 'createMock', 'startEdit' ]         }
+            { events: [ 'ajaxResponse' ],          elements: 'elementsAll',         from: [ 'wait-xhr-to-edit' ],       conditions: [ 'isNextSeqNo' ],                     to: 'edit',                   actions: [ 'startEdit' ]                                    }
+            { events: [ 'enterKey', 'lostFocus' ], elements: 'elementClosest',      from: [ 'edit' ],                                                                      to: 'edit-done',              actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
+            { events: [ 'editDone' ],              elements: 'elementsAll',         from: [ 'edit-done' ],              conditions: [ 'pointerOutsideCell' ],              to: 'initial'                                                                               }
+            { events: [ 'editDone' ],              elements: 'elementsAll',         from: [ 'edit-done' ],              conditions: [ 'pointerInsideCell', 'isEmpty' ],    to: 'placeholder-after-edit', actions: [ 'storeSeqNo', 'createMock', 'showPlaceholder' ]  }
+            { events: [ 'editDone' ],              elements: 'elementsAll',         from: [ 'edit-done' ],              conditions: [ 'pointerInsideCell', 'isNonEmpty' ], to: 'mock',                   actions: [ 'createMock' ]                                   }
+            { events: [ 'ajaxResponse' ],          elements: 'elementsAll',         from: [ 'placeholder-after-edit' ], conditions: [ 'isNextSeqNo' ],                     to: 'placeholder',            actions: [ 'showPlaceholder' ]                              }
         ]
 
         events:
@@ -126,7 +126,7 @@ $ ->
                 grid =  f$.closest '.fr-grid', container
                 if f$.is '.fr-repeat-single-row', grid
                     position = 1 + f$.length f$.prevAll container
-                    thContainer = f$.nth position, f$.children f$.find 'tr.fr-grid-master-row', grid
+                    thContainer = f$.nth position, f$.children f$.find '.fr-grid-master-row', grid
                     f$.add thContainer, container
                 else container
             elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), adjustContainerForRepeat container

@@ -10,7 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import (reference) "../../../../apps/fr/style/form-runner-common";
+@import (reference) "../../../../../../../../form-runner/src/main/resources/apps/fr/style/form-runner-common";
 
 @darkBlue: #004B92;
 @lightBlue: #DEF;
@@ -107,7 +107,7 @@ body {
     }
 
     .fr-view .fr-section-container .fr-grid.fr-editable {                   // Tons of classes to take precedence over FR styling
-        .fb-grid-td, .fb-grid-th {
+        .fr-grid-td, .fr-grid-th {
             &:hover {
                 .xforms-label, .xforms-hint, .xforms-text .xforms-output-output {
                     &:empty:before {
@@ -238,7 +238,7 @@ body {
         .xforms-label:after { content: ": " }
         // Exceptions to above rule
         legend.xforms-label:after,
-        .fb-grid-th .xforms-label:after,
+        .fr-grid-th .xforms-label:after,
         .fr-grid thead tr th .xforms-label:after,
         .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
 
@@ -353,7 +353,7 @@ body {
         width: 800px;
         max-width: none;
         .xforms-select1 { width: auto }
-        .fr-repeat-table {
+        .fr-grid.fr-repeat {
             .fb-parameters {
                 .xforms-label { display: block }
                 .xforms-hint { display: block }
@@ -596,7 +596,7 @@ body {
     // Delete, expand, shrink shown to the left of the cell
     .fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
     .fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
-    .fr-grid .fb-grid-td .fb-grid-cell-icons img { display: inline }
+    .fr-grid .fr-grid-td .fb-grid-cell-icons img { display: inline }
     // Control details and validation shown to the top right of the cell
     .fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
     .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
@@ -613,7 +613,7 @@ body {
         }
     }
 
-    .fr-grid .fb-grid-td .fb-grid-control-icons img { display: inline }
+    .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
     .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
     .fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
     .fr-grid .fr-grid-content .xforms-trigger .btn input,                               // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
@@ -624,7 +624,7 @@ body {
     .fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     // When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder
     .fb-mock-link:hover { background-color: @yellow }                                   // Simulated link get yellow background on mouse over to suggest it can be edited
 
-    .fb-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
+    .fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
                                                                                         // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
     .fb-selected {                                                                      // Selected cell in grids
@@ -632,16 +632,16 @@ body {
         border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
     }
 
-    .fb-grid-td { border: 1px solid transparent }                                       // So that we can show the grid border on hover changing the border size
+    .fr-grid-td { border: 1px solid transparent }                                       // So that we can show the grid border on hover changing the border size
 
     // Editable grids
     .fr-view .xbl-fr-grid .fr-grid.fr-editable {
 
         &.fr-norepeat {                                                                                             // For non-repeat grid (`table` to override collapse in FR.less)
             border-collapse: collapse;
-            &:hover .fb-grid-td { border: 1px solid @lightBlue }
+            &:hover .fr-grid-td { border: 1px solid @lightBlue }
         }
-        .fb-grid-tr { height: 60px }                                                                                // Enough space to hold row icons so hovering doesn't cause the row to expand
+        .fr-grid-tr { height: 60px }                                                                                // Enough space to hold row icons so hovering doesn't cause the row to expand
         .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
             &:hover { background-color: #eee }                                                                      // Indicate the value can be edited
         }
@@ -650,7 +650,7 @@ body {
 
         // Even if the label or hint is empty, we still want space for 1 line to be reserved
         .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                              // In regular grid content
-        .fb-grid-th .xforms-label, .fb-grid-th .xforms-hint                                                         // In grid header, for the repeat single line
+        .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint                                                         // In grid header, for the repeat single line
             { min-height: 20px }                                                                                    // Use min-height instead of height so text wraps if it doesn't fit on 1 line
 
         .fr-grid-content {
@@ -678,7 +678,7 @@ body {
     .fb-component-icon { display: block }
 
     // Read-only components
-    .fb-section-component .fb-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
+    .fb-section-component .fr-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
     .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
     .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
 

@@ -302,56 +302,56 @@
 .orbeon #fr-view {
   margin-bottom: 10px;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-2em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-2em select {
   width: 2em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-3em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-3em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-3em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-3em select {
   width: 3em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-4em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-4em select {
   width: 4em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-5em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-5em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-5em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-5em select {
   width: 5em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-7em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-7em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-7em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-7em select {
   width: 7em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-10em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-10em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-10em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-10em select {
   width: 10em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-12em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-12em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-12em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-12em select {
   width: 12em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-15em input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-15em select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-15em input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-15em select {
   width: 15em;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-100pc input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-100pc select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-100pc input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-100pc select {
   width: 100%;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-2digits input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-2digits select {
   width: 29px;
 }
-.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
-.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
+.xforms-mobile.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-2digits input.xforms-input-input,
+.xforms-mobile.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-2digits select {
   width: 32px;
 }
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
-.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-4digits input.xforms-input-input,
+.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-4digits select {
   width: 43px;
 }
-.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
-.xforms-mobile.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
+.xforms-mobile.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-4digits input.xforms-input-input,
+.xforms-mobile.orbeon #fr-view .fr-grid .fr-grid-tr .fr-grid-content .fr-width-4digits select {
   width: 54px;
 }
 .orbeon #fr-view .xforms-help-popover {

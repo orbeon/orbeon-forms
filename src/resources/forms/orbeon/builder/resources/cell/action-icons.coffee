@@ -43,6 +43,9 @@ relevanceRules = do ->
                                         else false                                                                                          # Catch all, which shouldn't happen
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
     'fb-delete-trigger':            isNotEmpty
+    'fb-cut-trigger':               isNotEmpty
+    'fb-copy-trigger':              isNotEmpty
+    'fb-paste-trigger':             (gridTd) -> !isNotEmpty(gridTd)
     'fb-edit-details-trigger':      isNotEmpty
     'fb-edit-validation-trigger':   isNotEmpty
     'fb-edit-items-trigger':        (gridTd) -> isNotEmpty(gridTd) and $(gridTd).find('.fr-grid-content').hasClass('fb-itemset')

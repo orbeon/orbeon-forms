@@ -565,6 +565,7 @@
             </overwrite-version-help>
             <open-summary>Open Published Form Summary Page</open-summary>
             <open-new>Open Published Form New Page</open-new>
+            <comment>Comment</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Add Language</label>
@@ -1488,6 +1489,7 @@
             </overwrite-version-help>
             <open-summary>Ouvrir la page d'accueil du formulaire publié</open-summary>
             <open-new>Ouvrir le formulaire publié en création</open-new>
+            <comment>Commentaire</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Ajouter une langue</label>
@@ -2412,6 +2414,7 @@
             </overwrite-version-help>
             <open-summary>Åpne oppsummeringsside for det publiserte skjema</open-summary>
             <open-new>Åpne publisert skjema i sluttbrukermodus</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Legg til språk</label>
@@ -3335,6 +3338,7 @@
             </overwrite-version-help>
             <open-summary>Открыть информацию об опубликованной форме</open-summary>
             <open-new>Открыть страницу заполнения опубликованной формы</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Добавить язык</label>
@@ -4251,6 +4255,7 @@
                 NOTA: Questo sovrascriverà la definizione di modulo esistente. Se le modifiche apportate alla definizione di modulo sono piccole, come cambiare le etichette di controllo, la definizione del modulo sarà compatibile con i dati del modulo esistente. Ma se sono state apportate modifiche strutturali, come l'aggiunta, la rimozione, la ridenominazione, o il movimento dei controlli, la definizione di modulo potrebbe essere incompatibile con i dati esistenti. Si consiglia di essere attentiti quando sovrascrive una versione della definizione di modulo esistente. </overwrite-version-help>
             <open-summary>Elenca moduli già pubblicati</open-summary>
             <open-new>Compila nuovo modulo</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Aggiungi lingua</label>
@@ -5168,6 +5173,7 @@
             </overwrite-version-help>
             <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
             <open-new>Öffne neue Seite des veröffentlichten Formulars </open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Sprache hinzufügen</label>
@@ -6087,6 +6093,7 @@
             </overwrite-version-help>
             <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
             <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Lisää kieli</label>
@@ -7004,6 +7011,7 @@
             </overwrite-version-help>
             <open-summary>Abrir Página de Resumen del Formulario Publicado</open-summary>
             <open-new>Abrir nueva instancia del Formulario</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Agregar Idioma</label>
@@ -7927,6 +7935,7 @@
             </overwrite-version-help>
             <open-summary>Abrir a página de resumo do formulário submetido</open-summary>
             <open-new>Abrir uma nova página de um formulário publicado</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Adicionar língua</label>
@@ -8851,6 +8860,7 @@
             </overwrite-version-help>
             <open-summary>Öppna översikten över publicerade formulär</open-summary>
             <open-new>Öppna ny sida med publicerade formulär</open-new>
+            <comment todo="true">[Comment]</comment>
         </dialog-publish>
         <dialog-add-language>
             <label>Tillfoga språk</label>

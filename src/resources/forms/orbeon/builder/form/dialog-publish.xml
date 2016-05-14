@@ -11,16 +11,20 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:saxon="http://saxon.sf.net/"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+<xxf:dialog
+    xmlns:xh  = "http://www.w3.org/1999/xhtml"
+    xmlns:xf  = "http://www.w3.org/2002/xforms"
+    xmlns:xs  = "http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf = "http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr  = "http://orbeon.org/oxf/xml/form-runner"
+    xmlns:frf = "java:org.orbeon.oxf.fr.FormRunner"
 
-      id="fb-publish-dialog" level="modal" close="true" draggable="true" model="fb-publish-model" class="fb-publish-dialog">
+    id        = "fb-publish-dialog"
+    level     = "modal"
+    close     = "true"
+    draggable = "true"
+    model     = "fb-publish-model"
+    class     = "fb-publish-dialog">
 
     <xf:label model="fr-form-model" ref="$form-resources/dialog-publish/label"/>
     <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
@@ -31,9 +35,14 @@
         <xf:setvalue ref="instance()/published-attachments" value="-1"/>
         <xf:setvalue ref="instance()/published-version"     value="-1"/>
         <xf:setvalue ref="instance()/existing-version"      value="-1"/>
-        <xf:setvalue ref="instance()/version"               value="'next'"/>
+        <xf:setvalue ref="instance()/existing-comment"/>
+        <xf:setvalue ref="instance()/latest-version"        value="-1"/>
+        <xf:setvalue ref="instance()/selected-version"      value="'next'"/>
+        <xf:setvalue ref="instance()/selected-comment"/>
 
         <xf:send submission="fb-read-form-definition"/>
+
+        <xf:setvalue ref="instance()/latest-version"        value="../existing-version"/>
     </xf:action>
 
     <!-- Switch to display initial / success / error cases -->
@@ -64,7 +73,7 @@
                                 <xf:output value="$form-resources/dialog-publish/latest-published-version"/>
                             </xh:th>
                             <xh:td>
-                                <xf:output value="if ($existing-version gt 0) then $existing-version else '-'"/>
+                                <xf:output value="if ($latest-version gt 0) then $latest-version else '-'"/>
                             </xh:td>
                         </xh:tr>
                     </xf:group>
@@ -82,30 +91,57 @@
                 </xh:table>
 
                 <fr:grid>
-                    <xf:group ref=".[$versioning-supported and $existing-version gt 0]">
+                    <xf:group ref=".[$versioning-supported and $latest-version gt 0]">
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="instance()/version">
+                                <xf:select1 ref="instance()/selected-version">
                                     <xf:item>
-                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, $existing-version + 1)"/>
+                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, $latest-version + 1)"/>
                                         <xf:value>next</xf:value>
                                     </xf:item>
-                                    <xf:itemset ref="reverse(1 to $existing-version)">
+                                    <xf:itemset ref="reverse(1 to $latest-version)">
                                         <xf:label value="xxf:format-message($form-resources/dialog-publish/overwrite-version-item, .)"/>
                                         <xf:value value="."/>
                                     </xf:itemset>
+
+                                    <xf:action event="xforms-select">
+                                        <!-- If a previous version, then read so we can get the existing comment if any -->
+                                        <xf:action if="event('xxf:item-value')[. != 'next']">
+                                            <xf:send submission="fb-read-form-definition">
+                                                <xf:property name="form-version" value="event('xxf:item-value')"/>
+                                            </xf:send>
+                                            <xf:setvalue
+                                                ref="instance()/selected-comment"
+                                                value="../existing-comment"/>
+                                        </xf:action>
+                                        <!-- If "next" version, then clear comment -->
+                                        <xf:setvalue
+                                            if="event('xxf:item-value')[. = 'next']"
+                                            ref="instance()/selected-comment"/>
+
+                                    </xf:action>
+
                                 </xf:select1>
+                            </xh:td>
+                        </xh:tr>
+                    </xf:group>
+                    <xf:group ref=".[$versioning-supported]">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:textarea  ref="instance()/selected-comment">
+                                    <xf:label value="$form-resources/dialog-publish/comment"/>
+                                </xf:textarea>
                             </xh:td>
                         </xh:tr>
                     </xf:group>
                     <xh:tr>
                         <xh:td>
                             <xf:output
-                                ref=".[$existing-version gt 0 and $versioning-supported and instance()/version = 'next']"
+                                ref=".[$latest-version gt 0 and $versioning-supported and instance()/selected-version = 'next']"
                                 class="alert"
                                 value="$form-resources/dialog-publish/create-new-version-help/normalize-space()"/>
                             <xf:output
-                                ref=".[$existing-version gt 0 and ($versioning-supported and instance()/version != 'next' or not($versioning-supported))]"
+                                ref=".[$latest-version gt 0 and ($versioning-supported and instance()/selected-version != 'next' or not($versioning-supported))]"
                                 class="alert"
                                 value="$form-resources/dialog-publish/overwrite-version-help/normalize-space()"/>
                         </xh:td>
@@ -118,12 +154,33 @@
                     <xf:trigger xxf:modal="true" id="fb-publish-publish" appearance="xxf:primary">
                         <xf:label value="$form-resources/dialog-publish/publish"/>
                         <!-- Dispatch publish event -->
-                        <xf:dispatch event="DOMActivate" name="fb-publish-form" targetid="fr-form-model">
-                            <xf:property name="app"      value="$app"/>
-                            <xf:property name="form"     value="$form"/>
-                            <xf:property name="document" model="fr-persistence-model" value="$document"/>
-                            <xf:property name="version"  value="instance()/version/string()"/>
-                        </xf:dispatch>
+
+                        <xf:action event="DOMActivate">
+
+                            <xf:var
+                                name="doc"
+                                value="xxf:mutable-document(xxf:instance('fb-form-instance'))"/>
+
+                            <xf:var
+                                name="metadata"
+                                value="frf:metadataInstanceRoot($doc)"/>
+
+                            <xf:delete
+                                ref="$metadata/version-comment"/>
+
+                            <xf:insert
+                                context="$metadata"
+                                ref="*"
+                                origin="xf:element('version-comment', instance()/selected-comment/string())"/>
+
+                            <xf:dispatch name="fb-publish-form" targetid="fr-form-model">
+                                <xf:property name="doc"      value="$doc"/>
+                                <xf:property name="app"      value="$app"/>
+                                <xf:property name="form"     value="$form"/>
+                                <xf:property name="document" model="fr-persistence-model" value="$document"/>
+                                <xf:property name="version"  value="instance()/selected-version/string()"/>
+                            </xf:dispatch>
+                        </xf:action>
                     </xf:trigger>
                     <xf:output value="$form-resources/or/label"/>
                     <!-- Cancel button -->
@@ -137,7 +194,16 @@
         <!-- Success case -->
         <xf:case id="fb-publish-dialog-success">
             <xh:div>
-                <xf:output class="alert alert-success" value="xxf:format-message($form-resources/dialog-publish/publish-success, (data(instance()/published-attachments), data(instance()/published-version)))"/>
+                <xf:output
+                    class="alert alert-success"
+                    value="
+                        xxf:format-message(
+                            $form-resources/dialog-publish/publish-success,
+                            (
+                                instance()/published-attachments/data(.),
+                                instance()/published-version/data(.)
+                            )
+                        )"/>
                 <!-- Display response content if present -->
                 <xf:var name="response" value="instance('fr-create-update-submission-response')/string()"/>
                 <xf:group ref="$response[xxf:non-blank()]">
@@ -194,21 +260,31 @@
             <publish>
                 <app/>
                 <form/>
-                <published-attachments>-1</published-attachments>
-                <published-version>-1</published-version>
+
+                <published-attachments>-1</published-attachments> <!-- set by native `publish()` -->
+                <published-version>-1</published-version>         <!-- set by native `publish()` -->
+
                 <existing-version>-1</existing-version>
-                <version>next</version>
+                <existing-comment/>
+
+                <latest-version>-1</latest-version>
+
+                <selected-version>next</selected-version>
+                <selected-comment/>
             </publish>
         </xf:instance>
 
-        <xf:bind ref="published-attachments | published-version | existing-version" type="xs:integer"/>
+        <xf:bind
+            ref="published-attachments | published-version | existing-version | latest-version"
+            type="xs:integer"/>
 
         <xf:var name="app"              value="instance()/app/string()"/>
         <xf:var name="form"             value="instance()/form/string()"/>
-        <xf:var name="existing-version" value="data(instance()/existing-version)"/>
+        <xf:var name="latest-version"   value="instance()/latest-version/data(.)"/>
 
-        <xf:var name="versioning-supported"
-                value="if ($app != '') then frf:versioningSupported($app, $form) else false()"/>
+        <xf:var
+            name="versioning-supported"
+            value="xxf:non-blank($app) and frf:versioningSupported($app, $form)"/>
 
         <!--<xf:instance id="fb-existing-form-instance"><dummy/></xf:instance>-->
 
@@ -219,6 +295,12 @@
             resource="{frf:createFormDefinitionBasePath($app, $form)}/form.xhtml"
             replace="none">
 
+            <!-- To retrieve a specific version -->
+            <xf:header ref="event('form-version')[xxf:non-blank()]">
+                <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                <xf:value value="."/>
+            </xf:header>
+
             <xf:action event="xforms-submit-done">
                 <!-- Persistence might not return a version header, in case versioning is not supported. In which case,
                      return 1, the default version number. -->
@@ -227,10 +309,14 @@
                     value="
                         for $version in xxf:trim(event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value)
                         return
-                           if ($version != '') then
+                           if (xxf:non-blank($version)) then
                                $version
                            else
                                 1"/>
+
+                <xf:setvalue
+                    ref="instance()/existing-comment"
+                    value="frf:metadataInstanceRoot(event('response-body'))/version-comment/string()"/>
             </xf:action>
 
             <xf:action event="xforms-submit-error" if="event('response-status-code') = (404, 410)">
@@ -247,6 +333,10 @@
                     ref="instance()/existing-version"
                     value="-1"/>
             </xf:action>
+
+            <xf:setvalue
+                event="xforms-submit-error"
+                ref="instance()/existing-comment"/>
 
         </xf:submission>
 

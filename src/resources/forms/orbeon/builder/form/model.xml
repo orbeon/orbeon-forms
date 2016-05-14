@@ -574,7 +574,7 @@
                                 xxf:call-xpl(
                                     'oxf:/forms/orbeon/builder/form/deannotate.xpl',
                                     'data',
-                                    xxf:instance('fb-form-instance'),
+                                    event('doc'),
                                     'data'
                                 ),
                                 xxf:instance('fb-components-instance')

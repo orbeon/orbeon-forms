@@ -72,28 +72,36 @@
                         <xsl:copy-of select="/request/sql:datasource"/>
                         <sql:execute>
                             <sql:query>
-                                SELECT  d.form_metadata      form_metadata,
-                                        d.form_version       form_version,
-                                        d.last_modified_time last_modified_time
-                                FROM    orbeon_form_definition d,
-                                        (
-                                            SELECT      app, form, MAX(last_modified_time) last_modified_time
-                                            FROM        orbeon_form_definition
-                                            <xsl:if test="/request/app != ''">
-                                                WHERE
-                                                    <xsl:if test="/request/app != ''">
-                                                        app = <sql:param type="xs:string" select="/request/app"/>
-                                                    </xsl:if>
-                                                    <xsl:if test="/request/form != ''">
-                                                        AND form = <sql:param type="xs:string" select="/request/form"/>
-                                                    </xsl:if>
-                                            </xsl:if>
-                                            GROUP BY     app, form
-                                        ) m
-                                WHERE   d.app = m.app
-                                        AND d.form = m.form
-                                        AND d.last_modified_time = m.last_modified_time
-                                        AND d.deleted = 'N'
+                                SELECT
+                                  d.form_metadata      form_metadata,
+                                  d.form_version       form_version,
+                                  d.last_modified_time last_modified_time
+                                FROM
+                                  orbeon_form_definition d,
+                                  (
+                                    SELECT
+                                      app,
+                                      form,
+                                      form_version,
+                                      MAX(last_modified_time) last_modified_time
+                                    FROM
+                                      orbeon_form_definition
+                                    <xsl:if test="/request/app != ''">
+                                      WHERE
+                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                        <xsl:if test="/request/form != ''">
+                                          AND form = <sql:param type="xs:string" select="/request/form"/>
+                                        </xsl:if>
+                                    </xsl:if>
+                                    GROUP BY
+                                      app, form, form_version
+                                  ) app_form_version_last_time
+                                WHERE
+                                  d.app                = app_form_version_last_time.app                AND
+                                  d.form               = app_form_version_last_time.form               AND
+                                  d.form_version       = app_form_version_last_time.form_version       AND
+                                  d.last_modified_time = app_form_version_last_time.last_modified_time AND
+                                  d.deleted = 'N'
                             </sql:query>
                             <sql:result-set>
                                 <sql:row-iterator>

@@ -259,7 +259,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         if (! NetUtils.isSuccessCode(cxr.statusCode) && ! p.isDeferredSubmissionSecondPass)
           throw new XFormsSubmissionException(
             submission,
-            s"xf:submission for submission id: ${submission.getId}, error code received when submitting instance: ${cxr.statusCode}",
+            s"xf:submission for submission id: ${submission.getId}, error code received: ${cxr.statusCode}",
             "processing submission response",
             new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR, cxr)
           )

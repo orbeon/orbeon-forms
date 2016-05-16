@@ -106,7 +106,7 @@ private object SubmitResponseEvent {
 
       def warn[T](message: String): PartialFunction[Throwable, Option[T]] = {
         case NonFatal(t) ⇒
-          logger.logWarning("xforms-submit-error", message, t)
+          logger.logWarning("xforms-submit-done|error", message, t)
           None
       }
 
@@ -144,7 +144,7 @@ private object SubmitResponseEvent {
 
         if (XFormsProperties.getErrorLogging.contains("submission-error-body"))
           result map asString foreach { value ⇒
-            logger.logError("xforms-submit-error", "setting body document", "body", s"\n$value")
+            logger.logError("xforms-submit-done|error", "setting body document", "body", s"\n$value")
           }
 
         result

@@ -40,6 +40,16 @@ object RequestReader {
     def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) ⇒ value }
   }
 
+  // Remove `<description>` and `<migration>`, which we don't need, and can easily get us above the 4000 characters limit
+  // https://github.com/orbeon/orbeon-forms/issues/2385
+  // 2016-05-13: Also remove `<application-name>` and `<form-name>` since they are in their own columns.
+  private val MetadataElementsToFilter = Set(
+    "application-name",
+    "form-name",
+    "description",
+    "migration"
+  )
+
   // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, JQName.unapply is
   // called 17 times and IdAtt.unapply 2 times until the match is found, which is what is expected.
   def isMetadataElement(stack: List[StartElement]): Boolean =
@@ -88,11 +98,9 @@ object RequestReader {
 
       val metadataWriter = new StringBuilderWriter()
 
-      // Remove <description> and <migration>, which we don't need, and can easily get us above the 4000 characters limit
-      // https://github.com/orbeon/orbeon-forms/issues/2385
       val descriptionMigrationFilter = new ElementFilterXMLReceiver(newIdentityReceiver(metadataWriter)) {
-        override protected def isFilterElement(uri: String, localname: String, qName: String, attributes: Attributes): Boolean =
-          uri == "" && (localname == "description" || localname == "migration")
+        protected def isFilterElement(uri: String, localname: String, qName: String, attributes: Attributes) =
+          uri == "" && MetadataElementsToFilter(localname)
       }
 
       // MAYBE: strip enclosing namespaces; truncate long titles

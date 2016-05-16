@@ -11,52 +11,49 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:sql="http://orbeon.org/oxf/xml/sql"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:f="http//www.orbeon.com/function"
-        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xh="http://www.w3.org/1999/xhtml"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:sql="http://orbeon.org/oxf/xml/sql"
+    xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param name="instance" type="input"/>
-    <p:param name="data" type="output"/>
+    <p:param name="data"     type="output"/>
 
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
                 <include>/request/request-path</include>
                 <include>/request/headers/header[name = 'orbeon-datasource']</include>
+                <include>/request/parameters/parameter[name = 'all-versions']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
+
     <p:processor name="oxf:regexp">
         <p:input name="config"><config>/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/form(/([^/]+)(/([^/]+))?)?</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="request" href="#request"/>
         <p:input name="data"><dummy/></p:input>
         <p:input name="config">
             <request xsl:version="2.0">
-                <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
-                <xsl:variable name="matcher-groups" as="element(group)+" select="doc('input:matcher-groups')/result/group"/>
-                <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+                <xsl:variable name="request"        as="element(request)" select="doc('input:request')/request"/>
+                <xsl:variable name="matcher-groups" as="element(group)+"  select="doc('input:matcher-groups')/result/group"/>
+
+                <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string()"/></sql:datasource>
                 <xsl:copy-of select="doc('input:instance')/request/*"/>
-                <xsl:variable name="matcher-groups" as="element(group)+" select="doc('input:matcher-groups')/result/group"/>
+
                 <provider><xsl:value-of select="$matcher-groups[1]"/></provider>
+                <all-versions><xsl:value-of select="$request/parameters/parameter[name = 'all-versions']/value = 'true'"/></all-versions>
             </request>
         </p:input>
         <p:output name="data" id="request-description"/>
@@ -125,19 +122,35 @@
     </p:processor>
 
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#sql-out"/>
+        <p:input name="data"                href="#sql-out"/>
+        <p:input name="request-description" href="#request-description"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0" exclude-result-prefixes="#all">
+
                 <xsl:template match="/">
                     <forms>
-                        <xsl:for-each select="/sql-out/row">
-                            <form>
-                                <xsl:copy-of select="metadata/*" copy-namespaces="no"/>
-                                <xsl:copy-of select="* except metadata" copy-namespaces="no"/>
-                            </form>
-                        </xsl:for-each>
+                        <xsl:choose>
+                            <xsl:when test="doc('input:request-description')/*/all-versions = 'false'">
+                                <!-- NOTE: We should probably filter in SQL, but it makes the query very complex. So we do it in XSLT for now. -->
+                                <xsl:for-each-group select="/*/row" group-by="concat(application-name, '|', form-name)">
+                                    <xsl:variable name="max-form-version" select="max(current-group()/form-version/xs:integer(.))"/>
+                                    <xsl:apply-templates select="current-group()[form-version = $max-form-version]"/>
+                                </xsl:for-each-group>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="/*/row"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </forms>
                 </xsl:template>
+
+                <xsl:template match="row">
+                    <form>
+                        <xsl:copy-of select="* except metadata" copy-namespaces="no"/>
+                        <xsl:copy-of select="metadata/(* except (application-name, form-name))" copy-namespaces="no"/>
+                    </form>
+                </xsl:template>
+
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" ref="data"/>

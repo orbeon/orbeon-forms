@@ -81,17 +81,20 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     path       : String
   ): Unit = {
 
-    def buildQueryString =
-      NetUtils.encodeQueryString(request.getParameterMap)
-
     // Get persistence implementation target URL and configuration headers
     val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
     assert(persistenceBaseURL ne null, "no base URL specified for persistence provider, check properties")
-    val serviceURI = NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString)
+
+    val serviceURI = NetUtils.appendQueryString(
+      dropTrailingSlash(persistenceBaseURL) + path,
+      NetUtils.encodeQueryString(request.getParameterMap)
+    )
+
     proxyRequest(request, serviceURI, headers, response)
   }
 
   private def proxyRequest(request: Request, serviceURI: String, headers: Map[String, String], response: Response): Unit = {
+    
     val cxr = proxyEstablishConnection(request, serviceURI, headers)
 
     useAndClose(cxr) { cxr ⇒
@@ -176,7 +179,6 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     form     : Option[String],
     path     : String
   ): Unit = {
-    val propertySet = Properties.instance.getPropertySet
 
     val providers = {
       (app, form) match {
@@ -190,21 +192,24 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       }
     }
 
-    val allFormElements =
-      providers map
-      FormRunner.getPersistenceURLHeadersFromProvider flatMap {
-        case (baseURI, headers) ⇒
-          // Read all the forms for the current service
-          val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
-          val cxr        = proxyEstablishConnection(request, serviceURI, headers)
+    val parameters = NetUtils.encodeQueryString(request.getParameterMap)
 
-          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
-            val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
-            forms \\ "forms" \\ "form"
-          }
+    val allFormElements =
+      for {
+        provider           ← providers
+        (baseURI, headers) = FormRunner.getPersistenceURLHeadersFromProvider(provider)
+      } yield {
+        // Read all the forms for the current service
+        val serviceURI = NetUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
+        val cxr        = proxyEstablishConnection(request, serviceURI, headers)
+
+        ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
+          val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
+          forms \\ "forms" \\ "form"
+        }
       }
 
-    val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements)
+    val filteredFormElements = FormRunner.filterFormsAndAnnotateWithOperations(allFormElements.flatten)
 
     // Aggregate and serialize
     val documentElement = elementInfo("forms")

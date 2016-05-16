@@ -81,15 +81,27 @@ private object SubmitResponseEvent {
       e.containingDocument.getRequestStats.addXPathStat).asScala
   }
 
+  // For a given event, temporarily keep a reference to the body so that it's possible to call
+  // `event('response-body')` multiple times.
+  private var _body: Option[Option[String Either DocumentInfo]] = None
+
   def body(e: SubmitResponseEvent): Option[AnyRef] = {
     implicit val logger = e.indentedLogger
-    e.connectionResult flatMap tryToReadBody map {
+
+    def readOrReturn(cxr: ConnectionResult) =
+      _body getOrElse {
+        val result = tryToReadBody(cxr)
+        _body = Some(result)
+        result
+      }
+
+    e.connectionResult flatMap readOrReturn map {
       case Left(string)    ⇒ string
       case Right(document) ⇒ document
     }
   }
 
-  def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
+  private def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
     // Log response details if not done already
     cxr.logResponseDetailsOnce(Level.ERROR)
 
@@ -110,12 +122,16 @@ private object SubmitResponseEvent {
           None
       }
 
-      // Read the whole stream to a temp URI so we can read it more than once if needed
+      // Read the whole stream to a temp URI so we can read it more than once if needed. This allows trying reading
+      // as XML then as text.
       val tempURIOpt =
-        try useAndClose(cxr.content.inputStream) { is ⇒
-          Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
-        } catch
+        try {
+          useAndClose(cxr.content.inputStream) { is ⇒
+            Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
+          }
+        } catch {
           warn("error while reading response body.")
+        }
 
       tempURIOpt flatMap { tempURI ⇒
 

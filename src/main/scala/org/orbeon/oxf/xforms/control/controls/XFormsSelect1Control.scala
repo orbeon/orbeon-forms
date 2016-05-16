@@ -17,6 +17,7 @@ import org.dom4j.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 
@@ -107,10 +107,19 @@ class XFormsSelect1Control(
     val internalValue = getValue   ensuring (_ ne null)
     val itemset       = getItemset ensuring (_ ne null)
 
-    // Find the position of the first matching value
-    val updatedValue = itemset.allItemsIterator find (_.value == internalValue) map (_.externalValue(mustEncodeValues)) orNull
-
-    setExternalValue(updatedValue)
+    setExternalValue(
+      if (! isStaticReadonly) {
+        // Find the position of the first matching value
+        itemset.allItemsIterator              find
+          (_.value == internalValue)          map
+          (_.externalValue(mustEncodeValues)) orNull
+      } else {
+        // External value is the label
+        itemset.selectedItems(internalValue)  map
+        (_.label.htmlValue(getLocationData))  mkString
+        " - "
+      }
+    )
   }
 
   override def translateExternalValue(externalValue: String) = {

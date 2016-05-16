@@ -38,7 +38,10 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
   // All of this itemset's selected items based on the given instance value
   def jSelectedItems(value: String): JIterable[Item] =
-    (allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList) asJava
+        selectedItems(value).asJava
+
+    def selectedItems(value: String): List[Item] =
+        allItemsIterator filter (item ⇒ isSelected(multiple, value, item.value)) toList
 
   // Return the list of items as a JSON tree with hierarchical information
   def asJSON(controlValue: String, encode: Boolean, locationData: LocationData): String = {

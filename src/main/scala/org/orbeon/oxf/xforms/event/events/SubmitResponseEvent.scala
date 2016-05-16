@@ -36,6 +36,10 @@ trait SubmitResponseEvent extends XFormsEvent {
   def connectionResult: Option[ConnectionResult]
   final def headers = connectionResult map (_.headers)
 
+  // For a given event, temporarily keep a reference to the body so that it's possible to call
+  // `event('response-body')` multiple times.
+  var cachedBody: Option[Option[String Either DocumentInfo]] = None
+
   override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
   override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
   override def newPropertyName(name: String) = SubmitResponseEvent.Deprecated.get(name) orElse super.newPropertyName(name)
@@ -81,17 +85,13 @@ private object SubmitResponseEvent {
       e.containingDocument.getRequestStats.addXPathStat).asScala
   }
 
-  // For a given event, temporarily keep a reference to the body so that it's possible to call
-  // `event('response-body')` multiple times.
-  private var _body: Option[Option[String Either DocumentInfo]] = None
-
   def body(e: SubmitResponseEvent): Option[AnyRef] = {
     implicit val logger = e.indentedLogger
 
     def readOrReturn(cxr: ConnectionResult) =
-      _body getOrElse {
+      e.cachedBody getOrElse {
         val result = tryToReadBody(cxr)
-        _body = Some(result)
+        e.cachedBody = Some(result)
         result
       }
 

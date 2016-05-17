@@ -80,7 +80,13 @@
             <xf:var name="closed-value" value="$binding = $items/value/string()"/>
 
             <xh:span class="fr-component-group">
-                <xf:select1 id="select1" ref="$binding" appearance="full" xbl:attr="appearance xxf:encrypt-item-values">
+                <xf:select1
+                    id         = "select1"
+                    ref        = "$binding"
+                    appearance = "full"
+                    xbl:attr   = "appearance xxf:encrypt-item-values"
+                    class      = "xxforms-events-mode-default">
+
                     <xf:itemset ref="$items">
                         <xf:label ref="label"/>
                         <xf:hint  ref="hint"/>

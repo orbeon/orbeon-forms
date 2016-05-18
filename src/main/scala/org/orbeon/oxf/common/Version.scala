@@ -37,8 +37,9 @@ object Version {
 
   private val PossibleEditions = Set("CE", "PE")
 
-  val VersionNumber = "@RELEASE@"
-  val Edition       = Option("@EDITION@") filter PossibleEditions getOrElse "CE"
+  val VersionNumber = org.orbeon.oxf.common.BuildInfo.orbeonVersion
+  val Edition       = org.orbeon.oxf.common.BuildInfo.orbeonEdition
+
   val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 
   def versionStringIfAllowed =

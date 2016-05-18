@@ -28,6 +28,12 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="1.6">
+      <module name="core" target="1.6" />
+      <module name="formBuilder" target="1.6" />
+      <module name="resourcesPackaged" target="1.6" />
+      <module name="root" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
   <component name="EclipseCompilerSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />

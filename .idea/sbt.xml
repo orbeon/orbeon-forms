@@ -4,25 +4,23 @@
     <option name="linkedExternalProjectsSettings">
       <SbtProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="jdk" value="1.4" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/builder" />
             <option value="$PROJECT_DIR$/builder/project" />
             <option value="$PROJECT_DIR$/project" />
+            <option value="$PROJECT_DIR$/shared" />
+            <option value="$PROJECT_DIR$/shared/.js" />
+            <option value="$PROJECT_DIR$/shared/.js/project" />
+            <option value="$PROJECT_DIR$/shared/.jvm" />
+            <option value="$PROJECT_DIR$/shared/.jvm/project" />
+            <option value="$PROJECT_DIR$/src" />
+            <option value="$PROJECT_DIR$/src/project" />
           </set>
         </option>
-        <option name="sbtVersion" value="0.13.7" />
-        <option name="useAutoImport" value="true" />
-        <option name="useOurOwnAutoImport" value="true" />
-        <option name="myModules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/builder" />
-            <option value="$PROJECT_DIR$/builder/project" />
-            <option value="$PROJECT_DIR$/project" />
-          </set>
-        </option>
+        <option name="sbtVersion" value="0.13.9" />
       </SbtProjectSettings>
     </option>
   </component>

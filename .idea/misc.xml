@@ -41,7 +41,7 @@
     <resource url="http://www.w3.org/1999/XSL/Transform" location="$PROJECT_DIR$/src/java/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd" />
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/orbeon-war/WEB-INF/classes" />
   </component>
   <component name="SvnBranchConfigurationManager">

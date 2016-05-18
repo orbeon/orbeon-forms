@@ -31,17 +31,6 @@
     <!-- Expose environment variables -->
     <property environment="env"/>
 
-    <!-- Scala tasks -->
-    <!-- http://www.scala-lang.org/node/98 -->
-    <taskdef resource="scala/tools/ant/antlib.xml">
-        <classpath>
-            <pathelement location="lib/scala-compiler-2.11.7.jar"/>
-            <pathelement location="lib/scala-library-2.11.7.jar"/>
-            <pathelement location="lib/scala-reflect-2.11.7.jar"/>
-            <pathelement location="lib/scala-xml_2.11-1.0.4.jar"/>
-        </classpath>
-    </taskdef>
-
     <!-- JUnit tasks -->
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
         <classpath>
@@ -339,66 +328,24 @@
         </path>
     </target>
 
-    <!-- Perform string replacement in Version.scala to set version and edition  -->
-    <target name="set-version" depends="init">
-        <mkdir dir="${build.dir}/src"/>
-        <copy todir="${build.dir}/src" file="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true" encoding="UTF-8">
-            <filterset>
-                <filter token="RELEASE" value="${release.number}"/>
-                <filter token="EDITION" value="${edition}"/>
-            </filterset>
-        </copy>
-    </target>
-
-    <!-- A task we use only from IntelliJ before running tests that sets the version in place in Version.scala.
-         The task is executed automatically by IntelliJ, which saves us from having to edit that file by hand. -->
-    <target name="intellij-before-make" depends="set-version">
-        <mkdir dir="test/src/config"/>
-        <copy file="build/src/Version.scala" tofile="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
-    </target>
-
     <!-- Compile source -->
-    <target name="classes" depends="set-version, classpath" unless="skip.compilation">
-
-        <scalac destdir="${build.classes.dir}"
-                classpathref="class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="no">
-            <src path="${build.dir}/src"/> <!-- Location of the copy of Version.scala with the release/edition set -->
-            <src path="src/main/java"/>
-            <src path="src/main/scala"/>
-            <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns,
-                 and scalac doesn't support fileset child elements, only include/exclude. -->
-            <exclude name="org/orbeon/oxf/common/Version.scala"/>
-        </scalac>
-
-        <javac destdir="${build.classes.dir}"
-                classpathref="class.path"
-                debug="${build.debug}" optimize="off" target="1.6" source="1.6"
-                fork="true" memoryInitialSize="128m" memoryMaximumSize="400m" encoding="utf-8">
-            <src path="${build.dir}/src"/>
-            <src path="src/main/java"/>
-            <exclude name="org/orbeon/oxf/common/Version.java"/>
-            <exclude name="org/orbeon/oxf/xforms/analysis/PathMapUIDependencies.java"/>
-        </javac>
+    <target name="classes" depends="classpath" unless="skip.compilation">
+        <exec executable="sbt">
+            <arg value="project core"/>
+            <arg value="compile"/>
+            <arg value="-Dorbeon.version=${release.number}"/>
+            <arg value="-Dorbeon.edition=${edition}"/>
+        </exec>
     </target>
 
     <!-- Compile test source -->
-    <target name="test-classes" depends="classes, test-classpath" unless="skip.compilation">
-        <mkdir dir="${build.test-classes.dir}"/>
-
-        <scalac destdir="${build.test-classes.dir}"
-                classpathref="test.class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                addparams="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="no">
-            <src path="src/test/scala"/>
-            <src path="src/test/java"/>
-        </scalac>
-
-        <javac srcdir="src/test/java" destdir="${build.test-classes.dir}"
-                classpathref="test.class.path" debug="on" optimize="off" target="1.6" source="1.6"
-                includes="**/*.java" encoding="utf-8">
-        </javac>
+    <target name="test-classes" depends="test-classpath" unless="skip.compilation">
+        <exec executable="sbt">
+            <arg value="project core"/>
+            <arg value="test:compile"/>
+            <arg value="-Dorbeon.version=${release.number}"/>
+            <arg value="-Dorbeon.edition=${edition}"/>
+        </exec>
     </target>
 
     <target name="embedding-jar" depends="classes">
@@ -845,12 +792,16 @@
                 <exec executable="sbt">
                     <arg value="project formBuilder"/>
                     <arg value="fastOptJSToExplodedWar"/>
+                    <arg value="-Dorbeon.version=${release.number}"/>
+                    <arg value="-Dorbeon.edition=${edition}"/>
                 </exec>
             </then>
             <else>
                 <exec executable="sbt">
                     <arg value="project formBuilder"/>
                     <arg value="fullOptJSToExplodedWar"/>
+                    <arg value="-Dorbeon.version=${release.number}"/>
+                    <arg value="-Dorbeon.edition=${edition}"/>
                 </exec>
             </else>
         </if>

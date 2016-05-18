@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="formBuilder-build" external.linked.project.path="$MODULE_DIR$/../../builder/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="sbt._, Keys._, dsl._, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, $db0581717b9655b5fc43.core, $db0581717b9655b5fc43.resourcesPackaged, $db0581717b9655b5fc43.formBuilder, $db0581717b9655b5fc43.formBuilderSharedJS, $db0581717b9655b5fc43.formBuilderSharedJVM, $db0581717b9655b5fc43.fullOptJSToExplodedWar, $db0581717b9655b5fc43.fastOptJSToExplodedWar" sbt.resolvers="https://jcenter.bintray.com/|maven|jcenter, https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="resourcesPackaged-build" external.linked.project.path="$MODULE_DIR$/../../src/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="sbt._, Keys._, dsl._, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, $db0581717b9655b5fc43.core, $db0581717b9655b5fc43.resourcesPackaged, $db0581717b9655b5fc43.formBuilder, $db0581717b9655b5fc43.formBuilderSharedJS, $db0581717b9655b5fc43.formBuilderSharedJVM, $db0581717b9655b5fc43.fullOptJSToExplodedWar, $db0581717b9655b5fc43.fastOptJSToExplodedWar" sbt.resolvers="https://jcenter.bintray.com/|maven|jcenter, https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../builder/project/target/idea-classes" />
-    <output-test url="file://$MODULE_DIR$/../../builder/project/target/idea-test-classes" />
+    <output url="file://$MODULE_DIR$/../../src/project/target/idea-classes" />
+    <output-test url="file://$MODULE_DIR$/../../src/project/target/idea-test-classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../builder/project">
-      <sourceFolder url="file://$MODULE_DIR$/../../builder/project" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/../../builder/project/project/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../builder/project/target" />
+    <content url="file://$MODULE_DIR$/../../src/project">
+      <sourceFolder url="file://$MODULE_DIR$/../../src/project" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../src/project/project/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../src/project/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

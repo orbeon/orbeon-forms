@@ -2,10 +2,19 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/OF-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/OF-sources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-build.iml" filepath="$PROJECT_DIR$/.idea/modules/core-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJS-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/of.iml" filepath="$PROJECT_DIR$/.idea/modules/of.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/of-build.iml" filepath="$PROJECT_DIR$/.idea/modules/of-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/resourcesPackaged.iml" filepath="$PROJECT_DIR$/.idea/modules/resourcesPackaged.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/resourcesPackaged-build.iml" filepath="$PROJECT_DIR$/.idea/modules/resourcesPackaged-build.iml" />
     </modules>
   </component>
 </project>

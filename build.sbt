@@ -1,5 +1,18 @@
+val ScalaVersion         = "2.11.8"
+val ScalaJsDomVersion    = "0.9.0"
+val ScalaJsJQueryVersion = "0.9.0"
+
+val OrbeonFormsVersion   = "2016.2-SNAPSHOT"
+
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarClassesPath        = ExplodedWarWebInf + "/classes"
+val CompileClassesPath            = "build/classes"
+val TestClassesPath               = "build/test-classes"
+
+val CompileClasspathForEnv        = if (sys.props.get("orbeon.env") == Some("dev")) ExplodedWarClassesPath else CompileClassesPath
+val OrbeonVersion                 = sys.props.get("orbeon.version") getOrElse OrbeonFormsVersion
+val OrbeonEdition                 = sys.props.get("orbeon.edition") getOrElse "CE"
+
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
 
@@ -14,6 +27,7 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
     sourceFile.name match { case ScalaJSFileNameFormat(_, prefix, optType) ⇒ prefix → optType }
 
   val launcherName  = s"$prefix-launcher.js"
+  val jsdepsName    = s"$prefix-jsdeps.js"
   val sourceMapName = s"${sourceFile.name}.map"
 
   val targetDir =
@@ -24,6 +38,7 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
   val names = List(
     sourceFile                                 → s"$prefix.js",
     (sourceFile.getParentFile / launcherName)  → launcherName,
+    (sourceFile.getParentFile / jsdepsName)    → jsdepsName,
     (sourceFile.getParentFile / sourceMapName) → sourceMapName
   )
 
@@ -35,25 +50,69 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
     )
 }
 
-lazy val formBuilder = (project in file("builder")).
-  enablePlugins(ScalaJSPlugin).
-  settings(
-    organization                   := "org.orbeon",
-    name                           := "form-builder",
-    version                        := "4.11-SNAPSHOT",
+lazy val commonSettings = Seq(
+  organization                 := "org.orbeon",
+  version                      := OrbeonFormsVersion,
+  scalaVersion                 := ScalaVersion,
 
-    scalaVersion                   := "2.11.7",
+  javacOptions  ++= Seq(
+    "-encoding", "utf8",
+    "-source", "1.6",
+    "-target", "1.6"
+  ),
+  scalacOptions ++= Seq(
+    "-encoding", "utf8",
+    "-feature",
+    "-language:postfixOps",
+    "-language:reflectiveCalls",
+    "-language:implicitConversions",
+    "-language:higherKinds",
+    "-language:existentials"
+    // Consider the following flags
+//    "-deprecation",
+//    "-unchecked",
+//    "-Xfatal-warnings",
+//    "-Xlint",
+//    "-Yno-adapted-args",
+//    "-Ywarn-dead-code",        // N.B. doesn't work well with the ??? hole
+//    "-Ywarn-numeric-widen",
+//    "-Ywarn-value-discard",
+//    "-Xfuture",
+//    "-Ywarn-unused-import"     // 2.11 only
+  )
+)
+
+lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("shared"))
+  .settings(
+    scalaVersion                   := ScalaVersion
+  )
+  .jvmSettings(
+    classDirectory    in Compile := baseDirectory.value.getParentFile.getParentFile / CompileClasspathForEnv
+  )
+  .jsSettings(
+  )
+
+lazy val formBuilderSharedJVM = formBuilderShared.jvm
+lazy val formBuilderSharedJS  = formBuilderShared.js
+
+lazy val formBuilder = (project in file("builder"))
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(formBuilderSharedJS)
+  .settings(commonSettings: _*)
+  .settings(
+    name                           := "form-builder",
 
     scalaSource         in Compile := baseDirectory.value / "src" / "builder" / "scala",
     javaSource          in Compile := baseDirectory.value / "src" / "builder" / "java",
     resourceDirectory   in Compile := baseDirectory.value / "src" / "builder" / "resources",
 
     jsDependencies                 += RuntimeDOM,
-    jsDependencies                 += "org.webjars" % "jquery" % "2.1.3" / "2.1.3/jquery.js",
 
-    libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % "0.8.1",
+    libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
+    libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
 
-    // Temporary, until there is an 0.8.2 which fixes the jquery.js issue
+    skip in packageJSDependencies  := false,
+
     unmanagedBase                  := baseDirectory.value / "lib",
 
     persistLauncher     in Compile := true,
@@ -69,26 +128,44 @@ lazy val formBuilder = (project in file("builder")).
     )
   )
 
-lazy val core = (project in file(".")).
-  dependsOn(formBuilder).
-  settings(
-    organization                 := "org.orbeon",
-    name                         := "orbeon-core",
-    version                      := "4.11-SNAPSHOT",
+lazy val resourcesPackaged = (project in file("src"))
+  .settings(commonSettings: _*)
+  .settings(
+    name                         := "orbeon-resources-packaged",
 
-    scalaVersion                 := "2.11.7",
-
-    scalaSource       in Compile := baseDirectory.value / "src" / "main" / "scala",
-    javaSource        in Compile := baseDirectory.value / "src" / "main" / "java",
-    resourceDirectory in Compile := baseDirectory.value / "src" / "main" / "resources",
-
-    scalaSource       in Test    := baseDirectory.value / "src" / "test" / "scala",
-    javaSource        in Test    := baseDirectory.value / "src" / "test" / "java",
-    resourceDirectory in Test    := baseDirectory.value / "src" / "test" / "resources",
-
-    unmanagedBase                := baseDirectory.value / "lib",
-
-    classDirectory    in Compile := baseDirectory.value / ExplodedWarClassesPath
+    resourceDirectory in Compile := baseDirectory.value / "resources-packaged",
+    target                       := baseDirectory.value / "resources-packaged-target"
   )
+
+lazy val core = (project in file("src"))
+  .enablePlugins(BuildInfoPlugin)
+  .dependsOn(formBuilderSharedJVM)
+  .settings(commonSettings: _*)
+  .settings(
+    name                         := "orbeon-core",
+
+    buildInfoKeys                := Seq[BuildInfoKey]("orbeonVersion" → OrbeonVersion, "orbeonEdition" → OrbeonEdition),
+    buildInfoPackage             := "org.orbeon.oxf.common",
+
+    defaultConfiguration := Some(Compile),
+
+    scalaSource       in Compile := baseDirectory.value / "main" / "scala",
+    javaSource        in Compile := baseDirectory.value / "main" / "java",
+    resourceDirectory in Compile := baseDirectory.value / "main" / "resources",
+
+    scalaSource       in Test    := baseDirectory.value / "test" / "scala",
+    javaSource        in Test    := baseDirectory.value / "test" / "java",
+    resourceDirectory in Test    := baseDirectory.value / "test" / "resources",
+
+    unmanagedBase                := baseDirectory.value / ".." / "lib",
+
+    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv,
+    classDirectory    in Test    := baseDirectory.value / ".." / TestClassesPath
+  )
+
+//lazy val root = (project in file("."))
+//  .enablePlugins(BuildInfoPlugin)
+//  .aggregate(formBuilder, core)
+//  .settings(commonSettings: _*)
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

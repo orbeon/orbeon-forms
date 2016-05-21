@@ -301,7 +301,7 @@ object XFormsStaticStateImpl {
 
     // Pointers to nested elements
     def rootControl = staticStateElement.element("root")
-    def xblElements = rootControl.elements(XBL_XBL_QNAME).asInstanceOf[JList[Element]].asScala
+    def xblElements = rootControl.elements(XBL_XBL_QNAME).asScala
 
     // TODO: if staticStateDocument contains XHTML document, get controls and models from there?
 

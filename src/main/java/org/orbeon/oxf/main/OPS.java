@@ -15,9 +15,10 @@ package org.orbeon.oxf.main;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
+import org.dom4j.io.SAXReader;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
@@ -37,15 +38,18 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.xml.sax.InputSource;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.File;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import static org.orbeon.oxf.pipeline.InitUtils.createProcessor;
 
@@ -139,7 +143,7 @@ public class OPS {
                 if (inputValue.startsWith("<")) {
                     // XML document
                     try {
-                        processorDefinition.addInput(inputName, DocumentHelper.parseText(inputValue).getRootElement());
+                        processorDefinition.addInput(inputName, parseText(inputValue).getRootElement());
                     } catch (DocumentException e) {
                         throw new OXFException(e);
                     }
@@ -151,6 +155,49 @@ public class OPS {
         } else {
             throw new OXFException("No main processor definition found.");
         }
+    }
+
+    public static Document parseText(String text) throws DocumentException {
+
+        final SAXReader reader = new SAXReader();
+        final String encoding = getEncoding(text);
+
+        InputSource source = new InputSource(new StringReader(text));
+        source.setEncoding(encoding);
+
+        final Document result = reader.read(source);
+
+        if (result.getXMLEncoding() == null) {
+            result.setXMLEncoding(encoding);
+        }
+
+        return result;
+    }
+
+    private static String getEncoding(String text) {
+        String result = null;
+
+        final String xml = text.trim();
+
+        if (xml.startsWith("<?xml")) {
+            final int end = xml.indexOf("?>");
+            final String sub = xml.substring(0, end);
+            final StringTokenizer tokens = new StringTokenizer(sub, " =\"\'");
+
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken();
+
+                if ("encoding".equals(token)) {
+                    if (tokens.hasMoreTokens()) {
+                        result = tokens.nextToken();
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     public void parseArgs(String[] args) {

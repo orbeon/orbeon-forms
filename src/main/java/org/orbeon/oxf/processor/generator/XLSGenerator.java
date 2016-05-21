@@ -27,8 +27,8 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
+import org.dom4j.util.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataElement;
 import org.orbeon.saxon.om.DocumentInfo;
 
 import java.io.ByteArrayInputStream;
@@ -68,7 +68,7 @@ public class XLSGenerator extends ProcessorImpl {
                                 "/request/parameters/parameter[1]/value", getLocationData());
 
                         final Element valueElement = (Element) expr.evaluateSingleToJavaReturnToPoolOrNull();
-                        
+
                         if (valueElement == null) throw new OXFException(NO_FILE);
                         String type = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);
                         if (type == null) throw new OXFException(NO_FILE);
@@ -91,7 +91,7 @@ public class XLSGenerator extends ProcessorImpl {
                     }
 
                     // Generate XML from Excel file
-                    final java.io.ByteArrayInputStream bais 
+                    final java.io.ByteArrayInputStream bais
                         = new ByteArrayInputStream( fileContent );
                     final org.dom4j.Document d = extractFromXLS( bais );
                     final DOMGenerator domGenerator = new DOMGenerator

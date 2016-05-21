@@ -64,12 +64,12 @@ public class XPathProcessor extends ProcessorImpl {
 
                         // Get declared namespaces
                         final Map<String, String> namespaces = new HashMap<String, String>();
-                        for (Iterator i = Dom4jUtils.elements(config.getRootElement(), "namespace").iterator(); i.hasNext();) {
+                        for (Iterator i = config.getRootElement().elements("namespace").iterator(); i.hasNext();) {
                             Element namespaceElement = (Element) i.next();
                             namespaces.put(namespaceElement.attributeValue("prefix"),
                                     namespaceElement.attributeValue("uri"));
                         }
-                        return new Config(new NamespaceMapping(namespaces), Dom4jUtils.elements(config.getRootElement(), "xpath").get(0).getStringValue());
+                        return new Config(new NamespaceMapping(namespaces), config.getRootElement().elements("xpath").get(0).getStringValue());
                     }
                 });
 

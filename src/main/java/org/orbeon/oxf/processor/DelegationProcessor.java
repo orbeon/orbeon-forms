@@ -19,7 +19,6 @@ import org.apache.axis.message.*;
 import org.apache.axis.soap.SOAPConstants;
 import org.dom4j.*;
 import org.dom4j.Text;
-import org.dom4j.io.DOMReader;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -292,8 +291,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                             // Send body from result envelope
                                             final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
                                             locationSAXWriter.setContentHandler(xmlReceiver);
-                                            final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
-                                            final Document resultEnvelopeDOM4j = new DOMReader(factory).read(resultEnvelope.getAsDocument());
+                                            final DocumentFactory factory = DocumentFactory.getInstance();
+                                            final Document resultEnvelopeDOM4j = new DelegationProcessorDOMReader(factory).read(resultEnvelope.getAsDocument());
 
                                             final String xpathString =
                                                     operation != null && operation.select != null

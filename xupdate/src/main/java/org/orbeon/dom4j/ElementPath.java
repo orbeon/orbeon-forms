@@ -12,7 +12,7 @@ package org.orbeon.dom4j;
  * information about the current path hierarchy they are to process. It's
  * primary use is to retrieve the current {@link Element}being processed.
  *
- * @author <a href="mailto:dwhite@equipecom.com">Dave White </a>
+ * @author Dave White
  * @version $Revision: 1.6 $
  */
 public interface ElementPath {

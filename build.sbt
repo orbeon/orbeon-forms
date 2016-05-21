@@ -145,19 +145,25 @@ lazy val xupdate = (project in file("xupdate"))
     classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
   )
 
-
-lazy val resourcesPackaged = (project in file("src"))
+lazy val dom4j = (project in file("dom4j"))
   .settings(commonSettings: _*)
   .settings(
-    name                         := "orbeon-resources-packaged",
-
-    resourceDirectory in Compile := baseDirectory.value / "resources-packaged",
-    target                       := baseDirectory.value / "resources-packaged-target"
+    name                         := "orbeon-dom4j",
+    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
   )
+
+//lazy val resourcesPackaged = (project in file("src"))
+//  .settings(commonSettings: _*)
+//  .settings(
+//    name                         := "orbeon-resources-packaged",
+//
+//    resourceDirectory in Compile := baseDirectory.value / "resources-packaged",
+//    target                       := baseDirectory.value / "resources-packaged-target"
+//  )
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(common, xupdate, formBuilderSharedJVM)
+  .dependsOn(common, dom4j, formBuilderSharedJVM, xupdate)
   .settings(commonSettings: _*)
   .settings(
     name                         := "orbeon-core",

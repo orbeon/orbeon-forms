@@ -30,7 +30,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataDocument;
 
 import java.net.URL;
 import java.util.*;
@@ -127,8 +127,8 @@ public class PipelineBlock {
             configElement.addElement("root").addText(hrefAggregate.getRoot());
             addNamespaces(configElement, node, false);
 
-            final String sid = locationData == null 
-                             ? DOMGenerator.DefaultContext 
+            final String sid = locationData == null
+                             ? DOMGenerator.DefaultContext
                              : locationData.getSystemID();
             final DOMGenerator configGenerator = new DOMGenerator
                 ( aggregatorConfig, "aggregate config", DOMGenerator.ZeroValidity, sid );
@@ -172,8 +172,8 @@ public class PipelineBlock {
             // Connect XPath processor to config
             final Processor xpathProcessor = new XPathProcessor();
             xpathProcessor.setLocationData(locationData); // TODO FIXME: I suspect locationData will always be null here because node is null!
-            final String sid = locationData == null 
-                             ? DOMGenerator.DefaultContext 
+            final String sid = locationData == null
+                             ? DOMGenerator.DefaultContext
                              : locationData.getSystemID();
             final DOMGenerator configGenerator = new DOMGenerator
                 ( xpathConfig, "xpath config", DOMGenerator.ZeroValidity, sid );

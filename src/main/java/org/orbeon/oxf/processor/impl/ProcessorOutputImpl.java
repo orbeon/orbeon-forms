@@ -30,7 +30,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataDocument;
 
 /**
  * Base class for all built-in ProcessorOutput implementations.
@@ -430,7 +430,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
     public final Object getValidity(PipelineContext pipelineContext) {
         return getRuntimeFilter().getValidity(pipelineContext);
     }
-    
+
     public void toXML(PipelineContext pipelineContext, XMLReceiverHelper helper) {
 
         final ProcessorInput input = getInput();

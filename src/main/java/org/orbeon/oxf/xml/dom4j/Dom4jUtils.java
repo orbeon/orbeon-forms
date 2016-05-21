@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.*;
-import org.dom4j.CharacterData;
 import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.dom4j.util.NonLazyUserDataDocument;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -54,7 +54,7 @@ public class Dom4jUtils {
 
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         Element nullElement = factory.createElement("null");
         nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true");
         NULL_DOCUMENT.setRootElement(nullElement);
@@ -64,53 +64,13 @@ public class Dom4jUtils {
         final XMLReader xmlReader = XMLParsing.newXMLReader(parserConfiguration);
 
         final SAXReader saxReader = new SAXReader(xmlReader);
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         saxReader.setDocumentFactory(factory);
         return saxReader;
     }
 
     private static SAXReader createSAXReader() throws SAXException {
         return createSAXReader(XMLParsing.ParserConfiguration.XINCLUDE_ONLY);
-    }
-
-    /**
-     * Typed version of the dom4j API.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Element> elements(Element element) {
-        return (List<Element>) element.elements();
-    }
-
-    /**
-     * Typed version of the dom4j API.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Element> elements(Element element, QName name) {
-        return (List<Element>) element.elements(name);
-    }
-
-    /**
-     * Typed version of the dom4j API.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Element> elements(Element element, String name) {
-        return (List<Element>) element.elements(name);
-    }
-
-    /**
-     * Typed version of the dom4j API.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Node> content(Element container) {
-        return (List<Node>) container.content();
-    }
-
-    /**
-     * Typed version of the dom4j API.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Attribute> attributes(Element element) {
-        return (List<Attribute>) element.attributes();
     }
 
     /**
@@ -578,32 +538,32 @@ public class Dom4jUtils {
     }
 
     public static Text createText(final String text) {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createText(text);
     }
 
     public static Element createElement(final String name) {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createElement(name);
     }
 
     public static Element createElement(final String qualifiedName, final String namespaceURI) {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createElement(qualifiedName, namespaceURI);
     }
 
     public static Element createElement(final QName qName) {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createElement(qName);
     }
 
     public static Attribute createAttribute(final QName qName, final String value) {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createAttribute(null, qName, value);
     }
 
     public static Namespace createNamespace(final String prefix, final String uri) {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createNamespace(prefix, uri);
     }
 
@@ -622,7 +582,7 @@ public class Dom4jUtils {
      */
     public static Document createDocumentCopyElement(final Element newRoot) {
         final Element copy = newRoot.createCopy();
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createDocument(copy);
     }
 
@@ -705,7 +665,7 @@ public class Dom4jUtils {
     }
 
     public static Document createDocument() {
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        final DocumentFactory factory = DocumentFactory.getInstance();
         return factory.createDocument();
     }
 
@@ -768,7 +728,7 @@ public class Dom4jUtils {
     public static void visitSubtree(Element container, VisitorListener visitorListener, boolean mutable) {
 
         // If the source tree can mutate, copy the list first, otherwise dom4j might throw exceptions
-        final List<Node> content = mutable ? new ArrayList<Node>(content(container)) : content(container);
+        final List<Node> content = mutable ? new ArrayList<Node>(container.content()) : container.content();
 
         // Iterate over the content
         for (final Node childNode : content) {

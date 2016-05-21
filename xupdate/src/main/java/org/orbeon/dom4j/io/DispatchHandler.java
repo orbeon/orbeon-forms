@@ -26,7 +26,7 @@ import java.util.HashMap;
  * elements encountered.
  * </p>
  *
- * @author <a href="mailto:dwhite@equipecom.com">Dave White </a>
+ * @author Dave White
  * @version $Revision: 1.11 $
  */
 class DispatchHandler implements ElementHandler {

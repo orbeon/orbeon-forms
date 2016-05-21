@@ -35,7 +35,7 @@ object SubmissionHeaders {
 
     val fullPrefix = xblContainer.getFullPrefix
 
-    val headerElements = Dom4jUtils.elements(enclosingElement, XFormsConstants.XFORMS_HEADER_QNAME)
+    val headerElements = enclosingElement.elements(XFormsConstants.XFORMS_HEADER_QNAME)
     if (headerElements.nonEmpty) {
 
       val headerNameValues = mutable.LinkedHashMap[String, List[String]](initialHeaders.toList: _*)

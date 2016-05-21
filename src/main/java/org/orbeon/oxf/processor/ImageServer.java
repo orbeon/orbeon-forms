@@ -34,7 +34,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataDocument;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;

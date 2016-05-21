@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import org.dom4j.DocumentFactory;
 import org.dom4j.io.SAXContentHandler;
+import org.dom4j.util.NonLazyUserDataElement;
 import org.orbeon.oxf.xml.XMLReceiver;
 
 /**
@@ -22,6 +24,6 @@ import org.orbeon.oxf.xml.XMLReceiver;
 public class NonLazySAXContentHandler extends SAXContentHandler implements XMLReceiver {
 
     public NonLazySAXContentHandler() {
-        super(NonLazyUserDataDocumentFactory.getInstance());
+        super(DocumentFactory.getInstance());
     }
 }

@@ -115,7 +115,7 @@ case class AbstractBinding(
   private def templateRootOption = templateElement map { e ⇒
     if (e.elements.size != 1)
       throw new OXFException("xxbl:transform requires a single child element.")
-    e.elements.get(0).asInstanceOf[Element]
+    e.elements.get(0)
   }
 
   private lazy val transformConfig =

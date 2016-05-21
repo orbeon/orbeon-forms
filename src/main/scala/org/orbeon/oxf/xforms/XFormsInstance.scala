@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import javax.xml.transform.stream.StreamResult
 
-import org.dom4j.{XPath ⇒ _, _}
+import org.dom4j._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util._

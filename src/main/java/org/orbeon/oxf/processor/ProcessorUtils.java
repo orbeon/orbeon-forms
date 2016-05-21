@@ -29,7 +29,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataDocument;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
 

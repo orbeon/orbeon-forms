@@ -29,7 +29,7 @@ object URLGeneratorBase {
       for {
         headerElem  ← Dom4j.elements(configElement, "header")
         headerName  = headerElem.element("name").getStringValue
-        valueElem   ← headerElem.elements("value").asInstanceOf[ju.List[Element]].asScala
+        valueElem   ← headerElem.elements("value").asScala
         headerValue = valueElem.getStringValue
       } yield
         headerName → headerValue

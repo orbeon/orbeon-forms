@@ -24,6 +24,7 @@ import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
 
 import org.apache.commons.fileupload.FileItem
+import org.dom4j.util.{NonLazyUserDataDocument, NonLazyUserDataElement}
 import org.dom4j.{Document, Element, Node}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
@@ -167,7 +168,7 @@ class EmailProcessor extends ProcessorImpl {
     }
 
     def addRecipients(elementName: String, recipientType: RecipientType) =
-      for (element ← Dom4jUtils.elements(messageElement, elementName).asScala) {
+      for (element ← messageElement.elements(elementName).asScala) {
         val addresses = createAddresses(element)
         message.addRecipients(recipientType, addresses)
       }
@@ -187,7 +188,7 @@ class EmailProcessor extends ProcessorImpl {
     addRecipients("bcc", Message.RecipientType.BCC)
 
     // Set headers if any
-    for (headerElement ← Dom4jUtils.elements(messageElement, "header").asScala) {
+    for (headerElement ← messageElement.elements("header").asScala) {
       val headerName  = headerElement.element("name").getTextTrim  // required
       val headerValue = headerElement.element("value").getTextTrim // required
 

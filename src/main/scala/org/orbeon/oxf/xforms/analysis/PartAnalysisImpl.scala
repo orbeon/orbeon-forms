@@ -214,7 +214,7 @@ class PartAnalysisImpl(
         val globalsOptions =
           for {
             global        ← xblBindings.allGlobals
-            globalElement ← Dom4jUtils.elements(global.compactShadowTree.getRootElement).asScala // children of xxbl:global
+            globalElement ← global.compactShadowTree.getRootElement.elements().asScala // children of xxbl:global
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
               case childrenBuilder: ChildrenBuilderTrait ⇒

@@ -103,7 +103,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         )
 
       // Add substitution fonts for Acrobat fields
-      for (element ← Dom4jUtils.elements(configRoot, "substitution-font").asScala) {
+      for (element ← configRoot.elements("substitution-font").asScala) {
         val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), "utf-8")
         val embed            = element.attributeValue("embed") == "true"
 
@@ -138,7 +138,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           variables   = variables
         )
 
-        handleElements(pageContext, Dom4jUtils.elements(configRoot).asScala)
+        handleElements(pageContext, configRoot.elements().asScala)
 
         // Handle preview grid (NOTE: This can be heavy in memory)
         if (templateRoot.attributeValue("show-grid") == "true")
@@ -195,7 +195,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           fontFamily      = context.resolveString("font-family", context.fontFamily),
           fontSize        = context.resolveFloat("font-size",    0f, context.fontSize))
 
-      handleElements(newGroupContext, Dom4jUtils.elements(newGroupContext.element).asScala)
+      handleElements(newGroupContext, newGroupContext.element.elements().asScala)
     }
   }
 
@@ -215,7 +215,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         offsetY         = context.offsetY + (iterationIndex - 1) * offsetIncrementY
       )
 
-      handleElements(iterationContext, Dom4jUtils.elements(context.element).asScala)
+      handleElements(iterationContext, context.element.elements().asScala)
     }
   }
 

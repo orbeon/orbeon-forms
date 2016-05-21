@@ -4,7 +4,7 @@
     <option name="linkedExternalProjectsSettings">
       <SbtProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="jdk" value="1.4" />
+        <option name="jdk" value="1.6" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -12,6 +12,8 @@
             <option value="$PROJECT_DIR$/builder/project" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/common/project" />
+            <option value="$PROJECT_DIR$/dom4j" />
+            <option value="$PROJECT_DIR$/dom4j/project" />
             <option value="$PROJECT_DIR$/project" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/shared/.js" />

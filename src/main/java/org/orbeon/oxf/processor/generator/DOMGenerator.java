@@ -23,7 +23,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataDocument;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 

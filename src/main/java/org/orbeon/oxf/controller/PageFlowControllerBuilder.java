@@ -17,6 +17,8 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.util.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataElement;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.pipeline.PipelineConfig;
@@ -186,7 +188,7 @@ public class PageFlowControllerBuilder {
         final ASTChoose actionsChoose = new ASTChoose(new ASTHrefId(xformedInstance)) {{
 
             // Always add a branch to test on whether the XML submission asked to bypass actions, model, view, and epilogue
-            // Use of this <bypass> document is arguably a HACK 
+            // Use of this <bypass> document is arguably a HACK
             addWhen(new ASTWhen() {{
 
                 setTest("/bypass[@xsi:nil = 'true']");

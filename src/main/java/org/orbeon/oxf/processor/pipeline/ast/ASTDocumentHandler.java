@@ -16,8 +16,8 @@ package org.orbeon.oxf.processor.pipeline.ast;
 import org.dom4j.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
+import org.dom4j.util.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataElement;
 
 import java.util.*;
 

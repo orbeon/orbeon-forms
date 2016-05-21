@@ -28,8 +28,8 @@ import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
+import org.dom4j.util.NonLazyUserDataDocument;
+import org.dom4j.util.NonLazyUserDataElement;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +38,7 @@ import java.io.InputStream;
 import java.util.StringTokenizer;
 
 /**
- * Convert from a binary XLS (Excel) file to XML. 
+ * Convert from a binary XLS (Excel) file to XML.
  */
 public class FromXLSConverter extends ProcessorImpl {
 
@@ -123,7 +123,7 @@ public class FromXLSConverter extends ProcessorImpl {
 
             private void addToElement(Element element, String xpath, String value) {
                 StringTokenizer elements = new StringTokenizer(xpath, "/");
-                
+
                 while (elements.hasMoreTokens()) {
                     String name = elements.nextToken();
                     if (elements.hasMoreTokens()) {

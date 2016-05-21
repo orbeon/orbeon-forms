@@ -7,14 +7,14 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-build.iml" filepath="$PROJECT_DIR$/.idea/modules/common-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-build.iml" filepath="$PROJECT_DIR$/.idea/modules/core-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom4j.iml" filepath="$PROJECT_DIR$/.idea/modules/dom4j.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom4j-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dom4j-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJS.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJS-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/resourcesPackaged.iml" filepath="$PROJECT_DIR$/.idea/modules/resourcesPackaged.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/resourcesPackaged-build.iml" filepath="$PROJECT_DIR$/.idea/modules/resourcesPackaged-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root.iml" filepath="$PROJECT_DIR$/.idea/modules/root.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root-build.iml" filepath="$PROJECT_DIR$/.idea/modules/root-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xupdate.iml" filepath="$PROJECT_DIR$/.idea/modules/xupdate.iml" />

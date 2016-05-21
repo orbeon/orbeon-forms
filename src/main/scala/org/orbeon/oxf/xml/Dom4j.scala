@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List ⇒ JList}
 
 import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.dom4j._
@@ -92,7 +92,7 @@ object Dom4j {
         compareTwoNodeSeqs(filterOut(d1.content), filterOut(d2.content))(normalizeText)
       case (e1: Element, e2: Element) ⇒
         e1.getQName == e2.getQName &&
-          compareTwoNodeSeqs(e1.attributes.asInstanceOf[JList[Attribute]].asScala.sorted, e2.attributes.asInstanceOf[JList[Attribute]].asScala.sorted)(normalizeText) && // sort attributes
+          compareTwoNodeSeqs(e1.attributes.asScala.sorted, e2.attributes.asScala.sorted)(normalizeText) && // sort attributes
           compareTwoNodeSeqs(filterOut(e1.content), filterOut(e2.content))(normalizeText)
       case (a1: Attribute, a2: Attribute) ⇒
         a1.getQName == a2.getQName &&
@@ -103,23 +103,23 @@ object Dom4j {
         normalizeText(t1.getText) == normalizeText(t2.getText)
       case (p1: ProcessingInstruction, p2: ProcessingInstruction) ⇒
         p1.getTarget == p2.getTarget &&
-          p1.getValues.asInstanceOf[JMap[String, String]].asScala == p2.getValues.asInstanceOf[JMap[String, String]].asScala
+          p1.getValues.asScala == p2.getValues.asScala
       case _ ⇒
         false
     }
 
   // Return an element's directly nested elements
-  def elements(e: Element): Seq[Element] = Dom4jUtils.elements(e).asScala
+  def elements(e: Element): Seq[Element] = e.elements().asScala
 
   // Return an element's directly nested elements with the given name
-  def elements(e: Element, qName: QName): Seq[Element] = Dom4jUtils.elements(e, qName).asScala
-  def elements(e: Element, name: String): Seq[Element] = Dom4jUtils.elements(e, name).asScala
+  def elements(e: Element, qName: QName): Seq[Element] = e.elements(qName).asScala
+  def elements(e: Element, name: String): Seq[Element] = e.elements(name).asScala
 
   // Return the element's content as a mutable buffer
-  def content(e: Element): mutable.Buffer[Node] = e.content.asInstanceOf[JList[Node]].asScala
+  def content(e: Element): mutable.Buffer[Node] = e.content.asScala
 
   // Return an element's attributes
-  def attributes(e: Element): Seq[Attribute] = Dom4jUtils.attributes(e).asScala
+  def attributes(e: Element): Seq[Attribute] = e.attributes().asScala
 
   // Ordering on QName, comparing first by namespace URI then by local name
   implicit object QNameOrdering extends Ordering[QName] {

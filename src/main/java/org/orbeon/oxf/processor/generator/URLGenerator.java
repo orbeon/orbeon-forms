@@ -402,7 +402,7 @@ public class URLGenerator extends ProcessorImpl {
                             }
 
                             final List<String> readHeaders = new LinkedList<String>();
-                            for (Object o : Dom4jUtils.elements(configElement, "read-header")) {
+                            for (Object o : configElement.elements("read-header")) {
                                 final Element el = (Element) o;
                                 readHeaders.add(el.getStringValue());
                             }

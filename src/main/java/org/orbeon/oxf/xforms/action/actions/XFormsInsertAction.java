@@ -406,7 +406,7 @@ public class XFormsInsertAction extends XFormsAction {
                 } else {
                     // Other node types
                     final Element parentNode = insertLocationNode.getParent();
-                    final List<Node> siblingElements = Dom4jUtils.content(parentNode);
+                    final List<Node> siblingElements = parentNode.content();
                     final int actualIndex = siblingElements.indexOf(insertLocationNode);
 
                     // Prepare insertion of new element
@@ -598,7 +598,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                     } else if (!(clonedNode instanceof Document)) {
                         // Add other node to element
-                        Dom4jUtils.content(insertContextElement).add(otherNodeIndex++, clonedNode);
+                        insertContextElement.content().add(otherNodeIndex++, clonedNode);
                         insertedNodes.add(clonedNode);
                     } else {
                         // "If a cloned node cannot be placed at the target location due to a node type conflict, then the

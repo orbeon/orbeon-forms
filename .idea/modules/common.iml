@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="common" external.linked.project.path="$MODULE_DIR$/../../common" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../build/classes" />
+    <output url="file://$MODULE_DIR$/../../build/orbeon-war/WEB-INF/classes" />
     <output-test url="file://$MODULE_DIR$/../../common/target/scala-2.11/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../common">
@@ -22,6 +22,15 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="SBT: unmanaged-jars-test">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../lib/test/apache-tomcat-6.0.36.zip!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -163,15 +172,6 @@
           <root url="jar://$MODULE_DIR$/../../lib/xsu12.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/yui-compressor-ant-task-0.5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/yuicompressor-2.4.7.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library name="SBT: unmanaged-jars-test">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/test/apache-tomcat-6.0.36.zip!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

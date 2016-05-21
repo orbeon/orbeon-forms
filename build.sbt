@@ -163,9 +163,7 @@ lazy val core = (project in file("src"))
     classDirectory    in Test    := baseDirectory.value / ".." / TestClassesPath
   )
 
-//lazy val root = (project in file("."))
-//  .enablePlugins(BuildInfoPlugin)
-//  .aggregate(formBuilder, core)
-//  .settings(commonSettings: _*)
+lazy val root = (project in file("."))
+  .settings(commonSettings: _*)
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

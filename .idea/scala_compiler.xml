@@ -9,7 +9,7 @@
     <option name="deprecationWarnings" value="true" />
     <option name="uncheckedWarnings" value="true" />
     <option name="incrementalityType" value="SBT" />
-    <profile name="SBT 1" modules="of,formBuilderSharedJVM" />
+    <profile name="SBT 1" modules="formBuilderSharedJVM" />
     <profile name="SBT 2" modules="formBuilderSharedJS">
       <plugins>
         <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.9.jar" />
@@ -30,15 +30,7 @@
         <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.9.jar" />
       </plugins>
     </profile>
-    <profile name="SBT 4" modules="root">
-      <option name="postfixOps" value="true" />
-      <option name="reflectiveCalls" value="true" />
-      <option name="implicitConversions" value="true" />
-      <option name="higherKinds" value="true" />
-      <option name="existentials" value="true" />
-      <option name="featureWarnings" value="true" />
-    </profile>
-    <profile name="SBT 5" modules="core,resourcesPackaged">
+    <profile name="SBT 5" modules="root,core,resourcesPackaged">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />

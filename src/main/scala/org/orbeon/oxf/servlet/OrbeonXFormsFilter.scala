@@ -100,6 +100,9 @@ class OrbeonXFormsFilter extends Filter {
             // Execute filter
             filterChain.doFilter(requestWrapper, responseWrapper)
 
+            // Restore content length if needed, see https://github.com/orbeon/orbeon-forms/issues/2775
+            httpResponse.setContentLength(-1)
+
             val failureCodeOpt =
               responseWrapper.statusCode filterNot NetUtils.isSuccessCode
 

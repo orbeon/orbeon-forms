@@ -31,8 +31,6 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
 
     val expected: Document =
       <metadata>
-        <application-name>acme</application-name>
-        <form-name>order</form-name>
         <title xml:lang="en">ACME Order Form</title>
         <title xml:lang="fr">Formulaire de commande ACME</title>
         <permissions>

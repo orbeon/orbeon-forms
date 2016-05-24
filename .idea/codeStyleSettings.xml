@@ -5,6 +5,9 @@
       <value>
         <option name="RIGHT_MARGIN" value="160" />
         <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="" />
+        <MarkdownNavigatorCodeStyleSettings>
+          <option name="RIGHT_MARGIN" value="72" />
+        </MarkdownNavigatorCodeStyleSettings>
         <ScalaCodeStyleSettings>
           <option name="NOT_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
           <option name="ENFORCE_FUNCTIONAL_SYNTAX_FOR_UNIT" value="false" />

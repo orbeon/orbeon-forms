@@ -30,7 +30,7 @@
 
     <!-- JUnit tasks -->
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-        <classpath>U
+        <classpath>
             <pathelement location="lib/junit-4.11.jar"/>
             <pathelement location="lib/ant-junit-1.7.1.jar"/>
         </classpath>

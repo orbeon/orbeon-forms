@@ -18,7 +18,6 @@ import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.dom4j.util.NonLazyUserDataDocument;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -38,11 +37,6 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.*;
 
-/**
- * Collection of utility routines for working with DOM4J. In particular offers many methods found in DocumentHelper.
- * The difference between these 'copied' methods and the originals is that our copies use our NonLazyUserData* classes.
- * (As opposed to DOM4J's defaults or whatever happens to be specified in DOM4J's system property.)
- */
 public class Dom4jUtils {
 
     /**
@@ -53,20 +47,14 @@ public class Dom4jUtils {
     public static final Document NULL_DOCUMENT;
 
     static {
-        NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        Element nullElement = factory.createElement("null");
+        NULL_DOCUMENT = DocumentFactory.createDocument();
+        Element nullElement = DocumentFactory.createElement("null");
         nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true");
         NULL_DOCUMENT.setRootElement(nullElement);
     }
 
     private static SAXReader createSAXReader(XMLParsing.ParserConfiguration parserConfiguration) throws SAXException {
-        final XMLReader xmlReader = XMLParsing.newXMLReader(parserConfiguration);
-
-        final SAXReader saxReader = new SAXReader(xmlReader);
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        saxReader.setDocumentFactory(factory);
-        return saxReader;
+        return new SAXReader(XMLParsing.newXMLReader(parserConfiguration));
     }
 
     private static SAXReader createSAXReader() throws SAXException {
@@ -102,23 +90,17 @@ public class Dom4jUtils {
      */
     public static String nodeToString(final Node node) {
         final String ret;
-        switch (node.getNodeType()) {
-            case Node.DOCUMENT_NODE: {
-                ret = domToString((Branch) ((Document) node).getRootElement());
-                break;
-            }
-            case Node.ELEMENT_NODE: {
-                ret = domToString((Branch) node);
-                break;
-            }
-            case Node.TEXT_NODE: {
-                ret = node.getText();
-                break;
-            }
-            default :
-                ret = domToString(node, null);
-                break;
+
+        if (node instanceof Document) {
+            ret = domToString((Branch) ((Document) node).getRootElement());
+        } else if (node instanceof Element) {
+            ret = domToString((Branch) node);
+        } else if (node instanceof Text) {
+            ret = node.getText();
+        } else {
+            ret = domToString(node, null);
         }
+
         return ret;
     }
 
@@ -173,16 +155,12 @@ public class Dom4jUtils {
     }
 
     private static String domToString(final Node node, final OutputFormat format) {
-        try {
-            final StringBuilderWriter writer = new StringBuilderWriter();
-            // Ugh, XMLWriter doesn't accept null formatter _and_ default formatter is protected.
-            final XMLWriter xmlWriter = format == null ? new XMLWriter(writer) : new XMLWriter(writer, format);
-            xmlWriter.write(node);
-            xmlWriter.close();
-            return writer.toString();
-        } catch (final IOException e) {
-            throw new OXFException(e);
-        }
+        final StringBuilderWriter writer = new StringBuilderWriter();
+        // TODO ORBEON: Ugh, XMLWriter doesn't accept null formatter _and_ default formatter is protected.
+        final XMLWriter xmlWriter = format == null ? new XMLWriter(writer) : new XMLWriter(writer, format);
+        xmlWriter.write(node);
+        xmlWriter.close();
+        return writer.toString();
     }
 
     /**
@@ -212,13 +190,11 @@ public class Dom4jUtils {
     }
 
     public static Document readDom4j(Reader reader) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader();
-        return saxReader.read(reader);
+        return createSAXReader().read(reader);
     }
 
     public static Document readDom4j(Reader reader, String uri) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader();
-        return saxReader.read(reader, uri);
+        return createSAXReader().read(reader, uri);
     }
 
     /*
@@ -226,9 +202,8 @@ public class Dom4jUtils {
      * (because it relies on JAXP).
      */
     public static Document readDom4j(String xmlString, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(parserConfiguration);
         final StringReader stringReader = new StringReader(xmlString);
-        return saxReader.read(stringReader);
+        return createSAXReader(parserConfiguration).read(stringReader);
     }
 
     public static Document readDom4j(String xmlString) throws SAXException, DocumentException {
@@ -236,13 +211,11 @@ public class Dom4jUtils {
     }
 
     public static Document readDom4j(InputStream inputStream, String uri, XMLParsing.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(parserConfiguration);
-        return saxReader.read(inputStream, uri);
+        return createSAXReader(parserConfiguration).read(inputStream, uri);
     }
 
     public static Document readDom4j(InputStream inputStream) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(XMLParsing.ParserConfiguration.PLAIN);
-        return saxReader.read(inputStream);
+        return createSAXReader(XMLParsing.ParserConfiguration.PLAIN).read(inputStream);
     }
 
     public static String makeSystemId(final Element e) {
@@ -376,11 +349,7 @@ public class Dom4jUtils {
         final LocationSAXWriter writer = new LocationSAXWriter();
         final LocationSAXContentHandler ch = new LocationSAXContentHandler();
         writer.setContentHandler(new NamespaceCleanupXMLReceiver(ch, xml11));
-        try {
-            writer.write(document);
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        }
+        writer.write(document);
         return ch.getDocument();
     }
 
@@ -514,35 +483,7 @@ public class Dom4jUtils {
         return new QName(localName, new Namespace("p1", namespaceURI));
     }
 
-    public static Text createText(final String text) {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createText(text);
-    }
-
-    public static Element createElement(final String name) {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createElement(name);
-    }
-
-    public static Element createElement(final String qualifiedName, final String namespaceURI) {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createElement(qualifiedName, namespaceURI);
-    }
-
-    public static Element createElement(final QName qName) {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createElement(qName);
-    }
-
-    public static Attribute createAttribute(final QName qName, final String value) {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createAttribute(null, qName, value);
-    }
-
-    public static Namespace createNamespace(final String prefix, final String uri) {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createNamespace(prefix, uri);
-    }
+    // TODO ORBEON: remove uses, just use DocumentFactory
 
     /**
      * Create a copy of a dom4j Node.
@@ -558,9 +499,7 @@ public class Dom4jUtils {
      * Return a new document with a copy of newRoot as its root.
      */
     public static Document createDocumentCopyElement(final Element newRoot) {
-        final Element copy = newRoot.createCopy();
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createDocument(copy);
+        return DocumentFactory.createDocument(newRoot.createCopy());
     }
 
     /**
@@ -588,7 +527,7 @@ public class Dom4jUtils {
         final Document document; {
             if (detach) {
                 // Detach
-                document = createDocument();
+                document = DocumentFactory.createDocument();
                 document.setRootElement((Element) newRoot.detach());
             } else {
                 // Copy
@@ -639,11 +578,6 @@ public class Dom4jUtils {
         }
 
         return document;
-    }
-
-    public static Document createDocument() {
-        final DocumentFactory factory = DocumentFactory.getInstance();
-        return factory.createDocument();
     }
 
     /**

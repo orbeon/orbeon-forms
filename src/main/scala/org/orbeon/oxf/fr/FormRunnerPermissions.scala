@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.dom4j.DocumentFactory
 import org.orbeon.oxf.fb.FormBuilder
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
@@ -154,7 +155,7 @@ trait FormRunnerPermissions {
 
       val wrapper = wrapperOpt.getOrElse(
         // Create wrapper we don't have one already
-        new DocumentWrapper(Dom4jUtils.createDocument, null, formEl.getConfiguration)
+        new DocumentWrapper(DocumentFactory.createDocument, null, formEl.getConfiguration)
         // Save wrapper for following iterations
         |!> (w ⇒ wrapperOpt = Some(w))
       )

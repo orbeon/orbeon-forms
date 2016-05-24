@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import java.{util ⇒ ju}
 
-import org.dom4j.{Document, Element}
+import org.dom4j.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -47,7 +47,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     XXFormsUploadDoneEvent.StandardProperties ++
     XXFormsLoadEvent.StandardProperties
 
-  private val DummyEvent = List(LocalEvent(Dom4jUtils.createElement("dummy"), trusted = false))
+  private val DummyEvent = List(LocalEvent(DocumentFactory.createElement("dummy"), trusted = false))
 
   case class LocalEvent(private val element: Element, trusted: Boolean) {
 
@@ -210,7 +210,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
       def createBlankingEvent(control: XFormsControl) = {
-        val newEventElement = Dom4jUtils.createElement(XXFORMS_EVENT_QNAME)
+        val newEventElement = DocumentFactory.createElement(XXFORMS_EVENT_QNAME)
         newEventElement.addAttribute("name", XXFORMS_VALUE_OR_ACTIVATE)
         newEventElement.addAttribute("source-control-id", control.getEffectiveId)
         LocalEvent(newEventElement, trusted = false)

@@ -178,16 +178,12 @@ public class SQLProcessor extends ProcessorImpl {
                         }
                     });
                     // Create SAXStore
-                    try {
-                        final SAXStore store = new SAXStore();
-                        final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
-                        locationSAXWriter.setContentHandler(store);
-                        locationSAXWriter.write(configDocument);
-                        // Return the normalized document
-                        return new Config(store, useXPathExpressions, xpathExpressions);
-                    } catch (SAXException e) {
-                        throw new OXFException(e);
-                    }
+                    final SAXStore store = new SAXStore();
+                    final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
+                    locationSAXWriter.setContentHandler(store);
+                    locationSAXWriter.write(configDocument);
+                    // Return the normalized document
+                    return new Config(store, useXPathExpressions, xpathExpressions);
                 }
             });
 

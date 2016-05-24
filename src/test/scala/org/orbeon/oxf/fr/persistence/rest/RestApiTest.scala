@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 
-import org.dom4j.Document
+import org.dom4j.{Document, DocumentFactory}
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.db._
@@ -287,9 +287,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
         val string = new Array[Char](size)
         for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
-        val text = Dom4jUtils.createText(new String(string))
-        val element = Dom4jUtils.createElement("gaga") |!> (_.add(text))
-        val document = Dom4jUtils.createDocument |!> (_.add(element)) |> HttpRequest.XML
+        val text = DocumentFactory.createText(new String(string))
+        val element = DocumentFactory.createElement("gaga") |!> (_.add(text))
+        val document = DocumentFactory.createDocument |!> (_.add(element)) |> HttpRequest.XML
         val url = crudURLPrefix(provider) + s"data/$position/data.xml"
         HttpAssert.put(url, Specific(1), document, 201)
         HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(document, AllOperations, Some(1)))

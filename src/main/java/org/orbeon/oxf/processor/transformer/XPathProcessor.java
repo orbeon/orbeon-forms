@@ -15,8 +15,10 @@ package org.orbeon.oxf.processor.transformer;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.tree.DefaultProcessingInstruction;
-import org.dom4j.tree.DefaultText;
+import org.dom4j.ProcessingInstruction;
+import org.dom4j.Text;
+import org.dom4j.tree.ConcreteProcessingInstruction;
+import org.dom4j.tree.ConcreteText;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPath;
@@ -119,11 +121,11 @@ public class XPathProcessor extends ProcessorImpl {
         } else if (result instanceof NodeInfo) {
             final NodeInfo nodeInfo = (NodeInfo) result;
             TransformerUtils.writeTinyTree(nodeInfo, new EmbeddedDocumentXMLReceiver(xmlReceiver));
-        } else if (result instanceof DefaultProcessingInstruction) {
-            DefaultProcessingInstruction processingInstruction = (DefaultProcessingInstruction) result;
+        } else if (result instanceof ProcessingInstruction) {
+            ProcessingInstruction processingInstruction = (ProcessingInstruction) result;
             xmlReceiver.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
-        } else if (result instanceof DefaultText) {
-            strVal = ((DefaultText) result).getText();
+        } else if (result instanceof Text) {
+            strVal = ((Text) result).getText();
         } else if (result instanceof String) {
             strVal = (String) result;
         } else if (result instanceof Long) {

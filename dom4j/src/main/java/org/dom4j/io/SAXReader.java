@@ -116,107 +116,11 @@ public class SAXReader {
     /** Encoding of InputSource - null means system default encoding */
     private String encoding = null;
 
-    // private boolean includeExternalGeneralEntities = false;
-    // private boolean includeExternalParameterEntities = false;
-
-    /** The SAX filter used to filter SAX events */
-    private XMLFilter xmlFilter;
-
-    public SAXReader() {
-    }
-
     public SAXReader(XMLReader xmlReader) {
         this.xmlReader = xmlReader;
     }
 
-    /**
-     * Allows a SAX property to be set on the underlying SAX parser. This can be
-     * useful to set parser-specific properties such as the location of schema
-     * or DTD resources. Though use this method with caution as it has the
-     * possibility of breaking the standard behaviour. An alternative to calling
-     * this method is to correctly configure an XMLReader object instance and
-     * call the {@link #setXMLReader(XMLReader)}method
-     *
-     * @param name
-     *            is the SAX property name
-     * @param value
-     *            is the value of the SAX property
-     *
-     * @throws SAXException
-     *             if the XMLReader could not be created or the property could
-     *             not be changed.
-     */
-    public void setProperty(String name, Object value) throws SAXException {
-        getXMLReader().setProperty(name, value);
-    }
-
-    /**
-     * Sets a SAX feature on the underlying SAX parser. This can be useful to
-     * set parser-specific features. Though use this method with caution as it
-     * has the possibility of breaking the standard behaviour. An alternative to
-     * calling this method is to correctly configure an XMLReader object
-     * instance and call the {@link #setXMLReader(XMLReader)}method
-     *
-     * @param name
-     *            is the SAX feature name
-     * @param value
-     *            is the value of the SAX feature
-     *
-     * @throws SAXException
-     *             if the XMLReader could not be created or the feature could
-     *             not be changed.
-     */
-    public void setFeature(String name, boolean value) throws SAXException {
-        getXMLReader().setFeature(name, value);
-    }
-
-    /**
-     * <p>
-     * Reads a Document from the given <code>File</code>
-     * </p>
-     *
-     * @param file
-     *            is the <code>File</code> to read from.
-     *
-     * @return the newly created Document instance
-     *
-     * @throws DocumentException
-     *             if an error occurs during parsing.
-     */
-    public Document read(File file) throws DocumentException {
-        try {
-            /*
-             * We cannot convert the file to an URL because if the filename
-             * contains '#' characters, there will be problems with the URL in
-             * the InputSource (because a URL like
-             * http://myhost.com/index#anchor is treated the same as
-             * http://myhost.com/index) Thanks to Christian Oetterli
-             */
-            InputSource source = new InputSource(new FileInputStream(file));
-            if (this.encoding != null) {
-                source.setEncoding(this.encoding);
-            }
-            String path = file.getAbsolutePath();
-
-            if (path != null) {
-                // Code taken from Ant FileUtils
-                StringBuilder sb = new StringBuilder("file://");
-
-                // add an extra slash for filesystems with drive-specifiers
-                if (!path.startsWith(File.separator)) {
-                    sb.append("/");
-                }
-
-                path = path.replace('\\', '/');
-                sb.append(path);
-
-                source.setSystemId(sb.toString());
-            }
-
-            return read(source);
-        } catch (FileNotFoundException e) {
-            throw new DocumentException(e.getMessage(), e);
-        }
+    public SAXReader() {
     }
 
     /**
@@ -236,36 +140,6 @@ public class SAXReader {
         String systemID = url.toExternalForm();
 
         InputSource source = new InputSource(systemID);
-        if (this.encoding != null) {
-            source.setEncoding(this.encoding);
-        }
-
-        return read(source);
-    }
-
-    /**
-     * <p>
-     * Reads a Document from the given URL or filename using SAX.
-     * </p>
-     *
-     * <p>
-     * If the systemId contains a <code>':'</code> character then it is
-     * assumed to be a URL otherwise its assumed to be a file name. If you want
-     * finer grained control over this mechansim then please explicitly pass in
-     * either a {@link URL}or a {@link File}instance instead of a {@link
-     * String} to denote the source of the document.
-     * </p>
-     *
-     * @param systemId
-     *            is a URL for a document or a file name.
-     *
-     * @return the newly created Document instance
-     *
-     * @throws DocumentException
-     *             if an error occurs during parsing.
-     */
-    public Document read(String systemId) throws DocumentException {
-        InputSource source = new InputSource(systemId);
         if (this.encoding != null) {
             source.setEncoding(this.encoding);
         }
@@ -386,8 +260,6 @@ public class SAXReader {
         try {
             XMLReader reader = getXMLReader();
 
-            reader = installXMLFilter(reader);
-
             EntityResolver thatEntityResolver = this.entityResolver;
 
             if (thatEntityResolver == null) {
@@ -401,9 +273,6 @@ public class SAXReader {
             SAXContentHandler contentHandler = createContentHandler(reader);
             contentHandler.setEntityResolver(thatEntityResolver);
             contentHandler.setInputSource(in);
-
-            boolean internal = isIncludeInternalDTDDeclarations();
-            boolean external = isIncludeExternalDTDDeclarations();
 
             contentHandler.setMergeAdjacentText(isMergeAdjacentText());
             contentHandler.setStripWhitespaceText(isStripWhitespaceText());
@@ -447,16 +316,6 @@ public class SAXReader {
      */
     public boolean isValidating() {
         return validating;
-    }
-
-    /**
-     * Sets the validation mode.
-     *
-     * @param validation
-     *            indicates whether or not validation should occur.
-     */
-    public void setValidation(boolean validation) {
-        this.validating = validation;
     }
 
     /**
@@ -593,52 +452,8 @@ public class SAXReader {
         this.encoding = encoding;
     }
 
-    /**
-     * Returns the SAX filter being used to filter SAX events.
-     *
-     * @return the SAX filter being used or null if no SAX filter is installed
-     */
-    public XMLFilter getXMLFilter() {
-        return xmlFilter;
-    }
-
     // Implementation methods
     // -------------------------------------------------------------------------
-
-    /**
-     * Installs any XMLFilter objects required to allow the SAX event stream to
-     * be filtered and preprocessed before it gets to dom4j.
-     *
-     * @param reader
-     *            DOCUMENT ME!
-     *
-     * @return the new XMLFilter if applicable or the original XMLReader if no
-     *         filter is being used.
-     */
-    protected XMLReader installXMLFilter(XMLReader reader) {
-        XMLFilter filter = getXMLFilter();
-
-        if (filter != null) {
-            // find the root XMLFilter
-            XMLFilter root = filter;
-
-            while (true) {
-                XMLReader parent = root.getParent();
-
-                if (parent instanceof XMLFilter) {
-                    root = (XMLFilter) parent;
-                } else {
-                    break;
-                }
-            }
-
-            root.setParent(reader);
-
-            return filter;
-        }
-
-        return reader;
-    }
 
     /**
      * Factory Method to allow alternate methods of creating and configuring

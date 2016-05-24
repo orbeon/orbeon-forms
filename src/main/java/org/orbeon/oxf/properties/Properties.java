@@ -149,6 +149,8 @@ public class Properties {
                     lastUpdate = current;
 
                     success = true;
+                } catch (Throwable t) {
+                    System.out.println(t);
                 } finally {
                     pipelineContext.destroy(success);
                 }

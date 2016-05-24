@@ -163,6 +163,12 @@ lazy val dom4j = (project in file("dom4j"))
     name := "orbeon-dom4j"
   )
 
+lazy val dom = (project in file("dom"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-dom"
+  )
+
 lazy val formRunner = (project in file("form-runner"))
   .settings(commonSettings: _*)
   .settings(
@@ -184,7 +190,7 @@ val PathsToExcludeFromCoreJAR = List(
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(common, dom4j, formBuilderSharedJVM, xupdate)
+  .dependsOn(common, dom, formBuilderSharedJVM, xupdate)
   .settings(commonSettings: _*)
   .settings(
     name                         := "orbeon-core",
@@ -214,7 +220,7 @@ lazy val core = (project in file("src"))
   )
 
 lazy val root = (project in file("."))
-  .aggregate(common, dom4j, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient)
+  .aggregate(common, dom, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient)
   .settings(
 
     scalaVersion                  := ScalaVersion,

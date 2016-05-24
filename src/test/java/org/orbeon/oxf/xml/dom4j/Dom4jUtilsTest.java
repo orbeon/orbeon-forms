@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml.dom4j;
 
 import junit.framework.TestCase;
 import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.junit.Test;
 
@@ -22,12 +23,12 @@ public class Dom4jUtilsTest extends TestCase {
     @Test
     public void testDomToString() {
 
-        final Document document = Dom4jUtils.createDocument();
-        final Element rootElement = Dom4jUtils.createElement("div");
+        final Document document = DocumentFactory.createDocument();
+        final Element rootElement = DocumentFactory.createElement("div");
         document.setRootElement(rootElement);
 
         rootElement.addText("    ");
-        final Element bElement = Dom4jUtils.createElement("b");
+        final Element bElement = DocumentFactory.createElement("b");
         bElement.addText("bold");
         rootElement.add(bElement);
         rootElement.addText("    ");

@@ -288,7 +288,7 @@ class XFormsInstance(
 
   // Log the current MIP values applied to this instance
   def debugLogMIPs() = {
-    val result = Dom4jUtils.createDocument
+    val result = DocumentFactory.createDocument
     underlyingDocumentOpt.get.accept(new VisitorSupport {
       final override def visit(element: Element) = {
         currentElement = rootElement.addElement("element")

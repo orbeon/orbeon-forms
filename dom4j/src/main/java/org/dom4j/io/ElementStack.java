@@ -8,7 +8,6 @@
 package org.dom4j.io;
 
 import org.dom4j.Element;
-import org.dom4j.ElementHandler;
 import org.dom4j.ElementPath;
 
 /**
@@ -40,10 +39,6 @@ class ElementStack implements ElementPath {
 
     public void setDispatchHandler(DispatchHandler dispatchHandler) {
         this.handler = dispatchHandler;
-    }
-
-    public DispatchHandler getDispatchHandler() {
-        return this.handler;
     }
 
     /**
@@ -115,67 +110,9 @@ class ElementStack implements ElementPath {
         return lastElementIndex + 1;
     }
 
-    public Element getElement(int depth) {
-        Element element;
-
-        try {
-            element = (Element) stack[depth];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            element = null;
-        }
-
-        return element;
-    }
-
-    public String getPath() {
-        if (handler == null) {
-            setDispatchHandler(new DispatchHandler());
-        }
-
-        return handler.getPath();
-    }
 
     public Element getCurrent() {
         return peekElement();
-    }
-
-    public void addHandler(String path, ElementHandler elementHandler) {
-        this.handler.addHandler(getHandlerPath(path), elementHandler);
-    }
-
-    public void removeHandler(String path) {
-        this.handler.removeHandler(getHandlerPath(path));
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param path
-     *            DOCUMENT ME!
-     *
-     * @return true when an <code>ElementHandler</code> is registered for the
-     *         specified path.
-     */
-    public boolean containsHandler(String path) {
-        return this.handler.containsHandler(path);
-    }
-
-    private String getHandlerPath(String path) {
-        String handlerPath;
-
-        if (this.handler == null) {
-            setDispatchHandler(new DispatchHandler());
-        }
-
-        if (path.startsWith("/")) {
-            handlerPath = path;
-        } else if (getPath().equals("/")) {
-            handlerPath = getPath() + path;
-        } else {
-            handlerPath = getPath() + "/" + path;
-        }
-
-        return handlerPath;
     }
 }
 

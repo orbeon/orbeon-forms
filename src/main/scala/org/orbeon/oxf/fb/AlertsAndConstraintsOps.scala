@@ -448,7 +448,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val localname = parseQName(schemaType)._2
           val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
             { case (prefix, uri) ⇒ new Namespace(prefix, uri) } getOrElse
-            Namespace.NO_NAMESPACE
+            Namespace.EmptyNamespace
           new QName(localname, namespace)
         }
 

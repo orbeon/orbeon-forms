@@ -133,7 +133,7 @@ object XBLTransformer {
 
             // Insert content if any
             if ((contentToInsert ne null) && ! contentToInsert.isEmpty) {
-              val parentContent = element.getParent.content()
+              val parentContent = element.getParent.content
               val elementIndex = parentContent.indexOf(element)
               parentContent.addAll(elementIndex, contentToInsert)
             }

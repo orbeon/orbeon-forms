@@ -168,7 +168,9 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="xupdate" exported="" />
+    <orderEntry type="module" module-name="dom" exported="" />
+    <orderEntry type="module" module-name="common" exported="" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
     <orderEntry type="module-library" scope="TEST">
       <library name="SBT: unmanaged-jars-test">
         <CLASSES>
@@ -178,8 +180,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="module" module-name="common" exported="" />
-    <orderEntry type="module" module-name="dom4j" exported="" />
+    <orderEntry type="module" module-name="xupdate" exported="" />
   </component>
 </module>

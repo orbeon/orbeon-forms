@@ -555,12 +555,7 @@ public class TransformerUtils {
         final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
         locationSAXWriter.setContentHandler(xmlReceiver);
         locationSAXWriter.setLexicalHandler(xmlReceiver);
-
-        try {
-            locationSAXWriter.write(node);
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        }
+        locationSAXWriter.write(node);
     }
 
     /**

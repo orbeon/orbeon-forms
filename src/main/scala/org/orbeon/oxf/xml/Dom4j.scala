@@ -109,7 +109,7 @@ object Dom4j {
     }
 
   // Return an element's directly nested elements
-  def elements(e: Element): Seq[Element] = e.elements().asScala
+  def elements(e: Element): Seq[Element] = e.elements.asScala
 
   // Return an element's directly nested elements with the given name
   def elements(e: Element, qName: QName): Seq[Element] = e.elements(qName).asScala
@@ -119,7 +119,7 @@ object Dom4j {
   def content(e: Element): mutable.Buffer[Node] = e.content.asScala
 
   // Return an element's attributes
-  def attributes(e: Element): Seq[Attribute] = e.attributes().asScala
+  def attributes(e: Element): Seq[Attribute] = e.attributes.asScala
 
   // Ordering on QName, comparing first by namespace URI then by local name
   implicit object QNameOrdering extends Ordering[QName] {
@@ -142,7 +142,7 @@ object Dom4j {
 
         val existingOrNew =
           existing.headOption getOrElse {
-            val newElement = Dom4jUtils.createElement(qName)
+            val newElement = DocumentFactory.createElement(qName)
             parent.add(newElement)
             newElement
           }

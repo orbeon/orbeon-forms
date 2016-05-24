@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.impl;
 
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -30,7 +31,6 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.dom4j.util.NonLazyUserDataDocument;
 
 /**
  * Base class for all built-in ProcessorOutput implementations.
@@ -292,7 +292,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
                     // Create config document for Debug processor
                     final org.dom4j.Document debugConfigDocument;
                     {
-                        debugConfigDocument = new NonLazyUserDataDocument();
+                        debugConfigDocument = DocumentFactory.createDocument();
                         Element configElement = debugConfigDocument.addElement("config");
                         configElement.addElement("message").addText(debugMessage);
                         if (debugLocationData != null) {

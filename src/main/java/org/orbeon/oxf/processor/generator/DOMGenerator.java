@@ -13,17 +13,20 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.dom4j.util.NonLazyUserDataDocument;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -129,7 +132,7 @@ public final class DOMGenerator extends ProcessorImpl {
 
     private static org.dom4j.Document makeCopyDoc(final org.dom4j.Element e) {
         final org.dom4j.Element cpy = e.createCopy();
-        final NonLazyUserDataDocument ret = new NonLazyUserDataDocument();
+        final Document ret = DocumentFactory.createDocument();
         ret.setRootElement(cpy);
         return ret;
     }

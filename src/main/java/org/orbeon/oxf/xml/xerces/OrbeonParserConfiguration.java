@@ -25,10 +25,6 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
 
     private boolean externalEntities;
 
-    public OrbeonParserConfiguration() {
-        this(XMLParsing.ParserConfiguration.PLAIN);
-    }
-
     public OrbeonParserConfiguration(XMLParsing.ParserConfiguration parserConfiguration) {
         super(null, null, null);
         this.externalEntities = parserConfiguration.externalEntities;
@@ -71,7 +67,7 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
         // back in to Xerces.
         final TreeMap<String, Boolean> result = new TreeMap<String, Boolean>(fFeatures);
         result.remove(PARSER_SETTINGS);
-        
+
         result.put("http://xml.org/sax/features/namespaces", true);
         result.put("http://xml.org/sax/features/namespace-prefixes", false);
 

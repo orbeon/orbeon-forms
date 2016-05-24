@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.dom4j.DocumentFactory
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.expr.XPathContext
 
 class XXFormsCreateDocument extends XFormsFunction  {
   // Create a new DocumentWrapper. If we use a global one, the first document ever created is wrongly returned!
   override def evaluateItem(xpathContext: XPathContext) =
-    new DocumentWrapper(Dom4jUtils.createDocument, null, XPath.GlobalConfiguration)
+    new DocumentWrapper(DocumentFactory.createDocument, null, XPath.GlobalConfiguration)
 }

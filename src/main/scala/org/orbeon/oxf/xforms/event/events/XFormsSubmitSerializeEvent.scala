@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
+import org.dom4j.DocumentFactory
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -45,9 +46,9 @@ private object XFormsSubmitSerializeEvent {
   import XFormsEvent._
 
   def createSubmissionBodyElement(containingDocument: XFormsContainingDocument) = {
-    val document = Dom4jUtils.createDocument
+    val document = DocumentFactory.createDocument
     val docWrapper = new DocumentWrapper(document, null, XPath.GlobalConfiguration)
-    val submissionBodyElement = Dom4jUtils.createElement("submission-body")
+    val submissionBodyElement = DocumentFactory.createElement("submission-body")
     document.setRootElement(submissionBodyElement)
     docWrapper.wrap(submissionBodyElement)
   }

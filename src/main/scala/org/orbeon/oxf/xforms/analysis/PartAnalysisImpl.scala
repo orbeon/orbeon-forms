@@ -214,7 +214,7 @@ class PartAnalysisImpl(
         val globalsOptions =
           for {
             global        ← xblBindings.allGlobals
-            globalElement ← global.compactShadowTree.getRootElement.elements().asScala // children of xxbl:global
+            globalElement ← global.compactShadowTree.getRootElement.elements.asScala // children of xxbl:global
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
               case childrenBuilder: ChildrenBuilderTrait ⇒
@@ -224,7 +224,7 @@ class PartAnalysisImpl(
             }
 
         // Add globals to the root analysis
-        rootControlAnalysis.addChildren(globalsOptions.flatten.toSeq)
+        rootControlAnalysis.addChildren(globalsOptions.flatten.toSeq) // TODO: unclear is .toSeq is needed
       } else if (xblBindings.allGlobals.nonEmpty)
         warn(s"There are ${xblBindings.allGlobals.size} xxbl:global in a child part. Those won't be processed.")
 

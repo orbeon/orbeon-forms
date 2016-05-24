@@ -295,7 +295,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                         // Convert the result to a text node
                         final String stringValue = ((Item) currentObject).getStringValue();
-                        final Text textNode = Dom4jUtils.createText(stringValue);
+                        final Text textNode = DocumentFactory.createText(stringValue);
 
                         sourceNodes.add(null); // there is no source node for this cloned node, it's a source item
                         clonedNodesTemp.add(textNode);
@@ -366,7 +366,7 @@ public class XFormsInsertAction extends XFormsAction {
             {
                 boolean hasTextNode = false;
                 for (Node clonedNode: clonedNodes) {
-                    hasTextNode |= clonedNode != null && clonedNode.getNodeType() == Node.TEXT_NODE;
+                    hasTextNode |= clonedNode != null && clonedNode.getNodeType() == Node$.MODULE$.TEXT_NODE();
                 }
                 if (hasTextNode)
                     Dom4jUtils.normalizeTextNodes(insertLocationNode);
@@ -392,7 +392,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "d. Otherwise, the target location is immediately before or after the insert location
                 // node, based on the position attribute setting or its default."
 
-                if (insertLocationNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+                if (insertLocationNode.getNodeType() == Node$.MODULE$.ATTRIBUTE_NODE()) {
                     // Special case for "next to an attribute"
 
                     // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but
@@ -431,7 +431,7 @@ public class XFormsInsertAction extends XFormsAction {
                                 // Element, text, comment, processing instruction node
                                 siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
                                 insertedNodes.add(clonedNode);
-                                hasTextNode |= clonedNode.getNodeType() == Node.TEXT_NODE;
+                                hasTextNode |= clonedNode.getNodeType() == Node$.MODULE$.TEXT_NODE();
                                 addIndex++;
                             } else {
                                 // We never insert attributes or namespace nodes as siblings

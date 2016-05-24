@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.exception.OrbeonFormatter;
@@ -34,7 +35,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.dom4j.util.NonLazyUserDataDocument;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -461,7 +461,7 @@ public class ImageServer extends ProcessorImpl {
 
     private String computeCacheFileName(String type, String path, List<Element> nodes) {
         // Create digest document and digest
-        Document document = new NonLazyUserDataDocument();
+        Document document = DocumentFactory.createDocument();
         Element rootElement = document.addElement("image");
         for (Element element: nodes) {
             rootElement.add(element.createCopy());

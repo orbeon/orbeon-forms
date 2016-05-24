@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Headers;
@@ -29,7 +26,6 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.dom4j.util.NonLazyUserDataDocument;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -125,7 +121,7 @@ public class ProcessorUtils {
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
             Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
-            result = new NonLazyUserDataDocument();
+            result = DocumentFactory.createDocument();
             result.add(copiedElement);
         } else {
             // External URI

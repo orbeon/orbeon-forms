@@ -878,7 +878,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 curr = (NodeWrapper) curr.getParent();
             } while (curr != null && curr.getNodeKind() == Type.ELEMENT);// NOTE: support elements detached from document
 
-            nslist.put("xml", Namespace.XML_NAMESPACE);
+            nslist.put("xml", Namespace.XMLNamespace());
             prefixes = nslist.keySet().iterator();
         }
 

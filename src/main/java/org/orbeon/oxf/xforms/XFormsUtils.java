@@ -678,7 +678,11 @@ public class XFormsUtils {
         if (nodeInfo instanceof VirtualNode)
             return (Node) ((VirtualNode) nodeInfo).getUnderlyingNode();
         else if (nodeInfo.getNodeKind() == org.w3c.dom.Node.ATTRIBUTE_NODE) {
-            return Dom4jUtils.createAttribute(new QName(nodeInfo.getLocalPart(), new Namespace(nodeInfo.getPrefix(), nodeInfo.getURI())), nodeInfo.getStringValue());
+            return DocumentFactory.createAttribute(
+                null,
+                new QName(nodeInfo.getLocalPart(), new Namespace(nodeInfo.getPrefix(), nodeInfo.getURI())),
+                nodeInfo.getStringValue()
+            );
         } else
             return TransformerUtils.tinyTreeToDom4j((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
     }

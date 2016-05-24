@@ -291,8 +291,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                             // Send body from result envelope
                                             final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
                                             locationSAXWriter.setContentHandler(xmlReceiver);
-                                            final DocumentFactory factory = DocumentFactory.getInstance();
-                                            final Document resultEnvelopeDOM4j = new DelegationProcessorDOMReader(factory).read(resultEnvelope.getAsDocument());
+                                            final Document resultEnvelopeDOM4j = new DelegationProcessorDOMReader().read(resultEnvelope.getAsDocument());
 
                                             final String xpathString =
                                                     operation != null && operation.select != null

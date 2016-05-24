@@ -24,7 +24,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -37,7 +36,6 @@ import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.dom4j.util.NonLazyUserDataDocument;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -338,7 +336,7 @@ public class RequestGenerator extends ProcessorImpl {
 
     public static Document readWholeRequestAsDOM4J(final ExternalContext.Request request, final Context context) {
 
-        final Document document = new NonLazyUserDataDocument();
+        final Document document = DocumentFactory.createDocument();
         final Element requestElement = document.addElement("request");
 
         addTextElement(requestElement, "container-type", request.getContainerType());

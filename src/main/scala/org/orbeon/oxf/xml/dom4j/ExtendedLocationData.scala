@@ -20,12 +20,12 @@ import collection.{breakOut, immutable}
  * LocationData information with additional information.
  */
 class ExtendedLocationData private (
-    val systemID: String,
-    val line: Int,
-    val col: Int,
-    val description: Option[String],
-    paramsAllowNullValues: immutable.Seq[(String, String)])
-  extends LocationData(systemID, line, col) {
+    systemID              : String,
+    line                  : Int,
+    col                   : Int,
+    val description       : Option[String],
+    paramsAllowNullValues : immutable.Seq[(String, String)]
+) extends LocationData(systemID, line, col) {
 
   val params = paramsAllowNullValues filter (_._2 ne null)
 

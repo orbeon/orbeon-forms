@@ -18,18 +18,19 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.XLSUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.dom4j.util.NonLazyUserDataDocument;
-import org.dom4j.util.NonLazyUserDataElement;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -77,14 +78,13 @@ public class FromXLSConverter extends ProcessorImpl {
                 HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inputStream));
 
                 // Create document
-                final NonLazyUserDataElement root = new NonLazyUserDataElement( "workbook" );
-                final NonLazyUserDataDocument resultDocument = new NonLazyUserDataDocument( root );
+                final Document resultDocument = DocumentFactory.createDocument("workbook");
 
                 // Add elements for each sheet
                 for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                     HSSFSheet sheet = workbook.getSheetAt(i);
 
-                    final Element element = new NonLazyUserDataElement("sheet");
+                    final Element element = DocumentFactory.createElement("sheet");
                     resultDocument.getRootElement().add(element);
 
                     // Go though each cell
@@ -130,14 +130,14 @@ public class FromXLSConverter extends ProcessorImpl {
                         // Not the last: try to find sub element, otherwise create
                         Element child = element.element(name);
                         if (child == null) {
-                            child = new NonLazyUserDataElement(name);
+                            child = DocumentFactory.createElement(name);
                             element.add(child);
                         }
                         element = child;
                     } else {
                         // Last: add element, set content to value
-                        Element child = new NonLazyUserDataElement(name);
-                        child.add(Dom4jUtils.createText(value));
+                        Element child = DocumentFactory.createElement(name);
+                        child.add(DocumentFactory.createText(value));
                         element.add(child);
                     }
                 }

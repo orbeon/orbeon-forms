@@ -20,19 +20,14 @@ import java.util.List;
  */
 public class DelegationProcessorDOMReader {
     /** <code>DocumentFactory</code> used to create new document objects */
-    private DocumentFactory factory;
 
     /** stack of <code>Namespace</code> and <code>QName</code> objects */
     private NamespaceStack namespaceStack;
 
-    public DelegationProcessorDOMReader(DocumentFactory factory) {
-        this.factory = factory;
-        this.namespaceStack = new NamespaceStack(factory);
+    public DelegationProcessorDOMReader() {
+        this.namespaceStack = new NamespaceStack();
     }
 
-    public DocumentFactory getDocumentFactory() {
-        return factory;
-    }
 
     public Document read(org.w3c.dom.Document domDocument) {
         if (domDocument instanceof Document) {
@@ -203,14 +198,14 @@ public class DelegationProcessorDOMReader {
     }
 
     protected Document createDocument() {
-        return getDocumentFactory().createDocument();
+        return DocumentFactory.createDocument();
     }
 
     protected void clearNamespaceStack() {
         namespaceStack.clear();
 
-        if (!namespaceStack.contains(Namespace.XML_NAMESPACE)) {
-            namespaceStack.push(Namespace.XML_NAMESPACE);
+        if (!namespaceStack.contains(Namespace.XMLNamespace())) {
+            namespaceStack.push(Namespace.XMLNamespace());
         }
     }
 

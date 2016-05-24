@@ -14,17 +14,15 @@
 package org.orbeon.oxf.xforms.state
 
 import collection.JavaConverters._
-
 import sbinary.Operations._
 import XFormsOperations._
 import XFormsProtocols._
-
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.xforms._
 import control.Controls.ControlsIterator
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{TransformerUtils, SAXStore}
-import org.dom4j.Element
+import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
+import org.dom4j.{DocumentFactory, Element}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 
 // Immutable representation of the dynamic state
@@ -69,7 +67,7 @@ case class DynamicState(
   def decodeControlsJava           = decodeControls.asJava
 
   def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
-  
+
   // For tests only
   def copyUpdateSequence(sequence: Int) = copy(sequence = sequence)
 
@@ -84,7 +82,7 @@ case class DynamicState(
   // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
   def toXML = {
 
-    val document = Dom4jUtils.createDocument
+    val document = DocumentFactory.createDocument
     val rootElement = document.addElement("dynamic-state")
 
     // Add UUIDs
@@ -110,7 +108,7 @@ case class DynamicState(
 
         // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
         def instanceToXML(instanceState: InstanceState): Element = {
-          val instanceElement = Dom4jUtils.createElement("instance")
+          val instanceElement = DocumentFactory.createElement("instance")
 
           def att(name: String,  value: String): Unit = instanceElement.addAttribute(name, value)
 

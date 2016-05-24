@@ -13,24 +13,22 @@
  */
 package org.orbeon.oxf.processor.validation;
 
-import org.orbeon.msv.verifier.jarv.Const;
-import org.orbeon.msv.verifier.jarv.TheFactoryImpl;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.orbeon.msv.iso_relax.verifier.*;
+import org.orbeon.msv.verifier.jarv.Const;
+import org.orbeon.msv.verifier.jarv.TheFactoryImpl;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.dom4j.util.NonLazyUserDataDocument;
-import org.dom4j.util.NonLazyUserDataElement;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -64,24 +62,20 @@ public class MSVValidationProcessor extends ProcessorImpl {
     private static final SAXParserFactory factory;
 
     static {
-        NO_DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {
-            {
-                add(new NonLazyUserDataElement("decorate") {
-                    {
-                        setText("false");
-                    }
-                });
-            }
-        }), "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
-        DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {
-            {
-                add(new NonLazyUserDataElement("decorate") {
-                    {
-                        setText("true");
-                    }
-                });
-            }
-        }), "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
+
+        {
+            final Document configDoc = DocumentFactory.createDocument("config");
+            configDoc.getRootElement().addElement("decorate").setText("false");
+
+            NO_DECORATION_CONFIG = new DOMGenerator(configDoc, "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
+        }
+
+        {
+            final Document configDoc = DocumentFactory.createDocument("config");
+            configDoc.getRootElement().addElement("decorate").setText("true");
+
+            DECORATION_CONFIG = new DOMGenerator(configDoc, "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
+        }
         // 02/06/2004 d : If we don't do anything VM would just convert unchecked exceptions thrown
         //                from here into ExceptionInInitializerError without setting the cause.
         //                This of course makes diagnosing reports from the field a major pain.

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
@@ -24,7 +25,6 @@ import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.dom4j.util.NonLazyUserDataDocument;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -66,7 +66,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     final String sig = ScalaUtils.trimAllToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
 
                     sigDataNode.detach();
-                    final Document sigData = new NonLazyUserDataDocument();
+                    final Document sigData = DocumentFactory.createDocument();
                     sigData.add(sigDataNode);
 
                     dsa.update(Dom4jUtils.domToString(sigData).getBytes("utf-8"));

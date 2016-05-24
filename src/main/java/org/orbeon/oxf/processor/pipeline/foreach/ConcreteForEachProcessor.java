@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.processor.pipeline.foreach;
 
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.Node$;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
@@ -28,6 +30,7 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -222,7 +225,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             final Object nextObject = iterator.next();
             if (nextObject instanceof Node) {
                 final Node nextNode = (Node) nextObject;
-                if (nextNode.getNodeType() != Node.ELEMENT_NODE)
+                if (nextNode.getNodeType() != Node$.MODULE$.ELEMENT_NODE())
                     throw new OXFException("Select expression '" + select
                             + "' did not return a sequence of elements. One node was a '"
                             + nextNode.getNodeTypeName() + "'");

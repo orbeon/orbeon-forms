@@ -24,8 +24,7 @@ import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
 
 import org.apache.commons.fileupload.FileItem
-import org.dom4j.util.{NonLazyUserDataDocument, NonLazyUserDataElement}
-import org.dom4j.{Document, Element, Node}
+import org.dom4j.{Document, DocumentFactory, Element, Node}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -285,9 +284,9 @@ class EmailProcessor extends ProcessorImpl {
             throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html", partOrBodyElement.getData.asInstanceOf[LocationData])
 
           // Create Document and convert it into a String
-          val rootElement = (if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement).asInstanceOf[Element]
-          val partDocument = new NonLazyUserDataDocument
-          partDocument.setRootElement(rootElement.asInstanceOf[NonLazyUserDataElement].clone.asInstanceOf[Element])
+          val rootElement = if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
+          val partDocument = DocumentFactory.createDocument
+          partDocument.setRootElement(rootElement.clone().asInstanceOf[Element])
           Right(handleInlinePartContent(partDocument, contentType))
       }
 

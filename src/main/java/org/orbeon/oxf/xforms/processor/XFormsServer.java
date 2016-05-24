@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
@@ -525,7 +526,7 @@ public class XFormsServer extends ProcessorImpl {
                 final XFormsModelSubmission activeSubmission = containingDocument.getClientActiveSubmissionFirstPass();
                 final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
                 if (activeSubmission != null || loads.size() > 0) {
-                    final Document eventsDocument = Dom4jUtils.createDocument();
+                    final Document eventsDocument = DocumentFactory.createDocument();
                     final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
 
                     // Check for xxforms-submit event

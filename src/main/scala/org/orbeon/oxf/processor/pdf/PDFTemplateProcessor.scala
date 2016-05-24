@@ -138,7 +138,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           variables   = variables
         )
 
-        handleElements(pageContext, configRoot.elements().asScala)
+        handleElements(pageContext, configRoot.elements.asScala)
 
         // Handle preview grid (NOTE: This can be heavy in memory)
         if (templateRoot.attributeValue("show-grid") == "true")
@@ -195,7 +195,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           fontFamily      = context.resolveString("font-family", context.fontFamily),
           fontSize        = context.resolveFloat("font-size",    0f, context.fontSize))
 
-      handleElements(newGroupContext, newGroupContext.element.elements().asScala)
+      handleElements(newGroupContext, newGroupContext.element.elements.asScala)
     }
   }
 
@@ -215,7 +215,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         offsetY         = context.offsetY + (iterationIndex - 1) * offsetIncrementY
       )
 
-      handleElements(iterationContext, context.element.elements().asScala)
+      handleElements(iterationContext, context.element.elements.asScala)
     }
   }
 

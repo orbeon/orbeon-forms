@@ -25,23 +25,6 @@ public interface ElementPath {
     /**
      * DOCUMENT ME!
      *
-     * @param depth
-     *            DOCUMENT ME!
-     *
-     * @return the element at the specified depth index, 0 = root element
-     */
-    Element getElement(int depth);
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return the path as a string
-     */
-    String getPath();
-
-    /**
-     * DOCUMENT ME!
-     *
      * @return the current element
      */
     Element getCurrent();

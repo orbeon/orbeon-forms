@@ -17,6 +17,7 @@ import org.orbeon.dom4j.tree.NamespaceStack;
 import org.xml.sax.*;
 import org.xml.sax.ext.DeclHandler;
 import org.xml.sax.ext.LexicalHandler;
+import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.lang.reflect.Method;
@@ -826,25 +827,11 @@ public class SAXContentHandler extends DefaultHandler implements
     }
 
     private String getEncoding() {
-        if (locator == null) {
+        if (locator instanceof Locator2) {
+            return ((Locator2) locator).getEncoding();
+        } else {
             return null;
         }
-
-        // use reflection to avoid dependency on Locator2
-        // or other locator implemenations.
-        try {
-            Method m = locator.getClass().getMethod("getEncoding",
-                    new Class[] {});
-
-            if (m != null) {
-                return (String) m.invoke(locator, null);
-            }
-        } catch (Exception e) {
-            // do nothing
-        }
-
-        // couldn't determine encoding, returning null...
-        return null;
     }
 
     /**

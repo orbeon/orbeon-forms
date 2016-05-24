@@ -21,7 +21,7 @@ import java.util.Map;
  * @author James Strachan
  */
 public class DefaultProcessingInstruction extends
-        org.dom4j.tree.FlyweightProcessingInstruction {
+        FlyweightProcessingInstruction {
     /** The parent of this node */
     private Element parent;
 
@@ -60,11 +60,6 @@ public class DefaultProcessingInstruction extends
     public void setText(String text) {
         this.text = text;
         this.values = parseValues(text);
-    }
-
-    public void setValues(Map<String, String> values) {
-        this.values = values;
-        this.text = toString(values);
     }
 
     public void setValue(String name, String value) {

@@ -63,7 +63,7 @@ class DispatchHandler implements ElementHandler {
 
     /**
      * Adds the <code>ElementHandler</code> to be called when the specified
-     * path is encounted.
+     * path is encountered.
      *
      * @param handlerPath
      *            is the path to be handled

@@ -9,9 +9,6 @@ package org.dom4j;
 
 import org.dom4j.tree.QNameCache;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -205,25 +202,6 @@ public class QName implements Serializable {
 
     public void setDocumentFactory(DocumentFactory documentFactory) {
         this.documentFactory = documentFactory;
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // We use writeObject() and not writeUTF() to minimize space
-        // This allows for writing pointers to already written strings
-        out.writeObject(namespace.getPrefix());
-        out.writeObject(namespace.getURI());
-
-        out.defaultWriteObject();
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
-        String prefix = (String) in.readObject();
-        String uri = (String) in.readObject();
-
-        in.defaultReadObject();
-
-        namespace = Namespace.get(prefix, uri);
     }
 
     private static QNameCache getCache() {

@@ -64,15 +64,6 @@ public class OutputFormat implements Cloneable {
     /** pad string-element boundaries with whitespace */
     private boolean padText = false;
 
-    /** Whether or not to use XHTML standard. */
-    private boolean doXHTML = false;
-
-    /**
-     * Controls when to output a line.separtor every so many tags in case of no
-     * lines and total text trimming.
-     */
-    private int newLineAfterNTags = 0; // zero means don't bother.
-
     /** Quote character to use when writing attributes. */
     private char attributeQuoteChar = '\"';
 
@@ -237,47 +228,6 @@ public class OutputFormat implements Cloneable {
 
         this.indent = indentBuffer.toString();
     }
-
-    /**
-     * <p>
-     * Whether or not to use the XHTML standard: like HTML but passes an XML
-     * parser with real, closed tags. Also, XHTML CDATA sections will be output
-     * with the CDATA delimiters: ( &quot; <b>&lt;![CDATA[ </b>&quot; and &quot;
-     * <b>]]&gt; </b>&quot; ) otherwise, the class HTMLWriter will output the
-     * CDATA text, but not the delimiters.
-     * </p>
-     *
-     * <p>
-     * Default is <code>false</code>
-     * </p>
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean isXHTML() {
-        return doXHTML;
-    }
-
-    /**
-     * <p>
-     * This will set whether or not to use the XHTML standard: like HTML but
-     * passes an XML parser with real, closed tags. Also, XHTML CDATA sections
-     * will be output with the CDATA delimiters: ( &quot; <b>&lt;[CDATA[
-     * </b>&quot; and &quot; <b>]]&lt; </b>) otherwise, the class HTMLWriter
-     * will output the CDATA text, but not the delimiters.
-     * </p>
-     *
-     * <p>
-     * Default: false
-     * </p>
-     *
-     * @param xhtml
-     *            <code>boolean</code> true=>conform to XHTML, false=>conform
-     *            to HTML, can have unclosed tags, etc.
-     */
-    public void setXHTML(boolean xhtml) {
-        doXHTML = xhtml;
-    }
-
 
     public char getAttributeQuoteCharacter() {
         return attributeQuoteChar;

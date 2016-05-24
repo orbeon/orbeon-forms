@@ -21,16 +21,13 @@ import java.util.Map;
 /**
  * <p>
  * <code>AbstractDocument</code> is an abstract base class for tree
- * implementors to use for implementation inheritence.
+ * implementors to use for implementation inheritance.
  * </p>
  *
  * @author James Strachan
  */
 public abstract class AbstractDocument extends AbstractBranch implements
         Document {
-
-    /** The encoding of this document as stated in the XML declaration */
-    protected String encoding;
 
     public AbstractDocument() {
     }
@@ -47,9 +44,6 @@ public abstract class AbstractDocument extends AbstractBranch implements
         return this;
     }
 
-    public String getXMLEncoding() {
-        return null;
-    }
 
     public String getStringValue() {
         Element root = getRootElement();
@@ -59,7 +53,6 @@ public abstract class AbstractDocument extends AbstractBranch implements
 
     public String asXML() {
         OutputFormat format = new OutputFormat();
-        format.setEncoding(encoding);
 
         try {
             StringWriter out = new StringWriter();
@@ -76,7 +69,6 @@ public abstract class AbstractDocument extends AbstractBranch implements
 
     public void write(Writer out) throws IOException {
         OutputFormat format = new OutputFormat();
-        format.setEncoding(encoding);
 
         XMLWriter writer = new XMLWriter(out, format);
         writer.write(this);
@@ -125,14 +117,6 @@ public abstract class AbstractDocument extends AbstractBranch implements
     }
 
     public Document addProcessingInstruction(String target, String data) {
-        ProcessingInstruction node = getDocumentFactory()
-                .createProcessingInstruction(target, data);
-        add(node);
-
-        return this;
-    }
-
-    public Document addProcessingInstruction(String target, Map<String, String> data) {
         ProcessingInstruction node = getDocumentFactory()
                 .createProcessingInstruction(target, data);
         add(node);
@@ -220,10 +204,6 @@ public abstract class AbstractDocument extends AbstractBranch implements
      *            DOCUMENT ME!
      */
     protected abstract void rootElementAdded(Element rootElement);
-
-    public void setXMLEncoding(String enc) {
-        this.encoding = enc;
-    }
 }
 
 /*

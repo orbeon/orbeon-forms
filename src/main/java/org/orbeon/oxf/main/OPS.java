@@ -157,7 +157,7 @@ public class OPS {
         }
     }
 
-    public static Document parseText(String text) throws DocumentException {
+    private static Document parseText(String text) throws DocumentException {
 
         final SAXReader reader = new SAXReader();
         final String encoding = getEncoding(text);
@@ -165,13 +165,7 @@ public class OPS {
         InputSource source = new InputSource(new StringReader(text));
         source.setEncoding(encoding);
 
-        final Document result = reader.read(source);
-
-        if (result.getXMLEncoding() == null) {
-            result.setXMLEncoding(encoding);
-        }
-
-        return result;
+        return reader.read(source);
     }
 
     private static String getEncoding(String text) {
@@ -200,7 +194,7 @@ public class OPS {
         return result;
     }
 
-    public void parseArgs(String[] args) {
+    private void parseArgs(String[] args) {
         final Options options = new Options();
         {
             final Option o = new Option("r", "root", true, "Specifies the resource manager root");

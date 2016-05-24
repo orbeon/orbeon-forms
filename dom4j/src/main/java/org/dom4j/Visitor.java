@@ -38,16 +38,6 @@ public interface Visitor {
 
     /**
      * <p>
-     * Visits the given <code>DocumentType</code>
-     * </p>
-     *
-     * @param documentType
-     *            is the <code>DocumentType</code> node to visit.
-     */
-    void visit(DocumentType documentType);
-
-    /**
-     * <p>
      * Visits the given <code>Element</code>
      * </p>
      *

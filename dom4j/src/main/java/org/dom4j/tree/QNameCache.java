@@ -150,20 +150,6 @@ public class QNameCache {
     /**
      * DOCUMENT ME!
      *
-     * @param qname
-     *            DOCUMENT ME!
-     *
-     * @return the cached QName instance if there is one or adds the given qname
-     *         to the cache if not
-     */
-    public QName intern(QName qname) {
-        return get(qname.getName(), qname.getNamespace(), qname
-                .getQualifiedName());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param namespace
      *            DOCUMENT ME!
      *

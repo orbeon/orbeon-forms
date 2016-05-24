@@ -19,7 +19,7 @@ import java.io.Writer;
 /**
  * <p>
  * <code>AbstractNode</code> is an abstract base class for tree implementors
- * to use for implementation inheritence.
+ * to use for implementation inheritance.
  * </p>
  *
  * @author James Strachan

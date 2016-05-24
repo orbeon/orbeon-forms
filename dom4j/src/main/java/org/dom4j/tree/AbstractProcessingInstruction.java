@@ -21,7 +21,7 @@ import java.util.StringTokenizer;
 /**
  * <p>
  * <code>AbstractProcessingInstruction</code> is an abstract base class for
- * tree implementors to use for implementation inheritence.
+ * tree implementors to use for implementation inheritance.
  * </p>
  *
  * @author James Strachan
@@ -65,11 +65,6 @@ public abstract class AbstractProcessingInstruction extends AbstractNode
     }
 
     public void setValue(String name, String value) {
-        throw new UnsupportedOperationException("This PI is read-only and "
-                + "cannot be modified");
-    }
-
-    public void setValues(Map<String, String> data) {
         throw new UnsupportedOperationException("This PI is read-only and "
                 + "cannot be modified");
     }

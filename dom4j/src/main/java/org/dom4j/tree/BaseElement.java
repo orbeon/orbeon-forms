@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * <p>
  * <code>BaseElement</code> is a useful base class for implemementation
- * inheritence of an XML element.
+ * inheritance of an XML element.
  * </p>
  *
  * @author James Strachan
@@ -93,14 +93,6 @@ public abstract class BaseElement extends AbstractElement {
 
     public void clearContent() {
         contentList().clear();
-    }
-
-    public void setContent(List content) {
-        this.content = content;
-
-        if (content instanceof ContentListFacade) {
-            this.content = ((ContentListFacade<Node>) content).getBackingList();
-        }
     }
 
     // Implementation methods

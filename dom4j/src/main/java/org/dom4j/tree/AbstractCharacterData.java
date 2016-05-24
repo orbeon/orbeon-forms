@@ -13,7 +13,7 @@ import org.dom4j.Element;
 /**
  * <p>
  * <code>AbstractCharacterData</code> is an abstract base class for tree
- * implementors to use for implementation inheritence.
+ * implementors to use for implementation inheritance.
  * </p>
  *
  * @author James Strachan

@@ -61,10 +61,6 @@ public class DefaultDocument extends AbstractDocument {
         return rootElement;
     }
 
-    public String getXMLEncoding() {
-        return encoding;
-    }
-
     public EntityResolver getEntityResolver() {
         return entityResolver;
     }

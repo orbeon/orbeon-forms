@@ -58,16 +58,7 @@ public class DocumentFactory implements Serializable {
      * @since 1.5
      */
     public Document createDocument(String encoding) {
-        // to keep the DocumentFactory backwards compatible, we have to do this
-        // in this not so nice way, since subclasses only need to extend the
-        // createDocument() method.
-        Document answer = createDocument();
-
-        if (answer instanceof AbstractDocument) {
-            answer.setXMLEncoding(encoding);
-        }
-
-        return answer;
+        return createDocument();
     }
 
     public Document createDocument(Element rootElement) {
@@ -144,30 +135,9 @@ public class DocumentFactory implements Serializable {
         return cache.get(qualifiedName, uri);
     }
 
-    // Properties
-    // -------------------------------------------------------------------------
-
-    // Implementation methods
-    // -------------------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param qname
-     *            DOCUMENT ME!
-     *
-     * @return the cached QName instance if there is one or adds the given qname
-     *         to the cache if not
-     */
-    protected QName intern(QName qname) {
-        return cache.intern(qname);
-    }
-
     /**
      * Factory method to create the QNameCache. This method should be overloaded
      * if you wish to use your own derivation of QName.
-     *
-     * @return DOCUMENT ME!
      */
     protected QNameCache createQNameCache() {
         return new QNameCache(this);

@@ -519,7 +519,7 @@ public interface Element extends Branch {
      * </p>
      *
      * @param name
-     *            is the name of the attribute value to be returnd
+     *            is the name of the attribute value to be returned
      *
      * @return the value of the attribute, null if the attribute does not exist
      *         or the empty string
@@ -534,7 +534,7 @@ public interface Element extends Branch {
      * </p>
      *
      * @param name
-     *            is the name of the attribute value to be returnd
+     *            is the name of the attribute value to be returned
      * @param defaultValue
      *            is the default value to be returned if the attribute has no
      *            value defined.

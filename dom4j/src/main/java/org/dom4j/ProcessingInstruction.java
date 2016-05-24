@@ -65,8 +65,6 @@ public interface ProcessingInstruction extends Node {
     Map<String, String> getValues();
 
     void setValue(String name, String value);
-
-    void setValues(Map<String, String> data);
 }
 
 /*

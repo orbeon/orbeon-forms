@@ -121,11 +121,6 @@ public class SAXWriter implements XMLReader {
 
                 break;
 
-            case Node.DOCUMENT_TYPE_NODE:
-                write((DocumentType) node);
-
-                break;
-
             case Node.NAMESPACE_NODE:
 
                 // Will be output with attributes

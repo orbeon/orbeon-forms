@@ -59,27 +59,6 @@ public interface Document extends Branch {
     Document addProcessingInstruction(String target, String text);
 
     /**
-     * Adds a processing instruction for the given target
-     *
-     * @param target
-     *            is the target of the processing instruction
-     * @param data
-     *            is a Map of the key / value pairs of the processing
-     *            instruction
-     *
-     * @return this <code>Document</code> instance.
-     */
-    Document addProcessingInstruction(String target, Map<String, String> data);
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return the EntityResolver used to find resolve URIs such as for DTDs, or
-     *         XML Schema documents
-     */
-    EntityResolver getEntityResolver();
-
-    /**
      * Sets the EntityResolver used to find resolve URIs such as for DTDs, or
      * XML Schema documents
      *
@@ -87,38 +66,6 @@ public interface Document extends Branch {
      *            DOCUMENT ME!
      */
     void setEntityResolver(EntityResolver entityResolver);
-
-    /**
-     * Return the encoding of this document, as part of the XML declaration This
-     * is <code>null</code> when unspecified or when it is not known (such as
-     * when the Document was created in memory) or when the implementation does
-     * not support this operation.
-     *
-     * <p>
-     * The way this encoding is retrieved also depends on the way the XML source
-     * is parsed. For instance, if the SAXReader is used and if the underlying
-     * XMLReader implementation support the
-     * <code>org.xml.sax.ext.Locator2</code> interface, the result returned by
-     * this method is specified by the <code>getEncoding()</code> method of
-     * that interface.
-     * </p>
-     *
-     * @return The encoding of this document, as stated in the XML declaration,
-     *         or <code>null</code> if unknown.
-     *
-     * @since 1.5
-     */
-    String getXMLEncoding();
-
-    /**
-     * Sets the encoding of this document as it will appear in the XML
-     * declaration part of the document.
-     *
-     * @param encoding the encoding of the document
-     *
-     * @since 1.6
-     */
-    void setXMLEncoding(String encoding);
 }
 
 /*

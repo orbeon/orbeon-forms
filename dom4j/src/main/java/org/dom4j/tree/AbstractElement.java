@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * <p>
  * <code>AbstractElement</code> is an abstract base class for tree
- * implementors to use for implementation inheritence.
+ * implementors to use for implementation inheritance.
  * </p>
  *
  * @author James Strachan
@@ -769,15 +769,6 @@ public abstract class AbstractElement extends AbstractBranch implements
     }
 
     public Element addProcessingInstruction(String target, String data) {
-        ProcessingInstruction node = getDocumentFactory()
-                .createProcessingInstruction(target, data);
-
-        addNewNode(node);
-
-        return this;
-    }
-
-    public Element addProcessingInstruction(String target, Map<String, String> data) {
         ProcessingInstruction node = getDocumentFactory()
                 .createProcessingInstruction(target, data);
 

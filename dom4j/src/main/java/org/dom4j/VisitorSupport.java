@@ -10,7 +10,7 @@ package org.dom4j;
 /**
  * <p>
  * <code>VisitorSupport</code> is an abstract base class which is useful for
- * implementation inheritence or when using anonymous inner classes to create
+ * implementation inheritance or when using anonymous inner classes to create
  * simple <code>Visitor</code> implementations.
  * </p>
  *
@@ -21,9 +21,6 @@ public abstract class VisitorSupport implements Visitor {
     }
 
     public void visit(Document document) {
-    }
-
-    public void visit(DocumentType documentType) {
     }
 
     public void visit(Element node) {

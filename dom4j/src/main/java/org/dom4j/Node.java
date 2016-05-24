@@ -31,7 +31,7 @@ import java.io.Writer;
  * @see #isReadOnly
  */
 public interface Node extends Cloneable {
-    // W3C DOM complient node type codes
+    // W3C DOM compliant node type codes
 
     /** Matches Element nodes */
     short ELEMENT_NODE = 1;
@@ -59,9 +59,6 @@ public interface Node extends Cloneable {
 
     /** Matches Document nodes */
     short DOCUMENT_NODE = 9;
-
-    /** Matches DocumentType nodes */
-    short DOCUMENT_TYPE_NODE = 10;
 
     // public static final short DOCUMENT_FRAGMENT_NODE = 11;
     // public static final short NOTATION_NODE = 12;
@@ -303,7 +300,7 @@ public interface Node extends Cloneable {
      * nodes polymorphically much easier as the switch statement can be used
      * instead of multiple if (instanceof) statements.
      *
-     * @return a W3C DOM complient code for the node type such as ELEMENT_NODE
+     * @return a W3C DOM compliant code for the node type such as ELEMENT_NODE
      *         or ATTRIBUTE_NODE
      */
     short getNodeType();

@@ -292,23 +292,6 @@ public class XMLWriter extends XMLFilterImpl implements LexicalHandler {
     }
 
     /**
-     * Writes the given {@link DocumentType}.
-     *
-     * @param docType
-     *            <code>DocumentType</code> to output.
-     *
-     * @throws IOException
-     *             DOCUMENT ME!
-     */
-    public void write(DocumentType docType) throws IOException {
-        writeDocType(docType);
-
-        if (autoFlush) {
-            flush();
-        }
-    }
-
-    /**
      * Writes the given {@link Entity}.
      *
      * @param entity
@@ -983,13 +966,6 @@ public class XMLWriter extends XMLFilterImpl implements LexicalHandler {
         lastOutputNodeType = Node.CDATA_SECTION_NODE;
     }
 
-    private void writeDocType(DocumentType docType) throws IOException {
-        if (docType != null) {
-            docType.write(writer);
-            writePrintln();
-        }
-    }
-
     private void writeNamespace(Namespace namespace) throws IOException {
         if (namespace != null) {
             writeNamespace(namespace.getPrefix(), namespace.getURI());
@@ -1159,11 +1135,6 @@ public class XMLWriter extends XMLFilterImpl implements LexicalHandler {
 
             case Node.DOCUMENT_NODE:
                 write((Document) node);
-
-                break;
-
-            case Node.DOCUMENT_TYPE_NODE:
-                writeDocType((DocumentType) node);
 
                 break;
 

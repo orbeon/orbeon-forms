@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="common" external.linked.project.path="$MODULE_DIR$/../../common" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../build/classes" />
+    <output url="file://$MODULE_DIR$/../../common/target/scala-2.11/classes" />
     <output-test url="file://$MODULE_DIR$/../../common/target/scala-2.11/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../common">
@@ -136,8 +136,8 @@
           <root url="jar://$MODULE_DIR$/../../lib/saxon-9-1-0-8_orbeon_20160524.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/saxpath-dev_orbeon.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/sbinary_2.11-SNAPSHOT.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/scala-library-2.11.7.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/scala-reflect-2.11.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/scala-library-2.11.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/scala-reflect-2.11.8.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/scala-xml_2.11-1.0.4.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/scalatest_2.11-2.2.4.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/selenium-java-2.45.0-srcs.jar!/" />

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="formBuilderClient" external.linked.project.path="$MODULE_DIR$/../../form-builder-client" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/../../form-builder-client/target/scala-2.11/classes" />
+    <output-test url="file://$MODULE_DIR$/../../form-builder-client/target/scala-2.11/test-classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../form-builder-client">
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/builder/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/builder/scala" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/builder/scala-2.11" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/target/scala-2.11/src_managed/main" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/test/scala" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/test/scala-2.11" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/target/scala-2.11/src_managed/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/builder/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/target/scala-2.11/resource_managed/main" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/src/test/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-builder-client/target/scala-2.11/resource_managed/test" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../../form-builder-client/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="formBuilderSharedJS" exported="" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.9:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-js:scalajs-dom_sjs0.6_2.11:0.9.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: be.doeraene:scalajs-jquery_sjs0.6_2.11:0.9.0:jar" level="project" />
+  </component>
+</module>

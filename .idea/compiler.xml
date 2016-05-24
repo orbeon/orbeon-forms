@@ -33,6 +33,10 @@
       <module name="core" target="1.6" />
       <module name="dom4j" target="1.6" />
       <module name="formBuilder" target="1.6" />
+      <module name="formBuilderClient" target="1.6" />
+      <module name="formBuilderSharedJS" target="1.6" />
+      <module name="formBuilderSharedJVM" target="1.6" />
+      <module name="formRunner" target="1.6" />
       <module name="root" target="1.6" />
       <module name="xupdate" target="1.6" />
     </bytecodeTargetLevel>
@@ -40,8 +44,5 @@
   <component name="EclipseCompilerSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />
     <option name="DEPRECATION" value="false" />
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_STRING" value="-encoding utf8" />
   </component>
 </project>

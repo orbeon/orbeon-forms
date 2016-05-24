@@ -1,17 +1,14 @@
+import sbt.Keys._
+
 val ScalaVersion         = "2.11.8"
 val ScalaJsDomVersion    = "0.9.0"
 val ScalaJsJQueryVersion = "0.9.0"
 
-val OrbeonFormsVersion   = "2016.2-SNAPSHOT"
+val DefaultOrbeonFormsVersion   = "2016.2-SNAPSHOT"
+val DefaultOrbeonEdition        = "CE"
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
-val ExplodedWarClassesPath        = ExplodedWarWebInf + "/classes"
-val CompileClassesPath            = "build/classes"
-val TestClassesPath               = "build/test-classes"
-
-val CompileClasspathForEnv        = if (sys.props.get("orbeon.env") == Some("dev")) ExplodedWarClassesPath else CompileClassesPath
-val OrbeonVersion                 = sys.props.get("orbeon.version") getOrElse OrbeonFormsVersion
-val OrbeonEdition                 = sys.props.get("orbeon.edition") getOrElse "CE"
+val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
 
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
@@ -20,6 +17,15 @@ val ScalaJSFileNameFormat = "((.+)-(fastopt|opt)).js".r
 
 val fastOptJSToExplodedWar   = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
 val fullOptJSToExplodedWar   = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
+
+val orbeonVersionFromProperties = settingKey[String]("Orbeon Forms version from system properties.")
+val orbeonEditionFromProperties = settingKey[String]("Orbeon Forms edition from system properties.")
+
+// TBH I don't know whether `in ThisBuild` is needed
+orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
+orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
+
+val copyJarToExplodedWar = taskKey[File]("Copy JAR file to local WEB-INF/bin for development")
 
 def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
 
@@ -51,9 +57,9 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
 }
 
 lazy val commonSettings = Seq(
-  organization                 := "org.orbeon",
-  version                      := OrbeonFormsVersion,
-  scalaVersion                 := ScalaVersion,
+  organization                  := "org.orbeon",
+  version                       := orbeonVersionFromProperties.value,
+  scalaVersion                  := ScalaVersion,
 
   javacOptions  ++= Seq(
     "-encoding", "utf8",
@@ -79,15 +85,23 @@ lazy val commonSettings = Seq(
 //    "-Ywarn-value-discard",
 //    "-Xfuture",
 //    "-Ywarn-unused-import"     // 2.11 only
-  )
+  ),
+
+  copyJarToExplodedWar := {
+
+    val sourceJarFile = (packageBin in Compile).value
+    val targetJarFile = new File(ExplodedWarLibPath + '/' + sourceJarFile.name)
+
+    println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}")
+    IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
+
+    targetJarFile
+  }
 )
 
-lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("shared"))
-  .settings(
-    scalaVersion                   := ScalaVersion
-  )
+lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("form-builder-shared"))
+  .settings(commonSettings: _*)
   .jvmSettings(
-    classDirectory    in Compile := baseDirectory.value.getParentFile.getParentFile / CompileClasspathForEnv
   )
   .jsSettings(
   )
@@ -95,12 +109,12 @@ lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("sh
 lazy val formBuilderSharedJVM = formBuilderShared.jvm
 lazy val formBuilderSharedJS  = formBuilderShared.js
 
-lazy val formBuilder = (project in file("builder"))
+lazy val formBuilderClient = (project in file("form-builder-client"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(formBuilderSharedJS)
   .settings(commonSettings: _*)
   .settings(
-    name                           := "form-builder",
+    name                           := "form-builder-client",
 
     scalaSource         in Compile := baseDirectory.value / "src" / "builder" / "scala",
     javaSource          in Compile := baseDirectory.value / "src" / "builder" / "java",
@@ -131,35 +145,42 @@ lazy val formBuilder = (project in file("builder"))
 lazy val common = (project in file("common"))
   .settings(commonSettings: _*)
   .settings(
-    name                         := "orbeon-common",
-    unmanagedBase                := baseDirectory.value / ".." / "lib",
-    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
+    name          := "orbeon-common",
+    unmanagedBase := baseDirectory.value / ".." / "lib"
   )
 
 lazy val xupdate = (project in file("xupdate"))
   .dependsOn(common)
   .settings(commonSettings: _*)
   .settings(
-    name                         := "orbeon-xupdate",
-    unmanagedBase                := baseDirectory.value / ".." / "lib",
-    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
+    name          := "orbeon-xupdate",
+    unmanagedBase := baseDirectory.value / ".." / "lib"
   )
 
 lazy val dom4j = (project in file("dom4j"))
   .settings(commonSettings: _*)
   .settings(
-    name                         := "orbeon-dom4j",
-    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv
+    name := "orbeon-dom4j"
   )
 
-//lazy val resourcesPackaged = (project in file("src"))
-//  .settings(commonSettings: _*)
-//  .settings(
-//    name                         := "orbeon-resources-packaged",
-//
-//    resourceDirectory in Compile := baseDirectory.value / "resources-packaged",
-//    target                       := baseDirectory.value / "resources-packaged-target"
-//  )
+lazy val formRunner = (project in file("form-runner"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-form-runner"
+  )
+
+lazy val formBuilder = (project in file("form-builder"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-form-builder"
+  )
+
+val PathsToExcludeFromCoreJAR = List(
+  "org/orbeon/oxf/servlet/OrbeonXFormsFilter",
+  "org/orbeon/oxf/portlet/OrbeonProxyPortlet",
+  "org/orbeon/oxf/fr/embedding/servlet/ServletFilter",
+  "org/orbeon/oxf/fr/embedding/servlet/API"
+)
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
@@ -168,8 +189,11 @@ lazy val core = (project in file("src"))
   .settings(
     name                         := "orbeon-core",
 
-    buildInfoKeys                := Seq[BuildInfoKey]("orbeonVersion" → OrbeonVersion, "orbeonEdition" → OrbeonEdition),
     buildInfoPackage             := "org.orbeon.oxf.common",
+    buildInfoKeys                := Seq[BuildInfoKey](
+      "orbeonVersion" → orbeonVersionFromProperties.value,
+      "orbeonEdition" → orbeonEditionFromProperties.value
+    ),
 
     defaultConfiguration := Some(Compile),
 
@@ -183,11 +207,28 @@ lazy val core = (project in file("src"))
 
     unmanagedBase                := baseDirectory.value / ".." / "lib",
 
-    classDirectory    in Compile := baseDirectory.value / ".." / CompileClasspathForEnv,
-    classDirectory    in Test    := baseDirectory.value / ".." / TestClassesPath
+    // TODO: only src/main/resources/org/orbeon/oxf/xforms/script/coffee-script.js
+
+    // http://www.scala-sbt.org/0.13/docs/Mapping-Files.html
+    mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
   )
 
 lazy val root = (project in file("."))
-  .settings(commonSettings: _*)
+  .aggregate(common, dom4j, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient)
+  .settings(
+
+    scalaVersion                  := ScalaVersion,
+
+    // TEMP: override so that root project it doesn't search under src
+    scalaSource       in Compile := baseDirectory.value / "root" / "src" / "main" / "scala",
+    javaSource        in Compile := baseDirectory.value / "root" / "src" / "main" / "java",
+    resourceDirectory in Compile := baseDirectory.value / "root" / "src" / "main" / "resources",
+
+    scalaSource       in Test    := baseDirectory.value / "root" / "src" / "test" / "scala",
+    javaSource        in Test    := baseDirectory.value / "root" / "src" / "test" / "java",
+    resourceDirectory in Test    := baseDirectory.value / "root" / "src" / "test" / "resources",
+
+    publishArtifact := false
+  )
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

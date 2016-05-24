@@ -227,11 +227,6 @@
         <echo message="Building Orbeon Forms ${release.number}"/>
         <echo message="Using Ant ${ant.version}"/>
 
-        <!-- Provide custom version number to TeamCity -->
-        <!-- http://confluence.jetbrains.com/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingBuildNumber-->
-        <propertyregex property="teamcity.release.number" input="${release.number}" regexp="\." replace="_"/>
-        <echo message="##teamcity[buildNumber '${teamcity.release.number}']"/>
-
         <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>

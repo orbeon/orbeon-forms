@@ -25,7 +25,7 @@
     <property name="war.lib" value="${war.inf}/lib"/>
     <property name="rsync.dir" value="${build.dir}/rsync"/>
     <property name="src.dir" location="src"/>
-    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20131113.jar"/>
+    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20160524.jar"/>
     <property name="catalina.home" value=""/>
 
     <!-- Expose environment variables -->

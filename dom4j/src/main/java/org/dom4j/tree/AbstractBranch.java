@@ -246,29 +246,6 @@ public abstract class AbstractBranch extends AbstractNode implements Branch {
         return removeNode(pi);
     }
 
-    public Element elementByID(String elementID) {
-        for (int i = 0, size = nodeCount(); i < size; i++) {
-            Node node = node(i);
-
-            if (node instanceof Element) {
-                Element element = (Element) node;
-                String id = elementID(element);
-
-                if ((id != null) && id.equals(elementID)) {
-                    return element;
-                } else {
-                    element = element.elementByID(elementID);
-
-                    if (element != null) {
-                        return element;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
     public void appendContent(Branch branch) {
         for (int i = 0, size = branch.nodeCount(); i < size; i++) {
             Node node = branch.node(i);

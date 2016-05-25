@@ -61,10 +61,6 @@ public class DefaultDocument extends AbstractDocument {
         return rootElement;
     }
 
-    public EntityResolver getEntityResolver() {
-        return entityResolver;
-    }
-
     public void setEntityResolver(EntityResolver entityResolver) {
         this.entityResolver = entityResolver;
     }
@@ -76,51 +72,6 @@ public class DefaultDocument extends AbstractDocument {
         document.appendContent(this);
 
         return document;
-    }
-
-    public void setContent(List<Node> content) {
-        rootElement = null;
-        contentRemoved();
-
-        if (content instanceof ContentListFacade) {
-            content = ((ContentListFacade<Node>) content).getBackingList();
-        }
-
-        if (content == null) {
-            this.content = null;
-        } else {
-            int size = content.size();
-            List newContent = createContentList(size);
-
-            for (int i = 0; i < size; i++) {
-                Object object = content.get(i);
-
-                if (object instanceof Node) {
-                    Node node = (Node) object;
-                    Document doc = node.getDocument();
-
-                    if ((doc != null) && (doc != this)) {
-                        node = (Node) node.clone();
-                    }
-
-                    if (node instanceof Element) {
-                        if (rootElement == null) {
-                            rootElement = (Element) node;
-                        } else {
-                            throw new IllegalAddException(
-                                    "A document may only "
-                                            + "contain one root " + "element: "
-                                            + content);
-                        }
-                    }
-
-                    newContent.add(node);
-                    childAdded(node);
-                }
-            }
-
-            this.content = newContent;
-        }
     }
 
     public void clearContent() {

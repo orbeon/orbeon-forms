@@ -56,18 +56,6 @@ public interface Branch extends Node {
     int nodeCount();
 
     /**
-     * Returns the element of the given ID attribute value. If this tree is
-     * capable of understanding which attribute value should be used for the ID
-     * then it should be used, otherwise this method should return null.
-     *
-     * @param elementID
-     *            DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    Element elementByID(String elementID);
-
-    /**
      * <p>
      * Returns the content nodes of this branch as a backed {@link List}so that
      * the content of this branch may be modified directly using the

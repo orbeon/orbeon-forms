@@ -25,7 +25,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
-import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -62,9 +61,6 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 		final DocumentInfo instanceDocumentInfo = new DocumentWrapper(instanceDocument, null, XPath.GlobalConfiguration());
 
 		try {
-            final StringBuilderWriter barcodeConfigWriter = new StringBuilderWriter();
-			configDocument.write(barcodeConfigWriter);
-
 			final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();
 			final Configuration cfg = builder.build(new StringInputStream(Dom4jUtils.domToString(configDocument)));
 			final BarcodeGenerator gen = BarcodeUtil.getInstance().createBarcodeGenerator(cfg);

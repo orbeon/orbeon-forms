@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="xupdate" external.linked.project.path="$MODULE_DIR$/../../xupdate" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../build/orbeon-war/WEB-INF/classes" />
+    <output url="file://$MODULE_DIR$/../../build/classes" />
     <output-test url="file://$MODULE_DIR$/../../xupdate/target/scala-2.11/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../xupdate">
@@ -22,16 +22,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common" exported="" />
-    <orderEntry type="module-library" scope="TEST">
-      <library name="SBT: unmanaged-jars-test">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/test/apache-tomcat-6.0.36.zip!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -67,8 +57,6 @@
           <root url="jar://$MODULE_DIR$/../../lib/commons-lang3-3.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-pool-1.6.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-validator-1.4.0.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/dom4j-1_6_1-src.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/dom4j-1_6_1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/ehcache-core-2.6.3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/ejb-2_0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/exist-1_4_1_dev_orbeon_20110104.jar!/" />
@@ -145,7 +133,7 @@
           <root url="jar://$MODULE_DIR$/../../lib/proguard-5.2.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/resolver-xerces_2_6_2_orbeon.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/rhino-1.7R2.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/saxon-9-1-0-8_orbeon_20131113.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/saxon-9-1-0-8_orbeon_20160524.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/saxpath-dev_orbeon.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/sbinary_2.11-SNAPSHOT.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/scala-library-2.11.7.jar!/" />
@@ -173,6 +161,16 @@
           <root url="jar://$MODULE_DIR$/../../lib/xsu12.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/yui-compressor-ant-task-0.5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/yuicompressor-2.4.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="SBT: unmanaged-jars-test">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../lib/test/apache-tomcat-6.0.36.zip!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

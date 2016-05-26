@@ -41,21 +41,31 @@ trait FormRunnerPermissions {
    * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
    */
   //@XPathFunction
-  def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
-    if (permissionsElement eq null)
-      List("*")                                            // No permissions defined for this form, authorize any operation
-    else
-      (permissionsElement \ "permission")
-          .filter(p ⇒
-          (p \ * isEmpty) ||                              // Only consider permissions with no constraints (unnecessary line for clarity)
-          (p \ * forall (_.localname == "user-role")))    // … or with only `user-role` constraints
-          .filter(p ⇒
-          p \ "user-role" forall (r ⇒                     // If we have user-role constraints, they must all pass
-            ScalaUtils.split((r \@ "any-of").stringValue) // Constraint is satisfied if user has at least one of the roles
-            .map(_.replace("%20", " "))                   // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
-              .intersect(orbeonRoles.toSeq).nonEmpty))
-        .flatMap(permissionOperations)                    // For the permissions that passed, return the list operations
-        .distinct                                         // Remove duplicate operations
+  def authorizedOperationsBasedOnRoles(permissionsElOrNull: NodeInfo): List[String] = {
+
+    Option(permissionsElOrNull) match {
+      case None ⇒
+        // No permissions defined for this form, authorize any operation
+        List("*")
+      case Some(permissionsEl) ⇒
+        permissionsEl
+            .child("permission").toList
+            // Only consider permissions with no constraints, or where all constraints are for a role
+            .filter(_.child(*).forall(_.localname == "user-role"))
+            // User must match all the <user-role>
+            .filter(_.child("user-role").forall(
+              // User must have at least one of the roles in any-of="…"
+              _.attValue("any-of")
+                .pipe(ScalaUtils.split[List](_))
+                // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space
+                .map(_.replace("%20", " "))
+                .intersect(orbeonRoles.toSeq).nonEmpty)
+            )
+            // Extract the operations on each <permission>
+            .flatMap(permissionOperations)
+            // Remove duplicate operations
+            .distinct
+    }
   }
 
   //@XPathFunction
@@ -74,19 +84,19 @@ trait FormRunnerPermissions {
     permissionsElement : NodeInfo,
     dataUsername       : Option[String],
     dataGroupname      : Option[String]
-  ): Seq[String] = {
+  ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
     require(dataUsername  ne null)
     require(dataGroupname ne null)
-    require(dataUsername .map(_ != "").getOrElse(true))
-    require(dataGroupname.map(_ != "").getOrElse(true))
+    require(!dataUsername.contains(""))
+    require(!dataGroupname.contains(""))
 
     def ownerGroupMemberOperations(
       headerWithUsernameOrGroupname : String,
       maybeDataUsernameOrGroupname  : Option[String],
       condition                     : String
-    ): Seq[String] = {
+    ): List[String] = {
       val request = NetUtils.getExternalContext.getRequest
 
       val maybeCurrentUsernameOrGroupname =
@@ -95,9 +105,8 @@ trait FormRunnerPermissions {
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
           if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
-            val allPermissions                   = permissionsElement \ "permission"
+            val allPermissions                   = permissionsElement.child("permission").toList
             val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
-
             permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
         case _ ⇒ Nil
       }
@@ -110,7 +119,6 @@ trait FormRunnerPermissions {
       case _ ⇒
         val ownerOperations       = ownerGroupMemberOperations(Headers.OrbeonUsernameLower, dataUsername,  "owner")
         val groupMemberOperations = ownerGroupMemberOperations(Headers.OrbeonGroupLower   , dataGroupname, "group-member")
-
         (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }

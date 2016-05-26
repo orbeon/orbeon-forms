@@ -93,6 +93,7 @@
                                 <value>xml</value>
                                 <value>text</value>
                                 <value>binary</value>
+                                <value>json</value>
                             </choice>
                         </element>
                     </optional>

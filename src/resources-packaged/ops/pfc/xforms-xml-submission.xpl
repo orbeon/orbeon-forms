@@ -11,7 +11,8 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -32,20 +33,26 @@
                 <include>/request/parameters</include>
             </config>
         </p:input>
-        <!--<p:output name="data" id="request-info" debug="xxxxml-submission"/>-->
         <p:output name="data" id="request-info"/>
     </p:processor>
 
     <p:choose href="#request-info">
         <!-- Check for noscript mode form post OR script form post for replace="all" -->
         <!-- NOTE: In portlet mode, the method and content-type are not available (not sure why), so just assume checking for the content type is enough -->
-        <p:when test="(
-                        (
-                          lower-case(/*/method) = 'post' and (/*/content-type = 'application/x-www-form-urlencoded' or starts-with(/*/content-type, 'multipart/form-data'))
-                        ) or /*/container-type = 'portlet'
-                      ) and (
-                        /*/parameters/parameter[name = '$noscript']/value = 'true' or /*/parameters/parameter[name = '$server-events']
-                      )">
+        <p:when
+            test="
+                (
+                    (
+                        lower-case(/*/method) = 'post' and (
+                            /*/content-type = 'application/x-www-form-urlencoded' or
+                            starts-with(/*/content-type, 'multipart/form-data')
+                        )
+                    ) or
+                        /*/container-type = 'portlet'
+                ) and (
+                    /*/parameters/parameter[name = '$noscript']/value = 'true' or
+                    /*/parameters/parameter[name = '$server-events']
+                )">
             <!-- Process submission -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="/ops/xforms/xforms-server-submit.xpl"/>
@@ -59,14 +66,20 @@
                 <p:output name="data" ref="instance"/>
             </p:processor>
         </p:when>
-        <!-- Check for XML post -->
+        <!-- Check for XML body -->
         <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
         <!-- We check the content-type for application/xml and text/xml using a starts-with to handle the
              case where a charset specified as part of the content-type  -->
-        <p:when test="(lower-case(/*/method) = ('post', 'put') or /*/container-type = 'portlet')
-                        and (starts-with(/*/content-type, 'application/xml')
-                             or starts-with(/*/content-type, 'text/xml')
-                             or ends-with(/*/content-type, '+xml'))">
+        <p:when
+            test="
+                (
+                    lower-case(/*/method) = ('post', 'put') or
+                    /*/container-type = 'portlet'
+                ) and (
+                    starts-with(/*/content-type, 'application/xml') or
+                    starts-with(/*/content-type, 'text/xml') or
+                    ends-with(/*/content-type, '+xml')
+                )">
 
             <!-- Extract request body -->
             <p:processor name="oxf:request">
@@ -122,8 +135,59 @@
                 </p:otherwise>
             </p:choose>
         </p:when>
-        <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet')
-                        and /*/parameters/parameter[name = '$instance']">
+        <!-- Check for JSON body -->
+        <p:when
+            test="
+                (
+                    lower-case(/*/method) = ('post', 'put') or
+                    /*/container-type = 'portlet'
+                ) and (
+                    starts-with(/*/content-type, 'application/json') or
+                    starts-with(/*/content-type, 'text/json')
+                )">
+
+            <!-- Extract request body -->
+            <p:processor name="oxf:request">
+                <p:input name="config">
+                    <config stream-type="xs:anyURI">
+                        <include>/request/body</include>
+                    </config>
+                </p:input>
+                <p:output name="data" id="request-body"/>
+            </p:processor>
+
+            <p:choose href="#request-body">
+                <p:when test="/request/body != ''">
+
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" transform="oxf:xslt" href="#request-body">
+                            <config xsl:version="2.0">
+                                <url><xsl:value-of select="/request/body"/></url>
+                                <mode>json</mode>
+                            </config>
+                        </p:input>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+
+                </p:when>
+                <p:otherwise>
+                    <!-- Use a null instance -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data">
+                            <null xsi:nil="true"/>
+                        </p:input>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
+        </p:when>
+        <p:when
+            test="
+                (
+                    lower-case(/*/method) = 'get' or
+                    /*/container-type = 'portlet'
+                ) and
+                    /*/parameters/parameter[name = '$instance']">
             <!-- Check for XML GET with $instance parameter -->
 
             <!-- Decode parameter -->

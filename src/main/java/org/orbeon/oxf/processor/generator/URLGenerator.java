@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -43,6 +44,7 @@ import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -524,7 +526,9 @@ public class URLGenerator extends ProcessorImpl {
                                         mode = "html";
                                     else if (XMLUtils.isXMLMediatype(contentType))
                                         mode = "xml";
-                                    else if (XMLUtils.isTextOrJSONContentType(contentType))
+                                    else if (XMLUtils.isJSONContentType(contentType))
+                                        mode = "json";
+                                    else if (XMLUtils.isTextContentType(contentType))
                                         mode = "text";
                                     else
                                         mode = "binary";
@@ -543,6 +547,9 @@ public class URLGenerator extends ProcessorImpl {
                                 } else if (mode.equals("text")) {
                                     // Text mode
                                     handler.readText(output, contentType, validity);
+                                    configURIReferences.uriReferences = null;
+                                } else if (mode.equals("json")) {
+                                    handler.readJSON(output, contentType, validity);
                                     configURIReferences.uriReferences = null;
                                 } else {
                                     // Binary mode
@@ -755,6 +762,7 @@ public class URLGenerator extends ProcessorImpl {
         void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
         void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException;
         void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
+        void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException;
     }
 
     private static abstract class ResourceHandlerBase implements ResourceHandler {
@@ -794,6 +802,14 @@ public class URLGenerator extends ProcessorImpl {
 
             // Parse and output to SAXResult
             TransformerUtils.sourceToSAX(new DOMSource(tidy.parseDOM(is, null)), output);
+        }
+
+        public void readJSON(InputStream is, XMLReceiver output) throws IOException {
+
+            final Reader reader     = new InputStreamReader(is, "utf-8");
+            final String jsonString = NetUtils.readStreamAsString(reader);
+
+            Converter.jsonStringToXml(jsonString, output);
         }
     }
 
@@ -875,6 +891,11 @@ public class URLGenerator extends ProcessorImpl {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
+        }
+
+        public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
+            inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
+            readJSON(inputStream, output);
         }
 
         private String getKey() {
@@ -989,6 +1010,11 @@ public class URLGenerator extends ProcessorImpl {
             ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
+        public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
+            openConnection();
+            readJSON(inputStream, output);
+        }
+
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
@@ -1101,6 +1127,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             ProcessorUtils.readBinary(System.in, output, contentType, lastModified, getConnectionStatusCode());
+        }
+
+        public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
+            readJSON(System.in, output);
         }
 
         private String getKey() {

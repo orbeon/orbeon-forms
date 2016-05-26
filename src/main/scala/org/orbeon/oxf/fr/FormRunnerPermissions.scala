@@ -59,8 +59,9 @@ trait FormRunnerPermissions {
                 .pipe(ScalaUtils.split[List](_))
                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space
                 .map(_.replace("%20", " "))
-                .intersect(orbeonRoles.toSeq).nonEmpty)
-            )
+                .intersect(orbeonRoles.toSeq)
+                .nonEmpty
+            ))
             // Extract the operations on each <permission>
             .flatMap(permissionOperations)
             // Remove duplicate operations

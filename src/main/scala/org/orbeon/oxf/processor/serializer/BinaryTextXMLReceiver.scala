@@ -108,11 +108,11 @@ class BinaryTextXMLReceiver(
 
       val isBinaryInput = QName.get(typeLocalName, Namespace.get(typePrefix, typeNamespaceURI)) match {
         case XS_BASE64BINARY_QNAME ⇒ true
-        case XS_STRING_QNAME ⇒ false
-        case _ ⇒ throw new OXFException("Type xs:string or xs:base64Binary must be specified")
+        case XS_STRING_QNAME       ⇒ false
+        case _                     ⇒ throw new OXFException("Type xs:string or xs:base64Binary must be specified")
       }
 
-      // Set last-modified, Content-Disposition and status code when available
+      // Set Last-Modified, Content-Disposition and status code when available
       response foreach { response ⇒
 
         // This will override caching settings which may have taken place before

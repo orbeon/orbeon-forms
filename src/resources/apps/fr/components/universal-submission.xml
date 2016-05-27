@@ -54,7 +54,7 @@
         replace="{instance('fr-send-submission-params')/@replace}"
         instance="fr-send-submission-response"/>
 
-    <!-- Instance to store the result of the create/update submission -->
+    <!-- Instance to store the result of fr-send-submission if any -->
     <xf:instance id="fr-send-submission-response">
         <response xmlns=""/>
     </xf:instance>

@@ -437,6 +437,10 @@
         <class name="org.orbeon.oxf.processor.converter.HTMLRewrite"/>
     </processor>
 
+    <processor name="oxf:xml-to-json">
+        <class name="org.orbeon.oxf.processor.converter.JsonToTextConverter"/>
+    </processor>
+
     <!-- True serializers -->
     <processor name="oxf:http-serializer">
         <class name="org.orbeon.oxf.processor.serializer.HttpSerializer"/>

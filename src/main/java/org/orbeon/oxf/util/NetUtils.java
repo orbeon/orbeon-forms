@@ -788,7 +788,7 @@ public class NetUtils {
     /**
      * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
      *
-     * NOTE: See more recent W3C note: http://www.w3.org/TR/2008/NOTE-leiri-20081103/
+     * W3C note: https://www.w3.org/TR/leiri/
      *
      * @param uriString    URI to encode
      * @param processSpace whether to process the space character or leave it unchanged

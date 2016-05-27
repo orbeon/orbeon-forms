@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action
 import java.util.{List ⇒ JList}
 
 import org.dom4j.QName
-import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -347,7 +347,7 @@ object XFormsAPI {
 
   // xf:load
   def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit =
-    XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, url, target.orNull, null, false, false)
+    XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, NetUtils.encodeHRRI(url, true), target.orNull, null, false, false)
 
   // xf:setfocus
   def setfocus(controlId: String, inputOnly: Boolean = false): Unit =

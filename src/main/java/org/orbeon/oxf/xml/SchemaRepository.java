@@ -39,7 +39,6 @@ import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
-import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.properties.Properties;
 
 import java.util.HashMap;
@@ -118,10 +117,6 @@ public class SchemaRepository {
         // SQL processor schemas
         SCHEMAS.put(SQLProcessor.SQL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-config.rng");
         SCHEMAS.put(SQLProcessor.SQL_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-datasource.rng");
-
-        // XML:DB schemas
-        SCHEMAS.put(XMLDBProcessor.XMLDB_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-datasource.rng");
-        SCHEMAS.put(XMLDBProcessor.XMLDB_QUERY_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-query.rng");
 
         // XQuery Generator schema
         SCHEMAS.put(XQueryProcessor.XQUERY_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "XQuery/xquery-processor.rng");

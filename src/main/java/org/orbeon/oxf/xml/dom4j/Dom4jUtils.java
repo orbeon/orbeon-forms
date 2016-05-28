@@ -251,29 +251,6 @@ public class Dom4jUtils {
         return ldSid == null ? DOMGenerator.DefaultContext : ldSid;
     }
 
-    /**
-     *  Convert the result of XPathUtils.selectObjectValue() to a string
-     */
-    public static String objectToString(Object o) {
-        StringBuilder builder = new StringBuilder();
-        if (o instanceof List) {
-            for (Iterator i = ((List) o).iterator(); i.hasNext();) {
-                // this will be a node
-                builder.append(objectToString(i.next()));
-            }
-        } else if (o instanceof Element) {
-            builder.append(((Element) o).asXML());
-        } else if (o instanceof Node) {
-            builder.append(((Node) o).asXML());
-        } else if (o instanceof String)
-            builder.append((String) o);
-        else if (o instanceof Number)
-            builder.append(o);
-        else
-            throw new OXFException("Should never happen");
-        return builder.toString();
-    }
-
     private static boolean isTextOrCDATA(Node node) {
         return (node instanceof Text) || (node instanceof CDATA);
     }

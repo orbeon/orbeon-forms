@@ -641,23 +641,6 @@
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer"/>
     </processor>
 
-    <!-- XML:DB processors -->
-    <processor name="oxf:xmldb-query">
-        <class name="org.orbeon.oxf.processor.xmldb.XMLDBQueryProcessor"/>
-    </processor>
-
-    <processor name="oxf:xmldb-insert">
-        <class name="org.orbeon.oxf.processor.xmldb.XMLDBInsertProcessor"/>
-    </processor>
-
-    <processor name="oxf:xmldb-update">
-        <class name="org.orbeon.oxf.processor.xmldb.XMLDBUpdateProcessor"/>
-    </processor>
-
-    <processor name="oxf:xmldb-delete">
-        <class name="org.orbeon.oxf.processor.xmldb.XMLDBDeleteProcessor"/>
-    </processor>
-
     <!-- Zip processors -->
     <processor name="oxf:unzip">
         <class name="org.orbeon.oxf.processor.zip.UnzipProcessor"/>

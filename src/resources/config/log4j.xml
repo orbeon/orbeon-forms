@@ -94,10 +94,6 @@
         <priority value="debug"/>
     </category>
 
-    <category name="org.orbeon.oxf.processor.xmldb.XMLDBProcessor">
-        <priority value="debug"/>
-    </category>
-
     <category name="org.orbeon.oxf.processor.sql.SQLProcessor">
         <priority value="debug"/>
     </category>

@@ -4,6 +4,7 @@ tmp/
 target/
 build-local.properties
 .idea/shelf/
+src/resources-packaged-target/
 src/resources-local/
 tmp
 *~

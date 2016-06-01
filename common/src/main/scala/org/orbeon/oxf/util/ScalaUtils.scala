@@ -113,6 +113,7 @@ object ScalaUtils extends PathOps {
   // Extensions on Boolean
   implicit class BooleanWrapper(val b: Boolean) extends AnyVal {
     def option[A](a: ⇒ A)   = if (b) Option(a)   else None
+    def string(s: String)   = if (b) s           else ""
     def list[A](a: ⇒ A)     = if (b) List(a)     else Nil
     def set[A](a: ⇒ A)      = if (b) Set(a)      else Set.empty[A]
     def iterator[A](a: ⇒ A) = if (b) Iterator(a) else Iterator.empty

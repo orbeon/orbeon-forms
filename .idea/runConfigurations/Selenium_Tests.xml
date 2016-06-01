@@ -8,7 +8,7 @@
     </extension>
     <module name="core" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" value="" />
+    <option name="ALTERNATIVE_JRE_PATH" />
     <option name="PACKAGE_NAME" value="org.orbeon.oxf.client" />
     <option name="MAIN_CLASS_NAME" value="org.orbeon.oxf.client.CombinedClientTest" />
     <option name="METHOD_NAME" value="" />
@@ -33,6 +33,8 @@
     <ConfigurationWrapper RunnerId="Cover" />
     <ConfigurationWrapper RunnerId="Debug" />
     <ConfigurationWrapper RunnerId="Run" />
-    <method />
+    <method>
+      <option name="Make" enabled="false" />
+    </method>
   </configuration>
 </component>

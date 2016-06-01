@@ -93,11 +93,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     proxyRequest(request, serviceURI, headers, response)
   }
 
-  private def proxyRequest(request: Request, serviceURI: String, headers: Map[String, String], response: Response): Unit = {
-    
-    val cxr = proxyEstablishConnection(request, serviceURI, headers)
-
-    useAndClose(cxr) { cxr ⇒
+  private def proxyRequest(
+    request    : Request,
+    serviceURI : String,
+    headers    : Map[String, String],
+    response   : Response
+  ): Unit =
+    useAndClose(proxyEstablishConnection(request, serviceURI, headers)) { cxr ⇒
       // Proxy status code
       response.setStatus(cxr.statusCode)
       // Proxy incoming headers
@@ -106,9 +108,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       copyStream(cxr.content.inputStream, response.getOutputStream)
     }
 
-  }
-
-  private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]): ConnectionResult = {
+  private def proxyEstablishConnection(
+    request : Request,
+    uri     : String,
+    headers : Map[String, String]
+  ): ConnectionResult = {
     // Create the absolute outgoing URL
     val outgoingURL =
       new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))

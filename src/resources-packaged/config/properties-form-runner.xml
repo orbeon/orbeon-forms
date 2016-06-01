@@ -91,6 +91,7 @@
         home review pdf delete duplicate new
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.lhha-order.*.*"                               value="help label control alert hint"/>
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.*.*"                             value="true"/>
     <!-- TOC disabled by default -->

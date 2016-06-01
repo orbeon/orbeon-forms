@@ -266,7 +266,16 @@
                 if (property('xxf:noscript')) then
                     'label control alert hint help'
                 else
-                    'help label control alert hint'
+                    xxf:property(
+                        string-join(
+                            (
+                                'oxf.fr.detail.lhha-order',
+                                xxf:instance('fr-parameters-instance')/app/string(),
+                                xxf:instance('fr-parameters-instance')/form/string()
+                            ),
+                            '.'
+                        )
+                    )
             }}"
             xxf:host-language="{{
                 for $mode in xxf:instance('fr-parameters-instance')/mode/string()

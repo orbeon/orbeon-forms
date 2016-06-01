@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.io.{InputStream, OutputStream, Reader, Writer}
+import java.sql.Timestamp
 
 import org.orbeon.errorified.Exceptions
 
@@ -408,5 +409,9 @@ object ScalaUtils extends PathOps {
       val a = i.to[Array]
       new String(a, 0, a.length)
     }
+  }
+
+  implicit def ordered: Ordering[Timestamp] = new Ordering[Timestamp] {
+      def compare(x: Timestamp, y: Timestamp): Int = x compareTo y
   }
 }

@@ -35,7 +35,7 @@ class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent
 
   override def remove(index: Int): T = {
     val node = branchContent.remove(index)
-    if (node != null) {
+    if (node ne null) {
       branch.childRemoved(node)
     }
     node

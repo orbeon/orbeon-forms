@@ -34,16 +34,16 @@ class NamespaceCache {
     val uriCache = getURICache(uri)
     var ref = uriCache.get(prefix)
     var answer: Namespace = null
-    if (ref != null) {
+    if (ref ne null) {
       answer = ref.get
     }
-    if (answer == null) {
+    if (answer eq null) {
       uriCache.synchronized {
         ref = uriCache.get(prefix)
-        if (ref != null) {
+        if (ref ne null) {
           answer = ref.get
         }
-        if (answer == null) {
+        if (answer eq null) {
           answer = createNamespace(prefix, uri)
           uriCache.put(prefix, new WeakReference[Namespace](answer))
         }
@@ -58,16 +58,16 @@ class NamespaceCache {
   def get(uri: String): Namespace = {
     var ref = noPrefixCache.get(uri)
     var answer: Namespace = null
-    if (ref != null) {
+    if (ref ne null) {
       answer = ref.get
     }
-    if (answer == null) {
+    if (answer eq null) {
       noPrefixCache.synchronized {
         ref = noPrefixCache.get(uri)
-        if (ref != null) {
+        if (ref ne null) {
           answer = ref.get
         }
-        if (answer == null) {
+        if (answer eq null) {
           answer = createNamespace("", uri)
           noPrefixCache.put(uri, new WeakReference[Namespace](answer))
         }
@@ -82,10 +82,10 @@ class NamespaceCache {
    */
   private def getURICache(uri: String): ju.Map[String, WeakReference[Namespace]] = {
     var answer = cache.get(uri)
-    if (answer == null) {
+    if (answer eq null) {
       cache.synchronized {
         answer = cache.get(uri)
-        if (answer == null) {
+        if (answer eq null) {
           answer = new ConcurrentHashMap[String, WeakReference[Namespace]]()
           cache.put(uri, answer)
         }

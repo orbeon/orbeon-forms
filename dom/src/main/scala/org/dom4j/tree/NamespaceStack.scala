@@ -53,7 +53,7 @@ class NamespaceStack {
     namespaceCacheList.add(null)
     currentNamespaceCache = null
     val prefix = namespace.getPrefix
-    if ((prefix == null) || (prefix.length == 0)) {
+    if ((prefix eq null) || (prefix.length == 0)) {
       _defaultNamespace = namespace
     }
   }
@@ -77,7 +77,7 @@ class NamespaceStack {
    */
   def getNamespaceForPrefix(_prefix: String): Namespace = {
     var prefix = _prefix
-    if (prefix == null) {
+    if (prefix eq null) {
       prefix = ""
     }
     var i = namespaceStack.size - 1
@@ -96,7 +96,7 @@ class NamespaceStack {
    */
   def getURI(prefix: String): String = {
     val namespace = getNamespaceForPrefix(prefix)
-    if (namespace != null) namespace.getURI else null
+    if (namespace ne null) namespace.getURI else null
   }
 
   /**
@@ -105,8 +105,8 @@ class NamespaceStack {
   def contains(namespace: Namespace): Boolean = {
     val prefix = namespace.getPrefix
     var current: Namespace = null
-    current = if ((prefix == null) || (prefix.length == 0)) getDefaultNamespace else getNamespaceForPrefix(prefix)
-    if (current == null) {
+    current = if ((prefix eq null) || (prefix.length == 0)) getDefaultNamespace else getNamespaceForPrefix(prefix)
+    if (current eq null) {
       return false
     }
     if (current == namespace) {
@@ -121,12 +121,12 @@ class NamespaceStack {
     var localName = _localName
     var qualifiedName = _qualifiedName
 
-    if (localName == null) {
+    if (localName eq null) {
       localName = qualifiedName
-    } else if (qualifiedName == null) {
+    } else if (qualifiedName eq null) {
       qualifiedName = localName
     }
-    if (namespaceURI == null) {
+    if (namespaceURI eq null) {
       namespaceURI = ""
     }
     var prefix = ""
@@ -149,18 +149,18 @@ class NamespaceStack {
     var localName = _localName
     var qualifiedName = _qualifiedName
 
-    if (qualifiedName == null) {
+    if (qualifiedName eq null) {
       qualifiedName = localName
     }
     val map = getNamespaceCache
     var answer = map.get(qualifiedName)
-    if (answer != null) {
+    if (answer ne null) {
       return answer
     }
-    if (localName == null) {
+    if (localName eq null) {
       localName = qualifiedName
     }
-    if (namespaceURI == null) {
+    if (namespaceURI eq null) {
       namespaceURI = ""
     }
     var namespace: Namespace = null
@@ -187,7 +187,7 @@ class NamespaceStack {
 
     var uri = _uri
 
-    if (uri == null) {
+    if (uri eq null) {
       uri = ""
     }
     val namespace = createNamespace(prefix, uri)
@@ -229,7 +229,7 @@ class NamespaceStack {
     super.toString + " Stack: " + namespaceStack.toString
 
   private def pushQName(localName: String, qualifiedName: String, namespace: Namespace, prefix: String): QName = {
-    if ((prefix == null) || (prefix.length == 0)) {
+    if ((prefix eq null) || (prefix.length == 0)) {
       _defaultNamespace = null
     }
     createQName(localName, qualifiedName, namespace)
@@ -251,9 +251,9 @@ class NamespaceStack {
     var i = namespaceStack.size - 1
     while (i >= 0) {
       val namespace = namespaceStack.get(i)
-      if (namespace != null) {
+      if (namespace ne null) {
         val prefix = namespace.getPrefix
-        if ((prefix == null) || (namespace.getPrefix.length == 0)) {
+        if ((prefix eq null) || (namespace.getPrefix.length == 0)) {
           return namespace
         }
       }
@@ -271,13 +271,13 @@ class NamespaceStack {
   }
 
   private def getNamespaceCache: ju.Map[String, QName] = {
-    if (currentNamespaceCache == null) {
+    if (currentNamespaceCache eq null) {
       val index = namespaceStack.size - 1
       if (index < 0) {
         currentNamespaceCache = rootNamespaceCache
       } else {
         currentNamespaceCache = namespaceCacheList.get(index)
-        if (currentNamespaceCache == null) {
+        if (currentNamespaceCache eq null) {
           currentNamespaceCache = new ju.HashMap[String, QName]()
           namespaceCacheList.set(index, currentNamespaceCache)
         }

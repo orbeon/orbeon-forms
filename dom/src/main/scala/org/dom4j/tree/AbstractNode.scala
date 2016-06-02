@@ -39,7 +39,7 @@ abstract class AbstractNode extends Node with Cloneable with Serializable {
 
   def getDocument: Document = {
     val element = getParent
-    if (element != null) element.getDocument else null
+    if (element ne null) element.getDocument else null
   }
 
   def setDocument(document: Document) = ()
@@ -58,11 +58,11 @@ abstract class AbstractNode extends Node with Cloneable with Serializable {
 
   def detach(): Node = {
     val parent = getParent
-    if (parent != null) {
+    if (parent ne null) {
       parent.remove(this)
     } else {
       val document = getDocument
-      if (document != null) {
+      if (document ne null) {
         document.remove(this)
       }
     }

@@ -205,7 +205,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       super.getProperty(name)
 
   private def setLexicalHandler(handler: LexicalHandler): Unit = {
-    if (handler == null) {
+    if (handler eq null) {
       throw new NullPointerException("Null lexical handler")
     } else {
       this.lexicalHandler = handler
@@ -237,7 +237,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   override def startPrefixMapping(prefix: String, uri: String): Unit = {
-    if (namespacesMap == null) {
+    if (namespacesMap eq null) {
       namespacesMap = new ju.HashMap[String, String]()
     }
     namespacesMap.put(prefix, uri)
@@ -288,7 +288,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
-    if ((ch == null) || (ch.length == 0) || (length <= 0)) {
+    if ((ch eq null) || (ch.length == 0) || (length <= 0)) {
       return
     }
     try {
@@ -378,7 +378,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
     } catch {
       case e: IOException ⇒ handleException(e)
     }
-    if (lexicalHandler != null) {
+    if (lexicalHandler ne null) {
       lexicalHandler.endCDATA()
     }
   }
@@ -406,7 +406,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
         case e: IOException ⇒ handleException(e)
       }
     }
-    if (lexicalHandler != null) {
+    if (lexicalHandler ne null) {
       lexicalHandler.comment(ch, start, length)
     }
   }
@@ -472,7 +472,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   private def isElementSpacePreserved(element: Element): Boolean = {
     val attr = element.attribute("space")
     var preserveFound = preserve
-    if (attr != null) {
+    if (attr ne null) {
       preserveFound = if ("xml" == attr.getNamespacePrefix && "preserve" == attr.getText) true else false
     }
     preserveFound
@@ -522,8 +522,8 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
             writeNode(node)
         }
       }
-      if (lastTextNode != null) {
-        if (buff != null) {
+      if (lastTextNode ne null) {
+        if (buff ne null) {
           writeString(buff.toString)
           buff = null
         } else {
@@ -549,7 +549,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
 
   private def writeCDATA(text: String): Unit = {
     writer.write("<![CDATA[")
-    if (text != null) {
+    if (text ne null) {
       writer.write(text)
     }
     writer.write("]]>")
@@ -557,13 +557,13 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   private def writeNamespace(namespace: Namespace): Unit = {
-    if (namespace != null) {
+    if (namespace ne null) {
       writeNamespace(namespace.getPrefix, namespace.getURI)
     }
   }
 
   private def writeNamespaces(): Unit = {
-    if (namespacesMap != null) {
+    if (namespacesMap ne null) {
       val iter = namespacesMap.entrySet().iterator()
       while (iter.hasNext) {
         val entry = iter.next()
@@ -576,7 +576,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   private def writeNamespace(prefix: String, uri: String): Unit = {
-    if ((prefix != null) && (prefix.length > 0)) {
+    if ((prefix ne null) && (prefix.length > 0)) {
       writer.write(" xmlns:")
       writer.write(prefix)
       writer.write("=\"")
@@ -599,7 +599,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
 
   private def writeString(_text: String): Unit = {
     var text = _text
-    if ((text != null) && (text.length > 0)) {
+    if ((text ne null) && (text.length > 0)) {
       if (escapeText) {
         text = escapeElementEntities(text)
       }
@@ -634,7 +634,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
    */
   private def writeNodeText(node: Node): Unit = {
     var text = node.getText
-    if ((text != null) && (text.length > 0)) {
+    if ((text ne null) && (text.length > 0)) {
       if (escapeText) {
         text = escapeElementEntities(text)
       }
@@ -682,13 +682,13 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
     var hasPublic = false
     writer.write("<!DOCTYPE ")
     writer.write(name)
-    if ((publicID != null) && (publicID != "")) {
+    if ((publicID ne null) && (publicID != "")) {
       writer.write(" PUBLIC \"")
       writer.write(publicID)
       writer.write("\"")
       hasPublic = true
     }
-    if ((systemID != null) && (systemID != "")) {
+    if ((systemID ne null) && (systemID != "")) {
       if (!hasPublic) {
         writer.write(" SYSTEM")
       }
@@ -729,7 +729,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
     for (i ← 0 until element.attributeCount) {
       val attribute = element.attribute(i)
       val ns = attribute.getNamespace
-      if ((ns != null) && (ns != Namespace.EmptyNamespace) && (ns != Namespace.XMLNamespace)) {
+      if ((ns ne null) && (ns != Namespace.EmptyNamespace) && (ns != Namespace.XMLNamespace)) {
         val prefix = ns.getPrefix
         val uri = namespaceStack.getURI(prefix)
         if (ns.getURI != uri) {
@@ -740,13 +740,13 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       val attName = attribute.getName
       if (attName.startsWith("xmlns:")) {
         val prefix = attName.substring(6)
-        if (namespaceStack.getNamespaceForPrefix(prefix) == null) {
+        if (namespaceStack.getNamespaceForPrefix(prefix) eq null) {
           val uri = attribute.getValue
           namespaceStack.push(prefix, uri)
           writeNamespace(prefix, uri)
         }
       } else if (attName == "xmlns") {
-        if (namespaceStack.getDefaultNamespace == null) {
+        if (namespaceStack.getDefaultNamespace eq null) {
           val uri = attribute.getValue
           namespaceStack.push(null, uri)
           writeNamespace(null, uri)
@@ -790,7 +790,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
 
   private def indent(): Unit = {
     val indent = format.getIndent
-    if ((indent != null) && (indent.length > 0)) {
+    if ((indent ne null) && (indent.length > 0)) {
       for (i ← 0 until indentLevel) {
         writer.write(indent)
       }
@@ -856,8 +856,8 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
             entity = "&#" + c.toInt + ";"
         }
       }
-      if (entity != null) {
-        if (block == null) {
+      if (entity ne null) {
+        if (block eq null) {
           block = text.toCharArray
         }
         buffer.append(block, last, i - last)
@@ -870,7 +870,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       return text
     }
     if (last < size) {
-      if (block == null) {
+      if (block eq null) {
         block = text.toCharArray
       }
       buffer.append(block, last, i - last)
@@ -914,8 +914,8 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
           entity = "&#" + c.toInt + ";"
         }
       }
-      if (entity != null) {
-        if (block == null) {
+      if (entity ne null) {
+        if (block eq null) {
           block = text.toCharArray
         }
         buffer.append(block, last, i - last)
@@ -928,7 +928,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       return text
     }
     if (last < size) {
-      if (block == null) {
+      if (block eq null) {
         block = text.toCharArray
       }
       buffer.append(block, last, i - last)
@@ -939,9 +939,9 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   private def isNamespaceDeclaration(ns: Namespace): Boolean = {
-    if ((ns != null) && (ns != Namespace.XMLNamespace)) {
+    if ((ns ne null) && (ns != Namespace.XMLNamespace)) {
       val uri = ns.getURI
-      if (uri != null) {
+      if (uri ne null) {
         if (!namespaceStack.contains(ns)) {
           return true
         }

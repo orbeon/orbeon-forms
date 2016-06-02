@@ -63,7 +63,7 @@ class ConcreteDocument extends AbstractBranch with Document {
     }
 
   protected def addNode(node: Node): Unit = {
-    if (node != null) {
+    if (node ne null) {
       val document = node.getDocument
       if ((document ne null) && (document ne this)) {
         throw new IllegalAddException(
@@ -78,7 +78,7 @@ class ConcreteDocument extends AbstractBranch with Document {
   }
 
   protected def addNode(index: Int, node: Node): Unit = {
-    if (node != null) {
+    if (node ne null) {
       val document = node.getDocument
       if ((document ne null) && (document ne this)) {
         throw new IllegalAddException(
@@ -112,7 +112,7 @@ class ConcreteDocument extends AbstractBranch with Document {
   def accept(visitor: Visitor): Unit = {
     visitor.visit(this)
     val ct = content
-    if (ct != null) {
+    if (ct ne null) {
       val iter = ct.iterator()
       while (iter.hasNext) {
         val node = iter.next()
@@ -127,7 +127,7 @@ class ConcreteDocument extends AbstractBranch with Document {
 
   def normalize(): Unit = {
     val element = getRootElement
-    if (element != null) {
+    if (element ne null) {
       element.normalize()
     }
   }
@@ -147,7 +147,7 @@ class ConcreteDocument extends AbstractBranch with Document {
   def setRootElement(rootElement: Element): Unit = {
     // TODO ORBEON review: what if we have text and comment nodes at the top?
     clearContent()
-    if (rootElement != null) {
+    if (rootElement ne null) {
       add(rootElement)
       rootElementAdded(rootElement)
     }
@@ -184,7 +184,7 @@ class ConcreteDocument extends AbstractBranch with Document {
 
   protected def checkAddElementAllowed(element: Element): Unit = {
     val root = getRootElement
-    if (root != null) {
+    if (root ne null) {
       throw new IllegalAddException(
         this,
         element,

@@ -38,7 +38,7 @@ private object ConcreteElement {
   * with the safe functionality as UserDataElement.
   *
   * Btw ConcreteElement also tries to be smart wrt to cloning and parent specifying.  That
-  * is, if you clone the clone will have parent == null but will have all of the requisite
+  * is, if you clone the clone will have parent eq null but will have all of the requisite
   * namespace declarations and if you setParent( notNull ) then any redundant namespace declarations
   * are removed.
   */
@@ -77,7 +77,7 @@ class ConcreteElement(var qname: QName)
 
   override def setParent(parent: Element): Unit = {
 
-    if (_parentBranch.isInstanceOf[Element] || (parent != null))
+    if (_parentBranch.isInstanceOf[Element] || (parent ne null))
       _parentBranch = parent
 
     if (parent ne null) {
@@ -116,13 +116,13 @@ class ConcreteElement(var qname: QName)
     }
 
   override def setDocument(document: Document): Unit =
-    if (_parentBranch.isInstanceOf[Document] || (document != null))
+    if (_parentBranch.isInstanceOf[Document] || (document ne null))
       _parentBranch = document
 
 
   def isRootElement: Boolean = {
     val document = getDocument
-    if (document != null) {
+    if (document ne null) {
       val root = document.getRootElement
       if (root == this) {
         return true
@@ -151,7 +151,7 @@ class ConcreteElement(var qname: QName)
   override def toString: String = {
     val uri = getNamespaceURI
     val result =
-      if ((uri != null) && (uri.length > 0)) {
+      if ((uri ne null) && (uri.length > 0)) {
         super.toString + " [Element: <" + getQualifiedName + " uri: " + uri + " attributes: " + attributeList + "/>]"
       } else {
         super.toString + " [Element: <" + getQualifiedName + " attributes: " + attributeList + "/>]"
@@ -173,7 +173,7 @@ class ConcreteElement(var qname: QName)
         return null
       }
       val node = list.get(index)
-      if (node != null) {
+      if (node ne null) {
         return node
       }
     }
@@ -335,7 +335,7 @@ class ConcreteElement(var qname: QName)
 
   def attributeValue(name: String): String = {
     val attrib = attribute(name)
-    if (attrib == null) {
+    if (attrib eq null) {
       null
     } else {
       attrib.getValue
@@ -344,7 +344,7 @@ class ConcreteElement(var qname: QName)
 
   def attributeValue(qName: QName): String = {
     val attrib = attribute(qName)
-    if (attrib == null) {
+    if (attrib eq null) {
       null
     } else {
       attrib.getValue
@@ -353,22 +353,22 @@ class ConcreteElement(var qname: QName)
 
   def attributeValue(name: String, defaultValue: String): String = {
     val answer = attributeValue(name)
-    if (answer != null) answer else defaultValue
+    if (answer ne null) answer else defaultValue
   }
 
   def attributeValue(qName: QName, defaultValue: String): String = {
     val answer = attributeValue(qName)
-    if (answer != null) answer else defaultValue
+    if (answer ne null) answer else defaultValue
   }
 
   def add(att: Attribute): Unit = {
-    if (att.getParent != null) {
+    if (att.getParent ne null) {
       val message = "The Attribute already has an existing parent \"" + att.getParent.getQualifiedName + "\""
       throw new IllegalAddException(this, att, message)
     }
-    if (att.getValue == null) {
+    if (att.getValue eq null) {
       val oldAttribute = attribute(att.getQName)
-      if (oldAttribute != null) {
+      if (oldAttribute ne null) {
         remove(oldAttribute)
       }
     } else {
@@ -384,7 +384,7 @@ class ConcreteElement(var qname: QName)
       childRemoved(att)
     } else {
       val copy = attribute(att.getQName)
-      if (copy != null) {
+      if (copy ne null) {
         list.remove(copy)
         answer = true
       }
@@ -409,13 +409,13 @@ class ConcreteElement(var qname: QName)
 
   def addAttribute(name: String, value: String): Element = {
     val att = attribute(name)
-    if (value != null) {
-      if (att == null) {
+    if (value ne null) {
+      if (att eq null) {
         add(DocumentFactory.createAttribute(this, name, value))
       } else {
         att.setValue(value)
       }
-    } else if (att != null) {
+    } else if (att ne null) {
       remove(att)
     }
     this
@@ -423,13 +423,13 @@ class ConcreteElement(var qname: QName)
 
   def addAttribute(qName: QName, value: String): Element = {
     val att = attribute(qName)
-    if (value != null) {
-      if (att == null) {
+    if (value ne null) {
+      if (att eq null) {
         add(DocumentFactory.createAttribute(this, qName, value))
       } else {
         att.setValue(value)
       }
-    } else if (att != null) {
+    } else if (att ne null) {
       remove(att)
     }
     this
@@ -456,7 +456,7 @@ class ConcreteElement(var qname: QName)
       prefix = name.substring(0, index)
       localName = name.substring(index + 1)
       namespace = getNamespaceForPrefix(prefix)
-      if (namespace == null) {
+      if (namespace eq null) {
         throw new IllegalAddException("No such namespace prefix: " + prefix + " is in scope on: " +
           this +
           " so cannot add element: " +
@@ -466,7 +466,7 @@ class ConcreteElement(var qname: QName)
       namespace = getNamespaceForPrefix("")
     }
     var node: Element = null
-    if (namespace != null) {
+    if (namespace ne null) {
       val qname = DocumentFactory.createQName(localName, namespace)
       node = DocumentFactory.createElement(qname)
     } else {
@@ -530,7 +530,7 @@ class ConcreteElement(var qname: QName)
 
   override def setText(text: String): Unit = {
     val allContent = internalContent
-    if (allContent != null) {
+    if (allContent ne null) {
       val it = allContent.iterator()
       while (it.hasNext) {
         it.next().getNodeType match {
@@ -586,12 +586,12 @@ class ConcreteElement(var qname: QName)
       val node = list.get(i)
       node match {
         case text: Text ⇒
-          if (previousText != null) {
+          if (previousText ne null) {
             previousText.appendText(text.getText)
             remove(text)
           } else {
             val value = text.getText
-            if ((value == null) || (value.length <= 0)) {
+            if ((value eq null) || (value.length <= 0)) {
               remove(text)
             } else {
               previousText = text
@@ -634,7 +634,7 @@ class ConcreteElement(var qname: QName)
     }
   }
 
-  // The clone will have parent == null but will have any necessary namespace declarations this element's ancestors.
+  // The clone will have parent eq null but will have any necessary namespace declarations this element's ancestors.
   override def clone(): AnyRef = {
 
     val clone = cloneInternal
@@ -655,9 +655,9 @@ class ConcreteElement(var qname: QName)
         private def compare(s1: String, s2: String): Int = {
           if (s1 == s2) {
             return 0
-          } else if (s1 == null) {
+          } else if (s1 eq null) {
             return -1
-          } else if (s2 == null) {
+          } else if (s2 eq null) {
             return 1
           }
           s1.compareTo(s2)
@@ -709,7 +709,7 @@ class ConcreteElement(var qname: QName)
       localName = qualifiedName.substring(index + 1)
     }
     val namespace = getNamespaceForPrefix(prefix)
-    if (namespace != null) {
+    if (namespace ne null) {
       DocumentFactory.createQName(localName, namespace)
     } else {
       DocumentFactory.createQName(localName)
@@ -738,20 +738,20 @@ class ConcreteElement(var qname: QName)
       }
     }
     val parent = getParent
-    if (parent != null) {
+    if (parent ne null) {
       val answer = parent.getNamespaceForPrefix(prefix)
-      if (answer != null) {
+      if (answer ne null) {
         return answer
       }
     }
-    if ((prefix == null) || (prefix.length <= 0)) {
+    if ((prefix eq null) || (prefix.length <= 0)) {
       return Namespace.EmptyNamespace
     }
     null
   }
 
   def getNamespaceForURI(uri: String): Namespace = {
-    if ((uri == null) || (uri.length <= 0)) {
+    if ((uri eq null) || (uri.length <= 0)) {
       Namespace.EmptyNamespace
     } else if (uri == getNamespaceURI) {
       getNamespace
@@ -802,7 +802,7 @@ class ConcreteElement(var qname: QName)
   def remove(element: Element) : Boolean = removeNode(element)
 
   protected def addNode(node: Node): Unit = {
-    if (node.getParent != null) {
+    if (node.getParent ne null) {
       val message = "The Node already has an existing parent of \"" + node.getParent.getQualifiedName + "\""
       throw new IllegalAddException(this, node, message)
     }
@@ -810,7 +810,7 @@ class ConcreteElement(var qname: QName)
   }
 
   protected def addNode(index: Int, node: Node): Unit = {
-    if (node.getParent != null) {
+    if (node.getParent ne null) {
       val message = "The Node already has an existing parent of \"" + node.getParent.getQualifiedName +
         "\""
       throw new IllegalAddException(this, node, message)
@@ -848,13 +848,13 @@ class ConcreteElement(var qname: QName)
    * Called when a new child node is added to create any parent relationships
    */
   protected[dom4j] def childAdded(node: Node): Unit = {
-    if (node != null) {
+    if (node ne null) {
       node.setParent(this)
     }
   }
 
   protected[dom4j] def childRemoved(node: Node): Unit = {
-    if (node != null) {
+    if (node ne null) {
       node.setParent(null)
       node.setDocument(null)
     }

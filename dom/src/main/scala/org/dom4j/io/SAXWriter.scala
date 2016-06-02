@@ -217,7 +217,7 @@ class SAXWriter extends XMLReader {
 
   private def startPrefixMapping(element: Element, namespaceStack: NamespaceStack): Unit = {
     val elementNamespace = element.getNamespace
-    if ((elementNamespace != null) && !isIgnoreableNamespace(elementNamespace, namespaceStack)) {
+    if ((elementNamespace ne null) && !isIgnoreableNamespace(elementNamespace, namespaceStack)) {
       namespaceStack.push(elementNamespace)
       contentHandler.startPrefixMapping(elementNamespace.getPrefix, elementNamespace.getURI)
     }
@@ -234,7 +234,7 @@ class SAXWriter extends XMLReader {
   private def endPrefixMapping(stack: NamespaceStack, stackSize: Int): Unit = {
     while (stack.size > stackSize) {
       val namespace = stack.pop()
-      if (namespace != null)
+      if (namespace ne null)
         contentHandler.endPrefixMapping(namespace.getPrefix)
     }
   }
@@ -265,7 +265,7 @@ class SAXWriter extends XMLReader {
       true
     } else {
       val uri = namespace.getURI
-      if ((uri == null) || (uri.length <= 0))
+      if ((uri eq null) || (uri.length <= 0))
         true
       else
         namespaceStack.contains(namespace)

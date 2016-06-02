@@ -13,7 +13,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
 
   override def getText: String = {
     val list = internalContent
-    if (list != null) {
+    if (list ne null) {
       val size = list.size
       if (size >= 1) {
         val first = list.get(0)

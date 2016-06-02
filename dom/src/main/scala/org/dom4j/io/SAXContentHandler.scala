@@ -41,7 +41,7 @@ class SAXContentHandler(
     if (mergeAdjacentText && textInTextBuffer) {
       completeCurrentTextNode()
     }
-    if (currentElement != null) {
+    if (currentElement ne null) {
       currentElement.addProcessingInstruction(target, data)
     } else {
       getDocument.addProcessingInstruction(target, data)
@@ -62,7 +62,7 @@ class SAXContentHandler(
     elementStack.clear()
     namespaceStack.clear()
     declaredNamespaceIndex = 0
-    if (mergeAdjacentText && (textBuffer == null)) {
+    if (mergeAdjacentText && (textBuffer eq null)) {
       textBuffer = new jl.StringBuilder
     }
     textInTextBuffer = false
@@ -111,8 +111,8 @@ class SAXContentHandler(
     if (end == 0)
       return
 
-    if (currentElement != null) {
-      if (entity != null) {
+    if (currentElement ne null) {
+      if (entity ne null) {
         if (mergeAdjacentText && textInTextBuffer)
           completeCurrentTextNode()
 
@@ -160,7 +160,7 @@ class SAXContentHandler(
       }
       val text = new String(ch, start, end)
       if (text.length > 0) {
-        if (currentElement != null) {
+        if (currentElement ne null) {
           currentElement.addComment(text)
         } else {
           getDocument.addComment(text)

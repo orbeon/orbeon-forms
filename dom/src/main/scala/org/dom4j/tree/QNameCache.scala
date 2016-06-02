@@ -16,12 +16,12 @@ class QNameCache {
   def get(_name: String): QName = {
     var name = _name
     var answer: QName = null
-    if (name != null) {
+    if (name ne null) {
       answer = noNamespaceCache.get(name)
     } else {
       name = ""
     }
-    if (answer == null) {
+    if (answer eq null) {
       answer = createQName(name)
       noNamespaceCache.put(name, answer)
     }
@@ -32,12 +32,12 @@ class QNameCache {
     var name = _name
     val cache = getOrCreateNamespaceCache(namespace)
     var answer: QName = null
-    if (name != null) {
+    if (name ne null) {
       answer = cache.get(name)
     } else {
       name = ""
     }
-    if (answer == null) {
+    if (answer eq null) {
       answer = createQName(name, namespace)
       cache.put(name, answer)
     }
@@ -48,12 +48,12 @@ class QNameCache {
     var localName = _localName
     val cache = getOrCreateNamespaceCache(namespace)
     var answer: QName = null
-    if (localName != null) {
+    if (localName ne null) {
       answer = cache.get(localName)
     } else {
       localName = ""
     }
-    if (answer == null) {
+    if (answer eq null) {
       answer = createQName(localName, namespace, qName)
       cache.put(localName, answer)
     }
@@ -76,7 +76,7 @@ class QNameCache {
       return noNamespaceCache
     }
     var answer: ju.Map[String, QName] = null
-    if (namespace != null) {
+    if (namespace ne null) {
       answer = namespaceCache.get(namespace)
     }
     if (answer eq null) {

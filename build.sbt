@@ -40,7 +40,7 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
     sourceFile.name match { case MatchScalaJSFileNameFormatRE(_, prefix, optType) ⇒ prefix → optType }
 
   val launcherName  = s"$prefix-launcher.js"
-  val jsdepsName    = s"$prefix-jsdeps.js"
+  val jsdepsName    = s"$prefix-jsdeps${if (optType == "opt") ".min" else ""}.js"
   val sourceMapName = s"${sourceFile.name}.map"
 
   val targetDir =
@@ -55,12 +55,15 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
     (sourceFile.getParentFile / sourceMapName) → sourceMapName
   )
 
-  for ((file, newName) ← names)
+  for ((sourceFile, newName) ← names) {
+    val targetFile = targetDir / newName
+    println(s"Copying Scala.js file ${sourceFile.name} to ${targetFile.absolutePath}.")
     IO.copyFile(
-      sourceFile           = file,
-      targetFile           = targetDir / newName,
+      sourceFile           = sourceFile,
+      targetFile           = targetFile,
       preserveLastModified = true
     )
+  }
 }
 
 lazy val commonSettings = Seq(
@@ -124,7 +127,7 @@ lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("fo
 lazy val formBuilderSharedJVM = formBuilderShared.jvm
 lazy val formBuilderSharedJS  = formBuilderShared.js
 
-lazy val formBuilderClient = (project in file("orbeon-form-builder-client"))
+lazy val formBuilderClient = (project in file("form-builder-client"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(formBuilderSharedJS)
   .settings(commonSettings: _*)
@@ -141,8 +144,6 @@ lazy val formBuilderClient = (project in file("orbeon-form-builder-client"))
     libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
 
     skip in packageJSDependencies  := false,
-
-    unmanagedBase                  := baseDirectory.value / "lib",
 
     persistLauncher     in Compile := true,
 

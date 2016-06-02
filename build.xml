@@ -429,7 +429,7 @@
     <!-- JARs -->
     <target name="jars" depends="classes, orbeon-minify-js, embedding-jar, xforms-filter-jar">
 
-        <!-- This packages core, dom4j, xupdate, common, etc. -->
+        <!-- This packages core, dom, xupdate, common, etc. -->
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>

@@ -12,8 +12,6 @@
             <option value="$PROJECT_DIR$/common/project" />
             <option value="$PROJECT_DIR$/dom" />
             <option value="$PROJECT_DIR$/dom/project" />
-            <option value="$PROJECT_DIR$/dom4j" />
-            <option value="$PROJECT_DIR$/dom4j/project" />
             <option value="$PROJECT_DIR$/form-builder" />
             <option value="$PROJECT_DIR$/form-builder-shared" />
             <option value="$PROJECT_DIR$/form-builder-shared/.js" />

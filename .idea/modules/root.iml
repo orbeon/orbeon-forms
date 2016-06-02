@@ -30,7 +30,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -175,5 +174,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
   </component>
 </module>

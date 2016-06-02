@@ -172,12 +172,6 @@ lazy val xupdate = (project in file("xupdate"))
     unmanagedBase := baseDirectory.value / ".." / "lib"
   )
 
-lazy val dom4j = (project in file("dom4j"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "orbeon-dom4j"
-  )
-
 lazy val dom = (project in file("dom"))
   .settings(commonSettings: _*)
   .settings(

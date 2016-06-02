@@ -8,8 +8,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-build.iml" filepath="$PROJECT_DIR$/.idea/modules/core-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom.iml" filepath="$PROJECT_DIR$/.idea/modules/dom.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dom-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom4j.iml" filepath="$PROJECT_DIR$/.idea/modules/dom4j.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom4j-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dom4j-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-builder-shared-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-builder-shared-sources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" />

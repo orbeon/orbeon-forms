@@ -10,7 +10,7 @@
     <option name="uncheckedWarnings" value="true" />
     <option name="incrementalityType" value="SBT" />
     <profile name="SBT 1" modules="root" />
-    <profile name="SBT 3" modules="formBuilderClient,formBuilderSharedJS">
+    <profile name="SBT 3" modules="formBuilderSharedJS,formBuilderClient">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />

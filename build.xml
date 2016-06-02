@@ -23,7 +23,6 @@
     <dirname property="build.root" file="${ant.file}"/>
 
     <property name="saxon.jar"     value="saxon-9-1-0-8_orbeon_20160524.jar"/>
-    <!--<property name="catalina.home" value=""/>-->
 
     <!-- Expose environment variables -->
     <property environment="env"/>
@@ -183,9 +182,6 @@
     </fileset>
 
     <target name="init">
-
-
-
         <tstamp>
             <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>
@@ -198,13 +194,10 @@
         <property name="examples-cli-src.dir"           value="src/examples-cli"/>
         <property name="test.exist-db.dir"              location="src/resources-packaged/ops/unit-tests/exist-data"/>
 
-        <property name="jar.file"                       value="build/lib/orbeon.jar"/>
         <property name="xforms-filter.jar.file"         value="build/lib/orbeon-xforms-filter.jar"/>
         <property name="cli.jar.file"                   value="build/lib/orbeon-cli.jar"/>
         <property name="resources-private.jar.file"     value="build/lib/orbeon-resources-private.jar"/>
         <property name="resources-public.jar.file"      value="build/lib/orbeon-resources-public.jar"/>
-        <property name="form-runner.jar.file"           value="build/lib/orbeon-form-runner.jar"/>
-        <property name="form-builder.jar.file"          value="build/lib/orbeon-form-builder.jar"/>
 
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
@@ -525,18 +518,13 @@
             <zipfileset src="lib/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
         </jar>
 
-        <copy file="common/target/scala-2.11/orbeon-common_2.11-${release.number}.jar"             tofile="build/orbeon-war/WEB-INF/lib/orbeon-common.jar"/>
-        <copy file="dom/target/scala-2.11/orbeon-dom_2.11-${release.number}.jar"                   tofile="build/orbeon-war/WEB-INF/lib/orbeon-dom.jar"/>
-        <!--<copy file="dom4j/target/scala-2.11/orbeon-dom4j_2.11-${release.number}.jar"            tofile="build/orbeon-war/WEB-INF/lib/orbeon-dom.jar"/>-->
-        <!--<copy file="shared/.jvm/target/scala-2.11/formbuildershared_2.11-${release.number}.jar" tofile="build/orbeon-war/WEB-INF/lib/orbeon-form-builder-shared.jar"/>-->
-        <copy file="src/target/scala-2.11/orbeon-core_2.11-${release.number}.jar"                  tofile="build/orbeon-war/WEB-INF/lib/orbeon-core.jar"/>
-        <copy file="xupdate/target/scala-2.11/orbeon-xupdate_2.11-${release.number}.jar"           tofile="build/orbeon-war/WEB-INF/lib/orbeon-xupdate.jar"/>
-        <copy file="form-runner/target/scala-2.11/orbeon-form-runner_2.11-${release.number}.jar"   tofile="build/orbeon-war/WEB-INF/lib/orbeon-form-runner.jar"/>
-        <copy file="form-builder/target/scala-2.11/orbeon-form-builder_2.11-${release.number}.jar" tofile="build/orbeon-war/WEB-INF/lib/orbeon-form-builder.jar"/>
-
-        <copy file="${xforms-filter.jar.file}"                                                     todir="build/orbeon-war/WEB-INF/lib"/>
-        <copy file="${resources-private.jar.file}"                                                 todir="build/orbeon-war/WEB-INF/lib"/>
-        <copy file="${resources-public.jar.file}"                                                  todir="build/orbeon-war/WEB-INF/lib"/>
+        <!-- This copies the JAR files to the exploded WAR -->
+        <exec executable="sbt" failonerror="true">
+            <arg value="-Dorbeon.version=${release.number}"/>
+            <arg value="-Dorbeon.edition=${edition}"/>
+            <arg value="project root"/>
+            <arg value="copyJarToExplodedWar"/>
+        </exec>
 
         <copy todir="build/orbeon-war/WEB-INF">
             <fileset dir="lib">

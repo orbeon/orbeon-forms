@@ -1,11 +1,11 @@
 import sbt.Keys._
 
-val ScalaVersion         = "2.11.8"
-val ScalaJsDomVersion    = "0.9.0"
-val ScalaJsJQueryVersion = "0.9.0"
+val ScalaVersion                  = "2.11.8"
+val ScalaJsDomVersion             = "0.9.0"
+val ScalaJsJQueryVersion          = "0.9.0"
 
-val DefaultOrbeonFormsVersion   = "2016.2-SNAPSHOT"
-val DefaultOrbeonEdition        = "CE"
+val DefaultOrbeonFormsVersion     = "2016.2-SNAPSHOT"
+val DefaultOrbeonEdition          = "CE"
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
@@ -13,24 +13,31 @@ val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
 
-val ScalaJSFileNameFormat = "((.+)-(fastopt|opt)).js".r
+val MatchScalaJSFileNameFormatRE  = """((.+)-(fastopt|opt)).js""".r
+val MatchRawJarNameRE             = """([^_]+)(?:_.*)?\.jar""".r
 
-val fastOptJSToExplodedWar   = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
-val fullOptJSToExplodedWar   = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
+val copyJarToExplodedWar          = taskKey[Option[File]]("Copy JAR file to local WEB-INF/bin for development.")
+val fastOptJSToExplodedWar        = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
+val fullOptJSToExplodedWar        = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
 
-val orbeonVersionFromProperties = settingKey[String]("Orbeon Forms version from system properties.")
-val orbeonEditionFromProperties = settingKey[String]("Orbeon Forms edition from system properties.")
+val orbeonVersionFromProperties   = settingKey[String]("Orbeon Forms version from system properties.")
+val orbeonEditionFromProperties   = settingKey[String]("Orbeon Forms edition from system properties.")
 
 // TBH I don't know whether `in ThisBuild` is needed
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
 orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 
-val copyJarToExplodedWar = taskKey[File]("Copy JAR file to local WEB-INF/bin for development")
+val PathsToExcludeFromCoreJAR = List(
+  "org/orbeon/oxf/servlet/OrbeonXFormsFilter",
+  "org/orbeon/oxf/portlet/OrbeonProxyPortlet",
+  "org/orbeon/oxf/fr/embedding/servlet/ServletFilter",
+  "org/orbeon/oxf/fr/embedding/servlet/API"
+)
 
 def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
 
   val (prefix, optType) =
-    sourceFile.name match { case ScalaJSFileNameFormat(_, prefix, optType) ⇒ prefix → optType }
+    sourceFile.name match { case MatchScalaJSFileNameFormatRE(_, prefix, optType) ⇒ prefix → optType }
 
   val launcherName  = s"$prefix-launcher.js"
   val jsdepsName    = s"$prefix-jsdeps.js"
@@ -90,17 +97,25 @@ lazy val commonSettings = Seq(
   copyJarToExplodedWar := {
 
     val sourceJarFile = (packageBin in Compile).value
-    val targetJarFile = new File(ExplodedWarLibPath + '/' + sourceJarFile.name)
+    val MatchRawJarNameRE(sourceJarRawName) = sourceJarFile.name
+    val targetJarFile = new File(ExplodedWarLibPath + '/' + sourceJarRawName + ".jar")
 
-    println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}")
-    IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
-
-    targetJarFile
+    if (sourceJarRawName != "orbeon-form-builder-client") {
+      println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
+      IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
+      Some(targetJarFile)
+    } else {
+      println(s"Not copying excluded JAR ${sourceJarFile.name}.")
+      None
+    }
   }
 )
 
 lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("form-builder-shared"))
   .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-form-builder-shared"
+  )
   .jvmSettings(
   )
   .jsSettings(
@@ -109,12 +124,12 @@ lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("fo
 lazy val formBuilderSharedJVM = formBuilderShared.jvm
 lazy val formBuilderSharedJS  = formBuilderShared.js
 
-lazy val formBuilderClient = (project in file("form-builder-client"))
+lazy val formBuilderClient = (project in file("orbeon-form-builder-client"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(formBuilderSharedJS)
   .settings(commonSettings: _*)
   .settings(
-    name                           := "form-builder-client",
+    name                           := "orbeon-form-builder-client",
 
     scalaSource         in Compile := baseDirectory.value / "src" / "builder" / "scala",
     javaSource          in Compile := baseDirectory.value / "src" / "builder" / "java",
@@ -181,13 +196,6 @@ lazy val formBuilder = (project in file("form-builder"))
     name := "orbeon-form-builder"
   )
 
-val PathsToExcludeFromCoreJAR = List(
-  "org/orbeon/oxf/servlet/OrbeonXFormsFilter",
-  "org/orbeon/oxf/portlet/OrbeonProxyPortlet",
-  "org/orbeon/oxf/fr/embedding/servlet/ServletFilter",
-  "org/orbeon/oxf/fr/embedding/servlet/API"
-)
-
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
   .dependsOn(common, dom, formBuilderSharedJVM, xupdate)
@@ -214,7 +222,6 @@ lazy val core = (project in file("src"))
     unmanagedBase                := baseDirectory.value / ".." / "lib",
 
     // TODO: only src/main/resources/org/orbeon/oxf/xforms/script/coffee-script.js
-
     // http://www.scala-sbt.org/0.13/docs/Mapping-Files.html
     mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
   )
@@ -238,3 +245,4 @@ lazy val root = (project in file("."))
   )
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)
+

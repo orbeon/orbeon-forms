@@ -15,8 +15,6 @@
             <option value="$PROJECT_DIR$/dom4j" />
             <option value="$PROJECT_DIR$/dom4j/project" />
             <option value="$PROJECT_DIR$/form-builder" />
-            <option value="$PROJECT_DIR$/form-builder-client" />
-            <option value="$PROJECT_DIR$/form-builder-client/project" />
             <option value="$PROJECT_DIR$/form-builder-shared" />
             <option value="$PROJECT_DIR$/form-builder-shared/.js" />
             <option value="$PROJECT_DIR$/form-builder-shared/.js/project" />
@@ -25,6 +23,8 @@
             <option value="$PROJECT_DIR$/form-builder/project" />
             <option value="$PROJECT_DIR$/form-runner" />
             <option value="$PROJECT_DIR$/form-runner/project" />
+            <option value="$PROJECT_DIR$/orbeon-form-builder-client" />
+            <option value="$PROJECT_DIR$/orbeon-form-builder-client/project" />
             <option value="$PROJECT_DIR$/project" />
             <option value="$PROJECT_DIR$/src" />
             <option value="$PROJECT_DIR$/src/project" />

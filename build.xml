@@ -909,6 +909,9 @@
                             <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
                             <exclude name="org/orbeon/oxf/fr/persistence/**/*Test.class"    if="skip.database"/>
                         </fileset>
+                        <fileset dir="common/target/scala-2.11/test-classes">
+                            <include name="org/orbeon/oxf/**/*Test.class"/>
+                        </fileset>
                     </batchtest>
 
                     <!-- Configure resource manager -->

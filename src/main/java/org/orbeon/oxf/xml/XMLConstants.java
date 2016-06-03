@@ -106,6 +106,6 @@ public class XMLConstants {
     public static final String SAX_LEXICAL_HANDLER = "http://xml.org/sax/properties/lexical-handler";
 
     private XMLConstants() {
-        // Disallow contruction
+        // Disallow construction
     }
 }

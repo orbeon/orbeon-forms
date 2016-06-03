@@ -202,7 +202,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
     val stepProcessorContext = new StepProcessorContext(controllerValidity)
     val locationData = configRoot.getData.asInstanceOf[LocationData]
-    val urlBase = Option(locationData) map (_.getSystemID) orNull
+    val urlBase = Option(locationData) map (_.file) orNull
 
     // Gather properties
     implicit val properties = getPropertySet

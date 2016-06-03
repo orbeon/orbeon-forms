@@ -97,7 +97,7 @@ public class Utils {
                                 String url = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(0));
                                 Document result = documentContext.getDocument(url);
                                 if (result == null) {
-                                    Source source = uriResolver.resolve(url, locationData.getSystemID());
+                                    Source source = uriResolver.resolve(url, locationData.file());
                                     if (! (source instanceof SAXSource))
                                         throw new ValidationException("Unsupported source type", locationData);
                                     XMLReader xmlReader = ((SAXSource) source).getXMLReader();

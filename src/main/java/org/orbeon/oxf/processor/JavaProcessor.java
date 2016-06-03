@@ -342,8 +342,8 @@ public class JavaProcessor extends ProcessorImpl {
      * exception is thrown.
      */
     public static File getFileFromURL(String urlString, LocationData locationData) {
-        URL sourcePathURL = (locationData != null && locationData.getSystemID() != null)
-            ? URLFactory.createURL(locationData.getSystemID(), urlString)
+        URL sourcePathURL = (locationData != null && locationData.file() != null)
+            ? URLFactory.createURL(locationData.file(), urlString)
             : URLFactory.createURL(urlString);
 
         // Make sure the protocol is oxf: or file:

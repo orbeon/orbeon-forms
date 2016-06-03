@@ -129,7 +129,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                         }
                                         final Document schemaDoc = readInputAsDOM4J(context, input);
                                         final LocationData locator = (LocationData) schemaDoc.getRootElement().getData();
-                                        final String schemaSystemId = (locator != null && locator.getSystemID() != null) ? locator.getSystemID() : null;
+                                        final String schemaSystemId = (locator != null && locator.file() != null) ? locator.file() : null;
                                         // Be sure to set our own XML parser factory
                                         final VerifierFactory verifierFactory = new TheFactoryImpl(factory);
                                         verifierFactory.setEntityResolver(new EntityResolver() {
@@ -167,16 +167,16 @@ public class MSVValidationProcessor extends ProcessorImpl {
                         private void generateErrorElement(SchemaValidationException ve) throws SAXException {
                             if (decorateOutput && ve != null) {
 
-                                final String systemId = ve.firstLocationData().getSystemID();
+                                final String systemId = ve.firstLocationData().file();
                                 final AttributesImpl a = new AttributesImpl();
                                 a.addAttribute("", MESSAGE_ATTRIBUTE,
                                         MESSAGE_ATTRIBUTE, "CDATA", ve.message());
                                 a.addAttribute("", SYSTEMID_ATTRIBUTE,
                                         SYSTEMID_ATTRIBUTE, "CDATA", systemId == null ? "" : systemId);
                                 a.addAttribute("", LINE_ATTRIBUTE,
-                                        LINE_ATTRIBUTE, "CDATA", Integer.toString(ve.firstLocationData().getLine()));
+                                        LINE_ATTRIBUTE, "CDATA", Integer.toString(ve.firstLocationData().line()));
                                 a.addAttribute("", COLUMN_ATTRIBUTE,
-                                        COLUMN_ATTRIBUTE, "CDATA", Integer.toString(ve.firstLocationData().getCol()));
+                                        COLUMN_ATTRIBUTE, "CDATA", Integer.toString(ve.firstLocationData().col()));
 
                                 xmlReceiver.startElement(ORBEON_ERROR_NS,
                                         ERROR_ELEMENT,

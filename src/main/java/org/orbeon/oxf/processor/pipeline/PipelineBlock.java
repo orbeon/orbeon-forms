@@ -129,7 +129,7 @@ public class PipelineBlock {
 
             final String sid = locationData == null
                              ? DOMGenerator.DefaultContext
-                             : locationData.getSystemID();
+                             : locationData.file();
             final DOMGenerator configGenerator = new DOMGenerator
                 ( aggregatorConfig, "aggregate config", DOMGenerator.ZeroValidity, sid );
             PipelineUtils.connect(configGenerator, ProcessorImpl.OUTPUT_DATA, aggregator, ProcessorImpl.INPUT_CONFIG);
@@ -149,8 +149,8 @@ public class PipelineBlock {
 
             // Get the docbase url from the location data if available
             // and concatenate it with the current href
-            final URL url = URLFactory.createURL(locationData != null && locationData.getSystemID() != null ?
-                    locationData.getSystemID() : null,
+            final URL url = URLFactory.createURL(locationData != null && locationData.file() != null ?
+                    locationData.file() : null,
                     ((ASTHrefURL) href).getURL());
 
             // This is interpreted as a URL, use URL Generator
@@ -174,7 +174,7 @@ public class PipelineBlock {
             xpathProcessor.setLocationData(locationData); // TODO FIXME: I suspect locationData will always be null here because node is null!
             final String sid = locationData == null
                              ? DOMGenerator.DefaultContext
-                             : locationData.getSystemID();
+                             : locationData.file();
             final DOMGenerator configGenerator = new DOMGenerator
                 ( xpathConfig, "xpath config", DOMGenerator.ZeroValidity, sid );
             PipelineUtils.connect(configGenerator, ProcessorImpl.OUTPUT_DATA, xpathProcessor, ProcessorImpl.INPUT_CONFIG);

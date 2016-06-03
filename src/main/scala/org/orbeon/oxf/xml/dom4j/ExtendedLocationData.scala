@@ -36,9 +36,9 @@ class ExtendedLocationData private (
   // With LocationData, description, params and element
   def this(locationData: LocationData, description: Option[String] = None, params: immutable.Seq[(String, String)] = Nil, element: Option[Element] = None) =
     this(
-      Option(locationData) map (_.getSystemID) orNull,
-      Option(locationData) map (_.getLine) getOrElse -1,
-      Option(locationData) map (_.getCol) getOrElse -1,
+      Option(locationData) map (_.file) orNull,
+      Option(locationData) map (_.line) getOrElse -1,
+      Option(locationData) map (_.col) getOrElse -1,
       description,
       (if (element.isDefined) List("element" → (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
     )

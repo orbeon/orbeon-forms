@@ -297,10 +297,10 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
                         configElement.addElement("message").addText(debugMessage);
                         if (debugLocationData != null) {
                             Element systemIdElement = configElement.addElement("system-id");
-                            if (debugLocationData.getSystemID() != null)
-                                systemIdElement.addText(debugLocationData.getSystemID());
-                            configElement.addElement("line").addText(Integer.toString(debugLocationData.getLine()));
-                            configElement.addElement("column").addText(Integer.toString(debugLocationData.getCol()));
+                            if (debugLocationData.file() != null)
+                                systemIdElement.addText(debugLocationData.file());
+                            configElement.addElement("line").addText(Integer.toString(debugLocationData.line()));
+                            configElement.addElement("column").addText(Integer.toString(debugLocationData.col()));
                         }
                     }
                     final DOMGenerator dg = new DOMGenerator
@@ -443,9 +443,9 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
                     "processor-name", input.getProcessor(pipelineContext) != null && input.getProcessor(pipelineContext).getName() != null ? input.getProcessor(pipelineContext).getName().getQualifiedName() : null,
                     "processor-object", input.getProcessor(pipelineContext) != null ? Integer.toString(input.getProcessor(pipelineContext).getSequenceNumber()) : null,
 
-                    "system-id", (input.getLocationData() != null) ? input.getLocationData().getSystemID() : null,
-                    "line", (input.getLocationData() != null) ? Integer.toString(input.getLocationData().getLine()) : null,
-                    "column", (input.getLocationData() != null) ? Integer.toString(input.getLocationData().getCol()) : null
+                    "system-id", (input.getLocationData() != null) ? input.getLocationData().file() : null,
+                    "line", (input.getLocationData() != null) ? Integer.toString(input.getLocationData().line()) : null,
+                    "column", (input.getLocationData() != null) ? Integer.toString(input.getLocationData().col()) : null
             });
         }
 
@@ -458,9 +458,9 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
                 "processor-name", getProcessor(pipelineContext) != null && getProcessor(pipelineContext).getName() != null ? getProcessor(pipelineContext).getName().getQualifiedName() : null,
                 "processor-object", getProcessor(pipelineContext) != null ? Integer.toString(getProcessor(pipelineContext).getSequenceNumber()) : null,
 
-                "system-id", (getLocationData() != null) ? getLocationData().getSystemID() : null,
-                "line", (getLocationData() != null) ? Integer.toString(getLocationData().getLine()) : null,
-                "column", (getLocationData() != null) ? Integer.toString(getLocationData().getCol()) : null,
+                "system-id", (getLocationData() != null) ? getLocationData().file() : null,
+                "line", (getLocationData() != null) ? Integer.toString(getLocationData().line()) : null,
+                "column", (getLocationData() != null) ? Integer.toString(getLocationData().col()) : null,
 
                 "schema", getSchema(),
                 "debug", getDebugMessage()

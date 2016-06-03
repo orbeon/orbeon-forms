@@ -147,7 +147,7 @@ public class TestExternalContext implements ExternalContext  {
                     // TODO: Support same scenarios as Email processor
                     if (hrefAttribute != null) {
                         final LocationData locationData = (LocationData) bodyNode.getData();
-                        final String systemId = locationData == null ? null : locationData.getSystemID();
+                        final String systemId = locationData == null ? null : locationData.file();
 
                         final SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
                         final FileItem fileItem = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource);

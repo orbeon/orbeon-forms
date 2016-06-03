@@ -29,7 +29,7 @@ class LocationSAXWriter extends SAXWriter {
           if (_currentLocationData eq null)
             null
           else
-            _currentLocationData.systemID
+            _currentLocationData.file
         }
 
         def getLineNumber: Int = {

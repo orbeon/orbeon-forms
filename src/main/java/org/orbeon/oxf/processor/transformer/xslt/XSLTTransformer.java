@@ -313,15 +313,15 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
 
                             public String getSystemId() {
-                                return (currentLocationData != null) ? currentLocationData.getSystemID() : inputLocator.getSystemId();
+                                return (currentLocationData != null) ? currentLocationData.file() : inputLocator.getSystemId();
                             }
 
                             public int getLineNumber() {
-                                return (currentLocationData != null) ? currentLocationData.getLine() : inputLocator.getLineNumber();
+                                return (currentLocationData != null) ? currentLocationData.line() : inputLocator.getLineNumber();
                             }
 
                             public int getColumnNumber() {
-                                return (currentLocationData != null) ? currentLocationData.getCol() : inputLocator.getColumnNumber();
+                                return (currentLocationData != null) ? currentLocationData.col() : inputLocator.getColumnNumber();
                             }
 
                             public void setLocationData(LocationData locationData) {
@@ -448,7 +448,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     saxResult.setLexicalHandler(outputReceiver);
 
                     if (processorLocationData != null) {
-                        final String processorSystemId = processorLocationData.getSystemID();
+                        final String processorSystemId = processorLocationData.file();
                         //saxResult.setSystemId(sysID); // NOT SURE WHY WE DID THIS
                         // TODO: use source document system ID, not stylesheet system ID
                         transformerHandler.setSystemId(processorSystemId);
@@ -696,7 +696,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // No XSLT errors are available
                         final LocationData transformerExceptionLocationData
                             = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetXMLReceiver.getSystemId());
-                        if (transformerExceptionLocationData.getSystemID() != null)
+                        if (transformerExceptionLocationData.file() != null)
                             throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(transformerExceptionLocationData, "creating XSLT transformer"));
                         else
                             throw new OXFException(e);

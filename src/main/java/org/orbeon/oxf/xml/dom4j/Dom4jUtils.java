@@ -220,7 +220,7 @@ public class Dom4jUtils {
 
     public static String makeSystemId(final Element e) {
         final LocationData ld = (LocationData) e.getData();
-        final String ldSid = ld == null ? null : ld.getSystemID();
+        final String ldSid = ld == null ? null : ld.file();
         return ldSid == null ? DOMGenerator.DefaultContext : ldSid;
     }
 

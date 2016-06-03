@@ -78,7 +78,7 @@ public class XPathProcessor extends ProcessorImpl {
                 final DocumentInfo documentInfo = readCacheInputAsTinyTree(context, XPath.GlobalConfiguration(), INPUT_DATA);
                 PooledXPathExpression xpath = null;
                 try {
-                    final String baseURI = (locationData == null) ? null : locationData.getSystemID();
+                    final String baseURI = (locationData == null) ? null : locationData.file();
                     xpath = XPathCache.getXPathExpression(documentInfo.getConfiguration(), documentInfo,
                             config.getExpression(), config.getNamespaces(), null, org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), baseURI, locationData);
                     List<Object> results = xpath.evaluateToJavaReturnToPool();

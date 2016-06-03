@@ -39,9 +39,9 @@ private object XXFormsActionErrorEvent {
 
   val Getters = Map[String, XXFormsActionErrorEvent ⇒ Option[Any]](
     "element"   → (e ⇒ e.rootLocationOpt collect { case x: ExtendedLocationData if x.elementString.isDefined ⇒ x.elementString.get }),
-    "system-id" → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getSystemID))),
-    "line"      → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getLine))),
-    "column"    → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getCol))),
+    "system-id" → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.file))),
+    "line"      → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.line))),
+    "column"    → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.col))),
     "message"   → (e ⇒ e.throwableOpt map Exceptions.getRootThrowable flatMap (t ⇒ Option(t.getMessage))),
     "throwable" → (e ⇒ e.throwableOpt map OrbeonFormatter.format)
   )

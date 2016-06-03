@@ -270,7 +270,7 @@ public class PipelineProcessor extends ProcessorImpl {
                         {
                             final Object validity = astPipeline.getValidity();
                             final LocationData pipelineLocationData = astPipeline.getLocationData();
-                            String systemId = (pipelineLocationData == null) ? DOMGenerator.DefaultContext : pipelineLocationData.getSystemID();
+                            String systemId = (pipelineLocationData == null) ? DOMGenerator.DefaultContext : pipelineLocationData.file();
                             if (systemId == null)
                                 systemId = DOMGenerator.DefaultContext;
                             domGenerator = PipelineUtils.createDOMGenerator(inlineDocument, "inline input", validity, systemId);
@@ -477,7 +477,7 @@ public class PipelineProcessor extends ProcessorImpl {
         } else if (schemaHref != null) {
             String url;
             if (locationData != null) {
-                url = URLFactory.createURL(locationData.getSystemID(), schemaHref).toString();
+                url = URLFactory.createURL(locationData.file(), schemaHref).toString();
             } else {
                 url = schemaHref;
             }

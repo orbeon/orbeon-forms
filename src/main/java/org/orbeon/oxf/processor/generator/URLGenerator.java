@@ -445,8 +445,8 @@ public class URLGenerator extends ProcessorImpl {
                             // NOTE: We check whether there is a protocol, because we have
                             // some Java location data which are NOT to be interpreted as
                             // base URIs
-                            final URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
-                                    ? URLFactory.createURL(locationData.getSystemID(), url)
+                            final URL fullURL = (locationData != null && locationData.file() != null && NetUtils.urlHasProtocol(locationData.file()))
+                                    ? URLFactory.createURL(locationData.file(), url)
                                     : URLFactory.createURL(url);
 
                             // Create configuration
@@ -576,7 +576,7 @@ public class URLGenerator extends ProcessorImpl {
                 } catch (ValidationException e) {
                     final LocationData locationData = e.firstLocationData();
                     // The system id may not be set
-                    if (locationData == null || locationData.getSystemID() == null)
+                    if (locationData == null || locationData.file() == null)
                         throw OrbeonLocationException.wrapException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                     else
                         throw e;

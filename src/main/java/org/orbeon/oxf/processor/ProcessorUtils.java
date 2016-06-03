@@ -108,8 +108,8 @@ public class ProcessorUtils {
     }
 
     public static URL createRelativeURL(LocationData locationData, String urlString) {
-        return (locationData != null && locationData.getSystemID() != null)
-                ? URLFactory.createURL(locationData.getSystemID(), urlString)
+        return (locationData != null && locationData.file() != null)
+                ? URLFactory.createURL(locationData.file(), urlString)
                 : URLFactory.createURL(urlString);
     }
 

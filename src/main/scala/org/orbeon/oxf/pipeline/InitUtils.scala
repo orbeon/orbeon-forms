@@ -135,10 +135,10 @@ object InitUtils {
           connect(urlGenerator, OUTPUT_DATA, processor, inputName)
         case element: Element ⇒
           val locationData = ProcessorUtils.getElementLocationData(element)
-          connectInput(Option(locationData) map (_.getSystemID), createDOMGenerator(element, _, _, _))
+          connectInput(Option(locationData) map (_.file), createDOMGenerator(element, _, _, _))
         case document: Document ⇒
           val locationData = ProcessorUtils.getElementLocationData(document.getRootElement)
-          connectInput(Option(locationData) map (_.getSystemID), createDOMGenerator(document, _, _, _))
+          connectInput(Option(locationData) map (_.file), createDOMGenerator(document, _, _, _))
         case nodeInfo: NodeInfo ⇒
           connectInput(Option(nodeInfo.getSystemId), createDOMGenerator(nodeInfo, _, _, _))
         case value ⇒

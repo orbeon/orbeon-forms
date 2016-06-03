@@ -93,8 +93,8 @@ public class ZipProcessor extends ProcessorImpl {
                                         final LocationData locationData = getLocationData();
                                         final String realPath;
 
-                                        final URL fullURL = (locationData != null && locationData.getSystemID() != null)
-                                            ? URLFactory.createURL(locationData.getSystemID(), uri.toString())
+                                        final URL fullURL = (locationData != null && locationData.file() != null)
+                                            ? URLFactory.createURL(locationData.file(), uri.toString())
                                             : URLFactory.createURL(uri.toString());
 
                                         if (fullURL.getProtocol().equals("oxf")) {

@@ -58,9 +58,9 @@ object ServerError {
   def apply(message: String, location : Option[LocationData], classOpt : Option[String] = None): ServerError =
     ServerError(
       message.trimAllToEmpty,
-      location flatMap (l ⇒ Option(l.getSystemID)),
-      location map     (_.getLine) filter (_ >= 0),
-      location map     (_.getCol)  filter (_ >= 0),
+      location flatMap (l ⇒ Option(l.file)),
+      location map     (_.line) filter (_ >= 0),
+      location map     (_.col)  filter (_ >= 0),
       classOpt
     )
 

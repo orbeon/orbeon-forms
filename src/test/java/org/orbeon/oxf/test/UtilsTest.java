@@ -99,7 +99,7 @@ public class UtilsTest extends TestCase {
             Document doc = result.getDocument();
             Element firstName = (Element) XPathUtils.selectSingleNode(doc, "//firstname");
             assertEquals("Ada", firstName.getTextTrim());
-            assertEquals(4, ((LocationData) firstName.getData()).getLine());
+            assertEquals(4, ((LocationData) firstName.getData()).get_line());
 
             source = new LocationDocumentSource(doc);
             SAXResult saxResult = new SAXResult(new ForwardingXMLReceiver() {

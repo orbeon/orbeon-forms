@@ -104,10 +104,10 @@ public class ExceptionGenerator extends ProcessorImpl {
             for (Iterator i = locationDataList.iterator(); i.hasNext();) {
                 final LocationData locationData = (LocationData) i.next();
                 helper.startElement("location");
-                helper.element("system-id", locationData.getSystemID());
-                helper.element("line", Integer.toString(locationData.getLine()));
-                helper.element("column", Integer.toString(locationData.getCol()));
-                
+                helper.element("system-id", locationData.file());
+                helper.element("line", Integer.toString(locationData.line()));
+                helper.element("column", Integer.toString(locationData.col()));
+
                 if (locationData instanceof ExtendedLocationData) {
                     final ExtendedLocationData extendedLocationData = (ExtendedLocationData) locationData;
 

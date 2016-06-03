@@ -16,8 +16,8 @@ package org.orbeon.oxf.xml.dom4j
 import org.xml.sax.Locator
 
 case class ConstantLocator(locationData: LocationData) extends Locator {
-  def getSystemId     = locationData.getSystemID
-  def getLineNumber   = locationData.getLine
-  def getColumnNumber = locationData.getCol
+  def getSystemId     = locationData.file
+  def getLineNumber   = locationData.line
+  def getColumnNumber = locationData.col
   def getPublicId     = null
 }

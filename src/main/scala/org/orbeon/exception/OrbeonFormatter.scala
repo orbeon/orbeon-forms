@@ -36,7 +36,7 @@ object OrbeonFormatter extends Formatter {
 
   // Create SourceLocation from LocationData
   private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
-    isNotBlank(locationData.getSystemID) option {
+    isNotBlank(locationData.file) option {
 
       val (description, params) =
         locationData match {
@@ -45,9 +45,9 @@ object OrbeonFormatter extends Formatter {
         }
 
       SourceLocation(
-        locationData.getSystemID,
-        filterLineCol(locationData.getLine),
-        filterLineCol(locationData.getCol),
+        locationData.file,
+        filterLineCol(locationData.line),
+        filterLineCol(locationData.col),
         description,
         params.to[List]
       )

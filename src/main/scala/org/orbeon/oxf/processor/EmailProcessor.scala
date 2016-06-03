@@ -63,7 +63,7 @@ class EmailProcessor extends ProcessorImpl {
     val messageElement = dataDocument.getRootElement
 
     // Get system id (will likely be null if document is generated dynamically)
-    val dataInputSystemId = Option(messageElement.getData) map (_.asInstanceOf[LocationData].getSystemID) orNull
+    val dataInputSystemId = Option(messageElement.getData) map (_.asInstanceOf[LocationData].file) orNull
 
     implicit val propertySet = getPropertySet
 

@@ -21,17 +21,17 @@ import org.xml.sax.{Locator, SAXParseException}
 object LocationData {
   def createIfPresent(locator: Locator): LocationData =
     if (locator ne null) {
-      val filename = locator.getSystemId
+      val file = locator.getSystemId
       val line = locator.getLineNumber
-      if (StringUtils.isNotBlank(filename) && line != -1)
-        LocationData(filename, line, locator.getColumnNumber)
+      if (StringUtils.isNotBlank(file) && line != -1)
+        LocationData(file, line, locator.getColumnNumber)
       else
         null
     } else
       null
 }
 
-case class LocationData(systemID: String, line: Int, col: Int) {
+case class LocationData(file: String, line: Int, col: Int) {
 
   def this(locator: Locator) =
     this(locator.getSystemId, locator.getLineNumber, locator.getColumnNumber)
@@ -41,11 +41,6 @@ case class LocationData(systemID: String, line: Int, col: Int) {
 
   def this(exception: SAXParseException) =
     this(exception.getSystemId, exception.getLineNumber, exception.getColumnNumber)
-
-  // TODO: get rid of those once callers are changed
-  def getSystemID = systemID
-  def getLine = line
-  def getCol = col
 
   override def toString = {
     val sb = new java.lang.StringBuilder
@@ -70,11 +65,11 @@ case class LocationData(systemID: String, line: Int, col: Int) {
         false
       }
 
-    if (systemID ne null) {
+    if (file ne null) {
       if (hasLine || hasColumn)
         sb.append(" of ")
 
-      sb.append(systemID)
+      sb.append(file)
     }
 
     sb.toString

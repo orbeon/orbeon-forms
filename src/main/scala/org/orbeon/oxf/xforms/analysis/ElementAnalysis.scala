@@ -491,7 +491,7 @@ object ElementAnalysis {
 
   def createLocationData(element: Element): ExtendedLocationData =
       element.getData match {
-        case data: LocationData if (element ne null) && (data.getSystemID ne null) && data.getLine != -1 ⇒
+        case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 ⇒
           new ExtendedLocationData(data, "gathering static information", element)
         case _ ⇒ null
       }

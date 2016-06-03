@@ -71,7 +71,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     final DocumentWrapper instanceWrapper =
                         new DocumentWrapper(
                             instance,
-                            (locationData != null) ? locationData.getSystemID() : null,
+                            (locationData != null) ? locationData.file() : null,
                             org.orbeon.oxf.util.XPath.GlobalConfiguration()
                         );
 

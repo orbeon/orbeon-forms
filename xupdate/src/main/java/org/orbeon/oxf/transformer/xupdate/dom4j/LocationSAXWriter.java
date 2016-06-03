@@ -34,17 +34,17 @@ public class LocationSAXWriter extends SAXWriter {
 
         public String getSystemId() {
             LocationData locationData = getLocationData();
-            return locationData == null ? null : locationData.getSystemID();
+            return locationData == null ? null : locationData.file();
         }
 
         public int getLineNumber() {
             LocationData locationData = getLocationData();
-            return locationData == null ? -1 : locationData.getLine();
+            return locationData == null ? -1 : locationData.line();
         }
 
         public int getColumnNumber() {
             LocationData locationData = getLocationData();
-            return locationData == null ? -1 : locationData.getCol();
+            return locationData == null ? -1 : locationData.col();
         }
 
         private LocationData getLocationData() {

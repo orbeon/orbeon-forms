@@ -958,8 +958,8 @@ public class NetUtils {
      */
     public static String getRealPath(String configUrl, LocationData locationData) {
         // Use location data if present so that relative URLs can be supported
-        final URL fullURL = (locationData != null && locationData.getSystemID() != null)
-                ? URLFactory.createURL(locationData.getSystemID(), configUrl)
+        final URL fullURL = (locationData != null && locationData.file() != null)
+                ? URLFactory.createURL(locationData.file(), configUrl)
                 : URLFactory.createURL(configUrl);
 
         final String realPath;

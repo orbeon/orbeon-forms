@@ -290,7 +290,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         } else if (node instanceof ProcessingInstruction) {
             return ((ProcessingInstruction)node).getStringValue();
         } else if (node instanceof Namespace) {
-            return ((Namespace)node).getURI();
+            return ((Namespace)node).uri();
         } else {
             return "";
         }
@@ -348,7 +348,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             case Type.PROCESSING_INSTRUCTION:
                 return ((ProcessingInstruction)node).getTarget();
             case Type.NAMESPACE:
-                return ((Namespace)node).getPrefix();
+                return ((Namespace)node).prefix();
             default:
                 return null;
         }
@@ -775,8 +775,8 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 }
                 Namespace ns = (Namespace)wrapper.node;
                 int nscode = pool.allocateNamespaceCode(
-                                ns.getPrefix(),
-                                ns.getURI());
+                                ns.prefix(),
+                                ns.uri());
                 out.namespace(nscode, 0);
             }
         }
@@ -858,8 +858,8 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             do {
                 final Element elem = (Element)curr.node;
                 final Namespace ns = elem.getNamespace();
-                final String prefix = ns.getPrefix();
-                final String uri = ns.getURI();
+                final String prefix = ns.prefix();
+                final String uri = ns.uri();
 
                 if (! (prefix.length() == 0 && uri.length() == 0)) {
                     if (! nslist.containsKey(prefix)) {
@@ -870,15 +870,15 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 final List<Namespace> additionalNamespaces = elem.additionalNamespaces();
                 if (! additionalNamespaces.isEmpty()) {
                     for (final Namespace additionalNamespace : additionalNamespaces) {
-                        if (! nslist.containsKey(additionalNamespace.getPrefix())) {
-                            nslist.put(additionalNamespace.getPrefix(), additionalNamespace);
+                        if (! nslist.containsKey(additionalNamespace.prefix())) {
+                            nslist.put(additionalNamespace.prefix(), additionalNamespace);
                         }
                     }
                 }
                 curr = (NodeWrapper) curr.getParent();
             } while (curr != null && curr.getNodeKind() == Type.ELEMENT);// NOTE: support elements detached from document
 
-            nslist.put("xml", Namespace.XMLNamespace());
+            nslist.put("xml", Namespace$.MODULE$.XMLNamespace());
             prefixes = nslist.keySet().iterator();
         }
 
@@ -1081,8 +1081,8 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 int n = 0;
                 for (Iterator i = namespaces.iterator(); i.hasNext();) {
                     final Namespace namespace = (Namespace) i.next();
-                    final String prefix = namespace.getPrefix();
-                    final String uri = namespace.getURI();
+                    final String prefix = namespace.prefix();
+                    final String uri = namespace.uri();
 
                     result[n++] = pool.allocateNamespaceCode(prefix, uri);
                 }

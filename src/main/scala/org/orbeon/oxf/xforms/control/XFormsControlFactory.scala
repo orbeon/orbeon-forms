@@ -38,7 +38,7 @@ object XFormsControlFactory {
     XXFORMS_DYNAMIC_QNAME,
     XFORMS_REPEAT_ITERATION_QNAME
   )
-  
+
   private val CoreValueControls = Set(
     // Standard controls
     XFORMS_INPUT_QNAME,
@@ -53,7 +53,7 @@ object XFormsControlFactory {
     XXFORMS_ATTRIBUTE_QNAME,
     XXFORMS_TEXT_QNAME
   )
-  
+
   private val CoreControls = CoreValueControls + XFORMS_SUBMIT_QNAME + XFORMS_TRIGGER_QNAME
 
   private val BuiltinControls = ContainerControls ++
@@ -124,7 +124,7 @@ object XFormsControlFactory {
   }
 
   // TODO: Move this to ControlAnalysisFactory
-  private def getQName(controlURI: String, controlName: String) = QName.get(controlName, Namespace.get("", controlURI))
+  private def getQName(controlURI: String, controlName: String) = QName.get(controlName, Namespace("", controlURI))
   def isContainerControl(controlURI: String, controlName: String) = ContainerControls(getQName(controlURI, controlName))
   def isCoreControl(controlURI: String, controlName: String)      = CoreControls.contains(getQName(controlURI, controlName))
   def isBuiltinControl(controlURI: String, controlName: String)   = BuiltinControls.contains(getQName(controlURI, controlName))

@@ -362,8 +362,8 @@ public class Dom4jUtils {
             final List currentNamespaces = currentNode.declaredNamespaces();
             for (Iterator j = currentNamespaces.iterator(); j.hasNext();) {
                 final Namespace namespace = (Namespace) j.next();
-                if (!namespaces.containsKey(namespace.getPrefix())) {
-                    namespaces.put(namespace.getPrefix(), namespace.getURI());
+                if (!namespaces.containsKey(namespace.prefix())) {
+                    namespaces.put(namespace.prefix(), namespace.uri());
 
                     // TODO: Intern namespace strings to save memory; should use NamePool later
 //                    namespaces.put(namespace.getPrefix().intern(), namespace.getURI().intern());
@@ -466,7 +466,7 @@ public class Dom4jUtils {
                 throw new OXFException("No namespace declaration found for prefix: " + prefix);
             }
         }
-        return new QName(localName, new Namespace(prefix, namespaceURI));
+        return new QName(localName, Namespace$.MODULE$.apply(prefix, namespaceURI));
     }
 
     /**
@@ -480,7 +480,7 @@ public class Dom4jUtils {
 
         String namespaceURI = qName.substring(openIndex + 1, qName.indexOf("}"));
         String localName = qName.substring(qName.indexOf("}") + 1);
-        return new QName(localName, new Namespace("p1", namespaceURI));
+        return new QName(localName, Namespace$.MODULE$.apply("p1", namespaceURI));
     }
 
     // TODO ORBEON: remove uses, just use DocumentFactory

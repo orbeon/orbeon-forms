@@ -106,7 +106,7 @@ class BinaryTextXMLReceiver(
       val typeNamespaceURI =
         prefixMappings.getOrElse(typePrefix, throw new OXFException(s"Undeclared prefix in xsi:type: $typePrefix"))
 
-      val isBinaryInput = QName.get(typeLocalName, Namespace.get(typePrefix, typeNamespaceURI)) match {
+      val isBinaryInput = QName.get(typeLocalName, Namespace(typePrefix, typeNamespaceURI)) match {
         case XS_BASE64BINARY_QNAME ⇒ true
         case XS_STRING_QNAME       ⇒ false
         case _                     ⇒ throw new OXFException("Type xs:string or xs:base64Binary must be specified")

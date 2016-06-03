@@ -42,7 +42,7 @@ object XMLNames {
 
   val FRContainerTest = FRSectionTest || FRGridTest
 
-  val FRNamespace     = new Namespace("fr", FR)
+  val FRNamespace     = Namespace("fr", FR)
   val ItemsetIdQName  = new QName("itemsetid",  FRNamespace)
   val ItemsetMapQName = new QName("itemsetmap", FRNamespace)
 }

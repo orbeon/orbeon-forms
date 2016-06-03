@@ -14,11 +14,11 @@ object QName {
     if (((prefix eq null) || prefix.isEmpty) && (uri eq null)) {
       QName.get(name)
     } else if ((prefix eq null) || prefix.isEmpty) {
-      QNameCache.get(name, Namespace.get(uri))
+      QNameCache.get(name, Namespace(uri))
     } else if (uri eq null) {
       QName.get(name)
     } else {
-      QNameCache.get(name, Namespace.get(prefix, uri))
+      QNameCache.get(name, Namespace(prefix, uri))
     }
 
   def get(qualifiedName: String, uri: String): QName =
@@ -57,8 +57,8 @@ class QName(_name: String, _namespace: Namespace, _qualifiedName: String) {
 
   def getQualifiedName = qualifiedName
 
-  def getNamespacePrefix = namespace.getPrefix
-  def getNamespaceURI    = namespace.getURI
+  def getNamespacePrefix = namespace.prefix
+  def getNamespaceURI    = namespace.uri
 
   private var _hashCode: Int = _
 

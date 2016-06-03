@@ -60,7 +60,7 @@ import java.util.*;
 public class PipelineProcessor extends ProcessorImpl {
 
     public static final String PIPELINE_NAMESPACE_URI = "http://www.orbeon.com/oxf/pipeline";
-    public static final Namespace PIPELINE_NAMESPACE = new Namespace("p", PIPELINE_NAMESPACE_URI);
+    public static final Namespace PIPELINE_NAMESPACE = Namespace$.MODULE$.apply("p", PIPELINE_NAMESPACE_URI);
     private PipelineConfig configFromAST;
 
     public PipelineProcessor() {

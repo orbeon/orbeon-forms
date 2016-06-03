@@ -680,7 +680,7 @@ public class XFormsUtils {
         else if (nodeInfo.getNodeKind() == org.w3c.dom.Node.ATTRIBUTE_NODE) {
             return DocumentFactory.createAttribute(
                 null,
-                new QName(nodeInfo.getLocalPart(), new Namespace(nodeInfo.getPrefix(), nodeInfo.getURI())),
+                new QName(nodeInfo.getLocalPart(), Namespace$.MODULE$.apply(nodeInfo.getPrefix(), nodeInfo.getURI())),
                 nodeInfo.getStringValue()
             );
         } else

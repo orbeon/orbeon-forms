@@ -270,7 +270,7 @@ object XFormsFunction {
 
   def qNameFromQNameValue(value: QNameValue): dom4j.QName =
     parseQName(value.getStringValue) match {
-      case PrefixedName(prefix, local) ⇒ new dom4j.QName(local, new Namespace(prefix, value.getNamespaceURI))
+      case PrefixedName(prefix, local) ⇒ new dom4j.QName(local, Namespace(prefix, value.getNamespaceURI))
       case UnprefixedName(local)       ⇒ new dom4j.QName(local)
     }
 
@@ -299,7 +299,7 @@ object XFormsFunction {
         if (qNameURI eq null)
           prefixNotInScope()
 
-        new dom4j.QName(local, new Namespace(prefix, qNameURI))
+        new dom4j.QName(local, Namespace(prefix, qNameURI))
       case UnprefixedName(local) ⇒
         new dom4j.QName(local)
     }

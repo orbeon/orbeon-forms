@@ -52,7 +52,7 @@ class NamespaceStack {
     namespaceStack.add(namespace)
     namespaceCacheList.add(null)
     currentNamespaceCache = null
-    val prefix = namespace.getPrefix
+    val prefix = namespace.prefix
     if ((prefix eq null) || (prefix.length == 0)) {
       _defaultNamespace = namespace
     }
@@ -83,7 +83,7 @@ class NamespaceStack {
     var i = namespaceStack.size - 1
     while (i >= 0) {
       val namespace = namespaceStack.get(i)
-      if (prefix == namespace.getPrefix) {
+      if (prefix == namespace.prefix) {
         return namespace
       }
       i -= 1
@@ -96,14 +96,14 @@ class NamespaceStack {
    */
   def getURI(prefix: String): String = {
     val namespace = getNamespaceForPrefix(prefix)
-    if (namespace ne null) namespace.getURI else null
+    if (namespace ne null) namespace.uri else null
   }
 
   /**
    * @return true if the given prefix is in the stack.
    */
   def contains(namespace: Namespace): Boolean = {
-    val prefix = namespace.getPrefix
+    val prefix = namespace.prefix
     var current: Namespace = null
     current = if ((prefix eq null) || (prefix.length == 0)) getDefaultNamespace else getNamespaceForPrefix(prefix)
     if (current eq null) {
@@ -112,7 +112,7 @@ class NamespaceStack {
     if (current == namespace) {
       return true
     }
-    namespace.getURI == current.getURI
+    namespace.uri == current.uri
   }
 
   def getQName(_namespaceURI: String, _localName: String, _qualifiedName: String): QName = {
@@ -212,7 +212,7 @@ class NamespaceStack {
     var i = namespaceStack.size - 1
     while (i >= 0) {
       val ns = namespaceStack.get(i)
-      if (prefix == ns.getPrefix) {
+      if (prefix == ns.prefix) {
         remove(i)
         namespace = ns
         return namespace
@@ -252,8 +252,8 @@ class NamespaceStack {
     while (i >= 0) {
       val namespace = namespaceStack.get(i)
       if (namespace ne null) {
-        val prefix = namespace.getPrefix
-        if ((prefix eq null) || (namespace.getPrefix.length == 0)) {
+        val prefix = namespace.prefix
+        if ((prefix eq null) || (namespace.prefix.length == 0)) {
           return namespace
         }
       }

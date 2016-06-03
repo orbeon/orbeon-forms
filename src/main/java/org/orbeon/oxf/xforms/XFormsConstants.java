@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
+import org.dom4j.Namespace$;
 import org.dom4j.QName;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -75,14 +76,14 @@ public class XFormsConstants {
     public static final String XFORMS_PREFIX = "xforms"; // TODO: remove
     public static final String XFORMS_SHORT_PREFIX = "xf";
     public static final String XFORMS_NAMESPACE_URI = "http://www.w3.org/2002/xforms";
-    public static final Namespace XFORMS_NAMESPACE       = new Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI);
-    public static final Namespace XFORMS_NAMESPACE_SHORT = new Namespace(XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI);
+    public static final Namespace XFORMS_NAMESPACE       = Namespace$.MODULE$.apply(XFORMS_PREFIX, XFORMS_NAMESPACE_URI);
+    public static final Namespace XFORMS_NAMESPACE_SHORT = Namespace$.MODULE$.apply(XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI);
 
     public static final String XXFORMS_PREFIX = "xxforms"; // TODO: remove
     public static final String XXFORMS_SHORT_PREFIX = "xxf";
     public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-    public static final Namespace XXFORMS_NAMESPACE = new Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
-    public static final Namespace XXFORMS_NAMESPACE_SHORT = new Namespace(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI); // TODO: remove
+    public static final Namespace XXFORMS_NAMESPACE = Namespace$.MODULE$.apply(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
+    public static final Namespace XXFORMS_NAMESPACE_SHORT = Namespace$.MODULE$.apply(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI); // TODO: remove
 
     // Common attributes
     public static final QName REF_QNAME = new QName("ref");
@@ -143,13 +144,13 @@ public class XFormsConstants {
     // eXForms at http://www.exforms.org/
     public static final String EXFORMS_NAMESPACE_URI = "http://www.exforms.org/exf/1-0";
     public static final String EXFORMS_PREFIX = "exf";
-    public static final Namespace EXFORMS_NAMESPACE = new Namespace(EXFORMS_PREFIX, EXFORMS_NAMESPACE_URI);
+    public static final Namespace EXFORMS_NAMESPACE = Namespace$.MODULE$.apply(EXFORMS_PREFIX, EXFORMS_NAMESPACE_URI);
 
 
     // XBL
     public static final String XBL_PREFIX = "xbl";
     public static final String XBL_NAMESPACE_URI = "http://www.w3.org/ns/xbl";
-    public static final Namespace XBL_NAMESPACE = new Namespace(XBL_PREFIX, XBL_NAMESPACE_URI);
+    public static final Namespace XBL_NAMESPACE = Namespace$.MODULE$.apply(XBL_PREFIX, XBL_NAMESPACE_URI);
     public static final QName XBL_XBL_QNAME = new QName("xbl", XBL_NAMESPACE);
     public static final QName XBL_BINDING_QNAME = new QName("binding", XBL_NAMESPACE);
     public static final QName XBL_SCRIPT_QNAME = new QName("script", XBL_NAMESPACE);
@@ -166,7 +167,7 @@ public class XFormsConstants {
     // XBL extensions
     public static final String XXBL_PREFIX = "xxbl";
     public static final String XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl";
-    public static final Namespace XXBL_NAMESPACE = new Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI);
+    public static final Namespace XXBL_NAMESPACE = Namespace$.MODULE$.apply(XXBL_PREFIX, XXBL_NAMESPACE_URI);
     public static final QName XXBL_TRANSFORM_QNAME = new QName("transform", XXBL_NAMESPACE);
     public static final QName XXBL_AVT_QNAME = new QName("avt", XXBL_NAMESPACE);
     public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
@@ -190,7 +191,7 @@ public class XFormsConstants {
 
     public static final String XML_EVENTS_PREFIX = "ev";
     public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";
-    public static final Namespace XML_EVENTS_NAMESPACE = new Namespace(XML_EVENTS_PREFIX, XML_EVENTS_NAMESPACE_URI);
+    public static final Namespace XML_EVENTS_NAMESPACE = Namespace$.MODULE$.apply(XML_EVENTS_PREFIX, XML_EVENTS_NAMESPACE_URI);
 
     public static final QName XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME = new QName("event", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_EVENT_ATTRIBUTE_QNAME = new QName("event");

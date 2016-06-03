@@ -101,7 +101,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
   }
 
   def addElement(name: String, prefix: String, uri: String): Element = {
-    val namespace = Namespace.get(prefix, uri)
+    val namespace = Namespace(prefix, uri)
     val qName = DocumentFactory.createQName(name, namespace)
     addElement(qName)
   }

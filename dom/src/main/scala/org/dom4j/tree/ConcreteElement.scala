@@ -85,7 +85,7 @@ class ConcreteElement(var qname: QName)
 
       val nyNamespace = getNamespace
       if (nyNamespace != Namespace.EmptyNamespace) {
-        val myPrefix = nyNamespace.getPrefix
+        val myPrefix = nyNamespace.prefix
         val parentNamespace = parent.getNamespaceForPrefix(myPrefix)
         if (myPrefix == parentNamespace) { // ORBEON TODO: comparing unrelated!
           val myNm = nyNamespace.getName
@@ -98,7 +98,7 @@ class ConcreteElement(var qname: QName)
       while (contentIt.hasNext) {
         contentIt.next() match {
           case ns: Namespace ⇒
-            val prefix = ns.getPrefix
+            val prefix = ns.prefix
             val parentNamespace = parent.getNamespaceForPrefix(prefix)
             if (ns == parentNamespace)
               contentIt.remove()
@@ -645,9 +645,9 @@ class ConcreteElement(var qname: QName)
       class NamespaceNodeComparator extends ju.Comparator[Namespace] {
 
         def compare(n1: Namespace, n2: Namespace): Int = {
-          var answer = compare(n1.getURI, n2.getURI)
+          var answer = compare(n1.uri, n2.uri)
           if (answer == 0) {
-            answer = compare(n1.getPrefix, n2.getPrefix)
+            answer = compare(n1.prefix, n2.prefix)
           }
           answer
         }
@@ -684,7 +684,7 @@ class ConcreteElement(var qname: QName)
       val it = namespaceSet.iterator
       while (it.hasNext) {
         val ns = it.next()
-        val prefix = ns.getPrefix
+        val prefix = ns.prefix
         if (clone.getNamespaceForPrefix(prefix) eq null)
           clone.add(ns)
       }
@@ -730,7 +730,7 @@ class ConcreteElement(var qname: QName)
       for (i ← 0 until size) {
         list.get(i) match {
           case namespace: Namespace ⇒
-            if (prefix == namespace.getPrefix) {
+            if (prefix == namespace.prefix) {
               return namespace
             }
           case _ ⇒
@@ -761,7 +761,7 @@ class ConcreteElement(var qname: QName)
       for (i ← 0 until size) {
         list.get(i) match {
           case namespace: Namespace ⇒
-            if (uri == namespace.getURI) {
+            if (uri == namespace.uri) {
               return namespace
             }
           case _ ⇒

@@ -103,7 +103,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
   }
 
   implicit object InstanceFormat extends Format[InstanceState] {
-    
+
     def writes(output: Output, instance: InstanceState): Unit = {
       write(output, instance.effectiveId)
       write(output, instance.modelEffectiveId)
@@ -115,7 +115,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       write(output, instance.modified)
       write(output, instance.valid)
     }
-    
+
     def reads(in: Input) = {
 
       def readCachingOrContent = read[Byte](in) match {
@@ -137,20 +137,20 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
   implicit object QNameFormat extends Format[QName] {
     def writes(out: Output, value: QName): Unit = {
       write(out, value.getName)
-      write(out, value.getNamespace.getPrefix)
-      write(out, value.getNamespace.getURI)
+      write(out, value.getNamespace.prefix)
+      write(out, value.getNamespace.uri)
       write(out, value.getQualifiedName)
-      
+
     }
 
     def reads(in: Input) =
       QName.get(
         read[String](in),
-        Namespace.get(read[String](in), read[String](in)),
+        Namespace(read[String](in), read[String](in)),
         read[String](in)
       )
   }
-  
+
   implicit object PathMatcherFormat extends Format[PathMatcher] {
     def writes(output: Output, value: PathMatcher): Unit = {
       write(output, value.regexp)
@@ -169,7 +169,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
 // Modified version of sbinary JavaUTF to support reading/writing longer strings
 trait JavaLongUTF extends CoreProtocol {
-  
+
   private def getUTFLength(s: String) = {
 
     val length = s.length

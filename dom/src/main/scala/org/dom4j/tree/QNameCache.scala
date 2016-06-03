@@ -63,11 +63,11 @@ class QNameCache {
   def get(qualifiedName: String, uri: String): QName = {
     val index = qualifiedName.indexOf(':')
     if (index < 0) {
-      get(qualifiedName, Namespace.get(uri))
+      get(qualifiedName, Namespace(uri))
     } else {
       val name = qualifiedName.substring(index + 1)
       val prefix = qualifiedName.substring(0, index)
-      get(name, Namespace.get(prefix, uri))
+      get(name, Namespace(prefix, uri))
     }
   }
 

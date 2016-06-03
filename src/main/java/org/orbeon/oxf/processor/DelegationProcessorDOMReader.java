@@ -204,8 +204,8 @@ public class DelegationProcessorDOMReader {
     protected void clearNamespaceStack() {
         namespaceStack.clear();
 
-        if (!namespaceStack.contains(Namespace.XMLNamespace())) {
-            namespaceStack.push(Namespace.XMLNamespace());
+        if (!namespaceStack.contains(Namespace$.MODULE$.XMLNamespace())) {
+            namespaceStack.push(Namespace$.MODULE$.XMLNamespace());
         }
     }
 

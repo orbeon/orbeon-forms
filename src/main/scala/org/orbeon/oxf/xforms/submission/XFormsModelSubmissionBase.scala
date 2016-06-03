@@ -220,6 +220,6 @@ object XFormsModelSubmissionBase {
     }
 
     def addRootElementNamespace(doc: Document) =
-      doc.getRootElement.addNamespace(XXFORMS_NAMESPACE_SHORT.getPrefix, XXFORMS_NAMESPACE_SHORT.getURI)
+      doc.getRootElement.addNamespace(XXFORMS_NAMESPACE_SHORT.prefix, XXFORMS_NAMESPACE_SHORT.uri)
   }
 }

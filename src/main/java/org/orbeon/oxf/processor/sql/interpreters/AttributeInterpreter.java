@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.dom4j.Namespace;
+import org.dom4j.Namespace$;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
@@ -98,7 +98,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         if (prefixesMap.get(prefix) == null) {
             throw new ValidationException("Undeclared prefix for QName:" + qNameString, new LocationData(locator));
         } else {
-            return new QName(localName, new Namespace(prefix, (String) prefixesMap.get(prefix)));
+            return new QName(localName, Namespace$.MODULE$.apply(prefix, (String) prefixesMap.get(prefix)));
         }
     }
 }

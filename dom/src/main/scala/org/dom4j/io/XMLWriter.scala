@@ -558,7 +558,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
 
   private def writeNamespace(namespace: Namespace): Unit = {
     if (namespace ne null) {
-      writeNamespace(namespace.getPrefix, namespace.getURI)
+      writeNamespace(namespace.prefix, namespace.uri)
     }
   }
 
@@ -730,9 +730,9 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       val attribute = element.attribute(i)
       val ns = attribute.getNamespace
       if ((ns ne null) && (ns != Namespace.EmptyNamespace) && (ns != Namespace.XMLNamespace)) {
-        val prefix = ns.getPrefix
+        val prefix = ns.prefix
         val uri = namespaceStack.getURI(prefix)
-        if (ns.getURI != uri) {
+        if (ns.uri != uri) {
           writeNamespace(ns)
           namespaceStack.push(ns)
         }
@@ -940,7 +940,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
 
   private def isNamespaceDeclaration(ns: Namespace): Boolean = {
     if ((ns ne null) && (ns != Namespace.XMLNamespace)) {
-      val uri = ns.getURI
+      val uri = ns.uri
       if (uri ne null) {
         if (!namespaceStack.contains(ns)) {
           return true

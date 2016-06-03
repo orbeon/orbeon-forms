@@ -5,31 +5,15 @@ import java.util.concurrent.ConcurrentHashMap
 import java.{util ⇒ ju}
 
 import org.dom4j.Namespace
-import org.dom4j.tree.NamespaceCache._
 
-private object NamespaceCache {
+object NamespaceCache {
 
-  /**
-   * Cache of instances indexed by URI which contain caches for each prefix.
-   */
-  val cache = new ConcurrentHashMap[String, ju.Map[String, WeakReference[Namespace]]](11, 0.75f, 1)
+  // Cache of instances indexed by URI which contain caches for each prefix.
+  private val cache = new ConcurrentHashMap[String, ju.Map[String, WeakReference[Namespace]]](11, 0.75f, 1)
 
-  /**
-   * Cache of instances indexed by URI for defaultnamespaces with no prefixes.
-   */
-  val noPrefixCache = new ConcurrentHashMap[String, WeakReference[Namespace]](11, 0.75f, 1)
-}
+  // Cache of instances indexed by URI for default namespaces with no prefixes.
+  private val noPrefixCache = new ConcurrentHashMap[String, WeakReference[Namespace]](11, 0.75f, 1)
 
-/**
- * `NamespaceCache` caches instances of
- * `DefaultNamespace` for reuse both across documents and within
- * documents.
- */
-class NamespaceCache {
-
-  /**
-   * @return the namespace for the given prefix and uri
-   */
   def get(prefix: String, uri: String): Namespace = {
     val uriCache = getURICache(uri)
     var ref = uriCache.get(prefix)
@@ -44,7 +28,7 @@ class NamespaceCache {
           answer = ref.get
         }
         if (answer eq null) {
-          answer = createNamespace(prefix, uri)
+          answer = new ConcreteNamespace(prefix, uri)
           uriCache.put(prefix, new WeakReference[Namespace](answer))
         }
       }
@@ -52,9 +36,6 @@ class NamespaceCache {
     answer
   }
 
-  /**
-   * @return the name model for the given name and namepsace
-   */
   def get(uri: String): Namespace = {
     var ref = noPrefixCache.get(uri)
     var answer: Namespace = null
@@ -68,7 +49,7 @@ class NamespaceCache {
           answer = ref.get
         }
         if (answer eq null) {
-          answer = createNamespace("", uri)
+          answer = new ConcreteNamespace("", uri)
           noPrefixCache.put(uri, new WeakReference[Namespace](answer))
         }
       }
@@ -76,10 +57,7 @@ class NamespaceCache {
     answer
   }
 
-  /**
-   * @return the cache for the given namespace URI. If one does not currently
-   *         exist it is created.
-   */
+  // Return the cache for the given namespace URI. If one does not currently exist it is created.
   private def getURICache(uri: String): ju.Map[String, WeakReference[Namespace]] = {
     var answer = cache.get(uri)
     if (answer eq null) {
@@ -93,6 +71,4 @@ class NamespaceCache {
     }
     answer
   }
-
-  private def createNamespace(prefix: String, uri: String): Namespace = new Namespace(prefix, uri)
 }

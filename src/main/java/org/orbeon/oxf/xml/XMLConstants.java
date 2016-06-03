@@ -14,37 +14,30 @@
 package org.orbeon.oxf.xml;
 
 import org.dom4j.Namespace;
+import org.dom4j.Namespace$;
 import org.dom4j.QName;
 
 public class XMLConstants {
 
     public static final String XML_PREFIX = "xml";
     public static final String XML_URI = "http://www.w3.org/XML/1998/namespace";
-    public static final QName XML_BASE_QNAME = new QName("base", new Namespace(XML_PREFIX, XML_URI));
-    public static final QName XML_LANG_QNAME = new QName("lang", new Namespace(XML_PREFIX, XML_URI));
+    public static final QName XML_BASE_QNAME = new QName("base", Namespace$.MODULE$.apply(XML_PREFIX, XML_URI));
+    public static final QName XML_LANG_QNAME = new QName("lang", Namespace$.MODULE$.apply(XML_PREFIX, XML_URI));
 
     public static final String XSI_PREFIX = "xsi";
     public static final String XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";
-    public static final QName XSI_TYPE_QNAME = new QName("type", new Namespace(XSI_PREFIX, XSI_URI));
+    public static final QName XSI_TYPE_QNAME = new QName("type", Namespace$.MODULE$.apply(XSI_PREFIX, XSI_URI));
 
     public static final String XSD_PREFIX = "xs";
     public static final String XSD_URI = "http://www.w3.org/2001/XMLSchema";
-    public static final Namespace XSD_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
+    public static final Namespace XSD_NAMESPACE = Namespace$.MODULE$.apply(XSD_PREFIX, XSD_URI);
 
     public final static QName XML_SCHEMA_QNAME = new QName("schema", XSD_NAMESPACE);
 
-    // NOTE: "2003" was used at some point; the correct value for XInclude 1.0 is "2001"
-    public static final String XINCLUDE_URI = "http://www.w3.org/2001/XInclude";
-    public static final String OLD_XINCLUDE_URI = "http://www.w3.org/2003/XInclude";
-    public static final String XXINCLUDE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xinclude";
-    public static final Namespace XXINCLUDE_NAMESPACE = new Namespace("xxi", XXINCLUDE_NAMESPACE_URI);
-    public static final QName XXINCLUDE_OMIT_XML_BASE = new QName("omit-xml-base", XXINCLUDE_NAMESPACE);
-    public static final QName XINCLUDE_FIXUP_XML_BASE = new QName("fixup-xml-base", Namespace.EmptyNamespace());
-
     public static final String OPS_FORMATTING_URI = "http://orbeon.org/oxf/xml/formatting";
-    public static final Namespace OPS_FORMATTING_NAMESPACE = new Namespace("f", XMLConstants.OPS_FORMATTING_URI);
+    public static final Namespace OPS_FORMATTING_NAMESPACE = Namespace$.MODULE$.apply("f", XMLConstants.OPS_FORMATTING_URI);
     public static final String OXF_PROCESSORS_URI = "http://www.orbeon.com/oxf/processors";
-    public static final Namespace OXF_PROCESSORS_NAMESPACE = new Namespace("oxf", OXF_PROCESSORS_URI);
+    public static final Namespace OXF_PROCESSORS_NAMESPACE = Namespace$.MODULE$.apply("oxf", OXF_PROCESSORS_URI);
 
     public final static QName FORMATTING_URL_TYPE_QNAME = new QName("url-type", OPS_FORMATTING_NAMESPACE);
     public final static QName FORMATTING_URL_NOREWRITE_QNAME = new QName("url-norewrite", OPS_FORMATTING_NAMESPACE);
@@ -86,15 +79,15 @@ public class XMLConstants {
     public static final QName XS_DOUBLE_QNAME = new QName("double", XSD_NAMESPACE);
 
     public static final String OPS_TYPES_URI = "http://orbeon.org/oxf/xml/datatypes";
-    public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", new Namespace("ops", OPS_TYPES_URI));
+    public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", Namespace$.MODULE$.apply("ops", OPS_TYPES_URI));
 
-    public static final Namespace XSI_NAMESPACE = new Namespace(XSI_PREFIX, XSI_URI);
+    public static final Namespace XSI_NAMESPACE = Namespace$.MODULE$.apply(XSI_PREFIX, XSI_URI);
     public static final String XSI_NIL_ATTRIBUTE = "nil";
     public static final QName XSI_NIL_QNAME = new QName(XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
 
     public static final String XSLT_PREFIX = "xsl";
     public static final String XSLT_NAMESPACE_URI = "http://www.w3.org/1999/XSL/Transform";
-    public static final Namespace XSLT_NAMESPACE = new Namespace("xsl", XSLT_NAMESPACE_URI);
+    public static final Namespace XSLT_NAMESPACE = Namespace$.MODULE$.apply("xsl", XSLT_NAMESPACE_URI);
     public static final QName XSLT_VERSION_QNAME = new QName("version", XSLT_NAMESPACE);
 
     public static final String XHTML_PREFIX = "xhtml";

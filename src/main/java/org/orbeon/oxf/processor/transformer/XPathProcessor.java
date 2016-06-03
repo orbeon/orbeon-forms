@@ -17,8 +17,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.ProcessingInstruction;
 import org.dom4j.Text;
-import org.dom4j.tree.ConcreteProcessingInstruction;
-import org.dom4j.tree.ConcreteText;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPath;

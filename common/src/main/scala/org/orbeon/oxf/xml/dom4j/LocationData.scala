@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j
 
+import java.{lang ⇒ jl}
 import javax.xml.transform.SourceLocator
 
 import org.orbeon.oxf.util.ScalaUtils._
@@ -43,7 +44,7 @@ case class LocationData(file: String, line: Int, col: Int) {
     this(exception.getSystemId, exception.getLineNumber, exception.getColumnNumber)
 
   override def toString = {
-    val sb = new java.lang.StringBuilder
+    val sb = new jl.StringBuilder
 
     val hasLine =
       if (line > 0) {

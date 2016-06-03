@@ -326,6 +326,9 @@ object ScalaUtils extends PathOps {
     private def isZeroWidthChar(c: Int) =
       c == '\u200b' || c == '\u200c' || c == '\u200d' || c == '\ufeff'
 
+    def isBlank  = trimAllToEmpty.isEmpty
+    def nonBlank = trimAllToEmpty.nonEmpty
+
     def trimAllToEmpty = trimControlAndAllWhitespaceToEmptyCP
 
     def trimAllToOpt: Option[String] = {

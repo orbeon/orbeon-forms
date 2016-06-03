@@ -15,7 +15,7 @@ package org.orbeon.oxf.xml.dom4j
 
 import javax.xml.transform.SourceLocator
 
-import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util.ScalaUtils._
 import org.xml.sax.{Locator, SAXParseException}
 
 object LocationData {
@@ -23,7 +23,7 @@ object LocationData {
     if (locator ne null) {
       val file = locator.getSystemId
       val line = locator.getLineNumber
-      if (StringUtils.isNotBlank(file) && line != -1)
+      if (file.nonBlank && line != -1)
         LocationData(file, line, locator.getColumnNumber)
       else
         null

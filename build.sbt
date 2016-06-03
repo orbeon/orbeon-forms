@@ -168,8 +168,7 @@ lazy val xupdate = (project in file("xupdate"))
   .dependsOn(common)
   .settings(commonSettings: _*)
   .settings(
-    name          := "orbeon-xupdate",
-    unmanagedBase := baseDirectory.value / ".." / "lib"
+    name          := "orbeon-xupdate"
   )
 
 lazy val dom = (project in file("dom"))
@@ -192,7 +191,7 @@ lazy val formBuilder = (project in file("form-builder"))
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(common, dom, formBuilderSharedJVM, xupdate)
+  .dependsOn(common, dom, formBuilderSharedJVM)
   .settings(commonSettings: _*)
   .settings(
     name                         := "orbeon-core",

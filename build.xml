@@ -526,6 +526,10 @@
             <arg value="copyJarToExplodedWar"/>
         </exec>
 
+        <copy file="${xforms-filter.jar.file}"     todir="build/orbeon-war/WEB-INF/lib"/>
+        <copy file="${resources-private.jar.file}" todir="build/orbeon-war/WEB-INF/lib"/>
+        <copy file="${resources-public.jar.file}"  todir="build/orbeon-war/WEB-INF/lib"/>
+
         <copy todir="build/orbeon-war/WEB-INF">
             <fileset dir="lib">
                 <include name="commons-cli-1_0.jar"/>

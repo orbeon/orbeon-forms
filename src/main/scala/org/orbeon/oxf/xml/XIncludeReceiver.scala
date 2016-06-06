@@ -28,6 +28,8 @@ import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferences
 import XIncludeReceiver._
 import scala.util.control.NonFatal
 
+import XMLNames._
+
 // Streaming XInclude processing
 // NOTE: Does not support: <xi:fallback>, encoding, accept, or accept-language attributes.
 class XIncludeReceiver(

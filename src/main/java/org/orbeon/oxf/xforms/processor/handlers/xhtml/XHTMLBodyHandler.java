@@ -85,7 +85,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
         if (!handlerContext.isNoScript()) {
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+            helper.element("", XMLNames.XINCLUDE_URI(), "include", new String[] {
                     "href", getIncludedResourceURL(requestPath, "noscript-panel.xml"),
                     "fixup-xml-base", "false"
             });
@@ -167,7 +167,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             XFormsError.outputAjaxErrorPanel(containingDocument, helper, htmlPrefix);
 
             // Help panel
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+            helper.element("", XMLNames.XINCLUDE_URI(), "include", new String[] {
                     "href", getIncludedResourceURL(requestPath, "help-panel.xml"),
                     "fixup-xml-base", "false"
             });

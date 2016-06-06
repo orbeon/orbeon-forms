@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLResources
 import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XINCLUDE_URI}
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -73,7 +73,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // Include static XForms CSS and JS
     val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
 
-    helper.element("", XINCLUDE_URI, "include",
+    helper.element("", XMLNames.XINCLUDE_URI, "include",
       Array(
         "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css-js.xml"),
         "fixup-xml-base", "false"

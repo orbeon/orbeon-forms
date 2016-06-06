@@ -89,7 +89,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     writer.close()
   }
 
-  def println(): Unit =
+  def writeNewLine(): Unit =
     writer.write(OutputFormat.LineSeparator)
 
   def write(attribute: Attribute): Unit = {
@@ -115,7 +115,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       val node = doc.node(i)
       writeNode(node)
     }
-    writePrintln()
+    writeNewLineIfNeeded()
     if (autoFlush) {
       flush()
     }
@@ -250,7 +250,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
   override def startElement(namespaceURI: String, localName: String, qName: String, attributes: Attributes): Unit =
     try {
       charsAdded = false
-      writePrintln()
+      writeNewLineIfNeeded()
       indent()
       writer.write("<")
       writer.write(qName)
@@ -270,7 +270,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       charsAdded = false
       indentLevel -= 1
       if (lastElementClosed) {
-        writePrintln()
+        writeNewLineIfNeeded()
         indent()
       }
       val hadContent = true
@@ -332,7 +332,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       writer.write(" ")
       writer.write(data)
       writer.write("?>")
-      writePrintln()
+      writeNewLineIfNeeded()
       lastOutputNodeType = Node.PROCESSING_INSTRUCTION_NODE
       super.processingInstruction(target, data)
     } catch {
@@ -414,7 +414,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
   private def writeElement(element: Element): Unit = {
     val size = element.nodeCount
     val qualifiedName = element.getQualifiedName
-    writePrintln()
+    writeNewLineIfNeeded()
     indent()
     writer.write("<")
     writer.write(qualifiedName)
@@ -452,7 +452,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
         indentLevel += 1
         writeElementContent(element)
         indentLevel -= 1
-        writePrintln()
+        writeNewLineIfNeeded()
         indent()
       }
       writer.write("</")
@@ -593,7 +593,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     writer.write(" ")
     writer.write(pi.getText)
     writer.write("?>")
-    writePrintln()
+    writeNewLineIfNeeded()
     lastOutputNodeType = Node.PROCESSING_INSTRUCTION_NODE
   }
 
@@ -697,7 +697,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       writer.write("\"")
     }
     writer.write(">")
-    writePrintln()
+    writeNewLineIfNeeded()
   }
 
   private def writeEntity(entity: Entity): Unit =
@@ -716,7 +716,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
 
   private def writeComment(text: String): Unit = {
     if (format.newlines) {
-      println()
+      writeNewLine()
       indent()
     }
     writer.write("<!--")
@@ -797,10 +797,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     }
   }
 
-  /**
-   * This will print a new line only if the newlines flag was set to true
-   */
-  private def writePrintln(): Unit =
+  private def writeNewLineIfNeeded(): Unit =
     if (format.newlines) {
       val separator = OutputFormat.LineSeparator
       if (lastChar != separator.charAt(separator.length - 1)) {
@@ -818,7 +815,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     writer.write("<?xml version=\"1.0\"")
     writer.write(" encoding=\"" + OutputFormat.StandardEncoding + "\"")
     writer.write("?>")
-    println()
+    writeNewLine()
   }
 
   private def writeClose(qualifiedName: String): Unit = {

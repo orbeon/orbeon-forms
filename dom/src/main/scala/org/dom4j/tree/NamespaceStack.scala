@@ -219,8 +219,10 @@ class NamespaceStack {
       }
       i -= 1
     }
-    if (namespace eq null)
-      println(s"Warning: missing namespace prefix ignored: $prefix")
+
+    // ORBEON: We don't want a `println` here. We should either remove if it doesn't happen, or throw if it's an error.
+//    if (namespace eq null)
+//      println(s"Warning: missing namespace prefix ignored: $prefix")
 
     namespace
   }

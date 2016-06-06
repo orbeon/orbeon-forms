@@ -1,9 +1,9 @@
 package org.dom4j.io
 
-import java.{lang ⇒ jl}
+import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.dom4j._
-import org.dom4j.tree.{NamespaceStack, ConcreteElement}
+import org.dom4j.tree.{ConcreteElement, NamespaceStack}
 import org.xml.sax._
 import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.DefaultHandler
@@ -18,7 +18,7 @@ class SAXContentHandler(
   ignoreComments      : Boolean
 ) extends DefaultHandler with LexicalHandler {
 
-  protected val elementStack = new ElementStack(50)
+  protected val elementStack = new ju.ArrayList[Element](50)
   private val namespaceStack = new NamespaceStack
 
   private lazy val document = createDocument
@@ -90,7 +90,7 @@ class SAXContentHandler(
     val element = branch.addElement(qName)
     addDeclaredNamespaces(element)
     addAttributes(element, attributes)
-    elementStack.pushElement(element)
+    elementStack.add(element)
     currentElement = element
     entity = null
   }
@@ -103,8 +103,8 @@ class SAXContentHandler(
     if (mergeAdjacentText && textInTextBuffer)
       completeCurrentTextNode()
 
-    elementStack.popElement()
-    currentElement = elementStack.peekElement
+    elementStack.remove(elementStack.size - 1)
+    currentElement = elementStack.get(elementStack.size - 1)
   }
 
   override def characters(ch: Array[Char], start: Int, end: Int): Unit = {

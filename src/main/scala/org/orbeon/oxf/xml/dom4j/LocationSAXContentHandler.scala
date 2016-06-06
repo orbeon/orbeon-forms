@@ -38,6 +38,6 @@ class LocationSAXContentHandler
     super.startElement(namespaceURI, localName, qualifiedName, attributes)
     val locationData = LocationData.createIfPresent(locator)
     if (locationData ne null)
-      elementStack.getCurrent.setData(locationData)
+      elementStack.get(elementStack.size - 1).setData(locationData)
   }
 }

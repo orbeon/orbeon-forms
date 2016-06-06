@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.*;
+import org.dom4j.CharacterData;
 import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
@@ -126,11 +127,7 @@ public class Dom4jUtils {
     }
 
     public static String domToPrettyString(final Element element) {
-        final OutputFormat format = new OutputFormat();
-        format.setIndentSize(4);
-        format.setNewlines(true);
-        format.setTrimText(true);
-        return domToString(element, format);
+        return domToString(element, OutputFormat.apply(true, true, true));
     }
 
     /**
@@ -140,18 +137,11 @@ public class Dom4jUtils {
      * @return          resulting string
      */
     public static String domToCompactString(final Document document) {
-        final OutputFormat format = new OutputFormat();
-        format.setIndent(false);
-        format.setNewlines(false);
-        format.setTrimText(true);
-        return domToString(document.getRootElement(), format);
+        return domToString(document.getRootElement(), OutputFormat.apply(false, false, true));
     }
 
     private static String domToString(final Branch branch) {
-        final OutputFormat format = new OutputFormat();
-        format.setIndent(false);
-        format.setNewlines(false);
-        return domToString(branch, format);
+        return domToString(branch, OutputFormat.apply(false, false, false));
     }
 
     private static String domToString(final Node node, final OutputFormat format) {

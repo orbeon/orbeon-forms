@@ -16,7 +16,7 @@ private object XMLWriter {
     "http://xml.org/sax/properties/lexical-handler"
   )
 
-  val DefaultFormat = new OutputFormat
+  val DefaultFormat = OutputFormat(indent = false, newlines = false, trimText = false)
 }
 
 /**
@@ -29,7 +29,7 @@ private object XMLWriter {
  * such as to allow suppression of the XML declaration, the encoding declaration
  * or whether empty documents are collapsed.
  */
-class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends XMLFilterImpl with LexicalHandler {
+class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends XMLFilterImpl with LexicalHandler {
 
   // Should entityRefs by resolved when writing ?
   private val resolveEntityRefs = true
@@ -90,7 +90,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   def println(): Unit =
-    writer.write(format.getLineSeparator)
+    writer.write(OutputFormat.LineSeparator)
 
   def write(attribute: Attribute): Unit = {
     writeAttribute(attribute)
@@ -296,7 +296,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       if (escapeText) {
         string = escapeElementEntities(string)
       }
-      if (format.isTrimText) {
+      if (format.trimText) {
         if ((lastOutputNodeType == Node.TEXT_NODE) && !charsAdded) {
           writer.write(' ')
         } else if (charsAdded && Character.isWhitespace(lastChar)) {
@@ -486,7 +486,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
    * parser.
    */
   private def writeElementContent(element: Element): Unit = {
-    var trim = format.isTrimText
+    var trim = format.trimText
     val oldPreserve = preserve
     if (trim) {
       preserve = isElementSpacePreserved(element)
@@ -603,7 +603,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       if (escapeText) {
         text = escapeElementEntities(text)
       }
-      if (format.isTrimText) {
+      if (format.trimText) {
         var first = true
         val tokenizer = new ju.StringTokenizer(text)
         while (tokenizer.hasMoreTokens) {
@@ -715,7 +715,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
   }
 
   private def writeComment(text: String): Unit = {
-    if (format.isNewlines) {
+    if (format.newlines) {
       println()
       indent()
     }
@@ -752,7 +752,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
           writeNamespace(null, uri)
         }
       } else {
-        val quote = format.getAttributeQuoteCharacter
+        val quote = OutputFormat.AttributeQuoteCharacter
         writer.write(" ")
         writer.write(attribute.getQualifiedName)
         writer.write("=")
@@ -767,7 +767,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
     writer.write(" ")
     writer.write(attribute.getQualifiedName)
     writer.write("=")
-    val quote = format.getAttributeQuoteCharacter
+    val quote = OutputFormat.AttributeQuoteCharacter
     writer.write(quote)
     writeEscapeAttributeEntities(attribute.getValue)
     writer.write(quote)
@@ -779,7 +779,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
       writeAttribute(attributes, i)
 
   private def writeAttribute(attributes: Attributes, index: Int): Unit = {
-    val quote = format.getAttributeQuoteCharacter
+    val quote = OutputFormat.AttributeQuoteCharacter
     writer.write(" ")
     writer.write(attributes.getQName(index))
     writer.write("=")
@@ -790,7 +790,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
 
   private def indent(): Unit = {
     val indent = format.getIndent
-    if ((indent ne null) && (indent.length > 0)) {
+    if (indent.nonEmpty) {
       for (i ← 0 until indentLevel) {
         writer.write(indent)
       }
@@ -801,10 +801,10 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
    * This will print a new line only if the newlines flag was set to true
    */
   private def writePrintln(): Unit =
-    if (format.isNewlines) {
-      val separator = format.getLineSeparator
+    if (format.newlines) {
+      val separator = OutputFormat.LineSeparator
       if (lastChar != separator.charAt(separator.length - 1)) {
-        writer.write(format.getLineSeparator)
+        writer.write(OutputFormat.LineSeparator)
       }
     }
 
@@ -890,7 +890,7 @@ class XMLWriter(protected var writer: Writer, var format: OutputFormat) extends 
    * for XML attributes.
    */
   private def escapeAttributeEntities(text: String): String = {
-    val quote = format.getAttributeQuoteCharacter
+    val quote = OutputFormat.AttributeQuoteCharacter
     var block: Array[Char] = null
     var i = 0
     var last = 0

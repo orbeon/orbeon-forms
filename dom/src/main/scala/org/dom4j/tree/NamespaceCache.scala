@@ -9,7 +9,7 @@ import org.dom4j.Namespace
 object NamespaceCache {
 
   // Cache of instances indexed by URI which contain caches for each prefix.
-  private val cache = new ConcurrentHashMap[String, ju.Map[String, WeakReference[Namespace]]](11, 0.75f, 1)
+  private val cache = new ConcurrentHashMap[String, ConcurrentHashMap[String, WeakReference[Namespace]]](11, 0.75f, 1)
 
   // Cache of instances indexed by URI for default namespaces with no prefixes.
   private val noPrefixCache = new ConcurrentHashMap[String, WeakReference[Namespace]](11, 0.75f, 1)

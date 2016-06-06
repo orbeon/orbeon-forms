@@ -11,7 +11,6 @@ object Node {
   val DOCUMENT_NODE               : Short = 9
   val NAMESPACE_NODE              : Short = 13
   val UNKNOWN_NODE                : Short = 14
-  val MAX_NODE_TYPE               : Short = 14
 }
 
 trait Node extends Cloneable {

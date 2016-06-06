@@ -257,7 +257,7 @@
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
-            <arg value="project core"/>
+            <arg value="project root"/>
             <arg value="compile"/>
         </exec>
     </target>
@@ -267,7 +267,7 @@
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
-            <arg value="project core"/>
+            <arg value="project root"/>
             <arg value="test:compile"/>
         </exec>
     </target>

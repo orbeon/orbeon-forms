@@ -165,7 +165,7 @@ object XFormsError {
     helper             : XMLReceiverHelper,
     htmlPrefix         : String
   ): Unit =
-    helper.element("", XMLNames.XINCLUDE_URI, "include", Array(
+    helper.element("", XMLNames.XIncludeURI, "include", Array(
       "href", XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"),
       "fixup-xml-base", "false"
     ))

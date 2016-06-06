@@ -73,7 +73,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // Include static XForms CSS and JS
     val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
 
-    helper.element("", XMLNames.XINCLUDE_URI, "include",
+    helper.element("", XMLNames.XIncludeURI, "include",
       Array(
         "href", XHTMLBodyHandler.getIncludedResourceURL(requestPath, "static-xforms-css-js.xml"),
         "fixup-xml-base", "false"

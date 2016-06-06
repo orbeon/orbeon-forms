@@ -100,7 +100,7 @@ class XIncludeReceiver(
 
   override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
-    val isXIURI = Set(XINCLUDE_URI, OLD_XINCLUDE_URI)(uri)
+    val isXIURI = Set(XIncludeURI, XIncludeLegacyURI)(uri)
     val isInclude = isXIURI && localname == "include"
 
     // Do this before startElement(), which will modify the pending mappings
@@ -118,8 +118,8 @@ class XIncludeReceiver(
     if (isInclude) {
       // Entering xi:include element
 
-      if (uri == OLD_XINCLUDE_URI)
-        Logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XINCLUDE_URI + "' at " + new LocationData(outputLocator).toString)
+      if (uri == XIncludeLegacyURI)
+        Logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XIncludeURI + "' at " + new LocationData(outputLocator).toString)
 
       val href     = attributes.getValue("href")
       val parse    = Option(attributes.getValue("parse"))
@@ -127,8 +127,8 @@ class XIncludeReceiver(
 
       // Whether to create/update xml:base attribute or not
       val generateXMLBase = {
-        val disableXMLBase = attributes.getValue(XXINCLUDE_OMIT_XML_BASE.getNamespaceURI, XXINCLUDE_OMIT_XML_BASE.getName)
-        val fixupXMLBase = attributes.getValue(XINCLUDE_FIXUP_XML_BASE.getNamespaceURI, XINCLUDE_FIXUP_XML_BASE.getName)
+        val disableXMLBase = attributes.getValue(XXIncludeOmitXmlBaseQName.getNamespaceURI, XXIncludeOmitXmlBaseQName.getName)
+        val fixupXMLBase = attributes.getValue(XIncludeFixupXMLBaseQName.getNamespaceURI, XIncludeFixupXMLBaseQName.getName)
         ! (disableXMLBase == "true" || fixupXMLBase == "false")
       }
 
@@ -207,7 +207,7 @@ class XIncludeReceiver(
   override def endElement(uri: String, localname: String, qName: String): Unit = {
     level -= 1
 
-    if (Set(XINCLUDE_URI, OLD_XINCLUDE_URI)(uri) && localname == "include") {
+    if (Set(XIncludeURI, XIncludeLegacyURI)(uri) && localname == "include") {
       // Nothing to do when existing xi:include element
     } else {
       super.endElement(uri, localname, qName)

@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
 import org.orbeon.oxf.xforms.control.LHHASupport;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControl$;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
@@ -85,7 +84,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
         if (!handlerContext.isNoScript()) {
-            helper.element("", XMLNames.XINCLUDE_URI(), "include", new String[] {
+            helper.element("", XMLNames.XIncludeURI(), "include", new String[] {
                     "href", getIncludedResourceURL(requestPath, "noscript-panel.xml"),
                     "fixup-xml-base", "false"
             });
@@ -167,7 +166,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             XFormsError.outputAjaxErrorPanel(containingDocument, helper, htmlPrefix);
 
             // Help panel
-            helper.element("", XMLNames.XINCLUDE_URI(), "include", new String[] {
+            helper.element("", XMLNames.XIncludeURI(), "include", new String[] {
                     "href", getIncludedResourceURL(requestPath, "help-panel.xml"),
                     "fixup-xml-base", "false"
             });

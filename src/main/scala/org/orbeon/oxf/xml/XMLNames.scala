@@ -17,11 +17,11 @@ import org.dom4j.{Namespace, QName}
 
 object XMLNames {
 
-  // NOTE: "2003" was used at some point; the correct value for XInclude 1.0 is "2001"
-  val XINCLUDE_URI = "http://www.w3.org/2001/XInclude"
-  val OLD_XINCLUDE_URI = "http://www.w3.org/2003/XInclude"
-  val XXINCLUDE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xinclude"
-  val XXINCLUDE_NAMESPACE = Namespace("xxi", XXINCLUDE_NAMESPACE_URI)
-  val XXINCLUDE_OMIT_XML_BASE = new QName("omit-xml-base", XXINCLUDE_NAMESPACE)
-  val XINCLUDE_FIXUP_XML_BASE = new QName("fixup-xml-base", Namespace.EmptyNamespace)
+  val XIncludeURI               = "http://www.w3.org/2001/XInclude"
+  val XIncludeLegacyURI         = "http://www.w3.org/2003/XInclude"
+  val XXIncludeURI              = "http://orbeon.org/oxf/xml/xinclude"
+
+  val XXIncludeNS               = Namespace("xxi", XXIncludeURI)
+  val XXIncludeOmitXmlBaseQName = new QName("omit-xml-base", XXIncludeNS)
+  val XIncludeFixupXMLBaseQName = new QName("fixup-xml-base", Namespace.EmptyNamespace)
 }

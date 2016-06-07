@@ -967,15 +967,11 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                         advance();
                         return;
                     }
-                    if (nextChild instanceof Entity) {
-                        throw new IllegalStateException("Unexpanded entity in DOM4J tree");
-                    } else {
 //                        if (isAtomizing()) {
 //                            current = new UntypedAtomicValue(getStringValue(node));
 //                        } else {
-                            current = makeWrapper(nextChild, docWrapper, commonParent, ix++);
+                        current = makeWrapper(nextChild, docWrapper, commonParent, ix++);
 //                        }
-                    }
                 } else {
                     current = null;
                 }
@@ -987,15 +983,11 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                         advance();
                         return;
                     }
-                    if (nextChild instanceof Entity) {
-                        throw new IllegalStateException("Unexpanded entity in DOM4J tree");
-                    } else {
 //                        if (isAtomizing()) {
 //                            current = new UntypedAtomicValue(getStringValue(node));
 //                        } else {
-                            current = makeWrapper(nextChild, docWrapper, commonParent, ix--);
+                    current = makeWrapper(nextChild, docWrapper, commonParent, ix--);
 //                        }
-                    }
                 } else {
                     current = null;
                 }

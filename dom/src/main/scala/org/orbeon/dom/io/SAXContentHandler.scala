@@ -26,7 +26,6 @@ class SAXContentHandler(
 
   // State
   private var locator: Locator = _
-  private var entity: String = _
   private var insideCDATASection = false
   private var cdataText: jl.StringBuilder = _
   private var declaredNamespaceIndex = 0
@@ -92,7 +91,6 @@ class SAXContentHandler(
     addAttributes(element, attributes)
     elementStack.add(element)
     currentElement = element
-    entity = null
   }
 
   override def endElement(
@@ -112,13 +110,7 @@ class SAXContentHandler(
       return
 
     if (currentElement ne null) {
-      if (entity ne null) {
-        if (mergeAdjacentText && textInTextBuffer)
-          completeCurrentTextNode()
-
-        currentElement.addEntity(entity, new String(ch, start, end))
-        entity = null
-      } else if (insideCDATASection) {
+      if (insideCDATASection) {
         if (mergeAdjacentText && textInTextBuffer)
           completeCurrentTextNode()
 

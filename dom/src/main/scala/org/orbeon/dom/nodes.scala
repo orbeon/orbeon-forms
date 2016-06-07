@@ -7,5 +7,3 @@ trait CharacterData extends Node {
 trait CDATA   extends CharacterData
 trait Comment extends CharacterData
 trait Text    extends CharacterData
-
-trait Entity  extends Node

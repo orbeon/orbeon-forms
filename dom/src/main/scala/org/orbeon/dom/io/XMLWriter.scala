@@ -142,13 +142,6 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     }
   }
 
-  def write(entity: Entity): Unit = {
-    writeEntity(entity)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
   def write(namespace: Namespace): Unit = {
     writeNamespace(namespace)
     if (autoFlush) {
@@ -383,15 +376,9 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     }
   }
 
-  def startEntity(name: String): Unit = {
-    try {
-      writeEntityRef(name)
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
+  def startEntity(name: String): Unit =
     if (lexicalHandler ne null)
       lexicalHandler.startEntity(name)
-  }
 
   def endEntity(name: String): Unit =
     if (lexicalHandler ne null)
@@ -652,12 +639,11 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       case Node.ATTRIBUTE_NODE              ⇒ writeAttribute(node.asInstanceOf[Attribute])
       case Node.TEXT_NODE                   ⇒ writeNodeText(node)
       case Node.CDATA_SECTION_NODE          ⇒ writeCDATA(node.getText)
-      case Node.ENTITY_REFERENCE_NODE       ⇒ writeEntity(node.asInstanceOf[Entity])
       case Node.PROCESSING_INSTRUCTION_NODE ⇒ writeProcessingInstruction(node.asInstanceOf[ProcessingInstruction])
       case Node.COMMENT_NODE                ⇒ writeComment(node.getText)
       case Node.DOCUMENT_NODE               ⇒ write(node.asInstanceOf[Document])
       case Node.NAMESPACE_NODE              ⇒
-      case _ ⇒ throw new IOException("Invalid node type: " + node)
+      case _                                ⇒ throw new IllegalStateException
     }
   }
 
@@ -698,20 +684,6 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     }
     writer.write(">")
     writeNewLineIfNeeded()
-  }
-
-  private def writeEntity(entity: Entity): Unit =
-    if (!resolveEntityRefs) {
-      writeEntityRef(entity.getName)
-    } else {
-      writer.write(entity.getText)
-    }
-
-  private def writeEntityRef(name: String): Unit = {
-    writer.write("&")
-    writer.write(name)
-    writer.write(";")
-    lastOutputNodeType = Node.ENTITY_REFERENCE_NODE
   }
 
   private def writeComment(text: String): Unit = {

@@ -38,9 +38,7 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
       null
     }
 
-  // It's unclear what to do with Entity nodes, and even whether we should have them in the first place.
-  private def isRecognizedNodeClass(nodeClass: Class[_]): Boolean =
-    classOf[Node].isAssignableFrom(nodeClass) && ! classOf[Entity].isAssignableFrom(nodeClass)
+  private def isRecognizedNodeClass(nodeClass: Class[_]) = classOf[Node].isAssignableFrom(nodeClass)
 
   private def convertObjectToXPathValue(obj: Any, config: Configuration): ValueRepresentation = {
 
@@ -50,12 +48,10 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
     def wrapNode(document: DocumentInfo, node: Any): NodeInfo =
       document.asInstanceOf[DocumentWrapper].wrap(node)
 
-    // It's unclear what to do with Entity nodes, and even whether we should have them in the first place.
     obj match {
       case document : Document ⇒ wrapDocument(document)
-      case entity   : Entity   ⇒ null
       case node     : Node     ⇒ wrapNode(wrapDocument(node.getDocument), node)
-      case _                   ⇒ null
+      case _                   ⇒ throw new IllegalStateException
     }
   }
 

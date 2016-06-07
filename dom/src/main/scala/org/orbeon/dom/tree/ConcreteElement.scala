@@ -476,12 +476,6 @@ class ConcreteElement(var qname: QName)
     node
   }
 
-  def addEntity(name: String, text: String): Element = {
-    val node = DocumentFactory.createEntity(name, text)
-    addNewNode(node)
-    this
-  }
-
   def addNamespace(prefix: String, uri: String): Element = {
     val node = DocumentFactory.createNamespace(prefix, uri)
     addNewNode(node)
@@ -504,7 +498,6 @@ class ConcreteElement(var qname: QName)
     case ATTRIBUTE_NODE              ⇒ add(node.asInstanceOf[Attribute])
     case TEXT_NODE                   ⇒ add(node.asInstanceOf[Text])
     case CDATA_SECTION_NODE          ⇒ add(node.asInstanceOf[CDATA])
-    case ENTITY_REFERENCE_NODE       ⇒ add(node.asInstanceOf[Entity])
     case NAMESPACE_NODE              ⇒ add(node.asInstanceOf[Namespace])
     case _                           ⇒ super.add(node)
   }
@@ -513,18 +506,15 @@ class ConcreteElement(var qname: QName)
     case ATTRIBUTE_NODE              ⇒ remove(node.asInstanceOf[Attribute])
     case TEXT_NODE                   ⇒ remove(node.asInstanceOf[Text])
     case CDATA_SECTION_NODE          ⇒ remove(node.asInstanceOf[CDATA])
-    case ENTITY_REFERENCE_NODE       ⇒ remove(node.asInstanceOf[Entity])
     case NAMESPACE_NODE              ⇒ remove(node.asInstanceOf[Namespace])
     case _                           ⇒ super.remove(node)
   }
 
   def add(cdata: CDATA)            : Unit    = addNode(cdata)
-  def add(entity: Entity)          : Unit    = addNode(entity)
   def add(namespace: Namespace)    : Unit    = addNode(namespace)
   def add(text: Text)              : Unit    = addNode(text)
 
   def remove(cdata: CDATA)         : Boolean = removeNode(cdata)
-  def remove(entity: Entity)       : Boolean = removeNode(entity)
   def remove(namespace: Namespace) : Boolean = removeNode(namespace)
   def remove(text: Text)           : Boolean = removeNode(text)
 
@@ -534,7 +524,7 @@ class ConcreteElement(var qname: QName)
       val it = allContent.iterator()
       while (it.hasNext) {
         it.next().getNodeType match {
-          case CDATA_SECTION_NODE | ENTITY_REFERENCE_NODE | TEXT_NODE ⇒ it.remove()
+          case CDATA_SECTION_NODE | TEXT_NODE ⇒ it.remove()
           case _ ⇒
         }
       }

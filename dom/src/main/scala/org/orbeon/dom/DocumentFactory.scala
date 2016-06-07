@@ -17,7 +17,6 @@ object DocumentFactory {
   def createCDATA                (text: String)                               : CDATA                 = new ConcreteCDATA(text)
   def createComment              (text: String)                               : Comment               = new ConcreteComment(text)
   def createText                 (text: String)                               : Text                  = new ConcreteText(text ensuring (_ ne null))
-  def createEntity               (name: String, text: String)                 : Entity                = new ConcreteEntity(name, text)
   def createProcessingInstruction(target: String, data: String)               : ProcessingInstruction = new ConcreteProcessingInstruction(target, data)
 
   def createElementWithText(name: String, text: String): Element = {

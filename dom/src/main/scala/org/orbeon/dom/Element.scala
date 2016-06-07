@@ -51,20 +51,17 @@ trait Element extends Branch {
 
   def addComment(comment: String): Element
   def addCDATA(cdata: String): Element
-  def addEntity(name: String, text: String): Element
   def addNamespace(prefix: String, uri: String): Element
   def addProcessingInstruction(target: String, text: String): Element
   def addText(text: String): Element
 
   def add(att: Attribute): Unit
   def add(cdata: CDATA): Unit
-  def add(entity: Entity): Unit
   def add(text: Text): Unit
   def add(namespace: Namespace): Unit
 
   def remove(att: Attribute): Boolean
   def remove(cdata: CDATA): Boolean
-  def remove(entity: Entity): Boolean
   def remove(namespace: Namespace): Boolean
   def remove(text: Text): Boolean
 

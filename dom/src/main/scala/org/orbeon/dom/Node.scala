@@ -5,7 +5,6 @@ object Node {
   val ATTRIBUTE_NODE              : Short = 2
   val TEXT_NODE                   : Short = 3
   val CDATA_SECTION_NODE          : Short = 4
-  val ENTITY_REFERENCE_NODE       : Short = 5
   val PROCESSING_INSTRUCTION_NODE : Short = 7
   val COMMENT_NODE                : Short = 8
   val DOCUMENT_NODE               : Short = 9

@@ -56,7 +56,6 @@ class SAXWriter extends XMLReader {
       case Node.ATTRIBUTE_NODE              ⇒ write(node.asInstanceOf[Attribute])
       case Node.TEXT_NODE                   ⇒ write(node.getText)
       case Node.CDATA_SECTION_NODE          ⇒ write(node.asInstanceOf[CDATA])
-      case Node.ENTITY_REFERENCE_NODE       ⇒ write(node.asInstanceOf[Entity])
       case Node.PROCESSING_INSTRUCTION_NODE ⇒ write(node.asInstanceOf[ProcessingInstruction])
       case Node.COMMENT_NODE                ⇒ write(node.asInstanceOf[Comment])
       case Node.DOCUMENT_NODE               ⇒ write(node.asInstanceOf[Document])
@@ -92,25 +91,12 @@ class SAXWriter extends XMLReader {
     }
   }
 
-  private def write(comment: Comment): Unit = {
+  private def write(comment: Comment): Unit =
     if (lexicalHandler ne null) {
       val text = comment.getText
       val chars = text.toCharArray
       lexicalHandler.comment(chars, 0, chars.length)
     }
-  }
-
-  private def write(entity: Entity): Unit = {
-    val text = entity.getText
-    if (lexicalHandler ne null) {
-      val name = entity.getName
-      lexicalHandler.startEntity(name)
-      write(text)
-      lexicalHandler.endEntity(name)
-    } else {
-      write(text)
-    }
-  }
 
   private def write(pi: ProcessingInstruction): Unit =
     contentHandler.processingInstruction(pi.getTarget, pi.getText)
@@ -118,13 +104,6 @@ class SAXWriter extends XMLReader {
   def getDTDHandler: DTDHandler = dtdHandler
   def setDTDHandler(handler: DTDHandler): Unit =
     this.dtdHandler = handler
-
-//  def setXMLReader(xmlReader: XMLReader): Unit = {
-//    setContentHandler(xmlReader.getContentHandler)
-//    setDTDHandler(xmlReader.getDTDHandler)
-//    setEntityResolver(xmlReader.getEntityResolver)
-//    setErrorHandler(xmlReader.getErrorHandler)
-//  }
 
   def getFeature(name: String): Boolean = {
     val answer = features.get(name)
@@ -184,8 +163,6 @@ class SAXWriter extends XMLReader {
             case _ ⇒
               throw new SAXException("Invalid Node in DOM4J content: " + obj + " of type: " + obj.getClass)
           }
-        case entity: Entity ⇒
-          write(entity)
         case pi: ProcessingInstruction ⇒
           write(pi)
         case node: Namespace ⇒

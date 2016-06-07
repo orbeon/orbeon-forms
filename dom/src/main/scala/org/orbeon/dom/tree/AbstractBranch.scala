@@ -42,7 +42,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
     content match {
       case node: Node ⇒
         node.getNodeType match {
-          case CDATA_SECTION_NODE | ENTITY_REFERENCE_NODE | TEXT_NODE ⇒ return node.getText
+          case CDATA_SECTION_NODE | TEXT_NODE ⇒ return node.getText
           case _ ⇒
         }
       case _ ⇒
@@ -58,7 +58,7 @@ abstract class AbstractBranch extends AbstractNode with Branch {
       case node: Node ⇒
         // ORBEON TODO: match on trait
         node.getNodeType match {
-          case CDATA_SECTION_NODE | ENTITY_REFERENCE_NODE | TEXT_NODE | ELEMENT_NODE ⇒ node.getStringValue
+          case CDATA_SECTION_NODE | TEXT_NODE | ELEMENT_NODE ⇒ node.getStringValue
           case _ ⇒ ""
         }
       case s: String ⇒

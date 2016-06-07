@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="dom subproject" pattern="file[dom]:*/" />
+</component>

@@ -27,16 +27,16 @@ class ConcreteDocument extends AbstractBranch with Document {
   def getRootElement = _rootElement
 
   private var _internalContent: ju.List[Node] = _
-  protected def internalContent = _internalContent
-
-  def content: ju.List[Node] ={
-    if (internalContent eq null) {
+  protected def internalContent = {
+    if (_internalContent eq null) {
       _internalContent = new ju.ArrayList[Node](1)
       if (_rootElement ne null)
-        internalContent.add(_rootElement)
+        _internalContent.add(_rootElement)
     }
-    internalContent
+    _internalContent
   }
+
+  def content = internalContent
 
   override def clone(): AnyRef = {
     val document = super.clone().asInstanceOf[ConcreteDocument]
@@ -53,12 +53,10 @@ class ConcreteDocument extends AbstractBranch with Document {
   }
 
   private def contentRemoved(): Unit =
-    if (internalContent ne null) {
-      for (i ← 0 until _internalContent.size) {
-        internalContent.get(i) match {
-          case node: Node ⇒ childRemoved(node)
-          case _ ⇒
-        }
+    for (i ← 0 until internalContent.size) {
+      internalContent.get(i) match {
+        case node: Node ⇒ childRemoved(node)
+        case _ ⇒
       }
     }
 

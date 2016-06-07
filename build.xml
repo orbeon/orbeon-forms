@@ -901,7 +901,9 @@
                 <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed" logfailedtests="true">
                     <!-- Enable assertions -->
                     <jvmarg value="-ea"/>
-                    <jvmarg line="-server -Xms256m -Xmx1024m -XX:MaxPermSize=256m -Djava.awt.headless=true"/>
+                    <jvmarg line="-server -Djava.awt.headless=true"/>
+                    <jvmarg line="-Xms256m -Xmx1024m -XX:MaxPermSize=256m"/>
+                    <!--<jvmarg line="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=61155"/>-->
 
                     <batchtest>
                         <fileset dir="src/target/scala-2.11/test-classes">

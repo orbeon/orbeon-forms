@@ -14,13 +14,11 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.dom.QName;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.ExpressionVisitor;
-import org.orbeon.saxon.expr.StaticContext;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -60,6 +58,12 @@ public class Event extends XFormsFunction {
                 return getEventAttribute(event, attributeName);
             }
         }
+    }
+
+    @Override
+    public int getIntrinsicDependencies() {
+        // So that Saxon doesn't try to evaluate us at compile-time
+        return StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT;
     }
 
     private SequenceIterator getEventAttribute(XFormsEvent event, String attributeName) {

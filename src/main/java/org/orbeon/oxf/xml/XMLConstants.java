@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.dom4j.Namespace;
-import org.dom4j.Namespace$;
-import org.dom4j.QName;
+import org.orbeon.dom.Namespace;
+import org.orbeon.dom.Namespace$;
+import org.orbeon.dom.QName;
 
 public class XMLConstants {
 

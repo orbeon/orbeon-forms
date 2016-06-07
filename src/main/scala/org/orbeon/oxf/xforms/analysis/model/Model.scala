@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.model.Model._

@@ -18,7 +18,7 @@ import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xforms._
 import collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
-import org.dom4j.{QName, Element}
+import org.orbeon.dom.{QName, Element}
 import collection.mutable
 import org.orbeon.oxf.util.XPathCache
 

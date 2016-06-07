@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.serializer
 
 import java.io.ByteArrayOutputStream
-import org.dom4j.Document
+import org.orbeon.dom.Document
 import org.junit.Test
 import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.test.DocumentTestBase

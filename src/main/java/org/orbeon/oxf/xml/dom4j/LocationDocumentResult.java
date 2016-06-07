@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 
 import javax.xml.transform.sax.SAXResult;
 

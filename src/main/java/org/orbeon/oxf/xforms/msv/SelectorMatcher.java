@@ -15,10 +15,10 @@
  * @(#)$Id: SelectorMatcher.java,v 1.1 2005/05/04 23:55:58 ebruchez Exp $
  *
  * Copyright 2001 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
+ *
+ * This software is the proprietary information of Sun Microsystems, Inc.
  * Use is subject to license terms.
- * 
+ *
  */
 package org.orbeon.oxf.xforms.msv;
 
@@ -27,33 +27,33 @@ import org.orbeon.msv.relaxng.datatype.Datatype;
 
 /**
  * XPath matcher that tests the selector of an identity constraint.
- * 
+ *
  * This object is created whenever an element with identity constraints is found.
  * XML Schema guarantees that we can see if an element has id constraints at the
  * startElement method.
- * 
+ *
  * This matcher then monitor startElement/endElement and find matches to the
  * specified XPath. Every time it finds a match ("target node" in XML Schema
  * terminology), it creates a FieldsMatcher.
- * 
+ *
  * @author <a href="mailto:kohsuke.kawaguchi@eng.sun.com">Kohsuke KAWAGUCHI</a>
  */
 public class SelectorMatcher extends PathMatcher {
-    
+
     protected IdentityConstraint idConst;
-    
-    final org.dom4j.Element element;
-    
+
+    final org.orbeon.dom.Element element;
+
 
     SelectorMatcher(
-                IDConstraintChecker owner, IdentityConstraint idConst, final org.dom4j.Element elt ) {
+                IDConstraintChecker owner, IdentityConstraint idConst, final org.orbeon.dom.Element elt ) {
         super(owner, idConst.selectors );
         this.idConst = idConst;
         element = elt;
-        
+
         // register this scope as active.
         owner.pushActiveScope(idConst,this);
-        
+
         if(org.orbeon.msv.driver.textui.Debug.debug) {
             System.out.println("new id scope is available for {"+idConst.localName+"}");
         }
@@ -66,20 +66,20 @@ public class SelectorMatcher extends PathMatcher {
         owner.popActiveScope(idConst,this);
     }
 
-    
-    protected void onElementMatched( final org.dom4j.Element elt ) {
+
+    protected void onElementMatched( final org.orbeon.dom.Element elt ) {
         if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("find a match for a selector: "+idConst.localName);
-            
+
         // this element matches the path.
         owner.add( new FieldsMatcher( this, elt ) );
     }
-    
-    protected void onAttributeMatched( final org.dom4j.Attribute att, Datatype type ) {
-        
+
+    protected void onAttributeMatched(final org.orbeon.dom.Attribute att, Datatype type ) {
+
         // assertion failed:
         // selectors cannot contain attribute steps.
         throw new Error();
     }
-    
+
 }

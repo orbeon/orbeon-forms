@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.xml.dom4j
 
-import org.dom4j.io.SAXWriter
-import org.dom4j.{Document, Element}
+import org.orbeon.dom.io.SAXWriter
+import org.orbeon.dom.{Document, Element}
 import org.xml.sax.Locator
 
 class LocationSAXWriter extends SAXWriter {

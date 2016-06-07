@@ -17,8 +17,8 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.message.*;
 import org.apache.axis.soap.SOAPConstants;
-import org.dom4j.*;
-import org.dom4j.Text;
+import org.orbeon.dom.*;
+import org.orbeon.dom.Text;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -29,7 +29,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.*;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
@@ -334,7 +334,7 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         // Go through elements
                                         for (Iterator i = XPathUtils.selectNodeIterator(parametersDocument, "/*/*"); i.hasNext();) {
-                                            final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
+                                            final org.orbeon.dom.Element parameterElement = (org.orbeon.dom.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
                                             // TODO: should pass true?
                                             final QName type = Dom4jUtils.extractAttributeValueQName(parameterElement, XMLConstants.XSI_TYPE_QNAME, false);

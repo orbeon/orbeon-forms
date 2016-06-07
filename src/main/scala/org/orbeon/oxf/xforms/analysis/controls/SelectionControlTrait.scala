@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.apache.commons.lang3.StringUtils
-import org.dom4j.{Element, QName, Text}
+import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{XPath, XPathCache}
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.control.LHHAValue
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 
 trait SelectionControlTrait
 extends InputValueControl

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.processor.validation;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.DocumentFactory;
 import org.orbeon.msv.iso_relax.verifier.*;
 import org.orbeon.msv.verifier.jarv.Const;
 import org.orbeon.msv.verifier.jarv.TheFactoryImpl;

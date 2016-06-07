@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.dom4j.Node;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;

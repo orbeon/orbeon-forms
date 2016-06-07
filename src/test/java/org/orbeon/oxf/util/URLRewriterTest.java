@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -356,7 +356,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
             // Reinitialize properties
             Properties.invalidate();
             org.orbeon.oxf.properties.Properties.init(propertiesURL);
-    
+
             // Check platform paths
             for (final String path: platformPaths) {
                 final String versionedPath = "/" + orbeonVersion + path;

@@ -21,7 +21,7 @@ import java.io._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 
 import sbinary._
-import org.dom4j.{Namespace, QName, Document}
+import org.orbeon.dom.{Namespace, QName, Document}
 import sbinary.Operations._
 import org.orbeon.oxf.xforms.InstanceCaching
 

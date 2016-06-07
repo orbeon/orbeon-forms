@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.apache.commons.fileupload.FileItem;
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLParsing;

@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.Mediatypes;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +44,7 @@ public class ResourceServer extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read config input into a String, cache if possible
-            final org.dom4j.Node configNode = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+            final org.orbeon.dom.Node configNode = readCacheInputAsDOM4J(context, INPUT_CONFIG);
 
             // Get config URL first
             String urlString = XPathUtils.selectStringValueNormalize(configNode, "url");

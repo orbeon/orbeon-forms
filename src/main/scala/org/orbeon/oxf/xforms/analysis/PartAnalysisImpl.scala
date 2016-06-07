@@ -19,8 +19,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils.DebugXML
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.dom4j.Element
+import org.orbeon.saxon.dom.DocumentWrapper
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}

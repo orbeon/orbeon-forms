@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.XFormsConstants._

@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.processor.transformer;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.ProcessingInstruction;
-import org.dom4j.Text;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.ProcessingInstruction;
+import org.orbeon.dom.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPath;

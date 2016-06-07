@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms._
 import control.Controls.ControlsIterator
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
-import org.dom4j.{DocumentFactory, Element}
+import org.orbeon.dom.{DocumentFactory, Element}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 
 // Immutable representation of the dynamic state

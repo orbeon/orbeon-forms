@@ -156,7 +156,7 @@ public class IDConstraintChecker implements ValidationContext {
         }
     }
 
-    public void onNextAcceptorReady( StartTagInfo sti, Acceptor next, final org.dom4j.Element elt )  {
+    public void onNextAcceptorReady( StartTagInfo sti, Acceptor next, final org.orbeon.dom.Element elt )  {
 
         // call matchers
         int len = matchers.size();
@@ -199,7 +199,7 @@ public class IDConstraintChecker implements ValidationContext {
     }
 
     public void feedAttribute
-    ( Acceptor child, final org.dom4j.Attribute att, final Datatype[] result )  {
+    (Acceptor child, final org.orbeon.dom.Attribute att, final Datatype[] result )  {
 
         final int len = matchers.size();
         // call matchers for attributes.
@@ -213,7 +213,7 @@ public class IDConstraintChecker implements ValidationContext {
 
 
 
-    public void endElement( final org.dom4j.Element elt, final Datatype[] lastType )
+    public void endElement(final org.orbeon.dom.Element elt, final Datatype[] lastType )
                                  {
 
         // getLastCharacterType may sometimes return null. For example,
@@ -240,7 +240,7 @@ public class IDConstraintChecker implements ValidationContext {
         return ret;
     }
 
-    protected void reportError( final org.dom4j.Element elt, String propKey, Object[] args )  {
+    protected void reportError(final org.orbeon.dom.Element elt, String propKey, Object[] args )  {
 //        final String suffix = elt == null ? "" : " at " + elt.getUniquePath();
         // TODO: elt.getUniquePath();
         final String suffix = elt == null ? "" : " at " + elt.getQualifiedName();

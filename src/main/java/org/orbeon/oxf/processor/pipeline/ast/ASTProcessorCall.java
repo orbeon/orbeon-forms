@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.ast;
 
-import org.dom4j.QName;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.processor.Processor;
 
 import java.util.ArrayList;

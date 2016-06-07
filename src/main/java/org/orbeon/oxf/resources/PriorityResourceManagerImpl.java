@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -99,7 +99,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             }
         });
     }
-    
+
     public Document getContentAsDOM4J(final String key, final XMLParsing.ParserConfiguration parserConfiguration, final boolean handleLexical) {
         return (Document) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.dom4j.Document;
-import org.dom4j.io.DocumentSource;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -549,7 +549,7 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Node to SAX events.
      */
-    public static void writeDom4j(org.dom4j.Node node, XMLReceiver xmlReceiver) {
+    public static void writeDom4j(org.orbeon.dom.Node node, XMLReceiver xmlReceiver) {
 
         // NOTE: Use dom4j directly instead of sourceToSAX as performance is better
         final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
@@ -561,7 +561,7 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Node to SAX events.
      */
-    public static void writeDom4j(org.dom4j.Node node, ContentHandler contentHandler) {
+    public static void writeDom4j(org.orbeon.dom.Node node, ContentHandler contentHandler) {
         sourceToSAX(new LocationDocumentSource(node), contentHandler);
     }
 

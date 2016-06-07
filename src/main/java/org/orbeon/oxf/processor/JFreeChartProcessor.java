@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.ChartEntity;

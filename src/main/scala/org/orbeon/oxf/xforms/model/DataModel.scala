@@ -20,7 +20,7 @@ import org.apache.lucene.search.Collector
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.dom4j.{Comment ⇒ Comment4j, Text ⇒ Text4j, _}
+import org.orbeon.dom.{Comment ⇒ Comment4j, Text ⇒ Text4j, _}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node._
 import org.orbeon.saxon.om._

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.scope;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Marshaller;

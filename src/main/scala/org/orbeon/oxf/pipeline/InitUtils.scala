@@ -18,7 +18,7 @@ import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpSession}
 
 import org.apache.log4j.Logger
-import org.dom4j.{Document, Element}
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache

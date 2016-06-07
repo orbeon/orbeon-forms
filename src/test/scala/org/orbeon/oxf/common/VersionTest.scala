@@ -16,7 +16,7 @@ package org.orbeon.oxf.common
 import java.security.SignatureException
 
 import junit.framework.Assert._
-import org.dom4j.Document
+import org.orbeon.dom.Document
 import org.junit.Test
 import org.orbeon.oxf.common.PEVersion._
 import org.orbeon.oxf.processor.validation.SchemaValidationException

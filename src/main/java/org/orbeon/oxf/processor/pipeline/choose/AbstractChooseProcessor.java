@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import collection.mutable.LinkedHashMap
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.xbl.Scope
@@ -30,12 +30,12 @@ class SimpleElementAnalysis(
    preceding              : Option[ElementAnalysis],
    val scope              : Scope
 ) extends ElementAnalysis(
-  staticStateContext.partAnalysis, 
-  element, 
-  parent, 
+  staticStateContext.partAnalysis,
+  element,
+  parent,
   preceding
 ) {
-  
+
   self ⇒
 
   require(scope ne null)

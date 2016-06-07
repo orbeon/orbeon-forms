@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import collection.JavaConverters._
 import java.{util ⇒ ju}
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.{XMLReceiverHelper, Dom4j}
 
@@ -55,7 +55,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
     _children ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
   }
-  
+
   // Build this element's children and its descendants
   final def build(builder: Builder): Unit = {
 

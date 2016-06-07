@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.XPathCache

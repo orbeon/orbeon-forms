@@ -7,8 +7,8 @@
 
 package org.orbeon.oxf.processor;
 
-import org.dom4j.*;
-import org.dom4j.tree.NamespaceStack;
+import org.orbeon.dom.*;
+import org.orbeon.dom.tree.NamespaceStack;
 
 import java.util.ArrayList;
 import java.util.List;

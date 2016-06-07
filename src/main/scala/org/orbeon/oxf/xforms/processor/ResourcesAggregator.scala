@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import collection.mutable.{Buffer, LinkedHashSet}
 import net.sf.ehcache.{Element ⇒ EhElement }
 import org.apache.commons.lang3.StringUtils
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor._

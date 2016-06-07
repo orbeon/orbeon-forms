@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 
 object Names {
 

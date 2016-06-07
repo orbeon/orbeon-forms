@@ -13,7 +13,7 @@
  */
 package org.orbeon.scaxon
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.util.XPath._
@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.{XFormsInstance, XFormsUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.expr.{ExpressionTool, Token}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._

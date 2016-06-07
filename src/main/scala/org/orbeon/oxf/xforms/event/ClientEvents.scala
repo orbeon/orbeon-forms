@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import java.{util ⇒ ju}
 
-import org.dom4j.{Document, DocumentFactory, Element}
+import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.util.ScalaUtils._

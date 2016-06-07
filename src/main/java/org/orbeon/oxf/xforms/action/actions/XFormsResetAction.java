@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions;
 
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;

@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.DocumentFactory;
+import org.orbeon.dom.Element;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;

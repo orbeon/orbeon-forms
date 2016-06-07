@@ -18,19 +18,19 @@ import org.orbeon.oxf.util.{ScalaUtils, XPath}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.{Int64Value, StringValue}
-import org.{dom4j ⇒ d4j}
+import org.orbeon.dom
 
 object SQLFunctionLibrary extends OrbeonFunctionLibrary {
 
   def instance = this
 
-  class SQLFunctionContext(val currentNode: d4j.Node, val position: Int, val getColumn: (String, Int) ⇒ String) extends FunctionContext
+  class SQLFunctionContext(val currentNode: dom.Node, val position: Int, val getColumn: (String, Int) ⇒ String) extends FunctionContext
 
   abstract class Function2Base[V1, V2, R] extends Function2[V1, V2, R]
 
@@ -48,7 +48,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
   private class CurrentFunction extends SystemFunction {
     override def evaluateItem(xpathContext: XPathContext): NodeInfo = {
 
-      def wrap(node: d4j.Node) =
+      def wrap(node: dom.Node) =
         new DocumentWrapper(node.getDocument, null, XPath.GlobalConfiguration).wrap(node)
 
       functionContextOpt flatMap (c ⇒ Option(c.currentNode)) map wrap orNull

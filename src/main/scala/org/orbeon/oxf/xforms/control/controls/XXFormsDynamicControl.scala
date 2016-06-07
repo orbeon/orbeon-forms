@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.ELEMENT_NODE

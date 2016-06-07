@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.QName;
+import org.orbeon.dom.QName;
 
 import java.util.HashMap;
 import java.util.Map;

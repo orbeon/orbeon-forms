@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.dom4j.Namespace$;
-import org.dom4j.QName;
+import org.orbeon.dom.Namespace$;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;

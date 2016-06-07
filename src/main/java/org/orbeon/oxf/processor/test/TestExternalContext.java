@@ -15,8 +15,8 @@ package org.orbeon.oxf.processor.test;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.http.Headers;

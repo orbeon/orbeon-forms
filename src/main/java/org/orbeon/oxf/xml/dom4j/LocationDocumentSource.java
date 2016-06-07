@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.dom4j.Document;
-import org.dom4j.Node;
-import org.dom4j.io.DocumentSource;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Node;
+import org.orbeon.dom.io.DocumentSource;
 
 public class LocationDocumentSource extends DocumentSource {
 

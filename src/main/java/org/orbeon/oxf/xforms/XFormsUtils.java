@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ccil.cowan.tagsoup.HTMLSchema;
-import org.dom4j.*;
-import org.dom4j.io.DocumentSource;
+import org.orbeon.dom.*;
+import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;

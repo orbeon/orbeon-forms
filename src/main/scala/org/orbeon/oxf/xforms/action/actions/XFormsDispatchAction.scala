@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.apache.commons.lang3.StringUtils.isNotBlank
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsAction, XFormsActionInterpreter}

@@ -17,9 +17,9 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.DocumentFactory;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -30,7 +30,6 @@ import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -61,7 +60,7 @@ public class FromXLSConverter extends ProcessorImpl {
 
                     // Generate XML from Excel file
                     final java.io.ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
-                    final org.dom4j.Document d = extractFromXLS( bais );
+                    final org.orbeon.dom.Document d = extractFromXLS( bais );
                     final DOMGenerator domGenerator = new DOMGenerator
                         ( d, "from xls output", DOMGenerator.ZeroValidity
                           , DOMGenerator.DefaultContext );

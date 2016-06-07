@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.test
 
-import org.dom4j.{Document ⇒ JDocument, Element ⇒ JElement}
+import org.orbeon.dom.{Document ⇒ JDocument, Element ⇒ JElement}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.{XPath, ScalaUtils}
 import org.orbeon.oxf.xml.{TransformerUtils, Dom4j}

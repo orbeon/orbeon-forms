@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.event.XFormsEventHandler
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis

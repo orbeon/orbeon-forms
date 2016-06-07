@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.{Document ⇒ JDocument}
+import org.orbeon.dom.{Document ⇒ JDocument}
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._

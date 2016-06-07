@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.DocumentFactory;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.Base64;

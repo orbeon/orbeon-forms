@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.junit.Test
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.test.ResourceManagerTestBase

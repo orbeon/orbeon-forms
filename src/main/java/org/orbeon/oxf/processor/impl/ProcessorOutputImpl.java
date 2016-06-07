@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.impl;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
+import org.orbeon.dom.DocumentFactory;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -290,7 +290,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
                     debugProcessor.createOutput(ProcessorImpl.OUTPUT_DATA);
 
                     // Create config document for Debug processor
-                    final org.dom4j.Document debugConfigDocument;
+                    final org.orbeon.dom.Document debugConfigDocument;
                     {
                         debugConfigDocument = DocumentFactory.createDocument();
                         Element configElement = debugConfigDocument.addElement("config");

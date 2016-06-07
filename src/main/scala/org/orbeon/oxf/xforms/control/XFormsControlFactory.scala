@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import controls._
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.action.XFormsActions

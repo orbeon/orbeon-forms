@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.{IndentedLogger, Logging, WhitespaceMatching}
 import org.orbeon.oxf.xforms.XFormsConstants._

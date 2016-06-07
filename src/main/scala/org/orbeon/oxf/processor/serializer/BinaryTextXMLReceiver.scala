@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.serializer
 import java.io._
 
 import org.apache.commons.lang3.StringUtils.isNotBlank
-import org.dom4j.{Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.ExternalContext

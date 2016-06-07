@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import java.{util ⇒ ju}
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._

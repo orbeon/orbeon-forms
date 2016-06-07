@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.processor.XFormsFeatures._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 

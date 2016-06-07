@@ -12,9 +12,9 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 --%>
 <%@ page import="java.net.URL"%>
-<%@ page import="org.dom4j.io.SAXReader"%>
-<%@ page import="org.dom4j.Document"%>
-<%@ page import="org.dom4j.Element"%>
+<%@ page import="org.orbeon.dom.io.SAXReader"%>
+<%@ page import="org.orbeon.dom.Document"%>
+<%@ page import="org.orbeon.dom.Element"%>
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.net.URLEncoder"%>
 <%

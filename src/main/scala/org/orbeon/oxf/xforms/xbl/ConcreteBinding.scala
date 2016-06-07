@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.dom4j.{Element, Document}
+import org.orbeon.dom.{Element, Document}
 import org.orbeon.oxf.xml.SAXStore
 
 case class ConcreteBinding(

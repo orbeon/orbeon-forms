@@ -15,8 +15,8 @@ package org.orbeon.oxf.test;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.dom4j.Document;
-import org.dom4j.Element;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;

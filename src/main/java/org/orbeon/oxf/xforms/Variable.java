@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom.DocumentWrapper;
 import org.orbeon.saxon.expr.LastPositionFinder;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;

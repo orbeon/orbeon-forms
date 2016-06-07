@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.dom4j.{Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 
 
 trait ActionTrait extends SimpleElementAnalysis {

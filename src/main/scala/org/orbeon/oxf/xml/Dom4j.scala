@@ -16,7 +16,7 @@ package org.orbeon.oxf.xml
 import java.util.{List ⇒ JList}
 
 import org.apache.commons.lang3.StringUtils.isNotBlank
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._

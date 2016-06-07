@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.sql;
 
 import org.apache.log4j.Logger;
-import org.dom4j.*;
+import org.orbeon.dom.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

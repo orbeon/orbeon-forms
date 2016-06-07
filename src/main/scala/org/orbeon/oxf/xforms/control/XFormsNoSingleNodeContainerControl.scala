@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 abstract class XFormsNoSingleNodeContainerControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)

@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Namespace;
-import org.dom4j.Namespace$;
-import org.dom4j.QName;
+import org.orbeon.dom.Namespace;
+import org.orbeon.dom.Namespace$;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;

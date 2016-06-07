@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import java.util.{List ⇒ JList}
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.ScalaUtils._
@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.XML._

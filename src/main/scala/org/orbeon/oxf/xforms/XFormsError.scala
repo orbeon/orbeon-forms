@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.scaxon.XML._

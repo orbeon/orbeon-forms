@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.generator
 
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{DateUtils, ScalaUtils}
 import org.orbeon.oxf.xml.Dom4j
 

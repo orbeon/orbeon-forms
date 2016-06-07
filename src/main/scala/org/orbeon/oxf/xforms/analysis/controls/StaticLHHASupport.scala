@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.dom4j.Element
+import org.orbeon.dom.Element
 
 object LHHA {
   val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)

@@ -15,10 +15,10 @@ package org.orbeon.oxf.main;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.QName;
-import org.dom4j.io.SAXReader;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.DocumentException;
+import org.orbeon.dom.QName;
+import org.orbeon.dom.io.SAXReader;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;

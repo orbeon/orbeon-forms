@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;

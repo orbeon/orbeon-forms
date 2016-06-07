@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.itemset
 
 import org.apache.commons.lang3.StringUtils
-import org.dom4j.{Element, QName, Text}
+import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._

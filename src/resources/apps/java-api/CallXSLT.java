@@ -12,8 +12,8 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-import org.dom4j.Document;
-import org.dom4j.QName;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;

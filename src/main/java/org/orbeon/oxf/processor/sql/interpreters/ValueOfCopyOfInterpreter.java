@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.dom4j.Node;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom.DocumentWrapper;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.test;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

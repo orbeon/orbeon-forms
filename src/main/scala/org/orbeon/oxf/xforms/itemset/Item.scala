@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.LHHAValue

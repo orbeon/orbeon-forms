@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.*;
+import org.orbeon.dom.*;
 import org.orbeon.oxf.common.Defaults;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Headers;

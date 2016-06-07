@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.dom4j.{Document, Element, QName}
+import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.DOMSerializer
 import org.orbeon.oxf.processor.generator.DOMGenerator

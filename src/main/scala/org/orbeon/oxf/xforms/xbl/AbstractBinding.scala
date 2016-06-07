@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.dom4j.{Document, QName, Element}
+import org.orbeon.dom.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._

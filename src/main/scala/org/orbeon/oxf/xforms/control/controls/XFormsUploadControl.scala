@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.apache.commons.lang3.StringUtils
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.http.Headers

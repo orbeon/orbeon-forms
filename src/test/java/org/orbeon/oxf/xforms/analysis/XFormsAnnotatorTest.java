@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
 import org.junit.Test;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -28,8 +28,8 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.saxon.dom.NodeWrapper;
 
 import java.util.List;
 

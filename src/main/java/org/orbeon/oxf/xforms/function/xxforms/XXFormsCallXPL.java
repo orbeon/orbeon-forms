@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.QName;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.*;

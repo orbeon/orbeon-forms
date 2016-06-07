@@ -13,7 +13,7 @@
 */
 package org.orbeon.oxf.xml.dom4j
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import collection.{breakOut, immutable}
 
 /**

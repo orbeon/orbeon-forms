@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xforms.analysis.model
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.Whitespace._

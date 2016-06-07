@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.QName;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 

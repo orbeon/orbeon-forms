@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
+import org.orbeon.saxon.dom.{DocumentWrapper, NodeWrapper}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit

@@ -12,7 +12,7 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;

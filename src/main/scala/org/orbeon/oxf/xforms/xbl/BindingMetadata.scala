@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{ElementWithFiltersSelector, Selector, TypeSelector}
 import org.orbeon.oxf.resources.{ResourceManager, ResourceManagerWrapper}

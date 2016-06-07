@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import java.util.{List ⇒ JList}
 
-import org.dom4j.{Document, Element}
+import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.oxf.util.XPath.CompiledExpression
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._

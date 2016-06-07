@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.SimpleProcessor;

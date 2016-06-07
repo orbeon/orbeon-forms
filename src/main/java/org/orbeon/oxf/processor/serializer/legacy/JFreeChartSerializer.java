@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.processor.serializer.legacy;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
 import org.jfree.chart.*;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;

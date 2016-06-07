@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.dom4j.{Document, Element, QName}
+import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.ScalaUtils._

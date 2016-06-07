@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j
 
-import org.dom4j.io.{SAXContentHandler, SAXReader}
+import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.oxf.xml.XMLReceiver
 import org.xml.sax.{Attributes, Locator}
 

@@ -16,12 +16,12 @@ package org.orbeon.oxf.properties
 import java.net.{URI, URISyntaxException}
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.dom4j.{Document, Element, QName}
+import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{DateUtils, ScalaUtils, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.Name10Checker
 import org.orbeon.scaxon.XML._
 

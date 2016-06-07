@@ -15,8 +15,8 @@ package org.orbeon.oxf.processor.transformer.xslt;
 
 import org.orbeon.errorified.Exceptions;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Node;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;

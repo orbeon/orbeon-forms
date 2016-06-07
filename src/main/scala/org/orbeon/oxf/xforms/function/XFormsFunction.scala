@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.function
 
 import java.util.{Iterator ⇒ JIterator}
 
-import org.dom4j
-import org.dom4j.Namespace
+import org.orbeon.dom
+import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
@@ -102,7 +102,7 @@ abstract class XFormsFunction extends FunctionSupport {
   def setProperty(name: String, value: Option[String]) =
     context.setProperty(name, value)
 
-  protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): dom4j.QName = {
+  protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): dom.QName = {
 
     val evaluatedExpression =
       qNameExpression.evaluateItem(xpathContext)
@@ -268,13 +268,13 @@ object XFormsFunction {
       case (prefix, local) ⇒ PrefixedName(prefix, local)
     }
 
-  def qNameFromQNameValue(value: QNameValue): dom4j.QName =
+  def qNameFromQNameValue(value: QNameValue): dom.QName =
     parseQName(value.getStringValue) match {
-      case PrefixedName(prefix, local) ⇒ new dom4j.QName(local, Namespace(prefix, value.getNamespaceURI))
-      case UnprefixedName(local)       ⇒ new dom4j.QName(local)
+      case PrefixedName(prefix, local) ⇒ new dom.QName(local, Namespace(prefix, value.getNamespaceURI))
+      case UnprefixedName(local)       ⇒ new dom.QName(local)
     }
 
-  def qNameFromStringValue(value: String, bindingContext: BindingContext): dom4j.QName =
+  def qNameFromStringValue(value: String, bindingContext: BindingContext): dom.QName =
     parseQName(value) match {
       case PrefixedName(prefix, local) ⇒
 
@@ -299,8 +299,8 @@ object XFormsFunction {
         if (qNameURI eq null)
           prefixNotInScope()
 
-        new dom4j.QName(local, Namespace(prefix, qNameURI))
+        new dom.QName(local, Namespace(prefix, qNameURI))
       case UnprefixedName(local) ⇒
-        new dom4j.QName(local)
+        new dom.QName(local)
     }
 }

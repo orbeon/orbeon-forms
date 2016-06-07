@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 import java.util.concurrent.locks.Lock;

@@ -24,7 +24,7 @@ import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
 
 import org.apache.commons.fileupload.FileItem
-import org.dom4j.{Document, DocumentFactory, Element, Node}
+import org.orbeon.dom.{Document, DocumentFactory, Element, Node}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext

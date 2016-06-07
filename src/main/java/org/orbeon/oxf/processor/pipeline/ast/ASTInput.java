@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.pipeline.ast;
 
-import org.dom4j.Node;
-import org.dom4j.QName;
+import org.orbeon.dom.Node;
+import org.orbeon.dom.QName;
 
 public class ASTInput extends ASTInputOutput {
 

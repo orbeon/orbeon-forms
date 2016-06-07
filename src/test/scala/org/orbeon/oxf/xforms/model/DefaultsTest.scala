@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI._

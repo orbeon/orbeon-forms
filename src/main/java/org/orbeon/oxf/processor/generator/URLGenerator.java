@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
@@ -399,7 +399,7 @@ public class URLGenerator extends ProcessorImpl {
 
                             final String forwardHeaders; {
                                 // Get from configuration first, otherwise use global default
-                                final org.dom4j.Node configForwardHeaders = XPathUtils.selectSingleNode(configElement, "/config/forward-headers");
+                                final org.orbeon.dom.Node configForwardHeaders = XPathUtils.selectSingleNode(configElement, "/config/forward-headers");
                                 forwardHeaders = configForwardHeaders != null ? XPathUtils.selectStringValue(configForwardHeaders, ".") : Connection.jHeadersToForward();
                             }
 
@@ -431,7 +431,7 @@ public class URLGenerator extends ProcessorImpl {
                             final boolean enableConditionalGET = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/conditional-get", DEFAULT_ENABLE_CONDITIONAL_GET);
 
                             // Authentication
-                            final org.dom4j.Node configAuthentication = XPathUtils.selectSingleNode(configElement, "/config/authentication");
+                            final org.orbeon.dom.Node configAuthentication = XPathUtils.selectSingleNode(configElement, "/config/authentication");
                             final String username = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "username");
                             final String password = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "password");
                             final boolean preemptiveAuth = ProcessorUtils.selectBooleanValue(configElement, "/config/authentication/preemptive", DEFAULT_PREEMPTIVE_AUTHENTICATION);

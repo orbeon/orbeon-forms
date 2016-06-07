@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.dom4j
+import org.orbeon.dom
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.XPath
@@ -29,7 +29,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
-  def source: dom4j.Document =
+  def source: dom.Document =
     <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
+import org.orbeon.saxon.dom.OrbeonDOMObjectModel
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -150,14 +151,23 @@ object XPath {
   // Global Saxon configuration with a global name pool
   val GlobalConfiguration = new Configuration {
 
-    setNamePool(GlobalNamePool)
-    registerExternalObjectModel(GlobalDataConverter)
+    super.setNamePool(GlobalNamePool)
+    super.registerExternalObjectModel(GlobalDataConverter)
+    super.registerExternalObjectModel(OrbeonDOMObjectModel)
+
+    override def setNamePool(targetNamePool: NamePool): Unit =
+      throwException()
+
+    override def registerExternalObjectModel(model: ExternalObjectModel): Unit =
+      throwException()
 
     override def setAllowExternalFunctions(allowExternalFunctions: Boolean): Unit =
-      throw new IllegalStateException("Global XPath configuration is read-only")
+      throwException()
 
     override def setConfigurationProperty(name: String, value: AnyRef): Unit =
-      throw new IllegalStateException("Global XPath configuration is read-only")
+      throwException()
+
+    private def throwException() = throw new IllegalStateException("Global XPath configuration is read-only")
   }
 
   // New mutable configuration sharing the same name pool and converters, for use by mutating callers
@@ -166,6 +176,7 @@ object XPath {
       setNamePool(GlobalNamePool)
       setDocumentNumberAllocator(GlobalConfiguration.getDocumentNumberAllocator)
       registerExternalObjectModel(GlobalDataConverter)
+      registerExternalObjectModel(OrbeonDOMObjectModel)
     }
 
   // Compile the expression and return a literal value if possible

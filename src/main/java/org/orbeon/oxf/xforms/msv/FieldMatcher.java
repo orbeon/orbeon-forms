@@ -15,10 +15,10 @@
  * @(#)$Id: FieldMatcher.java,v 1.1 2005/05/04 23:55:58 ebruchez Exp $
  *
  * Copyright 2001 Sun Microsystems, Inc. All Rights Reserved.
- * 
- * This software is the proprietary information of Sun Microsystems, Inc.  
+ *
+ * This software is the proprietary information of Sun Microsystems, Inc.
  * Use is subject to license terms.
- * 
+ *
  */
 package org.orbeon.oxf.xforms.msv;
 
@@ -27,37 +27,37 @@ import org.orbeon.msv.relaxng.datatype.Datatype;
 
 /**
  * XPath matcher that tests one field of a key.
- * 
+ *
  * This object is created by a FieldsMatcher when a SelectorMathcer
  * finds a match to its selector. This object is responsible for finding
  * a match to one field of the constraint.
- * 
+ *
  * A field XPath may consist of "A|B|C". Each sub case A,B, and C is
  * tested by a child FieldPathMatcher object. This class coordinates
  * the work of those children and collects actual text that matches
  * the given XPath.
- * 
+ *
  * @author <a href="mailto:kohsuke.kawaguchi@eng.sun.com">Kohsuke KAWAGUCHI</a>
  */
 public class FieldMatcher extends PathMatcher {
-    
+
     protected Field field;
-    
+
     /**
      * the matched value. If this field is null, then it means
      * nothing is matched yet.
      */
     protected Object    value;
-    
+
     /** parent FieldsMatcher object. */
     protected final FieldsMatcher parent;
 
-    private org.dom4j.Element element;
-    
+    private org.orbeon.dom.Element element;
+
     FieldMatcher( FieldsMatcher parent, Field field )  {
         super( parent.owner, field.paths );
         this.parent = parent;
-        
+
         // test the initial match
         super.start( parent.element );
     }
@@ -66,10 +66,10 @@ public class FieldMatcher extends PathMatcher {
     /**
      * this method is called when the element matches the XPath.
      */
-    protected void onElementMatched( final org.dom4j.Element elt )  {
+    protected void onElementMatched( final org.orbeon.dom.Element elt )  {
         if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("field match for "+ parent.selector.idConst.localName );
-        
+
         // this field matches this element.
         // wait for the corresponding endElement call and
         // obtain text.
@@ -79,31 +79,31 @@ public class FieldMatcher extends PathMatcher {
     /**
      * this method is called when the attribute matches the XPath.
      */
-    protected void onAttributeMatched( final org.dom4j.Attribute att, Datatype type )  {
-        
+    protected void onAttributeMatched(final org.orbeon.dom.Attribute att, Datatype type )  {
+
         if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("field match for "+ parent.selector.idConst.localName );
-        
+
         final String val = att.getValue();
         setValue( val, type );
     }
-    
-    protected void startElement( final org.dom4j.Element elt ) 
+
+    protected void startElement( final org.orbeon.dom.Element elt )
                                  {
         if( element != null ) {
             // this situation is an error because a matched element
             // cannot contain any child element.
             // But what I don't know is how to treat this situation.
-            
+
             // 1. to make the document invalid?
             // 2. cancel the match?
-            
+
             // the current implementation choose the 2nd.
             element = null;
         }
         super.startElement( elt );
     }
-    
+
     protected void endElement( Datatype type ) {
         super.endElement(type);
         // double match error is already checked in the corresponding
@@ -115,7 +115,7 @@ public class FieldMatcher extends PathMatcher {
         }
     }
 
-    
+
     /** sets the value field. */
     private void setValue( String lexical, Datatype type ) {
         if(value!=null) {
@@ -123,7 +123,7 @@ public class FieldMatcher extends PathMatcher {
             doubleMatchError();
             return;
         }
-        
+
         if(type==null) {
             // this is possible only when we are recovering from errors.
             value = lexical;
@@ -132,7 +132,7 @@ public class FieldMatcher extends PathMatcher {
         } else
             value = type.createValue(lexical,owner);
     }
-    
+
     /** this field matches more than once. */
     private void doubleMatchError() {
         int i;
@@ -140,7 +140,7 @@ public class FieldMatcher extends PathMatcher {
         for( i=0; i<parent.children.length; i++ )
             if( parent.children[i]==this )
                 break;
-        
+
         owner.reportError( parent.element, IDConstraintChecker.ERR_DOUBLE_MATCH,
             new Object[]{
                 parent.selector.idConst.namespaceURI,

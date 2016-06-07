@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}

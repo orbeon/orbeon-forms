@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.DocumentFactory;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -69,11 +69,11 @@ public final class DOMGenerator extends ProcessorImpl {
 
     private static class DOM4JSourceFactory extends SourceFactory {
 
-        private final org.dom4j.Document doc;
+        private final org.orbeon.dom.Document doc;
 
-        DOM4JSourceFactory(final org.dom4j.Document d, final String sid, boolean clone) {
+        DOM4JSourceFactory(final org.orbeon.dom.Document d, final String sid, boolean clone) {
             super(sid);
-            doc = clone ? (org.dom4j.Document) d.clone() : d;
+            doc = clone ? (org.orbeon.dom.Document) d.clone() : d;
         }
 
         Source makeDOMSource() {
@@ -130,8 +130,8 @@ public final class DOMGenerator extends ProcessorImpl {
     public final static Long ZeroValidity = (long) 0;
     public final static String DefaultContext = "oxf:/";
 
-    private static org.dom4j.Document makeCopyDoc(final org.dom4j.Element e) {
-        final org.dom4j.Element cpy = e.createCopy();
+    private static org.orbeon.dom.Document makeCopyDoc(final org.orbeon.dom.Element e) {
+        final org.orbeon.dom.Element cpy = e.createCopy();
         final Document ret = DocumentFactory.createDocument();
         ret.setRootElement(cpy);
         return ret;
@@ -173,7 +173,7 @@ public final class DOMGenerator extends ProcessorImpl {
      *            document.
      */
 
-    public DOMGenerator(final org.dom4j.Element e, final String id, Object v, final String sid) {
+    public DOMGenerator(final org.orbeon.dom.Element e, final String id, Object v, final String sid) {
         this(id, v, new DOM4JSourceFactory(makeCopyDoc(e), sid, false));
     }
 
@@ -183,7 +183,7 @@ public final class DOMGenerator extends ProcessorImpl {
      * @param sid Base url used to resolve any relative URLs that may be contained within the
      *            document.
      */
-    public DOMGenerator(final org.dom4j.Document d, final String id, Object v, final String sid) {
+    public DOMGenerator(final org.orbeon.dom.Document d, final String id, Object v, final String sid) {
         this(id, v, new DOM4JSourceFactory(d, sid, true));
     }
 

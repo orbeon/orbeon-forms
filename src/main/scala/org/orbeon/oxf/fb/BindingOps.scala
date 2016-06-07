@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME

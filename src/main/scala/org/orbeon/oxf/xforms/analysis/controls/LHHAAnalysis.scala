@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.dom4j._
+import org.orbeon.dom._
 import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.Dom4j

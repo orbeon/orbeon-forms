@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.dom4j.QName;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;

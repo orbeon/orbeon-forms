@@ -16,7 +16,7 @@ package org.orbeon.oxf.common
 import java.io.{File, FileInputStream}
 import java.security.SignatureException
 
-import org.dom4j.Document
+import org.orbeon.dom.Document
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}

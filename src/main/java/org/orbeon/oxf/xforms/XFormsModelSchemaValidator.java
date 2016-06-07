@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.QName;
+import org.orbeon.dom.Attribute;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
+import org.orbeon.dom.QName;
 import org.orbeon.msv.datatype.xsd.DatatypeFactory;
 import org.orbeon.msv.datatype.xsd.XSDatatype;
 import org.orbeon.msv.grammar.Expression;

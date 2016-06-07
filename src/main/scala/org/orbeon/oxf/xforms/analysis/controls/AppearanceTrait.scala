@@ -17,7 +17,7 @@ import java.{lang ⇒ jl}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.dom4j.QName
+import org.orbeon.dom.QName
 
 // Trait for all elements that have an appearance
 trait AppearanceTrait extends SimpleElementAnalysis {
@@ -26,7 +26,7 @@ trait AppearanceTrait extends SimpleElementAnalysis {
 
   val appearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
   val mediatype   = Option(element.attributeValue(MEDIATYPE_QNAME))
-  
+
   def encodeAndAppendAppearances(sb: jl.StringBuilder) =
     appearances foreach (encodeAndAppendAppearance(sb, localName, _))
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.dom4j.{Element, QName}
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.actions._

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.dom4j.QName
+import org.orbeon.dom.QName
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.test.TestExternalContext

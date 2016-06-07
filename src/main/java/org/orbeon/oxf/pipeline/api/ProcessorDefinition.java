@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.pipeline.api;
 
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 

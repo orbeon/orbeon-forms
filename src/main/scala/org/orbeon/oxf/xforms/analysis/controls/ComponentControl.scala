@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.Scope
 

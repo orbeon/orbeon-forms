@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.dom4j.{Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.scaxon.XML.Test
 

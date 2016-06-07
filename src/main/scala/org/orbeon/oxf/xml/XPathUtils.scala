@@ -18,11 +18,11 @@ import java.{util ⇒ ju}
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.{ScalaUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.{dom4j ⇒ _}
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
-import org.{dom4j ⇒ d4j}
+import org.orbeon.dom
 
 import scala.collection.JavaConverters._
 
@@ -31,23 +31,23 @@ object XPathUtils {
 
   private def itemToJavaUnwrap: PartialFunction[Item, AnyRef] = {
     case v: AtomicValue                                             ⇒ Value.convertToJava(v)
-    case n: VirtualNode if n.getNodeKind != d4j.Node.NAMESPACE_NODE ⇒ n.getUnderlyingNode.asInstanceOf[d4j.Node]
+    case n: VirtualNode if n.getNodeKind != dom.Node.NAMESPACE_NODE ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
   }
 
-  private def itemToNodeUnwrap: PartialFunction[Item, d4j.Node] = {
+  private def itemToNodeUnwrap: PartialFunction[Item, dom.Node] = {
     case v: AtomicValue                                             ⇒ throw new IllegalArgumentException
-    case n: VirtualNode if n.getNodeKind != d4j.Node.NAMESPACE_NODE ⇒ n.getUnderlyingNode.asInstanceOf[d4j.Node]
+    case n: VirtualNode if n.getNodeKind != dom.Node.NAMESPACE_NODE ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
   }
 
   private val EmptyVariables  = ju.Collections.emptyMap[String, ValueRepresentation]()
   private val EmptyNamespaces = ju.Collections.emptyMap[String, String]()
 
   // 49 usages
-  def selectNodeIterator(contextNode: d4j.Node, expr: String): ju.Iterator[d4j.Node] =
+  def selectNodeIterator(contextNode: dom.Node, expr: String): ju.Iterator[dom.Node] =
     selectNodeIterator(contextNode, expr, EmptyNamespaces)
 
   // 1 external usage
-  def selectNodeIterator(contextNode: d4j.Node, expr: String, prefixes: ju.Map[String, String]): ju.Iterator[d4j.Node] = {
+  def selectNodeIterator(contextNode: dom.Node, expr: String, prefixes: ju.Map[String, String]): ju.Iterator[dom.Node] = {
 
     val resultWithItemsIt =
       selectIteratorImpl(
@@ -63,12 +63,12 @@ object XPathUtils {
 
   // 2 external usages from SQL interpreter
   def selectNodeIterator(
-    contextNode     : d4j.Node,
+    contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],
     functionLibrary : FunctionLibrary,
     functionContext : FunctionContext
-  ): ju.Iterator[d4j.Node] = {
+  ): ju.Iterator[dom.Node] = {
 
     val resultWithItemsIt =
       selectIteratorImpl(
@@ -84,7 +84,7 @@ object XPathUtils {
 
   // NOTE: Return `null` if there is no result.
   // 13 usages
-  def selectSingleNode(node: d4j.Node, expr: String): d4j.Node = {
+  def selectSingleNode(node: dom.Node, expr: String): dom.Node = {
     val it = selectNodeIterator(node, expr)
     if (it.hasNext)
       it.next()
@@ -93,17 +93,17 @@ object XPathUtils {
   }
 
   // 25 usages
-  def selectStringValue(node: d4j.Node, expr: String): String =
+  def selectStringValue(node: dom.Node, expr: String): String =
     selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)
 
   // 167 usages
-  def selectStringValueNormalize(node: d4j.Node, expr: String): String =
+  def selectStringValueNormalize(node: dom.Node, expr: String): String =
     ScalaUtils.trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
 
   // 3 external usages from SQL interpreter
   // Expects: List<Node>, Node, Number (Float, Double, Long, any other?), String.
   def selectObjectValue(
-    contextNode     : d4j.Node,
+    contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],
     functionLibrary : FunctionLibrary,
@@ -127,17 +127,17 @@ object XPathUtils {
     else if (resultWithJava.size == 1)
       resultWithJava.head
     else
-      resultWithJava collect { case v: d4j.Node ⇒ v } asJava
+      resultWithJava collect { case v: dom.Node ⇒ v } asJava
   }
 
   // 2 external usages
-  def selectObjectValue(contextNode: d4j.Node, expr: String): AnyRef =
+  def selectObjectValue(contextNode: dom.Node, expr: String): AnyRef =
     selectObjectValue(contextNode, expr, EmptyNamespaces, null, null)
 
   // 3 external usages from SQL interpreter
   // IMPORTANT: If the XPath expressions select an empty node set, return `null`!
   def selectStringValueOrNull(
-    contextNode     : d4j.Node,
+    contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],
     functionLibrary : FunctionLibrary,
@@ -157,7 +157,7 @@ object XPathUtils {
 
     if (resultWithJavaIt.hasNext) {
       resultWithJavaIt.next() match {
-        case v: d4j.Node ⇒ v.getStringValue
+        case v: dom.Node ⇒ v.getStringValue
         case v           ⇒ v.toString // covers String, Boolean, and number values
       }
     } else
@@ -166,16 +166,16 @@ object XPathUtils {
 
   // IMPORTANT: If the XPath expressions select an empty node set, return `null`!
   // 27 usages
-  def selectIntegerValue(node: d4j.Node, expr: String): Integer =
+  def selectIntegerValue(node: dom.Node, expr: String): Integer =
     Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)) map (new java.lang.Integer(_)) orNull
 
   // 2 callers from JFreeChart, both return xs:boolean
-  def selectBooleanValue(node: d4j.Node, expr: String): Boolean =
+  def selectBooleanValue(node: dom.Node, expr: String): Boolean =
     selectBooleanValueImp(node, expr, EmptyNamespaces, null, null)
 
   // 1 caller from SQL interpreter, implication is that expressions must return xs:boolean
   def selectBooleanValue(
-    contextNode     : d4j.Node,
+    contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],
     functionLibrary : FunctionLibrary,
@@ -190,7 +190,7 @@ object XPathUtils {
     )
 
   private def selectBooleanValueImp(
-    contextNode     : d4j.Node,
+    contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],
     functionLibrary : FunctionLibrary,
@@ -205,7 +205,7 @@ object XPathUtils {
     ).next().asInstanceOf[BooleanValue].effectiveBooleanValue
 
   private def selectIteratorImpl(
-    contextNode     : d4j.Node,
+    contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],
     functionLibrary : FunctionLibrary,

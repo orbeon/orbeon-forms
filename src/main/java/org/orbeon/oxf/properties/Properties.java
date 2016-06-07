@@ -14,8 +14,8 @@
 package org.orbeon.oxf.properties;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.QName;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DOMSerializer;

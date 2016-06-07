@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.analysis.controls._
 import model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.dom4j.{QName, Element}
+import org.orbeon.dom.{QName, Element}
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.Scope

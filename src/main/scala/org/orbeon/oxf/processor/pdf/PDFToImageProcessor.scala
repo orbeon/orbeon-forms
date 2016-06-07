@@ -19,7 +19,7 @@ import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.fop.util.bitmap.JAIMonochromeBitmapConverter
-import org.dom4j.{Element ⇒ DOM4JElement}
+import org.orbeon.dom.{Element ⇒ DOM4JElement}
 import org.icepdf.core.pobjects.{Document ⇒ ICEDocument, Page}
 import org.icepdf.core.util.GraphicsRenderingHints
 import org.orbeon.oxf.common.OXFException

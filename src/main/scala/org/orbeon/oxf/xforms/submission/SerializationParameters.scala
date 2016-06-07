@@ -17,14 +17,14 @@ import java.io.ByteArrayOutputStream
 import java.net.URLEncoder
 import javax.xml.transform.stream.StreamResult
 
-import org.dom4j.Document
-import org.dom4j.io.DocumentSource
+import org.orbeon.dom.Document
+import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{Connection, XPath}
 import org.orbeon.oxf.xforms.{InstanceData, XFormsUtils}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants, XMLUtils}
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 
 case class SerializationParameters(
   messageBody            : Array[Byte],

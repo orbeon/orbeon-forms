@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.test;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.itemset
 import XFormsItemUtils.isSelected
 import collection.JavaConverters._
 import java.lang.{Iterable ⇒ JIterable}
-import org.dom4j.Namespace
-import org.dom4j.QName
+import org.orbeon.dom.Namespace
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils

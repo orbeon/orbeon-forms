@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.dom4j.Document
+import org.orbeon.dom.Document
 import org.junit.Test
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.test.DocumentTestBase
@@ -24,7 +24,7 @@ import org.xml.sax.helpers.AttributesImpl
 import scala.collection.mutable
 
 class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
-  
+
   def newPropertySet = {
     val properties: Document =
       <properties xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
@@ -41,11 +41,11 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
 
     new PropertyStore(properties).getGlobalPropertySet
   }
-  
+
   class TestBindingLoader extends BindingLoader {
 
     var propertySet = newPropertySet
-    
+
     val FooXBL: Document =
       <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xbl:script src="/xbl/orbeon/foo/foo.js"/>
@@ -67,7 +67,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           <xbl:template/>
         </xbl:binding>
       </xbl:xbl>
-    
+
     val BazXBL: Document =
       <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xbl:script src="/xbl/orbeon/baz/baz.js"/>
@@ -78,7 +78,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           <xbl:template/>
         </xbl:binding>
       </xbl:xbl>
-    
+
     val GagaXBL: Document =
       <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <xbl:script src="/xbl/orbeon/gaga/gaga.js"/>
@@ -89,7 +89,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
           <xbl:template/>
         </xbl:binding>
       </xbl:xbl>
-    
+
     val Docs = Map(
       "/xbl/orbeon/foo/foo.xbl"   → FooXBL,
       "/xbl/orbeon/bar/bar.xbl"   → BarXBL,
@@ -113,7 +113,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
     var lastModified = 123L
     val contentRead = mutable.Set[String]()
   }
-  
+
 
   @Test def testLibraryLoad(): Unit = {
 

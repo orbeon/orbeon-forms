@@ -16,7 +16,7 @@ package org.orbeon.oxf.properties
 import java.net.URI
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.dom4j.{Element, QName}
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.util.ScalaUtils.{BooleanWrapper, StringOps, split}

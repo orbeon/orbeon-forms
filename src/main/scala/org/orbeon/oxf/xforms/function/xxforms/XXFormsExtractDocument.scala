@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.function.XFormsFunction

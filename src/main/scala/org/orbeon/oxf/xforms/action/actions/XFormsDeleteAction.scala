@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.dom4j.{Attribute, Document}
+import org.orbeon.dom.{Attribute, Document}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}

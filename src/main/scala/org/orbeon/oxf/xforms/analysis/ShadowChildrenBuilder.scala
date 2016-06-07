@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import controls.{LHHA, ComponentControl}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.XFormsConstants.{XXBLScope, FOR_QNAME}
 
 trait ShadowChildrenBuilder extends ChildrenBuilderTrait {

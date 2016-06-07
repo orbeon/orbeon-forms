@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls.ViewTrait
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.common.ValidationException
 
@@ -31,7 +31,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
   val name = element.attributeValue(NAME_QNAME)
   if (name eq null)
     throw new ValidationException(s"`${element.getQualifiedName}` element must have a `name` attribute", ElementAnalysis.createLocationData(element))
-  
+
   // Lazy because accessing scopeModel
   private lazy val nestedAnalysis =
     valueOrSequenceElement(element) map { valueElement ⇒
@@ -89,7 +89,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 }
 
 object VariableAnalysis {
-  
+
   def valueOrSelectAttributeJava(element: Element) =
     valueOrSelectAttribute(element).orNull
 
@@ -98,7 +98,7 @@ object VariableAnalysis {
 
   def valueOrSequenceElementJava(element: Element) =
     valueOrSequenceElement(element).orNull
-  
+
   def valueOrSequenceElement(element: Element) =
     Option(element.element(XXFORMS_VALUE_QNAME)) orElse Option(element.element(XXFORMS_SEQUENCE_QNAME))
 

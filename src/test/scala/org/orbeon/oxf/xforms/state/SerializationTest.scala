@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.state
 
 import org.scalatest.junit.AssertionsForJUnit
-import org.dom4j.Document
+import org.orbeon.dom.Document
 import org.orbeon.oxf.test.DocumentTestBase
 import XFormsOperations._
 import XFormsProtocols._
@@ -227,9 +227,9 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     assert(part.getControlAnalysis("input") ne null)
     assert(part.getControlAnalysis("trigger") ne null)
   }
-  
+
   @Test def issue2197RestoreIdsOfBoundControls(): Unit = {
-    
+
     val doc = this setupDocument
       <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -248,22 +248,22 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
           </fr:number>
         </xh:body>
       </xh:html>
-    
+
     assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-    
+
     val serializedState = XFormsState(
       staticStateDigest = Option(doc.getStaticState.digest),
       staticState       = doc.getStaticState.encodedState,
       dynamicState      = DynamicState(doc)
     )
-    
+
     val restoredDoc = new XFormsContainingDocument(serializedState, false)
-    
+
     assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
   }
-  
+
   @Test def issue2197RestoreInlineXBL(): Unit = {
-    
+
     val doc = this setupDocument
       <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -301,17 +301,17 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
           </fr:bar>
         </xh:body>
       </xh:html>
-    
+
     assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-    
+
     val serializedState = XFormsState(
       staticStateDigest = Option(doc.getStaticState.digest),
       staticState       = doc.getStaticState.encodedState,
       dynamicState      = DynamicState(doc)
     )
-    
+
     val restoredDoc = new XFormsContainingDocument(serializedState, false)
-    
+
     for (id ← List("my-foo", "my-bar", "my-number"))
       assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)
   }

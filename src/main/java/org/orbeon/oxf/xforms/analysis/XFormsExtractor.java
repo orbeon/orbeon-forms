@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.dom4j.QName;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -157,7 +157,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
     private void outputFirstElementIfNeeded() throws SAXException {
         if (! outputSingleTemplate && mustOutputFirstElement) {
             final AttributesImpl attributesImpl = new AttributesImpl();
-            
+
             // Add is HTML information
             attributesImpl.addAttribute("", "is-html", "is-html", XMLReceiverHelper.CDATA, isHTMLDocument?"true":"false");
 
@@ -306,7 +306,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
         if (! inXFormsOrExtension && ! isXFormsOrExtension) {
             addPropertiesIfAny(attributes);
         }
-        
+
         if (level == 0 && isTopLevel) {
         	isHTMLDocument = "html".equals(localname) && (uri == null || uri.length() == 0 || XMLConstants.XHTML_NAMESPACE_URI.equals(uri));
         }

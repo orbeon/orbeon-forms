@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.SAXLoggerProcessor;
@@ -81,7 +81,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
     private transient Locator locator; // used only for recording events, MUST be cleared afterwards
 
     private final Mark START_MARK = new Mark();
-    
+
     private List<Mark> marks = null;
 
     public class Mark {
@@ -114,10 +114,10 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.systemIdBufferPosition = store.systemIdBufferPosition;
             this.attributeCountBufferPosition = store.attributeCountBufferPosition;
             this.StringBuilderPosition = store.StringBuilder.size();
-            
+
             rememberMark();
         }
-        
+
         private Mark(final int[] values, final String id) {
             this.id = id;
             int i = 0;
@@ -128,22 +128,22 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.systemIdBufferPosition = values[i++];
             this.attributeCountBufferPosition = values[i++];
             this.StringBuilderPosition = values[i++];
-            
+
             rememberMark();
         }
-        
+
         private void rememberMark() {
-            // Keep a reference to marks, so that they can be serialized/deserialized along with the SAXStore 
+            // Keep a reference to marks, so that they can be serialized/deserialized along with the SAXStore
             if (marks == null)
                 marks = new ArrayList<Mark>();
-            
+
             marks.add(this);
         }
 
         public void replay(XMLReceiver xmlReceiver) throws SAXException {
             SAXStore.this.replay(xmlReceiver, this);
         }
-        
+
         public SAXStore saxStore() {
             return SAXStore.this;
         }
@@ -724,7 +724,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         out.writeBoolean(hasDocumentLocator);
         out.writeObject(publicId == null ? "" : publicId);
-        
+
         if (marks == null || marks.isEmpty()) {
             out.writeInt(0);
         } else {
@@ -789,7 +789,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         publicId = (String) in.readObject();
         if ("".equals(publicId))
             publicId = null;
-        
+
         final int marksCount = in.readInt();
         if (marksCount > 0) {
             for (int i = 0; i < marksCount; i++) {

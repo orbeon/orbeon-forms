@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.scope;
 
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

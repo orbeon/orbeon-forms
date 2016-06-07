@@ -14,8 +14,8 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -57,7 +57,7 @@ public class DebugProcessor extends ProcessorImpl {
                             }
                         }
                         final Document loggedDocument;
-                        final SAXStore saxStore = new SAXStore();   
+                        final SAXStore saxStore = new SAXStore();
                         {
                             readInputAsSAX(pipelineContext, name, saxStore);
                             final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();

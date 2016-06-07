@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.submission.XFormsSubmissionUtils;
 import org.orbeon.oxf.xml.TransformerUtils;

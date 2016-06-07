@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.ast;
 
-import org.dom4j.*;
+import org.orbeon.dom.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.foreach.AbstractForEachProcessor;
 

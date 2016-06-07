@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Element;
+import org.orbeon.dom.Element;
 
 public class ErrorInfo {
     public final Element element;

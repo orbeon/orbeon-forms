@@ -14,7 +14,7 @@
 package org.orbeon.oxf.test;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
+import org.orbeon.dom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

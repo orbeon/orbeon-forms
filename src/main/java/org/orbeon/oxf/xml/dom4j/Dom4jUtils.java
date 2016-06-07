@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.dom4j.*;
-import org.dom4j.CharacterData;
-import org.dom4j.io.DocumentSource;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
+import org.orbeon.dom.*;
+import org.orbeon.dom.CharacterData;
+import org.orbeon.dom.io.DocumentSource;
+import org.orbeon.dom.io.OutputFormat;
+import org.orbeon.dom.io.SAXReader;
+import org.orbeon.dom.io.XMLWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;

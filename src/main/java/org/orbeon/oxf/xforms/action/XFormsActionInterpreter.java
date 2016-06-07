@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.action;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;

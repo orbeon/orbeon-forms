@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.controller;
 
-import org.dom4j.*;
+import org.orbeon.dom.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.pipeline.PipelineConfig;

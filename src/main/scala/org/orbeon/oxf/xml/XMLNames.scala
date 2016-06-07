@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
-import org.dom4j.{Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 
 object XMLNames {
 

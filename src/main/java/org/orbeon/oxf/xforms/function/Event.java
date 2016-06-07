@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.dom4j.QName;
+import org.orbeon.dom.QName;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;

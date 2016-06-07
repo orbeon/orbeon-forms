@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import java.io.ByteArrayOutputStream
 import java.util.{Map ⇒ JMap}
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, XPath}

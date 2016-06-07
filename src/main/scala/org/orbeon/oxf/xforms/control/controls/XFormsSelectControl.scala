@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl

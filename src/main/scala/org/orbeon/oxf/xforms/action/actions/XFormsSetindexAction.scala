@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
@@ -61,7 +61,7 @@ class XFormsSetindexAction extends XFormsAction {
 }
 
 object XFormsSetindexAction {
-  
+
   def executeSetindexAction(
     interpreter    : XFormsActionInterpreter,
     actionElement  : Element,
@@ -70,17 +70,17 @@ object XFormsSetindexAction {
   ): Int = {
 
     val indentedLogger = interpreter.indentedLogger
-    
+
     // "This XForms Action begins by invoking the deferred update behavior."
     if (interpreter.isDeferredUpdates(actionElement))
       interpreter.containingDocument.synchronizeAndRefresh()
-    
+
     // Find repeat control
     interpreter.resolveObject(actionElement, repeatStaticId) match {
       case control: XFormsControl ⇒
-        
+
         val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl ⇒ repeat }
-        
+
         if (indentedLogger.isDebugEnabled)
           indentedLogger.logDebug("xf:setindex", "setting index upon xf:setindex",
             "old index", repeatControl map (_.getIndex.toString) orNull,
@@ -93,11 +93,11 @@ object XFormsSetindexAction {
 
         // Handle focus changes
         Focus.updateFocusWithEvents(focusedBefore)
-        
+
         // However at this time return the index only for repeat controls as we don't have a generic way to
         // figure this out yet
         repeatControl map (_.getIndex) getOrElse -1
-        
+
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action
         // such as dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
@@ -107,7 +107,7 @@ object XFormsSetindexAction {
             "index does not refer to an existing xf:repeat element, ignoring action",
             "repeat id", repeatStaticId
           )
-        
+
         -1
     }
   }

@@ -16,7 +16,7 @@ package org.orbeon.oxf.controller
 import collection.JavaConverters._
 import java.util.regex.Pattern
 import java.util.{List ⇒ JList, Map ⇒ JMap}
-import org.dom4j.{QName, Document, Element}
+import org.orbeon.dom.{QName, Document, Element}
 import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}

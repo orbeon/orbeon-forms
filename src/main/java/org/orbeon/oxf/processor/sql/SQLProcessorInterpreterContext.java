@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql;
 
-import org.dom4j.Node;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

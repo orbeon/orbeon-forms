@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.io.IOException
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}

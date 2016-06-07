@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.apache.commons.lang3.StringUtils
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
 import org.orbeon.oxf.util.{Connection, NetUtils}

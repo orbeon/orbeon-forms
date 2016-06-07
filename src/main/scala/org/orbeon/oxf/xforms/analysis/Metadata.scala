@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import java.util.{Map ⇒ JMap}
 
-import org.dom4j.io.DocumentSource
+import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate

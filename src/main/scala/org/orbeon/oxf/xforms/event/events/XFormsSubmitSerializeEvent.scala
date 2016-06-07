@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.dom4j.DocumentFactory
+import org.orbeon.dom.DocumentFactory
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.saxon.dom.DocumentWrapper
 
 class XFormsSubmitSerializeEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_SUBMIT_SERIALIZE, target, properties, bubbles = true, cancelable = false) {

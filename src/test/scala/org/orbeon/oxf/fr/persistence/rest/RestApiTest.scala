@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 
-import org.dom4j.{Document, DocumentFactory}
+import org.orbeon.dom.{Document, DocumentFactory}
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.db._

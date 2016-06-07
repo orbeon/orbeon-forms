@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import analysis.ElementAnalysis
 import analysis.model.Model
-import org.dom4j.Element
+import org.orbeon.dom.Element
 import org.orbeon.oxf.xml.NamespaceMapping
 import xbl.Scope
 
@@ -29,7 +29,7 @@ trait PartStaticAnalysisOps {
   def getModelByInstancePrefixedId(prefixedId: String): Model
   def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
   def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String
-  
+
   def getControlAnalysis(prefixedId: String): ElementAnalysis
   def scopeForPrefixedId(prefixedId: String): Scope
   def searchResolutionScopeByPrefixedId(prefixedId: String): Scope

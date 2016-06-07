@@ -16,7 +16,6 @@ package org.orbeon.oxf.resources;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.w3c.dom.Node;
-import org.xml.sax.XMLReader;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,8 +49,8 @@ public interface ResourceManager {
      * @param key a Resource Manager key
      * @return  a document element
      */
-    org.dom4j.Document getContentAsDOM4J(String key);
-    
+    org.orbeon.dom.Document getContentAsDOM4J(String key);
+
     /**
      * Gets a DOM4J document for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
@@ -61,7 +60,7 @@ public interface ResourceManager {
      * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments  @return  a document element
      */
-    org.dom4j.Document getContentAsDOM4J(String key, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical);
+    org.orbeon.dom.Document getContentAsDOM4J(String key, XMLParsing.ParserConfiguration parserConfiguration, boolean handleLexical);
 
     /**
      * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an

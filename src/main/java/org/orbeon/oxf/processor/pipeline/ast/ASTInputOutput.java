@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.ast;
 
-import org.dom4j.Node;
+import org.orbeon.dom.Node;
 
 
 public abstract class ASTInputOutput extends ASTNodeContainer implements ASTDebugSchema {

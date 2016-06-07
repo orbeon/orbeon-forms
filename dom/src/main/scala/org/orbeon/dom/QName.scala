@@ -80,5 +80,5 @@ class QName(_name: String, _namespace: Namespace, _qualifiedName: String) {
     }
 
   override def toString =
-    if (getNamespaceURI == "") name else s"Q{{$getNamespaceURI}}$getQualifiedName"
+    if (getNamespaceURI == "") name else s"Q{$getNamespaceURI}$getQualifiedName"
 }

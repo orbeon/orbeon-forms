@@ -104,7 +104,7 @@ class SAXContentHandler(
       completeCurrentTextNode()
 
     elementStack.remove(elementStack.size - 1)
-    currentElement = elementStack.get(elementStack.size - 1)
+    currentElement = if (elementStack.isEmpty) null else elementStack.get(elementStack.size - 1)
   }
 
   override def characters(ch: Array[Char], start: Int, end: Int): Unit = {

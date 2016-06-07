@@ -1907,10 +1907,32 @@
                         <xf:alert id="alert-7" validation="length-constraint uppercase-constraint">Both constraints</xf:alert>
 
                         <xf:message
-                                event="xxforms-constraints-changed"
-                                value="string-join((for $name in ('added-errors', 'removed-errors', 'added-warnings', 'removed-warnings')[exists(event(.))]
-                                                    return concat($name, ': ', string-join(event($name), ', ')),
-                                                    for $a in xxf:alert('my-input')[xxf:non-blank()] return concat('alert: ', $a)), ' | ')"/>
+                            event="xxforms-constraints-changed"
+                            value="
+                                string-join(
+                                    (
+                                        for $name in
+                                            (
+                                                'added-errors',
+                                                'removed-errors',
+                                                'added-warnings',
+                                                'removed-warnings'
+                                            )[exists(event(.))]
+                                            return
+                                                concat(
+                                                    $name,
+                                                    ': ',
+                                                    string-join(event($name), ', ')
+                                                ),
+                                        for $a in xxf:alert('my-input')[xxf:non-blank()]
+                                            return
+                                                concat(
+                                                    'alert: ',
+                                                    $a
+                                                )
+                                    ),
+                                    ' | '
+                                )"/>
                     </xf:input>
                 </xh:body>
             </xh:html>

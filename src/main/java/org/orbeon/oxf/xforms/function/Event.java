@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.dom4j.QName;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.expr.Expression;
@@ -45,15 +46,23 @@ public class Event extends XFormsFunction {
         final String attributeName = instanceIdExpression.evaluateAsString(xpathContext).toString();
 
         // Get the current event
-        final XFormsEvent event = getContainingDocument(xpathContext).getCurrentEvent();
+        // TODO: getContainingDocument(xpathContext) can be null in tests
 
-        return getEventAttribute(event, attributeName);
+        final XFormsContainingDocument doc = getContainingDocument(xpathContext);
+
+        if (doc == null) {
+            return EmptyIterator.getInstance();
+        } else {
+            final XFormsEvent event = doc.getCurrentEvent();
+            if (event == null) {
+                return EmptyIterator.getInstance();
+            } else {
+                return getEventAttribute(event, attributeName);
+            }
+        }
     }
 
-    protected SequenceIterator getEventAttribute(XFormsEvent event, String attributeName) {
-        // TODO: Currently the spec doesn't specify what happens when we call event() outside of an event handler
-        if (event == null)
-            return EmptyIterator.getInstance();
+    private SequenceIterator getEventAttribute(XFormsEvent event, String attributeName) {
 
         // As an extension, we allow a QName
 

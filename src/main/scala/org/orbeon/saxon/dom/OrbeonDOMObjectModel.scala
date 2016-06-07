@@ -40,7 +40,7 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
 
   // It's unclear what to do with Entity nodes, and even whether we should have them in the first place.
   private def isRecognizedNodeClass(nodeClass: Class[_]): Boolean =
-      classOf[Node].isAssignableFrom(nodeClass) && ! classOf[Entity].isAssignableFrom(nodeClass)
+    classOf[Node].isAssignableFrom(nodeClass) && ! classOf[Entity].isAssignableFrom(nodeClass)
 
   private def convertObjectToXPathValue(obj: Any, config: Configuration): ValueRepresentation = {
 

@@ -1,7 +1,7 @@
 package org.orbeon.dom.io
 
 object OutputFormat {
-  val StandardIndent          = "  "
+  val StandardIndent          = "    "
   val StandardEncoding        = "UTF-8"
   def LineSeparator           = "\n"
   def AttributeQuoteCharacter = '"'

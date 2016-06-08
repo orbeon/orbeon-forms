@@ -1519,9 +1519,26 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                     anchor.setAttribute("href", newControlValue);
                     YAHOO.util.Dom.removeClass(anchor, "xforms-readonly");
                 }
+            } else if (isStaticReadonly && jControl.is('.xforms-textarea')) {
+                // textarea in "static readonly" mode
+                var pre = jControl.children('pre').first();
+                if (pre.length > 0) {
+                    pre.text(newControlValue);
+                }
+            } else if (isStaticReadonly && jControl.is('.xforms-select1-appearance-full')) {
+                // Radio buttons in "static readonly" mode
+                var items = jControl.find('.xforms-selected, .xforms-deselected');
+                if (items.length > 0) {
+                    _.each(items, function(item) {
+                        var jItem    = $(item);
+                        var selected = jItem.find('.radio > span').text() == newControlValue;
+
+                        jItem.toggleClass('xforms-selected',     selected);
+                        jItem.toggleClass('xforms-deselected', ! selected);
+                    });
+                }
             } else if (jControl.is('.xforms-output') || isStaticReadonly) {
-                // XForms output or "static readonly" mode
-                var jControl = jControl;
+                // XForms output or other field in "static readonly" mode
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();
                 if (output.length > 0) {
                     if (jControl.is(".xforms-mediatype-image")) {

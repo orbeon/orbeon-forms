@@ -4,96 +4,30 @@ import java.io._
 import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom._
-import org.orbeon.dom.io.XMLWriter._
 import org.orbeon.dom.tree.NamespaceStack
-import org.xml.sax._
-import org.xml.sax.ext.LexicalHandler
-import org.xml.sax.helpers.XMLFilterImpl
 
 private object XMLWriter {
-
-  private val LexicalHandlerNames = Array(
-    "http://xml.org/sax/properties/lexical-handler"
-  )
-
   val DefaultFormat = OutputFormat(indent = false, newlines = false, trimText = false)
 }
 
 /**
- * `XMLWriter` takes a DOM4J tree and formats it to a stream as
- * XML. It can also take SAX events too so can be used by SAX clients as this
- * object implements the and  interfaces. as well. This formatter performs typical document
- * formatting. The XML declaration and processing instructions are always on
- * their own lines. An object can be used to define how
- * whitespace is handled when printing and allows various configuration options,
- * such as to allow suppression of the XML declaration, the encoding declaration
- * or whether empty documents are collapsed.
+ * `XMLWriter` takes a tree and formats it to a stream of characters.
  */
-class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends XMLFilterImpl with LexicalHandler {
-
-  private var isLastOutputNodeTypeText = false
-
-  // last written element node was a closing tag or an opening tag
-  private var lastElementClosed = false
-
-  // xml:space attribute value of preserve for whitespace flag
-  protected var preserve = false
+class XMLWriter(val writer: Writer, val format: OutputFormat) {
 
   private val namespaceStack = new NamespaceStack
-
-  private val escapeText = true
-
-  private var indentLevel = 0
-
-  // Buffer used when escaping strings
-  private val buffer = new jl.StringBuilder
-
-  // Whether we have added characters before from the same chunk of characters
-  private var charsAdded = false
-
-  private var lastChar: Char = _
-
-  // Whether a flush should occur after writing a document
-  private var autoFlush = false
-
-  var lexicalHandler: LexicalHandler = _
-  def getLexicalHandler = lexicalHandler
-
-  private var inDTD = false
-
-  private var namespacesMap: ju.Map[String, String] = _
-
   namespaceStack.push(Namespace.EmptyNamespace)
 
-  def this(writer: Writer) =
-    this(writer, DefaultFormat)
+  // State
+  private var isLastOutputNodeTypeText = false
+  private var preserve = false
+  private val escapeText = true
+  private var indentLevel = 0
+  private val buffer = new jl.StringBuilder
+  private var lastChar: Char = _
 
-  def setWriter(writer: Writer): Unit = {
-    this.writer = writer
-    this.autoFlush = false
-  }
-
-  def setOutputStream(out: OutputStream): Unit = {
-    this.writer = createWriter(out, OutputFormat.StandardEncoding)
-    this.autoFlush = true
-  }
-
-  def flush(): Unit =
-    writer.flush()
-
-  def close(): Unit = {
-    writer.close()
-  }
-
-  def writeNewLine(): Unit =
+  private def writeNewLine(): Unit =
     writer.write(OutputFormat.LineSeparator)
-
-  def write(attribute: Attribute): Unit = {
-    writeAttribute(attribute)
-    if (autoFlush) {
-      flush()
-    }
-  }
 
   /**
    * This will print the `Document` to the current Writer.
@@ -112,286 +46,10 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       writeNode(node)
     }
     writeNewLineIfNeeded()
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  def write(element: Element): Unit = {
-    writeElement(element)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  def write(cdata: CDATA): Unit = {
-    writeCDATA(cdata.getText)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  def write(comment: Comment): Unit = {
-    writeComment(comment.getText)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  def write(namespace: Namespace): Unit = {
-    writeNamespace(namespace)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  def write(processingInstruction: ProcessingInstruction): Unit = {
-    writeProcessingInstruction(processingInstruction)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  /**
-   * Perform the necessary entity escaping and whitespace stripping.
-   */
-  def write(text: String): Unit = {
-    writeString(text)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  def write(text: Text): Unit = {
-    writeString(text.getText)
-    if (autoFlush) {
-      flush()
-    }
   }
 
   def write(node: Node): Unit = {
     writeNode(node)
-    if (autoFlush) {
-      flush()
-    }
-  }
-
-  override def parse(source: InputSource): Unit = {
-    installLexicalHandler()
-    super.parse(source)
-  }
-
-  override def setProperty(name: String, value: AnyRef): Unit =
-    if (LexicalHandlerNames contains name)
-      setLexicalHandler(value.asInstanceOf[LexicalHandler])
-    else
-      super.setProperty(name, value)
-
-  override def getProperty(name: String): AnyRef =
-    if (LexicalHandlerNames contains name)
-      getLexicalHandler
-    else
-      super.getProperty(name)
-
-  private def setLexicalHandler(handler: LexicalHandler): Unit = {
-    if (handler eq null) {
-      throw new NullPointerException("Null lexical handler")
-    } else {
-      this.lexicalHandler = handler
-    }
-  }
-
-  override def setDocumentLocator(locator: Locator): Unit = {
-    super.setDocumentLocator(locator)
-  }
-
-  override def startDocument(): Unit = {
-    try {
-      writeDeclaration()
-      super.startDocument()
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-  }
-
-  override def endDocument(): Unit = {
-    super.endDocument()
-    if (autoFlush) {
-      try {
-        flush()
-      } catch {
-        case e: IOException ⇒
-      }
-    }
-  }
-
-  override def startPrefixMapping(prefix: String, uri: String): Unit = {
-    if (namespacesMap eq null) {
-      namespacesMap = new ju.HashMap[String, String]()
-    }
-    namespacesMap.put(prefix, uri)
-    super.startPrefixMapping(prefix, uri)
-  }
-
-  override def endPrefixMapping(prefix: String): Unit =
-    super.endPrefixMapping(prefix)
-
-  override def startElement(namespaceURI: String, localName: String, qName: String, attributes: Attributes): Unit =
-    try {
-      charsAdded = false
-      writeNewLineIfNeeded()
-      indent()
-      writer.write("<")
-      writer.write(qName)
-      writeNamespaces()
-      writeAttributes(attributes)
-      writer.write(">")
-      indentLevel += 1
-      isLastOutputNodeTypeText = false
-      lastElementClosed = false
-      super.startElement(namespaceURI, localName, qName, attributes)
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-
-  override def endElement(namespaceURI: String, localName: String, qName: String): Unit = {
-    try {
-      charsAdded = false
-      indentLevel -= 1
-      if (lastElementClosed) {
-        writeNewLineIfNeeded()
-        indent()
-      }
-      val hadContent = true
-      if (hadContent) {
-        writeClose(qName)
-      } else {
-        writeEmptyElementClose(qName)
-      }
-      isLastOutputNodeTypeText = false
-      lastElementClosed = true
-      super.endElement(namespaceURI, localName, qName)
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-  }
-
-  override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
-    if ((ch eq null) || (ch.length == 0) || (length <= 0)) {
-      return
-    }
-    try {
-      var string = String.valueOf(ch, start, length)
-      if (escapeText) {
-        string = escapeElementEntities(string)
-      }
-      if (format.trimText) {
-        if (isLastOutputNodeTypeText && !charsAdded) {
-          writer.write(' ')
-        } else if (charsAdded && Character.isWhitespace(lastChar)) {
-          writer.write(' ')
-        }
-        var delim = ""
-        val tokens = new ju.StringTokenizer(string)
-        while (tokens.hasMoreTokens) {
-          writer.write(delim)
-          writer.write(tokens.nextToken())
-          delim = " "
-        }
-      } else {
-        writer.write(string)
-      }
-      charsAdded = true
-      lastChar = ch((start + length) - 1)
-      isLastOutputNodeTypeText = true
-      super.characters(ch, start, length)
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-  }
-
-  override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int): Unit =
-    super.ignorableWhitespace(ch, start, length)
-
-  override def processingInstruction(target: String, data: String): Unit =
-    try {
-      indent()
-      writer.write("<?")
-      writer.write(target)
-      writer.write(" ")
-      writer.write(data)
-      writer.write("?>")
-      writeNewLineIfNeeded()
-      isLastOutputNodeTypeText = false
-      super.processingInstruction(target, data)
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-
-  override def notationDecl(name: String, publicID: String, systemID: String): Unit =
-    super.notationDecl(name, publicID, systemID)
-
-  override def unparsedEntityDecl(name: String, publicID: String, systemID: String, notationName: String): Unit =
-    super.unparsedEntityDecl(name, publicID, systemID, notationName)
-
-  def startDTD(name: String, publicID: String, systemID: String): Unit = {
-    inDTD = true
-    try {
-      writeDocType(name, publicID, systemID)
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-    if (lexicalHandler ne null)
-      lexicalHandler.startDTD(name, publicID, systemID)
-  }
-
-  def endDTD(): Unit = {
-    inDTD = false
-    if (lexicalHandler ne null)
-      lexicalHandler.endDTD()
-  }
-
-  def startCDATA(): Unit = {
-    try {
-      writer.write("<![CDATA[")
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-    if (lexicalHandler ne null)
-      lexicalHandler.startCDATA()
-  }
-
-  def endCDATA(): Unit = {
-    try {
-      writer.write("]]>")
-    } catch {
-      case e: IOException ⇒ handleException(e)
-    }
-    if (lexicalHandler ne null) {
-      lexicalHandler.endCDATA()
-    }
-  }
-
-  def startEntity(name: String): Unit =
-    if (lexicalHandler ne null)
-      lexicalHandler.startEntity(name)
-
-  def endEntity(name: String): Unit =
-    if (lexicalHandler ne null)
-      lexicalHandler.endEntity(name)
-
-  def comment(ch: Array[Char], start: Int, length: Int): Unit = {
-    if (!inDTD) {
-      try {
-        charsAdded = false
-        writeComment(new String(ch, start, length))
-      } catch {
-        case e: IOException ⇒ handleException(e)
-      }
-    }
-    if (lexicalHandler ne null) {
-      lexicalHandler.comment(ch, start, length)
-    }
   }
 
   private def writeElement(element: Element): Unit = {
@@ -545,19 +203,6 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     }
   }
 
-  private def writeNamespaces(): Unit = {
-    if (namespacesMap ne null) {
-      val iter = namespacesMap.entrySet().iterator()
-      while (iter.hasNext) {
-        val entry = iter.next()
-        val prefix = entry.getKey
-        val uri = entry.getValue
-        writeNamespace(prefix, uri)
-      }
-      namespacesMap = null
-    }
-  }
-
   private def writeNamespace(prefix: String, uri: String): Unit = {
     if ((prefix ne null) && (prefix.length > 0)) {
       writer.write(" xmlns:")
@@ -640,45 +285,6 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       case _                        ⇒ throw new IllegalStateException
     }
 
-  private def installLexicalHandler(): Unit = {
-    val parent = getParent
-    if (parent eq null)
-      throw new NullPointerException("No parent for filter")
-
-    for (i ← LexicalHandlerNames.indices) {
-      try {
-        parent.setProperty(LexicalHandlerNames(i), this)
-        return
-      } catch {
-        case ex: SAXNotRecognizedException ⇒
-        case ex: SAXNotSupportedException ⇒
-      }
-    }
-    // NOTE: No lexical handler installed.
-  }
-
-  private def writeDocType(name: String, publicID: String, systemID: String): Unit = {
-    var hasPublic = false
-    writer.write("<!DOCTYPE ")
-    writer.write(name)
-    if ((publicID ne null) && (publicID != "")) {
-      writer.write(" PUBLIC \"")
-      writer.write(publicID)
-      writer.write("\"")
-      hasPublic = true
-    }
-    if ((systemID ne null) && (systemID != "")) {
-      if (!hasPublic) {
-        writer.write(" SYSTEM")
-      }
-      writer.write(" \"")
-      writer.write(systemID)
-      writer.write("\"")
-    }
-    writer.write(">")
-    writeNewLineIfNeeded()
-  }
-
   private def writeComment(text: String): Unit = {
     if (format.newlines) {
       writeNewLine()
@@ -739,20 +345,6 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     isLastOutputNodeTypeText = false
   }
 
-  private def writeAttributes(attributes: Attributes): Unit =
-    for (i ← 0 until attributes.getLength)
-      writeAttribute(attributes, i)
-
-  private def writeAttribute(attributes: Attributes, index: Int): Unit = {
-    val quote = OutputFormat.AttributeQuoteCharacter
-    writer.write(" ")
-    writer.write(attributes.getQName(index))
-    writer.write("=")
-    writer.write(quote)
-    writeEscapeAttributeEntities(attributes.getValue(index))
-    writer.write(quote)
-  }
-
   private def indent(): Unit = {
     val indent = format.getIndent
     if (indent.nonEmpty) {
@@ -770,23 +362,11 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       }
     }
 
-  /**
-   * Get an OutputStreamWriter, use preferred encoding.
-   */
-  private def createWriter(outStream: OutputStream, encoding: String): Writer =
-    new BufferedWriter(new OutputStreamWriter(outStream, encoding))
-
   private def writeDeclaration(): Unit = {
     writer.write("<?xml version=\"1.0\"")
     writer.write(" encoding=\"" + OutputFormat.StandardEncoding + "\"")
     writer.write("?>")
     writeNewLine()
-  }
-
-  private def writeClose(qualifiedName: String): Unit = {
-    writer.write("</")
-    writer.write(qualifiedName)
-    writer.write(">")
   }
 
   private def writeEmptyElementClose(qualifiedName: String): Unit =
@@ -911,6 +491,4 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     }
     false
   }
-
-  private def handleException(e: IOException): Unit = throw new SAXException(e)
 }

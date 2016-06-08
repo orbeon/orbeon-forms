@@ -45,7 +45,7 @@ private class SAXEntityResolver(uriPrefix: String) extends EntityResolver {
   }
 
 /**
- * `SAXReader` creates a DOM4J tree from SAX parsing events.
+ * `SAXReader` creates a tree from SAX parsing events.
  */
 class SAXReader(xmlReader: XMLReader) {
 

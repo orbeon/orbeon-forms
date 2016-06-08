@@ -297,7 +297,7 @@ class ConcreteElement(var qname: QName)
 
   /**
    * This method provides a more optimal way of setting all the attributes on
-   * an Element particularly for use in .
+   * an Element.
    */
   def setAttributes(attributes: Attributes, namespaceStack: NamespaceStack, noNamespaceAttributes: Boolean): Unit = {
     val size = attributes.getLength
@@ -623,7 +623,7 @@ class ConcreteElement(var qname: QName)
       val clone =
         branch.node(i) match {
           case elem: ConcreteElement ⇒ elem.cloneInternal
-          case node                         ⇒ node.clone().asInstanceOf[Node]
+          case node                  ⇒ node.clone().asInstanceOf[Node]
         }
       add(clone: Node)
     }

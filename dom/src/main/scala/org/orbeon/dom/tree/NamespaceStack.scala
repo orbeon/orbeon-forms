@@ -7,7 +7,7 @@ import org.orbeon.dom.{DocumentFactory, Namespace, QName}
 /**
  * NamespaceStack implements a stack of namespaces and optionally maintains a
  * cache of all the fully qualified names (`QName`) which are in
- * scope. This is useful when building or navigating a *dom4j* document.
+ * scope. This is useful when building or navigating a tree.
  */
 class NamespaceStack {
 

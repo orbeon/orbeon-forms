@@ -9,7 +9,7 @@ import org.xml.sax.ext.LexicalHandler
 import org.xml.sax.helpers.DefaultHandler
 
 /**
- * `SAXContentHandler` builds a dom4j tree via SAX events.
+ * `SAXContentHandler` builds a tree via SAX events.
  */
 class SAXContentHandler(
   systemIdOpt         : Option[String],
@@ -212,22 +212,9 @@ class SAXContentHandler(
     }
   }
 
-  private def addAttributes(element: Element, attributes: Attributes): Unit = {
-    val noNamespaceAttributes = false
+  private def addAttributes(element: Element, attributes: Attributes): Unit =
     element match {
-      case baseElement: ConcreteElement ⇒
-        baseElement.setAttributes(attributes, namespaceStack, noNamespaceAttributes)
-      case _ ⇒
-        for (i ← 0 until attributes.getLength) {
-          val attributeQName = attributes.getQName(i)
-          if (noNamespaceAttributes || !attributeQName.startsWith("xmlns")) {
-            val attributeURI = attributes.getURI(i)
-            val attributeLocalName = attributes.getLocalName(i)
-            val attributeValue = attributes.getValue(i)
-            val qName = namespaceStack.getAttributeQName(attributeURI, attributeLocalName, attributeQName)
-            element.addAttribute(qName, attributeValue)
-          }
-        }
+      case elem: ConcreteElement ⇒ elem.setAttributes(attributes, namespaceStack, noNamespaceAttributes = false)
+      case _                     ⇒ throw new IllegalStateException
     }
-  }
 }

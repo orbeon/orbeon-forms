@@ -146,10 +146,9 @@ public class Dom4jUtils {
 
     private static String domToString(final Node node, final OutputFormat format) {
         final StringBuilderWriter writer = new StringBuilderWriter();
-        // TODO ORBEON: Ugh, XMLWriter doesn't accept null formatter _and_ default formatter is protected.
-        final XMLWriter xmlWriter = format == null ? new XMLWriter(writer) : new XMLWriter(writer, format);
+        final XMLWriter xmlWriter = new XMLWriter(writer, format == null ? XMLWriter.DefaultFormat() : format);
         xmlWriter.write(node);
-        xmlWriter.close();
+        writer.close();
         return writer.toString();
     }
 

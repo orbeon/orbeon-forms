@@ -111,9 +111,9 @@ class SAXWriter extends XMLReader {
   def setFeature(name: String, value: Boolean): Unit =
     name match {
       case FeatureNamespacePrefixes if value ⇒
-        throw new SAXNotSupportedException("Namespace prefixes feature is never supported in dom4j")
+        throw new SAXNotSupportedException("Namespace prefixes feature is never supported")
       case FeatureNamespaces if ! value ⇒
-        throw new SAXNotSupportedException("Namespace feature is always supported in dom4j")
+        throw new SAXNotSupportedException("Namespace feature is always supported")
       case FeatureNamespaces ⇒
       case _ ⇒
         features.put(name, value)
@@ -132,12 +132,12 @@ class SAXWriter extends XMLReader {
     }
 
   def parse(systemId: String): Unit =
-    throw new SAXNotSupportedException("This XMLReader can only accept <dom4j> InputSource objects")
+    throw new SAXNotSupportedException("This XMLReader can only accept a DocumentInputSource")
 
   def parse(input: InputSource): Unit =
     input match {
       case documentInput: DocumentInputSource ⇒ writeDocument(documentInput.getDocument)
-      case _                                  ⇒ throw new SAXNotSupportedException(s"This XMLReader can only accept <dom4j> InputSource objects")
+      case _                                  ⇒ throw new SAXNotSupportedException("This XMLReader can only accept a DocumentInputSource")
     }
 
   private def writeContent(branch: Branch, namespaceStack: NamespaceStack): Unit = {
@@ -149,8 +149,8 @@ class SAXWriter extends XMLReader {
         case cdata   : CDATA                 ⇒ writeCDATA(cdata)
         case comment : Comment               ⇒ writeComment(comment)
         case pi      : ProcessingInstruction ⇒ writeProcessingInstruction(pi)
-        case _       : Namespace             ⇒ // NOP
-        case n                               ⇒ throw new SAXException(s"Invalid Node in DOM4J content: $n")
+        case _       : Namespace             ⇒ // ignore
+        case _                               ⇒ throw new IllegalStateException
       }
     }
   }

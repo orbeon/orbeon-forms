@@ -27,11 +27,11 @@ class DocumentInputSource(var document: Document) extends InputSource {
    */
   override def getCharacterStream: Reader =
     try {
-      val out = new StringWriter
-      val writer = new XMLWriter(out)
-      writer.write(document)
+      val writer = new StringWriter
+      val xmlWriter = new XMLWriter(writer, XMLWriter.DefaultFormat)
+      xmlWriter.write(document)
       writer.flush()
-      new StringReader(out.toString)
+      new StringReader(writer.toString)
     } catch {
       case e: IOException ⇒ new Reader {
         def read(ch: Array[Char], offset: Int, length: Int): Int = throw e

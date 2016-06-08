@@ -6,51 +6,44 @@ import java.{lang ⇒ jl, util ⇒ ju}
 import org.orbeon.dom._
 import org.orbeon.dom.tree.NamespaceStack
 
-private object XMLWriter {
+object XMLWriter {
   val DefaultFormat = OutputFormat(indent = false, newlines = false, trimText = false)
 }
 
 /**
- * `XMLWriter` takes a tree and formats it to a stream of characters.
- */
-class XMLWriter(val writer: Writer, val format: OutputFormat) {
+  * `XMLWriter` takes a tree and formats it to a stream of characters.
+  */
+class XMLWriter(writer: Writer, format: OutputFormat) {
 
   private val namespaceStack = new NamespaceStack
   namespaceStack.push(Namespace.EmptyNamespace)
 
   // State
   private var isLastOutputNodeTypeText = false
-  private var preserve = false
-  private val escapeText = true
-  private var indentLevel = 0
-  private val buffer = new jl.StringBuilder
-  private var lastChar: Char = _
+  private var preserve                 = false
+  private val escapeText               = true
+  private var indentLevel              = 0
+  private val buffer                   = new jl.StringBuilder
+  private var lastChar: Char           = 0
 
   private def writeNewLine(): Unit =
     writer.write(OutputFormat.LineSeparator)
 
   /**
-   * This will print the `Document` to the current Writer.
-   *
-   * Warning: using your own Writer may cause the writer's preferred character
-   * encoding to be ignored. If you use encodings other than UTF8, we
-   * recommend using the method that takes an OutputStream instead.
-   *
-   * Note: as with all Writers, you may need to flush() yours after this
-   * method returns.
-   */
+    * This will print the `Document` to the current Writer.
+    *
+    * Note: as with all Writers, you may need to flush() yours after this
+    * method returns.
+    */
   def write(doc: Document): Unit = {
     writeDeclaration()
-    for (i ← 0 until doc.nodeCount) {
-      val node = doc.node(i)
-      writeNode(node)
-    }
+    for (i ← 0 until doc.nodeCount)
+      writeNode(doc.node(i))
     writeNewLineIfNeeded()
   }
 
-  def write(node: Node): Unit = {
+  def write(node: Node): Unit =
     writeNode(node)
-  }
 
   private def writeElement(element: Element): Unit = {
     val size = element.nodeCount
@@ -107,9 +100,9 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
   }
 
   /**
-   * Determines if element is a special case of XML elements where it contains
-   * an xml:space attribute of "preserve". If it does, then retain whitespace.
-   */
+    * Determines if element is a special case of XML elements where it contains
+    * an xml:space attribute of "preserve". If it does, then retain whitespace.
+    */
   private def isElementSpacePreserved(element: Element): Boolean = {
     val attr = element.attribute("space")
     var preserveFound = preserve
@@ -120,12 +113,12 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
   }
 
   /**
-   * Outputs the content of the given element. If whitespace trimming is
-   * enabled then all adjacent text nodes are appended together before the
-   * whitespace trimming occurs to avoid problems with multiple text nodes
-   * being created due to text content that spans parser buffers in a SAX
-   * parser.
-   */
+    * Outputs the content of the given element. If whitespace trimming is
+    * enabled then all adjacent text nodes are appended together before the
+    * whitespace trimming occurs to avoid problems with multiple text nodes
+    * being created due to text content that spans parser buffers in a SAX
+    * parser.
+    */
   private def writeElementContent(element: Element): Unit = {
     var trim = format.trimText
     val oldPreserve = preserve
@@ -190,18 +183,17 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
 
   private def writeCDATA(text: String): Unit = {
     writer.write("<![CDATA[")
-    if (text ne null) {
+
+    if (text ne null)
       writer.write(text)
-    }
+
     writer.write("]]>")
     isLastOutputNodeTypeText = false
   }
 
-  private def writeNamespace(namespace: Namespace): Unit = {
-    if (namespace ne null) {
+  private def writeNamespace(namespace: Namespace): Unit =
+    if (namespace ne null)
       writeNamespace(namespace.prefix, namespace.uri)
-    }
-  }
 
   private def writeNamespace(prefix: String, uri: String): Unit = {
     if ((prefix ne null) && (prefix.length > 0)) {
@@ -228,9 +220,10 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
   private def writeString(_text: String): Unit = {
     var text = _text
     if ((text ne null) && (text.length > 0)) {
-      if (escapeText) {
+
+      if (escapeText)
         text = escapeElementEntities(text)
-      }
+
       if (format.trimText) {
         var first = true
         val tokenizer = new ju.StringTokenizer(text)
@@ -238,9 +231,10 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
           val token = tokenizer.nextToken()
           if (first) {
             first = false
-            if (isLastOutputNodeTypeText) {
+
+            if (isLastOutputNodeTypeText)
               writer.write(" ")
-            }
+
           } else {
             writer.write(" ")
           }
@@ -257,15 +251,16 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
   }
 
   /**
-   * This method is used to write out Nodes that contain text and still allow
-   * for xml:space to be handled properly.
-   */
+    * This method is used to write out Nodes that contain text and still allow
+    * for xml:space to be handled properly.
+    */
   private def writeNodeText(node: Node): Unit = {
     var text = node.getText
     if ((text ne null) && (text.length > 0)) {
-      if (escapeText) {
+
+      if (escapeText)
         text = escapeElementEntities(text)
-      }
+
       isLastOutputNodeTypeText = true
       writer.write(text)
       lastChar = text.charAt(text.length - 1)
@@ -373,10 +368,10 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
     writer.write("/>")
 
   /**
-   * This will take the pre-defined entities in XML 1.0 and convert their
-   * character representation to the appropriate entity reference, suitable
-   * for XML attributes.
-   */
+    * This will take the pre-defined entities in XML 1.0 and convert their
+    * character representation to the appropriate entity reference, suitable
+    * for XML attributes.
+    */
   private def escapeElementEntities(text: String): String = {
     var block: Array[Char] = null
     var i = 0
@@ -396,7 +391,7 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
         case _ ⇒
           if (c < 32) {
             entity = "&#" + c.toInt + ";"
-        }
+          }
       }
       if (entity ne null) {
         if (block eq null) {
@@ -427,10 +422,10 @@ class XMLWriter(val writer: Writer, val format: OutputFormat) {
       writer.write(escapeAttributeEntities(txt))
 
   /**
-   * This will take the pre-defined entities in XML 1.0 and convert their
-   * character representation to the appropriate entity reference, suitable
-   * for XML attributes.
-   */
+    * This will take the pre-defined entities in XML 1.0 and convert their
+    * character representation to the appropriate entity reference, suitable
+    * for XML attributes.
+    */
   private def escapeAttributeEntities(text: String): String = {
     val quote = OutputFormat.AttributeQuoteCharacter
     var block: Array[Char] = null

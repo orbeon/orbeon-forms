@@ -1,10 +1,10 @@
 package org.orbeon.dom.io
 
-object OutputFormat {
-  val StandardIndent          = "    "
+private object OutputFormat {
+  val StandardIndent          = " " * 4
   val StandardEncoding        = "UTF-8"
-  def LineSeparator           = "\n"
-  def AttributeQuoteCharacter = '"'
+  val LineSeparator           = "\n"
+  val AttributeQuoteCharacter = '"'
 }
 
 case class OutputFormat(indent: Boolean, newlines: Boolean, trimText: Boolean) {

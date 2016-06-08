@@ -13,6 +13,7 @@
  */
 package org.orbeon.saxon.dom;
 
+import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.xforms.InstanceData;
@@ -32,40 +33,23 @@ import org.orbeon.saxon.value.Value;
  */
 public class TypedNodeWrapper extends NodeWrapper {
 
-    protected TypedNodeWrapper(Object node, NodeWrapper parent, int index) {
+    private TypedNodeWrapper(Node node, NodeWrapper parent, int index) {
         super(node, parent, index);
     }
 
     @Override
-    protected NodeWrapper makeWrapper(Object node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
+    protected NodeWrapper makeWrapper(Node node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
         return makeTypedWrapper(node, docWrapper, parent, index);
     }
 
-    static NodeWrapper makeTypedWrapper(Object node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
-        NodeWrapper wrapper;
-        final Node dom4jNode = (Node) node;
-        switch (dom4jNode.getNodeType()) {
-            case Type.DOCUMENT:
-                return docWrapper;
-            case Type.ELEMENT:
-            case Type.ATTRIBUTE:
-            case Type.COMMENT:
-            case Type.PROCESSING_INSTRUCTION:
-            case Type.NAMESPACE:
-            case Type.TEXT:
-                wrapper = new TypedNodeWrapper(node, parent, index);
-                wrapper.nodeKind = dom4jNode.getNodeType();
-                break;
-            case 4: // dom4j CDATA
-                wrapper = new TypedNodeWrapper(node, parent, index);
-                wrapper.nodeKind = Type.TEXT;
-                break;
-            default:
-                throw new IllegalArgumentException("Bad node type in dom4j: " + node.getClass() + " instance " + node.toString());
+    static NodeWrapper makeTypedWrapper(Node node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
+        if (node instanceof Document) {
+            return docWrapper;
+        } else {
+            final NodeWrapper wrapper = new TypedNodeWrapper(node, parent, index);
+            wrapper.docWrapper = docWrapper;
+            return wrapper;
         }
-
-        wrapper.docWrapper = docWrapper;
-        return wrapper;
     }
 
     @Override

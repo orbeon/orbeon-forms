@@ -24,7 +24,7 @@ import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
 
 import org.apache.commons.fileupload.FileItem
-import org.orbeon.dom.{Document, DocumentFactory, Element, Node}
+import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -338,7 +338,7 @@ class EmailProcessor extends ProcessorImpl {
       identity.setResult(new StreamResult(writer))
       val locationSAXWriter = new LocationSAXWriter
       locationSAXWriter.setContentHandler(identity)
-      locationSAXWriter.write(document.asInstanceOf[Node])
+      locationSAXWriter.write(document)
       writer.toString
     } else
       // For other types, just return the text nodes

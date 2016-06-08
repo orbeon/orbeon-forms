@@ -189,7 +189,7 @@ class XBLBindings(
   // Annotate a tree
   def annotateSubtree1(
      boundElement   : Option[Element], // for xml:base resolution
-     rawTree        : Node,
+     rawTree        : Document,
      innerScope     : Scope,
      outerScope     : Scope,
      startScope     : XXBLScope,
@@ -212,7 +212,7 @@ class XBLBindings(
   // Annotate a subtree and return a template and compact tree
   def annotateAndExtractSubtree(
      boundElement   : Option[Element], // for xml:base resolution
-     rawTree        : Node,
+     rawTree        : Document,
      innerScope     : Scope,
      outerScope     : Scope,
      startScope     : XXBLScope,
@@ -348,7 +348,7 @@ class XBLBindings(
       false
 
   // Keep public for unit tests
-  def annotateShadowTree(shadowTree: Node, prefix: String): Document = {
+  def annotateShadowTree(shadowTree: Document, prefix: String): Document = {
 
     // Create transformer
     val identity = TransformerUtils.getIdentityTransformerHandler

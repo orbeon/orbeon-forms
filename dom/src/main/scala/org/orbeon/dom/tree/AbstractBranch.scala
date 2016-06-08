@@ -2,7 +2,6 @@ package org.orbeon.dom.tree
 
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.orbeon.dom.Node._
 import org.orbeon.dom._
 
 abstract class AbstractBranch extends AbstractNode with Branch {
@@ -33,40 +32,12 @@ abstract class AbstractBranch extends AbstractNode with Branch {
     ""
   }
 
-  /**
-   * @return the text value of the given content object as text which returns
-   *         the text value of CDATA, Entity or Text nodes
-   */
-  private def getContentAsText(content: Node): String = {
-    // ORBEON: match on trait
+  // Return the text value of CDATA or Text node.
+  private def getContentAsText(content: Node): String =
     content match {
-      case node: Node ⇒
-        node.getNodeType match {
-          case CDATA_SECTION_NODE | TEXT_NODE ⇒ return node.getText
-          case _ ⇒
-        }
-      case _ ⇒
+      case _: CDATA | _: Text ⇒ content.getText
+      case _ ⇒ ""
     }
-    ""
-  }
-
-  /**
-   * @return the XPath defined string-value of the given content object
-   */
-  protected def getContentAsStringValue(content: AnyRef): String = {
-    content match {
-      case node: Node ⇒
-        // ORBEON TODO: match on trait
-        node.getNodeType match {
-          case CDATA_SECTION_NODE | TEXT_NODE | ELEMENT_NODE ⇒ node.getStringValue
-          case _ ⇒ ""
-        }
-      case s: String ⇒
-        s
-      case _ ⇒
-        ""
-    }
-  }
 
   def getTextTrim: String = {
     val text = getText
@@ -106,20 +77,18 @@ abstract class AbstractBranch extends AbstractNode with Branch {
     addElement(qName)
   }
 
-  // ORBEON TODO: match on trait
-  def add(node: Node) = node.getNodeType match {
-    case ELEMENT_NODE                ⇒ add(node.asInstanceOf[Element])
-    case COMMENT_NODE                ⇒ add(node.asInstanceOf[Comment])
-    case PROCESSING_INSTRUCTION_NODE ⇒ add(node.asInstanceOf[ProcessingInstruction])
-    case _                           ⇒ invalidNodeTypeException(node)
+  def add(node: Node) = node match {
+    case n: Element               ⇒ add(n)
+    case n: Comment               ⇒ add(n)
+    case n: ProcessingInstruction ⇒ add(n)
+    case n                        ⇒ invalidNodeTypeException(n)
   }
 
-  // ORBEON TODO: match on trait
-  def remove(node: Node): Boolean = node.getNodeType match {
-    case ELEMENT_NODE                ⇒ remove(node.asInstanceOf[Element])
-    case COMMENT_NODE                ⇒ remove(node.asInstanceOf[Comment])
-    case PROCESSING_INSTRUCTION_NODE ⇒ remove(node.asInstanceOf[ProcessingInstruction])
-    case _                           ⇒ invalidNodeTypeException(node); false
+  def remove(node: Node): Boolean = node match {
+    case n: Element               ⇒ remove(n)
+    case n: Comment               ⇒ remove(n)
+    case n: ProcessingInstruction ⇒ remove(n)
+    case n                        ⇒ invalidNodeTypeException(n)
   }
 
   def add(comment: Comment)             : Unit    = addNode(comment)

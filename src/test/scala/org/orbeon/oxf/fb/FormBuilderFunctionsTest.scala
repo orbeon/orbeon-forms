@@ -273,7 +273,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
   def rewrap(node: NodeInfo) = node match {
-    case nodeWrapper: NodeWrapper ⇒ node.root.asInstanceOf[DocumentWrapper].wrap(nodeWrapper.getUnderlyingNode)
+    case nodeWrapper: NodeWrapper ⇒ node.root.asInstanceOf[DocumentWrapper].wrap(nodeWrapper.getUnderlyingNode.asInstanceOf[org.orbeon.dom.Node])
     case _ ⇒ node
   }
 

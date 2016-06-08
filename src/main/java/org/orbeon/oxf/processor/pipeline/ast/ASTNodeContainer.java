@@ -14,6 +14,8 @@
 package org.orbeon.oxf.processor.pipeline.ast;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.orbeon.dom.Attribute;
+import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.Node$;
 import org.orbeon.oxf.common.ValidationException;
@@ -52,9 +54,9 @@ public abstract class ASTNodeContainer {
             ret = locationData;
         } else if (node == null) {
             ret = null;
-        } else if (node.getNodeType() == Node$.MODULE$.ELEMENT_NODE()) {
+        } else if (node instanceof Element) {
             ret = (LocationData) ((org.orbeon.dom.Element) node).getData();
-        } else if (node.getNodeType() == Node$.MODULE$.ATTRIBUTE_NODE()) {
+        } else if (node instanceof Attribute) {
             ret = (LocationData) ((org.orbeon.dom.Attribute) node).getData();
         } else {
             ret = null;

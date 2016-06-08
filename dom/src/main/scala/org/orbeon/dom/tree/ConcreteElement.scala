@@ -2,7 +2,6 @@ package org.orbeon.dom.tree
 
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.orbeon.dom.Node._
 import org.orbeon.dom._
 import org.xml.sax.Attributes
 
@@ -43,7 +42,7 @@ private object ConcreteElement {
   * are removed.
   */
 class ConcreteElement(var qname: QName)
-  extends AbstractBranch with Element with WithData{
+  extends AbstractBranch with Element with WithData {
 
   import ConcreteElement._
 
@@ -58,8 +57,6 @@ class ConcreteElement(var qname: QName)
   protected def internalContent = _internalContent
 
   def content = new ContentListFacade[Node](this, internalContent)
-
-  override def getNodeType: Short = Node.ELEMENT_NODE
 
   /**
    * Stores the parent branch of this node which is either a Document if this
@@ -494,20 +491,20 @@ class ConcreteElement(var qname: QName)
     this
   }
 
-  override def add(node: Node) = node.getNodeType match {
-    case ATTRIBUTE_NODE              ⇒ add(node.asInstanceOf[Attribute])
-    case TEXT_NODE                   ⇒ add(node.asInstanceOf[Text])
-    case CDATA_SECTION_NODE          ⇒ add(node.asInstanceOf[CDATA])
-    case NAMESPACE_NODE              ⇒ add(node.asInstanceOf[Namespace])
-    case _                           ⇒ super.add(node)
+  override def add(node: Node) = node match {
+    case n: Attribute ⇒ add(n)
+    case n: Text      ⇒ add(n)
+    case n: CDATA     ⇒ add(n)
+    case n: Namespace ⇒ add(n)
+    case n            ⇒ super.add(n)
   }
 
-  override def remove(node: Node): Boolean = node.getNodeType match {
-    case ATTRIBUTE_NODE              ⇒ remove(node.asInstanceOf[Attribute])
-    case TEXT_NODE                   ⇒ remove(node.asInstanceOf[Text])
-    case CDATA_SECTION_NODE          ⇒ remove(node.asInstanceOf[CDATA])
-    case NAMESPACE_NODE              ⇒ remove(node.asInstanceOf[Namespace])
-    case _                           ⇒ super.remove(node)
+  override def remove(node: Node): Boolean = node match {
+    case n: Attribute ⇒ remove(n)
+    case n: Text      ⇒ remove(n)
+    case n: CDATA     ⇒ remove(n)
+    case n: Namespace ⇒ remove(n)
+    case n            ⇒ super.remove(n)
   }
 
   def add(cdata: CDATA)            : Unit    = addNode(cdata)
@@ -523,9 +520,9 @@ class ConcreteElement(var qname: QName)
     if (allContent ne null) {
       val it = allContent.iterator()
       while (it.hasNext) {
-        it.next().getNodeType match {
-          case CDATA_SECTION_NODE | TEXT_NODE ⇒ it.remove()
-          case _ ⇒
+        it.next() match {
+          case _: CDATA | _: Text ⇒ it.remove()
+          case _                  ⇒
         }
       }
     }
@@ -533,11 +530,18 @@ class ConcreteElement(var qname: QName)
   }
 
   override def getStringValue: String = {
+
+    def getContentAsStringValue(content: Node): String =
+      content match {
+        case _: CDATA | _: Text | _: Element ⇒ content.getStringValue
+        case _ ⇒ ""
+      }
+
     val list = internalContent
     val size = list.size
     if (size > 0) {
       if (size == 1) {
-        return getContentAsStringValue(list.get(0))
+        getContentAsStringValue(list.get(0))
       } else {
         val buffer = new jl.StringBuilder
         for (i ← 0 until size) {
@@ -547,10 +551,11 @@ class ConcreteElement(var qname: QName)
             buffer.append(string)
           }
         }
-        return buffer.toString
+        buffer.toString
       }
+    } else {
+      ""
     }
-    ""
   }
 
   /**

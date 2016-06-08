@@ -15,6 +15,8 @@ package org.orbeon.oxf.xml
 
 import java.{util ⇒ ju}
 
+import org.orbeon.dom
+import org.orbeon.dom.Namespace
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.{ScalaUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.{dom4j ⇒ _}
@@ -22,7 +24,6 @@ import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
-import org.orbeon.dom
 
 import scala.collection.JavaConverters._
 
@@ -30,13 +31,13 @@ import scala.collection.JavaConverters._
 object XPathUtils {
 
   private def itemToJavaUnwrap: PartialFunction[Item, AnyRef] = {
-    case v: AtomicValue                                             ⇒ Value.convertToJava(v)
-    case n: VirtualNode if n.getNodeKind != dom.Node.NAMESPACE_NODE ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
+    case v: AtomicValue                                                  ⇒ Value.convertToJava(v)
+    case n: VirtualNode if ! n.getUnderlyingNode.isInstanceOf[Namespace] ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
   }
 
   private def itemToNodeUnwrap: PartialFunction[Item, dom.Node] = {
-    case v: AtomicValue                                             ⇒ throw new IllegalArgumentException
-    case n: VirtualNode if n.getNodeKind != dom.Node.NAMESPACE_NODE ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
+    case v: AtomicValue                                                  ⇒ throw new IllegalArgumentException
+    case n: VirtualNode if ! n.getUnderlyingNode.isInstanceOf[Namespace] ⇒ n.getUnderlyingNode.asInstanceOf[dom.Node]
   }
 
   private val EmptyVariables  = ju.Collections.emptyMap[String, ValueRepresentation]()

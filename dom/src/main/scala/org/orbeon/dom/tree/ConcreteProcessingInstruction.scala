@@ -2,12 +2,10 @@ package org.orbeon.dom.tree
 
 import java.{lang ⇒ jl, util ⇒ ju}
 
-import org.orbeon.dom.{Node, ProcessingInstruction, Visitor}
+import org.orbeon.dom.{ProcessingInstruction, Visitor}
 
 class ConcreteProcessingInstruction(var target: String, var text: String, var values: ju.Map[String, String])
   extends AbstractNode with ProcessingInstruction with WithParent {
-
-  override def getNodeType: Short = Node.PROCESSING_INSTRUCTION_NODE
 
   def this(target: String, text: String) =
     this(target, text, ConcreteProcessingInstruction.parseValues(text))

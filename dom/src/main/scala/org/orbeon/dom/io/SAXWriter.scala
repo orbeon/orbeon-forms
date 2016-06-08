@@ -49,21 +49,19 @@ class SAXWriter extends XMLReader {
   properties.put(FeatureNamespacePrefixes, java.lang.Boolean.FALSE)
   properties.put(FeatureNamespacePrefixes, java.lang.Boolean.TRUE)
 
-  // ORBEON TODO: match on traits
   def write(node: Node): Unit =
-    node.getNodeType match {
-      case Node.ELEMENT_NODE                ⇒ write(node.asInstanceOf[Element])
-      case Node.ATTRIBUTE_NODE              ⇒ write(node.asInstanceOf[Attribute])
-      case Node.TEXT_NODE                   ⇒ write(node.getText)
-      case Node.CDATA_SECTION_NODE          ⇒ write(node.asInstanceOf[CDATA])
-      case Node.PROCESSING_INSTRUCTION_NODE ⇒ write(node.asInstanceOf[ProcessingInstruction])
-      case Node.COMMENT_NODE                ⇒ write(node.asInstanceOf[Comment])
-      case Node.DOCUMENT_NODE               ⇒ write(node.asInstanceOf[Document])
-      case Node.NAMESPACE_NODE              ⇒ // NOP
-      case _                                ⇒ throw new SAXException("Invalid node type: " + node)
+    node match {
+      case n: Element               ⇒ writeElement(n)
+      case n: Text                  ⇒ writeText(n.getText)
+      case n: CDATA                 ⇒ writeCDATA(n)
+      case n: ProcessingInstruction ⇒ writeProcessingInstruction(n)
+      case n: Comment               ⇒ writeComment(n)
+      case n: Document              ⇒ writeDocument(n)
+      case n: Namespace             ⇒ // NOP
+      case n                        ⇒ throw new SAXException(s"Invalid node type: $n")
     }
 
-  private def write(document: Document): Unit =
+  private def writeDocument(document: Document): Unit =
     if (document ne null) {
       createDocumentLocator(document) foreach contentHandler.setDocumentLocator
       startDocument()
@@ -71,34 +69,34 @@ class SAXWriter extends XMLReader {
       endDocument()
     }
 
-  private def write(element: Element): Unit =
-    write(element, new NamespaceStack)
+  private def writeElement(element: Element): Unit =
+    writeElement(element, new NamespaceStack)
 
-  private def write(text: String): Unit =
+  private def writeText(text: String): Unit =
     if (text ne null) {
       val chars = text.toCharArray
       contentHandler.characters(chars, 0, chars.length)
     }
 
-  private def write(cdata: CDATA): Unit = {
+  private def writeCDATA(cdata: CDATA): Unit = {
     val text = cdata.getText
     if (lexicalHandler ne null) {
       lexicalHandler.startCDATA()
-      write(text)
+      writeText(text)
       lexicalHandler.endCDATA()
     } else {
-      write(text)
+      writeText(text)
     }
   }
 
-  private def write(comment: Comment): Unit =
+  private def writeComment(comment: Comment): Unit =
     if (lexicalHandler ne null) {
       val text = comment.getText
       val chars = text.toCharArray
       lexicalHandler.comment(chars, 0, chars.length)
     }
 
-  private def write(pi: ProcessingInstruction): Unit =
+  private def writeProcessingInstruction(pi: ProcessingInstruction): Unit =
     contentHandler.processingInstruction(pi.getTarget, pi.getText)
 
   def getDTDHandler: DTDHandler = dtdHandler
@@ -138,37 +136,21 @@ class SAXWriter extends XMLReader {
 
   def parse(input: InputSource): Unit =
     input match {
-      case documentInput: DocumentInputSource ⇒
-        val document = documentInput.getDocument
-        write(document)
-      case _ ⇒
-        throw new SAXNotSupportedException("This XMLReader can only accept " + "<dom4j> InputSource objects")
+      case documentInput: DocumentInputSource ⇒ writeDocument(documentInput.getDocument)
+      case _                                  ⇒ throw new SAXNotSupportedException(s"This XMLReader can only accept <dom4j> InputSource objects")
     }
 
   private def writeContent(branch: Branch, namespaceStack: NamespaceStack): Unit = {
     val iter = branch.nodeIterator
     while (iter.hasNext) {
-      val obj = iter.next()
-      obj match {
-        case element: Element ⇒
-          write(element, namespaceStack)
-        case _: CharacterData ⇒
-          obj match {
-            case text: Text ⇒
-              write(text.getText)
-            case cdata: CDATA ⇒
-              write(cdata)
-            case comment: Comment ⇒
-              write(comment)
-            case _ ⇒
-              throw new SAXException("Invalid Node in DOM4J content: " + obj + " of type: " + obj.getClass)
-          }
-        case pi: ProcessingInstruction ⇒
-          write(pi)
-        case node: Namespace ⇒
-          write(node)
-        case _ ⇒
-          throw new SAXException("Invalid Node in DOM4J content: " + obj)
+      iter.next() match {
+        case element : Element               ⇒ writeElement(element, namespaceStack)
+        case text    : Text                  ⇒ writeText(text.getText)
+        case cdata   : CDATA                 ⇒ writeCDATA(cdata)
+        case comment : Comment               ⇒ writeComment(comment)
+        case pi      : ProcessingInstruction ⇒ writeProcessingInstruction(pi)
+        case _       : Namespace             ⇒ // NOP
+        case n                               ⇒ throw new SAXException(s"Invalid Node in DOM4J content: $n")
       }
     }
   }
@@ -183,7 +165,7 @@ class SAXWriter extends XMLReader {
   private def startDocument(): Unit = contentHandler.startDocument()
   private def endDocument(): Unit   = contentHandler.endDocument()
 
-  private def write(element: Element, namespaceStack: NamespaceStack): Unit = {
+  private def writeElement(element: Element, namespaceStack: NamespaceStack): Unit = {
     val stackSize = namespaceStack.size
     startPrefixMapping(element, namespaceStack)
     startElement(element)

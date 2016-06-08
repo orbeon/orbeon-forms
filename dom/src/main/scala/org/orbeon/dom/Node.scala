@@ -1,15 +1,17 @@
 package org.orbeon.dom
 
 object Node {
-  val ELEMENT_NODE                : Short = 1
-  val ATTRIBUTE_NODE              : Short = 2
-  val TEXT_NODE                   : Short = 3
-  val CDATA_SECTION_NODE          : Short = 4
-  val PROCESSING_INSTRUCTION_NODE : Short = 7
-  val COMMENT_NODE                : Short = 8
-  val DOCUMENT_NODE               : Short = 9
-  val NAMESPACE_NODE              : Short = 13
-  val UNKNOWN_NODE                : Short = 14
+  def nodeTypeName(node: Node): String = node match {
+    case _: Element               ⇒ "Element"
+    case _: Attribute             ⇒ "Attribute"
+    case _: Text                  ⇒ "Text"
+    case _: Document              ⇒ "Document"
+    case _: Comment               ⇒ "Comment"
+    case _: ProcessingInstruction ⇒ "ProcessingInstruction"
+    case _: Namespace             ⇒ "Namespace"
+    case _: CDATA                 ⇒ "CDATA"
+    case _                        ⇒ throw new IllegalStateException
+  }
 }
 
 trait Node extends Cloneable {
@@ -27,9 +29,6 @@ trait Node extends Cloneable {
   def setText(text: String): Unit
 
   def getStringValue: String
-
-  def getNodeType: Short
-  def getNodeTypeName: String
 
   def detach(): Node
 

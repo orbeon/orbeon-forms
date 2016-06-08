@@ -1,10 +1,8 @@
 package org.orbeon.dom.tree
 
-import org.orbeon.dom.{Comment, Node, Visitor}
+import org.orbeon.dom.{Comment, Visitor}
 
 class ConcreteComment(var text: String) extends WithCharacterData with Comment {
-
-  override def getNodeType: Short = Node.COMMENT_NODE
 
   override def getText               = text
   override def setText(text: String) = this.text = text

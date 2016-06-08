@@ -1,10 +1,8 @@
 package org.orbeon.dom.tree
 
-import org.orbeon.dom.{CDATA, Node, Visitor}
+import org.orbeon.dom.{CDATA, Visitor}
 
 class ConcreteCDATA(var text: String) extends WithCharacterData with CDATA {
-
-  override def getNodeType: Short = Node.CDATA_SECTION_NODE
 
   override def getText               = text
   override def setText(text: String) = this.text = text

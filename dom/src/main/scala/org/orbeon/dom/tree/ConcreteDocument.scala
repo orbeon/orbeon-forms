@@ -14,8 +14,6 @@ object ConcreteDocument {
 
 class ConcreteDocument extends AbstractBranch with Document {
 
-  override def getNodeType: Short = Node.DOCUMENT_NODE
-
   // ORBEON TODO: review: why would a document expose `name`?
   private var _name: String = _
   override def getName = _name

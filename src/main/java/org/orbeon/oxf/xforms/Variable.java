@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.dom.Element;
+import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -182,7 +183,7 @@ public class Variable {
                 final VirtualNode virtualNode = (VirtualNode) item;
                 final DocumentWrapper documentWrapper = (DocumentWrapper) virtualNode.getDocumentRoot();
 
-                current = documentWrapper.wrap(virtualNode.getUnderlyingNode());
+                current = documentWrapper.wrap((Node) virtualNode.getUnderlyingNode());
             } else {
                 // Pass through
                 current = item;

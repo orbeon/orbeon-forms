@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class XFormsInsertAction extends XFormsAction {
 
-    public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
+    private static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
@@ -366,7 +366,7 @@ public class XFormsInsertAction extends XFormsAction {
             {
                 boolean hasTextNode = false;
                 for (Node clonedNode: clonedNodes) {
-                    hasTextNode |= clonedNode != null && clonedNode.getNodeType() == Node$.MODULE$.TEXT_NODE();
+                    hasTextNode |= clonedNode != null && (clonedNode instanceof Text);
                 }
                 if (hasTextNode)
                     Dom4jUtils.normalizeTextNodes(insertLocationNode);
@@ -392,7 +392,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "d. Otherwise, the target location is immediately before or after the insert location
                 // node, based on the position attribute setting or its default."
 
-                if (insertLocationNode.getNodeType() == Node$.MODULE$.ATTRIBUTE_NODE()) {
+                if (insertLocationNode instanceof Attribute) {
                     // Special case for "next to an attribute"
 
                     // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but
@@ -431,13 +431,13 @@ public class XFormsInsertAction extends XFormsAction {
                                 // Element, text, comment, processing instruction node
                                 siblingElements.add(actualInsertionIndex + addIndex, clonedNode);
                                 insertedNodes.add(clonedNode);
-                                hasTextNode |= clonedNode.getNodeType() == Node$.MODULE$.TEXT_NODE();
+                                hasTextNode |= clonedNode instanceof Text;
                                 addIndex++;
                             } else {
                                 // We never insert attributes or namespace nodes as siblings
                                 if (indentedLogger != null && indentedLogger.isDebugEnabled())
                                     indentedLogger.logDebug("xf:insert", "skipping insertion of node as sibling in element content",
-                                        "type", clonedNode.getNodeTypeName(),
+                                        "type", Node$.MODULE$.nodeTypeName(clonedNode),
                                         "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
                                     );
                     }
@@ -482,7 +482,7 @@ public class XFormsInsertAction extends XFormsAction {
             // Instance can be null if document into which delete is performed is not in an instance, e.g. in a variable
             final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstanceOrNull.documentInfo();
             insertedNodeInfos = new ArrayList<NodeInfo>(insertedNodes.size());
-            for (Object insertedNode : insertedNodes)
+            for (Node insertedNode : insertedNodes)
                 insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
         } else {
             insertedNodeInfos = Collections.emptyList();
@@ -521,23 +521,23 @@ public class XFormsInsertAction extends XFormsAction {
         return insertedNodeInfos;
     }
 
-    public static int findNodeIndexRewrapIfNeeded(NodeInfo node) {
+    private static int findNodeIndexRewrapIfNeeded(NodeInfo node) {
         return findNodeIndex(rewrapIfNeeded(node));
     }
 
-    public static NodeInfo rewrapIfNeeded(NodeInfo node) {
+    private static NodeInfo rewrapIfNeeded(NodeInfo node) {
         if (node instanceof VirtualNode) {
             final DocumentWrapper doc = (DocumentWrapper) node.getDocumentRoot();
             final Object underlying = ((VirtualNode) node).getUnderlyingNode();
             if (doc != null)
-                return doc.wrap(underlying);
+                return doc.wrap((Node) underlying);
             else
-                return DocumentWrapper.makeWrapper(underlying); // unclear whether NodeWrappers are created with a null doc, but if so rewrapping this way should be ok
+                return DocumentWrapper.makeWrapper((Node) underlying); // unclear whether NodeWrappers are created with a null doc, but if so rewrapping this way should be ok
         } else
             return node;
     }
 
-    public static int findNodeIndex(NodeInfo node) {
+    private static int findNodeIndex(NodeInfo node) {
 
         if (node.getParent() == null)
             return 0;

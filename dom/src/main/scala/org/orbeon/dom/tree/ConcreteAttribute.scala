@@ -5,8 +5,6 @@ import org.orbeon.dom._
 class ConcreteAttribute(qname: QName, var value: String)
   extends AbstractNode with Attribute with WithParent with WithData {
 
-  override def getNodeType: Short = Node.ATTRIBUTE_NODE
-
   def getQName: QName = qname
 
   def getValue: String = value

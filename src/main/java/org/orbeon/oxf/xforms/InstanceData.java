@@ -472,7 +472,7 @@ public class InstanceData {// rename to DataNodeProperties once done
             element.setData(instanceData);
         } else {
             // No other node type is supported
-            throw new OXFException("Cannot create InstanceData on node type: " + node.getNodeTypeName());
+            throw new OXFException("Cannot create InstanceData on node type: " + Node$.MODULE$.nodeTypeName(node));
         }
         return instanceData;
     }

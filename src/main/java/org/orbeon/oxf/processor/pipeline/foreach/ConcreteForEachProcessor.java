@@ -225,10 +225,10 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             final Object nextObject = iterator.next();
             if (nextObject instanceof Node) {
                 final Node nextNode = (Node) nextObject;
-                if (nextNode.getNodeType() != Node$.MODULE$.ELEMENT_NODE())
+                if (! (nextNode instanceof Element))
                     throw new OXFException("Select expression '" + select
                             + "' did not return a sequence of elements. One node was a '"
-                            + nextNode.getNodeTypeName() + "'");
+                            + Node$.MODULE$.nodeTypeName(nextNode) + "'");
             } else {
                 throw new OXFException("Select expression '" + select
                         + "' did not return a sequence of elements. One item was a '"

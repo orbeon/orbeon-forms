@@ -254,11 +254,10 @@ public class PipelineProcessor extends ProcessorImpl {
                         // Create inline document
                         final Document inlineDocument;
                         {
-                            final int nodeType = inlineNode.getNodeType();
-                            if (nodeType == Node$.MODULE$.ELEMENT_NODE()) {
+                            if (inlineNode instanceof Element) {
                                 final Element element = (Element) inlineNode;
                                 inlineDocument = Dom4jUtils.createDocumentCopyParentNamespaces(element);
-                            } else if (nodeType == Node$.MODULE$.DOCUMENT_NODE()) {
+                            } else if (inlineNode instanceof Document) {
                                 inlineDocument = (Document) inlineNode;
                             } else {
                                 throw new OXFException("Invalid type for inline document: " + inlineNode.getClass().getName());

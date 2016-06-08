@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.saxon.om.Item;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -80,15 +81,15 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                     String stringValue = (String) result;
                     output.characters(stringValue.toCharArray(), 0, stringValue.length());
                 } else if (result instanceof List) {
-                    final List listResult = (List) result;
+                    final List<Node> listResult = (List) result;
                     if ("value-of".equals(localname)) {
                         // Get string value
 
                         final String stringValue;
                         if (listResult.size() > 0) {
                             // Wrap all elements of the list
-                            final List newList = new ArrayList(listResult.size());
-                            for (Iterator i = listResult.iterator(); i.hasNext();) {
+                            final List<Item> newList = new ArrayList<Item>(listResult.size());
+                            for (Iterator<Node> i = listResult.iterator(); i.hasNext();) {
                                 newList.add(wrapper.wrap(i.next()));
                             }
 
@@ -113,7 +114,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                         // Get string value
                         // TODO: use XPathCache.evaluateAsString()
                         PooledXPathExpression expr = XPathCache.getXPathExpression(
-                                wrapper.getConfiguration(), wrapper.wrap(result), "string(.)", null);
+                                wrapper.getConfiguration(), wrapper.wrap((Node) result), "string(.)", null);
                         String stringValue = (String) expr.evaluateSingleToJavaReturnToPoolOrNull();
                         output.characters(stringValue.toCharArray(), 0, stringValue.length());
                     } else {

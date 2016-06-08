@@ -2,40 +2,9 @@ package org.orbeon.dom.tree
 
 import java.io.Serializable
 
-import org.orbeon.dom.tree.AbstractNode._
 import org.orbeon.dom.{Document, Element, Node}
 
-private object AbstractNode {
-  val NodeTypeNames = Array(
-    "Node",
-    "Element",
-    "Attribute",
-    "Text",
-    "CDATA",
-    "Entity",
-    "Entity",
-    "ProcessingInstruction",
-    "Comment",
-    "Document",
-    "DocumentType",
-    "DocumentFragment",
-    "Notation",
-    "Namespace",
-    "Unknown"
-  )
-}
-
 abstract class AbstractNode extends Node with Cloneable with Serializable {
-
-  def getNodeType: Short = Node.UNKNOWN_NODE
-
-  def getNodeTypeName: String = {
-    val `type` = getNodeType
-    if ((`type` < 0) || (`type` >= NodeTypeNames.length)) {
-      return "Unknown"
-    }
-    NodeTypeNames(`type`)
-  }
 
   def getDocument: Document = {
     val element = getParent

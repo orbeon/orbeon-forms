@@ -13,17 +13,16 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.xforms._
-import event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
-import event.{Dispatch, XFormsEvent, XFormsEventTarget}
-import org.apache.lucene.search.Collector
+import org.orbeon.dom
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.dom.{Comment ⇒ Comment4j, Text ⇒ Text4j, _}
+import org.orbeon.saxon.om._
+import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node._
-import org.orbeon.saxon.om._
 
 /**
  * Represent access to the data model via the NodeInfo abstraction.
@@ -114,7 +113,7 @@ object DataModel {
 
     isWritableItem(nodeInfo) match {
       case Left(virtualNode) ⇒
-        setValueForNode(virtualNode.getUnderlyingNode.asInstanceOf[Node], newValue)
+        setValueForNode(virtualNode.getUnderlyingNode.asInstanceOf[dom.Node], newValue)
         onSuccess()
         true
       case Right(reason) ⇒
@@ -228,16 +227,16 @@ object DataModel {
         containingDocument.getControls.markDirtySinceLastRequest(true)
     }
 
-  private def setValueForNode(node: Node, newValue: String) =
+  private def setValueForNode(node: dom.Node, newValue: String) =
     node match {
-      case element: Element                  ⇒ element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
-      case attribute: Attribute              ⇒ attribute.setValue(newValue)
-      case text: Text4j if newValue.nonEmpty ⇒ text.setText(newValue)
-      case text: Text4j                      ⇒ text.getParent.remove(text)
-      case pi: ProcessingInstruction         ⇒ pi.setText(newValue)
-      case comment: Comment4j                ⇒ comment.setText(newValue)
+      case element   : dom.Element                   ⇒ element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
+      case attribute : dom.Attribute                 ⇒ attribute.setValue(newValue)
+      case text      : dom.Text if newValue.nonEmpty ⇒ text.setText(newValue)
+      case text      : dom.Text                      ⇒ text.getParent.remove(text)
+      case pi        : dom.ProcessingInstruction     ⇒ pi.setText(newValue)
+      case comment   : dom.Comment                   ⇒ comment.setText(newValue)
       // Should not happen as caller checks for isWritableItem()
-      case _ ⇒ throw new IllegalStateException("Setting value on disallowed node type: " + node.getNodeTypeName)
+      case _ ⇒ throw new IllegalStateException(s"Setting value on disallowed node type: ${dom.Node.nodeTypeName(node)}")
     }
 
   // Whether the item is an element node.
@@ -285,10 +284,9 @@ object DataModel {
       val iterator = e.iterateAxis(Axis.CHILD)
       var next = iterator.next()
       while (next ne null) {
-        if (next.isInstanceOf[NodeInfo]) {
-          val node = next.asInstanceOf[NodeInfo]
-          if (node.getNodeKind == ELEMENT_NODE)
-            visitElement(node, visit)
+        next match {
+          case node: NodeInfo if node.getNodeKind == ELEMENT_NODE ⇒ visitElement(node, visit)
+          case _ ⇒
         }
         next = iterator.next()
       }

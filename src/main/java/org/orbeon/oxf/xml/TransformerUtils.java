@@ -549,13 +549,12 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Node to SAX events.
      */
-    public static void writeDom4j(org.orbeon.dom.Node node, XMLReceiver xmlReceiver) {
-
+    public static void writeDom4j(org.orbeon.dom.Document document, XMLReceiver xmlReceiver) {
         // NOTE: Use dom4j directly instead of sourceToSAX as performance is better
         final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
         locationSAXWriter.setContentHandler(xmlReceiver);
         locationSAXWriter.setLexicalHandler(xmlReceiver);
-        locationSAXWriter.write(node);
+        locationSAXWriter.write(document);
     }
 
     /**

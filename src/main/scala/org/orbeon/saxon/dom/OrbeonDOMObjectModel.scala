@@ -42,15 +42,12 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
 
   private def convertObjectToXPathValue(obj: Any, config: Configuration): ValueRepresentation = {
 
-    def wrapDocument(node: Document): DocumentInfo =
+    def wrapDocument(node: Document) =
       new DocumentWrapper(node.getDocument, null, config)
-
-    def wrapNode(document: DocumentInfo, node: Any): NodeInfo =
-      document.asInstanceOf[DocumentWrapper].wrap(node)
 
     obj match {
       case document : Document ⇒ wrapDocument(document)
-      case node     : Node     ⇒ wrapNode(wrapDocument(node.getDocument), node)
+      case node     : Node     ⇒ wrapDocument(node.getDocument).wrap(node)
       case _                   ⇒ throw new IllegalStateException
     }
   }

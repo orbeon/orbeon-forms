@@ -31,11 +31,7 @@ private object XMLWriter {
  */
 class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends XMLFilterImpl with LexicalHandler {
 
-  // Should entityRefs by resolved when writing ?
-  private val resolveEntityRefs = true
-
-  // last type of node written so algorithms can refer to the previous node type
-  private var lastOutputNodeType: Int = _
+  private var isLastOutputNodeTypeText = false
 
   // last written element node was a closing tag or an opening tag
   private var lastElementClosed = false
@@ -251,7 +247,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       writeAttributes(attributes)
       writer.write(">")
       indentLevel += 1
-      lastOutputNodeType = Node.ELEMENT_NODE
+      isLastOutputNodeTypeText = false
       lastElementClosed = false
       super.startElement(namespaceURI, localName, qName, attributes)
     } catch {
@@ -272,7 +268,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       } else {
         writeEmptyElementClose(qName)
       }
-      lastOutputNodeType = Node.ELEMENT_NODE
+      isLastOutputNodeTypeText = false
       lastElementClosed = true
       super.endElement(namespaceURI, localName, qName)
     } catch {
@@ -290,7 +286,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
         string = escapeElementEntities(string)
       }
       if (format.trimText) {
-        if ((lastOutputNodeType == Node.TEXT_NODE) && !charsAdded) {
+        if (isLastOutputNodeTypeText && !charsAdded) {
           writer.write(' ')
         } else if (charsAdded && Character.isWhitespace(lastChar)) {
           writer.write(' ')
@@ -307,7 +303,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       }
       charsAdded = true
       lastChar = ch((start + length) - 1)
-      lastOutputNodeType = Node.TEXT_NODE
+      isLastOutputNodeTypeText = true
       super.characters(ch, start, length)
     } catch {
       case e: IOException ⇒ handleException(e)
@@ -326,7 +322,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       writer.write(data)
       writer.write("?>")
       writeNewLineIfNeeded()
-      lastOutputNodeType = Node.PROCESSING_INSTRUCTION_NODE
+      isLastOutputNodeTypeText = false
       super.processingInstruction(target, data)
     } catch {
       case e: IOException ⇒ handleException(e)
@@ -428,7 +424,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       }
     }
     writeAttributes(element)
-    lastOutputNodeType = Node.ELEMENT_NODE
+    isLastOutputNodeTypeText = false
     if (size <= 0) {
       writeEmptyElementClose(qualifiedName)
     } else {
@@ -449,7 +445,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     while (namespaceStack.size > previouslyDeclaredNamespaces) {
       namespaceStack.pop()
     }
-    lastOutputNodeType = Node.ELEMENT_NODE
+    isLastOutputNodeTypeText = false
   }
 
   /**
@@ -540,7 +536,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       writer.write(text)
     }
     writer.write("]]>")
-    lastOutputNodeType = Node.CDATA_SECTION_NODE
+    isLastOutputNodeTypeText = false
   }
 
   private def writeNamespace(namespace: Namespace): Unit = {
@@ -581,7 +577,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     writer.write(pi.getText)
     writer.write("?>")
     writeNewLineIfNeeded()
-    lastOutputNodeType = Node.PROCESSING_INSTRUCTION_NODE
+    isLastOutputNodeTypeText = false
   }
 
   private def writeString(_text: String): Unit = {
@@ -597,18 +593,18 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
           val token = tokenizer.nextToken()
           if (first) {
             first = false
-            if (lastOutputNodeType == Node.TEXT_NODE) {
+            if (isLastOutputNodeTypeText) {
               writer.write(" ")
             }
           } else {
             writer.write(" ")
           }
           writer.write(token)
-          lastOutputNodeType = Node.TEXT_NODE
+          isLastOutputNodeTypeText = true
           lastChar = token.charAt(token.length - 1)
         }
       } else {
-        lastOutputNodeType = Node.TEXT_NODE
+        isLastOutputNodeTypeText = true
         writer.write(text)
         lastChar = text.charAt(text.length - 1)
       }
@@ -625,27 +621,24 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
       if (escapeText) {
         text = escapeElementEntities(text)
       }
-      lastOutputNodeType = Node.TEXT_NODE
+      isLastOutputNodeTypeText = true
       writer.write(text)
       lastChar = text.charAt(text.length - 1)
     }
   }
 
-  // ORBEON: match on trait
-  private def writeNode(node: Node): Unit = {
-    val nodeType = node.getNodeType
-    nodeType match {
-      case Node.ELEMENT_NODE                ⇒ writeElement(node.asInstanceOf[Element])
-      case Node.ATTRIBUTE_NODE              ⇒ writeAttribute(node.asInstanceOf[Attribute])
-      case Node.TEXT_NODE                   ⇒ writeNodeText(node)
-      case Node.CDATA_SECTION_NODE          ⇒ writeCDATA(node.getText)
-      case Node.PROCESSING_INSTRUCTION_NODE ⇒ writeProcessingInstruction(node.asInstanceOf[ProcessingInstruction])
-      case Node.COMMENT_NODE                ⇒ writeComment(node.getText)
-      case Node.DOCUMENT_NODE               ⇒ write(node.asInstanceOf[Document])
-      case Node.NAMESPACE_NODE              ⇒
-      case _                                ⇒ throw new IllegalStateException
+  private def writeNode(node: Node): Unit =
+    node match {
+      case n: Element               ⇒ writeElement(n)
+      case n: Attribute             ⇒ writeAttribute(n)
+      case n: Text                  ⇒ writeNodeText(n)
+      case n: CDATA                 ⇒ writeCDATA(n.getText)
+      case n: ProcessingInstruction ⇒ writeProcessingInstruction(n)
+      case n: Comment               ⇒ writeComment(n.getText)
+      case n: Document              ⇒ write(n)
+      case n: Namespace             ⇒
+      case _                        ⇒ throw new IllegalStateException
     }
-  }
 
   private def installLexicalHandler(): Unit = {
     val parent = getParent
@@ -694,7 +687,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     writer.write("<!--")
     writer.write(text)
     writer.write("-->")
-    lastOutputNodeType = Node.COMMENT_NODE
+    isLastOutputNodeTypeText = false
   }
 
   private def writeAttributes(element: Element): Unit = {
@@ -743,7 +736,7 @@ class XMLWriter(protected var writer: Writer, val format: OutputFormat) extends 
     writer.write(quote)
     writeEscapeAttributeEntities(attribute.getValue)
     writer.write(quote)
-    lastOutputNodeType = Node.ATTRIBUTE_NODE
+    isLastOutputNodeTypeText = false
   }
 
   private def writeAttributes(attributes: Attributes): Unit =

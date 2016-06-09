@@ -88,12 +88,8 @@ public class DelegationProcessorDOMReader {
                 break;
 
             case org.w3c.dom.Node.TEXT_NODE:
-                element.addText(node.getNodeValue());
-
-                break;
-
             case org.w3c.dom.Node.CDATA_SECTION_NODE:
-                element.addCDATA(node.getNodeValue());
+                element.addText(node.getNodeValue());
 
                 break;
 

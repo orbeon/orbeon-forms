@@ -213,8 +213,8 @@ public class Dom4jUtils {
         return ldSid == null ? DOMGenerator.DefaultContext : ldSid;
     }
 
-    private static boolean isTextOrCDATA(Node node) {
-        return (node instanceof Text) || (node instanceof CDATA);
+    private static boolean isTextNode(Node node) {
+        return node instanceof Text;
     }
 
     /**
@@ -239,13 +239,13 @@ public class Dom4jUtils {
                 for (Iterator i = children.iterator(); i.hasNext();) {
                     final Node currentNode = (Node) i.next();
                     if (previousNode != null) {
-                        if (isTextOrCDATA(previousNode) && isTextOrCDATA(currentNode)) {
+                        if (isTextNode(previousNode) && isTextNode(currentNode)) {
                             final CharacterData previousNodeText = (CharacterData) previousNode;
                             if (sb == null)
                                 sb = new StringBuilder(previousNodeText.getText());
                             sb.append(currentNode.getText());
                             nodesToDetach.add(currentNode);
-                        } else if (isTextOrCDATA(previousNode)) {
+                        } else if (isTextNode(previousNode)) {
                             // Update node if needed
                             if (sb != null) {
                                 previousNode.setText(sb.toString());

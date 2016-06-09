@@ -181,16 +181,6 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
     preserve = oldPreserve
   }
 
-  private def writeCDATA(text: String): Unit = {
-    writer.write("<![CDATA[")
-
-    if (text ne null)
-      writer.write(text)
-
-    writer.write("]]>")
-    isLastOutputNodeTypeText = false
-  }
-
   private def writeNamespace(namespace: Namespace): Unit =
     if (namespace ne null)
       writeNamespace(namespace.prefix, namespace.uri)
@@ -272,7 +262,6 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
       case n: Element               ⇒ writeElement(n)
       case n: Attribute             ⇒ writeAttribute(n)
       case n: Text                  ⇒ writeNodeText(n)
-      case n: CDATA                 ⇒ writeCDATA(n.getText)
       case n: ProcessingInstruction ⇒ writeProcessingInstruction(n)
       case n: Comment               ⇒ writeComment(n.getText)
       case n: Document              ⇒ write(n)

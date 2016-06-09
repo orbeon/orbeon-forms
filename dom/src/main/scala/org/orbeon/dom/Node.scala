@@ -9,7 +9,6 @@ object Node {
     case _: Comment               ⇒ "Comment"
     case _: ProcessingInstruction ⇒ "ProcessingInstruction"
     case _: Namespace             ⇒ "Namespace"
-    case _: CDATA                 ⇒ "CDATA"
     case _                        ⇒ throw new IllegalStateException
   }
 }

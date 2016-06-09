@@ -432,12 +432,6 @@ class ConcreteElement(var qname: QName)
     this
   }
 
-  def addCDATA(cdata: String): Element = {
-    val node = DocumentFactory.createCDATA(cdata)
-    addNewNode(node)
-    this
-  }
-
   def addComment(comment: String): Element = {
     val node = DocumentFactory.createComment(comment)
     addNewNode(node)
@@ -494,7 +488,6 @@ class ConcreteElement(var qname: QName)
   override def add(node: Node) = node match {
     case n: Attribute ⇒ add(n)
     case n: Text      ⇒ add(n)
-    case n: CDATA     ⇒ add(n)
     case n: Namespace ⇒ add(n)
     case n            ⇒ super.add(n)
   }
@@ -502,16 +495,13 @@ class ConcreteElement(var qname: QName)
   override def remove(node: Node): Boolean = node match {
     case n: Attribute ⇒ remove(n)
     case n: Text      ⇒ remove(n)
-    case n: CDATA     ⇒ remove(n)
     case n: Namespace ⇒ remove(n)
     case n            ⇒ super.remove(n)
   }
 
-  def add(cdata: CDATA)            : Unit    = addNode(cdata)
   def add(namespace: Namespace)    : Unit    = addNode(namespace)
   def add(text: Text)              : Unit    = addNode(text)
 
-  def remove(cdata: CDATA)         : Boolean = removeNode(cdata)
   def remove(namespace: Namespace) : Boolean = removeNode(namespace)
   def remove(text: Text)           : Boolean = removeNode(text)
 
@@ -521,7 +511,7 @@ class ConcreteElement(var qname: QName)
       val it = allContent.iterator()
       while (it.hasNext) {
         it.next() match {
-          case _: CDATA | _: Text ⇒ it.remove()
+          case _: Text ⇒ it.remove()
           case _                  ⇒
         }
       }
@@ -533,7 +523,7 @@ class ConcreteElement(var qname: QName)
 
     def getContentAsStringValue(content: Node): String =
       content match {
-        case _: CDATA | _: Text | _: Element ⇒ content.getStringValue
+        case _: Text | _: Element ⇒ content.getStringValue
         case _ ⇒ ""
       }
 
@@ -558,21 +548,6 @@ class ConcreteElement(var qname: QName)
     }
   }
 
-  /**
-   * Puts all `Text` nodes in the full depth of the sub-tree
-   * underneath this `Node`, including attribute nodes, into a
-   * "normal" form where only structure (e.g., elements, comments, processing
-   * instructions, CDATA sections, and entity references) separates
-   * `Text` nodes, i.e., there are neither adjacent
-   * `Text` nodes nor empty `Text` nodes. This can
-   * be used to ensure that the DOM view of a document is the same as if it
-   * were saved and re-loaded, and is useful when operations (such as XPointer
-   * lookups) that depend on a particular document tree structure are to be
-   * used.In cases where the document contains `CDATASections`,
-   * the normalize operation alone may not be sufficient, since XPointers do
-   * not differentiate between `Text` nodes and
-   * `CDATASection` nodes.
-   */
   def normalize(): Unit = {
     val list = internalContent
     var previousText: Text = null

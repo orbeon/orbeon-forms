@@ -112,8 +112,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             return Type.PROCESSING_INSTRUCTION;
         else if (node instanceof Namespace)
             return Type.NAMESPACE;
-        else if (node instanceof CDATA)
-            return Type.TEXT;
         else
             throw new IllegalStateException();
     }
@@ -279,8 +277,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                         parent = makeWrapper(parentNode, docWrapper);
                 }
             } else if (node instanceof Text) {
-                parent = makeWrapper(node.getParent(), docWrapper);
-            } else if (node instanceof CDATA) {
                 parent = makeWrapper(node.getParent(), docWrapper);
             } else if (node instanceof Comment) {
                 parent = makeWrapper(node.getParent(), docWrapper);

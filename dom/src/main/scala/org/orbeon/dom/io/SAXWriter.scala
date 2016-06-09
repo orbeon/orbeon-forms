@@ -53,7 +53,6 @@ class SAXWriter extends XMLReader {
     node match {
       case n: Element               ⇒ writeElement(n)
       case n: Text                  ⇒ writeText(n.getText)
-      case n: CDATA                 ⇒ writeCDATA(n)
       case n: ProcessingInstruction ⇒ writeProcessingInstruction(n)
       case n: Comment               ⇒ writeComment(n)
       case n: Document              ⇒ writeDocument(n)
@@ -77,17 +76,6 @@ class SAXWriter extends XMLReader {
       val chars = text.toCharArray
       contentHandler.characters(chars, 0, chars.length)
     }
-
-  private def writeCDATA(cdata: CDATA): Unit = {
-    val text = cdata.getText
-    if (lexicalHandler ne null) {
-      lexicalHandler.startCDATA()
-      writeText(text)
-      lexicalHandler.endCDATA()
-    } else {
-      writeText(text)
-    }
-  }
 
   private def writeComment(comment: Comment): Unit =
     if (lexicalHandler ne null) {
@@ -146,7 +134,6 @@ class SAXWriter extends XMLReader {
       iter.next() match {
         case element : Element               ⇒ writeElement(element, namespaceStack)
         case text    : Text                  ⇒ writeText(text.getText)
-        case cdata   : CDATA                 ⇒ writeCDATA(cdata)
         case comment : Comment               ⇒ writeComment(comment)
         case pi      : ProcessingInstruction ⇒ writeProcessingInstruction(pi)
         case _       : Namespace             ⇒ // ignore

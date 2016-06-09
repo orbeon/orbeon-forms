@@ -32,11 +32,11 @@ abstract class AbstractBranch extends AbstractNode with Branch {
     ""
   }
 
-  // Return the text value of CDATA or Text node.
+  // Return the text value of the Text node.
   private def getContentAsText(content: Node): String =
     content match {
-      case _: CDATA | _: Text ⇒ content.getText
-      case _ ⇒ ""
+      case _: Text ⇒ content.getText
+      case _       ⇒ ""
     }
 
   def getTextTrim: String = {

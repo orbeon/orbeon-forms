@@ -26,8 +26,6 @@ class SAXContentHandler(
 
   // State
   private var locator: Locator = _
-  private var insideCDATASection = false
-  private var cdataText: jl.StringBuilder = _
   private var declaredNamespaceIndex = 0
   private var currentElement: Element = _
   private var textInTextBuffer = false
@@ -37,14 +35,14 @@ class SAXContentHandler(
     this.locator = documentLocator
 
   override def processingInstruction(target: String, data: String): Unit = {
-    if (mergeAdjacentText && textInTextBuffer) {
+
+    if (mergeAdjacentText && textInTextBuffer)
       completeCurrentTextNode()
-    }
-    if (currentElement ne null) {
+
+    if (currentElement ne null)
       currentElement.addProcessingInstruction(target, data)
-    } else {
+    else
       getDocument.addProcessingInstruction(target, data)
-    }
   }
 
   override def startPrefixMapping(prefix: String, uri: String): Unit =
@@ -61,9 +59,10 @@ class SAXContentHandler(
     elementStack.clear()
     namespaceStack.clear()
     declaredNamespaceIndex = 0
-    if (mergeAdjacentText && (textBuffer eq null)) {
+
+    if (mergeAdjacentText && (textBuffer eq null))
       textBuffer = new jl.StringBuilder
-    }
+
     textInTextBuffer = false
   }
 
@@ -80,6 +79,7 @@ class SAXContentHandler(
     qualifiedName : String,
     attributes    : Attributes
   ): Unit = {
+
     if (mergeAdjacentText && textInTextBuffer)
       completeCurrentTextNode()
 
@@ -98,6 +98,7 @@ class SAXContentHandler(
     localName    : String,
     qName        : String
   ): Unit = {
+
     if (mergeAdjacentText && textInTextBuffer)
       completeCurrentTextNode()
 
@@ -106,22 +107,16 @@ class SAXContentHandler(
   }
 
   override def characters(ch: Array[Char], start: Int, end: Int): Unit = {
+
     if (end == 0)
       return
 
     if (currentElement ne null) {
-      if (insideCDATASection) {
-        if (mergeAdjacentText && textInTextBuffer)
-          completeCurrentTextNode()
-
-        cdataText.append(new String(ch, start, end))
+      if (mergeAdjacentText) {
+        textBuffer.append(ch, start, end)
+        textInTextBuffer = true
       } else {
-        if (mergeAdjacentText) {
-          textBuffer.append(ch, start, end)
-          textInTextBuffer = true
-        } else {
-          currentElement.addText(new String(ch, start, end))
-        }
+        currentElement.addText(new String(ch, start, end))
       }
     }
   }
@@ -134,16 +129,8 @@ class SAXContentHandler(
   def endDTD()                                                   = ()
   def startEntity(name: String)                                  = ()
   def endEntity(name: String)                                    = ()
-
-  def startCDATA(): Unit = {
-    insideCDATASection = true
-    cdataText = new jl.StringBuilder
-  }
-
-  def endCDATA(): Unit = {
-    insideCDATASection = false
-    currentElement.addCDATA(cdataText.toString)
-  }
+  def startCDATA()                                               = ()
+  def endCDATA()                                                 = ()
 
   def comment(ch: Array[Char], start: Int, end: Int): Unit = {
     if (!ignoreComments) {

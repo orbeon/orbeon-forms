@@ -50,24 +50,21 @@ trait Element extends Branch {
   def addAttribute(qName: QName, value: String): Element
 
   def addComment(comment: String): Element
-  def addCDATA(cdata: String): Element
   def addNamespace(prefix: String, uri: String): Element
   def addProcessingInstruction(target: String, text: String): Element
   def addText(text: String): Element
 
   def add(att: Attribute): Unit
-  def add(cdata: CDATA): Unit
   def add(text: Text): Unit
   def add(namespace: Namespace): Unit
 
   def remove(att: Attribute): Boolean
-  def remove(cdata: CDATA): Boolean
   def remove(namespace: Namespace): Boolean
   def remove(text: Text): Boolean
 
   /**
    * Returns the text value of this element without recursing through child
-   * elements. This method iterates through all Text, CDATA and Entity
+   * elements. This method iterates through all Text
    * nodes that this element contains and appends the text
    * values together.
    */
@@ -82,7 +79,7 @@ trait Element extends Branch {
   /**
    * Returns the XPath string-value of this node. The behaviour of this method
    * is defined in the XPath specification. This method returns the string-value of all the
-   * contained Text, CDATA, Entity and Element nodes all appended together.
+   * contained Text and Element nodes all appended together.
    */
   def getStringValue: String
 

@@ -14,7 +14,6 @@ object DocumentFactory {
   def createElement              (qualifiedName: String, namespaceURI: String): Element               = createElement(createQName(qualifiedName, namespaceURI))
   def createAttribute            (owner: Element, name: String, value: String): Attribute             = createAttribute(owner, createQName(name), value)
   def createAttribute            (owner: Element, qName: QName, value: String): Attribute             = new ConcreteAttribute(qName, value)
-  def createCDATA                (text: String)                               : CDATA                 = new ConcreteCDATA(text)
   def createComment              (text: String)                               : Comment               = new ConcreteComment(text)
   def createText                 (text: String)                               : Text                  = new ConcreteText(text ensuring (_ ne null))
   def createProcessingInstruction(target: String, data: String)               : ProcessingInstruction = new ConcreteProcessingInstruction(target, data)

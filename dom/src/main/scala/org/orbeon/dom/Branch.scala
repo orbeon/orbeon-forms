@@ -133,16 +133,13 @@ trait Branch extends Node {
    * Puts all `Text` nodes in the full depth of the sub-tree
    * underneath this `Node`, including attribute nodes, into a
    * "normal" form where only structure (e.g., elements, comments, processing
-   * instructions, CDATA sections, and entity references) separates
+   * instructions) separates
    * `Text` nodes, i.e., there are neither adjacent
    * `Text` nodes nor empty `Text` nodes. This can
    * be used to ensure that the DOM view of a document is the same as if it
    * were saved and re-loaded, and is useful when operations (such as XPointer
    * lookups) that depend on a particular document tree structure are to be
-   * used.In cases where the document contains `CDATASections`,
-   * the normalize operation alone may not be sufficient, since XPointers do
-   * not differentiate between `Text` nodes and
-   * `CDATASection` nodes.
+   * used.
    */
   def normalize(): Unit
 }

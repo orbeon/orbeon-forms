@@ -196,9 +196,11 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
     //        renderer.getSharedContext().setDPI(150);
 
             // Set the document to process
-            renderer.setDocument(domDocument,
+            renderer.setDocument(
+                domDocument,
                 // No base URL if can't get request URL from context
-                externalContext.getRequest() == null ? null : externalContext.getRequest().getRequestURL());
+                externalContext.getRequest() == null ? null : externalContext.getRequest().getRequestURL()
+            );
 
             // Do the layout and create the resulting PDF
             renderer.layout();

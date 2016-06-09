@@ -167,7 +167,7 @@ class Connection(
             )
 
           debug("opening URL connection",
-            Seq(
+            List(
               "method" → httpMethod,
               "URL"    → connectionURI.toString
             ) ++ (cleanHeaders mapValues (_ mkString ",")))
@@ -238,8 +238,8 @@ trait ConnectionState {
       cookieStoreOpt match {
         case Some(cookieStore) ⇒
           val cookies = cookieStore.getCookies.asScala map (_.getName) mkString " | "
-          debug(positive, Seq(
-            "scope" → stateScope,
+          debug(positive, List(
+            "scope"        → stateScope,
             "cookie names" → (if (cookies.nonEmpty) cookies else null))
           )
         case None ⇒
@@ -423,7 +423,7 @@ object Connection extends Logging {
       // mediatype attribute"
       val headersWithContentTypeIfNeeded = {
 
-        val headers = customHeaders.toMap
+        val headers = customHeaders.toMap // TODO: .toMap unneeded
 
         if (requiresRequestBody(httpMethodUpper) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
           headers + (ContentType → List(mediatype ensuring (_ ne null)))
@@ -505,7 +505,11 @@ object Connection extends Logging {
       values    ← getHeader(nameLower)
       if canForwardHeader(nameLower)
     } yield {
-      debug("forwarding header", Seq("name" → nameLower, "value" → (values mkString " ")))
+      debug("forwarding header", List(
+        "name"  → nameLower,
+        "value" → (values mkString " ")
+        )
+      )
       nameLower → values
     }
   }
@@ -635,10 +639,10 @@ object Connection extends Logging {
 
         val sessionOption = Option(externalContext.getSession(false))
 
-        debug("setting cookie", Seq(
+        debug("setting cookie", List(
           "new session"              → (sessionOption map (_.isNew.toString) orNull),
           "session id"               → (sessionOption map (_.getId) orNull),
-          "requested session id"     → (requestOption map (_.getRequestedSessionId) orNull),
+          "requested session id"     → (requestOption flatMap (r ⇒ Option(r.getRequestedSessionId)) orNull),
           "session cookie name"      → sessionCookieName,
           "incoming session cookies" → (incomingSessionCookies mkString " - "),
           "incoming session headers" → (incomingSessionHeaders mkString " - ")))
@@ -682,9 +686,10 @@ object Connection extends Logging {
         // Multiple cookies in the header, separated with ";"
         val cookieHeaderValue = pairsToForward mkString "; "
 
-        debug("forwarding cookies", Seq(
-          "cookie" → cookieHeaderValue,
-          "requested session id" → externalContext.getRequest.getRequestedSessionId))
+        debug("forwarding cookies", List(
+          "cookie"               → cookieHeaderValue,
+          "requested session id" → externalContext.getRequest.getRequestedSessionId)
+        )
 
         Some("cookie" → List(cookieHeaderValue))
       } else

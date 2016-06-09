@@ -119,12 +119,14 @@ class LocalRequest(
   // attributes in its own ApplicationHttpRequest.specialAttributes. So for now we keep the forward, which was in
   // place before the 2013-09-10 refactor anyway.
   //
+  // 2016-06-09: If we remove support for RequestDispatcherSubmission with #2809, we can probably fix this.
+  //
   lazy val getAttributesMap = {
 
     val newMap = new ju.HashMap[String, AnyRef]
 
     newMap.asScala ++= incomingRequest.getAttributesMap.asScala filter {
-      case (k, v) ⇒ k.startsWith("javax.servlet.")
+      case (k, _) ⇒ k.startsWith("javax.servlet.")
     }
 
     ju.Collections.synchronizedMap(newMap)
@@ -190,7 +192,7 @@ class LocalRequest(
   def getNativeRequest                        = incomingRequest.getNativeRequest  // should not have mainstream uses; see RequestDispatcherSubmission, and cookies forwarding
   def getPathTranslated                       = incomingRequest.getPathTranslated // should really not be called
 
-  // Client and server are preserved, assuming all those relate to knowledge about the  URL rewriting and/or
+  // Client and server are preserved, assuming all those relate to knowledge about URL rewriting
   def getProtocol                             = incomingRequest.getProtocol
   def getServerPort                           = incomingRequest.getServerPort
   def getScheme                               = incomingRequest.getScheme

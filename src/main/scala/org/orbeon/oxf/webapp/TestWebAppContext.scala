@@ -13,22 +13,23 @@
  */
 package org.orbeon.oxf.webapp
 
-import collection.mutable.LinkedHashMap
 import org.apache.log4j.Logger
 
+import scala.collection.mutable
+
 class TestWebAppContext(private val logger: Logger) extends WebAppContext {
-  def getResource(s: String) = throw new UnsupportedOperationException
-  def getResourceAsStream(s: String) = throw new UnsupportedOperationException
-  def getRealPath(s: String) = null
-  val initParameters = Map.empty[String, String]
-  val attributes = TestWebAppContext.attributes
+  def getResource(s: String)                     = throw new UnsupportedOperationException
+  def getResourceAsStream(s: String)             = throw new UnsupportedOperationException
+  def getRealPath(s: String)                     = null
+  val initParameters                             = Map.empty[String, String]
+  val attributes                                 = TestWebAppContext.attributes
   def log(message: String, throwable: Throwable) = logger.error(message, throwable)
-  def log(message: String) = logger.info(message)
-  def getNativeContext = null
+  def log(message: String)                       = logger.info(message)
+  def getNativeContext                           = null
 }
 
 object TestWebAppContext {
   // Make this static so that multiple TestExternalContext run in the same application scope. This is not 100% ideal
   // because it breaks test isolation.
-  private val attributes = LinkedHashMap[String, AnyRef]()
+  private val attributes = mutable.LinkedHashMap[String, AnyRef]()
 }

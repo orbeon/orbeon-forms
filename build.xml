@@ -213,7 +213,7 @@
         </exec>
     </target>
 
-    <target name="clean" depends="sbt-clean" description="Remove all generated files except the local eXist database">
+    <target name="clean-keep-exist" depends="sbt-clean" description="Remove all generated files except the local eXist database">
         <delete includeEmptyDirs="true">
             <fileset dir="build">
                 <exclude name="orbeon-war/WEB-INF/exist-data"/>
@@ -221,6 +221,8 @@
             </fileset>
         </delete>
     </target>
+
+    <target name="clean" depends="clean-keep-exist" description="Remove all generated files except the local eXist database"/>
 
     <target name="mega-clean" depends="sbt-clean" description="Remove all generated files">
         <delete dir="build"/>

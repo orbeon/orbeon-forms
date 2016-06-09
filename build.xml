@@ -204,7 +204,25 @@
         <echo message="Using Ant ${ant.version}"/>
     </target>
 
-    <target name="clean" depends="init" description="Remove all generated files">
+    <target name="sbt-clean" depends="init" description="Remove all sbt-generated files">
+        <exec executable="sbt" failonerror="true">
+            <arg value="-Dorbeon.version=${release.number}"/>
+            <arg value="-Dorbeon.edition=${edition}"/>
+            <arg value="project root"/>
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="clean" depends="sbt-clean" description="Remove all generated files except the local eXist database">
+        <delete includeEmptyDirs="true">
+            <fileset dir="build">
+                <exclude name="orbeon-war/WEB-INF/exist-data"/>
+                <exclude name="orbeon-war/WEB-INF/exist-data/**"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="mega-clean" depends="sbt-clean" description="Remove all generated files">
         <delete dir="build"/>
     </target>
 
@@ -1122,7 +1140,7 @@
         <delete dir="build/exist-data-exported"/>
         <mkdir dir="build/exist-data-exported"/>
         <xdb:extract configuration="build/orbeon-war/WEB-INF/exist-conf.xml" uri="xmldb:exist:///db" initDb="true" destdir="build/exist-data-exported" subcollections="true" createdirectories="true"/>
-        <move todir="build/exist-data-exported" includeemptydirs="false">
+        <move todir="build/exist-data-exported" includeEmptyDirs="false">
             <fileset dir="build/exist-data-exported">
                 <include name="**/*.xhtml.xml"/>
             </fileset>

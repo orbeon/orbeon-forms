@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.junit.Test;
+import org.orbeon.oxf.externalcontext.TestSession;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.ScalaUtils;
@@ -76,7 +76,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertSame(document, XFormsDocumentCache.instance().takeDocument(document.getUUID()));
 
         // Expire session
-        ((TestExternalContext.TestSession) session).expireSession();
+        ((TestSession) session).expireSession();
 
         // Test that the document is no longer in cache
         assertNull(XFormsDocumentCache.instance().takeDocument(document.getUUID()));

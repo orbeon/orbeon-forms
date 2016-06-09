@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.fr
 
+import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.TestHttpClient.{CacheEvent, StaticState}
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
 import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
 
 class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsForJUnit {
 
   @Test def formRunnerStaticCache(): Unit = {
-
-    import FormRunnerSupport._
 
     val Id1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
     val Id2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"

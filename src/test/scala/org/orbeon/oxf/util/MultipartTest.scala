@@ -14,17 +14,18 @@
 package org.orbeon.oxf.util
 
 import java.io.ByteArrayInputStream
+
 import org.apache.commons.fileupload.FileItem
 import org.junit.Test
 import org.mockito.Mockito
+import org.orbeon.oxf.externalcontext.TestSession
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.processor.test.TestExternalContext.TestSession
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.util.Multipart._
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
-import Multipart._
 
 class MultipartTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 

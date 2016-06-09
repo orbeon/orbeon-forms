@@ -30,7 +30,7 @@ import java.util.*;
  *
  * Used by CommandLineExternalContext.
  */
-public class SimpleExternalContext implements ExternalContext {
+class SimpleExternalContext implements ExternalContext {
 
     private static final Logger logger = LoggerFactory.createLogger(SimpleExternalContext.class);
     private WebAppContext webAppContext = new TestWebAppContext(logger);

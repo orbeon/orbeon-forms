@@ -81,7 +81,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
             url         = url.toExternalForm,
             credentials = credentialsFromURL(url),
             cookieStore = new BasicCookieStore,
-            method      = methodName,
+            methodUpper = methodName,
             headers     = _requestHeaders mapValues (_.toList) toMap,
             content     = body map (StreamedContent(_, Option(getRequestProperty(Headers.ContentType)), bodyLength, None))
           )

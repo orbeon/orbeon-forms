@@ -273,18 +273,11 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
       val responseAdapter = new LocalResponse(response: URLRewriter)
       submissionProcess.process(localRequest, responseAdapter)
 
-      val responseHeaders = responseAdapter.capitalizedHeaders
-
       ConnectionResult(
         url         = effectiveResourceURI,
         statusCode  = responseAdapter.statusCode max 0,
-        headers     = responseHeaders,
-        content     = StreamedContent(
-          inputStream       = responseAdapter.getInputStream,
-          contentType       = Headers.firstHeaderIgnoreCase(responseHeaders, Headers.ContentType),
-          contentLength     = Headers.firstLongHeaderIgnoreCase(responseHeaders, Headers.ContentLength),
-          title             = None
-        )
+        headers     = responseAdapter.capitalizedHeaders,
+        content     = responseAdapter.streamedContent
       )
     }
   }

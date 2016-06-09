@@ -18,6 +18,7 @@ import org.orbeon.dom.Element;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
@@ -32,9 +33,6 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- *
- */
 public class TestScriptProcessor extends ProcessorImpl {
 
     public static final String TEST_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/schemas/test-processor";

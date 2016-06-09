@@ -45,12 +45,12 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
   import Private._
 
   def connect(
-    url        : String,
-    credentials: Option[Credentials],
-    cookieStore: CookieStore,
-    method     : String,
-    headers    : Map[String, List[String]],
-    content    : Option[StreamedContent]
+    url         : String,
+    credentials : Option[Credentials],
+    cookieStore : CookieStore,
+    methodUpper : String,
+    headers     : Map[String, List[String]],
+    content     : Option[StreamedContent]
   ): HttpResponse = {
 
     val uri = URI.create(url)
@@ -96,7 +96,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     httpClient.setCookieStore(cookieStore)
 
     val requestMethod =
-      method.toLowerCase match {
+      methodUpper.toLowerCase match {
         case "get"     ⇒ new HttpGet(uri)
         case "post"    ⇒ new HttpPost(uri)
         case "head"    ⇒ new HttpHead(uri)
@@ -104,7 +104,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         case "put"     ⇒ new HttpPut(uri)
         case "delete"  ⇒ new HttpDelete(uri)
         case "trace"   ⇒ new HttpTrace(uri)
-        case _         ⇒ throw new ProtocolException(s"Method $method is not supported")
+        case _         ⇒ throw new ProtocolException(s"Method $methodUpper is not supported")
       }
 
     val skipAuthorizationHeader = credentials.isDefined
@@ -136,7 +136,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
         val is =
           content map (_.inputStream) getOrElse
-          (throw new IllegalArgumentException(s"No request content provided for method$method"))
+          (throw new IllegalArgumentException(s"No request content provided for method$methodUpper"))
 
         val contentLength =
           content flatMap (_.contentLength) filter (_ >= 0L)

@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.test;
 
-import org.orbeon.dom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.externalcontext.RequestAdapter;
+import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 

@@ -223,7 +223,7 @@ object APISupport {
         url         = recombineQuery(requestDetails.url, requestDetails.params),
         credentials = None,
         cookieStore = getOrCreateCookieStore,
-        method      = if (requestDetails.content.isEmpty) "GET" else "POST",
+        methodUpper = if (requestDetails.content.isEmpty) "GET" else "POST",
         headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient → List("portlet")),
         content     = requestDetails.content
       )

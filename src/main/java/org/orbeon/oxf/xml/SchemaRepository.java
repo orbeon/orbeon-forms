@@ -34,7 +34,6 @@ import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.processor.serializer.HttpSerializer;
 import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
-import org.orbeon.oxf.processor.test.TestScriptProcessor;
 import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
@@ -122,7 +121,9 @@ public class SchemaRepository {
         SCHEMAS.put(XQueryProcessor.XQUERY_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "XQuery/xquery-processor.rng");
 
         // Test processor schema
-        SCHEMAS.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
+        // 2016-06-09: Not good that we have to hardcode this, but the processor is now in a different module. Processors
+        // should be able to add themselves to the repository somehow.
+        SCHEMAS.put("http://www.orbeon.org/oxf/xml/schemas/test-processor", PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
 
         SCHEMAS.put(PDFTemplateProcessor.PDFTemplateModelNamespaceURI(), PROCESSORS_SCHEMA_PATH + "pdf/pdf-template-model.rng");
 

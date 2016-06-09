@@ -32,7 +32,7 @@ object InternalHttpClient extends HttpClient {
     url         : String,
     credentials : Option[Credentials], // ignored
     cookieStore : CookieStore,         // ignored
-    method      : String,
+    methodUpper : String,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent]
   ): HttpResponse = {
@@ -101,18 +101,13 @@ object InternalHttpClient extends HttpClient {
       }
     }
 
-    val response = processRedirects(url, method, headers, content)
+    val response = processRedirects(url, methodUpper, headers, content)
 
     new HttpResponse {
       lazy val statusCode   = response.statusCode
       lazy val headers      = response.capitalizedHeaders
       lazy val lastModified = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
-      lazy val content      = StreamedContent(
-        inputStream       = response.getInputStream,
-        contentType       = Headers.firstHeaderIgnoreCase(headers, Headers.ContentType),
-        contentLength     = Headers.firstLongHeaderIgnoreCase(headers, Headers.ContentLength),
-        title             = None
-      )
+      lazy val content      = response.streamedContent
       def disconnect()      = content.close()
     }
   }

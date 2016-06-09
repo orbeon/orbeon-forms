@@ -11,14 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.processor.test;
+package org.orbeon.oxf.externalcontext;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -27,8 +26,8 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.TestWebAppContext;
 import org.orbeon.oxf.webapp.WebAppContext;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.sax.SAXSource;
@@ -72,7 +71,6 @@ public class TestExternalContext implements ExternalContext  {
 
         private Map<String, Object> attributesMap;
         private Map<String, Object[]> parameterMap;
-        private Map<String, String> headerMap;
         private Map<String, String[]> headerValuesMap;
 
         private InputStream bodyInputStream;
@@ -438,10 +436,6 @@ public class TestExternalContext implements ExternalContext  {
             return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
-        public String rewriteResourceURL(String urlString, boolean absolute) {
-            return rewriteResourceURL(urlString, absolute ? REWRITE_MODE_ABSOLUTE : REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        }
-
         public String rewriteResourceURL(String urlString, int rewriteMode) {
             return URLRewriterUtils.rewriteURL(getRequest(), urlString, rewriteMode);
         }
@@ -498,86 +492,6 @@ public class TestExternalContext implements ExternalContext  {
         }
         return session;
     }
-
-    public static class TestSession implements ExternalContext.Session {
-
-		private String sessionId;
-        private long creationTime;
-		private Set<SessionListener> sessionListeners = new LinkedHashSet<SessionListener>();
-		private Map attributesMap = new LinkedHashMap();
-        private boolean expired;
-
-		public TestSession(String sessionId) {
-			this.sessionId = sessionId;
-            this.creationTime = System.currentTimeMillis();
-		}
-
-		public void expireSession() {
-            for (final SessionListener listener: sessionListeners) {
-                listener.sessionDestroyed();
-            }
-            expired = true;
-		}
-
-		public void addListener(SessionListener sessionListener) {
-            checkExpired();
-            sessionListeners.add(sessionListener);
-		}
-
-        public Map getAttributesMap() {
-            checkExpired();
-            return attributesMap;
-		}
-
-		public Map getAttributesMap(int scope) {
-            checkExpired();
-            return getAttributesMap();
-		}
-
-		public long getCreationTime() {
-            checkExpired();
-            return creationTime;
-		}
-
-		public String getId() {
-            checkExpired();
-            return sessionId;
-		}
-
-		public long getLastAccessedTime() {
-            checkExpired();
-            return 0;// TODO
-		}
-
-		public int getMaxInactiveInterval() {
-            checkExpired();
-            return 0;// TODO
-		}
-
-		public void invalidate() {
-            checkExpired();
-            // TODO
-        }
-
-		public boolean isNew() {
-            checkExpired();
-            return false;// TODO
-		}
-
-		public void removeListener(SessionListener sessionListener) {
-            checkExpired();
-            sessionListeners.remove(sessionListener);
-		}
-
-		public void setMaxInactiveInterval(int interval) {
-            checkExpired();// TODO
-        }
-
-        private void checkExpired() {
-            if (expired)
-                throw new OXFException("Cannot call methods on expired session.");
-        }
-	}
 
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         // NIY

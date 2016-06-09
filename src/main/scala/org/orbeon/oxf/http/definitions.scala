@@ -200,7 +200,7 @@ trait HttpClient {
     url         : String,
     credentials : Option[Credentials],
     cookieStore : org.apache.http.client.CookieStore,
-    method      : String,
+    methodUpper : String,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent]
   ): HttpResponse

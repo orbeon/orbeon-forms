@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.ScalaUtils.StringOps
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, ScalaUtils}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
 import org.parboiled.errors.ParsingException

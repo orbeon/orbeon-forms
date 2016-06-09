@@ -15,7 +15,7 @@ package org.orbeon.oxf.externalcontext
 
 import java.io._
 
-import org.orbeon.oxf.http.{EmptyInputStream, Headers}
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.util.StringBuilderWriter
 
@@ -32,6 +32,16 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
   private var _printWriter : PrintWriter                = null
   private var _byteStream  : LocalByteArrayOutputStream = null
   private var _inputStream : InputStream                = null
+
+  def streamedContent = {
+    val responseHeaders = capitalizedHeaders
+    StreamedContent(
+      inputStream   = getInputStream,
+      contentType   = Headers.firstHeaderIgnoreCase(responseHeaders, Headers.ContentType),
+      contentLength = Headers.firstLongHeaderIgnoreCase(responseHeaders, Headers.ContentLength),
+      title         = None
+    )
+  }
 
   def statusCode = _statusCode
   def serverSideRedirect = _serverSideRedirect

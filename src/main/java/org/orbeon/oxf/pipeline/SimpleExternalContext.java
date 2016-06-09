@@ -33,7 +33,7 @@ import java.util.*;
 class SimpleExternalContext implements ExternalContext {
 
     private static final Logger logger = LoggerFactory.createLogger(SimpleExternalContext.class);
-    private WebAppContext webAppContext = new TestWebAppContext(logger);
+    private WebAppContext webAppContext = new TestWebAppContext(logger, new scala.collection.mutable.LinkedHashMap<String, Object>());
 
     public WebAppContext getWebAppContext() {
         return webAppContext;

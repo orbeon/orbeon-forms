@@ -49,12 +49,18 @@ object TestHttpClient {
   private val Logger = LoggerFactory.createLogger(TestHttpClient.getClass)
 
   private val Scheme      = "http"
-  private val Port        = 8080
   private val RemoteHost  = "localhost"
   private val RemoteAddr  = "127.0.0.1"
 
-  private val ServerHost  = "localhost"
-  private val ContextPath = "/orbeon"
+  private object ServerState {
+
+    val Port        = 8080
+    val Host        = "localhost"
+    val ContextPath = "/orbeon"
+
+    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]()
+    val sessions: mutable.Map[String, Session] = mutable.HashMap[String, Session]()
+  }
 
   def connect(
     url         : String,
@@ -91,13 +97,13 @@ object TestHttpClient {
 
         val (externalContext, response) = {
 
-          val webAppContext = new TestWebAppContext(Logger)
+          val webAppContext = new TestWebAppContext(Logger, ServerState.serverAttributes)
 
           // Create a request with only the methods used by `LocalRequest.incomingRequest` parameter
           val baseRequest = new RequestAdapter {
 
             override val getAttributesMap                        = ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef]())
-            override val getRequestURL                           = s"$Scheme://$RemoteHost:$Port$ContextPath/" // just used to resolve against
+            override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
 
             override val getContainerType                        = "servlet"
             override val getContainerNamespace                   = ""
@@ -106,19 +112,29 @@ object TestHttpClient {
             override val getNativeRequest                        = null
             override val getPathTranslated                       = ""
             override val getProtocol                             = "HTTP/1.1"
-            override val getServerPort                           = Port
+            override val getServerPort                           = ServerState.Port
             override val getScheme                               = Scheme
             override val getRemoteHost                           = RemoteHost
             override val getRemoteAddr                           = RemoteAddr
             override val isSecure                                = Scheme == "https"
             override val getLocale                               = null
             override val getLocales                              = null
-            override val getServerName                           = ServerHost
+            override val getServerName                           = ServerState.Host
             override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
-
             override def sessionInvalidate()                     = session foreach (_.invalidate())
             override val getRequestedSessionId                   = null
 
+            override val getUsername                             = username.orNull
+            override val getUserRoles                            = roles.toArray
+            override val getUserGroup                            = group.orNull
+
+            // The following are never used by our code
+            override val isRequestedSessionIdValid               = false   // only delegated
+            override def isUserInRole(role: String)              = false   // called by `xxf:is-user-in-role()`
+            override val getUserPrincipal                        = null    // some processors read it but result is unused
+            override val getAuthType                             = "BASIC" // some processors read it but result is unused
+
+            // Session handling
             private var session: Option[Session] = None
 
             override def getSession(create: Boolean): Session =
@@ -131,21 +147,11 @@ object TestHttpClient {
                   null
                 }
               }
-
-            override val getUsername                             = username.orNull
-            override val getUserRoles                            = roles.toArray
-            override val getUserGroup                            = group.orNull
-
-            // The following are never used by our code
-            override val isRequestedSessionIdValid               = false   // only delegated
-            override def isUserInRole(role: String)              = false   // called by `xxf:is-user-in-role()`
-            override val getUserPrincipal                        = null    // some processors read it but result is unused
-            override val getAuthType                             = "BASIC" // some processors read it but result is unused
           }
 
           val request = new LocalRequest(
             incomingRequest         = baseRequest,
-            contextPath             = ContextPath,
+            contextPath             = ServerState.ContextPath,
             pathQuery               = url,
             methodUpper             = methodUpper,
             headersMaybeCapitalized = headers,

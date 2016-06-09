@@ -46,7 +46,7 @@ public class TestExternalContext implements ExternalContext  {
     private PipelineContext pipelineContext;
     private Document requestDocument;
 
-    private WebAppContext webAppContext = new TestWebAppContext(logger);
+    private WebAppContext webAppContext = new TestWebAppContext(logger, new scala.collection.mutable.LinkedHashMap<String, Object>());
 
     private Request request;
     private Response response;

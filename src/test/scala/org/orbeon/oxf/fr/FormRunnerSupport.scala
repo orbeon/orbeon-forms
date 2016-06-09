@@ -68,8 +68,6 @@ trait FormRunnerSupport extends DocumentTestBase {
     val (processorService, response, events) =
       TestHttpClient.connect(
         url         = s"/fr/$app/$form/$mode${if (noscript) "?fr-noscript=true" else ""}",
-        credentials = None,
-        cookieStore = null, // TODO?
         methodUpper = "GET",
         headers     = Map.empty,
         content     = None

@@ -155,7 +155,7 @@ public class SQLProcessor extends ProcessorImpl {
                                     if (node instanceof Text) {
                                         Text text = (Text) node;
                                         if (previousText != null) {
-                                            previousText.appendText(text.getText());
+                                            previousText.setText(previousText.getText() + text.getText());
                                             element.remove(text);
                                         } else {
                                             String value = text.getText();

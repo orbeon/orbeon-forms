@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.orbeon.dom.*;
-import org.orbeon.dom.CharacterData;
 import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.dom.io.OutputFormat;
 import org.orbeon.dom.io.SAXReader;
@@ -240,7 +239,7 @@ public class Dom4jUtils {
                     final Node currentNode = (Node) i.next();
                     if (previousNode != null) {
                         if (isTextNode(previousNode) && isTextNode(currentNode)) {
-                            final CharacterData previousNodeText = (CharacterData) previousNode;
+                            final Text previousNodeText = (Text) previousNode;
                             if (sb == null)
                                 sb = new StringBuilder(previousNodeText.getText());
                             sb.append(currentNode.getText());

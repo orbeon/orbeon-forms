@@ -71,7 +71,7 @@ object Dom4j {
   // Only keep the nodes we care about
   private def filterOut(l: Seq[Node]) = l collect {
     case n @ (_: Document | _: Element | _: Attribute | _: Comment | _: ProcessingInstruction) ⇒ n
-    case t: CharacterData if isNotBlank(t.getText) ⇒ t
+    case t: Text if isNotBlank(t.getText) ⇒ t
   }
 
   private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String ⇒ String) =
@@ -99,7 +99,7 @@ object Dom4j {
           a1.getValue == a2.getValue
       case (c1: Comment, c2: Comment) ⇒
         c1.getText == c2.getText
-      case (t1: CharacterData, t2: CharacterData) ⇒ // Text, CDATA, or Comment (Comment is checked above - dom4j class hierarchy is bad)
+      case (t1: Text, t2: Text) ⇒
         normalizeText(t1.getText) == normalizeText(t2.getText)
       case (p1: ProcessingInstruction, p2: ProcessingInstruction) ⇒
         p1.getTarget == p2.getTarget &&

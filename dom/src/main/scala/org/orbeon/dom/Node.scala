@@ -34,3 +34,6 @@ trait Node extends Cloneable {
   def accept(visitor: Visitor): Unit
   override def clone(): AnyRef = super.clone()
 }
+
+trait Comment extends Node
+trait Text    extends Node

@@ -557,7 +557,7 @@ class ConcreteElement(var qname: QName)
       node match {
         case text: Text ⇒
           if (previousText ne null) {
-            previousText.appendText(text.getText)
+            previousText.setText(previousText.getText + text.getText)
             remove(text)
           } else {
             val value = text.getText

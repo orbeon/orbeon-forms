@@ -107,7 +107,7 @@ class XMLWriter(writer: Writer, format: OutputFormat) {
     val attr = element.attribute("space")
     var preserveFound = preserve
     if (attr ne null) {
-      preserveFound = if ("xml" == attr.getNamespacePrefix && "preserve" == attr.getText) true else false
+      preserveFound = if ("xml" == attr.getNamespacePrefix && "preserve" == attr.getValue) true else false
     }
     preserveFound
   }

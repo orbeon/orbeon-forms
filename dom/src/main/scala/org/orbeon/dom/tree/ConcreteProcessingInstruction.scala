@@ -4,11 +4,8 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom.{ProcessingInstruction, Visitor}
 
-class ConcreteProcessingInstruction(var target: String, var text: String, var values: ju.Map[String, String])
+class ConcreteProcessingInstruction(var target: String, var text: String)
   extends AbstractNode with ProcessingInstruction with WithParent {
-
-  def this(target: String, text: String) =
-    this(target, text, ConcreteProcessingInstruction.parseValues(text))
 
   override def getName: String = getTarget
   override def setName(name: String): Unit = setTarget(name)
@@ -17,23 +14,10 @@ class ConcreteProcessingInstruction(var target: String, var text: String, var va
   def setTarget(target: String) = this.target = target
 
   override def getText = text
-  override def setText(text: String): Unit = {
-    this.text = text
-    this.values = ConcreteProcessingInstruction.parseValues(text)
-  }
+  override def setText(text: String): Unit = this.text = text
 
-  def getValue(name: String): String = {
-    val answer = values.get(name)
-    if (answer eq null)
-      ""
-    else
-      answer
-  }
-
-  def setValue(name: String, value: String): Unit =
-    values.put(name, value)
-
-  def getValues: ju.Map[String, String] = ju.Collections.unmodifiableMap(values)
+  def getValues: ju.Map[String, String] =
+    ju.Collections.unmodifiableMap(ConcreteProcessingInstruction.parseValues(text))
 
   def accept(visitor: Visitor): Unit = visitor.visit(this)
 
@@ -43,7 +27,8 @@ class ConcreteProcessingInstruction(var target: String, var text: String, var va
 }
 
 // ORBEON: Not sure we need this custom parsing of PIs. If not, could remove it.
-object ConcreteProcessingInstruction {
+// 2016-06-10: Only used by tree comparison. We could move this there.
+private object ConcreteProcessingInstruction {
 
   /**
    * Parses the raw data of PI as a `Map`.

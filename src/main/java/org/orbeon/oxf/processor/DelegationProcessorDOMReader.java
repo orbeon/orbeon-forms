@@ -139,8 +139,7 @@ public class DelegationProcessorDOMReader {
                     String prefix = getPrefix(name);
                     String uri = attribute.getNodeValue();
 
-                    Namespace namespace = namespaceStack.addNamespace(prefix,
-                            uri);
+                    Namespace namespace = namespaceStack.addNamespace(prefix, uri);
                     element.add(namespace);
                 } else {
                     attributes.add(attribute);

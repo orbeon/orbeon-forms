@@ -39,7 +39,7 @@ class NamespaceStack {
   private var _defaultNamespace: Namespace = _
   def getDefaultNamespace = {
     if (_defaultNamespace eq null)
-      _defaultNamespace = findDefaultNamespace()
+      _defaultNamespace = findDefaultNamespace
 
     _defaultNamespace
   }
@@ -139,8 +139,7 @@ class NamespaceStack {
     } else if (localName.trim().length == 0) {
       localName = qualifiedName
     }
-    val namespace = createNamespace(prefix, namespaceURI)
-    pushQName(localName, qualifiedName, namespace, prefix)
+    pushQName(localName, Namespace(prefix, namespaceURI), prefix)
   }
 
   def getAttributeQName(_namespaceURI: String, _localName: String, _qualifiedName: String): QName = {
@@ -168,7 +167,7 @@ class NamespaceStack {
     val index = qualifiedName.indexOf(":")
     if (index > 0) {
       prefix = qualifiedName.substring(0, index)
-      namespace = createNamespace(prefix, namespaceURI)
+      namespace = Namespace(prefix, namespaceURI)
       if (localName.trim().length == 0) {
         localName = qualifiedName.substring(index + 1)
       }
@@ -178,24 +177,16 @@ class NamespaceStack {
         localName = qualifiedName
       }
     }
-    answer = pushQName(localName, qualifiedName, namespace, prefix)
+    answer = pushQName(localName, namespace, prefix)
     map.put(qualifiedName, answer)
     answer
   }
 
-  def push(prefix: String, _uri: String): Unit = {
-
-    var uri = _uri
-
-    if (uri eq null) {
-      uri = ""
-    }
-    val namespace = createNamespace(prefix, uri)
-    push(namespace)
-  }
+  def push(prefix: String, uri: String): Unit =
+    push(Namespace(prefix, if (uri eq null) "" else uri))
 
   def addNamespace(prefix: String, uri: String): Namespace = {
-    val namespace = createNamespace(prefix, uri)
+    val namespace = Namespace(prefix, uri)
     push(namespace)
     namespace
   }
@@ -227,29 +218,18 @@ class NamespaceStack {
     namespace
   }
 
-  override def toString: String =
-    super.toString + " Stack: " + namespaceStack.toString
-
-  private def pushQName(localName: String, qualifiedName: String, namespace: Namespace, prefix: String): QName = {
+  private def pushQName(localName: String, namespace: Namespace, prefix: String): QName = {
     if ((prefix eq null) || (prefix.length == 0)) {
       _defaultNamespace = null
     }
-    createQName(localName, qualifiedName, namespace)
-  }
-
-  private def createQName(localName: String, qualifiedName: String, namespace: Namespace): QName = {
     DocumentFactory.createQName(localName, namespace)
-  }
-
-  private def createNamespace(prefix: String, namespaceURI: String): Namespace = {
-    DocumentFactory.createNamespace(prefix, namespaceURI)
   }
 
   /**
    * Attempts to find the current default namespace on the stack right now or
    * returns null if one could not be found
    */
-  private def findDefaultNamespace(): Namespace = {
+  private def findDefaultNamespace: Namespace = {
     var i = namespaceStack.size - 1
     while (i >= 0) {
       val namespace = namespaceStack.get(i)

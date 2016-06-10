@@ -212,10 +212,6 @@ public class Dom4jUtils {
         return ldSid == null ? DOMGenerator.DefaultContext : ldSid;
     }
 
-    private static boolean isTextNode(Node node) {
-        return node instanceof Text;
-    }
-
     /**
      * Go over the Node and its children and make sure that there are no two contiguous text nodes so as to ensure that
      * XPath expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
@@ -238,13 +234,13 @@ public class Dom4jUtils {
                 for (Iterator i = children.iterator(); i.hasNext();) {
                     final Node currentNode = (Node) i.next();
                     if (previousNode != null) {
-                        if (isTextNode(previousNode) && isTextNode(currentNode)) {
+                        if (previousNode instanceof Text && currentNode instanceof Text) {
                             final Text previousNodeText = (Text) previousNode;
                             if (sb == null)
                                 sb = new StringBuilder(previousNodeText.getText());
                             sb.append(currentNode.getText());
                             nodesToDetach.add(currentNode);
-                        } else if (isTextNode(previousNode)) {
+                        } else if (previousNode instanceof Text) {
                             // Update node if needed
                             if (sb != null) {
                                 previousNode.setText(sb.toString());

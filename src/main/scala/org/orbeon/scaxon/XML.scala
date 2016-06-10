@@ -137,7 +137,7 @@ object XML {
   def attribute(name: QName, value: String = ""): Attribute = DocumentFactory.createAttribute(null, name, value)
   def attributeInfo(name: QName, value: String = ""): NodeInfo = Wrapper.wrap(attribute(name, value))
 
-  def namespace(prefix: String, uri: String): Namespace = DocumentFactory.createNamespace(prefix, uri)
+  def namespace(prefix: String, uri: String): Namespace = Namespace(prefix, uri)
   def namespaceInfo(prefix: String, uri: String): NodeInfo = Wrapper.wrap(namespace(prefix, uri))
 
   // Parse the given qualified name and return the separated prefix and local name

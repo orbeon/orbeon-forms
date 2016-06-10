@@ -9,7 +9,5 @@ class ConcreteComment(var text: String) extends AbstractNode with WithParent wit
 
   def accept(visitor: Visitor) = visitor.visit(this)
 
-  override def toString: String = {
-    super.toString + " [Comment: \"" + getText + "\"]"
-  }
+  override def toString = s"""Comment("$text")"""
 }

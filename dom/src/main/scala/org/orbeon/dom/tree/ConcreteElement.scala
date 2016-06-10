@@ -468,7 +468,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def addNamespace(prefix: String, uri: String): Element = {
-    val node = DocumentFactory.createNamespace(prefix, uri)
+    val node = Namespace(prefix, uri)
     addNewNode(node)
     this
   }

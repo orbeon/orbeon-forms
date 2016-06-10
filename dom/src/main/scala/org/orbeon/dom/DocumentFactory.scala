@@ -24,8 +24,6 @@ object DocumentFactory {
     e
   }
 
-  def createNamespace(prefix: String, uri: String)         = Namespace(prefix, uri)
-
   def createQName(localName: String, namespace: Namespace) = cache.get(localName, namespace)
   def createQName(localName: String)                       = cache.get(localName)
   def createQName(qualifiedName: String, uri: String)      = cache.get(qualifiedName, uri)

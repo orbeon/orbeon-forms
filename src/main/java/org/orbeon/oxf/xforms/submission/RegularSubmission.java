@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.http.HttpMethod$;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -53,7 +54,7 @@ public class RegularSubmission extends BaseSubmission {
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
             Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
                 absoluteResolvedURL.getScheme(),
-                p.actualHttpMethod,
+                HttpMethod$.MODULE$.getOrElseThrow(p.actualHttpMethod),
                 p2.credentials != null,
                 sp.actualRequestMediatype(),
                 p2.encoding,

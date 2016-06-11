@@ -17,6 +17,7 @@ import java.net.URI
 
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
@@ -170,13 +171,13 @@ trait FormRunnerPersistence {
     )
 
     val cxr = Connection(
-      httpMethodUpper = "GET",
-      url             = url,
-      credentials     = None,
-      content         = None,
-      headers         = headers,
-      loadState       = true,
-      logBody         = false
+      method      = GET,
+      url         = url,
+      credentials = None,
+      content     = None,
+      headers     = headers,
+      loadState   = true,
+      logBody     = false
     ).connect(
       saveState = true
     )

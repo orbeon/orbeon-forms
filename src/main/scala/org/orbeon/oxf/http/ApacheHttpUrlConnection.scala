@@ -72,7 +72,8 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
           }
         }
 
-        val methodName = _method getOrElse "GET" toUpperCase
+        val methodName = _method getOrElse "GET"
+        val method     = HttpMethod.getOrElseThrow(methodName)
         val body       = _os map (_.toByteArray) map (new ByteArrayInputStream(_))
         val bodyLength = _os map (_.size.toLong)
 
@@ -81,7 +82,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
             url         = url.toExternalForm,
             credentials = credentialsFromURL(url),
             cookieStore = new BasicCookieStore,
-            methodUpper = methodName,
+            method      = method,
             headers     = _requestHeaders mapValues (_.toList) toMap,
             content     = body map (StreamedContent(_, Option(getRequestProperty(Headers.ContentType)), bodyLength, None))
           )

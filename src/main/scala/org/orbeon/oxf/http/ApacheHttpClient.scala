@@ -30,15 +30,12 @@ import org.apache.http.conn.ssl.SSLSocketFactory
 import org.apache.http.entity.{ContentType, InputStreamEntity}
 import org.apache.http.impl.auth.{BasicScheme, NTLMEngine, NTLMEngineException, NTLMScheme}
 import org.apache.http.impl.client.{BasicCredentialsProvider, DefaultHttpClient}
-import org.apache.http.impl.conn.{PoolingHttpClientConnectionManager, PoolingClientConnectionManager}
+import org.apache.http.impl.conn.PoolingClientConnectionManager
 import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
-import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.ScalaUtils._
-
-import scala.collection.immutable.Seq
 
 class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
@@ -48,7 +45,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     url         : String,
     credentials : Option[Credentials],
     cookieStore : CookieStore,
-    methodUpper : String,
+    method      : HttpMethod,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent]
   ): HttpResponse = {
@@ -96,15 +93,14 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     httpClient.setCookieStore(cookieStore)
 
     val requestMethod =
-      methodUpper.toLowerCase match {
-        case "get"     ⇒ new HttpGet(uri)
-        case "post"    ⇒ new HttpPost(uri)
-        case "head"    ⇒ new HttpHead(uri)
-        case "options" ⇒ new HttpOptions(uri)
-        case "put"     ⇒ new HttpPut(uri)
-        case "delete"  ⇒ new HttpDelete(uri)
-        case "trace"   ⇒ new HttpTrace(uri)
-        case _         ⇒ throw new ProtocolException(s"Method $methodUpper is not supported")
+      method match {
+        case GET     ⇒ new HttpGet(uri)
+        case POST    ⇒ new HttpPost(uri)
+        case HEAD    ⇒ new HttpHead(uri)
+        case OPTIONS ⇒ new HttpOptions(uri)
+        case PUT     ⇒ new HttpPut(uri)
+        case DELETE  ⇒ new HttpDelete(uri)
+        case TRACE   ⇒ new HttpTrace(uri)
       }
 
     val skipAuthorizationHeader = credentials.isDefined
@@ -136,7 +132,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
         val is =
           content map (_.inputStream) getOrElse
-          (throw new IllegalArgumentException(s"No request content provided for method$methodUpper"))
+          (throw new IllegalArgumentException(s"No request content provided for method ${method.name}"))
 
         val contentLength =
           content flatMap (_.contentLength) filter (_ >= 0L)

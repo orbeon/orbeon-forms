@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.StreamedContent
+import org.orbeon.oxf.http.{GET, POST, StreamedContent}
 
 import collection.JavaConverters._
 import org.junit.Test
@@ -27,6 +27,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.webapp.WebAppContext
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
+
 import collection.mutable
 
 class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
@@ -61,7 +62,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     val headers =
       Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
         scheme            = "http",
-        httpMethodUpper   = "GET",
+        method            = GET,
         hasCredentials    = false,
         mediatype         = null,
         encodingForSOAP   = "UTF-8",
@@ -76,7 +77,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         incomingRequest         = externalContext.getRequest,
         contextPath             = "/orbeon",
         pathQuery               = "/foo/bar",
-        methodUpper             = "GET",
+        method                  = GET,
         headersMaybeCapitalized = headers,
         content                 = None
       )
@@ -102,21 +103,21 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     val messageBody = "name1=value1b&name1=value1c&name2=value2b".getBytes("utf-8")
 
     // POST configuration
-    val method = "POST"
+    val method = POST
     val bodyMediaType = "application/x-www-form-urlencoded"
     val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
     val headers =
       Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
-        scheme            = "http",
-        httpMethodUpper   = method,
-        hasCredentials    = false,
-        mediatype         = bodyMediaType,
-        encodingForSOAP   = "UTF-8",
-        customHeaders     = explicitHeaders,
-        headersToForward  = Set(),
-        getHeader         = _ ⇒ None)(
-        logger            = ResourceManagerTestBase.newIndentedLogger
+        scheme           = "http",
+        method           = method,
+        hasCredentials   = false,
+        mediatype        = bodyMediaType,
+        encodingForSOAP  = "UTF-8",
+        customHeaders    = explicitHeaders,
+        headersToForward = Set(),
+        getHeader        = _ ⇒ None)(
+        logger           = ResourceManagerTestBase.newIndentedLogger
       )
 
     val wrapper =
@@ -124,7 +125,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         incomingRequest         = NetUtils.getExternalContext.getRequest,
         contextPath             = "/orbeon",
         pathQuery               = s"/foobar?$queryString",
-        methodUpper             = method,
+        method                  = method,
         headersMaybeCapitalized = headers,
         content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
       )

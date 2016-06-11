@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.submission
 
 import java.io.ByteArrayInputStream
 
-import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult}
 
 /**
@@ -52,15 +52,15 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll)
 
     val headers = Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
-      scheme            = "http",
-      httpMethodUpper   = p.actualHttpMethod,
-      hasCredentials    = p2.credentials != null,
-      mediatype         = sp.actualRequestMediatype,
-      encodingForSOAP   = p2.encoding,
-      customHeaders     = customHeaderNameValues,
-      headersToForward  = Connection.headersToForwardFromProperty,
-      getHeader         = containingDocument.headersGetter)(
-      logger            = getDetailsLogger(p, p2)
+      scheme           = "http",
+      method           = HttpMethod.getOrElseThrow(p.actualHttpMethod),
+      hasCredentials   = p2.credentials != null,
+      mediatype        = sp.actualRequestMediatype,
+      encodingForSOAP  = p2.encoding,
+      customHeaders    = customHeaderNameValues,
+      headersToForward = Connection.headersToForwardFromProperty,
+      getHeader        = containingDocument.headersGetter)(
+      logger           = getDetailsLogger(p, p2)
     )
 
     // Do as if we are receiving a regular XML response

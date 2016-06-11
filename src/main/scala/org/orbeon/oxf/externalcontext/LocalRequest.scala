@@ -16,8 +16,7 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
-import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.ScalaUtils._
@@ -37,12 +36,10 @@ class LocalRequest(
   incomingRequest         : Request,
   contextPath             : String,
   pathQuery               : String,
-  methodUpper             : String,
+  method                  : HttpMethod,
   headersMaybeCapitalized : Map[String, List[String]],
   content                 : Option[StreamedContent]
 ) extends Request {
-
-  require(StringUtils.isAllUpperCase(methodUpper))
 
   private val _contentLengthOpt = content flatMap (_.contentLength)
   private val _contentTypeOpt   = content flatMap (_.contentType)
@@ -57,7 +54,7 @@ class LocalRequest(
       ).flatten
 
     def bodyHeadersIterator =
-      if (Connection.requiresRequestBody(methodUpper)) {
+      if (Connection.requiresRequestBody(method)) {
         (_contentLengthOpt.iterator map (value ⇒ Headers.ContentLengthLower → List(value.toString))) ++
         (_contentTypeOpt.iterator   map (value ⇒ Headers.ContentTypeLower   → List(value)))
       } else
@@ -85,7 +82,7 @@ class LocalRequest(
     // NOTE: Remember, the servlet container does not help us decoding the body: the "other side" will just end up here
     // when asking for parameters.
     def bodyParameters =
-      if (methodUpper == "POST")
+      if (method == POST)
         content collect {
           case StreamedContent(is, Some("application/x-www-form-urlencoded"), _, _) ⇒
             useAndClose(is) { is ⇒
@@ -101,7 +98,7 @@ class LocalRequest(
 
   /* SUPPORTED: methods called by ExternalContextToHttpServletRequestWrapper */
 
-  def getMethod            = methodUpper
+  def getMethod            = method.name
   def getParameterMap      = _queryAndBodyParameters
   def getQueryString       = _queryString.orNull
   def getCharacterEncoding = null;//TODO? // not used by our code

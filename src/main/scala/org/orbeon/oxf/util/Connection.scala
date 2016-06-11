@@ -17,7 +17,6 @@ import java.net.URI
 import java.util.{Map ⇒ JMap}
 import javax.servlet.http.{Cookie, HttpServletRequest}
 
-import org.apache.commons.lang3.StringUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
@@ -49,18 +48,16 @@ import scala.util.control.NonFatal
  * - managing SOAP POST and GET a la XForms 1.1 (should this be here?)
  */
 class Connection(
-  httpMethod  : String,
-  url         : URI,
-  credentials : Option[Credentials],
-  content     : Option[StreamedContent],
-  headers     : Map[String, List[String]],
-  logBody     : Boolean)(implicit
-  logger      : IndentedLogger
+  method         : HttpMethod,
+  url            : URI,
+  credentials    : Option[Credentials],
+  content        : Option[StreamedContent],
+  headers        : Map[String, List[String]],
+  logBody        : Boolean)(implicit
+  logger         : IndentedLogger
 ) extends ConnectionState with Logging {
 
   import org.orbeon.oxf.util.Connection._
-
-  require(StringUtils.isAllUpperCase(httpMethod))
 
   // Open the connection. This sends request headers, request body, and reads status and response headers.
   def connect(saveState: Boolean): ConnectionResult = {
@@ -69,7 +66,7 @@ class Connection(
     val scheme    = url.getScheme
 
     try {
-      if (httpMethod == "GET" && SupportedNonHttpReadonlySchemes(scheme)) {
+      if (method == GET && SupportedNonHttpReadonlySchemes(scheme)) {
         // GET for supported but non-http: or https: schemes
 
         // Create URL connection object
@@ -140,7 +137,7 @@ class Connection(
             effectiveConnectionURL,
             credentials,
             cookieStore,
-            httpMethod,
+            method,
             cleanHeaders,
             content
           )
@@ -168,7 +165,7 @@ class Connection(
 
           debug("opening URL connection",
             List(
-              "method" → httpMethod,
+              "method" → method.name,
               "URL"    → connectionURI.toString
             ) ++ (cleanHeaders mapValues (_ mkString ",")))
         }
@@ -192,7 +189,7 @@ class Connection(
 
         connectionResult
 
-      } else if (httpMethod != "GET" && Set("file", "oxf")(scheme)) {
+      } else if (method != GET && Set("file", "oxf")(scheme)) {
         // Writing to file: and oxf: SHOULD be supported
         throw new OXFException("submission URL scheme not yet implemented: " + scheme)
       } else if (scheme == "mailto") {
@@ -289,20 +286,20 @@ object Connection extends Logging {
 
   // Create a new Connection
   def apply(
-    httpMethodUpper : String,
-    url             : URI,
-    credentials     : Option[Credentials],
-    content         : Option[StreamedContent],
-    headers         : Map[String, List[String]],
-    loadState       : Boolean,
-    logBody         : Boolean)(implicit
-    logger          : IndentedLogger
+    method      : HttpMethod,
+    url         : URI,
+    credentials : Option[Credentials],
+    content     : Option[StreamedContent],
+    headers     : Map[String, List[String]],
+    loadState   : Boolean,
+    logBody     : Boolean)(implicit
+    logger      : IndentedLogger
   ): Connection = {
 
-    require(! requiresRequestBody(httpMethodUpper) || content.isDefined)
+    require(! requiresRequestBody(method) || content.isDefined)
 
     val connection =
-      new Connection(httpMethodUpper, url, credentials, content, headers, logBody)
+      new Connection(method, url, credentials, content, headers, logBody)
 
     // Get connection state if possible
     if (loadState && isHTTPOrHTTPS(url.getScheme))
@@ -323,6 +320,8 @@ object Connection extends Logging {
     logger            : IndentedLogger
   ): Connection = {
 
+    val httpMethod = HttpMethod.getOrElseThrow(httpMethodUpper)
+
     val messageBody: Option[Array[Byte]] =
       if (requiresRequestBody(httpMethodUpper)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
@@ -330,14 +329,14 @@ object Connection extends Logging {
       (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
 
     apply(
-      httpMethodUpper = httpMethodUpper,
-      url             = url,
-      credentials     = Option(credentialsOrNull),
-      content         = content,
-      headers         = headers,
-      loadState       = loadState,
-      logBody         = logBody)(
-      logger          = logger
+      method      = httpMethod,
+      url         = url,
+      credentials = Option(credentialsOrNull),
+      content     = content,
+      headers     = headers,
+      loadState   = loadState,
+      logBody     = logBody)(
+      logger      = logger
     )
   }
 
@@ -369,6 +368,9 @@ object Connection extends Logging {
   // Whether the given method requires a request body
   def requiresRequestBody(httpMethodUpper: String) = Set("POST", "PUT")(httpMethodUpper)
 
+  private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT)
+  def requiresRequestBody(httpMethod: HttpMethod) = HttpMethodsWithRequestBody(httpMethod)
+
   private def schemeRequiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)
   private def isHTTPOrHTTPS(scheme: String)         = Set("http", "https")(scheme)
 
@@ -393,7 +395,7 @@ object Connection extends Logging {
     hasCredentials      : Boolean,
     customHeadersOrNull : JMap[String, Array[String]],
     headersToForward    : String,
-    getHeader        : String ⇒ Option[List[String]],
+    getHeader           : String ⇒ Option[List[String]],
     logger              : IndentedLogger
   ): Map[String, List[String]] =
     buildConnectionHeadersLowerIfNeeded(
@@ -407,15 +409,15 @@ object Connection extends Logging {
     )
 
   def buildConnectionHeadersLowerWithSOAPIfNeeded(
-    scheme            : String,
-    httpMethodUpper   : String,
-    hasCredentials    : Boolean,
-    mediatype         : String,
-    encodingForSOAP   : String,
-    customHeaders     : Map[String, List[String]],
-    headersToForward  : Set[String],
-    getHeader         : String ⇒ Option[List[String]])(implicit
-    logger            : IndentedLogger
+    scheme           : String,
+    method           : HttpMethod,
+    hasCredentials   : Boolean,
+    mediatype        : String,
+    encodingForSOAP  : String,
+    customHeaders    : Map[String, List[String]],
+    headersToForward : Set[String],
+    getHeader        : String ⇒ Option[List[String]])(implicit
+    logger           : IndentedLogger
   ): Map[String, List[String]] =
     if (schemeRequiresHeaders(scheme)) {
 
@@ -425,7 +427,7 @@ object Connection extends Logging {
 
         val headers = customHeaders.toMap // TODO: .toMap unneeded
 
-        if (requiresRequestBody(httpMethodUpper) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
+        if (requiresRequestBody(method) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
           headers + (ContentType → List(mediatype ensuring (_ ne null)))
         else
           headers
@@ -448,7 +450,7 @@ object Connection extends Logging {
 
       val soapHeadersLower =
         buildSOAPHeadersLowerIfNeeded(
-          httpMethodUpper,
+          method,
           soapMediatypeWithContentType,
           encodingForSOAP
         )
@@ -706,7 +708,7 @@ object Connection extends Logging {
       { session ⇒ "cookie" →  List(sessionCookieName + "=" + session.getId) }
 
   private def buildSOAPHeadersLowerIfNeeded(
-    httpMethodUpper           : String,
+    method                    : HttpMethod,
     mediatypeMaybeWithCharset : String,
     encoding                  : String)(implicit
     logger                    : IndentedLogger
@@ -727,8 +729,8 @@ object Connection extends Logging {
       "; charset=" + parameters.getOrElse("charset", encoding)
 
     val newHeaders =
-      httpMethodUpper match {
-        case "GET" if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
+      method match {
+        case GET if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
           // Set an Accept header
 
           val parameters = getContentTypeParameters(mediatypeMaybeWithCharset).asScala
@@ -737,7 +739,7 @@ object Connection extends Logging {
           // Accept header with optional charset
           List("accept" → List(acceptHeader))
 
-        case "POST" if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
+        case POST if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
           // Set Content-Type and optionally SOAPAction headers
 
           val parameters            = getContentTypeParameters(mediatypeMaybeWithCharset).asScala

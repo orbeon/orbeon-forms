@@ -18,6 +18,7 @@ import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session.APPLICATION_SCOPE
 import org.orbeon.oxf.pipeline.api.ExternalContext._
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
@@ -101,13 +102,13 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         try {
           val cxr =
             Connection(
-              httpMethodUpper = "GET",
-              url             = resource.uri,
-              credentials     = None,
-              content         = None,
-              headers         = resource.headers,
-              loadState       = true,
-              logBody         = false
+              method      = GET,
+              url         = resource.uri,
+              credentials = None,
+              content     = None,
+              headers     = resource.headers,
+              loadState   = true,
+              logBody     = false
             ).connect(
               saveState = true
             )

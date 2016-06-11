@@ -19,7 +19,7 @@ import java.net.URI
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{EmptyInputStream, StreamedContent}
+import org.orbeon.oxf.http.{EmptyInputStream, HttpMethod, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.properties.PropertySet
@@ -105,7 +105,7 @@ object Authorizer extends Logging {
         // do, there is the issue of the first incoming request which doesn't have incoming cookies. So at this
         // point, we just follow the header proxying method we use in other places and remove Cookie/Set-Cookie.
 
-        val method  = request.getMethod
+        val method  = HttpMethod.getOrElseThrow(request.getMethod)
         val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString))
         val headers = proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true)
 
@@ -121,13 +121,13 @@ object Authorizer extends Logging {
 
         val connection =
           Connection(
-            httpMethodUpper = method,
-            url             = newURL,
-            credentials     = None,
-            content         = content,
-            headers         = headers.toMap mapValues (_.toList),
-            loadState       = true,
-            logBody         = false
+            method      = method,
+            url         = newURL,
+            credentials = None,
+            content     = content,
+            headers     = headers.toMap mapValues (_.toList),
+            loadState   = true,
+            logBody     = false
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?

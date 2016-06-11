@@ -18,7 +18,7 @@ import java.net.URI
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -37,7 +37,7 @@ private object HttpRequest {
 
   private def request(
     path        : String,
-    method      : String,
+    method      : HttpMethod,
     version     : Version,
     body        : Option[Body],
     credentials : Option[Credentials])(implicit
@@ -87,26 +87,26 @@ private object HttpRequest {
       (StreamedContent.fromBytes(_, contentType))
 
     Connection(
-      httpMethodUpper = method,
-      url             = documentURL,
-      credentials     = None,
-      content         = content,
-      headers         = headers,
-      loadState       = true,
-      logBody         = false
+      method      = method,
+      url         = documentURL,
+      credentials = None,
+      content     = content,
+      headers     = headers,
+      loadState   = true,
+      logBody     = false
     ).connect(
       saveState = true
     )
   }
 
   def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, "PUT", version, Some(body), credentials))(_.statusCode)
+    useAndClose(request(url, PUT, version, Some(body), credentials))(_.statusCode)
 
   def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, "DELETE", version, None, credentials))(_.statusCode)
+    useAndClose(request(url, DELETE, version, None, credentials))(_.statusCode)
 
   def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
-    useAndClose(request(url, "GET", version, None, credentials)) { cxr ⇒
+    useAndClose(request(url, GET, version, None, credentials)) { cxr ⇒
 
       val statusCode = cxr.statusCode
       val headers    = cxr.headers

@@ -22,6 +22,7 @@ import com.lowagie.text.{Image, Rectangle}
 import com.lowagie.text.pdf._
 import org.orbeon.dom.Element
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
@@ -330,7 +331,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
           val cxr =
             Connection(
-              httpMethodUpper = "GET",
+              method          = GET,
               url             = url,
               credentials     = None,
               content         = None,

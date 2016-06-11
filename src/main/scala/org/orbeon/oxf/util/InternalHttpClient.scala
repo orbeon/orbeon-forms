@@ -32,7 +32,7 @@ object InternalHttpClient extends HttpClient {
     url         : String,
     credentials : Option[Credentials], // ignored
     cookieStore : CookieStore,         // ignored
-    methodUpper : String,
+    method      : HttpMethod,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent]
   ): HttpResponse = {
@@ -54,7 +54,7 @@ object InternalHttpClient extends HttpClient {
     @tailrec
     def processRedirects(
       pathQuery : String,
-      method    : String,
+      method    : HttpMethod,
       headers   : Map[String, List[String]],
       content   : Option[StreamedContent]
     ): LocalResponse = {
@@ -64,7 +64,7 @@ object InternalHttpClient extends HttpClient {
           incomingRequest         = incomingRequest,
           contextPath             = incomingRequest.getContextPath,
           pathQuery               = pathQuery,
-          methodUpper             = method,
+          method                  = method,
           headersMaybeCapitalized = headers,
           content                 = content
         )
@@ -96,12 +96,12 @@ object InternalHttpClient extends HttpClient {
       // Content-Type and Content-Length, must not be provided upon redirect. Possibly, only headers  coming from
       // the incoming request should be passed, minus content headers.
       response.serverSideRedirect match {
-        case Some(location) ⇒ processRedirects(location, "GET", Map.empty, None)
+        case Some(location) ⇒ processRedirects(location, GET, Map.empty, None)
         case None           ⇒ response
       }
     }
 
-    val response = processRedirects(url, methodUpper, headers, content)
+    val response = processRedirects(url, method, headers, content)
 
     new HttpResponse {
       lazy val statusCode   = response.statusCode

@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{Headers, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Response}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
@@ -137,13 +137,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         getHeader        = Connection.getHeaderFromRequest(request)
       )
 
-    val method = request.getMethod
+    val method = HttpMethod.getOrElseThrow(request.getMethod)
 
-    if (! Set("GET", "DELETE", "PUT", "POST")(method))
+    if (! Set[HttpMethod](GET, DELETE, PUT, POST)(method))
       throw new OXFException(s"Unsupported method: $method")
 
     val requestContent =
-      Set("PUT", "POST")(method) option {
+      Connection.requiresRequestBody(method) option {
         // Ask the request generator first, as the body might have been read already
         // Q: Could this be handled automatically in ExternalContext?
         val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
@@ -160,13 +160,13 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       }
 
     Connection(
-      httpMethodUpper = method,
-      url             = outgoingURL,
-      credentials     = None,
-      content         = requestContent,
-      headers         = allHeaders,
-      loadState       = true,
-      logBody         = false
+      method      = method,
+      url         = outgoingURL,
+      credentials = None,
+      content     = requestContent,
+      headers     = allHeaders,
+      loadState   = true,
+      logBody     = false
     ).connect(
       saveState = true
     )

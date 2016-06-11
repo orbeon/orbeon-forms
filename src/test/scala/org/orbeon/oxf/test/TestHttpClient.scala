@@ -17,7 +17,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
-import org.orbeon.oxf.http.{Headers, HttpResponse, StreamedContent}
+import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
@@ -64,7 +64,7 @@ object TestHttpClient {
 
   def connect(
     url         : String,
-    methodUpper : String,
+    method      : HttpMethod,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent],
     username    : Option[String] = None,
@@ -153,7 +153,7 @@ object TestHttpClient {
             incomingRequest         = baseRequest,
             contextPath             = ServerState.ContextPath,
             pathQuery               = url,
-            methodUpper             = methodUpper,
+            method                  = method,
             headersMaybeCapitalized = headers,
             content                 = content
           )

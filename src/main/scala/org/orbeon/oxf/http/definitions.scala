@@ -195,12 +195,32 @@ trait HttpResponse {
   def disconnect() : Unit
 }
 
+sealed trait HttpMethod { def name: String }
+
+case object GET     extends { val name = "GET"     } with HttpMethod
+case object POST    extends { val name = "POST"    } with HttpMethod
+case object PUT     extends { val name = "PUT"     } with HttpMethod
+case object DELETE  extends { val name = "DELETE"  } with HttpMethod
+case object HEAD    extends { val name = "HEAD"    } with HttpMethod
+case object OPTIONS extends { val name = "OPTIONS" } with HttpMethod
+case object TRACE   extends { val name = "TRACE"   } with HttpMethod
+
+object HttpMethod {
+
+  private val AllMethods    = List(GET, POST, PUT, DELETE, HEAD, OPTIONS, TRACE)
+  private val MethodsByName = AllMethods map (m ⇒ m.name → m) toMap
+
+  def find(name: String): Option[HttpMethod] = MethodsByName.get(name.toUpperCase)
+
+  def getOrElseThrow(name: String): HttpMethod = find(name) getOrElse (throw new IllegalArgumentException(name))
+}
+
 trait HttpClient {
   def connect(
     url         : String,
     credentials : Option[Credentials],
     cookieStore : org.apache.http.client.CookieStore,
-    methodUpper : String,
+    method      : HttpMethod,
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent]
   ): HttpResponse

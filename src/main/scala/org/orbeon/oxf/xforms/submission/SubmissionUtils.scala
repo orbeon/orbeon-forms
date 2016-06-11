@@ -18,6 +18,7 @@ import java.net.URI
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http
+import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsModel
@@ -55,7 +56,7 @@ object SubmissionUtils {
     val url = new URI(resolvedURL)
 
     Connection(
-      httpMethodUpper = "GET",
+      method          = GET,
       url             = url,
       credentials     = None,
       content         = None,

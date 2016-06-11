@@ -749,11 +749,12 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         if (!(other instanceof NodeWrapper)) {
             return false;
         }
-        NodeWrapper ow = (NodeWrapper) other;
         if (node instanceof Namespace) {
-            return getLocalPart().equals(ow.getLocalPart()) && getParent().isSameNodeInfo(ow.getParent());
+            throw new UnsupportedOperationException("Cannot determine identity of Namespace node");
+        } else {
+            // This check that `this.node eq other.node`
+            return node == ((NodeWrapper) other).node;
         }
-        return node.equals(ow.node);
     }
 
     public Configuration getConfiguration() {

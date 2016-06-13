@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
-import org.orbeon.oxf.xforms.script.ScriptInterpreter;
 import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
@@ -74,9 +73,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
     // Asynchronous submission manager
     private AsynchronousSubmissionManager asynchronousSubmissionManager;
-
-    // Interpreter for JavaScript, etc.
-    private ScriptInterpreter scriptInterpreter;
 
     // A document refers to the static state and controls
     private final XFormsStaticState staticState;
@@ -777,12 +773,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             if (addPollEvent)
                 manager.addClientDelayEventIfNeeded();
         }
-    }
-
-    public ScriptInterpreter getScriptInterpreter() {
-        if (scriptInterpreter == null)
-            scriptInterpreter = new ScriptInterpreter(this);
-        return scriptInterpreter;
     }
 
     private void createControlsAndModels() {

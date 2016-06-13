@@ -30,7 +30,10 @@ object RelationalUtils extends Logging {
   implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.relational"))
 
   def withConnection[T](thunk: Connection ⇒ T): T =
-    useAndClose(getConnection(getDataSource(getDataSourceNameFromHeaders))) { connection ⇒
+    withConnection(getDataSourceNameFromHeaders)(thunk)
+
+  def withConnection[T](datasourceName: String)(thunk: Connection ⇒ T): T =
+    useAndClose(getConnection(getDataSource(datasourceName))) { connection ⇒
       try {
         val result = withDebug("executing block with connection")(thunk(connection))
         debug("about to commit")

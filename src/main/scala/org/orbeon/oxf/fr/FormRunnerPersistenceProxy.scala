@@ -228,12 +228,12 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     response : Response
   ): Unit = {
     getProviders(usableFor = FormRunner.Data)
-        .filter  (provider ⇒ Index.ProvidersWithIndexSupport.map(_.token).contains(provider))
-        .map     (FormRunner.getPersistenceURLHeadersFromProvider)
-        .foreach { case (baseURI, headers) ⇒
-          val serviceURI = baseURI + "/reindex"
-          proxyRequest(request, serviceURI, headers, response)
-        }
+      .filter  (provider ⇒ Index.ProvidersWithIndexSupport.map(_.name).contains(provider))
+      .map     (FormRunner.getPersistenceURLHeadersFromProvider)
+      .foreach { case (baseURI, headers) ⇒
+        val serviceURI = baseURI + "/reindex"
+        proxyRequest(request, serviceURI, headers, response)
+      }
   }
 
   // Get all providers that can be used either for form data or for form definitions

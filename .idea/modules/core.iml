@@ -165,6 +165,8 @@
           <root url="jar://$MODULE_DIR$/../../lib/sqljdbc4.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/tagsoup-1.2.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/tomcat-5_5-naming-factory-dbcp.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tomcat-7.0.68-catalina.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tomcat-7.0.68-juli.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/typesafe-config-2.10.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/tyrex-1.0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/xdb.jar!/" />

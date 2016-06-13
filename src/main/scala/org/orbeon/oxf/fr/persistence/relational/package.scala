@@ -15,18 +15,18 @@ package org.orbeon.oxf.fr.persistence
 
 package object relational {
 
-  sealed trait Provider    extends Product with Serializable { val token: String }
+  sealed trait Provider    extends Product with Serializable { val name: String }
 
-  case object  Oracle      extends Provider { val token = "oracle"     }
-  case object  MySQL       extends Provider { val token = "mysql"      }
-  case object  SQLServer   extends Provider { val token = "sqlserver"  }
-  case object  PostgreSQL  extends Provider { val token = "postgresql" }
-  case object  DB2         extends Provider { val token = "db2"        }
+  case object  Oracle      extends Provider { val name = "oracle"     }
+  case object  MySQL       extends Provider { val name = "mysql"      }
+  case object  SQLServer   extends Provider { val name = "sqlserver"  }
+  case object  PostgreSQL  extends Provider { val name = "postgresql" }
+  case object  DB2         extends Provider { val name = "db2"        }
 
   val AllProviders = List(Oracle, MySQL, SQLServer, PostgreSQL, DB2)
 
   def providerFromToken(token: String): Provider = {
-    val providerOpt = AllProviders.find(_.token == token)
+    val providerOpt = AllProviders.find(_.name == token)
     providerOpt.getOrElse(throw new IllegalStateException)
   }
 }

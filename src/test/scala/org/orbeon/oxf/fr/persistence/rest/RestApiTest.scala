@@ -43,13 +43,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   val AllOperations = Set("create", "read", "update", "delete")
 
-  private def crudURLPrefix(provider: Provider) = s"crud/${provider.token}/my-form/"
-  private def metadataURL(provider: Provider) = s"form/${provider.token}/my-form"
+  private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"
+  private def metadataURL(provider: Provider) = s"form/${provider.name}/my-form"
 
   private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T): Unit = {
     withDebug(message) {
       ProvidersTestedAutomatically.foreach { provider ⇒
-        withDebug("on database", List("provider" → provider.token)) {
+        withDebug("on database", List("provider" → provider.name)) {
           Connect.asTomcat(provider) { connection ⇒
             val statement = connection.createStatement
             try {

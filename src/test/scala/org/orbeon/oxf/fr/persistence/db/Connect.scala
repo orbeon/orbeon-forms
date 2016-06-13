@@ -15,31 +15,21 @@ package org.orbeon.oxf.fr.persistence.db
 
 import java.sql.{Connection, DriverManager}
 
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.DataSourceSupport
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
 
-  val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
-  def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                                 , block)
-  def asDDL   [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(s"orbeon_${buildNumber}_ddl")   , block)
-  def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(s"orbeon_${buildNumber}_tomcat"), block)
+  import DataSourceSupport._
+
+  def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                           , block)
+  def asDDL   [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(ddlUserFromBuildNumber)   , block)
+  def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(tomcatUserFromBuildNumber), block)
 
   private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
-    val url = provider match {
-      case Oracle     ⇒ System.getenv("ORACLE_URL")
-      case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
-      case SQLServer  ⇒ System.getenv("SQLSERVER_URL")  + user.map(";databaseName=" + _).getOrElse("")
-      case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("/")
-      case DB2        ⇒ System.getenv("DB2_URL")
-    }
-    val userName = provider match {
-      case Oracle ⇒ user.getOrElse("orbeon")
-      case _      ⇒ "orbeon"
-    }
-    val password = System.getenv("RDS_PASSWORD")
-    val driver = (provider == PostgreSQL).option(Class.forName("org.postgresql.Driver"))
-    useAndClose(DriverManager.getConnection(url, userName, password))(block)
+    val (url, username, password) = connectionDetailsFromEnv(provider, user)
+    useAndClose(DriverManager.getConnection(url, username, password))(block)
   }
 
   def getTableNames(provider: Provider, connection: Connection): List[String] = {
@@ -59,7 +49,7 @@ private[persistence] object Connect {
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""
       case provider ⇒
-        throw new IllegalArgumentException(s"unsupported provider `${provider.token}`")
+        throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
     }
     val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
     val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList

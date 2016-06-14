@@ -15,18 +15,16 @@ package org.orbeon.oxf.xforms.action
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{Logging, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.Item
-import org.orbeon.oxf.xml.Dom4j
-import collection.JavaConverters._
+
+import scala.collection.JavaConverters._
 
 abstract class XFormsAction extends Logging {
 
@@ -136,11 +134,11 @@ object XFormsAction {
                   xpathString        = value,
                   namespaceMapping   = actionInterpreter.getNamespaceMappings(element),
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
-                  functionLibrary    = XFormsContainingDocument.getFunctionLibrary,
+                  functionLibrary    = actionInterpreter.containingDocument.getFunctionLibrary,
                   functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
                   baseURI            = null,
                   locationData       = element.getData.asInstanceOf[LocationData],
-                  reporter           = actionInterpreter.containingDocument().getRequestStats.addXPathStat
+                  reporter           = actionInterpreter.containingDocument.getRequestStats.addXPathStat
                 ).asScala
               )
 

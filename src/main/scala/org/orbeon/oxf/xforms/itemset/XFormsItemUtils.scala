@@ -294,7 +294,7 @@ object XFormsItemUtils {
                         xpathString        = attributeValue,
                         namespaceMapping   = container.getNamespaceMappings(itemChoiceItemsetElem),
                         variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
-                        functionLibrary    = XFormsContainingDocument.getFunctionLibrary,
+                        functionLibrary    = container.getContainingDocument.getFunctionLibrary,
                         functionContext    = contextStack.getFunctionContext(elemEffectiveId),
                         baseURI            = null,
                         locationData       = itemChoiceItemsetElem.getData.asInstanceOf[LocationData],

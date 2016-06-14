@@ -300,7 +300,7 @@ public class XFormsActionInterpreter {
         final String result = XPathCache.evaluateAsString(
                 nodeset, position,
                 xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentBindingContext().getInScopeVariables(),
-                XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
+                _containingDocument.getFunctionLibrary(), functionContext, null,
                 (LocationData) actionElement.getData(),
                 containingDocument().getRequestStats().getReporter());
 
@@ -315,7 +315,7 @@ public class XFormsActionInterpreter {
         return XPathCache.evaluateKeepItems(
                 nodeset, position,
                 xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentBindingContext().getInScopeVariables(),
-                XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
+                _containingDocument.getFunctionLibrary(), functionContext, null,
                 (LocationData) actionElement.getData(),
                 containingDocument().getRequestStats().getReporter());
     }
@@ -354,7 +354,7 @@ public class XFormsActionInterpreter {
                 attributeValue,
                 namespaceMapping,
                 _actionXPathContext.getCurrentBindingContext().getInScopeVariables(),
-                XFormsContainingDocument.getFunctionLibrary(),
+                _containingDocument.getFunctionLibrary(),
                 functionContext,
                 null,
                 locationData,

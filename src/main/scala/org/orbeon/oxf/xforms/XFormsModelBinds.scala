@@ -633,7 +633,12 @@ trait ValidationBindOps extends Logging {
           // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
           val namespaceElement = XML.unsafeUnwrapElement(namespaceNodeInfo)
           val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement))
-          isOptionalAndEmpty || XPath.isXPath2Expression(nodeValue, namespaceMapping, staticBind.locationData)
+          isOptionalAndEmpty || XPath.isXPath2Expression(
+            nodeValue,
+            namespaceMapping,
+            containingDocument.getFunctionLibrary,
+            staticBind.locationData
+          )
         } else {
           // This means that we are bound to a node which is not an element and which does not have a
           // parent element. This could be a detached attribute, or an element node, etc. Unsure if we

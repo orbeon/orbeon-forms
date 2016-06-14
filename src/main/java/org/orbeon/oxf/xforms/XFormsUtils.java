@@ -305,13 +305,18 @@ public class XFormsUtils {
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     String tempResult;
                     try {
-                            tempResult = XPathCache.evaluateAsString(
-                                currentNodeset, currentBindingContext.position(),
-                                valueAttribute, container.getNamespaceMappings(childElement),
-                                contextStack.getCurrentBindingContext().getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                contextStack.getFunctionContext(sourceEffectiveId), null,
-                                (LocationData) childElement.getData(),
-                                container.getContainingDocument().getRequestStats().getReporter());
+                        tempResult = XPathCache.evaluateAsString(
+                            currentNodeset,
+                            currentBindingContext.position(),
+                            valueAttribute,
+                            container.getNamespaceMappings(childElement),
+                            contextStack.getCurrentBindingContext().getInScopeVariables(),
+                            container.getContainingDocument().getFunctionLibrary(),
+                            contextStack.getFunctionContext(sourceEffectiveId),
+                            null,
+                            (LocationData) childElement.getData(),
+                            container.getContainingDocument().getRequestStats().getReporter()
+                        );
                     } catch (Exception e) {
                         XFormsError.handleNonFatalXPathError(container, e);
                         tempResult = "";

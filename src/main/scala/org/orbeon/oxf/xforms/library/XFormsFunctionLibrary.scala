@@ -50,9 +50,6 @@ object XFormsFunctionLibrary extends {
   with EXFormsFunctions
   with XSLTFunctions {
 
-  // For Java callers
-  def instance = this
-
   // Saxon's last() function doesn't do what we need
   Fun("last", classOf[Last], op = 0, min = 0, INTEGER, EXACTLY_ONE)
 

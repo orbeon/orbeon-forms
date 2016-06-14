@@ -58,7 +58,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
   def writeAlertsAndValidationsAsXML(
     inDoc            : NodeInfo,
     controlName      : String,
-    newAppearance       : String,
+    newAppearance    : String,
     defaultAlertElem : NodeInfo,
     validationElems  : Array[NodeInfo]
   ): Unit = {
@@ -476,7 +476,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     def toXML(forLang: String): sx.Elem = {
 
-      val analyzed = ValidationFunction.analyzeKnownConstraint(expression)
+      val analyzed = ValidationFunction.analyzeKnownConstraint(
+        expression,
+        containingDocument.getFunctionLibrary
+      )
 
       <validation
         type={analyzed map (_._1) getOrElse "formula"}

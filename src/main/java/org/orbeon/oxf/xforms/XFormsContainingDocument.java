@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
@@ -60,7 +59,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     private SAXStore lastAjaxResponse; // last Ajax response for retry feature
 
     // Global XForms function library
-    private static FunctionLibrary functionLibrary = XFormsFunctionLibrary.instance();
+    private FunctionLibrary functionLibrary = null;
 
     // Whether this document is currently being initialized
     private boolean initializing;
@@ -99,7 +98,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     /**
      * Return the global function library.
      */
-    public static FunctionLibrary getFunctionLibrary() {
+    public FunctionLibrary getFunctionLibrary() {
         return functionLibrary;
     }
 
@@ -122,6 +121,9 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         // Initialize request information
         initializeRequestInformation();
         initializePathMatchers();
+
+        // Initialize function library
+        this.functionLibrary = staticState.functionLibrary();
 
         indentedLogger().startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
         {
@@ -224,6 +226,8 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
             this.xpathDependencies = Version.instance().createUIDependencies(this);
+
+            this.functionLibrary = staticState.functionLibrary();
         }
 
         // 2. Restore the dynamic state

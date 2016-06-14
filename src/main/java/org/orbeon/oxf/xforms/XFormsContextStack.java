@@ -478,7 +478,7 @@ public class XFormsContextStack {
                                         ref != null ? ref : nodeset,
                                         bindingElementNamespaceMapping,
                                         evaluationContextBinding.getInScopeVariables(),
-                                        XFormsContainingDocument.getFunctionLibrary(),
+                                        containingDocument.getFunctionLibrary(),
                                         functionContext,
                                         null,
                                         locationData,

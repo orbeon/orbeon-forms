@@ -9,7 +9,6 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
 import org.orbeon.oxf.{util ⇒ u}
@@ -79,7 +78,7 @@ class StaticBind(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,
-        functionLibrary  = XFormsFunctionLibrary,
+        functionLibrary  = staticStateContext.partAnalysis.staticState.functionLibrary,
         avt              = false
       )
     }

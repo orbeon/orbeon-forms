@@ -17,6 +17,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import state.AnnotatedTemplate
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.saxon.functions.FunctionLibrary
 
 trait XFormsStaticState {
 
@@ -36,7 +37,8 @@ trait XFormsStaticState {
 
   def isXPathAnalysis: Boolean
   def isCalculateDependencies: Boolean
-  
+
+  def functionLibrary: FunctionLibrary
   def sanitizeInput: String ⇒ String
 
   def staticProperty(name: String): Any

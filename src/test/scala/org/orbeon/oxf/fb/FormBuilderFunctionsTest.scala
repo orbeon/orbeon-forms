@@ -18,8 +18,9 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.dom.{DocumentWrapper, NodeWrapper}
@@ -508,18 +509,19 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
     import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction.analyzeKnownConstraint
 
-    implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
+    val Library = XFormsFunctionLibrary
+    val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
-    assert(Some("max-length"   → Some("5")) === analyzeKnownConstraint("xxf:max-length(5)")(Logger))
-    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length(5)")(Logger))
-    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length('5')")(Logger))
-    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("(xxf:min-length(5))")(Logger))
-    assert(Some("non-negative" → None)      === analyzeKnownConstraint("(xxf:non-negative())")(Logger))
-    assert(Some("negative"     → None)      === analyzeKnownConstraint("(xxf:negative())")(Logger))
-    assert(Some("non-positive" → None)      === analyzeKnownConstraint("(xxf:non-positive())")(Logger))
-    assert(Some("positive"     → None)      === analyzeKnownConstraint("(xxf:positive())")(Logger))
-    assert(None                             === analyzeKnownConstraint("xxf:min-length(foo)")(Logger))
-    assert(None                             === analyzeKnownConstraint("xxf:foobar(5)")(Logger))
+    assert(Some("max-length"   → Some("5")) === analyzeKnownConstraint("xxf:max-length(5)",    Library)(Logger))
+    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length(5)",    Library)(Logger))
+    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("xxf:min-length('5')",  Library)(Logger))
+    assert(Some("min-length"   → Some("5")) === analyzeKnownConstraint("(xxf:min-length(5))",  Library)(Logger))
+    assert(Some("non-negative" → None)      === analyzeKnownConstraint("(xxf:non-negative())", Library)(Logger))
+    assert(Some("negative"     → None)      === analyzeKnownConstraint("(xxf:negative())",     Library)(Logger))
+    assert(Some("non-positive" → None)      === analyzeKnownConstraint("(xxf:non-positive())", Library)(Logger))
+    assert(Some("positive"     → None)      === analyzeKnownConstraint("(xxf:positive())",     Library)(Logger))
+    assert(None                             === analyzeKnownConstraint("xxf:min-length(foo)",  Library)(Logger))
+    assert(None                             === analyzeKnownConstraint("xxf:foobar(5)",        Library)(Logger))
 
   }
 

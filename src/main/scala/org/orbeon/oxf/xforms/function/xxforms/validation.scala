@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext}
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.value._
 
 import scala.collection.JavaConverters._
@@ -72,6 +72,7 @@ trait ValidationFunction extends XFormsFunction {
   }
 }
 
+// NOTE: This should probably be scope in the Form Builder module.
 object ValidationFunction {
 
   private val BasicNamespaceMapping =
@@ -82,7 +83,11 @@ object ValidationFunction {
       XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI
     ).asJava)
 
-  def analyzeKnownConstraint(xpathString: String)(implicit logger: IndentedLogger): Option[(String, Option[String])] = {
+  def analyzeKnownConstraint(
+    xpathString     : String,
+    functionLibrary : FunctionLibrary)(implicit
+    logger          : IndentedLogger
+  ): Option[(String, Option[String])] = {
 
     def tryCompile =
       Try(
@@ -90,7 +95,7 @@ object ValidationFunction {
           staticContext = new ShareableXPathStaticContext(
             XPath.GlobalConfiguration,
             BasicNamespaceMapping, // TODO: use node namespaces
-            XFormsFunctionLibrary
+            functionLibrary
           ),
           xpathString   = xpathString
         )

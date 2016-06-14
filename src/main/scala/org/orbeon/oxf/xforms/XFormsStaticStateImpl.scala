@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.{List ⇒ JList}
-
-import org.orbeon.dom.{Document, Element}
+import org.orbeon.dom.Document
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -29,12 +27,14 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
+import org.orbeon.oxf.xml.{XMLReceiver, _}
 import org.orbeon.saxon.dom.DocumentWrapper
+import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 class XFormsStaticStateImpl(
   val encodedState        : String,
@@ -61,12 +61,43 @@ class XFormsStaticStateImpl(
   def toXML(helper: XMLReceiverHelper) = topLevelPart.toXML(helper)
 
   // Properties
+  // These are `lazy val`s because they depend on the default model being found, which is done when
+  // the `PartAnalysisImpl` is created above. Yes, this is tricky and not ideal.
   lazy val allowedExternalEvents   = stringOptionToSet(Option(staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY)))
   lazy val isHTMLDocument          = staticStateDocument.isHTMLDocument
   lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),         P.XPATH_ANALYSIS_PROPERTY)
   lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CALCULATE_ANALYSIS_PROPERTY), P.CALCULATE_ANALYSIS_PROPERTY)
 
   lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
+
+  // This is a bit tricky because during analysis, XPath expression require the function library. This means this
+  // property cannot use `nonDefaultPropertiesOnly` below, which collects all non-default properties and attempts to
+  // evaluates AVT properties, which themselves require finding the default model, which is not yet ready! So we
+  // use `staticStateDocument.nonDefaultProperties` instead.
+  lazy val functionLibrary: FunctionLibrary =
+    staticStateDocument.nonDefaultProperties.get(FUNCTION_LIBRARY_PROPERTY) flatMap trimAllToOpt match {
+      case Some(functionLibraryClassName) ⇒
+
+        def tryFromScalaObject: Try[AnyRef] = Try {
+          Class.forName(functionLibraryClassName + "$").getDeclaredField("MODULE$").get(null)
+        }
+
+        def fromJavaClass: AnyRef =
+          Class.forName(functionLibraryClassName).getDeclaredMethod("instance").invoke(null)
+
+        tryFromScalaObject getOrElse fromJavaClass match {
+          case library: FunctionLibrary ⇒
+            new FunctionLibraryList                         |!>
+              (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+              (_.addFunctionLibrary(library))
+          case _ ⇒
+            throw new ClassCastException(
+              s"property `$FUNCTION_LIBRARY_PROPERTY` does not refer to a FunctionLibrary with `$functionLibraryClassName`"
+            )
+        }
+      case None ⇒
+        XFormsFunctionLibrary
+    }
 
   def isCacheDocument       = staticBooleanProperty(P.CACHE_DOCUMENT_PROPERTY)
   def isClientStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE

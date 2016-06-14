@@ -98,7 +98,7 @@ public class Variable {
                         variableValue = XPathCache.evaluateAsExtent(
                                 currentNodeset, bindingContext.position(),
                                 expression, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(scopeModelVariables),
-                                XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData(),
+                                containingDocument.getFunctionLibrary(), functionContext, null, getLocationData(),
                                 containingDocument.getRequestStats().getReporter());
                     } catch (Exception e) {
                         if (handleNonFatal) {

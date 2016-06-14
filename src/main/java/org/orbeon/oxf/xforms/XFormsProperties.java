@@ -29,6 +29,8 @@ public class XFormsProperties {
     public static final String XFORMS_PROPERTY_PREFIX = "oxf.xforms.";
 
     // Document properties
+    public static final String FUNCTION_LIBRARY_PROPERTY = "function-library";
+
     public static final String STATE_HANDLING_PROPERTY = "state-handling";
     public static final String STATE_HANDLING_SERVER_VALUE = "server";
     public static final String STATE_HANDLING_CLIENT_VALUE = "client";
@@ -168,6 +170,7 @@ public class XFormsProperties {
     }
 
     public static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
+            new PropertyDefinition(FUNCTION_LIBRARY_PROPERTY, "", false),
             new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false) {
                 @Override
                 public void validate(Object value, LocationData locationData) {

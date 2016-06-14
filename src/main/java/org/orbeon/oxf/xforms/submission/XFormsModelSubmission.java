@@ -758,7 +758,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         final boolean isHandlingClientGetAll;
 
         // XPath function library and namespace mappings
-        final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
+        final FunctionLibrary functionLibrary = containingDocument.getFunctionLibrary();
         final NamespaceMapping namespaceMapping = container.getNamespaceMappings(submissionElement);
 
         // XPath context

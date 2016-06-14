@@ -13,17 +13,16 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xforms.analysis.controls._
-import model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.dom.{QName, Element}
 import org.orbeon.oxf.xforms.action.XFormsActions
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.analysis.controls._
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.expr.StringLiteral
 
 object ControlAnalysisFactory {
@@ -191,7 +190,7 @@ object ControlAnalysisFactory {
           xpathString      = XPath.makeStringExpression(valueExpr),
           namespaceMapping = namespaceMapping,
           locationData     = locationData,
-          functionLibrary  = XFormsFunctionLibrary,
+          functionLibrary  = staticStateContext.partAnalysis.staticState.functionLibrary,
           avt              = false
         )
 

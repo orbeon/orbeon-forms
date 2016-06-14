@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer
 import org.orbeon.scaxon.XML._
 
@@ -43,7 +42,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
   // All XPath runs in the context of the main form instance's root element
   def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
-  def xpathFunctionLibrary = XFormsFunctionLibrary
+  def xpathFunctionLibrary = containingDocument.getFunctionLibrary
   def xpathFunctionContext = XPath.functionContext.orNull
 
   // NOTE: Clear the PDF/TIFF URL *before* the process, because if we clear it after, it will be already cleared

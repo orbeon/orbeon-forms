@@ -141,7 +141,7 @@ object PathMapXPathAnalysis {
         xpathString      = xpathString,
         namespaceMapping = namespaceMapping,
         locationData     = locationData,
-        functionLibrary  = XFormsContainingDocument.getFunctionLibrary,
+        functionLibrary  = partAnalysis.staticState.functionLibrary,
         avt              = avt
       )
 

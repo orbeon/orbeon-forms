@@ -56,14 +56,14 @@ trait ControlXPathSupport {
       else {
         try
           XPathCache.evaluateAsAvt(
-            contextNodeset, 
-            bc.position, 
-            attributeValue, 
+            contextNodeset,
+            bc.position,
+            attributeValue,
             getNamespaceMappings,
-            bc.getInScopeVariables, 
-            XFormsContainingDocument.getFunctionLibrary, 
+            bc.getInScopeVariables,
+            containingDocument.getFunctionLibrary,
             newFunctionContext,
-            null, 
+            null,
             getLocationData,
             containingDocument.getRequestStats.addXPathStat
           )
@@ -101,7 +101,7 @@ trait ControlXPathSupport {
             xpathString,
             getNamespaceMappings,
             bindingContext.getInScopeVariables,
-            XFormsContainingDocument.getFunctionLibrary,
+            containingDocument.getFunctionLibrary,
             newFunctionContext,
             null,
             getLocationData,
@@ -134,7 +134,7 @@ trait ControlXPathSupport {
               xpathString,
               namespaceMapping,
               variableToValueMap,
-              XFormsContainingDocument.getFunctionLibrary,
+              containingDocument.getFunctionLibrary,
               newFunctionContext,
               null,
               getLocationData,

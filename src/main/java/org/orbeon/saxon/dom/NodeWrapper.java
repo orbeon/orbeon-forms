@@ -239,14 +239,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             return "";
     }
 
-    /**
-     * Get the display name of this node. For elements and attributes this is [prefix:]localname.
-     * For unnamed nodes, it is an empty string.
-     *
-     * @return The display name of this node.
-     * For a node with no name, return an empty string.
-     */
-
     public String getDisplayName() {
         switch (getNodeKind()) {
             case Type.ELEMENT:
@@ -260,10 +252,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 return "";
         }
     }
-
-    /**
-     * Get the NodeInfo object representing the parent of this node
-     */
 
     public NodeInfo getParent() {
         if (parent == null) {
@@ -735,25 +723,25 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
 
     }
 
-    /**
-     * Determine whether this is the same node as another node.
-     * Note: a.isSameNodeInfo(b) if and only if generateId(a)==generateId(b).
-     * This method has the same semantics as isSameNode() in DOM Level 3, but
-     * works on Saxon NodeInfo objects rather than DOM Node objects.
-     *
-     * @param other the node to be compared with this node
-     * @return true if this NodeInfo object and the supplied NodeInfo object represent
-     * the same node in the tree.
-     */
     public boolean isSameNodeInfo(NodeInfo other) {
-        if (!(other instanceof NodeWrapper)) {
-            return false;
-        }
-        if (node instanceof Namespace) {
-            throw new UnsupportedOperationException("Cannot determine identity of Namespace node");
+        if (other instanceof NodeWrapper) {
+            final NodeWrapper otherWrapper = (NodeWrapper) other;
+            if (node instanceof Namespace) {
+                final Namespace thisNamespace = (Namespace) node;
+                if (otherWrapper.node instanceof Namespace) {
+                    final Namespace otherNamespace = (Namespace) otherWrapper.node;
+                    // `Namespace` doesn't have a parent, but when `Namespace` is wrapped within `NodeWrapper`
+                    // a parent is set on the wrapper, so we can compare the parents' identity.
+                    return thisNamespace.prefix().equals(otherNamespace.prefix()) && getParent().isSameNodeInfo(otherWrapper.getParent());
+                } else {
+                    return false;
+                }
+            } else {
+                // This check that `this.node eq other.node`
+                return node == ((NodeWrapper) other).node;
+            }
         } else {
-            // This check that `this.node eq other.node`
-            return node == ((NodeWrapper) other).node;
+            return false;
         }
     }
 
@@ -820,4 +808,3 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         return node.hashCode();
     }
 }
-

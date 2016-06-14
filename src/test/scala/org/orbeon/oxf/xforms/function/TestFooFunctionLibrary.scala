@@ -21,8 +21,6 @@ import org.orbeon.saxon.value.StringValue
 
 object TestFooFunctionLibrary extends OrbeonFunctionLibrary {
 
-  def instance = this
-
   Namespace("http://orbeon.org/oxf/xml/foo") {
     Fun("echo", classOf[FooBarFunction], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)

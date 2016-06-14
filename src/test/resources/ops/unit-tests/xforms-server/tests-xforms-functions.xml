@@ -2772,21 +2772,24 @@
                 </xh:body>
             </xh:html>
         </input>
-        <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-            <xxf:dynamic-state>
-                <dynamic-state>
-                    <controls>
-                        <control effective-id="my-repeat" index="1"/>
-                    </controls>
-                </dynamic-state>
-            </xxf:dynamic-state>
-            <xxf:action>
-                <xxf:control-values/>
-                <xxf:message level="modal">1</xxf:message>
-                <xxf:message level="modal">2</xxf:message>
-                <xxf:message level="modal">3</xxf:message>
-            </xxf:action>
-        </xxf:event-response>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">1</xxf:message>
+                    <xxf:message level="modal">2</xxf:message>
+                    <xxf:message level="modal">3</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
     <test description="#2812: xxf:function-library" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>

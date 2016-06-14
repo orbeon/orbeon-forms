@@ -43,7 +43,7 @@ object Controls {
       bindingContext,
       None,
       rootControl,
-      Seq()
+      Nil
     ) |!>
       logTreeIfNeeded("after building full tree")
   }

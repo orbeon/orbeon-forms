@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
@@ -794,23 +793,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
         // Initialize controls
         xformsControls.createControlTree( scala.Option.<scala.collection.immutable.Map<String, ControlState >>apply(null));
-    }
-
-    public Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();
-
-    public void startHandleEvent(XFormsEvent event) {
-        eventStack.push(event);
-    }
-
-    public void endHandleEvent() {
-        eventStack.pop();
-    }
-
-    /**
-     * Return the event being processed by the current event handler, null if no event is being processed.
-     */
-    public XFormsEvent getCurrentEvent() {
-        return (eventStack.size() == 0) ? null : eventStack.peek();
     }
 
     @Override

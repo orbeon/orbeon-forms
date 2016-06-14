@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventFactory, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -53,6 +53,7 @@ abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
     extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
     with ContainingDocumentLogging
     with ContainingDocumentMisc
+    with ContainingDocumentEvent
     with ContainingDocumentTemplate
     with ContainingDocumentProperties
     with ContainingDocumentRequestStats
@@ -82,6 +83,15 @@ trait ContainingDocumentMisc {
     _lastModelSequenceNumber += 1
     _lastModelSequenceNumber
   }
+}
+
+trait ContainingDocumentEvent {
+
+  private var eventStack: List[XFormsEvent] = Nil
+
+  def startHandleEvent(event: XFormsEvent): Unit                = eventStack ::= event
+  def endHandleEvent()                    : Unit                = eventStack = eventStack.tail
+  def currentEventOpt                     : Option[XFormsEvent] = eventStack.headOption
 }
 
 trait ContainingDocumentTemplate extends Logging {

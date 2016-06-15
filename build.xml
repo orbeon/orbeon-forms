@@ -22,7 +22,7 @@
     <!-- set global build.root to be dir containing this file. -->
     <dirname property="build.root" file="${ant.file}"/>
 
-    <property name="saxon.jar"     value="saxon-9-1-0-8_orbeon_20160524.jar"/>
+    <property name="saxon.jar"     value="saxon-9-1-0-8_orbeon_20160615.jar"/>
 
     <!-- Expose environment variables -->
     <property environment="env"/>

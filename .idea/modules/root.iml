@@ -142,7 +142,7 @@
           <root url="jar://$MODULE_DIR$/../../lib/proguard-5.2.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/resolver-xerces_2_6_2_orbeon.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/rhino-1.7R2.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/saxon-9-1-0-8_orbeon_20160524.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/saxon-9-1-0-8_orbeon_20160615.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/saxpath-dev_orbeon.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/sbinary_2.11-SNAPSHOT.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/scala-library-2.11.8.jar!/" />

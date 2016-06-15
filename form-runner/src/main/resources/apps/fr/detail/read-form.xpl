@@ -104,7 +104,9 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="form-version">
                     <xsl:copy>
-                        <xsl:variable name="version-from-persistence" select="p:get-request-attribute('oxf.url-generator.header.orbeon-form-definition-version', 'text/plain')"/>
+                        <xsl:variable
+                            name="version-from-persistence"
+                            select="p:get-request-attribute('oxf.url-generator.header.orbeon-form-definition-version', 'text/plain')"/>
                         <!-- Use 1 if no version was returned by the persistence layer -->
                         <xsl:value-of select="($version-from-persistence, 1)[1]"/>
                     </xsl:copy>

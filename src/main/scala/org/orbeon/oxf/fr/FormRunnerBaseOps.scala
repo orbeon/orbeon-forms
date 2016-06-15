@@ -25,6 +25,8 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
+import scala.util.Try
+
 trait FormRunnerBaseOps {
 
   val XH = XHTML_NAMESPACE_URI
@@ -205,7 +207,7 @@ trait FormRunnerBaseOps {
   def isEmbeddable   = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
   // The standard Form Runner parameters
-  case class FormRunnerParams(app: String, form: String, formVersion: String, document: Option[String], mode: String)
+  case class FormRunnerParams(app: String, form: String, formVersion: Int, document: Option[String], mode: String)
 
   object FormRunnerParams {
     def apply(): FormRunnerParams = {
@@ -214,7 +216,7 @@ trait FormRunnerBaseOps {
       FormRunnerParams(
         app         = params elemValue "app",
         form        = params elemValue "form",
-        formVersion = params elemValue "form-version",
+        formVersion = Try(params elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
         document    = params elemValue "document" trimAllToOpt,
         mode        = params elemValue "mode"
       )

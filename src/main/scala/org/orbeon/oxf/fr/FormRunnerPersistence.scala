@@ -210,6 +210,10 @@ trait FormRunnerPersistence {
   def countValidationsByLevel(level: ValidationLevel) =
     (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
 
+  // Return whether the data is saved
+  def isFormDataSaved =
+    persistenceInstance.rootElement \ "data-status" === "clean"
+
   // Return all nodes which refer to data attachments
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String) =

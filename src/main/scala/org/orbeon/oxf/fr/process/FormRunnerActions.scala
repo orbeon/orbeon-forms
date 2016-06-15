@@ -100,7 +100,7 @@ trait FormRunnerActions {
         filename          = "data.xml",
         commonQueryString = s"valid=$dataValid" + querySuffix,
         forceAttachments  = false,
-        formVersion       = Some(formVersion)
+        formVersion       = Some(formVersion.toString)
       )
 
       // If we were in new mode, now we must be in edit mode
@@ -238,7 +238,7 @@ trait FormRunnerActions {
         case name @ "process"             ⇒ name → runningProcessId.get
         case name @ "app"                 ⇒ name → app
         case name @ "form"                ⇒ name → form
-        case name @ "form-version"        ⇒ name → formVersion
+        case name @ "form-version"        ⇒ name → formVersion.toString
         case name @ "document"            ⇒ name → document.get
         case name @ "valid"               ⇒ name → dataValid.toString
         case name @ "language"            ⇒ name → currentLang.stringValue

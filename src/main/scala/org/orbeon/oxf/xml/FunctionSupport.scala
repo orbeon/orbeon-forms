@@ -91,6 +91,7 @@ abstract class FunctionSupport extends SystemFunction {
 
   implicit def stringToStringValue(v: String)                        : StringValue      = StringValue.makeStringValue(v)
   implicit def booleanToBooleanValue(v: Boolean)                     : BooleanValue     = BooleanValue.get(v)
+  implicit def intToIntegerValue(v: Int)                             : IntegerValue     = Int64Value.makeIntegerValue(v)
 
   implicit def stringOptToStringValue(v: Option[String])             : StringValue      = v map stringToStringValue orNull
   implicit def booleanOptToBooleanValue(v: Option[Boolean])          : BooleanValue     = v map booleanToBooleanValue orNull

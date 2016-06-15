@@ -433,14 +433,6 @@ trait FormRunnerActions {
   def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = SectionsModel))
   def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = SectionsModel))
 
-  // Navigate the wizard to the previous page
-  def tryWizardPrev(params: ActionParams): Try[Any] =
-    Try (dispatch(name = "fr-prev", targetId = "fr-view-wizard"))
-
-  // Navigate the wizard to the next page
-  def tryWizardNext(params: ActionParams): Try[Any] =
-    Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
-
   def pdfTiffPathInstanceRootElementOpt(mode: String) =
     topLevelInstance(PersistenceModel, s"fr-$mode-url-instance") map (_.rootElement)
 

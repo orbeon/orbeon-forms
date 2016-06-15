@@ -63,6 +63,9 @@ private object FormRunnerFunctions {
   )
 
   val BooleanGettersByName = List(
+    "is-design-time"       → (() ⇒ FormRunner.isDesignTime),
+    "is-readonly-mode"     → (() ⇒ FormRunner.isReadonlyMode),
+    "is-noscript"          → (() ⇒ FormRunner.isNoscript),
     "is-wizard-toc-shown"  → (() ⇒ FormRunner.isWizardTocShown),
     "is-wizard-body-shown" → (() ⇒ FormRunner.isWizardBodyShown)
   )

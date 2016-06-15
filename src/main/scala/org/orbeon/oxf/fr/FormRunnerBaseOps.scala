@@ -196,8 +196,13 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
 
-  def isNoscript    = containingDocument.noscript
-  def isEmbeddable  = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
+  private val ReadonlyModes = Set("view", "pdf", "email", "controls")
+
+  def isDesignTime   = FormRunnerParams().app == "orbeon" && FormRunnerParams().form == "builder"
+  def isReadonlyMode = ReadonlyModes(FormRunner.FormRunnerParams().mode)
+
+  def isNoscript     = containingDocument.noscript
+  def isEmbeddable   = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
   // The standard Form Runner parameters
   case class FormRunnerParams(app: String, form: String, formVersion: String, document: Option[String], mode: String)

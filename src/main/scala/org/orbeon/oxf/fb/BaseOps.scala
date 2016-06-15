@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 trait BaseOps extends Logging {
 
-  implicit def logger = containingDocument.getIndentedLogger("form-builder")
+  implicit def logger = inScopeContainingDocument.getIndentedLogger("form-builder")
 
   // Minimal version of IE supported
   val MinimalIEVersion = 11
@@ -68,7 +68,7 @@ trait BaseOps extends Logging {
   def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get
 
   // Find the top-level form model of the form being edited
-  def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
+  def getFormModel = inScopeContainingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
   def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
 

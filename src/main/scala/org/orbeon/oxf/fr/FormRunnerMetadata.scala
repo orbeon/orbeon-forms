@@ -33,7 +33,7 @@ trait FormRunnerMetadata {
   //@XPathFunction
   def createFormMetadataDocument(data: NodeInfo): NodeInfo = {
 
-    val doc = XFormsAPI.containingDocument
+    val doc = XFormsAPI.inScopeContainingDocument
 
     val controls = doc.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala
 

@@ -156,7 +156,7 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
     withActionAndDoc(setupDocument(source)) {
 
-      val doc = containingDocument
+      val doc = inScopeContainingDocument
 
       val controlIds     = 1 to 12 map ("c" +)
       val controlIndexes = controlIds map doc.getStaticOps.getControlPosition

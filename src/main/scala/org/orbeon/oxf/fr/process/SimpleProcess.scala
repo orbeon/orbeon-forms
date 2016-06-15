@@ -34,15 +34,15 @@ import scala.util.Try
 //
 object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFormsActions with Logging {
 
-  implicit val logger = containingDocument.getIndentedLogger("process")
+  implicit val logger = inScopeContainingDocument.getIndentedLogger("process")
 
   override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
 
-  def currentXFormsDocumentId = XFormsAPI.containingDocument.getUUID
+  def currentXFormsDocumentId = XFormsAPI.inScopeContainingDocument.getUUID
 
   // All XPath runs in the context of the main form instance's root element
   def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
-  def xpathFunctionLibrary = containingDocument.getFunctionLibrary
+  def xpathFunctionLibrary = inScopeContainingDocument.getFunctionLibrary
   def xpathFunctionContext = XPath.functionContext.orNull
 
   // NOTE: Clear the PDF/TIFF URL *before* the process, because if we clear it after, it will be already cleared

@@ -478,7 +478,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val analyzed = ValidationFunction.analyzeKnownConstraint(
         expression,
-        containingDocument.getFunctionLibrary
+        inScopeContainingDocument.getFunctionLibrary
       )
 
       <validation

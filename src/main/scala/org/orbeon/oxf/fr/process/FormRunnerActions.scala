@@ -59,7 +59,7 @@ trait FormRunnerActions {
   // Check whether there are pending uploads
   def tryPendingUploads(params: ActionParams): Try[Any] =
     Try {
-      if (containingDocument.countPendingUploads > 0)
+      if (inScopeContainingDocument.countPendingUploads > 0)
         throw new OXFException("Pending uploads")
     }
 
@@ -340,7 +340,7 @@ trait FormRunnerActions {
 
     val newParams =
       for {
-        (name, values) ← containingDocument.getRequestParameters.to[List]
+        (name, values) ← inScopeContainingDocument.getRequestParameters.to[List]
         if ! ParamsToExcludeUponModeChange(name)
         value          ← values
       } yield

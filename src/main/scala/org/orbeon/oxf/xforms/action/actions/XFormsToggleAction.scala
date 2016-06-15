@@ -30,7 +30,7 @@ class XFormsToggleAction extends XFormsAction {
     resolveControl("case")(actionContext) match {
       case Some(caseControl: XFormsCaseControl) ⇒
         // Perform the actual toggle action
-        val deferred = XFormsAPI.actionInterpreter.isDeferredUpdates(actionElement)
+        val deferred = XFormsAPI.inScopeActionInterpreter.isDeferredUpdates(actionElement)
         XFormsToggleAction.toggle(caseControl, deferred)
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
@@ -47,11 +47,11 @@ object XFormsToggleAction {
   def toggle(caseControl: XFormsCaseControl, deferred: Boolean = true): Unit = {
     // "This XForms Action begins by invoking the deferred update behavior."
     if (deferred)
-      XFormsAPI.containingDocument.synchronizeAndRefresh()
+      XFormsAPI.inScopeContainingDocument.synchronizeAndRefresh()
 
     if (caseControl.parent.isRelevant && ! caseControl.isSelected) {
       // This case is in a relevant switch and not currently selected
-      val focusedBefore = XFormsAPI.containingDocument.getControls.getFocusedControl
+      val focusedBefore = XFormsAPI.inScopeContainingDocument.getControls.getFocusedControl
 
       // Actually toggle the xf:case
       caseControl.toggle()

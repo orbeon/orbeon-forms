@@ -28,7 +28,7 @@ trait FormRunnerErrorSummary {
 
   private def findErrorSummaryControl = (
     ErrorSummaryIds
-    flatMap      { id ⇒ Option(containingDocument.getControlByEffectiveId(id)) }
+    flatMap      { id ⇒ Option(inScopeContainingDocument.getControlByEffectiveId(id)) }
     collectFirst { case c: XFormsComponentControl ⇒ c }
   )
 
@@ -40,7 +40,7 @@ trait FormRunnerErrorSummary {
 
   //@XPathFunction
   def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
-    Option(containingDocument.getControlByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
+    Option(inScopeContainingDocument.getControlByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
       control ⇒
         val sectionsIt =
           new AncestorOrSelfIterator(control) collect {
@@ -97,7 +97,7 @@ trait FormRunnerErrorSummary {
     val repeatEffectiveId = absoluteIdToEffectiveId(repeatAbsoluteId)
     val repeatPrefixedId  = getPrefixedId(repeatEffectiveId)
 
-    val ancestorRepeats = containingDocument.getStaticOps.getAncestorRepeatIds(prefixedId)
+    val ancestorRepeats = inScopeContainingDocument.getStaticOps.getAncestorRepeatIds(prefixedId)
 
     if (ancestorRepeats contains repeatPrefixedId) {
       // Control is a descendant of the repeat so might be impacted
@@ -128,10 +128,10 @@ trait FormRunnerErrorSummary {
     val prefixedId  = getPrefixedId(effectiveId)
 
     val controlPosition =
-      containingDocument.getStaticOps.getControlPosition(prefixedId).get // argument must be a view control
+      inScopeContainingDocument.getStaticOps.getControlPosition(prefixedId).get // argument must be a view control
 
     val repeatsFromLeaf =
-      containingDocument.getStaticOps.getAncestorRepeats(prefixedId)
+      inScopeContainingDocument.getStaticOps.getAncestorRepeats(prefixedId)
 
     def iterations =
       getEffectiveIdSuffixParts(effectiveId)

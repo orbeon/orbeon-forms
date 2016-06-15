@@ -50,7 +50,7 @@ trait XFormsSupport extends MockitoSugar {
 
   def withAction[T](body: ⇒ T): T = {
     document.startOutermostActionHandler()
-    val result = withScalaAction(mockActionInterpreter(containingDocument))(body)
+    val result = withScalaAction(mockActionInterpreter(inScopeContainingDocument))(body)
     document.endOutermostActionHandler()
     result
   }

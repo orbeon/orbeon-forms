@@ -201,8 +201,8 @@ trait FormRunnerBaseOps {
   def isDesignTime   = FormRunnerParams().app == "orbeon" && FormRunnerParams().form == "builder"
   def isReadonlyMode = ReadonlyModes(FormRunner.FormRunnerParams().mode)
 
-  def isNoscript     = containingDocument.noscript
-  def isEmbeddable   = containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
+  def isNoscript     = inScopeContainingDocument.noscript
+  def isEmbeddable   = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
   // The standard Form Runner parameters
   case class FormRunnerParams(app: String, form: String, formVersion: String, document: Option[String], mode: String)

@@ -63,10 +63,10 @@ object XFormsAPI {
   }
 
   // Return the action interpreter
-  def actionInterpreter = actionInterpreterDyn.value.get
+  def inScopeActionInterpreter = actionInterpreterDyn.value.get
 
   // Return the containing document
-  def containingDocument = containingDocumentDyn.value.get
+  def inScopeContainingDocument = containingDocumentDyn.value.get
 
   // xf:setvalue
   // @return the node whose value was set, if any
@@ -227,7 +227,7 @@ object XFormsAPI {
 
   // Return an instance's root element in the current action context as per xxf:instance()
   def instanceRoot(staticId: String): Option[NodeInfo] =
-    XXFormsInstance.findInAncestorScopes(actionInterpreter.container, staticId)
+    XXFormsInstance.findInAncestorScopes(inScopeActionInterpreter.container, staticId)
 
   // Return an instance within a top-level model
   def topLevelInstance(modelId: String, instanceId: String) =
@@ -237,7 +237,7 @@ object XFormsAPI {
   // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
   // 2013-04-03: Unsure if we still need this for mocking
   def topLevelModel(modelId: String) =
-    containingDocument.models find (_.getId == modelId)
+    inScopeContainingDocument.models find (_.getId == modelId)
 
   def context[T](xpath: String)(body: ⇒ T): T = ???
   def context[T](item: Item)(body: ⇒ T): T = ???
@@ -308,7 +308,7 @@ object XFormsAPI {
 
   // NOTE: There is no source id passed so we resolve relative to the document
   def resolveAs[T: ClassTag](staticOrAbsoluteId: String) =
-    containingDocument.resolveObjectByIdInScope("#document", staticOrAbsoluteId, None) flatMap collectByErasedType[T]
+    inScopeContainingDocument.resolveObjectByIdInScope("#document", staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle
   def toggle(caseId: String, deferred: Boolean = true): Unit =
@@ -347,7 +347,7 @@ object XFormsAPI {
 
   // xf:load
   def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit =
-    XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, NetUtils.encodeHRRI(url, true), target.orNull, null, false, false)
+    XFormsLoadAction.resolveStoreLoadValue(inScopeContainingDocument, null, true, NetUtils.encodeHRRI(url, true), target.orNull, null, false, false)
 
   // xf:setfocus
   def setfocus(controlId: String, inputOnly: Boolean = false): Unit =

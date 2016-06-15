@@ -13,6 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.scaxon.XML._
+
 trait FormRunnerWizard extends FormRunnerBaseOps {
 
   //@XPathFunction
@@ -23,4 +27,14 @@ trait FormRunnerWizard extends FormRunnerBaseOps {
   def isWizardSeparateToc =
     formRunnerProperty("oxf.xforms.xbl.fr.wizard.separate-toc")(FormRunnerParams()) contains "true"
 
+  private def findWizardState =
+    XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-wizard") flatMap
+      (_.nestedContainer.defaultModel)                            map
+      (_.getDefaultInstance.rootElement)
+
+  def isWizardTocShown =
+    findWizardState map (_ elemValue "show-toc") contains "true"
+
+  def isWizardBodyShown =
+    findWizardState map (_ elemValue "show-body") contains "true"
 }

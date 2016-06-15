@@ -491,7 +491,7 @@
                             </xf:group>
                         </xf:group>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
-                        <xh:div class="fr-wizard-other{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
+                        <xh:div class="fr-wizard-other">
                             <xf:group appearance="xxf:internal" xxbl:scope="outer">
                                 <xsl:apply-templates select="* except fr:section"/>
                             </xf:group>

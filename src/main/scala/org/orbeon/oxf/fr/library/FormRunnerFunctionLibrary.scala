@@ -20,7 +20,7 @@ import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDepend
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.value.StringValue
+import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.orbeon.scaxon.XML._
 
 // The Form Runner function library
@@ -32,9 +32,16 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     // Register simple string functions
     for {
-      ((name, fun), index) ← NamedStringFunctions.zipWithIndex
+      ((name, _), index) ← StringGettersByName.zipWithIndex
     } locally {
-      Fun(name, classOf[StringFunctions], index, 0, STRING, ALLOWS_ZERO_OR_ONE)
+      Fun(name, classOf[StringFunction], index, 0, STRING, ALLOWS_ZERO_OR_ONE)
+    }
+
+    // Register simple boolean functions
+    for {
+      ((name, _), index) ← BooleanGettersByName.zipWithIndex
+    } locally {
+      Fun(name, classOf[BooleanFunction], index, 0, BOOLEAN, ALLOWS_ZERO_OR_ONE)
     }
 
     // Other functions
@@ -42,28 +49,45 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   }
 }
 
-object FormRunnerFunctions {
+private object FormRunnerFunctions {
 
-  val NamedStringFunctions = List(
-    "mode"         → (() ⇒ FormRunner.FormRunnerParams().mode),
-    "app-name"     → (() ⇒ FormRunner.FormRunnerParams().app),
-    "form-name"    → (() ⇒ FormRunner.FormRunnerParams().form),
-    "form-version" → (() ⇒ FormRunner.FormRunnerParams().formVersion),
-    "document-id"  → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
-    "lang"         → (() ⇒ FormRunner.currentLang.stringValue),
-    "username"     → (() ⇒ NetUtils.getExternalContext.getRequest.getUsername),
-    "user-group"   → (() ⇒ NetUtils.getExternalContext.getRequest.getUserGroup)
+  val StringGettersByName = List(
+    "mode"                 → (() ⇒ FormRunner.FormRunnerParams().mode),
+    "app-name"             → (() ⇒ FormRunner.FormRunnerParams().app),
+    "form-name"            → (() ⇒ FormRunner.FormRunnerParams().form),
+    "form-version"         → (() ⇒ FormRunner.FormRunnerParams().formVersion),
+    "document-id"          → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
+    "lang"                 → (() ⇒ FormRunner.currentLang.stringValue),
+    "username"             → (() ⇒ NetUtils.getExternalContext.getRequest.getUsername),
+    "user-group"           → (() ⇒ NetUtils.getExternalContext.getRequest.getUserGroup)
+  )
+
+  val BooleanGettersByName = List(
+    "is-wizard-toc-shown"  → (() ⇒ FormRunner.isWizardTocShown),
+    "is-wizard-body-shown" → (() ⇒ FormRunner.isWizardBodyShown)
   )
 
   val IndexedStringFunctions = (
     for {
-      ((name, fun), index) ← FormRunnerFunctions.NamedStringFunctions.zipWithIndex
+      ((_, fun), index) ← StringGettersByName.zipWithIndex
     } yield
       index → fun
   ).toMap
 
-  class StringFunctions extends FunctionSupport with RuntimeDependentFunction {
+  val IndexedBooleanFunctions = (
+    for {
+      ((_, fun), index) ← BooleanGettersByName.zipWithIndex
+    } yield
+      index → fun
+  ).toMap
+
+  class StringFunction extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): StringValue =
       IndexedStringFunctions(operation).apply()
+  }
+
+  class BooleanFunction extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+      IndexedBooleanFunctions(operation).apply()
   }
 }

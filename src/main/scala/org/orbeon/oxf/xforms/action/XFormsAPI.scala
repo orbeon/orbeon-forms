@@ -307,7 +307,7 @@ object XFormsAPI {
     }
 
   // NOTE: There is no source id passed so we resolve relative to the document
-  private def resolveAs[T: ClassTag](staticOrAbsoluteId: String) =
+  def resolveAs[T: ClassTag](staticOrAbsoluteId: String) =
     containingDocument.resolveObjectByIdInScope("#document", staticOrAbsoluteId, None) flatMap collectByErasedType[T]
 
   // xf:toggle

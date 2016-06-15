@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
@@ -63,39 +64,40 @@ object XFormsToXHTML {
     template           : AnnotatedTemplate,
     containingDocument : XFormsContainingDocument,
     xmlReceiver        : XMLReceiver
-  ): Unit = {
+  ): Unit =
+    XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
 
-    val nonJavaScriptLoads =
-      containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
+      val nonJavaScriptLoads =
+        containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
 
-    if (containingDocument.isGotSubmissionReplaceAll) {
-      // 1. Got a submission with replace="all"
-      // NOP: Response already sent out by a submission
-      indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
-    } else if (nonJavaScriptLoads.nonEmpty) {
-      // 2. Got at least one xf:load which is not a JavaScript call
+      if (containingDocument.isGotSubmissionReplaceAll) {
+        // 1. Got a submission with replace="all"
+        // NOP: Response already sent out by a submission
+        indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
+      } else if (nonJavaScriptLoads.nonEmpty) {
+        // 2. Got at least one xf:load which is not a JavaScript call
 
-      // This is the "load upon initialization in Servlet container, embedded or not" case.
-      // See `XFormsLoadAction` for details.
-      val location = nonJavaScriptLoads.head.getResource
-      indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
-      externalContext.getResponse.sendRedirect(location, false, false)
+        // This is the "load upon initialization in Servlet container, embedded or not" case.
+        // See `XFormsLoadAction` for details.
+        val location = nonJavaScriptLoads.head.getResource
+        indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
+        externalContext.getResponse.sendRedirect(location, false, false)
 
-      // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-      SAXUtils.streamNullDocument(xmlReceiver)
-    } else {
-      // 3. Regular case: produce a document
-      containingDocument.hostLanguage match {
-        case "xhtml" ⇒
-          XHTMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
-        case "xml" ⇒
-          XMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
-        case unknown ⇒
-          throw new OXFException(s"Unknown host language specified: $unknown")
+        // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
+        SAXUtils.streamNullDocument(xmlReceiver)
+      } else {
+        // 3. Regular case: produce a document
+        containingDocument.hostLanguage match {
+          case "xhtml" ⇒
+            XHTMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+          case "xml" ⇒
+            XMLOutput.send(containingDocument, template, externalContext)(xmlReceiver)
+          case unknown ⇒
+            throw new OXFException(s"Unknown host language specified: $unknown")
+        }
       }
+      containingDocument.afterInitialResponse()
     }
-    containingDocument.afterInitialResponse()
-  }
 
   def testOutputResponseState(
     containingDocument : XFormsContainingDocument,

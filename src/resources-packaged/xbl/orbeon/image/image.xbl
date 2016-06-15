@@ -51,7 +51,7 @@
 
         <xbl:template>
             <xf:output ref="xxf:binding('fr-image')" mediatype="image/*" xxf:alt="{xxf:label('fr-image')}">
-                <xf:header ref="xxf:instance('fr-parameters-instance')/form-version[xxf:non-blank()]">
+                <xf:header ref="fr:form-version()">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>
                 </xf:header>

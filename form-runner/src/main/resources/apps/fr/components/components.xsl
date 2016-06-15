@@ -242,24 +242,24 @@
         <xf:model
             id="fr-parameters-model"
             xxf:readonly-appearance="{{
-                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                    return
-                        if (
-                            $mode = 'view' or (
-                                $mode = ('pdf', 'email') and
-                                normalize-space(xxf:instance('fr-form-attachments')/pdf) = ''
-                            )
-                        ) then
-                            'static'
-                        else
-                            'dynamic'
+                for $mode in fr:mode()
+                return
+                    if (
+                        $mode = 'view' or (
+                            $mode = ('pdf', 'email') and
+                            normalize-space(xxf:instance('fr-form-attachments')/pdf) = ''
+                        )
+                    ) then
+                        'static'
+                    else
+                        'dynamic'
             }}"
             xxf:encrypt-item-values="{{
-                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                    return not(
-                        $mode = ('pdf', 'email') and
-                        normalize-space(xxf:instance('fr-form-attachments')/pdf) != ''
-                    )
+                for $mode in fr:mode()
+                return not(
+                    $mode = ('pdf', 'email') and
+                    normalize-space(xxf:instance('fr-form-attachments')/pdf) != ''
+                )
             }}"
             xxf:noscript="{{xxf:get-request-parameter('fr-noscript') = 'true'}}"
             xxf:order="{{
@@ -270,28 +270,28 @@
                         string-join(
                             (
                                 'oxf.fr.detail.lhha-order',
-                                xxf:instance('fr-parameters-instance')/app/string(),
-                                xxf:instance('fr-parameters-instance')/form/string()
+                                fr:app-name(),
+                                fr:form-name()
                             ),
                             '.'
                         )
                     )
             }}"
             xxf:host-language="{{
-                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                    return
-                        if ($mode = 'controls') then
-                            'xml'
-                        else
-                            'xhtml'
+                for $mode in fr:mode()
+                return
+                    if ($mode = 'controls') then
+                        'xml'
+                    else
+                        'xhtml'
             }}"
             xxf:no-updates="{{
-                for $mode in xxf:instance('fr-parameters-instance')/mode/string()
-                    return
-                        if ($mode = ('controls', 'pdf', 'email')) then
-                            'true'
-                        else
-                            'false'
+                for $mode in fr:mode()
+                return
+                    if ($mode = ('controls', 'pdf', 'email')) then
+                        'true'
+                    else
+                        'false'
             }}"
             xxf:noscript-support="{$is-noscript-support}"
             xxf:external-events="{@xxf:external-events} fr-open-pdf"
@@ -449,14 +449,13 @@
             <xf:var name="fr-roles" value="frf:orbeonRolesSequence()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
 
             <!-- Variable exposing the form app/form/mode -->
-            <xf:var name="fr-app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
-            <xf:var name="fr-form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
-
-            <!-- Variable exposing the form mode -->
-            <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode/string()"/>
+            <!-- NOTE: This is no longer the preferred way now that we have `fr:` functions. -->
+            <xf:var name="fr-app"  value="fr:app-name()"/>
+            <xf:var name="fr-form" value="fr:form-name()"/>
+            <xf:var name="fr-mode" value="fr:mode()"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
-            <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
+            <xf:bind ref="instance('fr-form-instance')" readonly="fr:is-readonly-mode()"/>
 
             <!-- Custom XForms model content to include -->
             <xsl:if test="$is-detail and normalize-space($custom-model)">

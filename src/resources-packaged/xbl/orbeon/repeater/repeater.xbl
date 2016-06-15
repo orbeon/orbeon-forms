@@ -107,8 +107,7 @@
                         <!-- NOTE: We need a better way to get the Form Runner mode. See also #673 and #629. -->
                         <xf:var
                             name="view-mode"
-                            value="xxf:readonly($repeat-context) or
-                                   xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                            value="xxf:readonly($repeat-context) or fr:is-readonly-mode()"/>
 
                         <xf:var name="min-avt" xxbl:scope="outer"><xsl:value-of select="($root/@min, $root/@minOccurs, 0)[1]"/></xf:var>
                         <xf:var name="min">

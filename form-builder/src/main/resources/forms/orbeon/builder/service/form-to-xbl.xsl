@@ -248,15 +248,16 @@
                     <!-- This is also at the top-level in components.xsl -->
                     <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
                     <xf:var name="fr-mode"   value="$fr-params/mode"/>
-                    <!-- NOTE: Make content readonly in orbeon/builder too because if the form author enters initial
+                    <!-- NOTE: Make content readonly at design time too because if the form author enters initial
                          data or adds a repeat iteration into the section template, that data will be either incorrect
                          or lost if the toolbox is reloaded. A better fix can be considered, but more complex at the
                          Form Builder level. -->
                     <xf:bind
                         ref="instance('fr-form-instance')"
-                        readonly="$fr-mode = ('view', 'pdf', 'email')
-                               or instance('readonly') = 'true'
-                               or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
+                        readonly="
+                            fr:is-readonly-mode()         or
+                            instance('readonly') = 'true' or
+                            fr:is-design-time()"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->

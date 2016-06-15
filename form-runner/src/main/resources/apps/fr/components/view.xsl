@@ -167,10 +167,10 @@
                     class="xforms-hidden"/>
 
             <!-- Expose document id to JavaScript -->
-            <xf:output id="fr-parameters-instance-document" ref="xxf:instance('fr-parameters-instance')/document" style="display: none"/>
+            <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" style="display: none"/>
 
             <!-- When the mode changes to "edit" after a save from /new, attempt to change the URL -->
-            <xf:var name="mode-for-save" value="xxf:instance('fr-parameters-instance')/mode/string()">
+            <xf:var name="mode-for-save" value="fr:mode()">
                 <!-- If URI is /new (it should be), change it to /edit/id -->
                 <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
                 <xf:action type="javascript" ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
@@ -756,7 +756,7 @@
                                 }}/{{
                                     string-join(
                                         (
-                                            xxf:instance('fr-parameters-instance')/document/string(),
+                                            fr:document-id(),
                                             xxf:document-id(),
                                             frf:filenameOrNull($button-name)[. != '']
                                         ),

@@ -32,11 +32,8 @@
             <xf:var name="button-label" value="$fr-resources/buttons/*[name() = $button-name]"/>
 
             <!-- Figure what, if any, loading indicator to use -->
-            <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app /string()"/>
-            <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
-
             <xf:var name="loading-indicator-property"
-                    value="string-join(('oxf.fr.detail.loading-indicator', $button-name, $app, $form), '.')"/>
+                    value="string-join(('oxf.fr.detail.loading-indicator', $button-name, fr:app-name(), fr:form-name()), '.')"/>
             <xf:var name="loading-indicator"
                     value="(xxf:property($loading-indicator-property), '')[1]"/>
             <xf:var name="is-inline"

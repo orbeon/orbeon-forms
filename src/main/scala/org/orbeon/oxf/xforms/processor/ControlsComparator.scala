@@ -19,6 +19,7 @@ import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XXFormsDynamicControl}
@@ -375,7 +376,7 @@ object ControlsComparator {
     valueChangeControlIdsAndValuesOrNull : i.Map[String, String],
     isTestMode                           : Boolean,
     receiver                             : XMLReceiver
-  ) = {
+  ) = XFormsAPI.withContainingDocument(document) { // scope because dynamic properties can cause lazy XPath evaluations
 
     val comparator = new ControlsComparator(
       document,

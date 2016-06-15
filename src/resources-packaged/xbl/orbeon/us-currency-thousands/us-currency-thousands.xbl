@@ -63,7 +63,7 @@
                 </xf:instance>
                 <xf:bind ref="." constraint="substring-after(., '$') castable as xs:decimal"/>
                 <!-- FR HACK: Make instance read-only when the form must be read-only -->
-                <xf:bind ref="." readonly="xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                <xf:bind ref="." readonly="fr:is-readonly-mode()"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template>

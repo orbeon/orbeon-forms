@@ -16,7 +16,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
@@ -32,11 +32,8 @@
             <xf:instance id="fr-response"      xxf:exclude-result-prefixes="#all"><document-id/></xf:instance>
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
 
-            <xf:var name="app"  value="xxf:instance('fr-parameters-instance')/app/string()"/>
-            <xf:var name="form" value="xxf:instance('fr-parameters-instance')/form/string()"/>
-
             <xf:var name="requested-document-id" value="instance('fr-request')/root()/document-id/string()"/>
-            <xf:var name="data-base-path"        value="frf:createFormDataBasePath($app, $form, false(), $requested-document-id)"/>
+            <xf:var name="data-base-path"        value="frf:createFormDataBasePath(fr:app-name(), fr:form-name(), false(), $requested-document-id)"/>
 
             <xf:action event="xforms-model-construct-done">
                 <xf:send submission="read-form-data"/>
@@ -70,8 +67,8 @@
                     <xf:action type="xpath">
                         frf:duplicate(
                             instance('fr-form-instance'),
-                            $app,
-                            $form,
+                            fr:app-name(),
+                            fr:form-name(),
                             $requested-document-id,
                             instance('fr-response'),
                             event('response-headers')[lower-case(name) = 'orbeon-form-definition-version']/value

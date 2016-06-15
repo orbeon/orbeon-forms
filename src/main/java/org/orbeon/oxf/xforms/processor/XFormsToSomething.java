@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.Metadata;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotator;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor;
@@ -243,7 +244,11 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                 produceOutput(pipelineContext, outputName, externalContext, htmlLogger, stage2CacheableState, containingDocument[0], xmlReceiver);
 
             // Notify state manager
-            XFormsStateManager.instance().afterInitialResponse(containingDocument[0], stage2CacheableState.template);
+            XFormsAPI.withContainingDocumentJava(containingDocument[0], new Runnable() { // scope because dynamic properties can cause lazy XPath evaluations
+                public void run() {
+                    XFormsStateManager.instance().afterInitialResponse(containingDocument[0], stage2CacheableState.template);
+                }
+            });
 
         } catch (Throwable e) {
             htmlLogger.logDebug("", "throwable caught during initialization.");

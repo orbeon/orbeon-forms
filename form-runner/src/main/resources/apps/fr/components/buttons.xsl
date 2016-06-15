@@ -66,7 +66,7 @@
                 }/pdf/{{
                     string-join(
                         (
-                            xxf:instance('fr-parameters-instance')/document/string(),
+                            fr:document-id(),
                             xxf:document-id(),
                             frf:filenameOrNull('pdf')[. != '']
                         ),

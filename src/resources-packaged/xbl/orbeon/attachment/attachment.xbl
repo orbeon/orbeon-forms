@@ -83,7 +83,7 @@
             <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[xxf:non-blank()]">
                 <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
                 <xbl:content includes=":root > xf|filename, :root > xf|mediatype"/>
-                <xf:header ref="xxf:instance('fr-parameters-instance')/form-version[xxf:non-blank()]">
+                <xf:header ref="fr:form-version()">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>
                 </xf:header>

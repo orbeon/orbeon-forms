@@ -68,9 +68,7 @@
 
                         <xf:var
                             name="view-mode"
-                            value="
-                                xxf:readonly(xxf:component-context()) or
-                                xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                            value="xxf:readonly(xxf:component-context()) or fr:is-readonly-mode()"/>
 
                         <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
@@ -81,7 +79,7 @@
 
                                 <xf:var
                                     name="initially-open"
-                                    value="xxf:instance('fr-parameters-instance')/mode/string() = ('view', 'pdf', 'email') or not('{@open}' = 'false')"/>
+                                    value="fr:is-readonly-mode() or not('{@open}' = 'false')"/>
 
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">

@@ -47,9 +47,6 @@
                 xxf:set-session-attribute('org.orbeon.fr.import.cancel', ())
             </xf:action>
 
-            <xf:var name="app" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/app)"/>
-            <xf:var name="form" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/form)"/>
-
             <!-- Main data -->
             <xf:instance id="fr-form-instance">
                 <wizard current="1">
@@ -89,7 +86,7 @@
 
             <!-- Validate data to import -->
             <xf:submission id="import-validate-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
-                           action="/fr/service/{$app}/{$form}/validate" replace="instance" instance="import-validation-result">
+                           action="/fr/service/{fr:app-name()}/{fr:form-name()}/validate" replace="instance" instance="import-validation-result">
                 <!-- Reset stats -->
                 <xf:action ev:event="xforms-submit" context="instance('import-batch-stats')">
                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
@@ -106,7 +103,7 @@
 
             <!-- Import data -->
             <xf:submission id="import-import-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
-                           action="/fr/service/{$app}/{$form}/import" replace="instance" instance="import-result">
+                           action="/fr/service/{fr:app-name()}/{fr:form-name()}/import" replace="instance" instance="import-result">
                 <!-- Reset stats -->
                 <xf:action ev:event="xforms-submit" context="instance('import-batch-stats')">
                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
@@ -123,7 +120,7 @@
 
             <!-- Delete all data in the given form -->
             <xf:submission id="import-delete-data-submission" method="delete" serialization="none"
-                           action="/fr/service/persistence/crud/{$app}/{$form}/data/" replace="none">
+                           action="/fr/service/persistence/crud/{fr:app-name()}/{fr:form-name()}/data/" replace="none">
 
                 <!-- Flag indicating we are importing -->
                 <xf:message ev:event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
@@ -181,7 +178,7 @@
             <!-- Search submission -->
             <xf:submission id="search-submission"
                     ref="instance('import-search-request')" validate="false"
-                    method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
+                    method="post" resource="/fr/service/persistence/search/{fr:app-name()}/{fr:form-name()}"
                     replace="instance" instance="import-search-response">
                 <!-- Set language upon submitting -->
                 <xf:action ev:event="xforms-submit">
@@ -394,7 +391,7 @@
                                                                 'There {0,choice,1#is|1&lt;are} {0,number,integer}
                                                                  existing {0,choice,1#document|1&lt;documents} in the database for form
                                                                  {1}/{2}.',
-                                                                ($existing, $app, $form)
+                                                                ($existing, fr:app-name(), fr:form-name())
                                                               )"/>
                                             Please choose whether to add to existing data, or to delete existing data first.
                                         </xh:td>

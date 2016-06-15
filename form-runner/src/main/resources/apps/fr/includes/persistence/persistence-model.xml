@@ -30,7 +30,7 @@
     <xf:var name="document-element" value="$parameters/document"/>
     <xf:var name="document"         value="$document-element/string()"/>
     <xf:var name="mode"             value="$parameters/mode/string()"/>
-    <xf:var name="is-fb"            value="$app = 'orbeon' and $form = 'builder'"/>
+    <xf:var name="is-fb"            value="fr:is-design-time()"/>
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
 

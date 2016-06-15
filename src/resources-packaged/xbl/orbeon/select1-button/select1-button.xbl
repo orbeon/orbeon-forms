@@ -51,7 +51,7 @@
                             <xf:var name="external-value" as="node()?"><xxf:value value="." xxbl:scope="outer"/></xf:var>
 
                             <!-- HACK: Whether we are Form Runner-read-only -->
-                            <xf:var name="readonly" value="xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                            <xf:var name="readonly" value="fr:is-readonly-mode()"/>
 
                             <!-- Init event -->
                             <xf:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">

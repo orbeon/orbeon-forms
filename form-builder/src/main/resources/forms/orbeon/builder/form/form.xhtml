@@ -268,7 +268,7 @@
                             <!--<xf:message ev:observer="#document" ev:event="keypress" xxf:text="&#40;"/>-->
 
                             <!-- IE warning -->
-                            <xf:group ref=".[xxf:instance('fr-parameters-instance')/mode != 'new' and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
+                            <xf:group ref=".[fr:mode() != 'new' and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
                                 <xf:switch>
                                     <xf:case id="fb-ie-warning-case-on">
                                         <xf:var name="minimal-ie-version" value="xs:integer(xxf:instance('fb-user-agent-instance')/minimal-ie-version)"/>

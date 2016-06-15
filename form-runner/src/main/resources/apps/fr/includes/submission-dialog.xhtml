@@ -28,14 +28,14 @@
     <xh:div>
         <xf:var
             name="content-from-persistence"
-            value="xxf:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
+            value="xxf:property(string-join(('oxf.fr.detail.submit.content-from-persistence', fr:app-name(), fr:form-name()), '.'))"/>
         <xf:output
             mediatype="text/html"
             ref="if ($content-from-persistence) then instance('fr-submission-result-instance') else $fr-resources/detail/messages/submit-dialog-message"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:group>
-            <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')))">
+            <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.detail.submit.buttons', fr:app-name(), fr:form-name()), '.')))">
                 <!-- Clear button -->
                 <xf:trigger ref="instance()[context() = 'clear']">
                     <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-clear"/>
@@ -60,7 +60,7 @@
                 <xf:trigger ref="instance()[context() = 'go']">
                     <xf:label mediatype="text/html" value="$fr-resources/buttons/submit-dialog-go"/>
                     <xf:action ev:event="DOMActivate">
-                        <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
+                        <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', fr:app-name(), fr:form-name()), '.'))"/>
                         <xf:load context="xxf:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
                     </xf:action>
                 </xf:trigger>
@@ -81,10 +81,5 @@
         <xf:instance id="fr-submission-result-instance">
             <content xmlns=""/>
         </xf:instance>
-
-        <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
-        <xf:var name="app"  value="$parameters/app"/>
-        <xf:var name="form" value="$parameters/form"/>
-
     </xf:model>
 </xxf:dialog>

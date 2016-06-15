@@ -604,10 +604,6 @@
                     <xf:var name="inverse-override"           value="'{$inverse}'"/>
 
                     <xf:var
-                        name="is-inner"
-                        value="starts-with($buttons-property-override, 'oxf.fr.detail.buttons.inner')"/>
-
-                    <xf:var
                         name="highlight-primary"
                         value="
                             if ($highlight-primary-override = '') then
@@ -624,26 +620,6 @@
                             else
                                 xs:boolean($inverse-override)"/>
 
-                    <xf:var
-                        name="buttons-property"
-                        value="
-                            if (xxf:non-blank($buttons-property-override)) then
-                                $buttons-property-override
-                            else if ($fr-mode = 'view') then
-                                'oxf.fr.detail.buttons.view'
-                            else
-                                'oxf.fr.detail.buttons'
-                    "/>
-
-                    <xf:var
-                        name="buttons-names"
-                        value="
-                            if (xxf:is-blank($buttons-property-override) and $fr-mode = ('pdf', 'email')) then
-                                ()
-                            else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
-                                'validate'
-                            else
-                                xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.')))
                     "/>
 
                     <!-- Message shown next to the buttons (empty by default) -->
@@ -652,36 +628,88 @@
                     </xh:span>
 
                     <xf:var
+                        xmlns:saxon="http://saxon.sf.net/"
                         name="names-and-refs-if-relevant"
                         value="
-                            for $button-name in $buttons-names
-                            return
-                                for $ref in
-                                    if ($is-inner and $button-name = ('save-final', 'submit', 'send', 'review', 'pdf', 'tiff', 'email')) then
-                                        xxf:binding('fr-wizard-submit-hide')
-                                    else if ($is-inner and $button-name = 'wizard-next') then
-                                        xxf:binding('fr-wizard-next-hide')
-                                    else if ($is-inner and $button-name = 'wizard-prev') then
-                                        xxf:binding('fr-wizard-prev-hide')
-                                    else if ($button-name = 'wizard-prev') then
-                                        xxf:binding('fr-wizard-prev')
-                                    else if ($button-name = 'wizard-next') then
-                                        xxf:binding('fr-wizard-next')
+                            let $buttons-property :=
+                                    if (xxf:non-blank($buttons-property-override)) then
+                                        $buttons-property-override
+                                    else if ($fr-mode = 'view') then
+                                        'oxf.fr.detail.buttons.view'
                                     else
-                                        xxf:instance('fr-triggers-instance')/*[name() = (
-                                            if ($button-name = 'summary') then
-                                                'can-access-summary'
-                                            else if ($button-name = 'refresh') then
-                                                'noscript'
-                                            else if ($button-name = 'pdf') then
-                                                'pdf'
-                                            else if ($button-name = 'tiff') then
-                                                'tiff'
-                                            else
-                                                'other'
-                                        )]
+                                        'oxf.fr.detail.buttons',
+                                $buttons-names :=
+                                    if (xxf:is-blank($buttons-property-override) and $fr-mode = ('pdf', 'email')) then
+                                        ()
+                                    else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
+                                        'validate'
+                                    else
+                                        xxf:split(xxf:property(string-join(($buttons-property, $fr-app, $fr-form), '.'))),
+                                $is-inner :=
+                                    starts-with($buttons-property-override, 'oxf.fr.detail.buttons.inner')
+                            return
+                                for $button-name in $buttons-names
                                 return
-                                    ($button-name, $ref)[xxf:relevant($ref)]
+                                    let $visible-expression :=
+                                            xxf:property(
+                                                string-join(
+                                                    ('oxf.fr.detail.button', $button-name, 'visible', $fr-app, $fr-form),
+                                                    '.'
+                                                )
+                                            ),
+                                        $enabled-expression :=
+                                            xxf:property(
+                                                string-join(
+                                                    ('oxf.fr.detail.button', $button-name, 'enabled', $fr-app, $fr-form),
+                                                    '.'
+                                                )
+                                            ),
+                                        $visible-or-empty :=
+                                            if (xxf:non-blank($visible-expression)) then
+                                                boolean(xxf:instance('fr-form-instance')/saxon:evaluate($visible-expression))
+                                            else
+                                                (),
+                                        $enabled-or-empty :=
+                                            if (xxf:non-blank($enabled-expression)) then
+                                                boolean(xxf:instance('fr-form-instance')/saxon:evaluate($enabled-expression))
+                                            else
+                                                (),
+                                    return
+                                        for $ref in
+                                            if (exists($visible-or-empty) or exists($enabled-or-empty)) then
+                                                (
+                                                    if (exists($enabled-or-empty) and not($enabled-or-empty)) then
+                                                        ''
+                                                    else
+                                                        xxf:instance('fr-triggers-instance')/other
+                                                )[
+                                                    empty($visible-or-empty) or $visible-or-empty
+                                                ]
+                                            else if ($is-inner and $button-name = ('save-final', 'submit', 'send', 'review', 'pdf', 'tiff', 'email')) then
+                                                xxf:binding('fr-wizard-submit-hide')
+                                            else if ($is-inner and $button-name = 'wizard-next') then
+                                                xxf:binding('fr-wizard-next-hide')
+                                            else if ($is-inner and $button-name = 'wizard-prev') then
+                                                xxf:binding('fr-wizard-prev-hide')
+                                            else if ($button-name = 'wizard-prev') then
+                                                xxf:binding('fr-wizard-prev')
+                                            else if ($button-name = 'wizard-next') then
+                                                xxf:binding('fr-wizard-next')
+                                            else
+                                                xxf:instance('fr-triggers-instance')/*[name() = (
+                                                    if ($button-name = 'summary') then
+                                                        'can-access-summary'
+                                                    else if ($button-name = 'refresh') then
+                                                        'noscript'
+                                                    else if ($button-name = 'pdf') then
+                                                        'pdf'
+                                                    else if ($button-name = 'tiff') then
+                                                        'tiff'
+                                                    else
+                                                        'other'
+                                                )]
+                                        return
+                                            ($button-name, $ref)[xxf:relevant($ref)]
                         "/>
 
                     <xf:repeat ref="$names-and-refs-if-relevant[position() mod 2 = 1]">

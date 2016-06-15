@@ -85,13 +85,9 @@ object RRRAction {
 
   private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
   private object ConcreteRecalculateFunctions extends XFormsRecalculateFunctions
-  private object ConcreteRevalidateFunctions  extends XFormsRevalidateFunctions
 
   def rebuild(model: XFormsModel, deferred: Boolean = false) =
     execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)
-
-  def revalidate(model: XFormsModel, deferred: Boolean = false) =
-    execute(ConcreteRevalidateFunctions, model, deferred, applyDefaults = false)
 
   def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false) =
     execute(ConcreteRecalculateFunctions, model, deferred, applyDefaults)

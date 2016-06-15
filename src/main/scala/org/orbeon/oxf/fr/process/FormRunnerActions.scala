@@ -110,13 +110,11 @@ trait FormRunnerActions {
       // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
       // before calling the submission
       recalculate(PersistenceModel)
-      revalidate (PersistenceModel)
       refresh    (PersistenceModel)
 
       if (isNew) {
         // Manual dependency HACK: RR fr-form-model as we have changed mode
         recalculate(FormModel)
-        revalidate(FormModel)
       }
 
       (beforeURLs, afterURLs, isDraft)

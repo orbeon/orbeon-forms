@@ -320,11 +320,6 @@ object XFormsAPI {
     resolveAs[XFormsModel](modelId) foreach
       (RRRAction.rebuild(_, deferred))
 
-  // xf:revalidate
-  def revalidate(modelId: String, deferred: Boolean = false): Unit =
-    resolveAs[XFormsModel](modelId) foreach
-      (RRRAction.revalidate(_, deferred))
-
   // xf:recalculate
   def recalculate(modelId: String, deferred: Boolean = false, applyDefaults: Boolean = false): Unit =
     resolveAs[XFormsModel](modelId) foreach

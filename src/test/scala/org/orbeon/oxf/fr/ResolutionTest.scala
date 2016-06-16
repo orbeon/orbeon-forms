@@ -37,7 +37,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <xh:head>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
           <xf:instance id="fr-form-instance">
             <form>
               <section>

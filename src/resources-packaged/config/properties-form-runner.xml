@@ -12,7 +12,8 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- === Persistence configuration === -->
 
@@ -109,6 +110,11 @@
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-final.*.*"             value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.submit.*.*"                 value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.refresh.visible.*.*">
+        fr:is-noscript()
+    </property>
+
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/>
 

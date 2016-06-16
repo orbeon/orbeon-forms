@@ -699,8 +699,6 @@
                                                 xxf:instance('fr-triggers-instance')/*[name() = (
                                                     if ($button-name = 'summary') then
                                                         'can-access-summary'
-                                                    else if ($button-name = 'refresh') then
-                                                        'noscript'
                                                     else if ($button-name = 'pdf') then
                                                         'pdf'
                                                     else if ($button-name = 'tiff') then

@@ -478,7 +478,6 @@
             <can-access-summary/>
             <pdf/>
             <tiff/>
-            <noscript/>
             <other/>
         </triggers>
     </xf:instance>
@@ -510,9 +509,6 @@
                  relevant="version:isPE()" xmlns:version="java:org.orbeon.oxf.common.Version"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and xxf:readonly(../strict-submit)"/>
-
-        <xf:bind ref="noscript"
-                 relevant="property('xxf:noscript')"/>
     </xf:bind>
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity

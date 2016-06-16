@@ -109,7 +109,7 @@ class XFormsStaticStateImpl(
         val maybeAVT = XFormsUtils.maybeAVT(rawPropertyValue)
         topLevelPart.defaultModel match {
           case Some(model) if maybeAVT ⇒
-            Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, XFormsFunctionLibrary, avt = true))
+            Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, functionLibrary, avt = true))
           case None if maybeAVT ⇒
             throw new IllegalArgumentException("can only evaluate AVT properties if a model is present")
           case _ ⇒

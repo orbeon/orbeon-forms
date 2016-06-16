@@ -418,9 +418,24 @@
             ev:defaultAction="cancel"
             xxf:phantom="true">
             <xf:action type="xpath">
-                frf:errorMessage(if (event('error-type') = 'size-error')
-                                 then xxf:format-message(xxf:r('detail.messages.upload-error-size', 'fr-fr-resources'), (event('permitted'), event('actual')))
-                                 else xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
+                frf:errorMessage(
+                    if (event('error-type') = 'size-error') then
+                        xxf:format-message(
+                            xxf:r(
+                                'detail.messages.upload-error-size',
+                                'fr-fr-resources'
+                            ),
+                            (
+                                event('permitted'),
+                                event('actual')
+                            )
+                        )
+                    else
+                        xxf:r(
+                            concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')),
+                            'fr-fr-resources'
+                        )
+                )
             </xf:action>
         </xf:action>
 

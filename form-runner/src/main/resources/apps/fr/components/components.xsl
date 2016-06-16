@@ -400,8 +400,8 @@
 
         <xf:model id="fr-pdf-model">
             <!-- Open PDF for the current form data (dispatch of the event done from pdf-instant-view.xpl) -->
-            <xf:action event="fr-open-pdf" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                xxf:instance('fr-form-instance')/process:runProcess(
+            <xf:action event="fr-open-pdf" type="xpath">
+                xxf:instance('fr-form-instance')/fr:run-process(
                     'oxf.fr.detail.process',
                     concat(
                         'open-pdf(lang = "',

@@ -14,14 +14,17 @@
 package org.orbeon.oxf.fr.library
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels.ErrorLevel
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsUserRoles
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
+import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{BooleanValue, IntegerValue, StringValue}
 import org.orbeon.scaxon.XML._
 
@@ -55,6 +58,16 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     // Other functions
     Fun("user-roles", classOf[XXFormsUserRoles], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+
+    Fun("run-process-by-name", classOf[FRRunProcessByName], op = 0, min = 2, Type.ITEM_TYPE, EMPTY,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("run-process", classOf[FRRunProcess], op = 0, min = 2, Type.ITEM_TYPE, EMPTY,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
   }
 }
 
@@ -118,5 +131,19 @@ private object FormRunnerFunctions {
   class IntFunction extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): IntegerValue =
       IndexedIntFunctions(operation).apply()
+  }
+
+  class FRRunProcessByName extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): Item = {
+      SimpleProcess.runProcessByName(stringArgument(0)(context), stringArgument(1)(context))
+      null
+    }
+  }
+
+  class FRRunProcess extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): Item = {
+      SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context))
+      null
+    }
   }
 }

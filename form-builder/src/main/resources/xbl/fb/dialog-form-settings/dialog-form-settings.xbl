@@ -343,9 +343,8 @@
                                 <xf:action
                                     event="DOMActivate"
                                     if="$is-new-form"
-                                    type="xpath"
-                                    xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                                    process:runProcessByName('oxf.fr.detail.process', 'close')
+                                    type="xpath">
+                                    fr:run-process-by-name('oxf.fr.detail.process', 'close')
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>

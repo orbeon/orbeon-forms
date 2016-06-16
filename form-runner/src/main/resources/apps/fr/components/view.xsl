@@ -351,8 +351,8 @@
                 </xf:trigger>
             </xf:group>
             <!-- React to activation of both triggers -->
-            <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                process:runProcess('oxf.fr.detail.process', 'toggle-noscript')
+            <xf:action ev:event="DOMActivate" type="xpath">
+                fr:run-process('oxf.fr.detail.process', 'toggle-noscript')
             </xf:action>
         </xf:group>
     </xsl:template>
@@ -400,13 +400,13 @@
         <fr:alert-dialog id="fr-confirmation-dialog" close="true">
             <fr:label ref="$fr-resources/detail/messages/confirmation-dialog-title"/>
             <fr:negative-choice>
-                <xf:action event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                    process:runProcess('oxf.fr.detail.process', 'abort')
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'abort')
                 </xf:action>
             </fr:negative-choice>
             <fr:positive-choice>
-                <xf:action event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                    process:runProcess('oxf.fr.detail.process', 'resume')
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'resume')
                 </xf:action>
             </fr:positive-choice>
         </fr:alert-dialog>

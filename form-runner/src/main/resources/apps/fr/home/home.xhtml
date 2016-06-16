@@ -20,8 +20,6 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-         xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
          xmlns:version="java:org.orbeon.oxf.common.Version"
 
          lang="{xxf:instance('fr-fr-language-instance')}"
@@ -108,11 +106,11 @@
 
                 <xf:action type="xpath">
                     if (not(version:isPE()) or instance()/current-remote-server = 0) then
-                        process:runProcessByName('oxf.fr.home.process', 'load-local')
+                        fr:run-process-by-name('oxf.fr.home.process', 'load-local')
                     else if ($remote-set) then
-                        process:runProcess('oxf.fr.home.process', 'load-start-with-remote')
+                        fr:run-process('oxf.fr.home.process', 'load-start-with-remote')
                     else
-                        process:runProcessByName('oxf.fr.home.process', 'load-start-with-credentials')
+                        fr:run-process-by-name('oxf.fr.home.process', 'load-start-with-credentials')
                 </xf:action>
             </xf:action>
 
@@ -284,7 +282,7 @@
                               fr-local-to-remote-button fr-remote-to-local-button
                               fr-upgrade-local-button   fr-upgrade-remote-button"
                     type="xpath">
-                process:runProcessByName('oxf.fr.home.process', substring-before(substring-after(event('xxf:observerid'), 'fr-'), '-button'))
+                fr:run-process-by-name('oxf.fr.home.process', substring-before(substring-after(event('xxf:observerid'), 'fr-'), '-button'))
             </xf:action>
 
             <!-- Open confirmation dialog in response to process event -->
@@ -497,7 +495,7 @@
                     value="'true'"/>
 
                 <xf:action type="xpath">
-                    process:runProcess('oxf.fr.home.process', 'error-message("database-error")')
+                    fr:run-process('oxf.fr.home.process', 'error-message("database-error")')
                 </xf:action>
             </xf:action>
 
@@ -942,12 +940,12 @@
             <!-- Message is dynamically set -->
             <fr:negative-choice>
                 <xf:action event="DOMActivate" type="xpath">
-                    process:runProcessByName('oxf.fr.home.process', 'confirmation-cancel')
+                    fr:run-process-by-name('oxf.fr.home.process', 'confirmation-cancel')
                 </xf:action>
             </fr:negative-choice>
             <fr:positive-choice xxf:modal="true">
                 <xf:action event="DOMActivate" type="xpath">
-                    process:runProcessByName('oxf.fr.home.process', 'confirmation-ok')
+                    fr:run-process-by-name('oxf.fr.home.process', 'confirmation-ok')
                 </xf:action>
             </fr:positive-choice>
         </fr:alert-dialog>
@@ -1019,7 +1017,7 @@
 
             <xf:action event="xxforms-dialog-close">
                 <xf:action type="xpath">
-                    process:runProcessByName('oxf.fr.home.process', if (event('fr-connect')) then 'credentials-ok' else 'credentials-cancel')
+                    fr:run-process-by-name('oxf.fr.home.process', if (event('fr-connect')) then 'credentials-ok' else 'credentials-cancel')
                 </xf:action>
             </xf:action>
 

@@ -60,8 +60,8 @@
                 <xf:action event="xforms-submit-done">
 
                     <!-- See also https://github.com/orbeon/orbeon-forms/issues/1874 -->
-                    <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                        process:runProcessByName('oxf.fr.service', 'duplicate.transform')
+                    <xf:action type="xpath">
+                        fr:run-process-by-name('oxf.fr.service', 'duplicate.transform')
                     </xf:action>
 
                     <xf:action type="xpath">

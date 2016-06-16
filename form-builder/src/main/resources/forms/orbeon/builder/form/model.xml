@@ -180,8 +180,8 @@
         <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
 
         <!-- Mark data as safe. Once user sets metadata from dialog, data will be marked dirty automatically.  -->
-        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-            process:runProcess('oxf.fr.detail.process', 'set-data-status(status = "safe")')
+        <xf:action type="xpath">
+            fr:run-process('oxf.fr.detail.process', 'set-data-status(status = "safe")')
         </xf:action>
 
     </xf:action>
@@ -263,8 +263,8 @@
 
         <!-- Free fr-form-instance and re-mark data as safe -->
         <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
-        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-            process:runProcess('oxf.fr.detail.process', 'set-data-status(status = "safe")')
+        <xf:action type="xpath">
+            fr:run-process('oxf.fr.detail.process', 'set-data-status(status = "safe")')
         </xf:action>
 
     </xf:action>
@@ -552,8 +552,8 @@
     <!-- Publish form operation -->
     <xf:action ev:event="fb-publish-form">
         <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
-        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-            process:runProcessByName('oxf.fr.detail.process', 'save')
+        <xf:action type="xpath">
+            fr:run-process-by-name('oxf.fr.detail.process', 'save')
         </xf:action>
         <xf:action type="xpath">
             for $annotated in

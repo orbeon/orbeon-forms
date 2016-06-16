@@ -42,8 +42,8 @@
                     value="$loading-indicator = 'modal'"/>
 
             <!-- React to button pressed -->
-            <xf:action event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                xxf:instance('fr-form-instance')/process:runProcessByName('oxf.fr.detail.process', $button-name)
+            <xf:action event="DOMActivate" type="xpath">
+                xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', $button-name)
             </xf:action>
 
             <xf:group ref="xxf:binding('fr-process-button')">

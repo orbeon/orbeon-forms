@@ -673,7 +673,7 @@
                                             if (xxf:non-blank($enabled-expression)) then
                                                 boolean(xxf:instance('fr-form-instance')/saxon:evaluate($enabled-expression))
                                             else
-                                                (),
+                                                ()
                                     return
                                         for $ref in
                                             if (exists($visible-or-empty) or exists($enabled-or-empty)) then

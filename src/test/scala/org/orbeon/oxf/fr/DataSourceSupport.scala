@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr
 import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 
 import org.apache.commons.dbcp.BasicDataSource
-import org.orbeon.oxf.fr.persistence.relational.Provider.{DB2, _}
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.immutable

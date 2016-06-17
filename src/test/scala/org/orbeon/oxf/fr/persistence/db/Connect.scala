@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.db
 import java.sql.{Connection, DriverManager}
 
 import org.orbeon.oxf.fr.DataSourceSupport
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {

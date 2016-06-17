@@ -12,43 +12,7 @@ case class DatasourceDescriptor(name: String, driver: String, url: String, usern
 
 object DatasourceDescriptor {
 
-  import DataSourceSupport._
-
   def apply(provider: Provider, user: Option[String]): DatasourceDescriptor = {
-
-    val (url, username, password) = connectionDetailsFromEnv(provider, user)
-
-    DatasourceDescriptor(
-      name     = provider.name,
-      driver   = DriverClassNames(provider),
-      url      = url,
-      username = username,
-      password = password
-    )
-  }
-
-}
-
-object DataSourceSupport {
-
-  def withDatasources[T](datasources: immutable.Seq[DatasourceDescriptor])(thunk: ⇒ T): T = {
-    val previousProperties = setupInitialContextForJDBC()
-    datasources foreach bindDatasource
-    val result = thunk
-    datasources foreach unbindDatasource
-    clearInitialContextForJDBC(previousProperties)
-    result
-  }
-
-  val DriverClassNames = Map(
-    Oracle     → "oracle.jdbc.OracleDriver",
-    MySQL      → "com.mysql.jdbc.Driver",
-    SQLServer  → "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-    PostgreSQL → "org.postgresql.Driver",
-    DB2        → "com.ibm.db2.jcc.DB2Driver"
-  )
-
-  def connectionDetailsFromEnv(provider: Provider, user: Option[String]) = {
 
     val url = provider match {
       case Oracle     ⇒ System.getenv("ORACLE_URL")
@@ -65,7 +29,37 @@ object DataSourceSupport {
 
     val password = System.getenv("RDS_PASSWORD")
 
-    (url, username, password)
+    DatasourceDescriptor(
+      name     = provider.name,
+      driver   = DriverClassNames(provider),
+      url      = url,
+      username = username,
+      password = password
+    )
+  }
+
+  private val DriverClassNames = Map(
+    Oracle     → "oracle.jdbc.OracleDriver",
+    MySQL      → "com.mysql.jdbc.Driver",
+    SQLServer  → "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+    PostgreSQL → "org.postgresql.Driver",
+    DB2        → "com.ibm.db2.jcc.DB2Driver"
+  )
+}
+
+// Utility to setup datasources outside of a servlet container environment, such as when running tests.
+object DataSourceSupport {
+
+  // Run the given thunk in the context of the datasources specified by the given descriptors.
+  // This sets a JNDI context, binds the datasources, runs the thunk, unbind the datasources, and
+  // does some JNDI context cleanup.
+  def withDatasources[T](datasources: immutable.Seq[DatasourceDescriptor])(thunk: ⇒ T): T = {
+    val originalProperties = setupInitialContextForJDBC()
+    datasources foreach bindDatasource
+    val result = thunk
+    datasources foreach unbindDatasource
+    clearInitialContextForJDBC(originalProperties)
+    result
   }
 
   private val BuildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
@@ -77,39 +71,41 @@ object DataSourceSupport {
 
   private def setupInitialContextForJDBC(): List[(String, Option[String])] = {
 
-    val previousProperties = List(Context.INITIAL_CONTEXT_FACTORY, Context.URL_PKG_PREFIXES) map { name ⇒
+    val originalProperties = List(Context.INITIAL_CONTEXT_FACTORY, Context.URL_PKG_PREFIXES) map { name ⇒
       name → Option(System.getProperty(name))
     }
 
     System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory")
     System.setProperty(Context.URL_PKG_PREFIXES,        "org.apache.naming")
 
-    try {
-      new InitialContext                      |!>
-        (_.createSubcontext("java:"))         |!>
-        (_.createSubcontext("java:comp"))     |!>
-        (_.createSubcontext("java:comp/env")) |!>
-        (_.createSubcontext("java:comp/env/jdbc"))
-    } catch {
-      case e: NameAlreadyBoundException ⇒ // ignore
-    }
+    def createSubcontextIgnoreIfBound(ic: InitialContext, name: String) =
+      try {
+        ic.createSubcontext(name)
+      } catch {
+        case e: NameAlreadyBoundException ⇒ // ignore
+      }
 
-    previousProperties
+    new InitialContext                                         |!>
+      (createSubcontextIgnoreIfBound(_, "java:"             )) |!>
+      (createSubcontextIgnoreIfBound(_, "java:comp"         )) |!>
+      (createSubcontextIgnoreIfBound(_, "java:comp/env"     )) |!>
+      (createSubcontextIgnoreIfBound(_, "java:comp/env/jdbc"))
+
+    originalProperties
   }
 
-  private def clearInitialContextForJDBC(previousProperties: List[(String, Option[String])]) = {
-    previousProperties foreach {
+  private def clearInitialContextForJDBC(originalProperties: List[(String, Option[String])]) =
+    originalProperties foreach {
       case (name, Some(value)) ⇒ System.setProperty(name, value)
       case (name, None)        ⇒ System.clearProperty(name)
     }
-  }
 
   private def bindDatasource(ds: DatasourceDescriptor): Unit =
     (new InitialContext).rebind(
       NamingPrefix + ds.name,
       new BasicDataSource                   |!>
-        (_.setDriverClassName(ds.driver))   |!>
-        (_.setUrl            (ds.url))      |!>
+        (_.setDriverClassName(ds.driver  )) |!>
+        (_.setUrl            (ds.url     )) |!>
         (_.setUsername       (ds.username)) |!>
         (_.setPassword       (ds.password))
     )

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.db
 
 import java.sql.{Connection, DriverManager}
 
-import org.orbeon.oxf.fr.DataSourceSupport
+import org.orbeon.oxf.fr.{DataSourceSupport, DatasourceDescriptor}
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.ScalaUtils._
 
@@ -28,8 +28,8 @@ private[persistence] object Connect {
   def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(tomcatUserFromBuildNumber), block)
 
   private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
-    val (url, username, password) = connectionDetailsFromEnv(provider, user)
-    useAndClose(DriverManager.getConnection(url, username, password))(block)
+    val descriptor = DatasourceDescriptor(provider, user)
+    useAndClose(DriverManager.getConnection(descriptor.url, descriptor.username, descriptor.password))(block)
   }
 
   def getTableNames(provider: Provider, connection: Connection): List[String] = {

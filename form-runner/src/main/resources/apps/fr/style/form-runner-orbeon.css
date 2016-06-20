@@ -167,11 +167,6 @@ body.orbeon {
 .orbeon .xforms-dialog .xforms-required.xforms-empty .xforms-label:before {
   color: #b94a48;
 }
-.orbeon .xforms-invalid.xforms-visited .xforms-input-input,
-.orbeon .xforms-invalid.xforms-visited input[type='password'],
-.orbeon textarea.xforms-invalid.xforms-visited {
-  border-color: #b94a48;
-}
 .orbeon .xforms-upload-info {
   background-color: transparent;
 }

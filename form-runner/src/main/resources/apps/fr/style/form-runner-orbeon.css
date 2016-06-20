@@ -173,57 +173,6 @@ body.orbeon {
 .orbeon .fr-toc a {
   text-decoration: none;
 }
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-title {
-  padding: 5px 10px;
-  color: white;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-level-info .fr-error-title {
-  background-color: #333333;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-level-warning .fr-error-title {
-  background-color: #fbb450;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-level-error .fr-error-title {
-  background-color: #b94a48;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-alert-error {
-  color: #b94a48;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-alert-warning {
-  color: #fbb450;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-alert-info {
-  color: #333333;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-alert .xforms-output-output {
-  display: inline-block;
-  vertical-align: top;
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-alert .xforms-output-output ul {
-  list-style-type: square;
-}
-.orbeon .fr-view .xbl-fr-error-summary table {
-  margin: 2px;
-}
-.orbeon .fr-view .xbl-fr-error-summary table td {
-  padding: 2px 10px;
-  vertical-align: top;
-}
-.orbeon .fr-view .xbl-fr-error-summary table td ul {
-  margin-bottom: 0;
-}
-.orbeon .fr-view .xbl-fr-error-summary table .fr-error-number {
-  text-align: right;
-}
-.orbeon .fr-view .xbl-fr-error-summary table .fr-error-number .xforms-output-output:after {
-  content: ".";
-}
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-summary-body {
-  padding: 0;
-  margin-bottom: 10px;
-  background-color: #f5f5f5;
-  border: 1px solid #e3e3e3;
-}
 .orbeon .xforms-static,
 .orbeon .fr-static {
   min-height: 1em;

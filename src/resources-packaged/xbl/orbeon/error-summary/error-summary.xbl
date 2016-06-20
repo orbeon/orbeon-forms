@@ -29,14 +29,7 @@
      -->
     <xbl:binding id="fr-error-summary-binding" element="fr|error-summary">
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-error-summary { clear: both; width: 100%; padding: 0 }
-                .xbl-fr-error-summary .fr-error-title { display: block }
-                .xbl-fr-error-summary .fr-error-summary-body { display: block }
-                .xbl-fr-error-summary .fr-error-list > li { margin-bottom: .5em }
-                .xbl-fr-error-summary .fr-error-alert-error { color: red }
-                .xbl-fr-error-summary .fr-error-alert-warning { color: orange }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/error-summary/error-summary.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">
@@ -393,56 +386,53 @@ Inserting error information into error list:
                                         <xsl:copy-of select="@*|node()"/>
                                     </xf:label>
                                 </xsl:for-each>
-                                <!-- Anchor for navigation -->
-                                <xh:table class="fr-error-list">
 
-                                    <xh:colgroup>
-                                        <xh:col class="fr-grid-col-1"/>
-                                        <xh:col class="fr-grid-col-2"/>
-                                        <xh:col class="fr-grid-col-3"/>
-                                    </xh:colgroup>
+                                <!-- Global errors -->
+                                <xsl:for-each select="$fr-errors">
+                                    <xf:group ref=".[exists({@ref, @nodeset})]" xxbl:scope="outer">
+                                        <xh:ol class="fr-error-group">
+                                            <xf:repeat ref="{@ref, @nodeset}">
+                                                <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
+                                                <xh:li>
+                                                    <!-- Clickable / linkable label -->
+                                                    <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
+                                                    <xh:td>
+                                                        <xsl:if test="exists(fr:label)">
+                                                            <xf:output class="fr-error-label">
+                                                                <xsl:copy-of select="fr:label/(@*|node())"/>
+                                                            </xf:output>
+                                                        </xsl:if>
+                                                    </xh:td>
+                                                    <xh:td>
+                                                        <!-- Alert message -->
+                                                        <xsl:if test="exists(fr:alert)">
+                                                            <xf:output class="fr-error-alert fr-error-alert-error">
+                                                                <xsl:copy-of select="fr:alert/(@*|node())"/>
+                                                            </xf:output>
+                                                        </xsl:if>
+                                                    </xh:td>
+                                                </xh:li>
+                                            </xf:repeat>
+                                        </xh:ol>
+                                    </xf:group>
+                                </xsl:for-each>
 
-                                    <!-- Display global errors -->
-                                    <xsl:for-each select="$fr-errors">
-                                        <xf:repeat ref="{@ref, @nodeset}" xxbl:scope="outer" xmlns:v="http://www.example.com/validation">
-                                            <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
-                                            <xh:tr>
+                                <!-- Controls errors -->
+                                <xf:var name="noscript" value="property('xxf:noscript')"/>
+                                <xf:group ref=".[exists($visible-errors-for-section)]">
+                                    <xh:ol class="fr-error-group">
+                                        <xf:repeat ref="$visible-errors-for-section" id="er">
+                                            <xh:li>
                                                 <!-- Clickable / linkable label -->
-                                                <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
-                                                <xh:td>
-                                                    <xsl:if test="exists(fr:label)">
-                                                        <xf:output class="fr-error-label">
-                                                            <xsl:copy-of select="fr:label/(@*|node())"/>
-                                                        </xf:output>
-                                                    </xsl:if>
-                                                </xh:td>
-                                                <xh:td>
-                                                    <!-- Alert message -->
-                                                    <xsl:if test="exists(fr:alert)">
-                                                        <xf:output class="fr-error-alert fr-error-alert-error">
-                                                            <xsl:copy-of select="fr:alert/(@*|node())"/>
-                                                        </xf:output>
-                                                    </xsl:if>
-                                                </xh:td>
-                                            </xh:tr>
-                                        </xf:repeat>
-                                    </xsl:for-each>
+                                                <xf:var
+                                                    name="label"
+                                                    value="if (xxf:non-blank(@label)) then @label else '&lt;i class=&quot;icon-arrow-right&quot;/>'"/>
+                                                <xf:var
+                                                    name="focusable"
+                                                    value="xxf:focusable(@absolute-id)"/>
 
-                                    <!-- Display control errors -->
-                                    <xf:var name="noscript" value="property('xxf:noscript')"/>
-                                    <xf:repeat ref="$visible-errors-for-section" id="er">
-                                        <xh:tr>
-                                            <!-- Clickable / linkable label -->
-                                            <xf:var
-                                                name="label"
-                                                value="if (xxf:non-blank(@label)) then @label else '&lt;i class=&quot;icon-arrow-right&quot;/>'"/>
-                                            <xf:var
-                                                name="focusable"
-                                                value="xxf:focusable(@absolute-id)"/>
-
-                                            <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
-                                            <xh:td>
-                                                <xf:switch caseref="$noscript" xxf:xforms11-switch="true">
+                                                <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
+                                                <xf:switch class="fr-error-link" caseref="$noscript" xxf:xforms11-switch="true">
                                                     <xf:case value="true()">
                                                         <!-- Use a plain link to the client id -->
                                                         <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="$label" class="fr-error-label"/></xh:a>
@@ -464,17 +454,15 @@ Inserting error information into error list:
                                                         </xf:switch>
                                                     </xf:case>
                                                 </xf:switch>
-                                            </xh:td>
-                                            <xh:td>
                                                 <xf:output
                                                     class="fr-error-alert fr-error-alert-{{@level}}"
                                                     mediatype="text/html"
                                                     value="@alert"
                                                     id="ao"/>
-                                            </xh:td>
-                                        </xh:tr>
-                                    </xf:repeat>
-                                </xh:table>
+                                            </xh:li>
+                                        </xf:repeat>
+                                    </xh:ol>
+                                </xf:group>
                             </xf:group>
 
                             <!-- Include optional footer -->

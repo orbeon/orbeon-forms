@@ -10,10 +10,6 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@error: #B94A48;
-@warning: lighten(@orange, 15%);
-@info: @textColor;
-
 @import (reference) "../../../../../../../bootstrap-src/less/variables";
 @import (reference) "../../../../../../../bootstrap-src/less/mixins";
 @import (reference) "form-runner-common";
@@ -195,52 +191,6 @@ body.orbeon { background-color: @frBackground }
 
     // Table of contents
     .fr-toc a { text-decoration: none }
-
-    // Error summary
-    .fr-view .xbl-fr-error-summary {
-        .fr-error-title {
-            padding: 5px 10px;
-            color: white;
-        }
-
-        // Multiple levels can be mixed so make sure the strongest wins
-        .fr-level-info    .fr-error-title { background-color: @info; }
-        .fr-level-warning .fr-error-title { background-color: @warning; }
-        .fr-level-error   .fr-error-title { background-color: @error; }
-
-         // Override defaults of XBL component
-        .fr-error-alert-error   { color: @error }
-        .fr-error-alert-warning { color: @warning }
-        .fr-error-alert-info    { color: @info }
-
-        .fr-error-alert .xforms-output-output {
-            display: inline-block;
-            vertical-align: top;
-            ul { list-style-type: square }
-        }
-
-        table {
-            margin: 2px;
-
-            td {
-                padding: 2px 10px;
-                vertical-align: top;
-
-                ul {
-                    margin-bottom: 0;
-                }
-            }
-            .fr-error-number {
-                text-align: right;
-                .xforms-output-output:after { content: "." }
-            }
-        }
-
-        // Mix-in a border into the error summary body
-        .fr-error-summary-body {
-            .fr-border;
-        }
-    }
 
     // Add background to static read-only fields and special output fields
     .xforms-static, .fr-static { min-height: 1em }

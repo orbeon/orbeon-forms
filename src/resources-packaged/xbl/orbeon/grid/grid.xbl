@@ -267,6 +267,10 @@
                                                  ()
                                         )
                                     "/>
+                                <!-- This can possibly help accessibility -->
+                                <xsl:if test="$table-elem = 'xh:table' and $has-rowspan">
+                                    <xsl:attribute name="role" select="'presentation'"/>
+                                </xsl:if>
                                 <!-- If repeat, add buttons and headers-->
                                 <xsl:if test="$is-repeat">
                                     <!-- Colgroup to make column sizing with CSS easier -->

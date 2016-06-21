@@ -36,9 +36,6 @@
   text-align: center;
   margin: 8px 30px 8px 0;
 }
-.orbeon .xbl-fr-wizard .fr-wizard-toc .nav li > .xforms-trigger {
-  float: right;
-}
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav a {
   text-decoration: none;
   overflow: hidden;
@@ -61,6 +58,9 @@
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav .nav-list {
   list-style-type: none;
   padding-right: 0;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-separate-toc li > .xforms-trigger {
+  float: right;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-body {
   border-left: 1px solid #e3e3e3;

@@ -25,16 +25,25 @@
   margin-bottom: 0;
   border-bottom: 1px solid #e3e3e3;
 }
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav ul,
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav li {
+  clear: both;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav .label {
+  display: inline-block;
+  float: right;
+  width: 70px;
+  text-align: center;
+  margin: 8px 30px 8px 0;
+}
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav li > .xforms-trigger {
+  float: right;
+}
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav a {
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.orbeon .xbl-fr-wizard .fr-wizard-toc .nav a .label {
-  float: right;
-  width: 70px;
-  text-align: center;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav .invalid > span > a {
   color: #b94a48;
@@ -49,8 +58,9 @@
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav li {
   line-height: 30px;
 }
-.orbeon .xbl-fr-wizard .fr-wizard-toc .nav ul ul {
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav .nav-list {
   list-style-type: none;
+  padding-right: 0;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-body {
   border-left: 1px solid #e3e3e3;

@@ -581,35 +581,13 @@
                                 name="section-label"
                                 value="xxf:label('{$static-section-id}')"/>
 
+                            <!-- Show non-activable title in separate toc mode -->
+                            <xf:output ref="$section-label[$separate-toc-mode]"/>
+
                             <xf:trigger appearance="minimal">
-                                <xf:label>
-                                    <xf:output value="$section-label"/>
-                                    <xsl:if test="$static-is-top-level-section">
-                                        <!-- NOTE: Hide labels when not in separate-toc mode as they take a lot of space -->
-                                        <xh:span class="{{'xforms-hidden'[not(xxf:instance('local')/separate-toc/data(.))]}} label label-{{
-                                            if ($top-level-section-has-visible-errors) then
-                                                'important'
-                                            else if ($top-level-section-incomplete) then
-                                                'warning'
-                                            else if ($top-level-section-not-started) then
-                                                ''
-                                            else
-                                                'success'
-                                        }}"><xf:output value="
-                                                xxf:r(
-                                                    if ($top-level-section-has-visible-errors) then
-                                                        'components.wizard.errors'
-                                                    else if ($top-level-section-incomplete) then
-                                                        'components.wizard.incomplete'
-                                                    else if ($top-level-section-not-started) then
-                                                        'components.wizard.not-started'
-                                                    else
-                                                        'components.wizard.complete',
-                                                    '|fr-fr-resources|'
-                                                )"/></xh:span>
-                                    </xsl:if>
-                                </xf:label>
-                                <xf:hint value="$section-label"/>
+                                <xf:label value="if ($separate-toc-mode) then xxf:r('components.wizard.edit', '|fr-fr-resources|') else $section-label"/>
+                                <xf:hint  value="$section-label"/>
+
                                 <xf:action event="DOMActivate" if="not($top-level-section-disabled)">
 
                                     <!-- Figure out the nav section id based on whether we support subsection navigation AND where in the hierarchy
@@ -652,6 +630,31 @@
                                     </xf:action>
                                 </xf:action>
                             </xf:trigger>
+
+                            <xsl:if test="$static-is-top-level-section">
+                                <!-- NOTE: Hide labels when not in separate-toc mode as they take a lot of space -->
+                                <xh:span class="{{'xforms-hidden'[not(xxf:instance('local')/separate-toc/data(.))]}} label{{
+                                    if ($top-level-section-has-visible-errors) then
+                                        ' label-important'
+                                    else if ($top-level-section-incomplete) then
+                                        ' label-warning'
+                                    else if ($top-level-section-not-started) then
+                                        ''
+                                    else
+                                        ' label-success'
+                                }}"><xf:output value="
+                                        xxf:r(
+                                            if ($top-level-section-has-visible-errors) then
+                                                'components.wizard.errors'
+                                            else if ($top-level-section-incomplete) then
+                                                'components.wizard.incomplete'
+                                            else if ($top-level-section-not-started) then
+                                                'components.wizard.not-started'
+                                            else
+                                                'components.wizard.complete',
+                                            '|fr-fr-resources|'
+                                        )"/></xh:span>
+                            </xsl:if>
 
                             <xsl:choose>
                                 <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">

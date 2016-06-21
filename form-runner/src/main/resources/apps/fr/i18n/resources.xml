@@ -106,6 +106,7 @@
                 <incomplete>Incomplete</incomplete>
                 <complete>Complete</complete>
                 <not-started>Not Started</not-started>
+                <edit>Edit</edit>
             </wizard>
         </components>
         <untitled-form>Untitled Form</untitled-form>
@@ -415,6 +416,7 @@
                 <incomplete>En cours</incomplete>
                 <complete>Rempli</complete>
                 <not-started>A remplir</not-started>
+                <edit>Editer</edit>
             </wizard>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
@@ -728,6 +730,7 @@
                 <incomplete>Incompleto</incomplete>
                 <complete>Completar</complete>
                 <not-started>No iniciado</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
@@ -1027,6 +1030,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
@@ -1324,6 +1328,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
@@ -1619,6 +1624,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
@@ -1927,6 +1933,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
@@ -2235,6 +2242,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
@@ -2543,6 +2551,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
@@ -2851,6 +2860,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Naamloos form</untitled-form>
@@ -3159,6 +3169,7 @@
                 <incomplete todo="true">[Incomplete]</incomplete>
                 <complete todo="true">[Complete]</complete>
                 <not-started todo="true">[Not Started]</not-started>
+                <edit todo="true">[Edit]</edit>
             </wizard>
         </components>
         <untitled-form>Formulário sem título</untitled-form>

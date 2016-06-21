@@ -17,6 +17,9 @@
 @frWizardTocWidth: 199px;
 @frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
 
+// Make li the same height as section title
+@wizardLineHeight: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
+
 .orbeon .xbl-fr-wizard {
 
     width: @frWizardWidth; // Avoid having TOC wrap below the body, see #1741
@@ -49,15 +52,25 @@
 
         .nav {
 
+            ul, li {
+                clear: both;
+            }
+
+            .label {
+                display: inline-block;
+                float: right;
+                width: 70px;
+                text-align: center;
+                margin: 8px @wizardLineHeight 8px 0;
+            }
+
+            li > .xforms-trigger {
+                float: right;
+            }
+
             a {
                 text-decoration: none;
                 .text-overflow();
-
-                .label {
-                    float: right;
-                    width: 70px;
-                    text-align: center;
-                }
             }
 
             .invalid > span > a {
@@ -79,12 +92,12 @@
             }
 
             li {
-                // Make li the same height as section title
-                line-height: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
+                line-height: @wizardLineHeight;
             }
 
-            ul ul {
+            .nav-list {
                 list-style-type: none;
+                padding-right: 0;
             }
         }
     }

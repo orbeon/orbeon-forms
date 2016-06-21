@@ -159,6 +159,8 @@ public class Variable {
     }
 
     /**
+     * See https://github.com/orbeon/orbeon-forms/issues/2803
+     *
      * This iterator rewraps NodeWrapper elements so that the original NodeWrapper is discarded and a new one created.
      * The reason we do this is that when we keep variables around, we don't want NodeWrapper.index to be set to
      * anything but -1. If we did that, then upon insertions of nodes in the DOM, the index would be out of date.

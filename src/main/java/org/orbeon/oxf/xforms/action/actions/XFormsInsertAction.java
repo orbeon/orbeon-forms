@@ -525,6 +525,7 @@ public class XFormsInsertAction extends XFormsAction {
         return findNodeIndex(rewrapIfNeeded(node));
     }
 
+    // See https://github.com/orbeon/orbeon-forms/issues/2803
     private static NodeInfo rewrapIfNeeded(NodeInfo node) {
         if (node instanceof VirtualNode) {
             final DocumentWrapper doc = (DocumentWrapper) node.getDocumentRoot();

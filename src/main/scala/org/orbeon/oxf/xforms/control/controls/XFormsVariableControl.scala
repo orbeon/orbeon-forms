@@ -29,8 +29,13 @@ import org.orbeon.saxon.value.EmptySequence
  *
  * Some of the logic is similar to what is in XFormsValueControl, except this works with ValueRepresentation.
  */
-class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsSingleNodeControl(container, parent, element, effectiveId) with NoLHHATrait {
+class XFormsVariableControl(
+  container   : XBLContainer,
+  parent      : XFormsControl,
+  element     : Element,
+  effectiveId : String
+) extends XFormsSingleNodeControl(container, parent, element, effectiveId)
+  with NoLHHATrait {
 
   override type Control <: VariableControl
 

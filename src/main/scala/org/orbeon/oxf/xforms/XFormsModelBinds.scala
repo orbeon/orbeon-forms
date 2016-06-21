@@ -154,7 +154,7 @@ trait RebuildBindOps {
       // Even before that, the bind tree could be modified more dynamically as is the case with controls
       _topLevelBinds =
         for (staticBind ← staticModel.topLevelBinds)
-          yield new RuntimeBind(model, staticBind, null, true)
+          yield new RuntimeBind(model, staticBind, null, isSingleNodeContext = true)
 
       isFirstRebuild = false
     }

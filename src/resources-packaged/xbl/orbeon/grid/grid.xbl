@@ -365,7 +365,7 @@
                                                              and make sure there is an empty value. -->
                                                         <xf:output
                                                                 xxbl:scope="outer"
-                                                                ref="$control-binding[xxf:relevant()], ''"
+                                                                ref="$control-binding[xxf:relevant()], ."
                                                                 value="''">
                                                             <xsl:if test="$control/@id">
                                                                 <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->

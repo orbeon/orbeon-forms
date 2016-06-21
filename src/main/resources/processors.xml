@@ -573,10 +573,6 @@
         <class name="org.orbeon.oxf.processor.ImageServer"/>
     </processor>
 
-    <processor name="oxf:xls-generator">
-        <class name="org.orbeon.oxf.processor.generator.XLSGenerator"/>
-    </processor>
-
     <processor name="oxf:email">
         <class name="org.orbeon.oxf.processor.EmailProcessor"/>
     </processor>

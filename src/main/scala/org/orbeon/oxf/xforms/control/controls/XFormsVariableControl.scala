@@ -51,7 +51,7 @@ class XFormsVariableControl(
   private var _previousValue: ValueRepresentation = null
 
   final def getValue = _value
-  def getVariableName = variable.getVariableName
+  def getVariableName = variable.staticVariable.name
 
   override def bindingContextForFollowing = _bindingContextForFollowing
   override def bindingContextForChild = _bindingContextForChild
@@ -74,9 +74,16 @@ class XFormsVariableControl(
         variable.markDirty()
         val contextStack = getContextStack
         contextStack.setBinding(bindingContext)
-        containingDocument.getRequestStats.withXPath(variable.expression) {
-          _value = variable.getVariableValue(contextStack, getEffectiveId, false, true)
+
+        variable.staticVariable.expressionStringOpt match {
+          case Some(expression) ⇒
+            containingDocument.getRequestStats.withXPath(expression) {
+              _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
+            }
+          case None ⇒
+            _value = variable.valueEvaluateIfNeeded(contextStack, getEffectiveId, pushOuterContext = false, handleNonFatal = true)
         }
+
       }
     } else {
       // Value is empty sequence if non-relevant

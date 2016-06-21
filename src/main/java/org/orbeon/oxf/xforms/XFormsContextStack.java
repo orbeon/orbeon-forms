@@ -215,7 +215,7 @@ public class XFormsContextStack {
         // further variables values could not be added. The method below temporarily adds more elements on the
         // stack but it is safer.
         getFunctionContext(sourceEffectiveId);
-        this.head = this.head.pushVariable((ElementAnalysis) staticVariable, variable.getVariableName(), variable.getVariableValue(this, sourceEffectiveId, true, handleNonFatal), newScope);
+        this.head = this.head.pushVariable((ElementAnalysis) staticVariable, variable.staticVariable().name(), variable.valueEvaluateIfNeeded(this, sourceEffectiveId, true, handleNonFatal), newScope);
 
         return this.head.variable().get();
     }

@@ -28,19 +28,22 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
   import VariableAnalysis._
 
   // Variable name and value
-  val name = element.attributeValue(NAME_QNAME)
+  val name = variableSelf.element.attributeValue(NAME_QNAME)
   if (name eq null)
     throw new ValidationException(s"`${element.getQualifiedName}` element must have a `name` attribute", ElementAnalysis.createLocationData(element))
 
+  val valueElement        = valueOrSequenceElement(variableSelf.element) getOrElse variableSelf.element
+  val expressionStringOpt = VariableAnalysis.valueOrSelectAttribute(valueElement)
+
   // Lazy because accessing scopeModel
   private lazy val nestedAnalysis =
-    valueOrSequenceElement(element) map { valueElement ⇒
+    valueOrSequenceElement(variableSelf.element) map { valueElement ⇒
       new SimpleElementAnalysis(staticStateContext, valueElement, Some(variableSelf), None, getChildElementScope(valueElement)) {
 
         nestedSelf ⇒
 
         override protected def computeValueAnalysis =
-          valueOrSelectAttribute(element) match {
+          valueOrSelectAttribute(variableSelf.element) match {
             case Some(value) ⇒ Some(analyzeXPath(nestedSelf.getChildrenContext, value))
             case None        ⇒ Some(StringAnalysis()) // TODO: store constant value?
           }
@@ -90,14 +93,8 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
 object VariableAnalysis {
 
-  def valueOrSelectAttributeJava(element: Element) =
-    valueOrSelectAttribute(element).orNull
-
   def valueOrSelectAttribute(element: Element) =
     Option(element.attributeValue(VALUE_QNAME)) orElse Option(element.attributeValue(SELECT_QNAME))
-
-  def valueOrSequenceElementJava(element: Element) =
-    valueOrSequenceElement(element).orNull
 
   def valueOrSequenceElement(element: Element) =
     Option(element.element(XXFORMS_VALUE_QNAME)) orElse Option(element.element(XXFORMS_SEQUENCE_QNAME))

@@ -43,7 +43,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
         nestedSelf ⇒
 
         override protected def computeValueAnalysis =
-          valueOrSelectAttribute(variableSelf.element) match {
+          valueOrSelectAttribute(nestedSelf.element) match {
             case Some(value) ⇒ Some(analyzeXPath(nestedSelf.getChildrenContext, value))
             case None        ⇒ Some(StringAnalysis()) // TODO: store constant value?
           }

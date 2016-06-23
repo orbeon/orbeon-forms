@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms
 import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.dom._
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util._
@@ -28,7 +29,6 @@ import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, NoDefaul
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 
 import scala.collection.JavaConverters._

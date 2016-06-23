@@ -14,13 +14,13 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.DocumentFactory
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 

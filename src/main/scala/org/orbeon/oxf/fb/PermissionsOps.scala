@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner.orbeonRoles
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.XPath
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 

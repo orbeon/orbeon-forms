@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.apache.commons.validator.routines.{EmailValidator, RegexValidator}
 import org.orbeon.dom.QName
+import org.orbeon.dom.saxon.TypedNodeWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.Logging._
@@ -33,7 +34,6 @@ import org.orbeon.oxf.xforms.model._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, XMLParsing}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, ValidationFailure}
-import org.orbeon.saxon.dom.TypedNodeWrapper
 import org.orbeon.saxon.expr.XPathContextMajor
 import org.orbeon.saxon.om.{Item, NodeInfo, StandardNames}
 import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}

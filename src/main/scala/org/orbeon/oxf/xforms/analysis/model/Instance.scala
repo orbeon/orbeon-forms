@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import org.orbeon.dom.saxon.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.http.Credentials
@@ -26,7 +27,6 @@ import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
-import org.orbeon.saxon.dom.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.saxon.om.DocumentInfo
 
 import scala.collection.JavaConverters._

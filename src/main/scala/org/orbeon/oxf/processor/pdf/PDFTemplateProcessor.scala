@@ -21,6 +21,7 @@ import java.util.{List ⇒ JList}
 import com.lowagie.text.{Image, Rectangle}
 import com.lowagie.text.pdf._
 import org.orbeon.dom.Element
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
@@ -34,7 +35,6 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
 

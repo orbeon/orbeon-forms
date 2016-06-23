@@ -1,4 +1,4 @@
-package org.orbeon.saxon.dom;
+package org.orbeon.dom.saxon;
 
 import org.orbeon.dom.*;
 import org.orbeon.saxon.Configuration;

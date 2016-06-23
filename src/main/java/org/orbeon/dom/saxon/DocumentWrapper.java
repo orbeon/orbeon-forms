@@ -1,4 +1,4 @@
-package org.orbeon.saxon.dom;
+package org.orbeon.dom.saxon;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
@@ -19,7 +19,7 @@ import java.util.Iterator;
  *
  * @author Michael H. Kay
  */
-public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
+public class DocumentWrapper extends org.orbeon.dom.saxon.NodeWrapper implements DocumentInfo {
 
     // An implementation of this interface can be set on DocumentWrapper to provide access to an index of elements by id.
     public interface IdGetter {

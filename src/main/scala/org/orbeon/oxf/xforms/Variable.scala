@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.Node
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, VariableAnalysis, VariableAnalysisTrait}
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.expr.LastPositionFinder
 import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation, VirtualNode}
 import org.orbeon.saxon.trans.XPathException

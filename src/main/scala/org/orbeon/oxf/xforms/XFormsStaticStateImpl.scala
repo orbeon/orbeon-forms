@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.dom.Document
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath.CompiledExpression
@@ -29,7 +30,6 @@ import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
 import org.orbeon.oxf.xml.{XMLReceiver, _}
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.xml.sax.Attributes
 

@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.dom.DocumentFactory
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.expr.XPathContext
 
 class XXFormsCreateDocument extends XFormsFunction  {

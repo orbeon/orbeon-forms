@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 

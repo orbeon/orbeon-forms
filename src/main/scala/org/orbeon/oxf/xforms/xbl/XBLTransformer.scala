@@ -17,6 +17,7 @@ import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom._
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -24,7 +25,6 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
 

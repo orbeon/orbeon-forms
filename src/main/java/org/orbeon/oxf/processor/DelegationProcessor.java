@@ -29,7 +29,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.*;
-import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
 import org.xml.sax.*;

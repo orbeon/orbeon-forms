@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.*;

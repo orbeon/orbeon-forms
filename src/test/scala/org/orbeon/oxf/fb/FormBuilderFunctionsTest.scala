@@ -14,6 +14,8 @@
 package org.orbeon.oxf.fb
 
 import org.junit.Test
+import org.orbeon.dom.saxon
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner
@@ -23,7 +25,6 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.dom.{DocumentWrapper, NodeWrapper}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
@@ -275,7 +276,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
   // See https://github.com/orbeon/orbeon-forms/issues/2803
   def rewrap(node: NodeInfo) = node match {
-    case nodeWrapper: NodeWrapper ⇒ node.root.asInstanceOf[DocumentWrapper].wrap(nodeWrapper.getUnderlyingNode.asInstanceOf[org.orbeon.dom.Node])
+    case nodeWrapper: saxon.NodeWrapper ⇒ node.root.asInstanceOf[DocumentWrapper].wrap(nodeWrapper.getUnderlyingNode.asInstanceOf[org.orbeon.dom.Node])
     case _ ⇒ node
   }
 

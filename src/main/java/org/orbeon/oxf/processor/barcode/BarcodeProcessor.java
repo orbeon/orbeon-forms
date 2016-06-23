@@ -28,7 +28,7 @@ import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 
 import java.awt.image.BufferedImage;

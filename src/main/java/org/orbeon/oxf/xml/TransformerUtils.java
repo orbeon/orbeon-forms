@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
-import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;

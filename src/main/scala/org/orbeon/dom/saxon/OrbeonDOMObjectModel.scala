@@ -1,17 +1,30 @@
-package org.orbeon.saxon.dom
+package org.orbeon.dom.saxon
 
 import java.io.Serializable
 import javax.xml.transform.{Result, Source}
 
-import org.orbeon.dom._
+import org.orbeon.dom.{Document, Node}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.ItemType
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.expr.{JPConverter, PJConverter, XPathContext}
-import org.orbeon.saxon.om._
+import org.orbeon.saxon.om.{ExternalObjectModel, NodeInfo, ValueRepresentation, VirtualNode}
 import org.orbeon.saxon.pattern.AnyNodeTest
 import org.orbeon.saxon.value.{SingletonNode, Value}
 
+/**
+  * Copyright (C) 2007 Orbeon, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify it under the terms of the
+  * GNU Lesser General Public License as published by the Free Software Foundation; either version
+  * 2.1 of the License, or (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  * See the GNU Lesser General Public License for more details.
+  *
+  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  */
 // Wrap Orbeon DOM documents as instances of the Saxon NodeInfo interface.
 // This started as a Saxon object model for DOM4J and got converted to Scala to support the Orbeon DOM based on DOM4J.
 object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
@@ -74,23 +87,3 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
   def sendSource(source: Source, receiver: Receiver, pipe: PipelineConfiguration): Boolean = false
   def unravel(source: Source, config: Configuration): NodeInfo = null
 }
-
-
-//
-// The contents of this file are subject to the Mozilla Public License Version 1.0 (the "License");
-// you may not use this file except in compliance with the License. You may obtain a copy of the
-// License at http://www.mozilla.org/MPL/
-//
-// Software distributed under the License is distributed on an "AS IS" basis,
-// WITHOUT WARRANTY OF ANY KIND, either express or implied.
-// See the License for the specific language governing rights and limitations under the License.
-//
-// The Original Code is: all this file.
-//
-// The Initial Developer of the Original Code is Michael H. Kay.
-//
-// Portions created by (your name) are Copyright (C) (your legal entity). All Rights Reserved.
-//
-// Contributor(s): Gunther Schadow (changes to allow access to public fields; also wrapping
-// of extensions and mapping of null to empty sequence).
-//

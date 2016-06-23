@@ -18,13 +18,13 @@ import org.orbeon.oxf.util.{ScalaUtils, XPath}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.{Int64Value, StringValue}
 import org.orbeon.dom
+import org.orbeon.dom.saxon.DocumentWrapper
 
 object SQLFunctionLibrary extends OrbeonFunctionLibrary {
 

@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.model.FlaggedDefaultsStrategy$;
 import org.orbeon.oxf.xforms.model.InstanceDataOps;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom.DocumentWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.AtomicValue;
 

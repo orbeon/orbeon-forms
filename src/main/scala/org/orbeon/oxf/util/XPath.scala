@@ -18,6 +18,7 @@ import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.{Result, Source, TransformerException, URIResolver}
 
 import org.apache.commons.lang3.StringUtils._
+import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
@@ -25,7 +26,6 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.{AnyItemType, Type}
-import org.orbeon.saxon.dom.OrbeonDOMObjectModel
 import org.orbeon.saxon.event.{PipelineConfiguration, Receiver}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary

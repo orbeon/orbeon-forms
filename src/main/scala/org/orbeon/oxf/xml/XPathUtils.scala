@@ -17,10 +17,10 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.XPath.FunctionContext
 import org.orbeon.oxf.util.{ScalaUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.{dom4j ⇒ _}
-import org.orbeon.saxon.dom.DocumentWrapper
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._

@@ -28,8 +28,8 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom.DocumentWrapper;
-import org.orbeon.saxon.dom.NodeWrapper;
+import org.orbeon.dom.saxon.DocumentWrapper;
+import org.orbeon.dom.saxon.NodeWrapper;
 
 import java.util.List;
 

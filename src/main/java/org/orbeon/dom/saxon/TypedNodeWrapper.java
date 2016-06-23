@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.saxon.dom;
+package org.orbeon.dom.saxon;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
@@ -31,22 +31,22 @@ import org.orbeon.saxon.value.Value;
 /**
  * This wrapper is an extension of the Saxon node wrapper which is aware of XForms type annotations.
  */
-public class TypedNodeWrapper extends NodeWrapper {
+public class TypedNodeWrapper extends org.orbeon.dom.saxon.NodeWrapper {
 
-    private TypedNodeWrapper(Node node, NodeWrapper parent, int index) {
+    private TypedNodeWrapper(Node node, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
         super(node, parent, index);
     }
 
     @Override
-    protected NodeWrapper makeWrapper(Node node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
+    protected org.orbeon.dom.saxon.NodeWrapper makeWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
         return makeTypedWrapper(node, docWrapper, parent, index);
     }
 
-    static NodeWrapper makeTypedWrapper(Node node, DocumentWrapper docWrapper, NodeWrapper parent, int index) {
+    static org.orbeon.dom.saxon.NodeWrapper makeTypedWrapper(Node node, org.orbeon.dom.saxon.DocumentWrapper docWrapper, org.orbeon.dom.saxon.NodeWrapper parent, int index) {
         if (node instanceof Document) {
             return docWrapper;
         } else {
-            final NodeWrapper wrapper = new TypedNodeWrapper(node, parent, index);
+            final org.orbeon.dom.saxon.NodeWrapper wrapper = new TypedNodeWrapper(node, parent, index);
             wrapper.docWrapper = docWrapper;
             return wrapper;
         }

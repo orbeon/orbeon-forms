@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
-import org.xml.sax.{Attributes, InputSource}
+import org.xml.sax.InputSource
 
 object RequestReader {
 
@@ -40,14 +40,11 @@ object RequestReader {
     def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) ⇒ value }
   }
 
-  // Remove `<description>` and `<migration>`, which we don't need, and can easily get us above the 4000 characters limit
-  // https://github.com/orbeon/orbeon-forms/issues/2385
-  // 2016-05-13: Also remove `<application-name>` and `<form-name>` since they are in their own columns.
-  private val MetadataElementsToFilter = Set(
-    "application-name",
-    "form-name",
-    "description",
-    "migration"
+  // See https://github.com/orbeon/orbeon-forms/issues/2385
+  private val MetadataElementsToKeep = Set(
+    "metadata",
+    "title",
+    "permissions"
   )
 
   // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, JQName.unapply is
@@ -98,16 +95,14 @@ object RequestReader {
 
       val metadataWriter = new StringBuilderWriter()
 
-      val descriptionMigrationFilter = new ElementFilterXMLReceiver(newIdentityReceiver(metadataWriter)) {
-        protected def isFilterElement(uri: String, localname: String, qName: String, attributes: Attributes) =
-          uri == "" && MetadataElementsToFilter(localname)
-      }
-
       // MAYBE: strip enclosing namespaces; truncate long titles
       val metadataFilter =
         new FilterReceiver(
           new WhitespaceXMLReceiver(
-            descriptionMigrationFilter,
+            new ElementFilterXMLReceiver(
+              newIdentityReceiver(metadataWriter),
+              (level, uri, localname) ⇒ level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
+            ),
             Whitespace.Normalize,
             (_, _, _, _) ⇒ Whitespace.Normalize
           ),

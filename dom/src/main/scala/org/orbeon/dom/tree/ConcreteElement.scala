@@ -86,7 +86,7 @@ class ConcreteElement(var qname: QName)
         val parentNamespace = parent.getNamespaceForPrefix(myPrefix)
         if (myPrefix == parentNamespace) { // ORBEON TODO: comparing unrelated!
           val myNm = nyNamespace.getName
-          val newNm = new QName(myNm)
+          val newNm = QName.get(myNm)
           setQName(newNm)
         }
       }

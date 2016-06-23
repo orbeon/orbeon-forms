@@ -20,8 +20,7 @@
 
     .fr-error-summary-body {
         display: block;
-        padding: 0 10px;
-        .fr-border; // mix-in a border into the error summary body
+        padding: 0;
     }
 
     .fr-error-title {
@@ -38,10 +37,15 @@
         margin: 5px 0;
 
         &> li {
-            border: 2px solid @error;
+            border: 2px solid;
             padding: 5px;
             margin-bottom: 5px;
             list-style-position: inside;
+
+            // Multiple levels can be mixed so make sure the strongest wins
+            &.fr-level-info    { border-color: @info; }
+            &.fr-level-warning { border-color: @warning; }
+            &.fr-level-error   { border-color: @error; }
         }
 
         .fr-error-number, .fr-error-link, .fr-error-alert {
@@ -79,8 +83,7 @@
     .fr-level-warning .fr-error-title { background-color: @warning; }
     .fr-level-error   .fr-error-title { background-color: @error; }
 
-     // Override defaults of XBL component
-    .fr-error-alert-error   { color: @error }
-    .fr-error-alert-warning { color: @warning }
     .fr-error-alert-info    { color: @info }
+    .fr-error-alert-warning { color: @warning }
+    .fr-error-alert-error   { color: @error }
 }

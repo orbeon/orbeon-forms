@@ -422,7 +422,7 @@ Inserting error information into error list:
                                 <xf:group ref=".[exists($visible-errors-for-section)]">
                                     <xh:ol class="fr-error-group">
                                         <xf:repeat ref="$visible-errors-for-section" id="er">
-                                            <xh:li>
+                                            <xh:li class="fr-level-{{@level}}">
                                                 <!-- Clickable / linkable label -->
                                                 <xf:var
                                                     name="label"

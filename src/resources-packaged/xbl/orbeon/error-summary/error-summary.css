@@ -5,11 +5,7 @@
 }
 .orbeon .xbl-fr-error-summary .fr-error-summary-body {
   display: block;
-  padding: 0 10px;
   padding: 0;
-  margin-bottom: 10px;
-  background-color: #f5f5f5;
-  border: 1px solid #e3e3e3;
 }
 .orbeon .xbl-fr-error-summary .fr-error-title {
   display: block;
@@ -25,10 +21,19 @@
   margin: 5px 0;
 }
 .orbeon .xbl-fr-error-summary .fr-error-group > li {
-  border: 2px solid #b94a48;
+  border: 2px solid;
   padding: 5px;
   margin-bottom: 5px;
   list-style-position: inside;
+}
+.orbeon .xbl-fr-error-summary .fr-error-group > li.fr-level-info {
+  border-color: #333333;
+}
+.orbeon .xbl-fr-error-summary .fr-error-group > li.fr-level-warning {
+  border-color: #fbb450;
+}
+.orbeon .xbl-fr-error-summary .fr-error-group > li.fr-level-error {
+  border-color: #b94a48;
 }
 .orbeon .xbl-fr-error-summary .fr-error-group .fr-error-number,
 .orbeon .xbl-fr-error-summary .fr-error-group .fr-error-link,
@@ -66,12 +71,12 @@
 .orbeon .xbl-fr-error-summary .fr-level-error .fr-error-title {
   background-color: #b94a48;
 }
-.orbeon .xbl-fr-error-summary .fr-error-alert-error {
-  color: #b94a48;
+.orbeon .xbl-fr-error-summary .fr-error-alert-info {
+  color: #333333;
 }
 .orbeon .xbl-fr-error-summary .fr-error-alert-warning {
   color: #fbb450;
 }
-.orbeon .xbl-fr-error-summary .fr-error-alert-info {
-  color: #333333;
+.orbeon .xbl-fr-error-summary .fr-error-alert-error {
+  color: #b94a48;
 }

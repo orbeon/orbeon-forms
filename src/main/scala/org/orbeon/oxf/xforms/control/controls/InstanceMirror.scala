@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.util.{List ⇒ JList}
-
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
@@ -384,7 +382,7 @@ object InstanceMirror {
                     XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
 
                   // If we can identify the position
-                  val content = newParentElement.content.asInstanceOf[JList[Node]]
+                  val content = newParentElement.content
                   if (content.size > removedNodeIndex) {
                     content.get(removedNodeIndex) match {
                       case newElement: Element if newElement.getQName == removedElement.getQName ⇒

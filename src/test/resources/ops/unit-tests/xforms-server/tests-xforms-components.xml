@@ -440,11 +440,11 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary≡fr-error-summary-model">
                                 <errors>
-                                    <error absolute-id="|first-name-control|" position="158" label="First name" alert="Invalid first name" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙1|" position="163" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙2|" position="163" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|note-control⊙3|" position="163" label="Note" alert="Invalid note" level="error" section-name=""/>
-                                    <error absolute-id="|last-name-control|" position="166" label="Last name" alert="Invalid last name" level="error" section-name=""/>
+                                    <error absolute-id="|first-name-control|" position="159" label="First name" alert="Invalid first name" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙1|" position="164" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙2|" position="164" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|note-control⊙3|" position="164" label="Note" alert="Invalid note" level="error" section-name=""/>
+                                    <error absolute-id="|last-name-control|" position="167" label="Last name" alert="Invalid last name" level="error" section-name=""/>
                                 </errors>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary≡fr-error-summary-model">
@@ -467,10 +467,10 @@
                         </instances>
                         <controls>
                             <control effective-id="my-summary≡er" index="2"/>
-                            <control effective-id="my-summary≡xf-117⊙1" case-id="xf-122"/>
-                            <control effective-id="my-summary≡xf-123⊙1" case-id="xf-124"/>
-                            <control effective-id="my-summary≡xf-117⊙2" case-id="xf-122"/>
-                            <control effective-id="my-summary≡xf-123⊙2" case-id="xf-124"/>
+                            <control effective-id="my-summary≡xf-119⊙1" case-id="xf-124"/>
+                            <control effective-id="my-summary≡xf-125⊙1" case-id="xf-126"/>
+                            <control effective-id="my-summary≡xf-119⊙2" case-id="xf-124"/>
+                            <control effective-id="my-summary≡xf-125⊙2" case-id="xf-126"/>
                             <control effective-id="repeat" index="2"/>
                         </controls>
                     </dynamic-state>
@@ -478,39 +478,41 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary≡body" class="fr-error-summary-body fr-level-error"/>
-                            <xxf:control id="my-summary≡xf-116⊙1">
+                            <xxf:control class="fr-level-error" id="my-summary≡xf-114⊙1"/>
+                            <xxf:control id="my-summary≡xf-118⊙1">
                             <xxf:value>1</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-117⊙1" class="fr-error-link">
-                            <xxf:case id="my-summary≡xf-122⊙1" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-118⊙1" visibility="hidden"/>
-                        </xxf:control>
-                        <xxf:attribute for="my-summary≡xf-119⊙1" name="href"/>
-                        <xxf:control id="my-summary≡xf-121⊙1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-123⊙1">
+                        <xxf:control id="my-summary≡xf-119⊙1" class="fr-error-link">
                             <xxf:case id="my-summary≡xf-124⊙1" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-128⊙1" visibility="hidden"/>
+                            <xxf:case id="my-summary≡xf-120⊙1" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-125⊙1" class="fr-error-label" label="Note"/>
-                        <xxf:control id="my-summary≡xf-129⊙1" class="fr-error-label" relevant="false"/>
+                        <xxf:attribute for="my-summary≡xf-121⊙1" name="href"/>
+                        <xxf:control id="my-summary≡xf-123⊙1" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-125⊙1">
+                            <xxf:case id="my-summary≡xf-126⊙1" visibility="visible"/>
+                            <xxf:case id="my-summary≡xf-130⊙1" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-summary≡xf-127⊙1" class="fr-error-label" label="Note"/>
+                        <xxf:control id="my-summary≡xf-131⊙1" class="fr-error-label" relevant="false"/>
                         <xxf:control id="my-summary≡ao⊙1" class="fr-error-alert fr-error-alert-error">
                             <xxf:value>Invalid note</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-116⊙2">
+                        <xxf:control class="fr-level-error" id="my-summary≡xf-114⊙2"/>
+                        <xxf:control id="my-summary≡xf-118⊙2">
                             <xxf:value>2</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-117⊙2" class="fr-error-link">
-                            <xxf:case id="my-summary≡xf-122⊙2" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-118⊙2" visibility="hidden"/>
-                        </xxf:control>
-                        <xxf:attribute for="my-summary≡xf-119⊙2" name="href"/>
-                        <xxf:control id="my-summary≡xf-121⊙2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-123⊙2">
+                        <xxf:control id="my-summary≡xf-119⊙2" class="fr-error-link">
                             <xxf:case id="my-summary≡xf-124⊙2" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-128⊙2" visibility="hidden"/>
+                            <xxf:case id="my-summary≡xf-120⊙2" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-125⊙2" class="fr-error-label" label="Last name"/>
-                        <xxf:control id="my-summary≡xf-129⊙2" class="fr-error-label" relevant="false"/>
+                        <xxf:attribute for="my-summary≡xf-121⊙2" name="href"/>
+                        <xxf:control id="my-summary≡xf-123⊙2" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-125⊙2">
+                            <xxf:case id="my-summary≡xf-126⊙2" visibility="visible"/>
+                            <xxf:case id="my-summary≡xf-130⊙2" visibility="hidden"/>
+                        </xxf:control>
+                        <xxf:control id="my-summary≡xf-127⊙2" class="fr-error-label" label="Last name"/>
+                        <xxf:control id="my-summary≡xf-131⊙2" class="fr-error-label" relevant="false"/>
                         <xxf:control id="my-summary≡ao⊙2" class="fr-error-alert fr-error-alert-error">
                             <xxf:value>Invalid last name</xxf:value>
                         </xxf:control>

@@ -33,10 +33,6 @@
             <label>Form Description</label>
             <hint>Form description in the current language</hint>
         </description>
-        <singleton>
-            <label>Singleton form</label>
-            <hint>Prevent users from creating additional form data if they have access an existing form data for this form definition</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>The logo appears at the top of your form</hint>
@@ -232,6 +228,11 @@
         <classes>
             <label>Custom CSS classes</label>
         </classes>
+        <default-always-never>
+            <item id="0">Use Default</item>
+            <item id="1">Always</item>
+            <item id="2">Never</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Continue</label>
@@ -255,6 +256,7 @@
             <label>Form Settings</label>
             <save-as>Save as…</save-as>
             <open><label>Form settings</label></open>
+            <options>Form Options</options>
             <stats>Form Statistics</stats>
             <sections>Sections</sections>
             <repeats>Repeats</repeats>
@@ -262,6 +264,14 @@
             <section-templates>Section templates</section-templates>
             <controls>Controls</controls>
             <all>All</all>
+            <singleton>
+                <label>Singleton Form</label>
+                <hint>Only allow one accessible instance of form data for this form definition</hint>
+            </singleton>
+            <wizard>
+                <label>Wizard View</label>
+                <hint>Show top-level sections as separate wizard pages</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control Settings</label>
@@ -475,18 +485,6 @@
             </options>
             <collapsible>
                 <label>Collapsible</label>
-                <item>
-                    <label>Use Default</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label>Always</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Never</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Visibility</label>
@@ -956,10 +954,6 @@
             <label>Description du formulaire</label>
             <hint>cliquer pour entrer une description du formulaire</hint>
         </description>
-        <singleton>
-            <label>Formulaire singleton</label>
-            <hint>Empêche les utilisateurs de créer des données de formulaire supplémentaires s'ils ont, pour ce formulaire, déjà accès à des données de formulaire existantes.</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Le logo apparaît au sommet de votre formulaire</hint>
@@ -1155,6 +1149,11 @@
         <classes>
             <label>Classes CSS personalisées</label>
         </classes>
+        <default-always-never>
+            <item id="0">Utiliser le défaut</item>
+            <item id="1">Toujours</item>
+            <item id="2">Jamais</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Continuer</label>
@@ -1178,13 +1177,22 @@
             <label>Paramètres du formulaire</label>
             <save-as>Sauvegarder sous…</save-as>
             <open><label>Paramètres du formulaire</label></open>
-            <stats>Statistiques du formulaire</stats>
+            <options>Options</options>
+            <stats>Statistiques</stats>
             <sections>Sections</sections>
             <repeats>Grilles répétées</repeats>
             <grids>Grilles</grids>
             <section-templates>Modèles de sections</section-templates>
             <controls>Contrôles</controls>
             <all>Total</all>
+            <singleton>
+                <label>Formulaire singleton</label>
+                <hint> Ne permet qu'une instance de données accessible par l'utilisateur pour ce formulaire</hint>
+            </singleton>
+            <wizard>
+                <label>Vue "wizard"</label>
+                <hint>Montre les sections de premier niveau dans des pages de wizard séparées</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Paramètres du contrôle</label>
@@ -1398,18 +1406,6 @@
             </options>
             <collapsible>
                 <label>Fermable</label>
-                <item>
-                    <label>Utiliser le défaut</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label>Toujours</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Jamais</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Visibilité</label>
@@ -1881,10 +1877,6 @@
             <label>Skjemainnstillinger</label>
             <hint>Klikk for å skrive inn skjemainnstillinger</hint>
         </description>
-        <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Logoen synes på toppen av skjemaene</hint>
@@ -2080,6 +2072,11 @@
         <classes>
             <label todo="true">[Custom CSS classes]</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Fortsett</label>
@@ -2103,6 +2100,7 @@
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form settings]</label></open>
+            <options todo="true">[Form Options]</options>
             <stats todo="true">[Form Statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
@@ -2110,6 +2108,14 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
+            <singleton>
+                <label todo="true">[Singleton form]</label>
+                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -2324,18 +2330,6 @@
             </options>
             <collapsible>
                 <label todo="true">[Collapsible]</label>
-                <item>
-                    <label todo="true">[Use Default]</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label todo="true">[Always]</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label todo="true">[Never]</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Synlighet</label>
@@ -2806,10 +2800,6 @@
             <label>Описание формы</label>
             <hint>Нажмите чтобы ввести описание (не обязательно)</hint>
         </description>
-        <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
-        </singleton>
         <logo>
             <label>Логотип</label>
             <hint>Логотип отображается в верхней части формы</hint>
@@ -3005,6 +2995,11 @@
         <classes>
             <label todo="true">[Custom CSS classes]</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Далее</label>
@@ -3028,6 +3023,7 @@
             <label todo="true">[Form Settings]</label>
             <save-as todo="true">[Save as…]</save-as>
             <open><label todo="true">[Form Settings]</label></open>
+            <options todo="true">[Form Options]</options>
             <stats todo="true">[Form statistics]</stats>
             <sections todo="true">[Sections]</sections>
             <repeats todo="true">[Repeats]</repeats>
@@ -3035,6 +3031,14 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
+            <singleton>
+                <label todo="true">[Singleton form]</label>
+                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
@@ -3248,18 +3252,6 @@
             </options>
             <collapsible>
                 <label todo="true">[Collapsible]</label>
-                <item>
-                    <label todo="true">[Use Default]</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label todo="true">[Always]</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label todo="true">[Never]</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Настройки видимости</label>
@@ -3731,10 +3723,6 @@
             <label>Descrizione del modulo</label>
             <hint>Descrizione del modulo nella lingua attualmente usata</hint>
         </description>
-        <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Il logo appare nella testa del modulo</hint>
@@ -3930,6 +3918,11 @@
         <classes>
             <label>Classi CSS personalizzati</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Continua</label>
@@ -3953,6 +3946,7 @@
             <label>Impostazioni modulo</label>
             <save-as>Salva con nome…</save-as>
             <open><label>Impostazioni modulo</label></open>
+            <options todo="true">[Form Options]</options>
             <stats>Statistiche del modulo</stats>
             <sections>Sezioni</sections>
             <repeats>Ripetizioni</repeats>
@@ -3960,6 +3954,14 @@
             <section-templates>Modelli di sezione</section-templates>
             <controls>Controlli</controls>
             <all>Tutti</all>
+            <singleton>
+                <label todo="true">[Singleton form]</label>
+                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Impostazioni di controllo</label>
@@ -4173,18 +4175,6 @@
             </options>
             <collapsible>
                 <label todo="true">[Collapsible]</label>
-                <item>
-                    <label todo="true">[Use Default]</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label todo="true">[Always]</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label todo="true">[Never]</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Visibilità</label>
@@ -4648,10 +4638,6 @@
             <label>Formularbeschreibung</label>
             <hint>Formularbeschreibung in der zur Zeit verwendeten Sprache</hint>
         </description>
-        <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Das Logo erscheint oberhalb des Formulars</hint>
@@ -4847,6 +4833,11 @@
         <classes>
             <label>Benutzerdefinierte CSS-Klassen</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Weiter</label>
@@ -4870,6 +4861,7 @@
             <label>Formulareinstellungen</label>
             <save-as>Speichern unter...</save-as>
             <open><label>Formulareinstellungen</label></open>
+            <options todo="true">[Form Options]</options>
             <stats>Formularstatistiken</stats>
             <sections>Abschnitte</sections>
             <repeats>Wiederholungen</repeats>
@@ -4877,6 +4869,14 @@
             <section-templates>Abschnittsvorlagen</section-templates>
             <controls>Steuerelemente</controls>
             <all>Alle</all>
+            <singleton>
+                <label todo="true">[Singleton form]</label>
+                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
@@ -5090,18 +5090,6 @@
             </options>
             <collapsible>
                 <label todo="true">[Collapsible]</label>
-                <item>
-                    <label todo="true">[Use Default]</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label todo="true">[Always]</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label todo="true">[Never]</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Sichtbarkeit</label>
@@ -5567,10 +5555,6 @@
             <label>Lomakkeen kuvaus</label>
             <hint>Lomakkeen kuvaus nykyisellä kielellä</hint>
         </description>
-        <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>Logo näkyy lomakkeesi yläosassa</hint>
@@ -5767,6 +5751,11 @@
         <classes>
             <label>Mukautetut CSS luokat</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Jatka</label>
@@ -5790,6 +5779,7 @@
             <label>Lomakeasetukset</label>
             <save-as>Tallenna nimellä</save-as>
             <open><label>Lomakeasetukset</label></open>
+            <options todo="true">[Form Options]</options>
             <stats>Lomatilastot</stats>
             <sections>Lohkot</sections>
             <repeats>Toistot</repeats>
@@ -5797,6 +5787,14 @@
             <section-templates>Lohkomallinteet</section-templates>
             <controls>Kontrollit</controls>
             <all>Kaikki</all>
+            <singleton>
+                <label todo="true">[Singleton form]</label>
+                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
@@ -6010,18 +6008,6 @@
             </options>
             <collapsible>
                 <label todo="true">[Collapsible]</label>
-                <item>
-                    <label todo="true">[Use Default]</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label todo="true">[Always]</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label todo="true">[Never]</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Näkyvyys</label>
@@ -6486,10 +6472,6 @@
             <label>Descripción del Formulario</label>
             <hint>Descripción del Formulario en el idioma configurado</hint>
         </description>
-        <singleton>
-            <label>Es Formulario único</label>
-            <hint>Impide que los usuarios ingresen nuevos formularios si existen formularios ingresados.</hint>
-        </singleton>
         <logo>
             <label>Logo</label>
             <hint>El logo se desplega en la parte superior del formulario</hint>
@@ -6685,6 +6667,11 @@
         <classes>
             <label>Classes CSS customizadas</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Continuar</label>
@@ -6708,6 +6695,7 @@
             <label>Configuración del Formulario</label>
             <save-as>Guardar como…</save-as>
             <open><label>Configuración del Formulario</label></open>
+            <options todo="true">[Form Options]</options>
             <stats>Estadísticas del Formulario</stats>
             <sections>Secciones</sections>
             <repeats>Repeticiones</repeats>
@@ -6715,6 +6703,14 @@
             <section-templates>Plantillas de Sección</section-templates>
             <controls>Controles</controls>
             <all>Todos</all>
+            <singleton>
+                <label>Es Formulario único</label>
+                <hint>Impide que los usuarios ingresen nuevos formularios si existen formularios ingresados.</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configuración de Controles</label>
@@ -6928,18 +6924,6 @@
             </options>
             <collapsible>
                 <label>Plegable</label>
-                <item>
-                    <label>Usar por Defecto</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label>Siempre</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Nunca</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Visibilidad</label>
@@ -7404,10 +7388,6 @@
             <label>Descrição do Formulário</label>
             <hint>Descrição do formulário na língua actual</hint>
         </description>
-        <singleton>
-            <label todo="true">[Singleton form]</label>
-            <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
-        </singleton>
         <logo>
             <label>Logotipo</label>
             <hint>O logotipo que aparece to topo do formulário</hint>
@@ -7603,6 +7583,11 @@
         <classes>
             <label>Classes CSS Personalizadas</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Continuar</label>
@@ -7626,6 +7611,7 @@
             <label>Configurações do Formulário</label>
             <save-as>Guardar como…</save-as>
             <open><label>Configurações do Formulário</label></open>
+            <options todo="true">[Form Options]</options>
             <stats>Estatística do Formulário</stats>
             <sections>Secções</sections>
             <repeats>Repetições</repeats>
@@ -7633,6 +7619,14 @@
             <section-templates>Templates da Secção</section-templates>
             <controls>Controlos</controls>
             <all>Todos</all>
+            <singleton>
+                <label todo="true">[Singleton form]</label>
+                <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configurações do Controlo</label>
@@ -7846,18 +7840,6 @@
             </options>
             <collapsible>
                 <label todo="true">[Collapsible]</label>
-                <item>
-                    <label todo="true">[Use Default]</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label todo="true">[Always]</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label todo="true">[Never]</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Visibilidade</label>
@@ -8328,10 +8310,6 @@
             <label>Beskrivning</label>
             <hint>Beskrivning av formuläret på aktuellt språk</hint>
         </description>
-        <singleton>
-            <label>Singulärt formulär</label>
-            <hint>Användare kan inte skapa ytterligare ifyllda formulär om de har tillgång något ifyllt formulär av denna typ</hint>
-        </singleton>
         <logo>
             <label>Logotyp</label>
             <hint>Bild som visas överst på formuläret</hint>
@@ -8527,6 +8505,11 @@
         <classes>
             <label>Anpassade CSS-klasser</label>
         </classes>
+        <default-always-never>
+            <item todo="true" id="0">[Use Default]</item>
+            <item todo="true" id="1">[Always]</item>
+            <item todo="true" id="2">[Never]</item>
+        </default-always-never>
         <!-- Dialogs -->
         <continue>
             <label>Fortsätt</label>
@@ -8550,6 +8533,7 @@
             <label>Inställningar för formulär</label>
             <save-as>Spara som…</save-as>
             <open><label>Inställningar för formulär</label></open>
+            <options todo="true">[Form Options]</options>
             <stats>Formulärstatistik</stats>
             <sections>Sektioner</sections>
             <repeats>Upprepningar</repeats>
@@ -8557,6 +8541,14 @@
             <section-templates>Sektionsmallar</section-templates>
             <controls>Kontroller</controls>
             <all>Allt</all>
+            <singleton>
+                <label>Singulärt formulär</label>
+                <hint>Användare kan inte skapa ytterligare ifyllda formulär om de har tillgång något ifyllt formulär av denna typ</hint>
+            </singleton>
+            <wizard>
+                <label todo="true">[Wizard View]</label>
+                <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            </wizard>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Inställningar för kontroll</label>
@@ -8770,18 +8762,6 @@
             </options>
             <collapsible>
                 <label>Hopfällbar</label>
-                <item>
-                    <label>Använd standard</label>
-                    <value>default</value>
-                </item>
-                <item>
-                    <label>Alltid</label>
-                    <value>true</value>
-                </item>
-                <item>
-                    <label>Aldrig</label>
-                    <value>false</value>
-                </item>
             </collapsible>
             <visibility>
                 <label>Synlighet</label>

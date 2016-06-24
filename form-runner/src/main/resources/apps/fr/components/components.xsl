@@ -43,6 +43,8 @@
     <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
     <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
 
+    <xsl:variable name="fr-form-metadata" select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
+
     <xsl:variable name="is-detail" select="not($mode = ('summary', 'home', ''))" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript-support" select="$fr-form-model/@xxf:noscript-support = 'true'" as="xs:boolean"/>
@@ -78,7 +80,16 @@
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"        as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
 
-    <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>
+    <xsl:variable
+        name="view-appearance"
+        as="xs:string"
+        select="
+            (
+                'wizard'[$fr-form-metadata/wizard = 'true'],
+                p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')),
+                'full'
+            )[1]"/>
+
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
     <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))" as="xs:boolean"/>

@@ -38,6 +38,10 @@
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
 
+                <xf:setvalue
+                    ref="$i/wizard"
+                    value="(event('wizard')[. = ('true', 'false')], 'default')[1]"/>
+
                 <!--  Sanitize as caller might pass an initial app name which is not allowed by current permissions -->
                 <xf:action if="$has-roles and not($allowed-apps-if-has-roles = ('*', event('app')))">
                     <xf:setvalue
@@ -86,6 +90,7 @@
                         <title/>
                         <description/>
                         <singleton/>
+                        <wizard/>
                         <mode/>
                     </instance>
                 </xf:instance>
@@ -199,67 +204,98 @@
                             <fr:tab>
                                 <fr:label ref="$resources/general-settings"/>
 
-                                <xh:div>
-
-                                    <!-- Application name -->
-                                    <!-- Use an input if app name is a wildcard -->
-                                    <xf:group ref=".[$app-chooser = 'input']">
-                                        <xf:input ref="app" id="fb-app-name-input" xxf:autocomplete="off">
-                                            <xf:label ref="$resources/application-name/label"/>
-                                            <xf:hint ref="$resources/application-name/hint"/>
-                                            <xf:alert ref="$resources/application-name/alert"/>
-                                        </xf:input>
-                                    </xf:group>
-                                    <!-- Otherwise, if there are multiple choices, use a dropdown -->
-                                    <xf:group ref=".[$app-chooser = 'select1']">
-                                        <fr:dropdown-select1 ref="app">
-                                            <xf:label ref="$resources/application-name/label"/>
-                                            <xf:itemset ref="$allowed-apps-if-has-roles">
-                                                <xf:label ref="."/>
-                                                <xf:value ref="."/>
-                                            </xf:itemset>
-                                        </fr:dropdown-select1>
-                                    </xf:group>
-                                    <!-- Otherwise, if there is just one choice, just show what the value will be -->
-                                    <xf:group ref=".[$app-chooser = 'output']">
-                                        <xf:output ref="app">
-                                            <xf:label ref="$resources/application-name/label"/>
-                                        </xf:output>
-                                    </xf:group>
-
-                                </xh:div>
-
-                                <xh:div>
-
-                                    <!-- Form name -->
-                                    <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
-                                        <xf:label ref="$resources/form-name/label"/>
-                                        <xf:hint ref="$resources/form-name/hint"/>
-                                        <xf:alert ref="$resources/form-name/alert"/>
-                                    </xf:input>
-
-                                    <!-- Title -->
-                                    <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
-                                        <xf:label ref="$resources/title/label"/>
-                                        <xf:hint ref="$resources/title/hint"/>
-                                        <xf:alert ref="$resources/title/alert"/>
-                                    </xf:input>
-
-                                    <!-- Description -->
-                                    <xf:textarea ref="description" id="fb-description-textarea">
-                                        <xf:label ref="$resources/description/label"/>
-                                        <xf:hint ref="$resources/description/hint"/>
-                                        <xf:alert ref="$resources/description/alert"/>
-                                    </xf:textarea>
-
-                                    <!-- Is singleton? -->
-                                    <fr:checkbox-input ref="singleton[$is-form-settings]" id="fb-singleton-input">
-                                        <xf:label ref="$resources/singleton/label"/>
-                                        <xf:hint ref="$resources/singleton/hint"/>
-                                    </fr:checkbox-input>
-
-                                </xh:div>
+                                <fr:grid>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <!-- Application name -->
+                                            <!-- Use an input if app name is a wildcard -->
+                                            <xf:group ref=".[$app-chooser = 'input']">
+                                                <xf:input ref="app" id="fb-app-name-input" xxf:autocomplete="off">
+                                                    <xf:label ref="$resources/application-name/label"/>
+                                                    <xf:hint ref="$resources/application-name/hint"/>
+                                                    <xf:alert ref="$resources/application-name/alert"/>
+                                                </xf:input>
+                                            </xf:group>
+                                            <!-- Otherwise, if there are multiple choices, use a dropdown -->
+                                            <xf:group ref=".[$app-chooser = 'select1']">
+                                                <fr:dropdown-select1 ref="app">
+                                                    <xf:label ref="$resources/application-name/label"/>
+                                                    <xf:itemset ref="$allowed-apps-if-has-roles">
+                                                        <xf:label ref="."/>
+                                                        <xf:value ref="."/>
+                                                    </xf:itemset>
+                                                </fr:dropdown-select1>
+                                            </xf:group>
+                                            <!-- Otherwise, if there is just one choice, just show what the value will be -->
+                                            <xf:group ref=".[$app-chooser = 'output']">
+                                                <xf:output ref="app">
+                                                    <xf:label ref="$resources/application-name/label"/>
+                                                </xf:output>
+                                            </xf:group>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <!-- Form name -->
+                                            <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
+                                                <xf:label ref="$resources/form-name/label"/>
+                                                <xf:hint ref="$resources/form-name/hint"/>
+                                                <xf:alert ref="$resources/form-name/alert"/>
+                                            </xf:input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <!-- Title -->
+                                            <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
+                                                <xf:label ref="$resources/title/label"/>
+                                                <xf:hint ref="$resources/title/hint"/>
+                                                <xf:alert ref="$resources/title/alert"/>
+                                            </xf:input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <!-- Description -->
+                                            <xf:textarea ref="description" id="fb-description-textarea">
+                                                <xf:label ref="$resources/description/label"/>
+                                                <xf:hint ref="$resources/description/hint"/>
+                                                <xf:alert ref="$resources/description/alert"/>
+                                            </xf:textarea>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
                             </fr:tab>
+
+                            <!-- Options -->
+                            <fr:tab class="fb-dialog-form-settings-options" visible="$is-form-settings">
+                                <fr:label value="$resources/dialog-form-settings/options"/>
+
+                                <fr:grid>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="singleton" id="fb-singleton-input">
+                                                <xf:label ref="$resources/dialog-form-settings/singleton/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/singleton/hint"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="wizard" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/wizard/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/wizard/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
+
+                            </fr:tab>
+
 
                             <!-- Stats -->
                             <fr:tab class="fb-dialog-form-settings-stats" visible="$is-form-settings">
@@ -366,12 +402,13 @@
 
                             <!-- Dispatch event with result -->
                             <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                                <xf:property name="app"               value="$i/app"/>
-                                <xf:property name="form"              value="$i/form"/>
-                                <xf:property name="title"             value="$i/title"/>
-                                <xf:property name="description"       value="$i/description"/>
-                                <xf:property name="singleton"         value="$i/singleton"/>
-                                <xf:property name="mode"              value="$i/mode"/>
+                                <xf:property name="app"               value="$i/app/string()"/>
+                                <xf:property name="form"              value="$i/form/string()"/>
+                                <xf:property name="title"             value="$i/title/string()"/>
+                                <xf:property name="description"       value="$i/description/string()"/>
+                                <xf:property name="singleton"         value="$i/singleton/string()"/>
+                                <xf:property name="wizard"            value="$i/wizard/string()"/>
+                                <xf:property name="mode"              value="$i/mode/string()"/>
                             </xf:dispatch>
 
                             <!-- Hide this dialog -->

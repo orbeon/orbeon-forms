@@ -149,6 +149,7 @@
                                         <xf:property name="title"       value="bind('title-bind')"/>
                                         <xf:property name="description" value="bind('description-bind')"/>
                                         <xf:property name="singleton"   value="bind('singleton-bind')"/>
+                                        <xf:property name="wizard"      value="bind('wizard-bind')"/>
                                     </xxf:show>
                                 </xf:action>
                             </xf:trigger>
@@ -311,6 +312,16 @@
                                         <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                                         <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
                                         <xf:setvalue ref="bind('singleton-bind')"   value="event('singleton')"/>
+
+                                        <!-- Add/remove wizard setting as needed -->
+                                        <xf:delete
+                                            bind="wizard-bind"/>
+                                        <xf:insert
+                                            if="event('wizard') = ('true', 'false')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('wizard', event('wizard'))"/>
+
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action

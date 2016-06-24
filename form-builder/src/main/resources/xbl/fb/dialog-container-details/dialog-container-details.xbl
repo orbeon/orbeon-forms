@@ -406,9 +406,9 @@
                                     <xh:td>
                                         <xf:select1 ref="collapsible" appearance="full xxf:horizontal">
                                             <xf:label ref="$resources/dialog-container-details/collapsible/label"/>
-                                            <xf:itemset ref="$resources/dialog-container-details/collapsible/item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
+                                            <xf:itemset ref="$resources/default-always-never/item">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
                                             </xf:itemset>
                                         </xf:select1>
                                     </xh:td>

@@ -236,9 +236,6 @@ body {
 .orbeon .fb-dialog-form-settings .xforms-label {
   display: block;
 }
-.orbeon .fb-dialog-form-settings .xforms-hint {
-  margin-bottom: 1em;
-}
 .orbeon .fb-dialog-form-settings .fb-settings-mode-new .nav-tabs {
   display: none;
 }

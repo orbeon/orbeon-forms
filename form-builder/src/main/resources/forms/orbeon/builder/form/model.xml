@@ -308,26 +308,30 @@
             "/>
 
             <!-- If valid app/form were passed, skip showing the dialog -->
-            <xf:action if="$valid-app-form-params">
-                <!-- Reuse existing logic of event handlers on dialog-form-settings -->
-                <xf:dispatch
-                        name="fb-update-metadata"
-                        targetid="dialog-form-settings">
-                    <xf:property name="mode"        value="'new'"/>
-                    <xf:property name="app"         value="$requested-app"/>
-                    <xf:property name="form"        value="$requested-form"/>
-                    <xf:property name="title"       value="($requested-title,       bind('title-bind'))[1]"/>
-                    <xf:property name="description" value="($requested-description, bind('description-bind'))[1]"/>
-                    <xf:property name="singleton"   value="''"/>
-                </xf:dispatch>
-            </xf:action>
+            <!-- Reuse existing logic of event handlers on dialog-form-settings -->
+            <xf:dispatch
+                    if="$valid-app-form-params"
+                    name="fb-update-metadata"
+                    targetid="dialog-form-settings">
+                <xf:property name="mode"        value="'new'"/>
+                <xf:property name="app"         value="$requested-app"/>
+                <xf:property name="form"        value="$requested-form"/>
+                <xf:property name="title"       value="($requested-title,       bind('title-bind'))[1]"/>
+                <xf:property name="description" value="($requested-description, bind('description-bind'))[1]"/>
+                <xf:property name="singleton"   value="()"/>
+                <xf:property name="wizard"      value="()"/>
+            </xf:dispatch>
 
-            <xxf:show if="not($valid-app-form-params)" dialog="dialog-form-settings">
+            <xxf:show
+                    if="not($valid-app-form-params)"
+                    dialog="dialog-form-settings">
                 <xf:property name="mode"        value="'new'"/>
                 <xf:property name="app"         value="($requested-app,         bind('application-name-bind'))[1]"/>
                 <xf:property name="form"        value="($requested-form,        bind('form-name-bind'))[1]"/>
                 <xf:property name="title"       value="($requested-title,       bind('title-bind'))[1]"/>
                 <xf:property name="description" value="($requested-description, bind('description-bind'))[1]"/>
+                <xf:property name="singleton"   value="()"/>
+                <xf:property name="wizard"      value="()"/>
             </xxf:show>
         </xf:action>
     </xf:action>
@@ -337,12 +341,13 @@
         <xf:bind ref="xh:head">
             <xf:bind ref="xf:model[@id = 'fr-form-model']">
                 <!-- Form metadata (also used by Form Runner) -->
-                <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*">
+                <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*" id="metadata-bind">
                     <xf:bind id="application-name-bind" ref="application-name"/>
                     <xf:bind id="form-name-bind"        ref="form-name"/>
                     <xf:bind id="title-bind"            ref="title[@xml:lang = $fb-lang]"/>
                     <xf:bind id="description-bind"      ref="description[@xml:lang = $fb-lang]"/>
                     <xf:bind id="singleton-bind"        ref="singleton"/>
+                    <xf:bind id="wizard-bind"           ref="wizard"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*">

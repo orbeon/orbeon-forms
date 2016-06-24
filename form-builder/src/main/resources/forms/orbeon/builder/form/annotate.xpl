@@ -463,15 +463,6 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Add singleton element to fr-form-metadata -->
-                <xsl:template match="xf:model/xf:instance[@id = 'fr-form-metadata']/metadata[empty(singleton)]"
-                              mode="within-model">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@* | node()" mode="#current"/>
-                        <xsl:element name="singleton">false</xsl:element>
-                    </xsl:copy>
-                </xsl:template>
-
                 <!-- For a while (not in a release) we supported xf:validation/@* (but not custom MIPs on them) -->
                 <xsl:template match="xf:bind/xf:validation[@relevant | @readonly | @constraint | @calculate | @xxf:default]"
                               mode="within-model">

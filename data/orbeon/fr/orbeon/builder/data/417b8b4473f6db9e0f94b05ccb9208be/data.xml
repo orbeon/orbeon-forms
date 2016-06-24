@@ -178,7 +178,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
                     <title xml:lang="fr">Contrôles de Form Builder</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
-                    <singleton>false</singleton>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

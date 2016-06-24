@@ -311,7 +311,15 @@
                                     <xf:action ev:event="fb-update-metadata">
                                         <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                                         <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
-                                        <xf:setvalue ref="bind('singleton-bind')"   value="event('singleton')"/>
+
+                                        <!-- Add/remove singleton setting as needed -->
+                                        <xf:delete
+                                            bind="singleton-bind"/>
+                                        <xf:insert
+                                            if="event('singleton') = 'true'"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('singleton', event('singleton'))"/>
 
                                         <!-- Add/remove wizard setting as needed -->
                                         <xf:delete

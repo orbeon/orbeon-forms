@@ -59,26 +59,26 @@
         select="version:versionStringIfAllowedOrEmpty()"
         xmlns:version="java:org.orbeon.oxf.common.Version"/>
 
-    <xsl:variable name="has-noscript-link" select="p:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="is-noscript-table" select="not(not(p:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
-    <xsl:variable name="min-toc" select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
-    <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
-    <xsl:variable name="error-summary" select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="default-logo-uri" select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="hide-logo" select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-footer" select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))))" as="xs:string*"/>
-    <xsl:variable name="custom-css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
-    <xsl:variable name="js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.uri', $app, $form), '.'))))" as="xs:string*"/>
-    <xsl:variable name="custom-js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
-    <xsl:variable name="inner-buttons" select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))" as="xs:string*"/>
-    <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="captcha-type" as="xs:string"  select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
-    <xsl:variable name="has-captcha"  as="xs:boolean" select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"/>
+    <xsl:variable name="has-noscript-link"    select="p:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))"                             as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-table"    select="not(not(p:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
+    <xsl:variable name="min-toc"              select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]"                       as="xs:integer"/>
+    <xsl:variable name="has-toc"              select="$min-toc ge 0"                                                                                   as="xs:boolean"/>
+    <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
+    <xsl:variable name="default-logo-uri"     select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))"                          as="xs:string?"/>
+    <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>
+    <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))"                        as="xs:boolean?"/>
+    <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
+    <xsl:variable name="css-uri"              select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))))"         as="xs:string*"/>
+    <xsl:variable name="custom-css-uri"       select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))))"  as="xs:string*"/>
+    <xsl:variable name="js-uri"               select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.uri', $app, $form), '.'))))"          as="xs:string*"/>
+    <xsl:variable name="custom-js-uri"        select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))"   as="xs:string*"/>
+    <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
+    <xsl:variable name="is-inline-hints"      select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())"        as="xs:boolean"/>
+    <xsl:variable name="captcha-type"         select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"                            as="xs:string"/>
+    <xsl:variable name="has-captcha"          select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"                                                  as="xs:boolean"/>
 
-    <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"        as="xs:boolean"/>
-    <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
+    <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
+    <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
 
     <xsl:variable
         name="view-appearance"

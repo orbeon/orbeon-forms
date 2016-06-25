@@ -54,7 +54,8 @@ trait FormRunnerActions {
     "set-data-status"  → trySetDataStatus
   )
 
-  private val SupportedRenderFormats = Set("pdf", "tiff")
+  private val SupportedRenderFormatsMediatypes = List("pdf" → "application/pdf", "tiff" → "image/tiff").toMap
+  private val SupportedRenderFormats = SupportedRenderFormatsMediatypes map (_._1) toSet
 
   // Check whether there are pending uploads
   def tryPendingUploads(params: ActionParams): Try[Any] =
@@ -209,7 +210,12 @@ trait FormRunnerActions {
     "parameters"          → "app form form-version document valid language process data-format-version"
   )
 
-  private val SendParameterKeys = List("uri", "serialization", "prune-metadata") ++ DefaultSendParameters.keys
+  private val SendParameterKeys = List(
+    "uri",
+    "serialization",
+    "content-type",
+    "prune-metadata"
+  ) ++ DefaultSendParameters.keys
 
   def trySend(params: ActionParams): Try[Any] =
     Try {
@@ -258,13 +264,19 @@ trait FormRunnerActions {
           case other                       ⇒ other
         } toMap
 
+      val contentToken = evaluatedPropertiesAsMap("content").get.trimAllToEmpty
+
       // Handle defaults which depend on other properties
       val evaluatedSendProperties = {
 
         def findDefaultSerialization(method: String) = method match {
-          case "post" | "put" ⇒ "application/xml"
-          case _              ⇒ "none"
+          case "post" | "put" if SupportedRenderFormats(contentToken) ⇒ "application/octet-stream"
+          case "post" | "put"                                         ⇒ "application/xml"
+          case _                                                      ⇒ "none"
         }
+
+        def findDefaultContentType =
+          SupportedRenderFormatsMediatypes.get(contentToken) orElse Some("application/xml")
 
         def findDefaultPruneMetadata(dataFormatVersion: String) = dataFormatVersion match {
           case "edge" ⇒ "false"
@@ -275,16 +287,23 @@ trait FormRunnerActions {
           evaluatedPropertiesAsMap.get("serialization").flatten orElse
             (evaluatedPropertiesAsMap.get("method").flatten map findDefaultSerialization)
 
+        val effectiveContentType =
+          evaluatedPropertiesAsMap.get("content-type").flatten orElse
+            findDefaultContentType
+
         val effectivePruneMetadata =
           evaluatedPropertiesAsMap.get("prune-metadata").flatten orElse
             (evaluatedPropertiesAsMap.get("data-format-version").flatten map findDefaultPruneMetadata)
 
-        evaluatedPropertiesAsMap + ("serialization" → effectiveSerialization) + ("prune-metadata" → effectivePruneMetadata)
+        evaluatedPropertiesAsMap +
+          ("serialization"  → effectiveSerialization) +
+          ("mediatype"      → effectiveContentType  ) + // `<xf:submission>` uses `mediatype`
+          ("prune-metadata" → effectivePruneMetadata)
       }
 
       // Create PDF and/or TIFF if needed
       for (format ← SupportedRenderFormats)
-        if (stringOptionToSet(evaluatedSendProperties("content")) exists Set(format, s"$format-url"))
+        if (Set(format, s"$format-url")(contentToken))
           tryCreatePdfOrTiffIfNeeded(params, format).get
 
       // Set data-safe-override as we know we are not losing data upon navigation. This happens:
@@ -440,8 +459,7 @@ trait FormRunnerActions {
   def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: String): Try[Any] =
     Try {
       pdfOrTiffPathOpt(format) match {
-        case Some(_) ⇒
-          // NOP: Path is already available.
+        case Some(_) ⇒ // NOP: Path is already available.
         case None    ⇒
           implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 

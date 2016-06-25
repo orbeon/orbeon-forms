@@ -514,13 +514,15 @@
          information, so that the above binds are kept in sync. Ideally would need smart dependency system. -->
     <xf:recalculate event="xxforms-value-changed" observer="fr-error-summary-instance"/>
 
-    <xf:instance id="fr-pdf-url-instance">
+    <xf:instance id="fr-pdf-url-instance" xxf:exclude-result-prefixes="#all">
         <uri/>
     </xf:instance>
 
-    <xf:instance id="fr-tiff-url-instance">
+    <xf:instance id="fr-tiff-url-instance" xxf:exclude-result-prefixes="#all">
         <uri/>
     </xf:instance>
+
+    <xf:bind ref="instance('fr-pdf-url-instance') | instance('fr-tiff-url-instance')" type="xs:anyURI"/>
 
     <!-- React to issue loading the document. We consider this fatal. -->
     <xf:action event="xforms-submit-error" target="fr-get-document-submission" type="xpath">

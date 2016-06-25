@@ -174,7 +174,8 @@ lazy val xupdate = (project in file("xupdate"))
 lazy val dom = (project in file("dom"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-dom"
+    name                  := "orbeon-dom",
+    unmanagedBase in Test := baseDirectory.value / ".." / "lib"
   )
 
 lazy val formRunner = (project in file("form-runner"))

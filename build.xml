@@ -931,6 +931,9 @@
                             <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
                             <exclude name="org/orbeon/oxf/fr/persistence/**/*Test.class"    if="skip.database"/>
                         </fileset>
+                        <fileset dir="dom/target/scala-2.11/test-classes">
+                            <include name="org/orbeon/oxf/**/*Test.class"/>
+                        </fileset>
                         <fileset dir="common/target/scala-2.11/test-classes">
                             <include name="org/orbeon/oxf/**/*Test.class"/>
                         </fileset>
@@ -971,6 +974,7 @@
                         <!-- Test classes -->
                         <pathelement location="src/target/scala-2.11/test-classes"/>
                         <pathelement location="common/target/scala-2.11/test-classes"/>
+                        <pathelement location="dom/target/scala-2.11/test-classes"/>
                         <!-- JUnit proper -->
                         <pathelement location="lib/junit-4.11.jar"/>
                         <pathelement location="lib/ant-junit-1.7.1.jar"/>

@@ -741,14 +741,14 @@ class ConcreteElement(var qname: QName)
     }
   }
 
+  // TODO: Only used by `NodeWrapper` and almost identical to `declaredNamespaces`, can we get rid of it?
   def additionalNamespaces: ju.List[Namespace] = {
+    val answer = new ju.ArrayList[Namespace]
     val list = internalContent
     val size = list.size
-    val answer = new ju.ArrayList[Namespace]
     for (i ← 0 until size) {
       list.get(i) match {
-        case namespace: Namespace if namespace != getNamespace ⇒
-          answer.add(namespace)
+        case namespace: Namespace if namespace != getNamespace ⇒ answer.add(namespace)
         case _ ⇒
       }
     }
@@ -756,7 +756,7 @@ class ConcreteElement(var qname: QName)
   }
 
   def declaredNamespaces: ju.List[Namespace] = {
-    val answer = new ju.ArrayList[Namespace]()
+    val answer = new ju.ArrayList[Namespace]
     val list = internalContent
     val size = list.size
     for (i ← 0 until size) {

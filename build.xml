@@ -927,15 +927,15 @@
 
                     <batchtest>
                         <fileset dir="src/target/scala-2.11/test-classes">
-                            <include name="org/orbeon/oxf/**/*Test.class"/>
+                            <include name="org/orbeon/**/*Test.class"/>
                             <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
                             <exclude name="org/orbeon/oxf/fr/persistence/**/*Test.class"    if="skip.database"/>
                         </fileset>
                         <fileset dir="dom/target/scala-2.11/test-classes">
-                            <include name="org/orbeon/oxf/**/*Test.class"/>
+                            <include name="org/orbeon/**/*Test.class"/>
                         </fileset>
                         <fileset dir="common/target/scala-2.11/test-classes">
-                            <include name="org/orbeon/oxf/**/*Test.class"/>
+                            <include name="org/orbeon/**/*Test.class"/>
                         </fileset>
                     </batchtest>
 

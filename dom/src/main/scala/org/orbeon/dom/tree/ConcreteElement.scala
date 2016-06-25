@@ -809,10 +809,21 @@ class ConcreteElement(var qname: QName)
     answer
   }
 
-  // TODO ORBEON review: this also clears namespaces, check usages!
   // 1 external usage
-  def clearContent(): Unit =
-    internalContent.clear()
+  def clearContent(): Unit = {
+
+    import scala.collection.JavaConverters._
+
+    val it = internalContent.iterator.asScala filter (_.isInstanceOf[Namespace])
+
+    if (it.hasNext) {
+      _internalContent = new ju.ArrayList[Node](DefaultContentListSize)
+      while (it.hasNext)
+        _internalContent.add(it.next())
+    } else {
+      internalContent.clear()
+    }
+  }
 
   /**
    * Called when a new child node is added to create any parent relationships

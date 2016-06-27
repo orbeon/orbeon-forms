@@ -50,18 +50,18 @@ private object XFormsContainingDocumentBase {
 import org.orbeon.oxf.xforms.XFormsContainingDocumentBase._
 
 abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
-    extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
-    with ContainingDocumentLogging
-    with ContainingDocumentMisc
-    with ContainingDocumentEvent
-    with ContainingDocumentTemplate
-    with ContainingDocumentProperties
-    with ContainingDocumentRequestStats
-    with ContainingDocumentRequest
-    with ContainingDocumentDelayedEvents
-    with XFormsDocumentLifecycle
-    with Cacheable
-    with XFormsObject
+  extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
+  with ContainingDocumentLogging
+  with ContainingDocumentMisc
+  with ContainingDocumentEvent
+  with ContainingDocumentTemplate
+  with ContainingDocumentProperties
+  with ContainingDocumentRequestStats
+  with ContainingDocumentRequest
+  with ContainingDocumentDelayedEvents
+  with XFormsDocumentLifecycle
+  with Cacheable
+  with XFormsObject
 
 trait ContainingDocumentMisc {
 
@@ -142,15 +142,15 @@ trait ContainingDocumentProperties {
   private object Memo {
     private val cache = collection.mutable.Map.empty[String, Any]
 
-    private def memo[T](name: String, get: ⇒ Any) =
+    private def memo[T](name: String, get: ⇒ T) =
       cache.getOrElseUpdate(name, get).asInstanceOf[T]
 
-    def staticStringProperty(name: String)  = memo[String] (name, getStaticState.staticProperty(name))
-    def staticBooleanProperty(name: String) = memo[Boolean](name, getStaticState.staticProperty(name))
-    def staticIntProperty(name: String)     = memo[Int]    (name, getStaticState.staticProperty(name))
+    def staticStringProperty (name: String) = memo(name, getStaticState.staticStringProperty(name))
+    def staticBooleanProperty(name: String) = memo(name, getStaticState.staticBooleanProperty(name))
+    def staticIntProperty    (name: String) = memo(name, getStaticState.staticIntProperty(name))
 
     def staticBooleanProperty[T](name: String, pred: T ⇒ Boolean) =
-      memo[Boolean](name, pred(getStaticState.staticProperty(name).asInstanceOf[T]))
+      memo(name, pred(getStaticState.staticProperty(name).asInstanceOf[T]))
 
     def dynamicProperty[T](name: String, convert: String ⇒ T) =
       memo[T](

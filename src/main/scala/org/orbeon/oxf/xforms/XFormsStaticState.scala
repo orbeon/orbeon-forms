@@ -41,8 +41,11 @@ trait XFormsStaticState {
   def functionLibrary: FunctionLibrary
   def sanitizeInput: String ⇒ String
 
-  def staticProperty(name: String): Any
+  def staticProperty       (name: String): Any
+  def staticStringProperty (name: String): String
   def staticBooleanProperty(name: String): Boolean
+  def staticIntProperty    (name: String): Int
+
   def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression]
   def clientNonDefaultProperties: Map[String, AnyRef]
 

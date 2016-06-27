@@ -50,7 +50,7 @@ class XFormsStaticStateImpl(
 
   implicit val getIndentedLogger = Loggers.getIndentedLogger("analysis")
 
-  // Create top-level part once vals are all initialized
+  // Create top-level part once `val`s are all initialized
   val topLevelPart = new PartAnalysisImpl(this, None, startScope, metadata, staticStateDocument)
 
   // Analyze top-level part
@@ -65,7 +65,7 @@ class XFormsStaticStateImpl(
   // the `PartAnalysisImpl` is created above. Yes, this is tricky and not ideal.
   lazy val allowedExternalEvents   = stringOptionToSet(Option(staticStringProperty(P.EXTERNAL_EVENTS_PROPERTY)))
   lazy val isHTMLDocument          = staticStateDocument.isHTMLDocument
-  lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),         P.XPATH_ANALYSIS_PROPERTY)
+  lazy val isXPathAnalysis         = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.XPATH_ANALYSIS_PROPERTY),     P.XPATH_ANALYSIS_PROPERTY)
   lazy val isCalculateDependencies = Version.instance.isPEFeatureEnabled(staticBooleanProperty(P.CALCULATE_ANALYSIS_PROPERTY), P.CALCULATE_ANALYSIS_PROPERTY)
 
   lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
@@ -111,7 +111,7 @@ class XFormsStaticStateImpl(
           case Some(model) if maybeAVT ⇒
             Right(XPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, functionLibrary, avt = true))
           case None if maybeAVT ⇒
-            throw new IllegalArgumentException("can only evaluate AVT properties if a model is present")
+            throw new IllegalArgumentException("can only evaluate AVT properties if a model is present") // 2016-06-27: Uncommon case but really?
           case _ ⇒
             Left(P.getPropertyDefinition(name).parseProperty(rawPropertyValue))
         }
@@ -122,27 +122,16 @@ class XFormsStaticStateImpl(
   def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression] =
     nonDefaultPropertiesOnly.getOrElse(name, Left(P.getPropertyDefinition(name).defaultValue))
 
-  def stringPropertyMaybeAsExpression(name: String): Either[String, CompiledExpression] =
-    propertyMaybeAsExpression(name: String).left map (_.toString)
-
-  def booleanPropertyMaybeAsExpression(name: String): Either[Boolean, CompiledExpression] =
-    propertyMaybeAsExpression(name: String).left map (_.asInstanceOf[Boolean])
-
-  def intPropertyMaybeAsExpression(name: String): Either[Int, CompiledExpression] =
-    propertyMaybeAsExpression(name: String).left map (_.asInstanceOf[Int])
-
   // For properties known to be static
-  override def staticProperty(name: String) =
-    propertyMaybeAsExpression(name).left.get
+  private def staticPropertyOrDefault(name: String) =
+    staticStateDocument.nonDefaultProperties.get(name) map
+      P.getPropertyDefinition(name).parseProperty      getOrElse
+      P.getPropertyDefinition(name).defaultValue
 
-  def staticStringProperty(name: String) =
-    stringPropertyMaybeAsExpression(name).left.get
-
-  def staticBooleanProperty(name: String) =
-    booleanPropertyMaybeAsExpression(name).left.get
-
-  def staticIntProperty(name: String) =
-    intPropertyMaybeAsExpression(name).left.get
+  def staticProperty       (name: String) = staticPropertyOrDefault(name: String)
+  def staticStringProperty (name: String) = staticPropertyOrDefault(name: String).toString
+  def staticBooleanProperty(name: String) = staticPropertyOrDefault(name: String).asInstanceOf[Boolean]
+  def staticIntProperty    (name: String) = staticPropertyOrDefault(name: String).asInstanceOf[Int]
 
   // 2014-05-02: Used by XHTMLHeadHandler only
   def clientNonDefaultProperties = staticStateDocument.nonDefaultProperties filter

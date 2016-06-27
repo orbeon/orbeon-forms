@@ -23,8 +23,7 @@
   min-height: 80px;
 }
 .xbl-fr-alert-dialog .xbl-fr-alert-dialog-message label {
-  position: relative;
-  top: 1em;
+  padding-top: 1em;
 }
 .xbl-fr-alert-dialog .xbl-fr-alert-dialog-buttons {
   text-align: right;

@@ -101,7 +101,8 @@
 
     <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="2000"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
-    <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="inline"/>
+    <property as="xs:string"  name="oxf.xforms.label.appearance"                            value="full"/>
+    <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="full"/>
     <property as="xs:string"  name="oxf.xforms.help.appearance"                             value="dialog"/>
 
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                          value="true"/>

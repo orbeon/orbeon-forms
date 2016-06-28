@@ -320,6 +320,8 @@
                 <xf:property name="description" value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="singleton"   value="()"/>
                 <xf:property name="wizard"      value="()"/>
+                <xf:property name="labels"      value="()"/>
+                <xf:property name="hints"       value="()"/>
             </xf:dispatch>
 
             <xxf:show
@@ -332,6 +334,8 @@
                 <xf:property name="description" value="($requested-description, bind('description-bind'))[1]"/>
                 <xf:property name="singleton"   value="()"/>
                 <xf:property name="wizard"      value="()"/>
+                <xf:property name="labels"      value="()"/>
+                <xf:property name="hints"       value="()"/>
             </xxf:show>
         </xf:action>
     </xf:action>
@@ -339,7 +343,7 @@
     <!-- Annotated form instance -->
     <xf:bind id="fb-form-binds" ref="instance('fb-form-instance')">
         <xf:bind ref="xh:head">
-            <xf:bind ref="xf:model[@id = 'fr-form-model']">
+            <xf:bind ref="xf:model[@id = 'fr-form-model']" id="fb-form-model-bind">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*" id="metadata-bind">
                     <xf:bind id="application-name-bind" ref="application-name"/>
@@ -354,6 +358,9 @@
                     <xf:bind id="css-attachment-bind"   ref="css" type="xs:anyURI"/>
                     <xf:bind id="pdf-attachment-bind"   ref="pdf" type="xs:anyURI"/>
                 </xf:bind>
+                <!-- Properties on main form model -->
+                <xf:bind id="labels-bind"               ref="@xxf:label.appearance"/>
+                <xf:bind id="hints-bind"                ref="@xxf:hint.appearance"/>
             </xf:bind>
         </xf:bind>
         <!-- Keep all @edit-ref attributes pointing to the right spot -->

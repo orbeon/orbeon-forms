@@ -42,6 +42,22 @@
                     ref="$i/wizard"
                     value="(event('wizard')[. = ('true', 'false')], 'default')[1]"/>
 
+                <xf:setvalue
+                    ref="$i/labels"
+                    value="(xxf:split(event('labels'))[. = 'full'], 'default')[1]"/>
+
+                <xf:setvalue
+                    ref="$i/labels-placeholders"
+                    value="xxf:split(event('labels')) = 'minimal'"/>
+
+                <xf:setvalue
+                    ref="$i/hints"
+                    value="(xxf:split(event('hints'))[. = ('full', 'tooltip')], 'default')[1]"/>
+
+                <xf:setvalue
+                    ref="$i/hints-placeholders"
+                    value="xxf:split(event('hints')) = 'minimal'"/>
+
                 <!--  Sanitize as caller might pass an initial app name which is not allowed by current permissions -->
                 <xf:action if="$has-roles and not($allowed-apps-if-has-roles = ('*', event('app')))">
                     <xf:setvalue
@@ -80,6 +96,62 @@
                 </xf:action>
 
             </xbl:handler>
+
+            <!-- Save and close if valid -->
+            <xbl:handler
+                event="DOMActivate"
+                observer="fb-app-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
+                if="valid($i)">
+
+                <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
+
+                <!-- Tell custom settings to apply changes -->
+                <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
+                    <xf:property name="form"              value="$form"/>
+                    <xf:property name="form-instance"     value="fbf:formInstanceRoot($form)"/>
+                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRoot($form)"/>
+                </xf:dispatch>
+
+                <!-- Dispatch event with result -->
+                <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
+                    <xf:property name="app"               value="$i/app/string()"/>
+                    <xf:property name="form"              value="$i/form/string()"/>
+                    <xf:property name="title"             value="$i/title/string()"/>
+                    <xf:property name="description"       value="$i/description/string()"/>
+                    <xf:property name="singleton"         value="$i/singleton/string()"/>
+                    <xf:property name="wizard"            value="$i/wizard/string()"/>
+                    <xf:property name="mode"              value="$i/mode/string()"/>
+
+                    <xf:property
+                        name="labels"
+                        value="
+                            if ($i/labels = 'default') then
+                                ()
+                            else string-join(
+                                (
+                                    $i/labels/string(),
+                                    'minimal'[data($i/labels-placeholders)]
+                                ),
+                                ' '
+                            )"/>
+
+                    <xf:property
+                        name="hints"
+                        value="
+                            if ($i/hints = 'default') then
+                                ()
+                            else string-join(
+                                (
+                                    $i/hints/string(),
+                                    'minimal'[data($i/hints-placeholders)]
+                                ),
+                                ' '
+                            )"/>
+                </xf:dispatch>
+
+                <!-- Hide this dialog -->
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
@@ -91,6 +163,10 @@
                         <description/>
                         <singleton/>
                         <wizard/>
+                        <labels/>
+                        <labels-placeholders/>
+                        <hints/>
+                        <hints-placeholders/>
                         <mode/>
                     </instance>
                 </xf:instance>
@@ -133,6 +209,14 @@
                     ref="singleton"
                     calculate="if (string() = '') then 'false' else ."
                     readonly="false()"
+                    type="xs:boolean"/>
+                <xf:bind
+                    ref="labels-placeholders"
+                    readonly="../labels = 'default'"
+                    type="xs:boolean"/>
+                <xf:bind
+                    ref="hints-placeholders"
+                    readonly="../hints = 'default'"
                     type="xs:boolean"/>
                 <xf:bind
                     ref="mode"
@@ -292,6 +376,70 @@
                                             </xf:select1>
                                         </xh:td>
                                     </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="labels" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/labels/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/labels/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/appearances/item[@id != 2]">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                        ref="
+                                                            if (@id = 0) then
+                                                                'default'
+                                                            else
+                                                                'full'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="labels-placeholders">
+                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
+                                                <xf:setvalue
+                                                    event="xforms-value-changed"
+                                                    if="event('xxf:value') = 'true'"
+                                                    ref="../hints-placeholders"
+                                                    value="false()"
+                                                />
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="hints" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/hints/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/hints/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/appearances/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                        ref="
+                                                            if (@id = 0) then
+                                                                'default'
+                                                            else if (@id = 1) then
+                                                                'full'
+                                                            else
+                                                                'tooltip'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="hints-placeholders">
+                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
+                                                <xf:setvalue
+                                                    event="xforms-value-changed"
+                                                    if="event('xxf:value') = 'true'"
+                                                    ref="../labels-placeholders"
+                                                    value="false()"
+                                                />
+                                            </fr:checkbox-input>
+                                        </xh:td>
+                                    </xh:tr>
                                 </fr:grid>
 
                             </fr:tab>
@@ -384,36 +532,6 @@
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>
-
-                        <!-- Event handler for 3 fields and button -->
-                        <xf:action
-                            event="DOMActivate"
-                            target="fb-app-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
-                            if="valid($i)">
-
-                            <xf:var name="form" value="xxf:instance('fb-form-instance')"/>
-
-                            <!-- Tell custom settings to apply changes -->
-                            <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
-                                <xf:property name="form"              value="$form"/>
-                                <xf:property name="form-instance"     value="fbf:formInstanceRoot($form)"/>
-                                <xf:property name="metadata-instance" value="fbf:metadataInstanceRoot($form)"/>
-                            </xf:dispatch>
-
-                            <!-- Dispatch event with result -->
-                            <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                                <xf:property name="app"               value="$i/app/string()"/>
-                                <xf:property name="form"              value="$i/form/string()"/>
-                                <xf:property name="title"             value="$i/title/string()"/>
-                                <xf:property name="description"       value="$i/description/string()"/>
-                                <xf:property name="singleton"         value="$i/singleton/string()"/>
-                                <xf:property name="wizard"            value="$i/wizard/string()"/>
-                                <xf:property name="mode"              value="$i/mode/string()"/>
-                            </xf:dispatch>
-
-                            <!-- Hide this dialog -->
-                            <xxf:hide dialog="dialog"/>
-                        </xf:action>
                     </xh:div>
                 </xxf:dialog>
             </xf:group>

@@ -150,6 +150,8 @@
                                         <xf:property name="description" value="bind('description-bind')"/>
                                         <xf:property name="singleton"   value="bind('singleton-bind')"/>
                                         <xf:property name="wizard"      value="bind('wizard-bind')"/>
+                                        <xf:property name="labels"      value="bind('labels-bind')"/>
+                                        <xf:property name="hints"       value="bind('hints-bind')"/>
                                     </xxf:show>
                                 </xf:action>
                             </xf:trigger>
@@ -329,6 +331,21 @@
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="xf:element('wizard', event('wizard'))"/>
+
+                                        <!-- Add/remove XForms properties as needed -->
+                                        <xf:delete
+                                            bind="labels-bind"/>
+                                        <xf:insert
+                                            if="exists(event('labels'))"
+                                            context="bind('fb-form-model-bind')"
+                                            origin="xf:attribute('xxf:label.appearance', event('labels'))"/>
+
+                                        <xf:delete
+                                            bind="hints-bind"/>
+                                        <xf:insert
+                                            if="exists(event('hints'))"
+                                            context="bind('fb-form-model-bind')"
+                                            origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
 
                                     </xf:action>
                                     <!-- Update app/form name if changed -->

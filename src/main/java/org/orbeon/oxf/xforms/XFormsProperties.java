@@ -57,8 +57,9 @@ public class XFormsProperties {
     public static final String HELP_ELEMENT_NAME_PROPERTY = "help-element";
     public static final String ALERT_ELEMENT_NAME_PROPERTY = "alert-element";
 
-    public static final String HINT_APPEARANCE_PROPERTY = "hint.appearance";
-    public static final String HELP_APPEARANCE_PROPERTY = "help.appearance";
+    public static final String LABEL_APPEARANCE_PROPERTY = "label.appearance";
+    public static final String HINT_APPEARANCE_PROPERTY  = "hint.appearance";
+    public static final String HELP_APPEARANCE_PROPERTY  = "help.appearance";
 
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
 
@@ -202,7 +203,8 @@ public class XFormsProperties {
             new PropertyDefinition(HINT_ELEMENT_NAME_PROPERTY, "span", false),
             new PropertyDefinition(HELP_ELEMENT_NAME_PROPERTY, "span", false),
             new PropertyDefinition(ALERT_ELEMENT_NAME_PROPERTY, "span", false),
-            new PropertyDefinition(HINT_APPEARANCE_PROPERTY, "inline", false),
+            new PropertyDefinition(LABEL_APPEARANCE_PROPERTY, "full", false),
+            new PropertyDefinition(HINT_APPEARANCE_PROPERTY, "full", false),
             new PropertyDefinition(HELP_APPEARANCE_PROPERTY, "dialog", false),
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY, "", false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY, true, false),

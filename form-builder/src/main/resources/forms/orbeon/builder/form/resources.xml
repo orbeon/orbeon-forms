@@ -270,8 +270,22 @@
             </singleton>
             <wizard>
                 <label>Wizard View</label>
-                <hint>Show top-level sections as separate wizard pages</hint>
+                <hint>Whether to show top-level sections as separate wizard pages</hint>
             </wizard>
+            <labels>
+                <label>Appearance of control labels</label>
+            </labels>
+            <hints>
+                <label>Appearance of control hints</label>
+            </hints>
+            <appearances>
+                <item id="0">Use Default</item>
+                <item id="1">Inline</item>
+                <item id="2">Tooltip</item>
+            </appearances>
+            <placeholders>
+                <label>Use placeholder for text fields</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Control Settings</label>
@@ -1191,8 +1205,22 @@
             </singleton>
             <wizard>
                 <label>Vue "wizard"</label>
-                <hint>Montre les sections de premier niveau dans des pages de wizard séparées</hint>
+                <hint>Montrer les sections de premier niveau dans des pages de wizard séparées</hint>
             </wizard>
+            <labels>
+                <label>Apparence des libellés</label>
+            </labels>
+            <hints>
+                <label>Apparence des suggestions</label>
+            </hints>
+            <appearances>
+                <item id="0">Utiliser le défaut</item>
+                <item id="1">En ligne</item>
+                <item id="2">Infobulle</item>
+            </appearances>
+            <placeholders>
+                <label>Placer en ligne dans les champs de texte</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Paramètres du contrôle</label>
@@ -2116,6 +2144,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -3039,6 +3081,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
@@ -3962,6 +4018,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Impostazioni di controllo</label>
@@ -4877,6 +4947,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Einstellungen Steuerelemente</label>
@@ -5795,6 +5879,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
@@ -6711,6 +6809,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configuración de Controles</label>
@@ -7627,6 +7739,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Configurações do Controlo</label>
@@ -8549,6 +8675,20 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <labels>
+                <label todo="true">[Appearance of control labels]</label>
+            </labels>
+            <hints>
+                <label todo="true">[Appearance of control hints]</label>
+            </hints>
+            <appearances>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Inline]</item>
+                <item todo="true" id="2">[Tooltip]</item>
+            </appearances>
+            <placeholders>
+                <label todo="true">[Use placeholder for text fields]</label>
+            </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Inställningar för kontroll</label>

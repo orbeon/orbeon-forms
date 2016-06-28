@@ -371,6 +371,9 @@
                                                                 <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->
                                                                 <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', $control/@id)"/>
                                                             </xsl:if>
+                                                            <xsl:if test="node-name($control) = xs:QName('xf:input')">
+                                                                <xsl:attribute name="class" select="'fr-grid-lhh-for-xforms-input'"/>
+                                                            </xsl:if>
                                                             <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                         </xf:output>
                                                     </xsl:if>

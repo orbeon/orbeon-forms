@@ -35,6 +35,9 @@ object AppearanceTrait {
   // The client expects long prefixes
   private val StandardPrefixes = Map(XXFORMS_NAMESPACE_URI → "xxforms", XFORMS_NAMESPACE_URI → "xforms")
 
+  def encodeAndAppendAppearances(sb: jl.StringBuilder, lhha: String, appearances: Set[String]): Unit =
+    appearances map QName.get foreach (encodeAndAppendAppearance(sb, lhha, _))
+
   def encodeAndAppendAppearance(sb: jl.StringBuilder, lhha: String, appearance: QName): Unit = {
     if (sb.length > 0)
       sb.append(' ')

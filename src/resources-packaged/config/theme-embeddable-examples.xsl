@@ -28,7 +28,8 @@
 
     <xsl:template match="/">
         <xh:div>
-            <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
+            <!-- Copy xforms-[dis|en]able-hint-as-tooltip and xforms-[dis|en]able-alert-as-tooltip from the body to the div -->
+            <!-- NOTE: Since Orbeon Forms 2016.2, the XForms engine places the hint classes on the `<xh:form>` element. -->
             <xsl:variable name="classes-to-copy" select="p:split(/xh:html/xh:body/@class)[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
             <xsl:attribute name="class" select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
             <!-- Styles -->

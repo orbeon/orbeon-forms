@@ -120,7 +120,17 @@
     <xsl:template match="xh:body">
         <xsl:copy>
             <!-- .orbeon is here to scope all Orbeon CSS rules -->
-            <xsl:attribute name="class" select="string-join(('orbeon', concat('xforms-', if ($is-inline-hints) then 'disable' else 'enable', '-hint-as-tooltip'), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
+            <xsl:attribute
+                name="class"
+                select="
+                    string-join(
+                        (
+                            'orbeon',
+                            'xforms-disable-alert-as-tooltip',
+                            @class
+                        ),
+                        ' '
+                    )"/>
             <xsl:apply-templates select="@* except @class"/>
             <xf:group model="fr-form-model" id="fr-view" class="container{if ($fluid) then '-fluid' else ''} fr-view {{concat('fr-mode-', $fr-mode)}}" xxf:element="div">
                 <xh:div class="popover-container-right"/>

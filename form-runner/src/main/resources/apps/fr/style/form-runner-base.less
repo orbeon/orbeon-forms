@@ -109,16 +109,28 @@
         }
     }
 
-    // Inline hints: display hint under each control
-    .xforms-hint-appearance-inline .xforms-hint {
-        display: block;
-        margin-top: .2em;
-        margin-left: 0;// used to have margin here but with new colors no margin seems better
-        width: 100%;
+    // Show hints inline (they are hidden by default in xforms.less)...
+    // NOTE: `.xforms-hint-appearance-inline` is for backward compatibility only and replaced with `.xforms-hint-appearance-full`.
+    .xforms-hint-appearance-full, .xforms-hint-appearance-inline {
+        .xforms-hint {
+            display: block;
+            width: 100%;
+            clear: both;
+        }
+
+        // ...except for grid headings for input fields if there is a local `minimal` appearance
+        .fr-grid-lhh-for-xforms-input .xforms-hint.xforms-hint-appearance-minimal {
+            display: none;
+        }
+
+        // ...and except for radio buttons/checkboxes, where hints cannot be inline and show on mouseover
+        .xforms-items .xforms-hint {
+            display: none;
+        }
     }
 
-    // Exception to the above rule: hints for items don't take space in the page, and are shown on click or mouseover
-    .xforms-hint-appearance-inline .xforms-items .xforms-hint {
+    // ...and except for grid headings for input fields if there is a global `minimal` appearance but no `full` local appearance
+    .xforms-hint-appearance-minimal .fr-grid-lhh-for-xforms-input .xforms-hint:not(.xforms-hint-appearance-full) {
         display: none;
     }
 

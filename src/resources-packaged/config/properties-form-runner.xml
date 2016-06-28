@@ -94,7 +94,8 @@
 
     <property as="xs:string"  name="oxf.fr.detail.lhha-order.*.*"                               value="help label control alert hint"/>
     <property as="xs:boolean" name="oxf.fr.detail.noscript.table.*.*"                           value="true"/>
-    <property as="xs:boolean" name="oxf.fr.detail.hints.inline.*.*"                             value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.label.appearance.*.*"                         value="full"/>
+    <property as="xs:string"  name="oxf.fr.detail.hint.appearance.*.*"                          value="full"/>
     <!-- TOC disabled by default -->
     <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>

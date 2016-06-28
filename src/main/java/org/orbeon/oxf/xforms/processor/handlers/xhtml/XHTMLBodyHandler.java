@@ -93,9 +93,25 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         final StringBuilder sb = new StringBuilder("xforms-form");
         sb.append(handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
 
-        // Hint/help appearance classes
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "hint", QName.get(containingDocument.getHintAppearance()));
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "help", QName.get(containingDocument.getHelpAppearance()));
+        // LHHA appearance classes
+        //
+        // NOTE: There can be multiple appearances at the same time:
+        //
+        // - `xforms-hint-appearance-full xforms-hint-appearance-minimal`
+        // - `xforms-hint-appearance-tooltip xforms-hint-appearance-minimal`
+        //
+        // That's because the `minimal` appearance doesn't apply to all controls, but only (as of 2016.2) to input fields.
+        //
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearances(sb, "label", containingDocument.getLabelAppearances());
+
+        final scala.collection.immutable.Set<String> hintAppearances = containingDocument.getHintAppearances();
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearances(sb, "hint", hintAppearances);
+        if (hintAppearances.contains("tooltip"))
+            sb.append(" xforms-enable-hint-as-tooltip");
+        else
+            sb.append(" xforms-disable-hint-as-tooltip");
+
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb,  "help", QName.get(containingDocument.getHelpAppearance()));
 
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters

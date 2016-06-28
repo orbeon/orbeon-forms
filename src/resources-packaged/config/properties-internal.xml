@@ -350,7 +350,8 @@
     <!-- ==== Internal Form Builder properties ==================================================================== -->
 
     <!-- In case somebody overrides with weaker properties -->
-    <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"            value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.label.appearance.orbeon.builder"        value="full"/>
+    <property as="xs:string"  name="oxf.fr.detail.hint.appearance.orbeon.builder"         value="full"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"      value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                 value=""/>
 

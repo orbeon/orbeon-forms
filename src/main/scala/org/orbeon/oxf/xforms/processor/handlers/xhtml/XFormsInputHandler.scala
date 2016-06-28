@@ -38,7 +38,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
   override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
     super.init(uri, localname, qName, attributes, matched)
-    this.placeHolderInfo = XFormsInputControl.placeholderInfo(elementAnalysis, currentControlOrNull)
+    this.placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
   }
 
   // TODO: Use type member instead

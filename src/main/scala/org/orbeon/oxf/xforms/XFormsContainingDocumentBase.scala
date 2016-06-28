@@ -243,7 +243,8 @@ trait ContainingDocumentProperties {
   def getHintElementName                    = staticStringProperty(HINT_ELEMENT_NAME_PROPERTY)
   def getHelpElementName                    = staticStringProperty(HELP_ELEMENT_NAME_PROPERTY)
   def getAlertElementName                   = staticStringProperty(ALERT_ELEMENT_NAME_PROPERTY)
-  def getHintAppearance                     = staticStringProperty(HINT_APPEARANCE_PROPERTY)
+  def getLabelAppearances                   = stringToSet(staticStringProperty(LABEL_APPEARANCE_PROPERTY))
+  def getHintAppearances                    = stringToSet(staticStringProperty(HINT_APPEARANCE_PROPERTY))
   def getHelpAppearance                     = staticStringProperty(HELP_APPEARANCE_PROPERTY)
   def getDateFormatInput                    = staticStringProperty(DATE_FORMAT_INPUT_PROPERTY)
 

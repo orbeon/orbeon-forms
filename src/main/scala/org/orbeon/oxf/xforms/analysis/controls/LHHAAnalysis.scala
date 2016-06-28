@@ -24,6 +24,7 @@ import xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import XFormsProperties._
 
 class LHHAAnalysis(
   staticStateContext : StaticStateContext,
@@ -43,6 +44,9 @@ class LHHAAnalysis(
   val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
   val isLocal           = forStaticIdOption.isEmpty
   val defaultToHTML     = LHHAAnalysis.isHTML(element)
+
+  val hasLocalMinimalAppearance = appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)
+  val hasLocalFullAppearance    = appearances(XFORMS_FULL_APPEARANCE_QNAME)
 
   // What we support for alert level/validation:
   //
@@ -202,16 +206,19 @@ object LHHAAnalysis {
     ).asInstanceOf[Boolean]
   }
 
-  // Whether the control has label OR hint placeholder
-  def hasLabelOrHintPlaceholder(elementAnalysis: ElementAnalysis) =
-    Seq("label", "hint") exists (hasLHHAPlaceholder(elementAnalysis, _))
-
   // Whether the control has a placeholder for the given LHHA type
   def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String) =
     elementAnalysis match {
       case lhhaTrait: StaticLHHASupport ⇒
-        lhhaTrait.lhh(lhhaType).toList exists
-          (lhha ⇒ lhha.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || lhha.appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME))
+        val hintOpt = lhhaTrait.lhh(lhhaType)
+        (hintOpt exists (_.hasLocalMinimalAppearance)) || (
+          ! (hintOpt exists (_.hasLocalFullAppearance)) &&
+          stringToSet(
+            elementAnalysis.part.staticState.staticStringProperty(
+              if (lhhaType == "hint") HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
+            )
+          )(XFORMS_MINIMAL_APPEARANCE_QNAME.getName)
+        )
       case _ ⇒
         false
     }

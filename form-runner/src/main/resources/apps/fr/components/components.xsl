@@ -73,12 +73,34 @@
     <xsl:variable name="js-uri"               select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.uri', $app, $form), '.'))))"          as="xs:string*"/>
     <xsl:variable name="custom-js-uri"        select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))"   as="xs:string*"/>
     <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
-    <xsl:variable name="is-inline-hints"      select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())"        as="xs:boolean"/>
     <xsl:variable name="captcha-type"         select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"                            as="xs:string"/>
     <xsl:variable name="has-captcha"          select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"                                                  as="xs:boolean"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
+
+    <xsl:variable
+        name="label-appearance"
+        as="xs:string"
+        select="
+            (
+                p:property(string-join(('oxf.fr.detail.label.appearance', $app, $form), '.'))[. = ('full', 'minimal')],
+                'full'
+            )[1]"/>
+
+    <xsl:variable
+        name="hint-appearance"
+        as="xs:string"
+        select="
+            (
+                (: Deprecated property for backward compatibility only :)
+                'full'   [p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = true()],
+                'tooltip'[p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false()],
+                (: New property :)
+                p:property(string-join(('oxf.fr.detail.hint.appearance', $app, $form), '.'))[. = ('full', 'minimal', 'tooltip')],
+                (: Default :)
+                'full'
+            )[1]"/>
 
     <xsl:variable
         name="view-appearance"
@@ -308,7 +330,9 @@
             xxf:external-events="{@xxf:external-events} fr-open-pdf"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xforms11-switch="false"
-            xxf:xpath-analysis="true">
+            xxf:xpath-analysis="true"
+            xxf:label.appearance="{$label-appearance}"
+            xxf:hint.appearance="{$hint-appearance}">
 
             <!-- Don't enable client events filtering for FB -->
             <xsl:if test="$is-form-builder">
@@ -318,6 +342,7 @@
             <xsl:copy-of select="@xxf:xpath-analysis"/>
             <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests, import, validate -->
             <xsl:copy-of select="@xxf:encrypt-item-values"/>
+            <xsl:copy-of select="@xxf:hint.appearance"/>
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

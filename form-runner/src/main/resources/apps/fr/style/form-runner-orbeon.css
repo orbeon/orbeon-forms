@@ -105,14 +105,11 @@ body.orbeon {
 .orbeon .xforms-alert.xforms-active.xforms-info {
   color: #333333;
 }
-.orbeon .xforms-hint-appearance-inline .xforms-hint {
-  display: block;
-  clear: both;
+.orbeon .xforms-hint {
   font-size: smaller;
+  color: #6E6E6E;
   margin-top: .2em;
   margin-left: 0;
-  width: 100%;
-  color: #6E6E6E;
 }
 .orbeon .navbar .fr-language-choice .fr-link-select1,
 .orbeon .navbar .fr-noscript-choice,

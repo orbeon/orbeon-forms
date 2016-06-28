@@ -20,6 +20,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.util.ScalaUtils.{StringOps, _}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
@@ -269,7 +270,11 @@ object XFormsInputControl {
   def testParseTimeForNoscript(value: String) = parseForNoscript(TimeParsePatterns, value, dayMonth = false)
   def testParseDateForNoscript(value: String, dayMonth: Boolean) = parseForNoscript(DateParsePatterns, value, dayMonth)
 
-  def placeholderInfo(elementAnalysis: ElementAnalysis, control: XFormsControl): Option[PlaceHolderInfo] = {
+  def placeholderInfo(
+    containingDocument : XFormsContainingDocument,
+    elementAnalysis    : ElementAnalysis,
+    control            : XFormsControl
+  ): Option[PlaceHolderInfo] = {
 
     val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "label")
     val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "hint")

@@ -91,13 +91,21 @@
   margin-bottom: 0;
   list-style-type: square;
 }
+.orbeon .xforms-hint-appearance-full .xforms-hint,
 .orbeon .xforms-hint-appearance-inline .xforms-hint {
   display: block;
-  margin-top: .2em;
-  margin-left: 0;
   width: 100%;
+  clear: both;
 }
+.orbeon .xforms-hint-appearance-full .fr-grid-lhh-for-xforms-input .xforms-hint.xforms-hint-appearance-minimal,
+.orbeon .xforms-hint-appearance-inline .fr-grid-lhh-for-xforms-input .xforms-hint.xforms-hint-appearance-minimal {
+  display: none;
+}
+.orbeon .xforms-hint-appearance-full .xforms-items .xforms-hint,
 .orbeon .xforms-hint-appearance-inline .xforms-items .xforms-hint {
+  display: none;
+}
+.orbeon .xforms-hint-appearance-minimal .fr-grid-lhh-for-xforms-input .xforms-hint:not(.xforms-hint-appearance-full) {
   display: none;
 }
 .orbeon .xforms-trigger button,

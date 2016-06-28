@@ -94,8 +94,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         sb.append(handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
 
         // Hint/help appearance classes
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "hint", new QName(containingDocument.getHintAppearance()));
-        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "help", new QName(containingDocument.getHelpAppearance()));
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "hint", QName.get(containingDocument.getHintAppearance()));
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "help", QName.get(containingDocument.getHelpAppearance()));
 
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters

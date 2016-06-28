@@ -437,7 +437,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).sorted.head
 
-          new QName(builtinTypeString, Namespace(prefix, nsURI)) → builtinTypeRequired
+          QName.get(builtinTypeString, Namespace(prefix, nsURI)) → builtinTypeRequired
         }
 
         def schemaTypeQName: QName = {
@@ -449,7 +449,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
             { case (prefix, uri) ⇒ Namespace(prefix, uri) } getOrElse
             Namespace.EmptyNamespace
-          new QName(localname, namespace)
+          QName.get(localname, namespace)
         }
 
         Either.cond(schemaTypeOpt.isDefined, schemaTypeQName, builtinTypeQName)

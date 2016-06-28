@@ -420,7 +420,7 @@ object PageFlowControllerProcessor {
   val ServicePublicMethodsProperty = "service-public-methods"
   val AuthorizerProperty           = "authorizer"
 
-  val DefaultMatcher               = new QName("glob")
+  val DefaultMatcher               = QName.get("glob")
   val DefaultVisibility            = "private"
   val DefaultInstancePassing       = PageFlowControllerBuilder.INSTANCE_PASSING_REDIRECT
 
@@ -607,7 +607,7 @@ object PageFlowControllerProcessor {
   def getPath(e: Element) = att(e, "path") orElse att(e, "path-info") ensuring (_.isDefined) get
 
   // Support "regexp" and "oxf:perl5-matcher" for backward compatibility
-  val RegexpQNames = Set(new QName("regexp"), new QName("perl5-matcher", OXF_PROCESSORS_NAMESPACE))
+  val RegexpQNames = Set(QName.get("regexp"), QName.get("perl5-matcher", OXF_PROCESSORS_NAMESPACE))
 
   // Compile and convert glob expression if needed
   def compilePattern(e: Element, path: String, default: QName) =

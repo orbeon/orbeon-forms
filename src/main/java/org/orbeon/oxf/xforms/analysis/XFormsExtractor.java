@@ -79,7 +79,7 @@ import java.util.Stack;
  */
 public class XFormsExtractor extends XFormsExtractorBase {
 
-    public static final QName LAST_ID_QNAME = new QName("last-id");
+    public static final QName LAST_ID_QNAME = QName.get("last-id");
 
     private Locator locator;
     private LocationData locationData;

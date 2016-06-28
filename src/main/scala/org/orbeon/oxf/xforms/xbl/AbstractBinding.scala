@@ -133,7 +133,7 @@ case class AbstractBinding(
 
       // Repackage the result
       val generatedRootElement = generatedDocument.getRootElement.detach.asInstanceOf[Element]
-      generatedDocument.addElement(new QName("template", XBL_NAMESPACE, "xbl:template"))
+      generatedDocument.addElement(QName.get("template", XBL_NAMESPACE, "xbl:template"))
       val newRoot = generatedDocument.getRootElement
       newRoot.add(XBL_NAMESPACE)
       newRoot.add(generatedRootElement)

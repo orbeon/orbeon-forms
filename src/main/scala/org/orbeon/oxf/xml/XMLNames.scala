@@ -22,6 +22,6 @@ object XMLNames {
   val XXIncludeURI              = "http://orbeon.org/oxf/xml/xinclude"
 
   val XXIncludeNS               = Namespace("xxi", XXIncludeURI)
-  val XXIncludeOmitXmlBaseQName = new QName("omit-xml-base", XXIncludeNS)
-  val XIncludeFixupXMLBaseQName = new QName("fixup-xml-base", Namespace.EmptyNamespace)
+  val XXIncludeOmitXmlBaseQName = QName.get("omit-xml-base", XXIncludeNS)
+  val XIncludeFixupXMLBaseQName = QName.get("fixup-xml-base", Namespace.EmptyNamespace)
 }

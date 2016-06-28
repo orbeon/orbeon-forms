@@ -32,9 +32,9 @@ import scala.collection.JavaConverters._
 
 object XBLTransformer {
 
-  val XBLAttrQName = new QName("attr", XBL_NAMESPACE)
-  val XBLContentQName = new QName("content", XBL_NAMESPACE)
-  val XXBLAttrQName = new QName("attr", XXBL_NAMESPACE)
+  val XBLAttrQName = QName.get("attr", XBL_NAMESPACE)
+  val XBLContentQName = QName.get("content", XBL_NAMESPACE)
+  val XXBLAttrQName = QName.get("attr", XXBL_NAMESPACE)
 
   /**
     * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.

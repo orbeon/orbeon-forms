@@ -64,7 +64,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                         logger.debug("To class: " + className);
 
                     final String defaultName = (processorQName != null) ? Dom4jUtils.qNameToExplodedQName(processorQName) : processorURI;
-                    final QName defaultQName = (processorQName != null) ? processorQName : new QName(processorURI);
+                    final QName defaultQName = (processorQName != null) ? processorQName : QName.get(processorURI);
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
                         public Processor createInstance() {
@@ -110,7 +110,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                 if (processorURI != null)
                                     logger.debug("Binding name: " + processorURI);
 
-                                final QName defaultQName = (processorQName != null) ? processorQName : new QName(processorURI);
+                                final QName defaultQName = (processorQName != null) ? processorQName : QName.get(processorURI);
 
                                 Processor baseProcessor = ((processorQName != null)
                                         ? ProcessorFactoryRegistry.lookup(processorQName)

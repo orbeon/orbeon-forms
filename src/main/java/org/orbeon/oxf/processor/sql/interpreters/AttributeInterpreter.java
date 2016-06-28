@@ -88,7 +88,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
 
         final int colonIndex = qNameString.indexOf(':');
         if (colonIndex == -1)
-            return new QName(qNameString);
+            return QName.get(qNameString);
         if (colonIndex == 0)
             throw new ValidationException("Invalid QName:" + qNameString, new LocationData(locator));
 
@@ -98,7 +98,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         if (prefixesMap.get(prefix) == null) {
             throw new ValidationException("Undeclared prefix for QName:" + qNameString, new LocationData(locator));
         } else {
-            return new QName(localName, Namespace$.MODULE$.apply(prefix, (String) prefixesMap.get(prefix)));
+            return QName.get(localName, Namespace$.MODULE$.apply(prefix, (String) prefixesMap.get(prefix)));
         }
     }
 }

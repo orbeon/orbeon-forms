@@ -450,7 +450,7 @@ public class Dom4jUtils {
                 throw new OXFException("No namespace declaration found for prefix: " + prefix);
             }
         }
-        return new QName(localName, Namespace$.MODULE$.apply(prefix, namespaceURI));
+        return QName.get(localName, Namespace$.MODULE$.apply(prefix, namespaceURI));
     }
 
     /**
@@ -460,11 +460,11 @@ public class Dom4jUtils {
         int openIndex = qName.indexOf("{");
 
         if (openIndex == -1)
-            return new QName(qName);
+            return QName.get(qName);
 
         String namespaceURI = qName.substring(openIndex + 1, qName.indexOf("}"));
         String localName = qName.substring(qName.indexOf("}") + 1);
-        return new QName(localName, Namespace$.MODULE$.apply("p1", namespaceURI));
+        return QName.get(localName, Namespace$.MODULE$.apply("p1", namespaceURI));
     }
 
     // TODO ORBEON: remove uses, just use DocumentFactory

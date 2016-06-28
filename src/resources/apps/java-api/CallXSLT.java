@@ -37,7 +37,7 @@ public class CallXSLT extends SimpleProcessor {
     public void generateMyoutput(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws SAXException {
 
         // Define the name of the processor (this is a QName)
-        final QName processorName = new QName("xslt", XMLConstants.OXF_PROCESSORS_NAMESPACE);
+        final QName processorName = QName.get("xslt", XMLConstants.OXF_PROCESSORS_NAMESPACE);
 
         // Get a factory for this processor
         final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);

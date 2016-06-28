@@ -61,7 +61,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         final ProcessorDefinition processorDefinition;
                         {
                             // Use processor QName
-                            final Element processorNameElement = startTaskElement.element(new QName("processor-name"));
+                            final Element processorNameElement = startTaskElement.element(QName.get("processor-name"));
                             final QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement, true);
                             processorDefinition = new ProcessorDefinition(processorQName);
 

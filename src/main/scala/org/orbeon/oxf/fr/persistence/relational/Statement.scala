@@ -1,0 +1,45 @@
+/**
+ * Copyright (C) 2016 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.fr.persistence.relational
+
+import java.sql.{Connection, PreparedStatement, ResultSet}
+
+object Statement {
+
+  type Setter = (PreparedStatement, Int) ⇒ Unit
+
+  case class StatementPart(
+    sql    : String,
+    setters: List[Setter]
+  )
+
+  val NilPart = StatementPart("", Nil)
+
+  def buildQuery(parts: List[StatementPart]): String =
+    parts
+      .map { case StatementPart(partSQL, _) ⇒ partSQL }
+      .mkString("\n")
+
+  def executeQuery(connection: Connection, sql: String, parts: List[StatementPart]): ResultSet = {
+    val ps = connection.prepareStatement(sql)
+    val index = Iterator.from(1)
+    parts
+      .map(_.setters)
+      .foreach(setters ⇒
+        setters.foreach(setter ⇒
+          setter(ps, index.next())))
+    ps.executeQuery()
+  }
+
+}

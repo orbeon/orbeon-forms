@@ -1,4 +1,4 @@
-// Copyright (C) 2011 Orbeon, Inc.
+ // Copyright (C) 2011 Orbeon, Inc.
 //
 // This program is free software; you can redistribute it and/or modify it under the terms of the
 // GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,8 +15,64 @@
 .orbeon {
 
     .btn-toolbar {
-        display: block;
-        float: left;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .fr-reindex-status {
+
+        padding-left: 1em;
+        padding-right: 1em;
+        font-size: @baseFontSize; // Same size used by Bootstrap for the nearby buttons
+        vertical-align: middle;
+
+        .progress {
+            display: inline-block;
+            width: 200px;
+            vertical-align: middle;
+            margin: 0 0 0 1em;
+        }
+    }
+
+    .fr-loading {
+        @-webkit-keyframes opacity {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @-moz-keyframes opacity {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .xforms-output-output {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        span {
+            -webkit-animation-name: opacity;
+            -webkit-animation-duration: 1s;
+            -webkit-animation-iteration-count: infinite;
+
+            -moz-animation-name: opacity;
+            -moz-animation-duration: 1s;
+            -moz-animation-iteration-count: infinite;
+        }
+
+        span:nth-child(1) {
+            -webkit-animation-delay: 100ms;
+            -moz-animation-delay: 100ms;
+        }
+
+        span:nth-child(2) {
+            -webkit-animation-delay: 300ms;
+            -moz-animation-delay: 300ms;
+        }
+
+        span:nth-child(3) {
+            -webkit-animation-delay: 500ms;
+            -moz-animation-delay: 500ms;
+        }
     }
 
     .pagination {

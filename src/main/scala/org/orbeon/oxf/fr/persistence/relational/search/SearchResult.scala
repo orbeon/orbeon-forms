@@ -16,29 +16,35 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.util.DateUtils._
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.XML
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, Request}
 
-trait SearchResult {
 
-  def outputResult(request: Request, result: Result, receiver: XMLReceiver): Unit = {
+trait SearchResult extends SearchRequest {
+
+  def outputResult(
+    request   : Request,
+    documents : List[Document],
+    count     : Int,
+    receiver  : XMLReceiver)
+  : Unit = {
 
     // Produce XML result
     val documentsElem =
-      <documents>{
-        for ((metadata, values) <- result) yield
-
-          // TODO: handle operations attribute
-          // TODO: check if any other attribute is used by the summary page
+      <documents search-total={count.toString}>{
+        documents.map(doc ⇒
           <document
-            created       ={DateTime.print(metadata.created.getTime)}
-            last-modified ={DateTime.print(metadata.lastModifiedTime.getTime)}
-            name          ={metadata.documentId}
-            operations    ="*">{
+            created       ={DateTime.print(doc.metadata.created.getTime)}
+            last-modified ={DateTime.print(doc.metadata.lastModifiedTime.getTime)}
+            name          ={doc.metadata.documentId}
+            draft         ={doc.metadata.draft.toString}
+            operations    ={doc.operations.mkString(" ")}>{
 
             <details>{
               request.columns.map { requestColumn ⇒
-                  val columnValue = values
+                  val columnValue = doc.values
                     // For all the value for the current doc, get the ones for the current column
-                    .filter(_.control == requestColumn)
+                    .filter(_.control == requestColumn.path)
                     // Sort them in the order in which they appear in the document
                     .sortBy(_.pos)
                     // Just get the string value
@@ -50,7 +56,11 @@ trait SearchResult {
             }</details>
 
           }</document>
+        )
       }</documents>
+
+    if (Logger.isDebugEnabled)
+      Logger.logDebug("search result", documentsElem.toString)
 
     XML.elemToSAX(documentsElem, receiver)
   }

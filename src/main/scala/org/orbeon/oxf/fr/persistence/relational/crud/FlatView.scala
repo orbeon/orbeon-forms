@@ -19,16 +19,16 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.persistence.relational.crud.RequestReader._
-import org.orbeon.oxf.fr.persistence.relational.{DB2, Oracle, PostgreSQL}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 
 private object FlatView {
 
-  val SupportedProviders = Set(Oracle, DB2, PostgreSQL)
+  val SupportedProviders: Set[Provider] = Set(PostgreSQL)
 
   case class Col(extractExpression: String, colName: String)
   val MetadataPairs           =
@@ -51,45 +51,12 @@ private object FlatView {
       TablePrefix + joinParts(List(appXML, formXML), MaxNameLength - TablePrefix.length)
     }
 
-    // Delete view if it exists
-    // - Only for DB2 and postgresql; on Oracle we can use "OR REPLACE" when creating the view.
-    if (Set(DB2, PostgreSQL)(req.provider)) {
-      val viewExists = {
-        val query = req.provider match{
-          case DB2          ⇒ s"""|SELECT *
-                                  |  FROM SYSIBM.SYSVIEWS
-                                  | WHERE      creator =  (SELECT current_schema
-                                  |                          FROM SYSIBM.SYSDUMMY1)
-                                  |       AND  name    = ?
-                                  |""".stripMargin
-          case PostgreSQL   ⇒ s"""|SELECT *
-                                  |  FROM      pg_catalog.pg_class c
-                                  |       JOIN pg_catalog.pg_namespace n
-                                  |         ON n.oid = c.relnamespace
-                                  | WHERE      n.nspname = current_schema
-                                  |       AND  c.relkind = 'v'
-                                  |       AND  upper(c.relname) = ?
-                                  |""".stripMargin
-          case _            ⇒ ???
-        }
-
-        val ps = connection.prepareStatement(query)
-        ps.setString(1, viewName)
-        val rs = ps.executeQuery()
-        rs.next()
-      }
-      if (viewExists)
-        connection.prepareStatement(s"DROP VIEW $viewName").executeUpdate()
-    }
-
     // Compute columns in the view
     val cols = {
       val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒
         val extractFunction = req.provider match {
-          case Oracle     ⇒ s"extractValue(d.xml, '/*/$path')"
-          case DB2        ⇒ s"XMLCAST(XMLQUERY('$$XML/*/$path/text()') AS VARCHAR(4000))"
           case PostgreSQL ⇒ s"(xpath('/*/$path/text()', d.xml))[1]::text"
-          case _          ⇒ ???
+          case _          ⇒ throw new UnsupportedOperationException
         }
         Col(extractFunction, col)
       }
@@ -100,7 +67,7 @@ private object FlatView {
     // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
     locally {
       val query =
-        s"""|CREATE  ${if (Set(Oracle, PostgreSQL)(req.provider)) "OR REPLACE" else ""} VIEW $viewName AS
+        s"""|CREATE  OR REPLACE VIEW $viewName AS
             |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
             |  FROM  orbeon_form_data d,
             |        (

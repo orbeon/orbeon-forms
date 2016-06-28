@@ -154,7 +154,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Search forms</search-forms>
                 <show-options>Show search options</show-options>
                 <close-options>Close search options</close-options>
-                <returned>Search returned {0,number,integer} of {1,number,integer} documents.</returned>
             </search>
             <paging>
                 <to>to</to>
@@ -274,6 +273,8 @@
                 <connect>Connect</connect>
                 <select>Select</select>
                 <operation>Operation</operation>
+                <reindex>Reindex database(s)</reindex>
+                <stop-reindex>Stop reindexing</stop-reindex>
                 <all>All</all>
                 <none>None</none>
                 <unpublished-local>Unpublished local forms</unpublished-local>
@@ -306,10 +307,12 @@
                 <remote>Remote</remote>
                 <form-identification>Form Identification</form-identification>
                 <last-modified>Modified</last-modified>
+                <reindexing-confirmation>Confirm Reindexing</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
                 <publish-confirmation>Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
+                <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Available</available>
@@ -319,6 +322,10 @@
                 <remote-server>Remote server</remote-server>
                 <username>Username</username>
                 <password>Password</password>
+                <reindexing-generic>Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+                <reindexing-provider>Reindexing {0} ({1,number}/{2,number})</reindexing-provider>
+                <reindexing-stopping>Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+                <reindexing-finished>The reindexing operation is finished</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -467,7 +474,6 @@
                 <search-forms>Rechercher</search-forms>
                 <show-options>Montrer les options de recherche</show-options>
                 <close-options>Cacher les options de recherche</close-options>
-                <returned>La recherche a retourné {0,number,integer} sur {1,number,integer} documents.</returned>
             </search>
             <paging>
                 <to>à</to>
@@ -588,6 +594,8 @@
                 <connect>Connecter</connect>
                 <select>Sélectionner</select>
                 <operation>Opération</operation>
+                <reindex>Réindexer la ou les bases de donnée(s)</reindex>
+                <stop-reindex>Arrêter le réindexage</stop-reindex>
                 <all>Tous</all>
                 <none>Aucun</none>
                 <unpublished-local>Formulaires locaux non publiés</unpublished-local>
@@ -620,10 +628,12 @@
                 <remote>Distant</remote>
                 <form-identification>Identification du formulaire</form-identification>
                 <last-modified>Modification</last-modified>
+                <reindexing-confirmation>Confirmer le réindexage</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
                 <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#publier|1#dépublier|2#mettre à jour} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
+                <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Disponible</available>
@@ -633,6 +643,10 @@
                 <remote-server>Serveur distant</remote-server>
                 <username>Nom d'utilisateur</username>
                 <password>Mot de passe</password>
+                <reindexing-generic>En cours de réindexage &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
+                <reindexing-provider>En cours de réindexage {0} ({1,number}/{2,number})</reindexing-provider>
+                <reindexing-stopping>Réindexage en cours d'arrêt &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+                <reindexing-finished>L'opération de réindexage est terminée</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -772,7 +786,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Buscar formulario</search-forms>
                 <show-options>Mostrar opciones de búsqueda</show-options>
                 <close-options>Cerrar opciones de búsqueda</close-options>
-                <returned>Resultado de la búsqueda {0,number,integer} de {1,number,integer} documentos.</returned>
             </search>
             <paging>
                 <to>al</to>
@@ -888,6 +901,8 @@
                 <connect>Conectar</connect>
                 <select>Seleccionar</select>
                 <operation>Operación</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Todos</all>
                 <none>Ninguno</none>
                 <unpublished-local>Despublicar formularios locales</unpublished-local>
@@ -920,10 +935,12 @@
                 <remote>Remoto</remote>
                 <form-identification>Identificación de Fomulario</form-identification>
                 <last-modified>Modificado</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
                 <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?]</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -933,6 +950,10 @@
                 <remote-server>Servidor Remoto</remote-server>
                 <username>Usuario</username>
                 <password>Contraseña</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -1073,7 +1094,6 @@
                 <search-forms>Søk etter skjema</search-forms>
                 <show-options>Vis alternativer for søk</show-options>
                 <close-options>Lukk alternativer for søk</close-options>
-                <returned>Søk fant {0,number,integer} til {1,number,integer} skjema.</returned>
             </search>
             <paging>
                 <to>til</to>
@@ -1186,6 +1206,8 @@
                 <connect todo="true">[Connect]</connect>
                 <select todo="true">[Select]</select>
                 <operation todo="true">[Operation]</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all todo="true">[All]</all>
                 <none todo="true">[None]</none>
                 <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
@@ -1218,10 +1240,12 @@
                 <remote todo="true">[Remote]</remote>
                 <form-identification todo="true">[Form Identification]</form-identification>
                 <last-modified todo="true">[Modified]</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -1231,6 +1255,10 @@
                 <remote-server todo="true">[Remote server]</remote-server>
                 <username todo="true">[Username]</username>
                 <password todo="true">[Password]</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -1370,7 +1398,6 @@
                 <search-forms>Поиск формы</search-forms>
                 <show-options>Показать настройки поиска</show-options>
                 <close-options>Закрыть настройки поиска</close-options>
-                <returned>Найдено {0,number,integer} из {1,number,integer} документов.</returned>
             </search>
             <paging>
                 <to>до</to>
@@ -1482,6 +1509,8 @@
                 <connect todo="true">[Connect]</connect>
                 <select todo="true">[Select]</select>
                 <operation todo="true">[Operation]</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all todo="true">[All]</all>
                 <none todo="true">[None]</none>
                 <unpublished-local todo="true">[Unpublished local forms]</unpublished-local>
@@ -1514,10 +1543,12 @@
                 <remote todo="true">[Remote]</remote>
                 <form-identification todo="true">[Form Identification]</form-identification>
                 <last-modified todo="true">[Modified]</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available todo="true">[Available]</available>
@@ -1527,6 +1558,10 @@
                 <remote-server todo="true">[Remote server]</remote-server>
                 <username todo="true">[Username]</username>
                 <password todo="true">[Password]</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -1672,7 +1707,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Cerca moduli</search-forms>
                 <show-options>Mostra opzioni di ricerca</show-options>
                 <close-options>Chiudi opzioni di ricerca</close-options>
-                <returned>Risultato della ricerca: {0,number,integer} di {1,number,integer} documenti.</returned>
             </search>
             <paging>
                 <to>a</to>
@@ -1791,6 +1825,8 @@
                 <connect>Connetti</connect>
                 <select>Seleziona</select>
                 <operation>Operazione</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Tutti</all>
                 <none>Nessuno</none>
                 <unpublished-local>Moduli locali non pubblicati</unpublished-local>
@@ -1823,10 +1859,12 @@
                 <remote>Remoto</remote>
                 <form-identification>Identificazione del modulo</form-identification>
                 <last-modified>Modificato</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
-                <publish-confirmation> Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+                <publish-confirmation>Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Disponibile</available>
@@ -1836,6 +1874,10 @@
                 <remote-server>Server remoto</remote-server>
                 <username>Utente</username>
                 <password>Password</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -1981,7 +2023,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Formular suchen</search-forms>
                 <show-options>Suchoptionen anzeigen</show-options>
                 <close-options>Suchoptionen schließen</close-options>
-                <returned>Suchergebnisse: {0,number,integer} von {1,number,integer} Dokumenten.</returned>
             </search>
             <paging>
                 <to>bis</to>
@@ -2100,6 +2141,8 @@
                 <connect>Verbinden</connect>
                 <select>Auswählen</select>
                 <operation>Operation</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Alle</all>
                 <none>Keine</none>
                 <unpublished-local>Unveröffentlichte lokale Formulare</unpublished-local>
@@ -2132,10 +2175,12 @@
                 <remote>Remote-System</remote>
                 <form-identification>Formular Identifikation</form-identification>
                 <last-modified>Geändert am</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
                 <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern} wollen?</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Verfügbar</available>
@@ -2145,6 +2190,10 @@
                 <remote-server>Remote-Server</remote-server>
                 <username>Benutzername</username>
                 <password>Passwort</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -2290,7 +2339,6 @@
                 <search-forms>Etsi lomakkeita</search-forms>
                 <show-options>Näytä hakuvaihtoehdot</show-options>
                 <close-options>Sulje hakuvaihtoehdot</close-options>
-                <returned>Etsintä palautetaan {0,number,integer} / {1,number,integer} Dokumentit.</returned>
             </search>
             <paging>
                 <to>-</to>
@@ -2409,6 +2457,8 @@
                 <connect>Yhdistä</connect>
                 <select>Valitse</select>
                 <operation>Toiminto</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Kaikki</all>
                 <none>Ei mitään</none>
                 <unpublished-local>Julkaisemattomat paikalliset lomakkeet</unpublished-local>
@@ -2441,10 +2491,12 @@
                 <remote>Etä</remote>
                 <form-identification>Lomakkeen tunnistetiedot</form-identification>
                 <last-modified>Muokattu</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
                 <publish-confirmation>Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Saatavilla</available>
@@ -2454,6 +2506,10 @@
                 <remote-server todo="true">[Remote server]</remote-server>
                 <username>Käyttäjänimi</username>
                 <password>Salasana</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -2599,7 +2655,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Sök formulär</search-forms>
                 <show-options>Visa sökalternativ</show-options>
                 <close-options>Dölj sökalternativ</close-options>
-                <returned>Sökningen gav {0,number,integer} av {1,number,integer} formulär.</returned>
             </search>
             <paging>
                 <to>till</to>
@@ -2718,6 +2773,8 @@
                 <connect>Anslut</connect>
                 <select>Välj</select>
                 <operation>Operation</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Alla</all>
                 <none>Inga</none>
                 <unpublished-local>Opublicerade lokala formulär</unpublished-local>
@@ -2750,10 +2807,12 @@
                 <remote>På servern</remote>
                 <form-identification>Identifiering av formulär</form-identification>
                 <last-modified>Senast ändrad</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
                 <publish-confirmation>Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Tillgänglig</available>
@@ -2763,6 +2822,10 @@
                 <remote-server>Server</remote-server>
                 <username>Användarnamn</username>
                 <password>Lösenord</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -2908,7 +2971,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Forms zoeken</search-forms>
                 <show-options>Zoekopties tonen</show-options>
                 <close-options>Zoektopties sluiten</close-options>
-                <returned>Zoekactie leverde {0,number,integer} van {1,number,integer} documenten.</returned>
             </search>
             <paging>
                 <to>tot</to>
@@ -3027,6 +3089,8 @@
                 <connect>Verbinden</connect>
                 <select>Selecteren</select>
                 <operation>Bewerking</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Alles</all>
                 <none>Niets</none>
                 <unpublished-local>Niet-gepubliceerde lokale forms</unpublished-local>
@@ -3059,10 +3123,12 @@
                 <remote>Extern</remote>
                 <form-identification>Form-identificatie</form-identification>
                 <last-modified>Bewerkt</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
                 <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden}?</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Beschikbaar</available>
@@ -3072,6 +3138,10 @@
                 <remote-server todo="true">[Remote server]</remote-server>
                 <username>Gebruiker</username>
                 <password>Wachtwoord</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>
@@ -3217,7 +3287,6 @@
                 <search-forms>&lt;i class="icon-search"/&gt; Procurar formulários</search-forms>
                 <show-options>Mostrar opções de procura</show-options>
                 <close-options>Fechar opções de procura</close-options>
-                <returned>A procura devolveu {0,number,integer} de {1,number,integer} documentos.</returned>
             </search>
             <paging>
                 <to>a</to>
@@ -3336,6 +3405,8 @@
                 <connect>Ligar</connect>
                 <select>Seleccionar</select>
                 <operation>Operação</operation>
+                <reindex todo="true">[Reindex database(s)]</reindex>
+                <stop-reindex todo="true">[Stop reindexing]</stop-reindex>
                 <all>Todos</all>
                 <none>Nenhum</none>
                 <unpublished-local>Formulários locais não publicados</unpublished-local>
@@ -3368,10 +3439,12 @@
                 <remote>Remoto</remote>
                 <form-identification>Identificação do Formulário</form-identification>
                 <last-modified>Modificado</last-modified>
+                <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
             </titles>
             <messages>
                 <no-forms>Não tem acesso a quaisquer formulários.</no-forms>
                 <publish-confirmation>Tem a certeza que quer {0,choice,0#publicar|1#não publicar} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
+                <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
             </messages>
             <labels>
                 <available>Disponível</available>
@@ -3381,6 +3454,10 @@
                 <remote-server todo="true">[Remote server]</remote-server>
                 <username>Utilizador</username>
                 <password>Senha</password>
+                <reindexing-generic todo="true">[Reindexing &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider todo="true">[Reindexing {0} ({1,number}/{2,number})]</reindexing-provider>
+                <reindexing-stopping todo="true">[Reindex operation is stopping &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished todo="true">[The reindexing operation is finished]</reindexing-finished>
             </labels>
         </home>
     </resource>

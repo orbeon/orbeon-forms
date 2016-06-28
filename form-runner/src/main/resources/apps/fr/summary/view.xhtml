@@ -187,7 +187,6 @@
             <!-- Paging information -->
             <xf:instance id="fr-paging-instance">
                 <search xmlns="">
-                    <total/>
                     <search-total/>
                     <page-size/>
                     <page-number/>
@@ -201,7 +200,6 @@
 
             <!-- Calculations for page navigation -->
             <xf:bind ref="instance('fr-paging-instance')">
-                <xf:bind ref="total"        calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
                 <xf:bind ref="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
                 <xf:bind ref="page-size"    calculate="instance('fr-search-instance')/page-size"/>
                 <xf:bind ref="page-number"  calculate="instance('fr-search-instance')/page-number"/>
@@ -352,7 +350,7 @@
 
             <!-- Summary data -->
             <xf:instance id="fr-summary-instance">
-                <documents xmlns="" total="0" search-total="0">
+                <documents xmlns="" search-total="0">
                     <!-- Content will be like this -->
                     <!--
                     <document name="" created="" last-modified="">
@@ -580,18 +578,6 @@
                     </xf:group>
 
                     <xf:group ref="instance('fr-summary-instance')" xxf:update="full">
-
-                        <!-- Don't show information about count if we only have one page, or if we're just showing drafts
-                             (in that case, even if we have more than one page we don't care about the number of documents
-                             not shown because they are not drafts) -->
-                        <xf:var name="show-partial-search" value="
-                            instance('fr-paging-instance')/(search-total != total)
-                            and not(xxf:get-request-parameter('drafts-for-never-saved-document') = 'true')"/>
-                        <xf:output
-                            ref=".[$show-partial-search]"
-                            class="fr-summary-search-count"
-                            value="xxf:format-message($fr-resources/summary/search/returned,
-                                                      for $ v in (instance('fr-paging-instance')/search-total, instance('fr-paging-instance')/total) return xs:integer($v))"/>
 
                         <xf:var name="show-created"       value="xxf:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
                         <xf:var name="show-last-modified" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>

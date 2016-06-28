@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.crud
 
-import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.webapp.HttpStatusCodeException
-import org.orbeon.oxf.common.Version
 
 
 class CRUD
@@ -29,10 +28,6 @@ class CRUD
   override def start(pipelineContext: PipelineContext): Unit =
     try {
       val req = request
-
-//            val PEProviders = Seq("oracle", "db2", "sqlserver")
-//            if (PEProviders.contains(req.provider))
-//                Version.instance.requirePEFeature("Enterprise relational database")
 
       httpRequest.getMethod match {
         case "GET"    ⇒ get(req)

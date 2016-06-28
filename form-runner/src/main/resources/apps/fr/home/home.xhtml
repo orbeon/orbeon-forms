@@ -21,6 +21,7 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:version="java:org.orbeon.oxf.common.Version"
+         xmlns:index="org.orbeon.oxf.fr.persistence.relational.index.status.UI"
 
          lang="{xxf:instance('fr-fr-language-instance')}"
          xml:lang="{xxf:instance('fr-fr-language-instance')}">
@@ -208,6 +209,54 @@
                 <xf:bind ref="current-remote-server"   type="xs:integer"/>
                 <xf:bind ref="remote-servers/remote-server/username | remote-servers/remote-server/password" required="true()" calculate="normalize-space()" readonly="false()"/>
             </xf:bind>
+
+            <xf:submission
+                    id="fr-reindex-submission"
+                    method="get"
+                    resource="/fr/service/persistence/reindex"
+                    replace="none"
+                    mode="asynchronous"/>
+
+            <!-- Refresh page every 2s -->
+            <xf:action
+                observer="fr-form-instance"
+                event="xxforms-value-changed"
+                if="instance('fr-form-instance')/any-has-admin-permission = 'true'">
+                <xf:dispatch
+                        name="ping-event"
+                        target="fr-form-model"/>
+            </xf:action>
+            <xf:action event="ping-event">
+                <xf:var name="status" value="index:status()"/>
+                <xf:setvalue
+                        ref="instance('fr-reindex-instance')/status"
+                        value="
+                            if (
+                                $status = 'stopped' and
+                                instance('fr-reindex-instance')/status != 'stopped'
+                            )
+                            then 'done'
+                            else $status"/>
+                <xf:setvalue ref="instance('fr-reindex-instance')/provider-token"   value="index:getProviderToken()"/>
+                <xf:setvalue ref="instance('fr-reindex-instance')/provider-current" value="index:getProviderCurrent()"/>
+                <xf:setvalue ref="instance('fr-reindex-instance')/provider-total"   value="index:getProviderTotal()"/>
+                <xf:setvalue ref="instance('fr-reindex-instance')/document-current" value="index:getDocumentCurrent()"/>
+                <xf:setvalue ref="instance('fr-reindex-instance')/document-total"   value="index:getDocumentTotal()"/>
+                <xf:dispatch
+                        name="ping-event"
+                        target="fr-form-model"
+                        delay="2000"/>
+            </xf:action>
+            <xf:instance id="fr-reindex-instance">
+                <reindex>
+                    <status>stopped</status>
+                    <provider-token/>
+                    <provider-current/>
+                    <provider-total/>
+                    <document-current/>
+                    <document-total/>
+                </reindex>
+            </xf:instance>
 
             <!-- Forms metadata -->
             <xf:instance id="fr-metadata"><forms/></xf:instance>
@@ -702,9 +751,78 @@
                             </xf:group>
                         </xh:div>
 
-                        <!--<xf:output ref="remote-server/label[normalize-space()]">-->
-                            <!--<xf:label ref="$fr-resources/home/labels/remote-server"/>-->
-                        <!--</xf:output>-->
+                        <!-- Buttons for reindexing -->
+                        <xf:group ref="instance('fr-reindex-instance')" xxf:internal="true">
+
+                            <!-- Button: start reindexing -->
+                            <xf:trigger ref=".[status = ('stopped', 'done')]"
+                                        class="btn-group" >
+                                <xf:label mediatype="text/html" ref="$fr-resources/home/buttons/reindex"/>
+                                <xf:dispatch event="DOMActivate" name="fr-show" targetid="reindex-confirmation-dialog"/>
+                            </xf:trigger>
+
+                            <!-- Button: stop reindexing -->
+                            <xf:trigger ref=".[status = ('starting', 'indexing')]"
+                                        class="btn-group">
+                                <xf:label mediatype="text/html" ref="$fr-resources/home/buttons/stop-reindex"/>
+                                <xf:action event="DOMActivate" type="xpath">
+                                    index:stop()
+                                </xf:action>
+                            </xf:trigger>
+
+                        </xf:group>
+
+                    </xf:group>
+
+                    <!-- Progress bars for reindexing -->
+                    <xf:group ref="instance('fr-reindex-instance')"
+                              class="fr-reindex-status">
+                        <xf:group ref=".[status = ('starting', 'indexing')]">
+                            <xf:var name="have-doc-count" value="document-current != 0"/>
+
+                            <!-- Status: when we don't have document count, show a generic message -->
+                            <xf:group ref=".[not($have-doc-count)]">
+                                <xf:output
+                                    class="fr-loading"
+                                    mediatype="text/html"
+                                    value="$fr-resources/home/labels/reindexing-generic"/>
+                            </xf:group>
+
+                            <!-- Status: when we have document count, show progress bar -->
+                            <xf:group ref=".[$have-doc-count]">
+                                <xf:output
+                                    value="xxf:format-message
+                                        (
+                                            $fr-resources/home/labels/reindexing-provider,
+                                            (
+                                                provider-token/string(),
+                                                number(document-current),
+                                                number(document-total)
+                                            )
+                                        )"/>
+                                <xf:var name="percent" value="document-current div document-total * 100"/>
+                                <xh:div class="progress progress-striped active">
+                                  <xh:div class="bar" style="width: {$percent}%;"/>
+                                </xh:div>
+                            </xf:group>
+
+                        </xf:group>
+
+                        <!-- Status: message when stopping  -->
+                        <xf:group ref=".[status = 'stopping']">
+                            <xf:output
+                                class="fr-loading"
+                                mediatype="text/html"
+                                value="$fr-resources/home/labels/reindexing-stopping"/>
+                        </xf:group>
+
+                        <!-- Status: done -->
+                        <xf:group ref=".[status = 'done']">
+                            <xf:output
+                                class="fr-loading"
+                                mediatype="text/html"
+                                value="$fr-resources/home/labels/reindexing-finished"/>
+                        </xf:group>
                     </xf:group>
 
                     <div class="pagination" xmlns="http://www.w3.org/1999/xhtml">
@@ -934,7 +1052,8 @@
             </fr:row>
         </fr:view>
 
-        <!-- Confirmation dialog -->
+        <!-- Confirmation dialogs -->
+
         <fr:alert-dialog id="publish-confirmation-dialog" close="true">
             <fr:label ref="$fr-resources/home/titles/publish-confirmation"/>
             <!-- Message is dynamically set -->
@@ -947,6 +1066,16 @@
                 <xf:action event="DOMActivate" type="xpath">
                     fr:run-process-by-name('oxf.fr.home.process', 'confirmation-ok')
                 </xf:action>
+            </fr:positive-choice>
+        </fr:alert-dialog>
+
+        <fr:alert-dialog id="reindex-confirmation-dialog" close="true">
+            <fr:label ref="$fr-resources/home/titles/reindexing-confirmation"/>
+            <fr:message value="$fr-resources/home/messages/reindexing-confirmation"/>
+            <fr:negative-choice/>
+            <fr:positive-choice>
+                <xf:send event="DOMActivate"
+                         submission="fr-reindex-submission"/>
             </fr:positive-choice>
         </fr:alert-dialog>
 

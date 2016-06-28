@@ -11,14 +11,22 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.index
+package org.orbeon.oxf.fr.persistence.relational.search.part
 
+import org.orbeon.oxf.fr.persistence.relational.Statement._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.Request
 import org.orbeon.oxf.fr.persistence.relational.Provider._
 
-object Index
-  extends FormDefinition
-  with Reindex {
+object mySqlOrderForRowNumPart {
 
-  val ProvidersWithIndexSupport: Set[Provider] = Set(MySQL, PostgreSQL)
+  def apply(request: Request) =
+    request.provider match {
+      case MySQL ⇒
+        StatementPart(
+          sql     = "ORDER BY c.last_modified_time desc",
+          setters = Nil
+        )
+      case _ ⇒ NilPart
+    }
 
 }

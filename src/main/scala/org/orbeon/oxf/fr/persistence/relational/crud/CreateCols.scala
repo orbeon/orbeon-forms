@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.{PreparedStatement, Timestamp}
-import org.orbeon.oxf.fr.persistence.relational.{Oracle, PostgreSQL}
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 
 trait CreateCols extends RequestResponse with Common {
 
@@ -54,7 +54,7 @@ trait CreateCols extends RequestResponse with Common {
     versionToSet : Int)
     : List[Col]  = {
 
-    val xmlCol           = if (req.provider == Oracle) "xml_clob" else "xml"
+    val xmlCol           = "xml"
     val xmlVal           = if (req.provider == PostgreSQL) "XMLPARSE( DOCUMENT ? )" else "?"
     val isFormDefinition = req.forForm && ! req.forAttachment
     val now              = new Timestamp(System.currentTimeMillis())
@@ -68,11 +68,6 @@ trait CreateCols extends RequestResponse with Common {
       }
 
     List(
-      Col(
-        included      = req.forData && req.provider == Oracle,
-        name          = "id",
-        value         = StaticColValue("orbeon_seq.NEXTVAL")
-      ),
       Col(
         included      = true,
         name          = "created",

@@ -11,35 +11,29 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational
+package org.orbeon.oxf.fr.persistence.relational.search.adt
 
 import java.sql.Timestamp
 
-package object search {
+case class DocumentMetaData(
+  documentId       : String,
+  draft            : Boolean,
+  created          : Timestamp,
+  lastModifiedTime : Timestamp,
+  lastModifiedBy   : String,
+  username         : Option[String],
+  groupname        : Option[String]
+)
 
-  case class Request(
-    app        : String,
-    form       : String,
-    pageSize   : Int,
-    pageNumber : Int,
-    columns    : List[String]
-  )
+case class DocumentValue(
+  control          : String,
+  pos              : Int,
+  value            : String
+)
 
-  case class DocumentMetaData(
-    documentId       : String,
-    created          : Timestamp,
-    lastModifiedTime : Timestamp,
-    lastModifiedBy   : String,
-    username         : String,
-    groupname        : String
-  )
+case class Document(
+  metadata         : DocumentMetaData,
+  operations       : List[String],
+  values           : List[DocumentValue]
+)
 
-  case class DocumentValue(
-    control          : String,
-    pos              : Int,
-    value            : String
-  )
-
-  type Result = List[(DocumentMetaData, List[DocumentValue])]
-
-}

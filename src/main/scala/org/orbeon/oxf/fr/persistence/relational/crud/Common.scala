@@ -101,18 +101,4 @@ trait Common extends RequestResponse with FormRunnerPersistence {
 
   def joinColumns(cols: Seq[String], t1: String, t2: String) = cols.map(c ⇒ s"$t1.$c = $t2.$c").mkString(" AND ")
 
-  def readFormMetadata(req: Request): DocumentInfo =
-    readFormMetadata(req.app, req.form).ensuring(_.isDefined, "can't find form metadata for data").get
-
-  // Given a user/group name coming from the data, tells us what operations we can do in this data, assuming that
-  // it is for the current request app/form
-  def authorizedOperations(formMetadata: DocumentInfo, dataUserGroup: (Option[String], Option[String])): Set[String] = {
-    val permissions = (formMetadata / "forms" / "form" / "permissions").headOption
-    permissions match {
-      case None ⇒ Set("create", "read", "update", "delete")
-      case Some(permissionsEl) ⇒
-        val (username, groupname) = dataUserGroup
-        FormRunner.allAuthorizedOperations(permissionsEl, username, groupname).toSet
-    }
-  }
 }

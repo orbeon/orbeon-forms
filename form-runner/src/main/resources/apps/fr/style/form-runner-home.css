@@ -1,6 +1,58 @@
 .orbeon .btn-toolbar {
-  display: block;
-  float: left;
+  display: inline-block;
+  vertical-align: middle;
+}
+.orbeon .fr-reindex-status {
+  padding-left: 1em;
+  padding-right: 1em;
+  font-size: 14px;
+  vertical-align: middle;
+}
+.orbeon .fr-reindex-status .progress {
+  display: inline-block;
+  width: 200px;
+  vertical-align: middle;
+  margin: 0 0 0 1em;
+}
+@-webkit-keyframes opacity {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@-moz-keyframes opacity {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.orbeon .fr-loading .xforms-output-output {
+  display: inline-block;
+  vertical-align: middle;
+}
+.orbeon .fr-loading span {
+  -webkit-animation-name: opacity;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-name: opacity;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: infinite;
+}
+.orbeon .fr-loading span:nth-child(1) {
+  -webkit-animation-delay: 100ms;
+  -moz-animation-delay: 100ms;
+}
+.orbeon .fr-loading span:nth-child(2) {
+  -webkit-animation-delay: 300ms;
+  -moz-animation-delay: 300ms;
+}
+.orbeon .fr-loading span:nth-child(3) {
+  -webkit-animation-delay: 500ms;
+  -moz-animation-delay: 500ms;
 }
 .orbeon .pagination {
   display: block;
@@ -60,6 +112,9 @@
 .orbeon .fr-forms-table .fr-home-select label input[type="checkbox"] {
   float: none;
   margin: 0;
+}
+.orbeon .fr-forms-table .fr-home-select label span {
+  display: none;
 }
 .orbeon .fr-forms-table .fr-home-select label .label {
   vertical-align: middle;

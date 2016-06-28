@@ -11,14 +11,22 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.index
+package org.orbeon.oxf.fr.persistence.relational.index.status
 
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider.Provider
 
-object Index
-  extends FormDefinition
-  with Reindex {
+// Case classes for information what we store in the session
 
-  val ProvidersWithIndexSupport: Set[Provider] = Set(MySQL, PostgreSQL)
-
-}
+sealed trait Status
+case object  Stopped    extends Status
+case object  Starting   extends Status
+case object  Stopping   extends Status
+case class   Indexing(
+  provider      : Provider,
+  providerCount : Count,
+  documentCount : Option[Count]
+)                              extends Status
+case class Count(
+  current       : Int,
+  total         : Int
+)

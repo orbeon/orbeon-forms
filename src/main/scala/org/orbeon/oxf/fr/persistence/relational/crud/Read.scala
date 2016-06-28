@@ -22,13 +22,14 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
   def get(req: Request): Unit = {
 
     // Read before establishing a connection, so we don't use two simultaneous connections
-    val formMetadataForDataRequestOpt = req.forData option readFormMetadata(req)
+    val formMetadataForDataRequestOpt = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form))
 
     RelationalUtils.withConnection { connection ⇒
 
@@ -47,25 +48,25 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
       val resultSet = {
         val table  = tableName(req)
         val idCols = idColumns(req)
-        val xmlCol = RelationalUtils.xmlCol(req.provider, "t")
+        val xmlCol = Provider.xmlCol(req.provider, "t")
         val ps = connection.prepareStatement(
           s"""|SELECT  t.last_modified_time
-            |        ${if (req.forAttachment) ", t.file_content"            else s", $xmlCol"}
-            |        ${if (req.forData)       ", t.username, t.groupname"   else ""}
-            |        , t.form_version, t.deleted
-            |FROM    $table t,
-            |        (
-            |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
-            |              FROM   $table
-            |             WHERE   app  = ?
-            |                     and form = ?
-            |                     ${if (req.forForm)       "and form_version = ?"              else ""}
-            |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
-            |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
-            |            GROUP BY ${idCols.mkString(", ")}
-            |        ) m
-            |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
-            |""".stripMargin)
+              |        ${if (req.forAttachment) ", t.file_content"            else s", $xmlCol"}
+              |        ${if (req.forData)       ", t.username, t.groupname"   else ""}
+              |        , t.form_version, t.deleted
+              |FROM    $table t,
+              |        (
+              |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+              |              FROM   $table
+              |             WHERE   app  = ?
+              |                     and form = ?
+              |                     ${if (req.forForm)       "and form_version = ?"              else ""}
+              |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
+              |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
+              |            GROUP BY ${idCols.mkString(", ")}
+              |        ) m
+              |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
+              |""".stripMargin)
 
         val position = Iterator.from(1)
         ps.setString(position.next(), req.app)
@@ -103,7 +104,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             val groupname = resultSet.getString("groupname")
             Option(username) → Option(groupname)
           }
-          val operations = authorizedOperations(formMetadata, dataUserGroup)
+          val operations = RelationalUtils.allAuthorizedOperations(formMetadata, dataUserGroup)
           if (! operations.contains("read"))
             throw new HttpStatusCodeException(403)
           httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))

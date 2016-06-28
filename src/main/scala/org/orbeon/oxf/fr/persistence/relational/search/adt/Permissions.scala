@@ -11,14 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.persistence.relational.index
+package org.orbeon.oxf.fr.persistence.relational.search.adt
 
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.saxon.om.NodeInfo
 
-object Index
-  extends FormDefinition
-  with Reindex {
-
-  val ProvidersWithIndexSupport: Set[Provider] = Set(MySQL, PostgreSQL)
-
-}
+case class Permissions(
+    formPermissionsElOpt  : Option[NodeInfo],
+    authorizedBasedOnRole : Boolean,
+    authorizedIfUsername  : Option[String],
+    authorizedIfGroup     : Option[String]
+  )

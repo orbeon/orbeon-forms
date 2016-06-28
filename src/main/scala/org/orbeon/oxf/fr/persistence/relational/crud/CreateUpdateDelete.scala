@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.fr.FormRunner.{XF, XH}
 import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -308,7 +309,7 @@ trait CreateUpdateDelete
   def change(req: Request, delete: Boolean): Unit = {
 
     // Read before establishing a connection, so we don't use two simultaneous connections
-    val formMetadata = req.forData option readFormMetadata(req)
+    val formPermissions = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form)).flatten
 
     RelationalUtils.withConnection { connection ⇒
 
@@ -332,13 +333,13 @@ trait CreateUpdateDelete
               // Check we're allowed to update or delete this resource
               val username      = existing.get.username
               val groupname     = existing.get.group
-              val authorizedOps = authorizedOperations(formMetadata.get, username → groupname)
+              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, username → groupname)
               val requiredOp    = if (delete) "delete" else "update"
               authorizedOps.contains(requiredOp)
             } else {
               // For deletes, if there is no data to delete, it is a 403 if could not read, update,
               // or delete if it existed (otherwise code later will return a 404)
-              val authorizedOps = authorizedOperations(formMetadata.get, None → None)
+              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, None → None)
               val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
               authorizedOps.intersect(requiredOps).nonEmpty
             }
@@ -397,6 +398,18 @@ trait CreateUpdateDelete
         deleteDraftOnSaveData(connection, req)
       if (delete && req.forData)
         deleteDraft(connection, req)
+
+      // Update index
+      val whatToReindex = req.dataPart match {
+          case Some(dataPart) ⇒
+            // Data: update index for this document id
+            Index.DataForDocumentId(dataPart.documentId)
+          case None ⇒
+            // Form definition: update index for this form version
+            // Re. the asInstanceOf, when updating a form, we must have a specific version specified
+            Index.DataForForm(req.app, req.form, versionSet)
+        }
+      Index.reindex(req.provider, connection, whatToReindex)
 
       // Create flat view if needed
       if (requestFlatView && FlatView.SupportedProviders(req.provider) && req.forForm && ! req.forAttachment && ! delete && req.form != "library")

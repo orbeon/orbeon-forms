@@ -273,7 +273,13 @@
                 <xf:var name="has-admin"        value="saxon:expression('xxf:split(@operations) = ''admin''')"/>
                 <xf:var name="has-remote-admin" value="saxon:expression('exists(remote-last-modified-time)')"/>
 
-                <xf:setvalue ref="instance()/any-has-admin-permission" value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
+                <xf:setvalue
+                    ref="instance()/any-has-admin-permission"
+                    value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
+
+                <!-- Because `any-has-admin-permission` is used in an `xf:bind/@ref` -->
+                <xf:rebuild xxf:deferred="true"/>
+
             </xf:action>
 
             <!-- Start process in reaction to action button -->

@@ -15,10 +15,11 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 
-import org.orbeon.dom.{Document, DocumentFactory}
 import org.junit.Test
+import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.ScalaUtils._
@@ -55,11 +56,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
             try {
               // Create tables
               val sql = provider match {
-                case Oracle     ⇒ "oracle-4_6.sql"
                 case MySQL      ⇒ "mysql-4_6.sql"
-                case SQLServer  ⇒ "sqlserver-4_6.sql"
                 case PostgreSQL ⇒ "postgresql-4_8.sql"
-                case DB2        ⇒ "db2-4_6.sql"
               }
               val createDDL = SQL.read(sql)
               withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
@@ -68,9 +66,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
               // Clean-up database dropping tables
               for (tableName ← Connect.getTableNames(provider, connection))
                 statement.executeUpdate(s"DROP TABLE $tableName")
-              // On SQL Server, since the full-text catalog isn't bound a table, we also need to clean it up
-              if (provider == SQLServer)
-                statement.executeUpdate("DROP FULLTEXT CATALOG orbeon_fulltext_catalog")
             }
           }
         }

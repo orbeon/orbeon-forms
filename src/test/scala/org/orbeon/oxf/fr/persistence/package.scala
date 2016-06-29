@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 
 package object persistence {
 
-  val ProvidersTestedAutomatically: List[Provider] = List(Oracle, MySQL, SQLServer, PostgreSQL)
+  val ProvidersTestedAutomatically: List[Provider] = List(MySQL, PostgreSQL)
 
 }

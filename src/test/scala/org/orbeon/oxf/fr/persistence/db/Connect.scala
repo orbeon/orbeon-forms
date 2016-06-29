@@ -15,8 +15,8 @@ package org.orbeon.oxf.fr.persistence.db
 
 import java.sql.{Connection, DriverManager}
 
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.fr.{DataSourceSupport, DatasourceDescriptor}
-import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
@@ -34,17 +34,12 @@ private[persistence] object Connect {
 
   def getTableNames(provider: Provider, connection: Connection): List[String] = {
     val query = provider match {
-      case Oracle ⇒
-        """SELECT table_name
-          |  FROM all_tables
-          | WHERE table_name LIKE 'ORBEON%'
-          |       AND owner = sys_context('USERENV', 'CURRENT_USER')"""
       case MySQL ⇒
         """SELECT table_name
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'
           |       AND table_schema = DATABASE()"""
-      case SQLServer | PostgreSQL ⇒
+      case PostgreSQL ⇒
         """SELECT table_name
           |  FROM information_schema.tables
           | WHERE table_name LIKE 'orbeon%'"""

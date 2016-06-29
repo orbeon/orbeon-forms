@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr
 import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 
 import org.apache.commons.dbcp.BasicDataSource
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.immutable
@@ -15,15 +15,11 @@ object DatasourceDescriptor {
   def apply(provider: Provider, user: Option[String]): DatasourceDescriptor = {
 
     val url = provider match {
-      case Oracle     ⇒ System.getenv("ORACLE_URL")
       case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
-      case SQLServer  ⇒ System.getenv("SQLSERVER_URL")  + user.map(";databaseName=" + _).getOrElse("")
       case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("/")
-      case DB2        ⇒ System.getenv("DB2_URL")
     }
 
     val username = provider match {
-      case Oracle ⇒ user.getOrElse("orbeon")
       case _      ⇒ "orbeon"
     }
 
@@ -39,11 +35,8 @@ object DatasourceDescriptor {
   }
 
   private val DriverClassNames = Map(
-    Oracle     → "oracle.jdbc.OracleDriver",
     MySQL      → "com.mysql.jdbc.Driver",
-    SQLServer  → "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-    PostgreSQL → "org.postgresql.Driver",
-    DB2        → "com.ibm.db2.jcc.DB2Driver"
+    PostgreSQL → "org.postgresql.Driver"
   )
 }
 

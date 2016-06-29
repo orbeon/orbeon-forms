@@ -16,9 +16,9 @@ package org.orbeon.oxf.fr.persistence.ddl
 import java.sql.Connection
 
 import org.junit.Test
-import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence._
+import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -34,15 +34,9 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
     val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"
     val createUserAndDatabase = provider match {
-      case Oracle     ⇒ Seq(s"CREATE USER $schema IDENTIFIED BY ${System.getenv("RDS_PASSWORD")}",
-                 s"ALTER  USER $schema QUOTA UNLIMITED ON users",
-                 s"GRANT  CREATE SESSION TO $schema",
-                 s"GRANT  CREATE TABLE   TO $schema",
-                 s"GRANT  CREATE TRIGGER TO $schema")
       case _          ⇒ Seq(s"CREATE DATABASE $schema")
     }
     val dropUserAndDatabase = provider match {
-      case Oracle     ⇒ Seq(s"DROP USER $schema CASCADE")
       case _          ⇒ Seq(s"DROP DATABASE $schema")
     }
     try {
@@ -67,19 +61,13 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
       SQL.executeStatements(provider, statement, sql)
       val query = provider match {
         // On Oracle, column order is "non-relevant", so we order by column name instead of position
-        case Oracle ⇒
-          """  SELECT *
-            |    FROM all_tab_cols
-            |   WHERE table_name = ?
-            |         AND NOT column_name LIKE 'SYS%'
-            |ORDER BY column_name"""
         case MySQL ⇒
           """   SELECT *
             |     FROM information_schema.columns
             |    WHERE table_name = ?
             |          AND table_schema = DATABASE()
             | ORDER BY ordinal_position"""
-        case SQLServer | PostgreSQL ⇒
+        case PostgreSQL ⇒
           """   SELECT *
             |     FROM information_schema.columns
             |    WHERE table_name = ?
@@ -95,7 +83,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
         }
         def tableInfo(): ColMeta = {
           val colName = tableInfoResultSet.getString("column_name")
-          val interestingKeys = Set(if (provider == Oracle) "nullable" else "is_nullable", "data_type")
+          val interestingKeys = Set("is_nullable", "data_type")
           val colKeyVals = for (metaKey ← interestingKeys) yield
             ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
           ColMeta(colName, colKeyVals)
@@ -118,20 +106,11 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
 
   @Test def createAndUpgradeTest(): Unit = {
     ProvidersTestedAutomatically.foreach {
-      case Oracle ⇒
-        assertSameTable(Oracle, "4_3", "4_4" )
-        assertSameTable(Oracle, "4_4", "4_5" )
-        assertSameTable(Oracle, "4_5", "4_6" )
-        assertSameTable(Oracle, "4_6", "4_10")
       case MySQL ⇒
         assertSameTable(MySQL,  "4_3", "4_4")
         assertSameTable(MySQL,  "4_4", "4_5")
         assertSameTable(MySQL,  "4_5", "4_6")
-      case SQLServer  ⇒ sqlToTableInfo(SQLServer , SQL.read("sqlserver-4_6.sql" ))
       case PostgreSQL ⇒ sqlToTableInfo(PostgreSQL, SQL.read("postgresql-4_8.sql"))
-      case DB2 ⇒
-        assertSameTable(MySQL,  "4_3", "4_4")
-        assertSameTable(MySQL,  "4_4", "4_6")
     }
   }
 }

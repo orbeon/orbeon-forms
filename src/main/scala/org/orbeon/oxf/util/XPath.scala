@@ -102,7 +102,7 @@ object XPath {
     val SaxonToScalaConverter = new PJConverter {
 
       // NOTE: Because of Java erasure, we cannot statically know whether we have e.g. Option[DocumentInfo] or
-      // Option[dom4j.Document]. So we have to decide whether to leave the contained nodes wrapped or not. We
+      // Option[dom.Document]. So we have to decide whether to leave the contained nodes wrapped or not. We
       // decide to leave them unwrapped, so that a Scala method can be defined as:
       //
       //  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo])

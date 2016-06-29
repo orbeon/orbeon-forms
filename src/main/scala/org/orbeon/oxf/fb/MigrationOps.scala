@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
 object MigrationOps {
@@ -26,6 +26,10 @@ object MigrationOps {
 
   private def findLegacyGridRepeats(doc: DocumentInfo) =
     findAllGridRepeats(doc) filter isLegacyRepeat
+
+  //@XPathFunction
+  def findAllRepeatNames(doc: DocumentInfo): SequenceIterator =
+    findFRBodyElement(doc) descendant * filter isRepeat map getControlName
 
   // Used for migrating the form definition's legacy grid repeats
   // The rest of the implementation is in annotate.xpl.

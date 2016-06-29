@@ -194,6 +194,9 @@
             <xf:instance xxf:exclude-result-prefixes="#all" fb:readonly="true" id="grid-22-template">
                 <grid-22-iteration bar=""/>
             </xf:instance>
+            <xf:instance fb:readonly="true" id="my-custom-template">
+                <my-custom-template-content/>
+            </xf:instance>
             <xf:action fb:event="xforms-ready"/>
             <xf:action fb:event="xforms-model-construct-done"/>
             <xf:action event="xforms-model-construct" target="#observer" class="fb-annotation">

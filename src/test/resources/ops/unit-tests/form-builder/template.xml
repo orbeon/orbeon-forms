@@ -178,6 +178,9 @@
             <xf:instance xxf:readonly="true" id="grid-22-template">
                 <grid-22 bar=""/>
             </xf:instance>
+            <xf:instance xxf:readonly="true" id="my-custom-template">
+                <my-custom-template-content/>
+            </xf:instance>
             <xf:action event="xforms-ready"/>
             <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
         </xf:model>

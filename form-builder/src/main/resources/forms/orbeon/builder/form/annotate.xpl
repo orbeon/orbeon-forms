@@ -36,11 +36,18 @@
 
                 <xsl:variable name="model"        select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
                 <xsl:variable name="instance"     select="$model/xf:instance[@id  = 'fr-form-instance']"/>
-                <xsl:variable name="templates"    select="$model/xf:instance[ends-with(@id, '-template')]"/>
-                <xsl:variable name="template-ids" select="$templates/generate-id()"/>
                 <xsl:variable name="xbl-ids"      select="/*/xh:head/xbl:xbl/generate-id()"/>
-
                 <xsl:variable name="bindings"     select="doc('input:bindings')/*/xbl:xbl/xbl:binding"/>
+
+                <!-- Only look at templates which are actually for repeats, in case form author manually added
+                     template instances. -->
+                <xsl:variable
+                    xmlns:migration="java:org.orbeon.oxf.fb.MigrationOps"
+                    name="template-ids"
+                    select="
+                        for $name in migration:findAllRepeatNames(/)
+                        return $model/xf:instance[@id = concat($name, '-template')]/generate-id()
+                    "/>
 
                 <!-- Whether we have "many" controls -->
                 <xsl:variable name="many-controls"
@@ -103,6 +110,7 @@
 
                 <!-- fr:body → xf:group -->
                 <xsl:template match="xh:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
+
                     <xf:group id="fb-body" class="fb-body">
                         <xsl:copy-of select="namespace::*"/>
                         <!-- Scope $lang which is the language of the form being edited -->

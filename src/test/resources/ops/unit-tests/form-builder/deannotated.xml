@@ -193,6 +193,9 @@
             <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-22-template">
                 <grid-22-iteration bar=""/>
             </xf:instance>
+            <xf:instance xxf:readonly="true" id="my-custom-template">
+                <my-custom-template-content/>
+            </xf:instance>
             <xf:action event="xforms-ready"/>
             <xf:action event="xforms-model-construct-done"/>
         </xf:model>

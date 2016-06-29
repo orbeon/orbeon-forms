@@ -263,7 +263,7 @@
                         <!-- Write classes -->
                         <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                         <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                        <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
+                        <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
 
                         <xf:action type="xpath">
                             (: Write alerts and constraints :)

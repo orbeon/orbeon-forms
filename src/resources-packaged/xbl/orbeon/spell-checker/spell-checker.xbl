@@ -88,21 +88,21 @@
                             <xf:var name="offset-after-current-c" value="$current-c/@o + $current-c/@l"/>
                             <!-- If this is the first <c>, consider inserting a <t> before -->
                             <xf:action if="$position = 1">
-                                <xf:insert if="$current-c/@o > 0" ref="." position="before" origin="xf:element('t', (xxf:attribute('o', '0'), xxf:attribute('l', $current-c/@o)))"/>
+                                <xf:insert if="$current-c/@o > 0" ref="." position="before" origin="xf:element('t', (xf:attribute('o', '0'), xf:attribute('l', $current-c/@o)))"/>
                             </xf:action>
                             <!-- If we are between two <c>, consider inserting a <t> in between -->
                             <xf:action if="exists($following-c)">
-                                <xf:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
+                                <xf:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xf:element('t', (xf:attribute('o', $offset-after-current-c), xf:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
                             </xf:action>
                             <!-- If this is the last <c>, consider insert a <t> after -->
                             <xf:action if="empty($following-c)">
                                 <xf:var name="text-length" value="string-length(instance('fr-spell-checker-request')/text)"/>
-                                <xf:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $text-length - $offset-after-current-c)))"/>
+                                <xf:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xf:element('t', (xf:attribute('o', $offset-after-current-c), xf:attribute('l', $text-length - $offset-after-current-c)))"/>
                             </xf:action>
                         </xf:action>
                         <!-- Populate the original value of the words -->
                         <xf:action iterate="instance('fr-spell-checker-result')/*">
-                            <xf:insert context="." origin="xxf:attribute('current', substring(instance('fr-spell-checker-request')/text, context()/@o + 1, context()/@l))"/>
+                            <xf:insert context="." origin="xf:attribute('current', substring(instance('fr-spell-checker-request')/text, context()/@o + 1, context()/@l))"/>
                         </xf:action>
                         <xxf:show dialog="fr-spell-checking-dialog"/>
                         <xf:setvalue ref="instance('fr-spell-checker-internal')/current-c-index">1</xf:setvalue>
@@ -174,7 +174,7 @@
                                     </xf:label>
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Mark this correction as handled -->
-                                        <xf:insert context="$current-c" origin="xxf:attribute('handled', 'true')"/>
+                                        <xf:insert context="$current-c" origin="xf:attribute('handled', 'true')"/>
                                         <!-- Move to the next correction -->
                                         <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                                     </xf:action>
@@ -188,7 +188,7 @@
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Mark all the correction with the same word as handled -->
                                         <xf:action iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
-                                            <xf:insert context="." origin="xxf:attribute('handled', 'true')"/>
+                                            <xf:insert context="." origin="xf:attribute('handled', 'true')"/>
                                         </xf:action>
                                         <!-- Move to the next correction -->
                                         <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
@@ -205,7 +205,7 @@
                                             <!-- Apply replacement -->
                                             <xf:setvalue ref="$current-c/@current" value="instance('fr-spell-checker-internal')/correction"/>
                                             <!-- Mark correction as handled -->
-                                            <xf:insert context="$current-c" origin="xxf:attribute('handled', 'true')"/>
+                                            <xf:insert context="$current-c" origin="xf:attribute('handled', 'true')"/>
                                             <!-- Move to the next correction -->
                                             <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                                         </xf:action>
@@ -222,7 +222,7 @@
                                                 <!-- Apply replacement -->
                                                 <xf:setvalue ref="@current" value="instance('fr-spell-checker-internal')/correction"/>
                                                 <!-- Mark correction as handled -->
-                                                <xf:insert context="." origin="xxf:attribute('handled', 'true')"/>
+                                                <xf:insert context="." origin="xf:attribute('handled', 'true')"/>
                                             </xf:action>
                                             <!-- Move to the next correction -->
                                             <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>

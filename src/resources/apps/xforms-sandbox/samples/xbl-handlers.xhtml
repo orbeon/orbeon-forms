@@ -50,12 +50,12 @@
                         <xf:insert model="model"
                            context="instance('events')" ref="*"
                            origin="xf:element('event',
-                                    (xxf:attribute('type', event('xxf:type')),
-                                     xxf:attribute('target', event('xxf:targetid')),
-                                     xxf:attribute('phase', 'bubbling'),
-                                     xxf:attribute('original-target', event('xxf:targetid')),
-                                     xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' ')),
-                                     xxf:attribute('original-indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                    (xf:attribute('type', event('xxf:type')),
+                                     xf:attribute('target', event('xxf:targetid')),
+                                     xf:attribute('phase', 'bubbling'),
+                                     xf:attribute('original-target', event('xxf:targetid')),
+                                     xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' ')),
+                                     xf:attribute('original-indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
                     </xbl:handler>
                 </xbl:handlers>
 

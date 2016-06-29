@@ -43,7 +43,7 @@
             </xf:instance>
 
             <xf:action ev:event="add-month" context="column-3d/graph">
-                <xf:insert context="." origin="xxf:attribute('animation', '0')"/>
+                <xf:insert context="." origin="xf:attribute('animation', '0')"/>
                 <xf:var name="current" value="set[last()]"/>
                 <xf:insert ref="set"/>
                 <xf:setvalue ref="set[last()]/@name" value="$current/@name + 1"/>

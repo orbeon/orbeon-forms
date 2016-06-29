@@ -103,9 +103,9 @@
                         <xf:insert ev:event="#all"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                         <xf:input id="my-input-1" ref="."/>
 
@@ -401,8 +401,8 @@
                         <xf:insert ev:event="xforms-enabled"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <!-- Everything relevant -->
@@ -520,8 +520,8 @@
                         <xf:insert ev:event="xforms-value-changed"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <!-- Must not get event -->
@@ -582,8 +582,8 @@
                         <xf:insert ev:event="xforms-value-changed"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <!-- Must not get event -->
@@ -665,8 +665,8 @@
                         <xf:insert ev:event="xforms-value-changed"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <xf:output id="output-1" value="value"/>
@@ -865,31 +865,31 @@
                         <xf:insert ev:event="foo bar"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('handler1-event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))))"/>
 
                         <xf:group id="group2">
                             <!-- Record only if target is observer -->
                             <xf:insert ev:event="foo bar" ev:target="#observer"
                                            context="instance('events')" ref="*"
                                            origin="xf:element('handler2-event',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('target', event('xxf:targetid'))))"/>
 
                             <!-- Record if target is observer OR group3 -->
                             <xf:insert ev:event="foo bar" ev:target="#observer group3"
                                            context="instance('events')" ref="*"
                                            origin="xf:element('handler3-event',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('target', event('xxf:targetid'))))"/>
 
                             <xf:group id="group3">
                                 <!-- Record only if target is observer -->
                                 <xf:insert ev:event="foo bar" ev:target="#observer"
                                                context="instance('events')" ref="*"
                                                origin="xf:element('handler4-event',
-                                                        (xxf:attribute('type', event('xxf:type')),
-                                                         xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                        (xf:attribute('type', event('xxf:type')),
+                                                         xf:attribute('target', event('xxf:targetid'))))"/>
                             </xf:group>
 
                         </xf:group>
@@ -1125,53 +1125,53 @@
                         <xf:insert ev:event="my-event" ev:phase="capture"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('group1',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('phase', event('xxf:phase')),
-                                                 xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('phase', event('xxf:phase')),
+                                                 xf:attribute('target', event('xxf:targetid'))))"/>
                         <xf:insert ev:event="my-event" ev:phase="target"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('group2',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('phase', event('xxf:phase')),
-                                                 xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('phase', event('xxf:phase')),
+                                                 xf:attribute('target', event('xxf:targetid'))))"/>
                         <xf:insert ev:event="my-event" ev:phase="bubbling"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('group3',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('phase', event('xxf:phase')),
-                                                 xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('phase', event('xxf:phase')),
+                                                 xf:attribute('target', event('xxf:targetid'))))"/>
                         <xf:insert ev:event="my-event" ev:phase="default"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('group4',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('phase', event('xxf:phase')),
-                                                 xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('phase', event('xxf:phase')),
+                                                 xf:attribute('target', event('xxf:targetid'))))"/>
 
                         <xf:input id="my-input" ref="name">
                             <xf:insert ev:event="my-event" ev:phase="capture"
                                            context="instance('events')" ref="*"
                                            origin="xf:element('input1',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('phase', event('xxf:phase')),
-                                                     xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('phase', event('xxf:phase')),
+                                                     xf:attribute('target', event('xxf:targetid'))))"/>
                             <xf:insert ev:event="my-event" ev:phase="target"
                                            context="instance('events')" ref="*"
                                            origin="xf:element('input2',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('phase', event('xxf:phase')),
-                                                     xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('phase', event('xxf:phase')),
+                                                     xf:attribute('target', event('xxf:targetid'))))"/>
                             <xf:insert ev:event="my-event" ev:phase="bubbling"
                                            context="instance('events')" ref="*"
                                            origin="xf:element('input3',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('phase', event('xxf:phase')),
-                                                     xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('phase', event('xxf:phase')),
+                                                     xf:attribute('target', event('xxf:targetid'))))"/>
                             <xf:insert ev:event="my-event" ev:phase="default"
                                            context="instance('events')" ref="*"
                                            origin="xf:element('input4',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('phase', event('xxf:phase')),
-                                                     xxf:attribute('target', event('xxf:targetid'))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('phase', event('xxf:phase')),
+                                                     xf:attribute('target', event('xxf:targetid'))))"/>
                         </xf:input>
                     </xf:group>
                 </xh:body>
@@ -1540,9 +1540,9 @@
                     <xf:insert ev:event="#all"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <xf:switch id="my-switch">
                         <xf:case id="case1">
@@ -1620,9 +1620,9 @@
                     <xf:insert ev:event="#all"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <xf:switch id="my-switch">
                         <xf:case id="case1">
@@ -1706,9 +1706,9 @@
                     <xf:insert ev:event="xforms-enabled xforms-disabled xxforms-dialog-open xxforms-dialog-close"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <xxf:dialog id="my-dialog">
                         <xf:input id="input1" ref="value[1]"/>
@@ -1783,8 +1783,8 @@
                         <xf:insert ev:event="xforms-value-changed"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <!-- Must never get event as value is constant-->
@@ -1813,8 +1813,8 @@
                         <xf:insert ev:event="xforms-value-changed"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
                         <xf:action ev:event="#all" ev:propagate="stop"/>
                     </xf:var>
@@ -1882,9 +1882,9 @@
                     <xf:insert ev:event="#all"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <!-- 1. Bindings and values are evaluated -->
                     <xf:group id="my-group">
@@ -1957,9 +1957,9 @@
                     <xf:insert ev:event="#all"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <!-- 1. Bindings and values are evaluated -->
                     <xf:group id="my-group">
@@ -2028,9 +2028,9 @@
                     <xf:insert ev:event="#all"
                                    model="events-model" context="." ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <xf:repeat ref="text" id="my-repeat">
                         <xf:input ref="." id="my-input"/>
@@ -2445,7 +2445,7 @@
                             ev:event="xxforms-valid xxforms-invalid xforms-revalidate"
                             context="instance('events')"
                             ref="*"
-                            origin="xf:element(event('xxf:type'), xxf:attribute('targetid', event('xxf:targetid')))"/>
+                            origin="xf:element(event('xxf:type'), xf:attribute('targetid', event('xxf:targetid')))"/>
 
                         <xf:action ev:event="xforms-model-construct-done">
                             <!-- Up until now there must have been one xxforms-invalid event for instance-2 -->

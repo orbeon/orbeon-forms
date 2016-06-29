@@ -321,7 +321,7 @@
                 <xf:insert
                     if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"
                     context="instance('fr-search-instance')"
-                    origin="xf:element('drafts', (xxf:attribute('for-never-saved-document', 'true'), 'only'))"/>
+                    origin="xf:element('drafts', (xf:attribute('for-never-saved-document', 'true'), 'only'))"/>
 
                 <!-- Query initial list of documents -->
                 <xf:send submission="search-submission"/>

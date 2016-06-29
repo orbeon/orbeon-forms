@@ -164,16 +164,16 @@
 
                     <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                     <xf:delete if="count($classes) = 0" ref="$control/@class"/>
-                    <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', string-join($classes, ' '))"/>
+                    <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
 
                     <xf:action if="$i/container-type = 'section'">
                         <!-- Initially open -->
                         <xf:delete if="data($i/initially-open)"      ref="$control/@fb:open"/>
-                        <xf:insert if="not(data($i/initially-open))" context="$control" origin="xxf:attribute('fb:open', 'false')"/>
+                        <xf:insert if="not(data($i/initially-open))" context="$control" origin="xf:attribute('fb:open', 'false')"/>
 
                         <!-- Collapsible -->
                         <xf:delete if="$i/collapsible = 'default'"      ref="$control/(@collapse, @collapsible)"/>
-                        <xf:insert if="not($i/collapsible = 'default')" context="$control" origin="xxf:attribute('collapsible', $i/collapsible = true())"/>
+                        <xf:insert if="not($i/collapsible = 'default')" context="$control" origin="xf:attribute('collapsible', $i/collapsible = true())"/>
                     </xf:action>
                 </xf:action>
 

@@ -59,7 +59,7 @@
 
             <!-- Insert condition on action if missing -->
             <xf:var name="action1" value="$instance/fb:action/xf:action[1]"/>
-            <xf:insert if="not(exists($action1/@if))" context="$action1" origin="xxf:attribute('if', 'true()')"/>
+            <xf:insert if="not(exists($action1/@if))" context="$action1" origin="xf:attribute('if', 'true()')"/>
         </xf:action>
     </xf:action>
 

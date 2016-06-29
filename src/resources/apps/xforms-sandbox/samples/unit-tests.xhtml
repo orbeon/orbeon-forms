@@ -60,7 +60,7 @@
             <xf:action ev:event="page-complete">
                 <xf:delete ref="reports/in-progress"/>
                 <xf:insert context="reports" ref="report" origin="saxon:parse(/instance/report-text)"/>
-                <xf:insert context="reports/report[last()]" origin="xxf:attribute('page', /instance/page)"/>
+                <xf:insert context="reports/report[last()]" origin="xf:attribute('page', /instance/page)"/>
                 <xf:setvalue ref="reports/report[last()]/@page" value="tokenize(., '/')[last()]"/>
                 <xf:setvalue ref="page-start" value="current-dateTime()"/>
             </xf:action>

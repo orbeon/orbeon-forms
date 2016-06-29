@@ -163,7 +163,7 @@
                 </xf:action>
                 <xf:action if="not($draft-requested)">
                     <xf:action context="instance('fr-search-request')/drafts">
-                        <xf:insert   context="." origin="xxf:attribute('for-document-id', $document)"/>
+                        <xf:insert   context="." origin="xf:attribute('for-document-id', $document)"/>
                         <xf:setvalue context="." value="'only'"/>
                     </xf:action>
                     <xf:send if="$autosave-enabled" submission="fr-search-submission"/>
@@ -209,7 +209,7 @@
 
                     <!-- Do we have drafts for documents that were never saved? -->
                     <xf:action context="instance('fr-search-request')/drafts">
-                        <xf:insert   context="." origin="xxf:attribute('for-never-saved-document', 'true')"/>
+                        <xf:insert   context="." origin="xf:attribute('for-never-saved-document', 'true')"/>
                         <xf:setvalue context="." value="'only'"/>
                     </xf:action>
                     <xf:send if="$autosave-enabled" submission="fr-search-submission"/>
@@ -383,7 +383,7 @@
             <xf:insert
                 if="exists($operations-header)"
                 context="instance('fr-authorized-operations')"
-                origin="xxf:attribute('from-persistence', $operations-header/string())"/>
+                origin="xf:attribute('from-persistence', $operations-header/string())"/>
         </xf:action>
     </xf:submission>
 

@@ -158,9 +158,9 @@
                             <!-- TEST: Event listener -->
                             <xf:insert context="instance('events')" ref="*"
                                            origin="xf:element('event',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('target', event('xxf:targetid')),
-                                                     xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('target', event('xxf:targetid')),
+                                                     xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                             <xf:dispatch targetid="group2" name="my-event"/>
                         </xf:action>
@@ -174,9 +174,9 @@
                                     <!-- TEST: Event listener -->
                                     <xf:insert context="instance('events')" ref="*"
                                                    origin="xf:element('event',
-                                                            (xxf:attribute('type', event('xxf:type')),
-                                                             xxf:attribute('target', event('xxf:targetid')),
-                                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                            (xf:attribute('type', event('xxf:type')),
+                                                             xf:attribute('target', event('xxf:targetid')),
+                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                                     <xf:dispatch targetid="group3" name="my-event"/>
                                 </xf:action>
@@ -191,9 +191,9 @@
                                     <!-- TEST: Event listener -->
                                     <xf:insert context="instance('events')" ref="*"
                                                    origin="xf:element('event',
-                                                            (xxf:attribute('type', event('xxf:type')),
-                                                             xxf:attribute('target', event('xxf:targetid')),
-                                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                            (xf:attribute('type', event('xxf:type')),
+                                                             xf:attribute('target', event('xxf:targetid')),
+                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                                     <xf:dispatch targetid="group4" name="my-event"/>
                                 </xf:action>
@@ -207,9 +207,9 @@
                             <!-- TEST: Event listener -->
                             <xf:insert context="instance('events')" ref="*"
                                            origin="xf:element('event',
-                                                    (xxf:attribute('type', event('xxf:type')),
-                                                     xxf:attribute('target', event('xxf:targetid')),
-                                                     xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                    (xf:attribute('type', event('xxf:type')),
+                                                     xf:attribute('target', event('xxf:targetid')),
+                                                     xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
                         </xf:action>
                     </xf:group>
                 </xh:body>

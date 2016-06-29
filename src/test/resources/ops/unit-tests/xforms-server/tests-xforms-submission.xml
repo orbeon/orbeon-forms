@@ -325,17 +325,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -395,17 +395,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -469,17 +469,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -548,17 +548,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -622,17 +622,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -696,17 +696,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -774,17 +774,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -862,17 +862,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('error-type', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('error-type', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -940,17 +940,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -961,9 +961,9 @@
                         <xf:insert ev:event="#all"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                         <!-- This must change -->
@@ -1048,17 +1048,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('inserted-nodes', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('inserted-nodes', $c)
                                                  ))"/>
 
                     </xf:model>
@@ -1132,17 +1132,17 @@
                         <xf:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('inserted-nodes')[1] return xxf:attribute('inserted-nodes', name($c)),
-                                                 for $c in event('deleted-nodes')[1] return xxf:attribute('deleted-nodes', name($c))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xf:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xf:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xf:insert ev:event="xforms-submit-done xforms-submit-error"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 for $c in event('error-type') return xxf:attribute('error-type', $c)
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 for $c in event('error-type') return xf:attribute('error-type', $c)
                                                  ))"/>
 
                     </xf:model>

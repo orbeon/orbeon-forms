@@ -162,8 +162,8 @@
             <xf:action ev:event="DOMActivate">
                 <xf:insert ref="*"
                                origin="xf:element('state',
-                                            (xxf:attribute('abbreviation', 'WY'),
-                                                xxf:attribute('name', 'Wyoming')))"/>
+                                            (xf:attribute('abbreviation', 'WY'),
+                                                xf:attribute('name', 'Wyoming')))"/>
             </xf:action>
         </xf:trigger>
         <xf:trigger id="insert-2-button">
@@ -171,8 +171,8 @@
             <xf:action ev:event="DOMActivate">
                 <xf:insert ref="state[@abbreviation = 'NH']"
                                origin="xf:element('state',
-                                            (xxf:attribute('abbreviation', 'NJ'),
-                                                xxf:attribute('name', 'New Jersey')))"/>
+                                            (xf:attribute('abbreviation', 'NJ'),
+                                                xf:attribute('name', 'New Jersey')))"/>
             </xf:action>
         </xf:trigger>
     </xh:body>

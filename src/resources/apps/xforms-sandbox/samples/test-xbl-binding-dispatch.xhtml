@@ -85,11 +85,11 @@
             <xf:insert ev:event="#all"
                            context="instance('events')" ref="*"
                            origin="xf:element('event',
-                                    (xxf:attribute('type', event('xxf:type')),
-                                     xxf:attribute('target', event('xxf:targetid')),
-                                     xxf:attribute('original-target', event('xxf:targetid')),
-                                     xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' ')),
-                                     xxf:attribute('original-indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                    (xf:attribute('type', event('xxf:type')),
+                                     xf:attribute('target', event('xxf:targetid')),
+                                     xf:attribute('original-target', event('xxf:targetid')),
+                                     xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' ')),
+                                     xf:attribute('original-indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
             <fr:foobar id="my-foobar">
                 <xf:message ev:event="fr:my-event"><xf:output value="concat('Got it: ', event('fr:my-context'))"/></xf:message>

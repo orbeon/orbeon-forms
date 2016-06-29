@@ -371,13 +371,13 @@
                                         <xf:action ev:event="xforms-enabled">
                                             <!-- Test use in actions -->
                                             <xf:insert context="instance('result')" ref="*"
-                                                           origin="xf:element('repeat-current', (xxf:attribute('position', $position),
-                                                                                                      xxf:attribute('repeat-current-1', xxf:repeat-current()),
-                                                                                                      xxf:attribute('repeat-current-2', xxf:repeat-current('my-repeat')),
-                                                                                                      xxf:attribute('repeat-index-1', xxf:index()),
-                                                                                                      xxf:attribute('repeat-index-2', index('my-repeat')),
-                                                                                                      xxf:attribute('repeat-context-1', name(xxf:context('my-group'))),
-                                                                                                      xxf:attribute('repeat-context-2', xxf:context('my-repeat'))
+                                                           origin="xf:element('repeat-current', (xf:attribute('position', $position),
+                                                                                                      xf:attribute('repeat-current-1', xxf:repeat-current()),
+                                                                                                      xf:attribute('repeat-current-2', xxf:repeat-current('my-repeat')),
+                                                                                                      xf:attribute('repeat-index-1', xxf:index()),
+                                                                                                      xf:attribute('repeat-index-2', index('my-repeat')),
+                                                                                                      xf:attribute('repeat-context-1', name(xxf:context('my-group'))),
+                                                                                                      xf:attribute('repeat-context-2', xxf:context('my-repeat'))
                                                                                                       ))"/>
                                         </xf:action>
                                         <!-- Test use in control values -->
@@ -1920,7 +1920,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:var name="new" value="xxf:create-document()"/>
-                            <xf:insert context="$new" origin="xf:element('foo', (xxf:attribute('new-attr', 'bar'), 'baz'))"/>
+                            <xf:insert context="$new" origin="xf:element('foo', (xf:attribute('new-attr', 'bar'), 'baz'))"/>
                             <xf:insert ref="instance()" origin="$new"/>
                         </xf:action>
 
@@ -1959,7 +1959,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:var name="new1" value="xxf:create-document()"/>
-                            <xf:insert context="$new1" origin="xf:element('foo', (xxf:attribute('new-attr', 'bar'), 'baz'))"/>
+                            <xf:insert context="$new1" origin="xf:element('foo', (xf:attribute('new-attr', 'bar'), 'baz'))"/>
                             <xf:var name="new2" value="xxf:create-document()"/>
                             <xf:insert ref="instance()" origin="$new2"/>
                         </xf:action>

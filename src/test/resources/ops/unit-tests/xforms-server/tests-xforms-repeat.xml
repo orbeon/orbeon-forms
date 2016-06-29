@@ -969,9 +969,9 @@
                                     <xf:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled xforms-required xforms-optional xforms-valid xforms-invalid xforms-readonly xforms-readwrite"
                                                    context="instance('events')" ref="*"
                                                    origin="xf:element('event',
-                                                            (xxf:attribute('type', event('xxf:type')),
-                                                             xxf:attribute('target', event('xxf:targetid')),
-                                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                            (xf:attribute('type', event('xxf:type')),
+                                                             xf:attribute('target', event('xxf:targetid')),
+                                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
                                     <xf:input ref="." id="my-input"/>
                                 </xf:repeat>
                             </xh:body>
@@ -1524,7 +1524,7 @@
 
                                 <xf:action ev:event="xforms-enabled xforms-disabled xxforms-nodeset-changed xxforms-index-changed">
                                     <xf:insert context="instance('changes')" ref="*"
-                                                   origin="xf:element(event('xxf:type'), xxf:attribute('id', event('xxf:target')))"/>
+                                                   origin="xf:element(event('xxf:type'), xf:attribute('id', event('xxf:target')))"/>
                                 </xf:action>
 
                                 <xf:group id="my-group" ref=".[@show = 'true']">
@@ -1613,9 +1613,9 @@
                     <xf:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <!-- Outer repeat -->
                     <xf:repeat id="my-outer-repeat" ref="outer">
@@ -1742,9 +1742,9 @@
                         <xf:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                         <!-- Top-level -->
 
@@ -2386,10 +2386,10 @@
                         <xf:insert ev:event="xxforms-index-changed"
                                        context="instance('events')" ref="*"
                                        origin="xf:element('event',
-                                                (xxf:attribute('type', event('xxf:type')),
-                                                 xxf:attribute('target', event('xxf:targetid')),
-                                                 xxf:attribute('old', event('xxf:old-index')),
-                                                 xxf:attribute('new', event('xxf:new-index'))
+                                                (xf:attribute('type', event('xxf:type')),
+                                                 xf:attribute('target', event('xxf:targetid')),
+                                                 xf:attribute('old', event('xxf:old-index')),
+                                                 xf:attribute('new', event('xxf:new-index'))
                                                  ))"/>
 
                         <xf:repeat ref="value" id="my-repeat"/>
@@ -2462,9 +2462,9 @@
                                 xf:element(
                                     'event',
                                     (
-                                        xxf:attribute('observer', event('xxf:observerid')),
-                                        xxf:attribute('type',     event('xxf:type')),
-                                        xxf:attribute('target',   event('xxf:targetid'))
+                                        xf:attribute('observer', event('xxf:observerid')),
+                                        xf:attribute('type',     event('xxf:type')),
+                                        xf:attribute('target',   event('xxf:targetid'))
                                     )
                                 )"/>
 
@@ -2487,9 +2487,9 @@
                                     xf:element(
                                         'event',
                                         (
-                                            xxf:attribute('observer', event('xxf:observerid')),
-                                            xxf:attribute('type',     event('xxf:type')),
-                                            xxf:attribute('target',   event('xxf:targetid'))
+                                            xf:attribute('observer', event('xxf:observerid')),
+                                            xf:attribute('type',     event('xxf:type')),
+                                            xf:attribute('target',   event('xxf:targetid'))
                                         )
                                     )"/>
                         </xf:repeat>
@@ -2505,9 +2505,9 @@
                                 xf:element(
                                     'event',
                                     (
-                                        xxf:attribute('observer', event('xxf:observerid')),
-                                        xxf:attribute('type',     event('xxf:type')),
-                                        xxf:attribute('target',   event('xxf:targetid'))
+                                        xf:attribute('observer', event('xxf:observerid')),
+                                        xf:attribute('type',     event('xxf:type')),
+                                        xf:attribute('target',   event('xxf:targetid'))
                                     )
                                 )"/>
 
@@ -2645,9 +2645,9 @@
                     <xf:insert ev:event="xforms-enabled"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
                                              ))"/>
 
                     <xf:repeat id="my-repeat" ref="value[position() le xs:integer(../@size)]">
@@ -2736,9 +2736,9 @@
                                 <xf:insert ev:event="xxforms-iteration-moved"
                                    context="instance('events')" ref="*"
                                    origin="xf:element('event',
-                                            (xxf:attribute('type', event('xxf:type')),
-                                             xxf:attribute('target', event('xxf:targetid')),
-                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                            (xf:attribute('type', event('xxf:type')),
+                                             xf:attribute('target', event('xxf:targetid')),
+                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
                                              ))"/>
                             </xf:output>
                             <xf:output id="my-value" value="value"/>
@@ -3221,9 +3221,9 @@
                                             <xf:insert xxbl:scope="outer"
                                                context="instance('events')" ref="*"
                                                origin="xf:element('event',
-                                                        (xxf:attribute('observer', event('xxf:absolute-observerid')),
-                                                         xxf:attribute('type', event('xxf:type')),
-                                                         xxf:attribute('target', event('xxf:absolute-targetid'))
+                                                        (xf:attribute('observer', event('xxf:absolute-observerid')),
+                                                         xf:attribute('type', event('xxf:type')),
+                                                         xf:attribute('target', event('xxf:absolute-targetid'))
                                                          ))"/>
 
                                         </xf:action>

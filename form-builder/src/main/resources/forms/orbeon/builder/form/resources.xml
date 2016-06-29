@@ -273,10 +273,10 @@
                 <hint>Whether to show top-level sections as separate wizard pages</hint>
             </wizard>
             <labels>
-                <label>Appearance of control labels</label>
+                <label>Appearance of Control Labels</label>
             </labels>
             <hints>
-                <label>Appearance of control hints</label>
+                <label>Appearance of Control Hints</label>
             </hints>
             <appearances>
                 <item id="0">Use Default</item>
@@ -284,7 +284,7 @@
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label>Use placeholder for text fields</label>
+                <label>Use Placeholder for Text Fields</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -2145,10 +2145,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -2156,7 +2156,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -3082,10 +3082,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -3093,7 +3093,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -4019,10 +4019,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -4030,7 +4030,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -4948,10 +4948,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -4959,7 +4959,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -5880,10 +5880,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -5891,7 +5891,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -6810,10 +6810,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -6821,7 +6821,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -7740,10 +7740,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -7751,7 +7751,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -8676,10 +8676,10 @@
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
             <labels>
-                <label todo="true">[Appearance of control labels]</label>
+                <label todo="true">[Appearance of Control Labels]</label>
             </labels>
             <hints>
-                <label todo="true">[Appearance of control hints]</label>
+                <label todo="true">[Appearance of Control Hints]</label>
             </hints>
             <appearances>
                 <item todo="true" id="0">[Use Default]</item>
@@ -8687,7 +8687,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use placeholder for text fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>

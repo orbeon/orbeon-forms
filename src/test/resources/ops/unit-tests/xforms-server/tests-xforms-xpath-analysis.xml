@@ -2574,7 +2574,7 @@
                 <xh:body>
                     <xf:insert ev:event="#all"
                                    model="events-model" context="." ref="*"
-                                   origin="xxf:element('event',
+                                   origin="xf:element('event',
                                             (xxf:attribute('type', event('xxf:type')),
                                              xxf:attribute('target', event('xxf:targetid'))))"/>
 

@@ -177,7 +177,7 @@
         </xf:dispatch>
 
         <!-- Free fr-form-instance -->
-        <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+        <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
 
         <!-- Mark data as safe. Once user sets metadata from dialog, data will be marked dirty automatically.  -->
         <xf:action type="xpath">
@@ -262,7 +262,7 @@
         </xf:action>
 
         <!-- Free fr-form-instance and re-mark data as safe -->
-        <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+        <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
         <xf:action type="xpath">
             fr:run-process('oxf.fr.detail.process', 'set-data-status(status = "safe")')
         </xf:action>
@@ -646,7 +646,7 @@
             </xf:dispatch>
 
             <!-- Free fr-form-instance. Leave data as unsafe. -->
-            <xf:insert ref="instance('fr-form-instance')" origin="xxf:element('dummy')"/>
+            <xf:insert ref="instance('fr-form-instance')" origin="xf:element('dummy')"/>
         </xf:action>
 
     </xf:submission>

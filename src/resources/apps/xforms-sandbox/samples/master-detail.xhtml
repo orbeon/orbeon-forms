@@ -39,9 +39,9 @@
             <xf:action ev:event="DOMActivate">
                 <!-- Insert new row and populate id with max of exising ids + 1 -->
                 <xf:insert ref="*" at="index('orange-repeat')"
-                               origin="xxf:element('orange',
-                                            (xxf:element('type'),
-                                             xxf:element('id', max(for $n in /*/orange/id[. castable as xs:integer] return xs:integer($n)) + 1)))"/>
+                               origin="xf:element('orange',
+                                            (xf:element('type'),
+                                             xf:element('id', max(for $n in /*/orange/id[. castable as xs:integer] return xs:integer($n)) + 1)))"/>
             </xf:action>
         </xf:trigger>
 

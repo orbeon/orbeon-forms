@@ -617,7 +617,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xxf:show dialog="dialog-1"/>
-                            <xf:insert ref="label" origin="xxf:element('label', 'Vanilla')"/>
+                            <xf:insert ref="label" origin="xf:element('label', 'Vanilla')"/>
                         </xf:action>
 
                     </xf:model>

@@ -16,9 +16,9 @@
                     <switch/>
                 </instance>
             </xf:instance>
-            
+
             <xf:setvalue event="xforms-model-construct-done" iterate="visible | switch" ref="." value="../lorem"/>
-            
+
         </xf:model>
     </xh:head>
     <xh:body>
@@ -34,7 +34,7 @@
         <xf:trigger>
           <xf:label>Repeat</xf:label>
           <xf:action event="DOMActivate">
-            <xf:insert context="." origin="xxf:element('repeat')"/>
+            <xf:insert context="." origin="xf:element('repeat')"/>
             <xf:setvalue ref="repeat" value="../lorem"/>
           </xf:action>
         </xf:trigger>
@@ -50,6 +50,6 @@
         <xf:repeat ref="repeat">
           <xf:textarea appearance="xxf:autosize" ref="."/>
         </xf:repeat>
-          
+
     </xh:body>
 </xh:html>

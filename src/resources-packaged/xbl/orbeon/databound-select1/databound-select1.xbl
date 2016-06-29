@@ -138,7 +138,7 @@
                 <xf:submission id="get-itemset" method="get" resource="{event('resource')}" replace="instance" serialization="none">
                     <xf:setvalue ev:event="xforms-submit-done" ref="instance('submission-ran')" value=". + 1"/>
                     <xf:action ev:event="xforms-submit-error">
-                        <xf:insert ref="instance('itemset')" origin="xxf:element('dummy')"/>
+                        <xf:insert ref="instance('itemset')" origin="xf:element('dummy')"/>
                     </xf:action>
                 </xf:submission>
             </xf:model>

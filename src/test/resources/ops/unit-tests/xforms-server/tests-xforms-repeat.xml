@@ -968,7 +968,7 @@
                                 <xf:repeat ref="*" id="my-repeat">
                                     <xf:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled xforms-required xforms-optional xforms-valid xforms-invalid xforms-readonly xforms-readwrite"
                                                    context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -1414,7 +1414,7 @@
 
                                     <xf:action ev:event="xforms-ready">
                                         <!-- Insert a node: this will immediately cause a repeat nodeset change -->
-                                        <xf:insert ref="value" origin="xxf:element('value', count(../value) + 1)"/>
+                                        <xf:insert ref="value" origin="xf:element('value', count(../value) + 1)"/>
                                         <!-- Delete a node: this will immediately cause a repeat nodeset change  -->
                                         <xf:delete ref="value[1]"/>
                                         <!-- Change repeat nodeset order without changing instance: this will cause change during refresh -->
@@ -1423,7 +1423,7 @@
                                         <!-- Remove all items ("going to 0" condition) must not dispatch event -->
                                         <xf:delete ref="value"/>
                                         <!-- Insert a new item ("going from 0" condition) must not dispatch event  -->
-                                        <xf:insert context="." ref="value" origin="xxf:element('value', 1)"/>
+                                        <xf:insert context="." ref="value" origin="xf:element('value', 1)"/>
                                     </xf:action>
 
                                 </xf:model>
@@ -1431,7 +1431,7 @@
                             <xh:body>
                                 <xf:group id="my-group">
                                     <xf:action ev:event="xxforms-nodeset-changed" ev:target="my-repeat">
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('change', count(instance('instance')/value))"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('change', count(instance('instance')/value))"/>
                                     </xf:action>
                                     <xf:repeat ref="xxf:sort(value, string(.), 'text', @order)" id="my-repeat">
                                         <xf:output id="my-output" value="."/>
@@ -1503,19 +1503,19 @@
                                     </xf:instance>
 
                                     <xf:action ev:event="xforms-ready">
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('before-refresh')"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('before-refresh')"/>
                                         <xf:refresh/>
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('after-refresh')"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('after-refresh')"/>
                                         <!-- Cause the group and its content to become relevant upon next refresh -->
                                         <xf:setvalue ref="@show">true</xf:setvalue>
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('before-refresh')"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('before-refresh')"/>
                                         <xf:refresh/>
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('after-refresh')"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('after-refresh')"/>
                                         <!-- Cause the group and its content to become non-relevant upon next refresh -->
                                         <xf:setvalue ref="@show">false</xf:setvalue>
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('before-refresh')"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('before-refresh')"/>
                                         <xf:refresh/>
-                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('after-refresh')"/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xf:element('after-refresh')"/>
                                     </xf:action>
 
                                 </xf:model>
@@ -1524,7 +1524,7 @@
 
                                 <xf:action ev:event="xforms-enabled xforms-disabled xxforms-nodeset-changed xxforms-index-changed">
                                     <xf:insert context="instance('changes')" ref="*"
-                                                   origin="xxf:element(event('xxf:type'), xxf:attribute('id', event('xxf:target')))"/>
+                                                   origin="xf:element(event('xxf:type'), xxf:attribute('id', event('xxf:target')))"/>
                                 </xf:action>
 
                                 <xf:group id="my-group" ref=".[@show = 'true']">
@@ -1612,7 +1612,7 @@
                     <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
                     <xf:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
                                    context="instance('events')" ref="*"
-                                   origin="xxf:element('event',
+                                   origin="xf:element('event',
                                             (xxf:attribute('type', event('xxf:type')),
                                              xxf:attribute('target', event('xxf:targetid')),
                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -1741,7 +1741,7 @@
                         <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
                         <xf:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
                                        context="instance('events')" ref="*"
-                                       origin="xxf:element('event',
+                                       origin="xf:element('event',
                                                 (xxf:attribute('type', event('xxf:type')),
                                                  xxf:attribute('target', event('xxf:targetid')),
                                                  xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -2374,7 +2374,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:setindex repeat="my-repeat" index="2"/>
-                            <xf:insert ref="value" origin="(xxf:element('value', 5), xxf:element('value', 6))"/>
+                            <xf:insert ref="value" origin="(xf:element('value', 5), xf:element('value', 6))"/>
                             <xf:delete ref="value" at="6"/>
                             <xf:delete ref="value"/>
                         </xf:action>
@@ -2385,7 +2385,7 @@
                     <xf:group id="my-group">
                         <xf:insert ev:event="xxforms-index-changed"
                                        context="instance('events')" ref="*"
-                                       origin="xxf:element('event',
+                                       origin="xf:element('event',
                                                 (xxf:attribute('type', event('xxf:type')),
                                                  xxf:attribute('target', event('xxf:targetid')),
                                                  xxf:attribute('old', event('xxf:old-index')),
@@ -2459,7 +2459,7 @@
                             context="xxf:instance('events')"
                             ref="*"
                             origin="
-                                xxf:element(
+                                xf:element(
                                     'event',
                                     (
                                         xxf:attribute('observer', event('xxf:observerid')),
@@ -2484,7 +2484,7 @@
                                 context="xxf:instance('events')"
                                 ref="*"
                                 origin="
-                                    xxf:element(
+                                    xf:element(
                                         'event',
                                         (
                                             xxf:attribute('observer', event('xxf:observerid')),
@@ -2502,7 +2502,7 @@
                             context="xxf:instance('events')"
                             ref="*"
                             origin="
-                                xxf:element(
+                                xf:element(
                                     'event',
                                     (
                                         xxf:attribute('observer', event('xxf:observerid')),
@@ -2631,7 +2631,7 @@
                         </xf:instance>
 
                         <xf:insert ev:event="xforms-refresh" context="instance('events')" ref="*"
-                                       origin="xxf:element('refresh')"/>
+                                       origin="xf:element('refresh')"/>
 
                         <xf:action ev:event="xforms-ready">
                             <!-- Clear until now -->
@@ -2644,7 +2644,7 @@
                 <xh:body>
                     <xf:insert ev:event="xforms-enabled"
                                    context="instance('events')" ref="*"
-                                   origin="xxf:element('event',
+                                   origin="xf:element('event',
                                             (xxf:attribute('type', event('xxf:type')),
                                              xxf:attribute('target', event('xxf:targetid')),
                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
@@ -2735,7 +2735,7 @@
                             <xf:output id="my-name" value="name">
                                 <xf:insert ev:event="xxforms-iteration-moved"
                                    context="instance('events')" ref="*"
-                                   origin="xxf:element('event',
+                                   origin="xf:element('event',
                                             (xxf:attribute('type', event('xxf:type')),
                                              xxf:attribute('target', event('xxf:targetid')),
                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
@@ -2935,10 +2935,10 @@
                         </xf:instance>
 
                         <xf:action ev:event="xforms-ready">
-                            <xf:insert ref="value[. = 3]" position="{'before'}" origin="xxf:element('value', 2)"/>
-                            <xf:insert ref="value[. = 3]" position="{'after'}" origin="xxf:element('value', 4)"/>
+                            <xf:insert ref="value[. = 3]" position="{'before'}" origin="xf:element('value', 2)"/>
+                            <xf:insert ref="value[. = 3]" position="{'after'}" origin="xf:element('value', 4)"/>
                             <!-- Invalid position defaults to "after" -->
-                            <xf:insert ref="value[. = 5]" position="{''}" origin="xxf:element('value', '6')"/>
+                            <xf:insert ref="value[. = 5]" position="{''}" origin="xf:element('value', '6')"/>
                         </xf:action>
                     </xf:model>
                 </xh:head>
@@ -3038,7 +3038,7 @@
 
                 <xf:trigger id="insert-trigger">
                     <xf:label/>
-                    <xf:insert id="insert" ev:event="DOMActivate" context="instance()" origin="xxf:element('company')"/>
+                    <xf:insert id="insert" ev:event="DOMActivate" context="instance()" origin="xf:element('company')"/>
                 </xf:trigger>
             </controls>
         </input>
@@ -3220,7 +3220,7 @@
                                         <xf:action ev:event="xforms-enabled my-event" xxbl:scope="inner">
                                             <xf:insert xxbl:scope="outer"
                                                context="instance('events')" ref="*"
-                                               origin="xxf:element('event',
+                                               origin="xf:element('event',
                                                         (xxf:attribute('observer', event('xxf:absolute-observerid')),
                                                          xxf:attribute('type', event('xxf:type')),
                                                          xxf:attribute('target', event('xxf:absolute-targetid'))

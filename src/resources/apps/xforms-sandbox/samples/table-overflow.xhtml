@@ -109,12 +109,12 @@
                 <tbody>
                     <xf:repeat
                         ref="
-                        for $n in 1 to rows return xxf:element('row', (
-                            xxf:element('number', $n),
-                            xxf:element('text', substring(normalize-space(text), 1, text-length))
+                        for $n in 1 to rows return xf:element('row', (
+                            xf:element('number', $n),
+                            xf:element('text', substring(normalize-space(text), 1, text-length))
                         ))
-                        
-                        
+
+
                         ">
                         <tr>
                             <td style="{td-style[1]}">

@@ -257,15 +257,15 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Within same group -->
                             <xf:setfocus control="my-input-111"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <xf:setfocus control="my-input-112"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Change one group -->
                             <xf:setfocus control="my-input-121"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Change two groups -->
                             <xf:setfocus control="my-input-211"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move up one group -->
                             <xf:setfocus control="my-input-2"/>
                         </xf:action>
@@ -282,7 +282,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:targetid'))))"/>
 
@@ -374,32 +374,32 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input-111"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Try to focus on non-relevant control (must fail) -->
                             <xf:setvalue ref="value[2]/@relevant">false</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Make control relevant again and set focus (must succeed) -->
                             <xf:setvalue ref="value[2]/@relevant">true</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Make control non-relevant again (focus must go away) -->
                             <xf:setvalue ref="value[2]/@relevant">false</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
 
                             <!-- Initial control -->
                             <xf:setvalue ref="value[2]/@relevant">true</xf:setvalue>
                             <xf:setfocus control="my-input-111"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Try to focus on readonly control (must fail) -->
                             <xf:setvalue ref="value[2]/@readonly">true</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Make control readwrite again and set focus (must succeed) -->
                             <xf:setvalue ref="value[2]/@readonly">false</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Make control readonly again (focus must go away) -->
                             <xf:setvalue ref="value[2]/@readonly">true</xf:setvalue>
                             <xf:setfocus control="my-input-211"/>
@@ -417,7 +417,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:targetid'))))"/>
 
@@ -515,13 +515,13 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Insert iteration before (focus will move from 2 to 1) -->
                             <xf:insert ref="value" at="1" position="before"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Delete iteration 1 (focus will move from old 1 to new 1) -->
                             <xf:delete ref="value[1]"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                         </xf:action>
 
                     </xf:model>
@@ -536,7 +536,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
@@ -610,11 +610,11 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move iteration with focus (focus moves with iteration and events are not dispatched) -->
                             <xf:setvalue ref="value[1]/@p" value="4"/>
                             <xf:refresh/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move iteration that doesn't have focus (focus moves with iteration and events are not dispatched) -->
                             <xf:setvalue ref="value[2]/@p" value="5"/>
                         </xf:action>
@@ -631,7 +631,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
@@ -701,10 +701,10 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move index (index must move to second iteration) -->
                             <xf:setindex repeat="my-outer-repeat" index="2"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move index (focus must go away) -->
                             <xf:setindex repeat="my-outer-repeat" index="3"/>
                         </xf:action>
@@ -721,7 +721,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
@@ -798,16 +798,16 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Set focus to hidden control (used to fail, now passes and case-2 is toggled) -->
                             <xf:setfocus control="my-input-2"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Toggle back to case-1 (focus must go away) -->
                             <xf:toggle case="case-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Set focus back to control -->
                             <xf:setfocus control="my-input-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Toggle 3rd case (focus must go to new control) -->
                             <xf:toggle case="case-3"/>
                         </xf:action>
@@ -824,7 +824,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut xforms-select xforms-deselect" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
@@ -919,23 +919,23 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Set focus to hidden control (must fail) -->
                             <xf:setfocus control="my-input-2"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Show dialog (focus must automatically go to first dialog control) -->
                             <xxf:show dialog="my-dialog-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Hide dialog (focus must go away) -->
                             <xxf:hide dialog="my-dialog-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
 
                             <!-- Initial control -->
                             <xf:setfocus control="my-input-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Show dialog (focus goes to second dialog control) -->
                             <xxf:show dialog="my-dialog-2"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Hide dialog (focus goes to initial control) -->
                             <xxf:hide dialog="my-dialog-2"/>
 
@@ -953,7 +953,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
@@ -1041,16 +1041,16 @@
                         <xf:action ev:event="xforms-ready">
                             <!-- Initial control -->
                             <xf:setfocus control="my-input-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Focus on gaga -->
                             <xf:setfocus control="my-gaga"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move focus within gaga -->
                             <xf:setfocus control="|my-gaga≡gaga-2|"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Focus on toto -->
                             <xf:setfocus control="my-toto"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <!-- Move focus within toto -->
                             <xf:setfocus control="toto-2"/>
                         </xf:action>
@@ -1087,7 +1087,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
@@ -1220,9 +1220,9 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:setfocus control="my-gaga"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                             <xf:setfocus control="my-toto"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xf:element('separator')"/>
                         </xf:action>
 
                     </xf:model>
@@ -1251,7 +1251,7 @@
 
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" xxf:phantom="true" model="events-model" context="." ref="*"
-                        origin="xxf:element('event',
+                        origin="xf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 

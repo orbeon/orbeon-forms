@@ -110,7 +110,7 @@
 
                         <!-- Save mode in metadata -->
                         <xf:delete ref="$metadata/metadata/form-instance-mode"/>
-                        <xf:insert context="$metadata/metadata" ref="*" origin="xxf:element('form-instance-mode', $ui/mode/text())"/>
+                        <xf:insert context="$metadata/metadata" ref="*" origin="xf:element('form-instance-mode', $ui/mode/text())"/>
                     </xf:action>
                 </xf:action>
 

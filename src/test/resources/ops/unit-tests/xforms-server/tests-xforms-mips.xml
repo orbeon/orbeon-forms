@@ -231,7 +231,7 @@
 
                         <xf:action ev:event="xforms-ready" iterate="*">
                             <xf:var name="current" value="."/>
-                            <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), valid($current))"/>
+                            <xf:insert context="instance('result')" ref="*" origin="xf:element(name($current), valid($current))"/>
                         </xf:action>
 
                     </xf:model>
@@ -311,7 +311,7 @@
 
                                     <xf:action ev:event="xforms-ready" iterate="*/*">
                                         <xf:var name="current" value="."/>
-                                        <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), valid($current))"/>
+                                        <xf:insert context="instance('result')" ref="*" origin="xf:element(name($current), valid($current))"/>
                                     </xf:action>
 
                                 </xf:model>
@@ -777,10 +777,10 @@
                                     </xf:instance>
 
                                     <xf:action ev:event="xxforms-valid" ev:observer="value">
-                                        <xf:insert context="instance('validity')" ref="*" origin="xxf:element('valid')" />
+                                        <xf:insert context="instance('validity')" ref="*" origin="xf:element('valid')" />
                                     </xf:action>
                                     <xf:action ev:event="xxforms-invalid" ev:observer="value">
-                                        <xf:insert context="instance('validity')" ref="*" origin="xxf:element('invalid')" />
+                                        <xf:insert context="instance('validity')" ref="*" origin="xf:element('invalid')" />
                                     </xf:action>
 
                                     <xf:setvalue ev:event="xforms-ready" ref="instance('value')">42</xf:setvalue>

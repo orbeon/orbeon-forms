@@ -58,13 +58,13 @@
                             context="instance()/remote-servers"
                             ref="*"
                             origin="
-                                xxf:element(
+                                xf:element(
                                     'remote-server',
                                     (
-                                        xxf:element('label',    if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 1] else ''),
-                                        xxf:element('url',      if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 2] else $remote-servers[1]),
-                                        xxf:element('username', ''),
-                                        xxf:element('password', '')
+                                        xf:element('label',    if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 1] else ''),
+                                        xf:element('url',      if (count($remote-servers) ge 2) then $remote-servers[($p - 1) * 2 + 2] else $remote-servers[1]),
+                                        xf:element('username', ''),
+                                        xf:element('password', '')
                                     )
                                 )
                             "
@@ -120,12 +120,12 @@
                 <xf:setvalue ref="selection"/>
 
                 <!-- Don't keep potentially large instances -->
-                <xf:insert ref="instance('fr-form')" origin="xxf:element('dummy')"/>
+                <xf:insert ref="instance('fr-form')" origin="xf:element('dummy')"/>
                 <xf:send submission="reset-toolbox"/>
 
                 <!-- Following doesn't work because instance is readonly and insert code thinks it's mutating -->
                 <!-- Ideal would be an xxf:reset-instance(s) action -->
-                <!--<xf:insert context="instance('fr-components')/root()" origin="xxf:element('dummy')"/>-->
+                <!--<xf:insert context="instance('fr-components')/root()" origin="xf:element('dummy')"/>-->
             </xf:action>
 
             <xf:instance id="fr-form-instance">
@@ -276,7 +276,7 @@
                 replace="instance"
                 targetref="instance('fr-metadata-local')">
 
-                <xf:insert event="xforms-submit" ref="instance('fr-metadata-local')" origin="xxf:element('forms')"/>
+                <xf:insert event="xforms-submit" ref="instance('fr-metadata-local')" origin="xf:element('forms')"/>
                 <xf:setvalue event="xforms-submit-done" ref="instance()/initializing">false</xf:setvalue>
             </xf:submission>
 
@@ -289,16 +289,16 @@
                 resource="{instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url}/fr/service/persistence/form"
                 replace="instance"
                 targetref="instance('fr-metadata-remote')">
-                <xf:insert event="xforms-submit" ref="instance('fr-metadata-remote')" origin="xxf:element('forms')"/>
+                <xf:insert event="xforms-submit" ref="instance('fr-metadata-remote')" origin="xf:element('forms')"/>
                 <xf:setvalue event="xforms-submit-done" ref="instance()/remote-successful">true</xf:setvalue>
             </xf:submission>
 
             <xf:action event="process-results">
 
-                <xf:insert ref="instance('fr-metadata')" origin="xxf:element('forms')"/>
+                <xf:insert ref="instance('fr-metadata')" origin="xf:element('forms')"/>
 
                 <!-- Create root element -->
-                <xf:var name="temp" value="xxf:element('forms')"/>
+                <xf:var name="temp" value="xf:element('forms')"/>
 
                 <!-- Join remote data if present -->
                 <xf:insert
@@ -309,8 +309,8 @@
                                 xxf:instance('fb-permissions')
                             )"/>
 
-                <xf:insert ref="instance('fr-metadata-local')"  origin="xxf:element('forms')"/>
-                <xf:insert ref="instance('fr-metadata-remote')" origin="xxf:element('forms')"/>
+                <xf:insert ref="instance('fr-metadata-local')"  origin="xf:element('forms')"/>
+                <xf:insert ref="instance('fr-metadata-remote')" origin="xf:element('forms')"/>
 
                 <xf:insert
                     context="instance('fr-metadata')"
@@ -417,7 +417,7 @@
                                 if="$toggle-to-unpublish"
                                 context="$metadata"
                                 ref="*"
-                                origin="xxf:element('available', 'false')"/>
+                                origin="xf:element('available', 'false')"/>
                         </xf:action>
 
                         <!-- If we upgrade the form definition: retrieve toolbox -->
@@ -530,7 +530,7 @@
 
             <xf:submission
                 id="reset-toolbox"
-                ref="xxf:element('dummy')"
+                ref="xf:element('dummy')"
                 method="put"
                 resource="echo:"
                 replace="instance"

@@ -44,18 +44,18 @@
 
                             <!-- Straight forward insert -->
                             <xf:action iterate="for $i in (1 to 3) return .">
-                                <xf:insert context="nested" origin="xxf:element('item')"/>
+                                <xf:insert context="nested" origin="xf:element('item')"/>
                             </xf:action>
 
                             <!-- Does the same thing as the previous, in one line (the iterate doesn't change the context of the insert since it return ".") -->
                             <xf:insert context="one-line"
                                     iterate="for $i in (1 to 3) return ."
-                                    origin="xxf:element('item')"/>
+                                    origin="xf:element('item')"/>
 
                             <!-- This should not do any insert as the iterate changes the context to a simple type -->
                             <xf:insert context="no-insert"
                                     iterate="for $i in (1 to 3) return 42"
-                                    origin="xxf:element('item')"/>
+                                    origin="xf:element('item')"/>
 
                         </xf:action>
                     </xf:model>

@@ -57,7 +57,7 @@
 
             <xf:action ev:event="xforms-ready" iterate="*">
                 <xf:var name="current" value="."/>
-                <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), valid($current))"/>
+                <xf:insert context="instance('result')" ref="*" origin="xf:element(name($current), valid($current))"/>
             </xf:action>
 
         </xf:model>

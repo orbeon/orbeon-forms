@@ -185,7 +185,7 @@
                                 <xf:insert
                                     ev:event="xforms-submit-error"
                                     ref="instance('suggestions-instance')"
-                                    origin="xxf:element('dummy')"/>
+                                    origin="xf:element('dummy')"/>
                             </xf:submission>
                         </xf:model>
 
@@ -229,7 +229,7 @@
 
                         <!-- Look for value based on label and update external value (e.g. on tab out) -->
                         <xf:action ev:event="update-external-value">
-                            <xf:var name="value" value="xxf:element('value')"/>
+                            <xf:var name="value" value="xf:element('value')"/>
                             <xf:dispatch name="get-value-from-itemset" targetid="component-inner-group"><xf:property name="fr-value" value="$value"/></xf:dispatch>
                             <xf:setvalue ref="$binding" value="$value"/>
                             <!-- If no value is found, clear the search field -->
@@ -296,7 +296,7 @@
                         </xsl:if>
                         <!-- In static mode, when the external value changes, search for an item with that value, and set search value to the item's label -->
                         <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="external-value" if="not($dynamic-itemset)">
-                            <xf:var name="select1-current-label" value="xxf:element('label')"/>
+                            <xf:var name="select1-current-label" value="xf:element('label')"/>
                             <xf:dispatch name="get-label-from-itemset" targetid="component-inner-group"><xf:property name="fr-label" value="$select1-current-label"/></xf:dispatch>
                             <xf:setvalue ref="$local/textfield-value" value="$select1-current-label"/>
                         </xf:action>

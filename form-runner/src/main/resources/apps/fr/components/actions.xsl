@@ -249,11 +249,11 @@
                         context="$new-choices-holder"
                         ref="*"
                         origin="
-                            xxf:element(
+                            xf:element(
                                 'item',
                                 (
-                                    xxf:element('label', xs:string($item-label)),
-                                    xxf:element('value', xs:string($item-value))
+                                    xf:element('label', xs:string($item-label)),
+                                    xf:element('value', xs:string($item-value))
                                 )
                             )"/>
                 </xf:action>

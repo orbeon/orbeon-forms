@@ -173,15 +173,15 @@
                                                 <xf:action ev:event="xforms-model-construct-done">
                                                     <xf:action iterate="(2007 to 2009)">
                                                         <xf:var name="year" value="." as="xs:string"/>
-                                                        <xf:insert context="instance('years-itemset')" origin="xxf:element('year', $year)"/>
+                                                        <xf:insert context="instance('years-itemset')" origin="xf:element('year', $year)"/>
                                                     </xf:action>
                                                     <xf:action iterate="(1 to 3)">
                                                         <xf:var name="month" value="." as="xs:string"/>
-                                                        <xf:insert context="instance('months-itemset')" ref="*" origin="xxf:element('month', $month)"/>
+                                                        <xf:insert context="instance('months-itemset')" ref="*" origin="xf:element('month', $month)"/>
                                                     </xf:action>
                                                     <xf:action iterate="(1 to 3)">
                                                         <xf:var name="day" value="." as="xs:string"/>
-                                                        <xf:insert context="instance('days-itemset')" ref="*" origin="xxf:element('day', $day)"/>
+                                                        <xf:insert context="instance('days-itemset')" ref="*" origin="xf:element('day', $day)"/>
                                                     </xf:action>
                                                 </xf:action>
                                             </xf:model>
@@ -261,7 +261,7 @@
                                     <xf:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled"
                                                    xxf:phantom="true"
                                                    context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -918,7 +918,7 @@
                                     <!-- Record all events -->
                                     <xf:insert ev:event="#all"
                                                    context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('phase', event('xxf:phase')),
@@ -928,7 +928,7 @@
 
                                     <xf:insert ev:event="#all" ev:phase="capture"
                                                    context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('phase', event('xxf:phase')),
@@ -1477,7 +1477,7 @@
                                             <xbl:handler event="#all">
                                                 <xf:insert model="model"
                                                    context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('phase', event('xxf:phase')),
@@ -1701,7 +1701,7 @@
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
                                                 <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" context="xxf:instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('observer', event('xxf:observerid')),
                                                              xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
@@ -1731,7 +1731,7 @@
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
                                                 <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" context="xxf:instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('observer', event('xxf:observerid')),
                                                              xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
@@ -1761,7 +1761,7 @@
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
                                                 <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" context="xxf:instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('observer', event('xxf:observerid')),
                                                              xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
@@ -1794,7 +1794,7 @@
                                 <xf:group context="instance('main-instance')" id="main-group">
                                     <!-- TEST: Event listener -->
                                     <xf:insert if="not(event('xxf:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('observer', event('xxf:observerid')),
                                                              xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
@@ -2297,7 +2297,7 @@
                         </xf:instance>
 
                         <xf:insert ev:event="my-event-1 my-event-2" context="instance('events')" ref="*"
-                                       origin="xxf:element('event',
+                                       origin="xf:element('event',
                                                 (xxf:attribute('type', event('xxf:type')),
                                                  xxf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
@@ -2316,7 +2316,7 @@
                         <!-- Don't put an id on the action -->
                         <xf:action ev:event="xforms-enabled xforms-disabled">
                             <xf:insert context="instance('events')" ref="*"
-                                           origin="xxf:element('event',
+                                           origin="xf:element('event',
                                                     (xxf:attribute('type', event('xxf:type')),
                                                      xxf:attribute('target', event('xxf:targetid'))
                                                      ))"/>
@@ -2328,7 +2328,7 @@
                         <!-- Put an id on the action -->
                         <xf:action ev:event="xforms-enabled xforms-disabled" id="my-event">
                             <xf:insert context="instance('events')" ref="*"
-                                           origin="xxf:element('event',
+                                           origin="xf:element('event',
                                                     (xxf:attribute('type', event('xxf:type')),
                                                      xxf:attribute('target', event('xxf:targetid'))
                                                      ))"/>
@@ -4450,7 +4450,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <!-- Insert new bind -->
-                            <xf:insert ref="//xf:bind" origin="xxf:element('xf:bind', (xxf:attribute('id', 'bind2'), xxf:attribute('ref', 'value2')))"/>
+                            <xf:insert ref="//xf:bind" origin="xf:element('xf:bind', (xxf:attribute('id', 'bind2'), xxf:attribute('ref', 'value2')))"/>
                             <!-- Delete first bind -->
                             <xf:delete ref="//xf:bind[@id = 'bind1']"/>
                         </xf:action>
@@ -4549,7 +4549,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <!-- Insert new control into XBL content -->
-                            <xf:insert ref="//xf:input" origin="xxf:element('xf:input', (xxf:attribute('id', 'input2'), xxf:attribute('bind', 'bind2')))"/>
+                            <xf:insert ref="//xf:input" origin="xf:element('xf:input', (xxf:attribute('id', 'input2'), xxf:attribute('bind', 'bind2')))"/>
                         </xf:action>
 
                     </xf:model>
@@ -4721,7 +4721,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <!-- Insert new control into XBL content -->
-                            <xf:insert context="//fr:bar" origin="xxf:element('xf:output', (xxf:attribute('id', 'output2'), xxf:attribute('value', '''Hello!''')))"/>
+                            <xf:insert context="//fr:bar" origin="xf:element('xf:output', (xxf:attribute('id', 'output2'), xxf:attribute('value', '''Hello!''')))"/>
                         </xf:action>
 
                     </xf:model>

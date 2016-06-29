@@ -80,7 +80,7 @@
                     }&amp;form={
                         encode-for-uri(/request/form)
                     }">
-                <xf:insert event="xforms-submit-done" ref="/*" origin="xxf:element('forms', *)"/>
+                <xf:insert event="xforms-submit-done" ref="/*" origin="xf:element('forms', *)"/>
                 <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
             </xf:submission>
         </p:input>

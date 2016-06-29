@@ -57,12 +57,12 @@
                     <xf:action iterate="xxf:list-models()[. != xxf:absolute-id('inspector-model')]">
                         <xf:var name="current-model-id" value="." as="xs:string"/>
                         <xf:action context="instance('inspector-itemset')">
-                            <xf:insert context="." ref="model" origin="xxf:element('model', xxf:attribute('id', $current-model-id))"/>
+                            <xf:insert context="." ref="model" origin="xf:element('model', xxf:attribute('id', $current-model-id))"/>
                         </xf:action>
                         <xf:action iterate="xxf:list-instances($current-model-id)">
                             <xf:var name="current-instance-id" value="." as="xs:string"/>
                             <xf:action context="instance('inspector-itemset')/model[last()]">
-                                <xf:insert context="." ref="instance" origin="xxf:element('instance', xxf:attribute('id', $current-instance-id))"/>
+                                <xf:insert context="." ref="instance" origin="xf:element('instance', xxf:attribute('id', $current-instance-id))"/>
                             </xf:action>
                         </xf:action>
                     </xf:action>

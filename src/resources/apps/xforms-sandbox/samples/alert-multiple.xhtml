@@ -63,7 +63,7 @@
         <xh:ul>
             <xf:repeat ref="instance('instance')/*">
                 <xf:var name="invalid-binds" value="xxf:invalid-binds(.)"/>
-                <xf:repeat ref="for $bind-id in $invalid-binds return xxf:element('bind-id', $bind-id)">
+                <xf:repeat ref="for $bind-id in $invalid-binds return xf:element('bind-id', $bind-id)">
                     <xh:li>
                         <xf:output value="if ($invalid-binds = 'must-be-present') then 'Age missing'
                             else if ($invalid-binds = 'must-be-integer') then 'Age must be an integer'

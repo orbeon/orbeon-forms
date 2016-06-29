@@ -371,7 +371,7 @@
                                         <xf:action ev:event="xforms-enabled">
                                             <!-- Test use in actions -->
                                             <xf:insert context="instance('result')" ref="*"
-                                                           origin="xxf:element('repeat-current', (xxf:attribute('position', $position),
+                                                           origin="xf:element('repeat-current', (xxf:attribute('position', $position),
                                                                                                       xxf:attribute('repeat-current-1', xxf:repeat-current()),
                                                                                                       xxf:attribute('repeat-current-2', xxf:repeat-current('my-repeat')),
                                                                                                       xxf:attribute('repeat-index-1', xxf:index()),
@@ -1409,7 +1409,7 @@
                         </xf:instance>
 
                         <xf:insert ev:event="xforms-ready" ref="value" at="last()" position="before"
-                                       origin="xxf:element('value', 44)"/>
+                                       origin="xf:element('value', 44)"/>
 
                     </xf:model>
                 </xh:head>
@@ -1920,7 +1920,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:var name="new" value="xxf:create-document()"/>
-                            <xf:insert context="$new" origin="xxf:element('foo', (xxf:attribute('new-attr', 'bar'), 'baz'))"/>
+                            <xf:insert context="$new" origin="xf:element('foo', (xxf:attribute('new-attr', 'bar'), 'baz'))"/>
                             <xf:insert ref="instance()" origin="$new"/>
                         </xf:action>
 
@@ -1959,7 +1959,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:var name="new1" value="xxf:create-document()"/>
-                            <xf:insert context="$new1" origin="xxf:element('foo', (xxf:attribute('new-attr', 'bar'), 'baz'))"/>
+                            <xf:insert context="$new1" origin="xf:element('foo', (xxf:attribute('new-attr', 'bar'), 'baz'))"/>
                             <xf:var name="new2" value="xxf:create-document()"/>
                             <xf:insert ref="instance()" origin="$new2"/>
                         </xf:action>

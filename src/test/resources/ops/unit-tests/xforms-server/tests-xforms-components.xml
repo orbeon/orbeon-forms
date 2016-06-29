@@ -157,7 +157,7 @@
                         <xf:action ev:event="my-event" ev:target="group1">
                             <!-- TEST: Event listener -->
                             <xf:insert context="instance('events')" ref="*"
-                                           origin="xxf:element('event',
+                                           origin="xf:element('event',
                                                     (xxf:attribute('type', event('xxf:type')),
                                                      xxf:attribute('target', event('xxf:targetid')),
                                                      xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -173,7 +173,7 @@
                                 <xf:action ev:event="my-event" ev:target="group2">
                                     <!-- TEST: Event listener -->
                                     <xf:insert context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -190,7 +190,7 @@
                                 <xf:action ev:event="my-event" ev:target="group3">
                                     <!-- TEST: Event listener -->
                                     <xf:insert context="instance('events')" ref="*"
-                                                   origin="xxf:element('event',
+                                                   origin="xf:element('event',
                                                             (xxf:attribute('type', event('xxf:type')),
                                                              xxf:attribute('target', event('xxf:targetid')),
                                                              xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -206,7 +206,7 @@
                         <xf:action ev:event="my-event" ev:target="group4">
                             <!-- TEST: Event listener -->
                             <xf:insert context="instance('events')" ref="*"
-                                           origin="xxf:element('event',
+                                           origin="xf:element('event',
                                                     (xxf:attribute('type', event('xxf:type')),
                                                      xxf:attribute('target', event('xxf:targetid')),
                                                      xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
@@ -385,7 +385,7 @@
                             <xf:setindex repeat="repeat" index="2"/>
                             <xf:dispatch name="DOMFocusOut" targetid="note-control"/>
                             <!-- Insert new note #2 -->
-                            <xf:insert ref="note" at="1" position="after" origin="xxf:element('note')"/>
+                            <xf:insert ref="note" at="1" position="after" origin="xf:element('note')"/>
                         </xf:action>
 
                     </xf:model>

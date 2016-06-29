@@ -113,7 +113,7 @@
                             <xf:insert context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
                             <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xf:insert context="$new-permission" origin="xxf:element('role', replace($role, '%20', ' '))"/>
+                            <xf:insert context="$new-permission" origin="xf:element('role', replace($role, '%20', ' '))"/>
                             <xf:setvalue ref="$new-permission/operations" value="string-join($permissions/@operations, ' ')"/>
                         </xf:action>
                     </xf:action>
@@ -127,30 +127,30 @@
                     <!-- Reset permissions element -->
                     <xf:delete ref="$metadata/permissions"/>
                     <xf:action if="$ui/has-permissions = 'true'">
-                        <xf:insert context="$metadata" ref="*" origin="xxf:element('permissions')"/>
+                        <xf:insert context="$metadata" ref="*" origin="xf:element('permissions')"/>
 
                         <!-- In UI replace space in role by %20 -->
                         <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(xxf:trim(.), ' ', '%20')"/>
 
                         <!-- Add "anyone" permission -->
                         <xf:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>
-                        <xf:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', xxf:attribute('operations', $anyone-operations))"/>
+                        <xf:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xf:element('permission', xxf:attribute('operations', $anyone-operations))"/>
 
                         <!-- Add owner permission -->
                         <xf:var name="owner-operations" value="$ui/permissions/permission[@for = 'owner']/operations"/>
-                        <xf:insert if="$owner-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', (xxf:attribute('operations', $owner-operations), xxf:element('owner')))"/>
+                        <xf:insert if="$owner-operations != ''" context="$metadata/permissions" origin="xf:element('permission', (xxf:attribute('operations', $owner-operations), xf:element('owner')))"/>
                         <!-- Add group members permission -->
                         <xf:var name="group-members-operations" value="$ui/permissions/permission[@for = 'group-members']/operations"/>
-                        <xf:insert if="$group-members-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', (xxf:attribute('operations', $group-members-operations), xxf:element('group-member')))"/>
+                        <xf:insert if="$group-members-operations != ''" context="$metadata/permissions" origin="xf:element('permission', (xxf:attribute('operations', $group-members-operations), xf:element('group-member')))"/>
 
                         <!-- For each role-based permission, get the roles that can access it, and store in metadata as a separate permission element -->
                         <xf:var name="role-permissions" value="$ui/permissions/permission[exists(role)]"/>
                         <xf:action iterate="distinct-values($role-permissions/operations/xxf:split())">
                             <xf:var name="operation" value="."/>
                             <xf:var name="roles" value="string-join(saxon:sort($role-permissions[xxf:split(operations) = $operation]/role), ' ')"/>
-                            <xf:insert context="$metadata/permissions" ref="*" origin="xxf:element('permission', (
+                            <xf:insert context="$metadata/permissions" ref="*" origin="xf:element('permission', (
                                 xxf:attribute('operations', $operation),
-                                xxf:element('user-role', xxf:attribute('any-of', $roles))))"/>
+                                xf:element('user-role', xxf:attribute('any-of', $roles))))"/>
                         </xf:action>
 
                         <!-- Optional code to consolidate multiple permission for the same roles -->
@@ -159,9 +159,9 @@
                         <xf:delete ref="$metadata/permissions/permission[user-role]"/>
                         <xf:action iterate="1 to count($any-ofs)">
                             <xf:var name="i" value="position()"/>
-                            <xf:insert context="$metadata/permissions" ref="*" origin="xxf:element('permission', (
+                            <xf:insert context="$metadata/permissions" ref="*" origin="xf:element('permission', (
                                 xxf:attribute('operations', saxon:item-at($operations, $i)),
-                                xxf:element('user-role', xxf:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
+                                xf:element('user-role', xxf:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
                         </xf:action>
 
                         <!-- Log metadata permissions -->
@@ -272,7 +272,7 @@
                                         <xf:label><xh:i class="icon-plus-sign"/></xf:label>
                                         <xf:action event="DOMActivate">
                                             <xf:insert ref="$ui/permissions/permission" origin="instance('permission-template')"/>
-                                            <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:element('role')"/>
+                                            <xf:insert context="$ui/permissions/permission[last()]" origin="xf:element('role')"/>
                                         </xf:action>
                                     </xf:trigger>
                                 </xh:td>

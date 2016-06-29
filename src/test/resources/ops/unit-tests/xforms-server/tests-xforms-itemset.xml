@@ -1224,7 +1224,7 @@
                                         </fruits>
                                     </xf:instance>
 
-                                    <!--<xf:insert ev:event="xforms-ready" context="instance()" origin="xxf:element('value', 1)"/>-->
+                                    <!--<xf:insert ev:event="xforms-ready" context="instance()" origin="xf:element('value', 1)"/>-->
                                     <xf:setvalue ev:event="xforms-ready" ref="@show">true</xf:setvalue>
 
                                 </xf:model>

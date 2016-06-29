@@ -88,16 +88,16 @@
                             <xf:var name="offset-after-current-c" value="$current-c/@o + $current-c/@l"/>
                             <!-- If this is the first <c>, consider inserting a <t> before -->
                             <xf:action if="$position = 1">
-                                <xf:insert if="$current-c/@o > 0" ref="." position="before" origin="xxf:element('t', (xxf:attribute('o', '0'), xxf:attribute('l', $current-c/@o)))"/>
+                                <xf:insert if="$current-c/@o > 0" ref="." position="before" origin="xf:element('t', (xxf:attribute('o', '0'), xxf:attribute('l', $current-c/@o)))"/>
                             </xf:action>
                             <!-- If we are between two <c>, consider inserting a <t> in between -->
                             <xf:action if="exists($following-c)">
-                                <xf:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xxf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
+                                <xf:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
                             </xf:action>
                             <!-- If this is the last <c>, consider insert a <t> after -->
                             <xf:action if="empty($following-c)">
                                 <xf:var name="text-length" value="string-length(instance('fr-spell-checker-request')/text)"/>
-                                <xf:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xxf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $text-length - $offset-after-current-c)))"/>
+                                <xf:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $text-length - $offset-after-current-c)))"/>
                             </xf:action>
                         </xf:action>
                         <!-- Populate the original value of the words -->

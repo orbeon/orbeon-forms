@@ -97,7 +97,7 @@
                 <xsl:variable name="grid-rows"                select="($root/*:body, $root/self::*)[1]/*:tr"/>
 
                 <xsl:variable name="static-row-count"         select="count($grid-rows)"/>
-                <xsl:variable name="static-col-count"         select="count($grid-rows[1]/*:td)"/>
+                <xsl:variable name="static-col-count"         select="max(for $row in $grid-rows return count($row/*:td))"/>
                 <!-- Show LHH in header only if repeating over a row group containing only one row -->
                 <xsl:variable name="lhh-in-header"            select="$is-repeat and $static-row-count = 1"/>
 

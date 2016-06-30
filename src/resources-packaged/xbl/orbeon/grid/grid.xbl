@@ -116,8 +116,8 @@
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
 
 
-                <xsl:variable name="has-rowspan"              select="exists($root//@rowspan)"/>
-                <xsl:variable name="is-table"                 select="$is-repeat or $has-rowspan"/>
+                <xsl:variable name="has-rowspan-or-colspan"   select="exists($root//(@rowspan | @colspan))"/>
+                <xsl:variable name="is-table"                 select="$is-repeat or $has-rowspan-or-colspan or exists($root/(xf:group | xf:repeat))"/>
 
                 <xsl:variable name="table-elem"               select="if ($is-table) then 'xh:table' else 'xh:div'"/>
                 <xsl:variable name="thead-elem"               select="if ($is-table) then 'xh:thead' else 'xh:div'"/>
@@ -268,7 +268,7 @@
                                         )
                                     "/>
                                 <!-- This can possibly help accessibility -->
-                                <xsl:if test="$table-elem = 'xh:table' and $has-rowspan">
+                                <xsl:if test="$is-table">
                                     <xsl:attribute name="role" select="'presentation'"/>
                                 </xsl:if>
                                 <!-- If repeat, add buttons and headers-->

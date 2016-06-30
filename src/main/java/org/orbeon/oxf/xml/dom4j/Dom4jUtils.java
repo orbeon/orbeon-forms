@@ -14,10 +14,7 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.orbeon.dom.*;
-import org.orbeon.dom.io.DocumentSource;
-import org.orbeon.dom.io.OutputFormat;
-import org.orbeon.dom.io.SAXReader;
-import org.orbeon.dom.io.XMLWriter;
+import org.orbeon.dom.io.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;

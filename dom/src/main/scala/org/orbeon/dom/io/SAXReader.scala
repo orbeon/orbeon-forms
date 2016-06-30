@@ -3,18 +3,23 @@ package org.orbeon.dom.io
 import java.io._
 import java.net.URL
 
+import org.orbeon.dom.Document
 import org.orbeon.dom.io.SAXReader._
-import org.orbeon.dom.{Document, DocumentException}
 import org.xml.sax._
+
+class DocumentException(message: String, throwable: Throwable) extends Exception(message, throwable) {
+  def this(message: String)      = this(message, null)
+  def this(throwable: Throwable) = this(throwable.getMessage, throwable)
+}
 
 object SAXReader {
 
-  private val SAXStringInterning    = "http://xml.org/sax/features/string-interning"
-  private val SAXNamespacePrefixes  = "http://xml.org/sax/features/namespace-prefixes"
-  private val SAXNamespaces         = "http://xml.org/sax/features/namespaces"
-  private val SAXValidation         = "http://xml.org/sax/features/validation"
+  private val SAXStringInterning   = "http://xml.org/sax/features/string-interning"
+  private val SAXNamespacePrefixes = "http://xml.org/sax/features/namespace-prefixes"
+  private val SAXNamespaces        = "http://xml.org/sax/features/namespaces"
+  private val SAXValidation        = "http://xml.org/sax/features/validation"
 
-  private val SAXLexicalHandler     = "http://xml.org/sax/properties/lexical-handler"
+  private val SAXLexicalHandler    = "http://xml.org/sax/properties/lexical-handler"
 
   // Should element & attribute names and namespace URIs be interned
   val SAXStringInternEnabled = true

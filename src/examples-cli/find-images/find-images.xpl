@@ -13,18 +13,17 @@
 -->
 <!--
 
-  This example finds all the images in the OPS examples and outputs metadata about them.
+  This example finds all the images in the current directory and outputs metadata about them.
 
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Find all examples descriptors -->
     <p:processor name="oxf:directory-scanner">
         <p:input name="config">
             <config>
-                <base-directory>../../web/doc</base-directory>
+                <base-directory>.</base-directory>
                 <include>**/*.jpg</include>
                 <include>**/*.jpeg</include>
                 <include>**/*.gif</include>

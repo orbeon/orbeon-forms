@@ -38,6 +38,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.xml.sax.InputSource;
 
 import javax.naming.Context;
@@ -159,7 +160,7 @@ public class OPS {
 
     private static Document parseText(String text) throws DocumentException {
 
-        final SAXReader reader = new SAXReader();
+        final SAXReader reader = new SAXReader(XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN));
         final String encoding = getEncoding(text);
 
         InputSource source = new InputSource(new StringReader(text));

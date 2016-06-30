@@ -17,16 +17,17 @@
 <%@ page import="org.orbeon.dom.Element"%>
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.net.URLEncoder"%>
+<%@ page import="org.orbeon.oxf.xml.XMLParsing" %>
 <%
     response.setContentType("application/xml");
-    SAXReader xmlReader = new SAXReader();
+    final SAXReader xmlReader = new SAXReader(XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN));
 
     // Build URL for query to Flickr
     String flickrURL = "https://www.flickr.com/services/rest/?method=";
     if ("POST".equals(request.getMethod())) {
         // We got a query string
-        Document queryDocument = xmlReader.read(request.getInputStream());
-        String query = queryDocument.getRootElement().getStringValue();
+        final Document queryDocument = xmlReader.read(request.getInputStream());
+        final String query = queryDocument.getRootElement().getStringValue();
         flickrURL = "https://www.flickr.com/services/rest/?method=flickr.photos.search&text=" + URLEncoder.encode(query, "UTF-8");
     } else {
         // No query, return interesting photos

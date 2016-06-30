@@ -49,8 +49,6 @@ private class SAXEntityResolver(uriPrefix: String) extends EntityResolver {
  */
 class SAXReader(xmlReader: XMLReader) {
 
-  def this() = this(null)
-
   def read(url: URL)         : Document = read(new InputSource(url.toExternalForm))
   def read(systemId: String) : Document = read(new InputSource(systemId))
   def read(in: InputStream)  : Document = read(new InputSource(in))

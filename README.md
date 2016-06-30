@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 2016.2 June 2016
+Last updated for Orbeon Forms 2016.2 July 2016
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -191,11 +191,11 @@ locations:
     jar:orbeon-resources-private.jar!/ops/xforms/schema/*.rn[c|g]
 
 This product makes use of the Silk Icons, released under a Creative Commons
-Attribution 2.5 License: http://www.famfamfam.com/lab/icons/silk/
+Attribution 2.5 License (<http://www.famfamfam.com/lab/icons/silk/>).
 
-This product makes use of the PixelMixer icons at http://www.iconarchive.com/artist/pixelmixer.html
+This product makes use of the PixelMixer icons (<http://www.iconarchive.com/artist/pixelmixer.html>).
 
-Please consult the third-party-licenses directory for more information
+Please consult the `third-party-licenses` directory for more information
 about individual licenses.
 
 Credits

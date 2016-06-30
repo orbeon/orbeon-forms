@@ -31,7 +31,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'filesystem resource manager (development mode)'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <xsl:comment>Filesystem resource managers</xsl:comment>
                     <context-param>
@@ -87,7 +87,7 @@
                 <param-name>oxf.run-mode</param-name>
                 <param-value>
                     <xsl:choose>
-                        <xsl:when test="$target = 'devel'">dev</xsl:when>
+                        <xsl:when test="$target = 'dev'">dev</xsl:when>
                         <xsl:otherwise>prod</xsl:otherwise>
                     </xsl:choose>
                 </param-value>
@@ -108,7 +108,7 @@
             <xsl:comment>Set context listener processors</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'context listener processors'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <context-param>
                         <param-name>oxf.context-initialized-processor.name</param-name>
@@ -132,7 +132,7 @@
             <xsl:comment>Set session listener processors</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'session listener processors'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <context-param>
                         <param-name>oxf.session-created-processor.name</param-name>
@@ -286,7 +286,7 @@
                 <xsl:comment>Set servlet initialization and destruction listeners</xsl:comment>
                 <xsl:call-template name="comment">
                     <xsl:with-param name="caption" select="'servlet listener processors'"/>
-                    <xsl:with-param name="commented" select="$target != 'devel'"/>
+                    <xsl:with-param name="commented" select="$target != 'dev'"/>
                     <xsl:with-param name="content">
                         <init-param>
                             <param-name>oxf.servlet-initialized-processor.name</param-name>
@@ -339,7 +339,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <servlet>
                         <servlet-name>exist-xmlrpc-servlet</servlet-name>
@@ -367,7 +367,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist WebDAV support'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <servlet>
                         <servlet-name>exist-webdav-servlet</servlet-name>
@@ -397,7 +397,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
                         <servlet-name>exist-xmlrpc-servlet</servlet-name>
@@ -408,7 +408,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist WebDAV support'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
                         <servlet-name>exist-webdav-servlet</servlet-name>
@@ -424,7 +424,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'relational persistence, and change oracle if necessary'"/>
-                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="commented" select="$target != 'dev'"/>
                 <xsl:with-param name="content">
                     <resource-ref>
                         <description>DataSource</description>

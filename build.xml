@@ -465,7 +465,7 @@
         <jar destfile="${cli.jar.file}" compress="false">
           <manifest>
             <attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>
-            <attribute name="Class-Path" value="lib/orbeon.jar lib/orbeon-xforms-filter.jar lib/orbeon-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>
+            <attribute name="Class-Path" value="lib/orbeon-core.jar lib/orbeon-dom.jar lib/orbeon-common.jar lib/orbeon-xforms-filter.jar lib/orbeon-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>
           </manifest>
         </jar>
 

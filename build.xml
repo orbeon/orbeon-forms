@@ -1003,6 +1003,10 @@
                         <pathelement location="lib/servlet-2_3-4_0_4.jar"/>
                         <pathelement location="lib/portlet-api_2.0.jar"/>
                         <pathelement location="lib/liferay-portal-service-6.1.1.jar"/>
+                        <pathelement location="${oracle.jar}"/>
+                        <pathelement location="${mysql.jar}"/>
+                        <pathelement location="${sqlserver.jar}"/>
+                        <pathelement location="${postgresql.jar}"/>
                     </classpath>
                     <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
                 </junit>

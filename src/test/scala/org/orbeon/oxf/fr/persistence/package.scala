@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider._
 
 package object persistence {
 
-  val ProvidersTestedAutomatically: List[Provider] = List(MySQL, PostgreSQL)
+//  val ProvidersTestedAutomatically: List[Provider] = List(MySQL, PostgreSQL)
+  val ProvidersTestedAutomatically: List[Provider] = List(MySQL)
 
 }

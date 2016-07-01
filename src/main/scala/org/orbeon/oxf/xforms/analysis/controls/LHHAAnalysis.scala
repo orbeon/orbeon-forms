@@ -210,9 +210,9 @@ object LHHAAnalysis {
   def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String) =
     elementAnalysis match {
       case lhhaTrait: StaticLHHASupport ⇒
-        val hintOpt = lhhaTrait.lhh(lhhaType)
-        (hintOpt exists (_.hasLocalMinimalAppearance)) || (
-          ! (hintOpt exists (_.hasLocalFullAppearance)) &&
+        val labelOrHintOpt = lhhaTrait.lhh(lhhaType)
+        (labelOrHintOpt exists (_.hasLocalMinimalAppearance)) || (
+          ! (labelOrHintOpt exists (_.hasLocalFullAppearance)) &&
           stringToSet(
             elementAnalysis.part.staticState.staticStringProperty(
               if (lhhaType == "hint") HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY

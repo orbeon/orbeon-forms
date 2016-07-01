@@ -342,6 +342,7 @@
             <xsl:copy-of select="@xxf:xpath-analysis"/>
             <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests, import, validate -->
             <xsl:copy-of select="@xxf:encrypt-item-values"/>
+            <xsl:copy-of select="@xxf:label.appearance"/>
             <xsl:copy-of select="@xxf:hint.appearance"/>
 
             <!-- Parameters passed to this page -->

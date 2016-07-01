@@ -307,7 +307,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     Connect.withOrbeonTables("large XML documents") { (connection, provider) ⇒
       for ((size, position) ← Seq(1024, 1024*1024).zipWithIndex) {
         val string = new Array[Char](size)
-        for (i ← 0 to size - 1) string(i) = Random.nextPrintableChar()
+        for (i ← 0 until size) string(i) = Random.nextPrintableChar()
         val text = DocumentFactory.createText(new String(string))
         val element = DocumentFactory.createElement("gaga") |!> (_.add(text))
         val document = DocumentFactory.createDocument |!> (_.add(element)) |> HttpRequest.XML

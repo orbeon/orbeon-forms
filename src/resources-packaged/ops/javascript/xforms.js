@@ -959,11 +959,15 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (element.name) {
                     var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
                     if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
-                            && ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                            && _.isNumber(ORBEON.xforms.Globals.isRenderingEngineTrident)
+                            && ORBEON.xforms.Globals.isRenderingEngineTrident < 9) {
+                        //
+                        // The following is for IE8 and below only.
+                        //
                         // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
                         // cause the name in the programming model to change in the collection of elements". This has a implication
                         // for radio buttons where using a same name for a set of radio buttons is used to group them together.
-                        // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
+                        // https://msdn.microsoft.com/en-us/library/ms534184(v=vs.85).aspx
 
                         // NOTE: Here we only fix the case of radio button groups. However, the name attribute issue is present
                         // for other controls as well. With IE versions (including IE 8 in quirks mode) that exhibit this bug,
@@ -979,11 +983,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         // That's because IE mixes up the element id and the name, AND the name "my-input" incorrectly points to
                         // the cloned element.
                         //
-                        // This seems fixed in IE 8 and up in standards mode.
-                        //
                         // If we wanted to fix this, we could run the code below also for <textarea> and for all <input>, not
-                        // only those with type="radio". We should also try to detect the issue so that we do not run this for IE
-                        // 8 in standards mode.
+                        // only those with type="radio".
                         var clone = document.createElement("<" + element.tagName + " name='" + newName + "' type='" + element.type + "'>");
                         for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
                             var attribute = element.attributes[attributeIndex];

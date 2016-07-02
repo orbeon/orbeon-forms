@@ -59,8 +59,10 @@
   list-style-type: none;
   padding-right: 0;
 }
-.orbeon .xbl-fr-wizard .fr-wizard-separate-toc li > .xforms-trigger {
+.orbeon .xbl-fr-wizard .fr-wizard-separate-toc .fr-toc-edit {
+  display: inline-block;
   float: right;
+  text-decoration: underline;
 }
 .orbeon .xbl-fr-wizard .fr-wizard-body {
   border-left: 1px solid #e3e3e3;

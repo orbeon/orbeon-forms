@@ -12,6 +12,7 @@ public class XMLUtils {
     public static String unescapeXMLMinimal(String str) {
         str = StringUtils.replace(str, "&amp;", "&");
         str = StringUtils.replace(str, "&lt;", "<");
+        str = StringUtils.replace(str, "&gt;", ">");
         return str;
     }
 
@@ -119,6 +120,7 @@ public class XMLUtils {
     public static String escapeXMLMinimal(String str) {
         str = StringUtils.replace(str, "&", "&amp;");
         str = StringUtils.replace(str, "<", "&lt;");
+        str = StringUtils.replace(str, ">", "&gt;"); // do this one too because the sequence `]]>` is not allowed
         return str;
     }
 

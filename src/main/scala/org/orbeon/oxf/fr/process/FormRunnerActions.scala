@@ -55,7 +55,7 @@ trait FormRunnerActions {
   )
 
   private val SupportedRenderFormatsMediatypes = List("pdf" → "application/pdf", "tiff" → "image/tiff").toMap
-  private val SupportedRenderFormats = SupportedRenderFormatsMediatypes map (_._1) toSet
+  private val SupportedRenderFormats = SupportedRenderFormatsMediatypes.keySet
 
   // Check whether there are pending uploads
   def tryPendingUploads(params: ActionParams): Try[Any] =

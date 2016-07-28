@@ -171,7 +171,7 @@ trait CreateUpdateDelete
 
     // Create Row object with first row of result
     if (resultSet.next()) {
-      val row = new Row(resultSet.getTimestamp("created"),
+      val row = Row(resultSet.getTimestamp("created"),
                 if (req.forData) Option(resultSet.getString("username" )) else None,
                 if (req.forData) Option(resultSet.getString("groupname")) else None,
                 if (req.forData) Option(resultSet.getInt("form_version")) else None)

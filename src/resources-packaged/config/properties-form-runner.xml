@@ -112,8 +112,30 @@
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.submit.*.*"                 value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
 
+    <!-- Buttons visible / enabled -->
     <property as="xs:string"  name="oxf.fr.detail.button.refresh.visible.*.*">
         fr:is-noscript()
+    </property>
+
+    <!-- Wizard buttons visible / enabled -->
+    <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.visible.*.*">
+        fr:is-wizard-body-shown()
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.enabled.*.*">
+        not(fr:is-wizard-first-page())
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.wizard-next.visible.*.*">
+        fr:is-wizard-body-shown()
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.wizard-next.enabled.*.*">
+        not(fr:is-wizard-last-page())
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.button.wizard-toc.visible.*.*">
+        fr:is-wizard-body-shown()
     </property>
 
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->

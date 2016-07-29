@@ -713,14 +713,6 @@
                                                 ]
                                             else if ($is-inner and $button-name = ('save-final', 'submit', 'send', 'review', 'pdf', 'tiff', 'email')) then
                                                 xxf:binding('fr-wizard-submit-hide')
-                                            else if ($is-inner and $button-name = 'wizard-next') then
-                                                xxf:binding('fr-wizard-next-hide')
-                                            else if ($is-inner and $button-name = 'wizard-prev') then
-                                                xxf:binding('fr-wizard-prev-hide')
-                                            else if ($button-name = 'wizard-prev') then
-                                                xxf:binding('fr-wizard-prev')
-                                            else if ($button-name = 'wizard-next') then
-                                                xxf:binding('fr-wizard-next')
                                             else
                                                 xxf:instance('fr-triggers-instance')/*[name() = (
                                                     if ($button-name = 'summary') then

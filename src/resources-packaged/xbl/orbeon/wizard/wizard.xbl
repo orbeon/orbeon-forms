@@ -391,20 +391,22 @@
                                         ]"/>
 
                                 <xf:var
+                                    id="fr-wizard-is-first-nav"
+                                    name="is-first-nav"
+                                    value="empty($prev-nav-case-ids)"/>
+
+                                <xf:var
+                                    id="fr-wizard-is-last-nav"
                                     name="is-last-nav"
                                     value="empty($next-nav-case-ids)"/>
 
-                                <xf:var
-                                    name="is-last-page"
-                                    value="empty($next-top-level-case-ids)"/>
-
-                                <xf:var name="prev-button-ref" value="if (exists($prev-nav-case-ids)) then xxf:instance('local')/readwrite else ''"/>
-                                <xf:var name="next-button-ref" value="if (not($is-last-nav))          then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
+                                <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
 
                                 <!-- This ids are used to expose visibility to buttons outside the wizard -->
-                                <xf:group id="fr-wizard-prev-hide"   ref="$prev-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
-                                <xf:group id="fr-wizard-next-hide"   ref="$next-button-ref[not($validated-mode) or not(xxf:readonly())]"/>
-                                <xf:group id="fr-wizard-submit-hide" ref="xxf:instance('local')/readwrite[not($validated-mode) or $is-last-page]"/>
+                                <xf:group
+                                    id="fr-wizard-submit-hide"
+                                    ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
 
                                 <xh:ul class="nav nav-list">
                                     <xsl:apply-templates mode="toc-sections"/>

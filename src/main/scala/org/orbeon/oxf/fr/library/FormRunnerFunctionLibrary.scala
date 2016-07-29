@@ -90,7 +90,9 @@ private object FormRunnerFunctions {
     "is-form-data-valid"               → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
     "is-form-data-saved"               → (() ⇒ FormRunner.isFormDataSaved),
     "is-wizard-toc-shown"              → (() ⇒ FormRunner.isWizardTocShown),
-    "is-wizard-body-shown"             → (() ⇒ FormRunner.isWizardBodyShown)
+    "is-wizard-body-shown"             → (() ⇒ FormRunner.isWizardBodyShown),
+    "is-wizard-first-page"             → (() ⇒ FormRunner.isWizardFirstPage),
+    "is-wizard-last-page"              → (() ⇒ FormRunner.isWizardLastPage)
   )
 
   val IntGettersByName = List(

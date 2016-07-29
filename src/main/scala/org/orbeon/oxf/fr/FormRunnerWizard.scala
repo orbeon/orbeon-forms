@@ -15,6 +15,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
+import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.value.{BooleanValue, EmptySequence, Value}
 import org.orbeon.scaxon.XML._
 
 trait FormRunnerWizard extends FormRunnerBaseOps {
@@ -37,4 +40,18 @@ trait FormRunnerWizard extends FormRunnerBaseOps {
 
   def isWizardBodyShown =
     findWizardState map (_ elemValue "show-body") contains "true"
+
+  private def findWizardVariableValue(staticOrAbsoluteId: String) =
+    XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
+
+  private def booleanValue(value: ValueRepresentation) = value match {
+    case v: Value    ⇒ v.effectiveBooleanValue
+    case _           ⇒ false
+  }
+
+  def isWizardLastPage =
+    findWizardVariableValue("fr-wizard-is-last-nav") exists booleanValue
+
+  def isWizardFirstPage =
+    findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
 }

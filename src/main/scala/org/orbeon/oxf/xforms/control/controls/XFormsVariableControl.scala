@@ -50,7 +50,7 @@ class XFormsVariableControl(
   // Previous value for refresh
   private var _previousValue: ValueRepresentation = null
 
-  final def getValue = _value
+  final def valueOpt = Option(_value)
   def getVariableName = variable.staticVariable.name
 
   override def bindingContextForFollowing = _bindingContextForFollowing

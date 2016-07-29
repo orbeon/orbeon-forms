@@ -27,7 +27,7 @@ trait ControlBindingSupport {
   final def bindingContext = _bindingContext
 
   // The control's binding, by default none
-  def binding: Seq[Item] = Seq()
+  def binding: Seq[Item] = Nil
 
   // Find the control's binding context
   final def contextForBinding: Option[Item] =

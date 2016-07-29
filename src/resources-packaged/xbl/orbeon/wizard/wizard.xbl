@@ -92,19 +92,26 @@
                     as="xs:string"/>
 
                 <xsl:variable
-                    name="static-nav-sections"
+                    name="static-nav-sections-or-grids"
                     select="
                         if ($static-subsections-nav) then
-                            /*//fr:section[
-                                (
-                                    (: Top-level section without subsections :)
-                                    count(ancestor::fr:section) = 0 and
-                                    empty(fr:section)
-                                ) or (
-                                    (: Subsection :)
-                                    count(ancestor::fr:section) = 1
-                                )
-                            ]
+                            /*//(
+                                fr:section[
+                                    (
+                                        (: Top-level section without subsections :)
+                                        count(ancestor::fr:section) = 0 and
+                                        empty(fr:section)
+                                    ) or (
+                                        (: Subsection :)
+                                        count(ancestor::fr:section) = 1
+                                    )
+                                ],
+                                (: Grid within a top-level section which also contains subsections :)
+                                fr:grid[
+                                    count(ancestor::fr:section) = 1 and
+                                    exists((preceding-sibling::fr:section | following-sibling::fr:section))
+                                ]
+                            )
                         else
                             (: Top-level sections :)
                             /*/fr:section
@@ -114,14 +121,14 @@
                     name="static-matching-top-level-section-ids"
                     select="
                         (
-                            for $s in $static-nav-sections
+                            for $s in $static-nav-sections-or-grids
                             return $s/ancestor-or-self::fr:section[last()]
                         )/@id
                 "/>
 
                 <xsl:variable
-                    name="static-nav-section-ids"
-                    select="$static-nav-sections/@id/string()"/>
+                    name="static-nav-section-or-grid-ids"
+                    select="$static-nav-sections-or-grids/((@id/string(), concat(generate-id(), '-wizard-grid'))[1])"/>
 
                 <xsl:variable
                     name="static-top-level-section-ids"
@@ -203,9 +210,10 @@
 
                                                         <!-- Subsections -->
                                                         <xf:switch id="{$static-section-id}-switch" xxf:element="div">
-                                                            <xsl:for-each select="fr:section">
-                                                                <xsl:variable name="static-subsection-id" select="@id"/>
-                                                                <xf:case id="{$static-subsection-id}-case">
+                                                            <xsl:for-each select="fr:section | fr:grid">
+                                                                <!-- fr:grid might not have an id, and we need one to toggle -->
+                                                                <xsl:variable name="section-or-grid-id" select="(@id, concat(generate-id(), '-wizard-grid'))[1]"/>
+                                                                <xf:case id="{$section-or-grid-id}-case">
                                                                     <xxf:setvisited
                                                                         event="xforms-deselect"
                                                                         target="#observer"
@@ -217,7 +225,12 @@
                                                                     </xf:action>
                                                                     <xf:group appearance="xxf:internal">
                                                                         <xsl:copy>
-                                                                            <xsl:attribute name="collapse">false</xsl:attribute>
+                                                                            <xsl:if test="self::fr:section">
+                                                                                <xsl:attribute name="collapse">false</xsl:attribute>
+                                                                            </xsl:if>
+                                                                            <xsl:if test="not(@id)">
+                                                                                <xsl:attribute name="id" select="$section-or-grid-id"/>
+                                                                            </xsl:if>
                                                                             <xsl:apply-templates select="@* except (@collapse | @open) | node()"/>
                                                                         </xsl:copy>
                                                                     </xf:group>
@@ -252,10 +265,10 @@
 
                             <xf:group appearance="xxf:internal" xxbl:scope="outer">
 
-                                <!-- Statically-known section ids -->
+                                <!-- Statically-known section and grid ids -->
                                 <xf:var
-                                    name="nav-section-ids"
-                                    value="{string-join(for $id in $static-nav-section-ids return concat('''', $id, ''''), ',')}"/>
+                                    name="nav-section-or-grid-ids"
+                                    value="{string-join(for $id in $static-nav-section-or-grid-ids return concat('''', $id, ''''), ',')}"/>
 
                                 <xf:var
                                     name="nav-matching-top-level-section-ids"
@@ -274,11 +287,9 @@
                                     value="xxf:instance('local')/separate-toc/data(.)"/>
 
                                 <xf:var
-                                    name="relevant-nav-section-ids"
+                                    name="relevant-nav-section-or-grid-ids"
                                     value="
-                                        $nav-section-ids[
-                                            exists(xxf:binding(.)) and xxf:relevant(xxf:binding(.))
-                                        ]"/>
+                                        $nav-section-or-grid-ids[xxf:is-control-relevant(.)]"/>
 
                                 <xf:var
                                     name="relevant-top-level-section-ids"
@@ -290,7 +301,7 @@
                                 <xf:var
                                     name="relevant-nav-case-ids"
                                     value="
-                                        for $section-id in $relevant-nav-section-ids
+                                        for $section-id in $relevant-nav-section-or-grid-ids
                                         return concat($section-id, '-case')"/>
 
                                 <xf:var
@@ -387,7 +398,7 @@
                                         $allow-next-top-level or
                                         replace($current-top-level-case-id, '-case$', '') =
                                         $nav-matching-top-level-section-ids[
-                                            index-of($nav-section-ids, replace($next-nav-case-ids[1], '-case$', ''))
+                                            index-of($nav-section-or-grid-ids, replace($next-nav-case-ids[1], '-case$', ''))
                                         ]"/>
 
                                 <xf:var
@@ -623,12 +634,14 @@
                                             if ($static-subsections-nav) then
                                                 (
                                                     if ($static-is-top-level-section) then
-                                                        (: Current section is a top-level section. Try first subsection if any, otherwise top-level section. :)
-                                                        ($static-current-section/fr:section[1], $static-current-section)[1]
+                                                        (: Current section is a top-level section. Try first subsection or grid if any, otherwise the top-level
+                                                           section itself, which means that there are no subsections or grids. :)
+                                                        ($static-current-section[exists(fr:section)]/(fr:section | fr:grid)[1], $static-current-section)[1]
                                                     else
-                                                        (: Current section is a subsection. Take first subsection. :)
+                                                        (: Current section is a subsection. Take first subsection from the top, as only two levels of
+                                                           section navigation are supported. :)
                                                         ($static-current-section/ancestor-or-self::fr:section)[2]
-                                                )/@id
+                                                )/(@id, concat(generate-id(), '-wizard-grid'))[1]
                                             else
                                                 $static-top-level-section-id
                                     "/>

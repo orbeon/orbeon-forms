@@ -111,7 +111,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       this._boundItem = bc.getSingleItem
 
     // Get MIPs
-    getBoundItem match {
+    this._boundItem match {
       case nodeInfo: NodeInfo ⇒
         // Control is bound to a node - get model item properties
         this._readonly  = InstanceData.getInheritedReadonly(nodeInfo)

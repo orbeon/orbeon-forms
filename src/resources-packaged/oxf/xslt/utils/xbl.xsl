@@ -49,7 +49,7 @@
                     <xxf:value xxbl:attr="{$prefix}:{$property}/(@model | @context | @ref | @bind)" value="." xxbl:scope="outer"/>
                 </xf:var>
                 <xsl:if test="not($server-only)">
-                    <xf:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
+                    <xf:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property} xforms-hidden">
                         <xf:action type="javascript" event="xforms-value-changed">
                             <xsl:text>ORBEON.xforms.XBL.callValueChanged("</xsl:text>
                             <xsl:value-of select="$prefix"/>
@@ -68,7 +68,7 @@
                 <xf:var name="{$property}-orbeon-xbl" xbl:attr="xbl:text={$property}">&#xb7;</xf:var>
                 <xf:var name="{$property}" value="if (${$property}-orbeon-xbl != '&#xb7;') then ${$property}-orbeon-xbl else xxf:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
                 <xsl:if test="not($server-only)">
-                    <xf:output class="xbl-{$prefix}-{$component}-{$property}" style="display: none" value="${$property}"/>
+                    <xf:output class="xbl-{$prefix}-{$component}-{$property} xforms-hidden" value="${$property}"/>
                 </xsl:if>
             </xsl:otherwise>
         </xsl:choose>

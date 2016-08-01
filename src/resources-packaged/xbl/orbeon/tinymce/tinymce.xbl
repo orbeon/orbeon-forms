@@ -122,9 +122,8 @@
                  -->
                 <xh:a
                     f:url-type="resource"
-                    style="display: none"
                     href="/xbl/orbeon/tinymce/jscripts/tiny_mce1b713b2e6d7fd45753f4b8a6270b776e.js"
-                    class="tinymce-base-url"/>
+                    class="tinymce-base-url xforms-hidden"/>
 
                 <!--
                     div to be converted into a TinyMCE Editor instance.

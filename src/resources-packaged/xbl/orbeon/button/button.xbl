@@ -53,7 +53,7 @@
                         <!-- Store @tabindex into hidden span -->
                         <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
                         <xsl:if test="/fr:button/@tabindex">
-                            <xh:span class="fr-button-tabindex" style="display: none">
+                            <xh:span class="fr-button-tabindex xforms-hidden">
                                 <xsl:value-of select="/fr:button/@tabindex"/>
                             </xh:span>
                         </xsl:if>

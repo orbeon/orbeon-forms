@@ -81,12 +81,12 @@
 
                 <!-- Evaluate other @*-ref attributes in same context as @ref -->
                 <!-- XForms controls to expose XForms values to JavaScript -->
-                <xf:output class="fb-map-address" xbl:attr="context model ref=address-ref bind=address-bind" style="display: none">
+                <xf:output class="fb-map-address xforms-hidden" xbl:attr="context model ref=address-ref bind=address-bind">
                     <!-- React to change of address -->
                     <xf:action type="javascript" id="xf-vc" ev:event="xforms-value-changed">YAHOO.xbl.fr.Map.instance(this).updateMarkerFromAddress();</xf:action>
                 </xf:output>
-                <xf:input class="fb-map-longitude" xbl:attr="context model ref=longitude-ref bind=longitude-bind" style="display: none"/>
-                <xf:input class="fb-map-latitude" xbl:attr="context model ref=latitude-ref bind=latitude-bind" style="display: none"/>
+                <xf:input class="fb-map-longitude xforms-hidden" xbl:attr="context model ref=longitude-ref bind=longitude-bind"/>
+                <xf:input class="fb-map-latitude xforms-hidden"  xbl:attr="context model ref=latitude-ref bind=latitude-bind"/>
             </xf:group>
             <!-- Load script depending on configuration properties -->
             <xh:script src="https://maps.googleapis.com/maps/api/js?key={xxf:property('oxf.xforms.xbl.fr.map.key')}"

@@ -82,7 +82,7 @@
                         <xf:action type="javascript" id="xf-tg" ev:event="fr-accordion-toggle fr-toggle fr-show fr-hide">YAHOO.xbl.fr.Accordion.instance(this).toggle(event.target);</xf:action>
 
                         <!-- Dummy controls so JavaScript can access the local instance -->
-                        <xf:output model="accordion-model" value="operation" class="xbl-fr-accordion-operation" style="display: none"/>
+                        <xf:output model="accordion-model" value="operation" class="xbl-fr-accordion-operation xforms-hidden"/>
 
                         <!-- Markup for the accordion -->
                         <xh:dl id="dl" class="xbl-fr-accordion-dl">

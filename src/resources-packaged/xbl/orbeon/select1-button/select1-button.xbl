@@ -59,7 +59,7 @@
                             </xf:action>
 
                             <!-- XForms select1 used as a datasource -->
-                            <xf:select1 ref="$external-value" class="fr-select1-button-select1" id="hidden-select" style="display: none">
+                            <xf:select1 ref="$external-value" class="fr-select1-button-select1 xforms-hidden" id="hidden-select">
                                 <xf:action type="javascript" if="not($readonly)" ev:event="xforms-enabled xxforms-iteration-moved" id="enabled">YAHOO.xbl.fr.Select1Button.instance(this).enabled();</xf:action>
                                 <xf:action type="javascript" if="not($readonly)" ev:event="xforms-value-changed" id="value-changed" >YAHOO.xbl.fr.Select1Button.instance(this).valueChanged();</xf:action>
                                 <xf:action type="javascript" if="not($readonly)" ev:event="xforms-readonly" id="readonly">YAHOO.xbl.fr.Select1Button.instance(this).readonly();</xf:action>
@@ -77,7 +77,7 @@
                                 <xh:input type="button" id="button" value="" class="fr-select1-button-button"/>
 
                                 <!-- Tell user of this component a value was selected -->
-                                <xf:trigger class="fr-select1-button-xforms-select" style="display: none">
+                                <xf:trigger class="fr-select1-button-xforms-select xforms-hidden">
                                     <xf:label/>
                                     <xf:dispatch ev:event="DOMActivate" name="xforms-select" targetid="fr-select1-button"/>
                                 </xf:trigger>

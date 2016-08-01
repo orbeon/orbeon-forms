@@ -112,8 +112,8 @@
 
                         <!-- Provides access the reCAPTCHA challenge/response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
-                        <xf:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
-                        <xf:input ref="response"  class="xbl-fr-recaptcha-response"  style="display: none"/>
+                        <xf:input ref="challenge" class="xbl-fr-recaptcha-challenge xforms-hidden"/>
+                        <xf:input ref="response"  class="xbl-fr-recaptcha-response xforms-hidden"/>
 
                         <!-- Div in which the reCAPTCHA is rendered-->
                         <xh:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>

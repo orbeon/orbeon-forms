@@ -46,7 +46,7 @@
                             <!-- Div in which the chart is rendered -->
                             <xh:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xh:div>
                             <!-- XML -->
-                            <xf:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml">
+                            <xf:output value="saxon:serialize($result, 'xml')" class="xbl-fr-fusion-charts-xml xforms-hidden">
                                 <xf:action type="javascript" id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xf:action>
                             </xf:output>
                             <!-- Access to parameters -->
@@ -55,7 +55,7 @@
                             <xsl:copy-of select="xxbl:parameter(., 'width')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'height')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'chart-id')"/>
-                            <xh:a f:url-type="resource" style="display: none" href="/dummy.js" class="fusion-charts-base-url"/>
+                            <xh:a f:url-type="resource" href="/dummy.js" class="fusion-charts-base-url xforms-hidden"/>
                         </xf:group>
                     </xf:group>
                 </xsl:template>

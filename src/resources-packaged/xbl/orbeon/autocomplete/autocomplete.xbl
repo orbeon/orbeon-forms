@@ -335,11 +335,11 @@
                         </xh:div>
 
                         <!-- Configuration -->
-                        <xf:output id="itemset" class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
+                        <xf:output id="itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden" value="$dynamic-itemset"/>
                         <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
 
                         <!-- Dropdown with value shown by autocomplete -->
-                        <xf:select1 id="select1" ref="$binding" class="fr-autocomplete-select1" appearance="minimal" xxf:encrypt-item-values="false" style="display: none">
+                        <xf:select1 id="select1" ref="$binding" class="fr-autocomplete-select1 xforms-hidden" appearance="minimal" xxf:encrypt-item-values="false">
                             <!-- The hidden dropdown contains first all the label/label, then all the value/value -->
                             <xsl:apply-templates select="xf:itemset | xf:item" mode="copy-label">
                                 <xsl:with-param name="resource-instance" tunnel="yes">suggestions-instance</xsl:with-param>
@@ -350,7 +350,7 @@
                         </xf:select1>
 
                         <!-- Input with external value -->
-                        <xf:input id="external-value" ref="$binding" class="fr-autocomplete-external-value" style="display: none"/>
+                        <xf:input id="external-value" ref="$binding" class="fr-autocomplete-external-value xforms-hidden"/>
                     </xf:group>
                 </xsl:template>
 

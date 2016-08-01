@@ -177,7 +177,7 @@
                     class="xforms-hidden"/>
 
             <!-- Expose document id to JavaScript -->
-            <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" style="display: none"/>
+            <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" class="xforms-hidden"/>
 
             <!-- When the mode changes to "edit" after a save from /new, attempt to change the URL -->
             <xf:var name="mode-for-save" value="fr:mode()">

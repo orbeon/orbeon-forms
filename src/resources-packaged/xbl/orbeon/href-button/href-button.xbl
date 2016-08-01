@@ -28,7 +28,7 @@
         <xbl:template xxbl:transform="oxf:xslt">
             <xf:group xsl:version="2.0">
                 <!-- Create the link so that the URL gets rewritten -->
-                <xh:a style="display:none" class="fr-href-button-anchor" target="_blank"
+                <xh:a class="fr-href-button-anchor xforms-hidden" target="_blank"
                          xbl:attr="href" f:url-type="resource" xxbl:scope="outer"/>
 
                 <!-- In script mode, intercept client-side click and open window directly -->

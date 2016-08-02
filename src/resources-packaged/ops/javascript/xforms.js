@@ -779,7 +779,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 this.internalShortDelay = new ORBEON.util.Property("internal-short-delay", 100);
                 this.delayBeforeDisplayLoading = new ORBEON.util.Property("delay-before-display-loading", 500);
                 this.delayBeforeUploadProgressRefresh= new ORBEON.util.Property("delay-before-upload-progress-refresh", 2000);
-                this.loadingMinTopPadding = new ORBEON.util.Property("loading-min-top-padding", 10);
                 this.helpHandler = new ORBEON.util.Property("help-handler", false);
                 this.helpTooltip = new ORBEON.util.Property("help-tooltip", false);
                 this.formatInputTime = new ORBEON.util.Property("format.input.time", "[h] =[m] =[s] [P]");

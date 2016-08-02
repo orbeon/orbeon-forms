@@ -163,16 +163,7 @@
                                     translate(
                                         string(
                                             for $clean in
-                                                for $v in
-                                                    translate(
-                                                        translate(
-                                                            xxf:trim($raw),
-                                                            $grouping-separator,
-                                                            ''
-                                                        ),
-                                                        $decimal-separator,
-                                                        '.'
-                                                    )
+                                                for $v in xxf:trim($raw)
                                                 return
                                                     (: There shouldn't be a prefix because that's stored out of band, but we remove it for historical reasons :)
                                                     if (starts-with($v, $prefix)) then

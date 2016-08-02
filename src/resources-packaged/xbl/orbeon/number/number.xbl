@@ -96,10 +96,12 @@
                         <xsl:copy-of select="xxbl:server-parameter(., 'round-when-formatting')"/>
                         <xsl:copy-of select="xxbl:server-parameter(., 'round-when-storing')"/>
 
-                        <xf:var name="binding"
+                        <xf:var
+                            name="binding"
                             value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
 
-                        <xf:var name="view"
+                        <xf:var
+                            name="view"
                             value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
 
                         <xf:var
@@ -253,7 +255,10 @@
                                                 $clean castable as xs:decimal        and
                                                 exists(($validation-fraction-digits-opt, $property-fraction-digits-opt))
                                             ) then
-                                                round-half-to-even(xs:decimal($clean), ($validation-fraction-digits-opt, $property-fraction-digits-opt)[1])
+                                                round-half-to-even(
+                                                    xs:decimal($clean),
+                                                    ($validation-fraction-digits-opt, $property-fraction-digits-opt)[1]
+                                                )
                                             else if ($clean castable as xs:decimal) then
                                                 xs:decimal($clean)
                                             else
@@ -279,7 +284,13 @@
                                     - if a `maxlength` or `xxf:maxlength` is placed on the bound element, that takes precedence
                                 - `min`: makes control natively invalid as the user types, if the value cannot be negative
                             -->
-                            <xh:span class="fr-width-10em {{(if (xxf:non-blank($prefix)) then 'input-prepend' else (), if (xxf:non-blank($suffix)) then 'input-append' else ())}}">
+                            <xh:span
+                                class="fr-width-10em {{
+                                    (
+                                        'input-prepend'[xxf:non-blank($prefix)],
+                                        'input-append' [xxf:non-blank($suffix)]
+                                    )
+                                }}">
                                 <xf:group class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
                                 <xh:input
                                     id="html-input"

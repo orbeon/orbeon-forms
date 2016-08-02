@@ -214,10 +214,13 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   }
 
   final override def compareExternalMaybeClientValue(
-    previousValue   : Option[String],
-    previousControl : Option[XFormsControl]
+    previousValueOpt   : Option[String],
+    previousControlOpt : Option[XFormsControl]
   ): Boolean =
-    super.compareExternalMaybeClientValue(previousValue orElse externalValueOpt, previousControl)
+    // NOTE: Call `compareExternalUseExternalValue` directly so as to avoid check on
+    // `(previousControlOpt exists (_ eq this)) && (getInitialLocal eq getCurrentLocal)` which
+    // causes part of https://github.com/orbeon/orbeon-forms/issues/2857.
+    compareExternalUseExternalValue(previousValueOpt orElse externalValueOpt, previousControlOpt)
 
   override def compareExternalUseExternalValue(
     previousExternalValue : Option[String],

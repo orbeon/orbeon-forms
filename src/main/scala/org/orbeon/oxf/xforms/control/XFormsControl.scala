@@ -179,6 +179,9 @@ class XFormsControl(
     previousValueOpt   : Option[String],
     previousControlOpt : Option[XFormsControl]
   ): Boolean =
+    // NOTE: See https://github.com/orbeon/orbeon-forms/issues/2857. We might consider removing this
+    // optimization as it is dangerous. `XFormsValueControl` works around it by calling
+    // `compareExternalUseExternalValue` directly.
     (previousControlOpt exists (_ eq this)) && (getInitialLocal eq getCurrentLocal) ||
     compareExternalUseExternalValue(previousValueOpt, previousControlOpt)
 

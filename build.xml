@@ -579,8 +579,7 @@
     <target name="orbeon-dev-war" depends="prepare" description="Create exploded WAR">
 
         <antcall target="war-common">
-            <param name="skip.compilation" value="${skip.compilation}"/>
-            <param name="target"           value="dev"/>
+            <param name="target" value="dev"/>
         </antcall>
 
         <!-- web.xml creates a resource manager pointing to this directory and it must exist -->
@@ -592,8 +591,7 @@
     <target name="orbeon-dist-war" depends="prepare, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
 
         <antcall target="war-common">
-            <param name="skip.compilation" value="${skip.compilation}"/>
-            <param name="target"           value="dist"/>
+            <param name="target" value="dist"/>
         </antcall>
 
         <mkdir dir="build/distrib"/>

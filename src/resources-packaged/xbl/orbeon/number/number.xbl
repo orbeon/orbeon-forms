@@ -105,7 +105,10 @@
                         <xf:var
                             name="property-fraction-digits-opt"
                             value="
-                                xs:integer(string($digits-after-decimal)[. castable as xs:integer])"/>
+                                if (local-name-from-QName(xxf:type($binding)) = 'integer') then
+                                    0
+                                else
+                                    xs:integer(string($digits-after-decimal)[. castable as xs:integer])"/>
 
                         <xf:var
                             name="validation-fraction-digits-opt"

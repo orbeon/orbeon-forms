@@ -56,7 +56,7 @@
              This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
         <xh:div>
             <xsl:if test="not($error-summary-bottom)">
-                <xsl:attribute name="style">display: none</xsl:attribute>
+                <xsl:attribute name="class">xforms-hidden</xsl:attribute>
             </xsl:if>
             <fr:error-summary position="bottom"/>
         </xh:div>

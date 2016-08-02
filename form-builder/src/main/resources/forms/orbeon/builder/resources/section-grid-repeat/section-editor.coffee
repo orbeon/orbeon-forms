@@ -14,7 +14,7 @@ $ ->
     frBodyLeft = 0;
     pageX = 0; pageY = 0
     SectionTitleSelector = '.fr-section-title:first'
-    SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first output'
+    SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first .xforms-output-output'
 
     FSM.create
         transitions : [

@@ -167,7 +167,8 @@
                                             for $clean in
                                                 for $v in xxf:trim($raw)
                                                 return
-                                                    (: There shouldn't be a prefix because that's stored out of band, but we remove it for historical reasons :)
+                                                    (: There shouldn't be a prefix because that's stored out of band,
+                                                       but we remove it for historical reasons :)
                                                     if (starts-with($v, $prefix)) then
                                                         xxf:trim(substring-after($v, $prefix))
                                                     else

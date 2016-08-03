@@ -258,7 +258,11 @@
                                 </xsl:for-each>
                             </xf:switch>
                         </xh:div>
-                        <xf:group class="fr-wizard-toc{{if ($local/show-toc/data(.)) then () else ' xforms-hidden', if (xxf:instance('local')/separate-toc/data(.)) then ' fr-wizard-separate-toc' else ()}}">
+                        <xf:group
+                            class="fr-wizard-toc{{
+                                ' xforms-hidden'         [not($local/show-toc/data(.))],
+                                ' fr-wizard-separate-toc'[$local/separate-toc/data(.)]
+                            }}">
 
                             <!-- Dispatch fr-toc-shown event as needed -->
                             <xf:group appearance="xxf:internal" ref=".[$local/show-toc/data(.)]">

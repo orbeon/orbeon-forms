@@ -429,11 +429,28 @@
                                 </xsl:element>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:copy-of
-                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                                    select="fbf:createTemplateContentFromBindNameXPath(/, fbf:controlNameFromId(@id), $bindings)/*[1]"/>
+                                <xsl:variable
+                                    name="new-template"
+                                    select="fbf:createTemplateContentFromBindNameXPath(/, fbf:controlNameFromId(@id), $bindings)/*[1]"
+                                    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"/>
+
+                                <xsl:choose>
+                                    <xsl:when test="exists($new-template/self::*)">
+                                        <xsl:copy-of select="$new-template"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!--
+                                            Handle further cases where form author manually added template instances, in which case we might not get any
+                                            elements to copy. So the assumption is that `createTemplateContentFromBindNameXPath()` will not return a node
+                                            containing elements if generating the template fail.
+                                        -->
+                                        <xsl:apply-templates select="node()"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+
                             </xsl:otherwise>
                         </xsl:choose>
+
                     </xsl:copy>
                 </xsl:template>
 

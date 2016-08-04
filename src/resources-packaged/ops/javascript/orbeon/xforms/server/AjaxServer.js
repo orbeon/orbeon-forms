@@ -948,7 +948,6 @@
                                             nestedRepeatLevel++;
                                     }
                                     afterInsertionPoint.parentNode.insertBefore(newTemplateNode, afterInsertionPoint);
-                                    ORBEON.xforms.Init.insertedElement(newTemplateNode);
                                 });
                             }
                         });

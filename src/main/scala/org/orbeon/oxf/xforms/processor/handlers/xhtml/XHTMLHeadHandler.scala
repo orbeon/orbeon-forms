@@ -602,6 +602,7 @@ object XHTMLHeadHandler {
           addControlToInitialize(c.getEffectiveId, None)
       case c ⇒
         // Legacy JavaScript initialization
+        // As of 2016-08-04: xxf:dialog, xf:select1[appearance = compact], xf:range
         if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
           addControlToInitialize(c.getEffectiveId, None)
     }

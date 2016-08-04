@@ -68,9 +68,6 @@ class XFormsRepeatControl(
   override def supportsRefreshEvents = true
   override def children = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
 
-  // If there is DnD, must tell the client to perform initialization
-  override def hasJavaScriptInitialization = false // isDnD
-
   override def onCreate(restoreState: Boolean, state: Option[ControlState]): Unit = {
     super.onCreate(restoreState, state)
 

@@ -150,7 +150,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * Return null when the attribute is not there.
              */
             getAttribute: function(element, name) {
-                if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                if (ORBEON.xforms.Globals.renderingEngineTridentOrZero) {
                     // IE incorrectly already return null when the attribute is not there,
                     // but this happens to be what we want to do here
                     return element.getAttribute(name);
@@ -158,7 +158,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     // Other browsers that follow the spec return an empty string when the attribute is not there,
                     // so we use hasAttribute() which is not implemented by IE to detect that case.
                     if (element.hasAttribute(name)) {
-                        if (ORBEON.xforms.Globals.isRenderingEngineWebCore) {
+                        if (ORBEON.xforms.Globals.renderingEngineWebCoreOrZero) {
                             return ORBEON.util.StringOps.replace(element.getAttribute(name), "&#38;", "&");
                         } else {
                             return element.getAttribute(name);
@@ -959,8 +959,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (element.name) {
                     var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
                     if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
-                            && _.isNumber(ORBEON.xforms.Globals.isRenderingEngineTrident)
-                            && ORBEON.xforms.Globals.isRenderingEngineTrident < 9) {
+                            && ORBEON.xforms.Globals.renderingEngineTridentOrZero > 0
+                            && ORBEON.xforms.Globals.renderingEngineTridentOrZero < 9) {
                         //
                         // The following is for IE8 and below only.
                         //
@@ -3356,14 +3356,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         document: function () {
 
             _.extend(ORBEON.xforms.Globals, {
-                // Booleans used for browser detection
-                isMac: navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                  // Running on Mac
-                isRenderingEngineGecko: YAHOO.env.ua.gecko,                                           // Firefox or compatible (Gecko rendering engine)
-                isFF3OrNewer: YAHOO.env.ua.gecko >= 1.9,                                              // Firefox 3.0 or newer or compatible (Gecko >= 1.9)
-                isRenderingEnginePresto: YAHOO.env.ua.opera,                                          // Opera
-                isRenderingEngineWebCore: YAHOO.env.ua.webkit,                                        // Safari
-                isRenderingEngineWebCore13: YAHOO.env.ua.webkit <= 312,                               // Safari 1.3
-                isRenderingEngineTrident: YAHOO.env.ua.ie,                                            // Internet Explorer
+                // Browser detection
+                isFF3OrNewer:                 YAHOO.env.ua.gecko >= 1.9, // Firefox 3.0 or newer or compatible (Gecko >= 1.9)
+                renderingEngineWebCoreOrZero: YAHOO.env.ua.webkit,       // Safari
+                renderingEngineTridentOrZero: YAHOO.env.ua.ie,           // Internet Explorer
 
                 /**
                  * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
@@ -3450,7 +3446,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
             // Initialize DOM methods based on browser
             (function () {
-                var methodsFrom = ORBEON.xforms.Globals.isRenderingEngineTrident ? ORBEON.util.IEDom : ORBEON.util.MozDom;
+                var methodsFrom = ORBEON.xforms.Globals.renderingEngineTridentOrZero ? ORBEON.util.IEDom : ORBEON.util.MozDom;
                 for (var method in methodsFrom)
                     ORBEON.util.Dom[method] = methodsFrom[method];
             }());

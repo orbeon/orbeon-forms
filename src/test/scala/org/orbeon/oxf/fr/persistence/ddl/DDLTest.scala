@@ -55,7 +55,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
    * Runs the SQL, and returns the information about the tables as defined in the database. The form in which this
    * information is returned varies depending on the database, hence the Any return type.
    */
-  private def sqlToTableInfo(provider: Provider, sql: Seq[String]): Set[TableMeta] = {
+  private def sqlToTableInfo(provider: Provider, sql: Seq[String]): List[TableMeta] = {
     withNewDatabase(provider) { connection ⇒
       val statement = connection.createStatement
       SQL.executeStatements(provider, statement, sql)
@@ -88,10 +88,10 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
             ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
           ColMeta(colName, colKeyVals)
         }
-        val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList
+        val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList.sortBy(_.colName)
         assert(colsMeta.nonEmpty)
         TableMeta(tableName, colsMeta)
-      }.toSet
+      }
     }
   }
 
@@ -110,6 +110,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
         assertSameTable(MySQL,  "4_3", "4_4")
         assertSameTable(MySQL,  "4_4", "4_5")
         assertSameTable(MySQL,  "4_5", "4_6")
+        assertSameTable(MySQL,  "4_6", "2016_2")
       case PostgreSQL ⇒ sqlToTableInfo(PostgreSQL, SQL.read("postgresql-4_8.sql"))
     }
   }

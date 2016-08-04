@@ -47,7 +47,10 @@ private[persistence] object Connect {
         throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
     }
     val tableNameResultSet = connection.createStatement.executeQuery(query.stripMargin)
-    val tableNamesList = Iterator.iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1)).toList
+    val tableNamesList = Iterator
+      .iterateWhile(tableNameResultSet.next(), tableNameResultSet.getString(1))
+      .toList
+      .sorted
     tableNamesList ensuring (_.nonEmpty)
   }
 }

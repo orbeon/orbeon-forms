@@ -628,7 +628,7 @@
                 // Remove top-level event handlers in case the user interacts with newly added elements before
                 // ORBEON.xforms.Init.document() has completed
                 if (ORBEON.xforms.Globals.topLevelListenerRegistered) {
-                    if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                    if (ORBEON.xforms.Globals.renderingEngineTridentOrZero) {
                         YAHOO.util.Event.removeListener(document, "focusin", ORBEON.xforms.Events.focus);
                         YAHOO.util.Event.removeListener(document, "focusout", ORBEON.xforms.Events.blur);
                         YAHOO.util.Event.removeListener(document, "change", ORBEON.xforms.Events.change);
@@ -1083,7 +1083,7 @@
                                 });
 
                                 // Set content of select element
-                                if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                                if (ORBEON.xforms.Globals.renderingEngineTridentOrZero) {
                                     // IE does not support setting the content of a select with innerHTML
                                     // So we have to generate the whole select, and use outerHTML
                                     YAHOO.util.Event.removeListener(select, "change");

@@ -3188,9 +3188,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                         }
                     });
                 }
-
-                // Re-initialize all the legacy/built-in controls
-                ORBEON.xforms.Init.insertedElement(YAHOO.util.Dom.get(fullUpdateId));
             }
         };
 
@@ -3759,32 +3756,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             window.setTimeout(function () {
                 ORBEON.xforms.Events.orbeonLoadedEvent.fire();
             }, ORBEON.util.Properties.internalShortDelay.get());
-        },
-
-        /**
-         * Initialize a newly copied subtree.
-         *
-         * Some of the more advanced controls are initialized when the page first loads. The server sets the value of the
-         * orbeonInitData variable to tell the client the id of those controls and the type of each control. When new
-         * controls are added, this function must be called so those the inserted advanced controls are initialized as
-         * well.
-         */
-        insertedElementEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-        insertedElement: function (element) {
-            // TODO: Also need destructors for controls
-            ORBEON.xforms.Init.insertedElementEvent.fire({element: element});
-            if (element.nodeType == ORBEON.util.Dom.ELEMENT_TYPE) {
-                if ($(element).is('.xforms-dialog')) {
-                    // Dialog
-                    ORBEON.xforms.Init._dialog(element);
-                }
-                // Recurse
-                for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-                    var child = element.childNodes[childIndex];
-                    if (child.nodeType == ORBEON.util.Dom.ELEMENT_TYPE)
-                        ORBEON.xforms.Init.insertedElement(child);
-                }
-            }
         },
 
         _setBasePaths: function (formID, scripts, versioned) {

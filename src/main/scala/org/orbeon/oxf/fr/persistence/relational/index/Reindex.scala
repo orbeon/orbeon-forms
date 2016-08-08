@@ -118,7 +118,7 @@ trait Reindex extends FormDefinition {
             |     d.app                = l.app                AND
             |     d.form               = l.form               AND
             |     d.document_id        = l.document_id        AND
-            |     d.last_modified_time = d.last_modified_time AND
+            |     d.last_modified_time = l.last_modified_time AND
             |     d.deleted            = 'N'
             |""".stripMargin
 

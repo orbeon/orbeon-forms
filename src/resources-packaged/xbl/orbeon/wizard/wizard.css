@@ -59,6 +59,9 @@
   list-style-type: none;
   padding-right: 0;
 }
+.orbeon .xbl-fr-wizard .fr-toc-edit {
+  display: none;
+}
 .orbeon .xbl-fr-wizard .fr-wizard-separate-toc .fr-toc-edit {
   display: inline-block;
   float: right;

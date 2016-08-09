@@ -177,7 +177,7 @@
                 <xsl:template match="details">
                     <xsl:for-each select="$instance/query[@path]">
                         &lt;detail>
-                            {string-join($d/*/<xsl:value-of select="@path"/>, ', ')}
+                            {string-join($d/*/<xsl:value-of select="@path"/>[. != ''], ', ')}
                         &lt;/detail>
                     </xsl:for-each>
                 </xsl:template>

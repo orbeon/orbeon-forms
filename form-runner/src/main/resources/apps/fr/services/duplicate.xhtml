@@ -22,7 +22,10 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
     <xh:head>
         <!-- This is to help the process engine which assumes the existing of this model and instance -->
-        <xf:model id="fr-parameters-model" xxf:xpath-analysis="true">
+        <xf:model
+            id="fr-parameters-model"
+            xxf:xpath-analysis="true"
+            xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
             <xf:instance id="fr-parameters-instance" src="input:data"/>
         </xf:model>
         <xf:model id="fr-form-model">

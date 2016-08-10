@@ -53,7 +53,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     for {
       ((name, _), index) ← IntGettersByName.zipWithIndex
     } locally {
-      Fun(name, classOf[BooleanFunction], index, 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+      Fun(name, classOf[IntFunction], index, 0, INTEGER, ALLOWS_ZERO_OR_ONE)
     }
 
     // Other functions

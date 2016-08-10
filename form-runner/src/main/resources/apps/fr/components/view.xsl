@@ -180,7 +180,8 @@
             <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" style="display: none"/>
 
             <!-- When the mode changes to "edit" after a save from /new, attempt to change the URL -->
-            <xf:var name="mode-for-save" value="fr:mode()">
+            <!-- NOTE: Keep `xxf:instance()`, see https://github.com/orbeon/orbeon-forms/issues/2872 -->
+            <xf:var name="mode-for-save" value="xxf:instance('fr-parameters-instance')/mode/string()">
                 <!-- If URI is /new (it should be), change it to /edit/id -->
                 <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
                 <xf:action type="javascript" ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">

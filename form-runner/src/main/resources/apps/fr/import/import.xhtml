@@ -29,7 +29,11 @@
             .fb-import-success { color: green; display: block }
             .fb-import-error { color: red; display: block }
         </xh:style>
-        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:submission-poll-delay="2000">
+        <xf:model
+            id="fr-form-model"
+            xxf:xpath-analysis="true"
+            xxf:submission-poll-delay="2000"
+            xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
 
             <xf:action
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"

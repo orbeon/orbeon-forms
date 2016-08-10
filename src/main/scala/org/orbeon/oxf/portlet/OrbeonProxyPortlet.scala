@@ -38,9 +38,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   import org.orbeon.oxf.portlet.OrbeonProxyPortlet._
 
   private case class PortletSettings(
-    forwardHeaders    : Map[String, String], // lowercase name → original name
-    forwardParams     : Set[String],
-    forwardProperties : Map[String, String], // lowercase name → original name
+    forwardHeaders     : Map[String, String], // lowercase name → original name
+    forwardParams      : Set[String],
+    forwardProperties  : Map[String, String], // lowercase name → original name
     useShortNamespaces : Boolean,
     httpClient         : HttpClient
    )

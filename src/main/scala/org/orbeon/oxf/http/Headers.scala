@@ -24,6 +24,8 @@ object Headers {
   val OrbeonGroup         = "Orbeon-Group"
   val OrbeonRoles         = "Orbeon-Roles"
 
+  val OrbeonRemoteAddress = "Orbeon-Remote-Address"
+
   val ContentType         = "Content-Type"
   val ContentLength       = "Content-Length"
   val LastModified        = "Last-Modified"

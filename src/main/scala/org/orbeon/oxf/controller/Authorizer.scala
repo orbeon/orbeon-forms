@@ -107,7 +107,15 @@ object Authorizer extends Logging {
 
         val method  = HttpMethod.getOrElseThrow(request.getMethod)
         val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString))
-        val headers = proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true)
+
+        // Add remote address to help authorizer filter
+        val allHeaders = {
+
+          val proxiedHeaders =
+            proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true).toMap mapValues (_.toList)
+
+          proxiedHeaders + (OrbeonRemoteAddress → Option(request.getRemoteAddr).toList)
+        }
 
         val content = Connection.requiresRequestBody(method) option
           StreamedContent(
@@ -125,7 +133,7 @@ object Authorizer extends Logging {
             url         = newURL,
             credentials = None,
             content     = content,
-            headers     = headers.toMap mapValues (_.toList),
+            headers     = allHeaders,
             loadState   = true,
             logBody     = false
           )

@@ -167,7 +167,7 @@ object ConnectionResult {
             cxr.close() // this eventually calls InputStream.close()
           result
         case ConnectionResult(_, statusCode, _, _, _, _) ⇒
-          throw new HttpStatusCodeException(if (statusCode != 200) statusCode else 500)
+          throw HttpStatusCodeException(if (statusCode != 200) statusCode else 500)
       }
     } catch {
       case NonFatal(t) ⇒

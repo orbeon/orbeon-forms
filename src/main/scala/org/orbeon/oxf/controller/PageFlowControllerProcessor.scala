@@ -135,7 +135,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         case None ⇒
           // We don't have a not found route so try the error route instead
           // Don't log because we already logged above
-          runErrorRoute(t getOrElse new HttpStatusCodeException(404), log = false)
+          runErrorRoute(t getOrElse HttpStatusCodeException(404), log = false)
       }
     }
 
@@ -589,7 +589,7 @@ object PageFlowControllerProcessor {
         unauthorized()
   }
 
-  def unauthorized() = throw new HttpStatusCodeException(403)
+  def unauthorized() = throw HttpStatusCodeException(403)
 
   case class PageFlow(
     routes            : Seq[Route],

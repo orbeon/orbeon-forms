@@ -247,7 +247,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
 
     // Remember all that we created
-    _nested = Some(new Nested(childContainer, partAnalysis, template, outerListener))
+    _nested = Some(Nested(childContainer, partAnalysis, template, outerListener))
 
     // Create new control subtree, attempting to restore switch state
     // LATER: See above comments

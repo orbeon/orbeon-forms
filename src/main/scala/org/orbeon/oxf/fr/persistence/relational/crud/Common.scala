@@ -82,7 +82,7 @@ trait Common extends RequestResponse with FormRunnerPersistence {
       case Next               ⇒ latest.map(_ + 1).getOrElse(1)
       case Specific(v)        ⇒ v
       case ForDocument(docId) ⇒ formVersion(connection, req.app, req.form, Some(docId))
-        .getOrElse(throw new HttpStatusCodeException(404))
+        .getOrElse(throw HttpStatusCodeException(404))
     }
   }
 

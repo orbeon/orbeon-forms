@@ -347,7 +347,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
   def assertSessionExists(): Unit =
     Option(NetUtils.getSession(false)) getOrElse
-      (throw new SessionExpiredException("Session has expired. Unable to process incoming request."))
+      (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
 
   private val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
 

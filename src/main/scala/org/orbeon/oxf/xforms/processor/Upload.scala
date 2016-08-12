@@ -71,7 +71,7 @@ class Upload extends ProcessorImpl {
             // NOTE: There is no point sending a response, see:
             // https://github.com/orbeon/orbeon-forms/issues/985
             Multipart.deleteFileItems(nameValues)
-            throw new HttpStatusCodeException(SC_REQUEST_ENTITY_TOO_LARGE, throwable = someThrowable)
+            throw HttpStatusCodeException(SC_REQUEST_ENTITY_TOO_LARGE, throwable = someThrowable)
         }
     })
 }

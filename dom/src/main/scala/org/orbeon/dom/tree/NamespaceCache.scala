@@ -28,7 +28,7 @@ object NamespaceCache {
           answer = ref.get
         }
         if (answer eq null) {
-          answer = new ConcreteNamespace(prefix, uri)
+          answer = ConcreteNamespace(prefix, uri)
           uriCache.put(prefix, new WeakReference[Namespace](answer))
         }
       }
@@ -49,7 +49,7 @@ object NamespaceCache {
           answer = ref.get
         }
         if (answer eq null) {
-          answer = new ConcreteNamespace("", uri)
+          answer = ConcreteNamespace("", uri)
           noPrefixCache.put(uri, new WeakReference[Namespace](answer))
         }
       }

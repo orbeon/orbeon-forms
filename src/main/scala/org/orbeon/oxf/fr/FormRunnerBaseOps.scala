@@ -171,8 +171,8 @@ trait FormRunnerBaseOps {
   // Interrupt current processing and send an error code to the client.
   // NOTE: This could be done through ExternalContext
   //@XPathFunction
-  def sendError(code: Int) = throw new HttpStatusCodeException(code)
-  def sendError(code: Int, resource: String) = throw new HttpStatusCodeException(code, Option(resource))
+  def sendError(code: Int) = throw HttpStatusCodeException(code)
+  def sendError(code: Int, resource: String) = throw HttpStatusCodeException(code, Option(resource))
 
   // Append a query string to a URL
   def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)

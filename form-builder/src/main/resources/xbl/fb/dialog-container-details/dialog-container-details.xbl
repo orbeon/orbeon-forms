@@ -46,7 +46,7 @@
                     <xf:setvalue ref="$i/initially-open"             value="false()"/>
                 </xf:action>
 
-                <xf:setvalue ref="$i/was-repeat"                     value="fbf:isRepeat(fbf:findControlByNameOrEmpty($form, $i/control-name))"/>
+                <xf:setvalue ref="$i/was-repeat"                     value="frf:isRepeat(fbf:findControlByNameOrEmpty($form, $i/control-name))"/>
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($form, $i/control-name)"/>

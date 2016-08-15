@@ -22,6 +22,7 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
@@ -149,7 +150,7 @@
 
         <!-- ==== Repeats ========================================================================================== -->
 
-        <xsl:variable name="repeat-ids" select="$fr-section//*[fbf:isRepeat(.)]/fbf:templateId(fbf:controlNameFromId(@id))"/>
+        <xsl:variable name="repeat-ids" select="$fr-section//*[frf:isRepeat(.)]/fbf:templateId(fbf:controlNameFromId(@id))"/>
         <xsl:variable name="repeat-templates" select="$fr-form-model/xf:instance[@id = $repeat-ids]" as="element()*"/>
 
         <!-- ==== Actions and services ============================================================================= -->

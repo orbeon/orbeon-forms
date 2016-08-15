@@ -20,6 +20,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding
@@ -53,7 +54,7 @@
                     <xsl:variable name="collapsible"       select="not(@collapsible = 'false' or @collapse = 'false')"/>
                     <xsl:variable name="animate"           select="not(@animate = 'false')"/>
                     <xsl:variable name="readonly"          select="@readonly = 'true'"/>
-                    <xsl:variable name="is-repeat"         select="fbf:isRepeat(.)"/>
+                    <xsl:variable name="is-repeat"         select="frf:isRepeat(.)"/>
                     <xsl:variable name="appearance"        select="(@appearance, 'full')[1]"/>
                     <xsl:variable name="right-column"      select="$appearance = 'minimal' and not($readonly)"/>
 

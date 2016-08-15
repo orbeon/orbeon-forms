@@ -259,9 +259,8 @@
                                 properly with this browser. We recommend you upgrade to Internet Explorer
                                 <xf:output value="$minimal-ie-version"/> or newer, or use
                                 <a href="http://www.google.com/chrome">Google Chrome</a>,
-                                <a href="http://www.mozilla.com/firefox/">Firefox</a>,
-                                <a href="http://www.apple.com/safari/">Safari</a>, or
-                                <a href="http://www.opera.com/">Opera</a>.
+                                <a href="http://www.mozilla.com/firefox/">Firefox</a>, or
+                                <a href="http://www.apple.com/safari/">Safari</a>.
                                 If we made a mistake and you are not using Internet Explorer
                                 <xf:output value="$minimal-ie-version - 1"/>
                                 or earlier, please

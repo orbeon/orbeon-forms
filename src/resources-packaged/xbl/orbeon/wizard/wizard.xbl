@@ -98,17 +98,26 @@
                             /*//(
                                 fr:section[
                                     (
-                                        (: Top-level section without subsections :)
-                                        count(ancestor::fr:section) = 0 and
-                                        empty(fr:section)
+                                        (: Top-level section :)
+                                        count(ancestor::fr:section) = 0 and (
+                                            empty(fr:section)          or
+                                            @subsections-nav = 'false' or
+                                            frf:isRepeat(.)
+                                        )
                                     ) or (
-                                        (: Subsection :)
-                                        count(ancestor::fr:section) = 1
+                                        (: First-level subsection :)
+                                        count(ancestor::fr:section) = 1    and
+                                        not(../@subsections-nav = 'false') and
+                                        not(frf:isRepeat(..))
                                     )
                                 ],
-                                (: Grid within a top-level section which also contains subsections :)
+                                (: Grid within a top-level section which also contains subsections
+                                   and top-level section doesn't have Subsection navigation explicitly
+                                   disabled and is not repeated :)
                                 fr:grid[
-                                    count(ancestor::fr:section) = 1 and
+                                    count(ancestor::fr:section) = 1    and
+                                    not(../@subsections-nav = 'false') and
+                                    not(frf:isRepeat(..))              and
                                     exists((preceding-sibling::fr:section | following-sibling::fr:section))
                                 ]
                             )
@@ -132,8 +141,7 @@
 
                 <xsl:variable
                     name="static-top-level-section-ids"
-                    select="/*/fr:section/@id/string()
-                "/>
+                    select="/*/fr:section/@id/string()"/>
 
                 <xsl:template match="/*">
                     <xf:group appearance="xxf:internal">
@@ -634,14 +642,26 @@
                                             if ($static-subsections-nav) then
                                                 (
                                                     if ($static-is-top-level-section) then
-                                                        (: Current section is a top-level section. Try first subsection or grid if any, otherwise the top-level
-                                                           section itself, which means that there are no subsections or grids. :)
-                                                        ($static-current-section[exists(fr:section)]/(fr:section | fr:grid)[1], $static-current-section)[1]
+                                                        (: Current section is a top-level section. Try first subsection or grid if any,
+                                                           otherwise the top-level section itself, which means that there are no subsections
+                                                           or grids. Unfortunately, there is some logic duplication between here and the
+                                                           computation of `$static-nav-sections-or-grids` above. :)
+                                                        (
+                                                            $static-current-section[
+                                                                not(@subsections-nav = 'false') and
+                                                                not(frf:isRepeat(.))            and
+                                                                exists(fr:section)
+                                                            ]/(fr:section | fr:grid)[1],
+                                                            $static-current-section
+                                                        )[1]
                                                     else
                                                         (: Current section is a subsection. Take first subsection from the top, as only two levels of
                                                            section navigation are supported. :)
                                                         ($static-current-section/ancestor-or-self::fr:section)[2]
-                                                )/(@id, concat(generate-id(), '-wizard-grid'))[1]
+                                                )/(
+                                                    @id,
+                                                    concat(generate-id(), '-wizard-grid')
+                                                )[1]
                                             else
                                                 $static-top-level-section-id
                                     "/>

@@ -189,6 +189,34 @@ trait CreateUpdateDelete
     val table = tableName(req)
     val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
 
+    // If we saved a "normal" document (not a draft), delete any draft document and draft attachments
+    if (req.forData && ! req.dataPart.get.isDraft && ! req.forAttachment) {
+
+      // First delete from orbeon_i_control_text, which requires a join
+      connection.prepareStatement(
+        s"""|DELETE FROM orbeon_i_control_text
+            |WHERE data_id IN (
+            |    SELECT data_id
+            |    FROM   orbeon_i_current
+            |    WHERE  document_id = ?   AND
+            |           draft       = 'Y'
+            |)
+            |""".stripMargin)
+        .kestrel(_.setString(1, req.dataPart.get.documentId))
+        .kestrel(_.executeUpdate())
+
+      // Then delete from all the other tables
+      for (table ←  Set("orbeon_i_current", "orbeon_form_data", "orbeon_form_data_attach")) {
+        connection.prepareStatement(
+          s"""|DELETE FROM $table
+              |WHERE  document_id = ?   AND
+              |       draft       = 'Y'
+              |""".stripMargin)
+          .kestrel(_.setString(1, req.dataPart.get.documentId))
+          .kestrel(_.executeUpdate())
+      }
+    }
+
     // Do insert
     locally {
 
@@ -218,24 +246,6 @@ trait CreateUpdateDelete
       ps.executeUpdate()
     }
 
-    // If we saved a "normal" document (not a draft), delete any draft document and draft attachments
-    if (req.forData && ! req.dataPart.get.isDraft && ! req.forAttachment) {
-      for (table ←  Set("orbeon_form_data", "orbeon_form_data_attach")) {
-        val ps = connection.prepareStatement(
-          s"""|DELETE FROM $table
-              |WHERE      app         = ?
-              |       AND form        = ?
-              |       AND document_id = ?
-              |       AND draft       = 'Y'
-              |""".stripMargin)
-        val position = Iterator.from(1)
-        ps.setString(position.next(), req.app)
-        ps.setString(position.next(), req.form)
-        ps.setString(position.next(), req.dataPart.get.documentId)
-        ps.executeUpdate()
-      }
-    }
-
     versionToSet
   }
 
@@ -249,27 +259,27 @@ trait CreateUpdateDelete
     val table = tableName(req)
     val ps = connection.prepareStatement(
       s"""|delete from $table
-        |where
-        |    app = ?
-        |    and form = ?
-        |    and document_id = ?
-        |    ${if (req.forAttachment) "and file_name = ?" else ""}
-        |    and draft = 'Y'
-        |    and last_modified_time !=
-        |        (
-        |            select last_modified_time from
-        |            (
-        |                select max(last_modified_time) last_modified_time
-        |                from $table
-        |                where
-        |                    app = ?
-        |                    and form = ?
-        |                    and document_id = ?
-        |                    ${if (req.forAttachment) "and file_name = ?" else ""}
-        |                    and draft = 'Y'
-        |            ) t
-        |        )
-        |""".stripMargin)
+          |where
+          |    app = ?
+          |    and form = ?
+          |    and document_id = ?
+          |    ${if (req.forAttachment) "and file_name = ?" else ""}
+          |    and draft = 'Y'
+          |    and last_modified_time !=
+          |        (
+          |            select last_modified_time from
+          |            (
+          |                select max(last_modified_time) last_modified_time
+          |                from $table
+          |                where
+          |                    app = ?
+          |                    and form = ?
+          |                    and document_id = ?
+          |                    ${if (req.forAttachment) "and file_name = ?" else ""}
+          |                    and draft = 'Y'
+          |            ) t
+          |        )
+          |""".stripMargin)
 
     val position = Iterator.from(1)
 

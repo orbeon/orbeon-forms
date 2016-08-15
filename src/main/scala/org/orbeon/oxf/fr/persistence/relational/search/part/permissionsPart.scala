@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 object permissionsPart {
 
   def apply(permissions: Permissions) =
-    if (permissions.authorizedIfUsername.isEmpty && permissions.authorizedIfGroup.isEmpty)
+    if (permissions.authorizedBasedOnRole)
       NilPart
     else {
       val usernameGroupnameTest =

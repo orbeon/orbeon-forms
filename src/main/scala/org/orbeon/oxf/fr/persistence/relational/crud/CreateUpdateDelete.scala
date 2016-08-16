@@ -206,7 +206,12 @@ trait CreateUpdateDelete
         .kestrel(_.executeUpdate())
 
       // Then delete from all the other tables
-      for (table ←  Set("orbeon_i_current", "orbeon_form_data", "orbeon_form_data_attach")) {
+      val tablesToDeleteDraftsFrom = List(
+        "orbeon_i_current",
+        "orbeon_form_data",
+        "orbeon_form_data_attach"
+      )
+      tablesToDeleteDraftsFrom.foreach(table ⇒
         connection.prepareStatement(
           s"""|DELETE FROM $table
               |WHERE  document_id = ?   AND
@@ -214,7 +219,7 @@ trait CreateUpdateDelete
               |""".stripMargin)
           .kestrel(_.setString(1, req.dataPart.get.documentId))
           .kestrel(_.executeUpdate())
-      }
+      )
     }
 
     // Do insert

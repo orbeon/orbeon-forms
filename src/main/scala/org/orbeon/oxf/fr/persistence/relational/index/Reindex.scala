@@ -53,21 +53,22 @@ trait Reindex extends FormDefinition {
     if (Index.ProvidersWithIndexSupport.contains(provider)) {
 
       // If a document id was provided, produce WHERE clause, and set parameter
-      val (whereClause, paramSetter) =
+      val (whereConditions, paramSetter) =
         whatToReindex match {
           case AllData ⇒ (
-            "",
+            Nil,
             (ps: PreparedStatement) ⇒ Unit
           )
           case DataForDocumentId(id) ⇒ (
-            "WHERE document_id = ?",
+            List("document_id = ?"),
             (ps: PreparedStatement) ⇒ ps.setString(1, id)
           )
           case DataForForm(app, form, version) ⇒ (
-            """WHERE app = ?          AND
-              |      form = ?         AND
-              |      form_version = ?
-            """.stripMargin,
+            List(
+              "app = ?",
+              "form = ?",
+              "form_version = ?"
+            ),
             (ps: PreparedStatement) ⇒ {
               ps.setString(1, app)
               ps.setString(2, form)
@@ -77,28 +78,33 @@ trait Reindex extends FormDefinition {
         }
 
       // Clean index
-      connection
-        .prepareStatement("DELETE FROM orbeon_i_control_text" + (
-            whatToReindex match {
-              case AllData ⇒ ""
-              case _ ⇒
-                s""" WHERE data_id IN (
-                   |   SELECT data_id
-                   |     FROM orbeon_i_current
-                   |   $whereClause
-                   | )
-                   |""".stripMargin
-            }
+      locally {
+        val deleteWhereClause = whereConditions match {
+          case Nil ⇒ ""
+          case _   ⇒ "WHERE " + whereConditions.mkString(" ")
+        }
+        connection
+          .prepareStatement("DELETE FROM orbeon_i_control_text" + (
+              whatToReindex match {
+                case AllData ⇒ ""
+                case _ ⇒
+                  s""" WHERE data_id IN (
+                     |   SELECT data_id
+                     |     FROM orbeon_i_current
+                     |   $deleteWhereClause
+                     | )
+                     |""".stripMargin
+              }
+            )
           )
-        )
-        .kestrel(paramSetter)
-        .execute()
-      connection
-        .prepareStatement(s"DELETE FROM orbeon_i_current $whereClause")
-        .kestrel(paramSetter)
-        .execute()
+          .kestrel(paramSetter)
+          .execute()
+        connection
+          .prepareStatement(s"DELETE FROM orbeon_i_current $deleteWhereClause")
+          .kestrel(paramSetter)
+          .execute()
+      }
 
-      // Get count of documents to index for progress indicator
       val currentFromWhere =
         s"""|    FROM
             |      orbeon_form_data d,
@@ -110,18 +116,22 @@ trait Reindex extends FormDefinition {
             |          max(last_modified_time) last_modified_time
             |        FROM
             |          orbeon_form_data
-            |        $whereClause
+            |        WHERE
+            |          draft = 'N'
+            |          ${whereConditions.map("AND " + _).mkString(" ")}
             |        GROUP BY
             |          app, form, document_id
             |      ) l
             |   WHERE
-            |     d.app                = l.app                AND
-            |     d.form               = l.form               AND
-            |     d.document_id        = l.document_id        AND
-            |     d.last_modified_time = l.last_modified_time AND
-            |     d.deleted            = 'N'
+            |     d.app                  = l.app                AND
+            |     d.form                 = l.form               AND
+            |     d.document_id          = l.document_id        AND
+            |     d.deleted              = 'N'                  AND
+            |     (
+            |       d.last_modified_time = l.last_modified_time OR
+            |       d.draft              = 'Y'
+            |     )
             |""".stripMargin
-
 
       // Count how many documents we'll reindex, and tell progress code
       connection
@@ -137,23 +147,24 @@ trait Reindex extends FormDefinition {
 
       // Get all the row from orbeon_form_data that are "latest" and not deleted
       val xmlCol = Provider.xmlCol(provider, "d")
+      val currentDataSql =
+        s"""  SELECT d.id,
+           |         d.created,
+           |         d.last_modified_time,
+           |         d.last_modified_by,
+           |         d.username,
+           |         d.groupname,
+           |         d.app,
+           |         d.form,
+           |         d.form_version,
+           |         d.document_id,
+           |         d.draft,
+           |         $xmlCol
+           |$currentFromWhere
+           |ORDER BY app, form
+           |""".stripMargin
       val currentData = connection
-        .prepareStatement(
-          s"""  SELECT d.id,
-             |         d.created,
-             |         d.last_modified_time,
-             |         d.last_modified_by,
-             |         d.username,
-             |         d.groupname,
-             |         d.app,
-             |         d.form,
-             |         d.form_version,
-             |         d.document_id,
-             |         d.draft,
-             |         $xmlCol
-             |$currentFromWhere
-             |ORDER BY app, form
-             |""".stripMargin)
+        .prepareStatement(currentDataSql)
         .kestrel(paramSetter)
         .executeQuery()
 

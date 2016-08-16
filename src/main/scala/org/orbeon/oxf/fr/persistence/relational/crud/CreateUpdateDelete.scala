@@ -189,8 +189,8 @@ trait CreateUpdateDelete
     val table = tableName(req)
     val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
 
-    // If we saved a "normal" document (not a draft), delete any draft document and draft attachments
-    if (req.forData && ! req.dataPart.get.isDraft && ! req.forAttachment) {
+    // If we saved data, delete any draft document and draft attachments
+    if (req.forData && ! req.forAttachment) {
 
       // First delete from orbeon_i_control_text, which requires a join
       connection.prepareStatement(
@@ -406,8 +406,6 @@ trait CreateUpdateDelete
       val versionSet = store(connection, req, existing, delete)
       if (! delete && req.forData && req.dataPart.get.isDraft)
         deleteDraftOnSaveData(connection, req)
-      if (delete && req.forData)
-        deleteDraft(connection, req)
 
       // Update index
       val whatToReindex = req.dataPart match {

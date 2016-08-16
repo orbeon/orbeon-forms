@@ -74,7 +74,6 @@
 
                 <xsl:variable name="root" select="/*[1]"/>
 
-                <xsl:variable name="freeze"             select="(xs:integer($root/@freeze[. castable as xs:integer]), 0)[1]"/>
                 <xsl:variable name="apply-defaults"     select="$root/@apply-defaults = 'true'"/>
                 <xsl:variable name="readonly"           select="$root/@readonly = 'true'"/>
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
@@ -123,6 +122,11 @@
                             <!-- xbl:attr="model context ref bind" -->
                         </xf:var>
 
+                        <xf:var name="freeze-avt" xxbl:scope="outer"><xsl:value-of select="$root/@freeze"/></xf:var>
+                        <xf:var name="freeze">
+                            <xxf:value value="(xs:integer(xxf:evaluate-avt($freeze-avt)[. castable as xs:integer]), 0)[1]" xxbl:scope="outer"/>
+                        </xf:var>
+
                         <xf:var name="can-add"
                                 value="$max = ('none', 'unbounded') or ($max castable as xs:integer and count($repeat-sequence) lt xs:integer($max))"/>
 
@@ -131,7 +135,7 @@
                                 <xsl:when test="$insert = 'index'">
                                     <xf:var
                                         name="p"
-                                        value="max(($repeat-index, {$freeze}))"/>
+                                        value="max(($repeat-index, $freeze))"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xf:var
@@ -278,7 +282,7 @@
                                     <xsl:when test="not($readonly)">
 
                                         <xf:var name="repeat-position" value="xxf:repeat-position()"/>
-                                        <xf:var name="frozen"          value="$repeat-position le {$freeze}"/>
+                                        <xf:var name="frozen"          value="$repeat-position le $freeze"/>
 
                                         <xf:var name="remove-constraint">
                                             <!-- Evaluate the constraint in the context of the iteration -->
@@ -289,10 +293,10 @@
                                             name="can-classes"
                                             value="
                                                 'can-remove'      [$remove-constraint and not($frozen) and $min castable as xs:integer and count($repeat-sequence) gt xs:integer($min)],
-                                                'can-move-up'     [$repeat-position gt {$freeze} + 1],
+                                                'can-move-up'     [$repeat-position gt $freeze + 1],
                                                 'can-move-down'   [not($frozen) and $repeat-position lt count($repeat-sequence)],
                                                 'can-insert-above'[$can-add and not($frozen)],
-                                                'can-insert-below'[$can-add and $repeat-position ge {$freeze}]"
+                                                'can-insert-below'[$can-add and $repeat-position ge $freeze]"
                                         />
                                     </xsl:when>
                                     <xsl:otherwise>

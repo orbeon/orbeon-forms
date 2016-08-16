@@ -210,8 +210,9 @@
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @open)"/>
                                                 <xsl:choose>
-                                                    <xsl:when test="$static-subsections-nav and exists(fr:section)">
-                                                        <!-- Subsection nav enabled -->
+                                                    <xsl:when test="$static-subsections-nav and not($static-nav-section-or-grid-ids = @id)">
+                                                        <!-- Subsection nav enabled AND the top-level section is not part of the nav, which
+                                                             means we navigate it's subsections/grids. -->
 
                                                         <!-- Don't forget the enclosing section lHHA -->
                                                         <xsl:apply-templates select="xf:label | xf:help | xf:hint | xf:alert"/>

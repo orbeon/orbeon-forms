@@ -81,7 +81,7 @@ trait Reindex extends FormDefinition {
       locally {
         val deleteWhereClause = whereConditions match {
           case Nil ⇒ ""
-          case _   ⇒ "WHERE " + whereConditions.mkString(" ")
+          case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
         }
         connection
           .prepareStatement("DELETE FROM orbeon_i_control_text" + (

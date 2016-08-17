@@ -1109,8 +1109,8 @@
                                 //  </span>
 
                                 // Get template
-                                var isFull = $(documentElement).is('.xforms-select');
-                                var template = isFull
+                                var isSelect = $(documentElement).is('.xforms-select');
+                                var template = isSelect
                                         ? ORBEON.util.Dom.get("xforms-select-full-template")
                                         : ORBEON.util.Dom.get("xforms-select1-full-template");
                                 template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
@@ -1139,7 +1139,7 @@
                                     ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-label$", parsedLabel, true);
                                     ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-value$", itemElement.value, false);
                                     var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
-                                    ORBEON.util.Utils.replaceInDOM(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId, false);
+                                    ORBEON.util.Utils.replaceInDOM(templateClone, isSelect ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId, false);
                                     ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-item-name$", controlId, false);
 
                                     if (itemElement.help && itemElement.help != "") {

@@ -63,10 +63,6 @@ class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsF
       // Once #1712 is fixed, should return true
       // See https://github.com/orbeon/orbeon-forms/issues/1712
       runAndAssert(Form, "edit", noscript = true)(expectedInitialHit = false, staticStateHoldsTemplate)
-
-      // NOTE: Need to run schema.xpl or FR PFC for this to work
-      // See https://github.com/orbeon/orbeon-forms/issues/1731
-      // runAndAssert(Form, "schema")(expectedFound = false)
     }
 
     locally {
@@ -79,10 +75,6 @@ class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsF
       runAndAssert(Form, "pdf" )(expectedInitialHit = true,  staticStateHoldsTemplate)
 
       runAndAssert(Form, "edit", noscript = true)(expectedInitialHit = true, staticStateHoldsTemplate)
-
-      // NOTE: Need to run schema.xpl or FR PFC for this to work
-      // See https://github.com/orbeon/orbeon-forms/issues/1731
-      // runAndAssert(Form, "schema")(expectedFound = false)
     }
   }
 }

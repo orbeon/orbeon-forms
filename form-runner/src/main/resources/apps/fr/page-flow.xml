@@ -141,12 +141,6 @@
     <!-- Import a collection of form data -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(import)" view="import/import.xpl"/>
 
-    <!-- Generate a schema for a form -->
-    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(schema)"
-             model="detail/detail-model.xpl"
-             view="services/schema.xpl">
-    </service>
-
     <!-- Duplicate form data -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(duplicate)"
              model="request-parameters.xpl"

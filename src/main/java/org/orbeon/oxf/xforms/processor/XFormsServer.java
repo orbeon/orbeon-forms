@@ -631,6 +631,17 @@ public class XFormsServer extends ProcessorImpl {
                     ch.endElement();
                 }
 
+                // Add repeat hierarchy update if needed
+                // https://github.com/orbeon/orbeon-forms/issues/2891
+                if (repeatHierarchy != null) {
+                    final String newRepeatHierarchy = containingDocument.getStaticOps().getRepeatHierarchyString(containingDocument.getContainerNamespace());
+                    if (! repeatHierarchy.equals(newRepeatHierarchy)) {
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-hierarchy");
+                        ch.text(XFormsUtils.escapeJavaScript(newRepeatHierarchy));
+                        ch.endElement();
+                    }
+                }
+
                 // Output repeat indexes information
                 {
                     // Output index updates
@@ -674,19 +685,6 @@ public class XFormsServer extends ProcessorImpl {
                     final List<XFormsContainingDocument.Message> messages = containingDocument.getMessagesToRun();
                     if (messages.size() > 0) {
                         outputMessagesInfo(ch, messages);
-                    }
-                }
-
-                // Add repeat hierarchy update if needed
-                if (repeatHierarchy != null) {
-                    final String newRepeatHierarchy = containingDocument.getStaticOps().getRepeatHierarchyString(containingDocument.getContainerNamespace());
-                    if (! repeatHierarchy.equals(newRepeatHierarchy)) {
-                        final String escaped = XFormsUtils.escapeJavaScript(newRepeatHierarchy);
-                        outputLoadsInfo(
-                            ch,
-                            containingDocument,
-                            Collections.singletonList(new XFormsContainingDocument.Load("javascript:ORBEON.xforms.Globals.processRepeatHierarchy('"+ escaped + "')", null, null, false, false))
-                        );
                     }
                 }
 

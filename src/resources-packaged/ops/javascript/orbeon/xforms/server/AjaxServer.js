@@ -1866,6 +1866,12 @@
                         _.each(actionElement.childNodes, function(childNode) {
                             switch (ORBEON.util.Utils.getLocalName(childNode)) {
 
+                                // Update repeat hierarchy
+                                case "repeat-hierarchy": {
+                                    ORBEON.xforms.Globals.processRepeatHierarchy(ORBEON.util.Dom.getStringValue(childNode));
+                                    break;
+                                }
+
                                 // Change highlighted section in repeat
                                 case "repeat-indexes": {
                                     var repeatIndexesElement = childNode;

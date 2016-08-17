@@ -3434,6 +3434,10 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
                 // Parse and store initial repeat hierarchy
                 processRepeatHierarchy: function (repeatTreeString) {
+
+                    ORBEON.xforms.Globals.repeatTreeChildToParent = {};
+                    ORBEON.xforms.Globals.repeatTreeParentToAllChildren = {};
+
                     var repeatTree = repeatTreeString.split(",");
                     for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
                         var repeatInfo = repeatTree[repeatIndex].split(" ");

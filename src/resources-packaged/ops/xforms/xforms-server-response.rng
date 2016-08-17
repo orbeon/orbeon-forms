@@ -309,6 +309,11 @@
                             </element>
                         </optional>
                         <optional>
+                            <element name="xxf:repeat-hierarchy">
+                                <data type="string"/>
+                            </element>
+                        </optional>
+                        <optional>
                             <element name="xxf:repeat-indexes">
                                 <zeroOrMore>
                                     <element name="xxf:repeat-index">

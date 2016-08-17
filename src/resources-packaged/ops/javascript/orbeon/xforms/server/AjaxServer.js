@@ -1010,7 +1010,7 @@
 
                         var recreatedInputs = {};
 
-                        function handleItemset(elem, controlId) {
+                        function handleItemset(elem, controlId, isReadonly) {
 
                             var itemsetTree = JSON.parse(ORBEON.util.Dom.getStringValue(elem));
 
@@ -1167,8 +1167,12 @@
                                         inputCheckboxOrRadio.checked = true;
                                     }
 
-                                    // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
-                                    inputCheckboxOrRadio.removeAttribute("disabled");
+                                    // Set or remove `disabled` depending on whether the control is readonly.
+                                    // NOTE: jQuery went back and forth on using `attr()` vs. `prop()` but this seems to work.
+                                    if (isReadonly)
+                                        $(inputCheckboxOrRadio).attr('disabled', true);
+                                    else
+                                        $(inputCheckboxOrRadio).removeAttr('disabled');
                                 });
                             }
 
@@ -1673,7 +1677,7 @@
                             _.each(elem.childNodes, function(childNode) {
                                 switch (ORBEON.util.Utils.getLocalName(childNode)) {
                                     case 'itemset':
-                                        handleItemset(childNode, controlId);
+                                        handleItemset(childNode, controlId, readonly == "true");
                                         break;
                                     case 'case':
                                         handleSwitchCase(childNode);

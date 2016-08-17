@@ -1874,10 +1874,9 @@
 
                                 // Change highlighted section in repeat
                                 case "repeat-indexes": {
-                                    var repeatIndexesElement = childNode;
                                     var newRepeatIndexes = {};
                                     // Extract data from server response
-                                    _.each(repeatIndexesElement.childNodes, function(childNode) {
+                                    _.each(childNode.childNodes, function(childNode) {
                                         if (ORBEON.util.Utils.getLocalName(childNode) == "repeat-index") {
                                             var repeatIndexElement = childNode;
                                             var repeatId = ORBEON.util.Dom.getAttribute(repeatIndexElement, "id");

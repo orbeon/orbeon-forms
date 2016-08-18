@@ -110,27 +110,21 @@ trait Reindex extends FormDefinition {
             |      orbeon_form_data d,
             |      (
             |        SELECT
-            |          app,
-            |          form,
             |          document_id,
+            |          draft,
             |          max(last_modified_time) last_modified_time
             |        FROM
             |          orbeon_form_data
             |        WHERE
-            |          draft = 'N'
-            |          ${whereConditions.map("AND " + _).mkString(" ")}
+            |          ${whereConditions.mkString(" AND ")}
             |        GROUP BY
-            |          app, form, document_id
+            |          document_id,
+            |          draft
             |      ) l
             |   WHERE
-            |     d.app                  = l.app                AND
-            |     d.form                 = l.form               AND
             |     d.document_id          = l.document_id        AND
-            |     d.deleted              = 'N'                  AND
-            |     (
-            |       d.last_modified_time = l.last_modified_time OR
-            |       d.draft              = 'Y'
-            |     )
+            |     d.last_modified_time   = l.last_modified_time AND
+            |     d.deleted              = 'N'
             |""".stripMargin
 
       // Count how many documents we'll reindex, and tell progress code

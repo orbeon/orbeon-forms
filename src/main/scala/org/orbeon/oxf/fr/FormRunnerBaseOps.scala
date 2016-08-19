@@ -187,10 +187,17 @@ trait FormRunnerBaseOps {
   def authorizedOperationsInstance = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
 
   // See also FormRunnerHome
+  private val CreateOps    = Set("*", "create")
+  private val ReadOps      = Set("*", "read")
   private val UpdateOps    = Set("*", "update")
+  private val DeleteOps    = Set("*", "delete")
 
   def authorizedOperations = split[Set](authorizedOperationsInstance.rootElement.stringValue)
-  def supportsUpdate       = authorizedOperations intersect UpdateOps nonEmpty
+
+  def canCreate = authorizedOperations intersect CreateOps nonEmpty
+  def canRead   = authorizedOperations intersect ReadOps   nonEmpty
+  def canUpdate = authorizedOperations intersect UpdateOps nonEmpty
+  def canDelete = authorizedOperations intersect DeleteOps nonEmpty
 
   // Captcha support
   def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")

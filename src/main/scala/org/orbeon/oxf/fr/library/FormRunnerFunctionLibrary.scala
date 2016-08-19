@@ -74,29 +74,33 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 private object FormRunnerFunctions {
 
   val StringGettersByName = List(
-    "mode"                             → (() ⇒ FormRunner.FormRunnerParams().mode),
-    "app-name"                         → (() ⇒ FormRunner.FormRunnerParams().app),
-    "form-name"                        → (() ⇒ FormRunner.FormRunnerParams().form),
-    "document-id"                      → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
-    "lang"                             → (() ⇒ FormRunner.currentLang.stringValue),
-    "username"                         → (() ⇒ NetUtils.getExternalContext.getRequest.getUsername),
-    "user-group"                       → (() ⇒ NetUtils.getExternalContext.getRequest.getUserGroup)
+    "mode"                 → (() ⇒ FormRunner.FormRunnerParams().mode),
+    "app-name"             → (() ⇒ FormRunner.FormRunnerParams().app),
+    "form-name"            → (() ⇒ FormRunner.FormRunnerParams().form),
+    "document-id"          → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
+    "lang"                 → (() ⇒ FormRunner.currentLang.stringValue),
+    "username"             → (() ⇒ NetUtils.getExternalContext.getRequest.getUsername),
+    "user-group"           → (() ⇒ NetUtils.getExternalContext.getRequest.getUserGroup)
   )
 
   val BooleanGettersByName = List(
-    "is-design-time"                   → (() ⇒ FormRunner.isDesignTime),
-    "is-readonly-mode"                 → (() ⇒ FormRunner.isReadonlyMode),
-    "is-noscript"                      → (() ⇒ FormRunner.isNoscript),
-    "is-form-data-valid"               → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
-    "is-form-data-saved"               → (() ⇒ FormRunner.isFormDataSaved),
-    "is-wizard-toc-shown"              → (() ⇒ FormRunner.isWizardTocShown),
-    "is-wizard-body-shown"             → (() ⇒ FormRunner.isWizardBodyShown),
-    "is-wizard-first-page"             → (() ⇒ FormRunner.isWizardFirstPage),
-    "is-wizard-last-page"              → (() ⇒ FormRunner.isWizardLastPage)
+    "is-design-time"       → (() ⇒ FormRunner.isDesignTime),
+    "is-readonly-mode"     → (() ⇒ FormRunner.isReadonlyMode),
+    "is-noscript"          → (() ⇒ FormRunner.isNoscript),
+    "is-form-data-valid"   → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
+    "is-form-data-saved"   → (() ⇒ FormRunner.isFormDataSaved),
+    "is-wizard-toc-shown"  → (() ⇒ FormRunner.isWizardTocShown),
+    "is-wizard-body-shown" → (() ⇒ FormRunner.isWizardBodyShown),
+    "is-wizard-first-page" → (() ⇒ FormRunner.isWizardFirstPage),
+    "is-wizard-last-page"  → (() ⇒ FormRunner.isWizardLastPage),
+    "can-create"           → (() ⇒ FormRunner.canCreate),
+    "can-read"             → (() ⇒ FormRunner.canRead),
+    "can-update"           → (() ⇒ FormRunner.canUpdate),
+    "can-delete"           → (() ⇒ FormRunner.canDelete)
   )
 
   val IntGettersByName = List(
-    "form-version"                     → (() ⇒ FormRunner.FormRunnerParams().formVersion)
+    "form-version"         → (() ⇒ FormRunner.FormRunnerParams().formVersion)
   )
 
   val IndexedStringFunctions = (

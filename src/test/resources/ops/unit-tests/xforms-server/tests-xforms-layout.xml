@@ -2039,7 +2039,6 @@
                 <xh:script src="/ops/yui/button/button-min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/button/button.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/number/number.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/slider/slider-min.js"/>
                 <xh:script src="/xbl/orbeon/currency/currency.js"/>
             </xh:head>
         </output>

@@ -156,15 +156,10 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         }
       )(_, _, _)
 
-    def getCSSResources(useDoc: Boolean) = {
-      val ops = if (useDoc) containingDocument.getStaticOps else null
-      XFormsFeatures.getCSSResources(ops).asScala
-    }
-
     // Output all CSS
     XBLResources.outputResources(
       outputCSSElement,
-      getCSSResources,
+      XFormsFeatures.cssResources.asScala,
       headElements,
       baselineResources,
       minimal
@@ -188,15 +183,10 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))
       )(_, _, _)
 
-    def getJavaScriptResources(useDoc: Boolean) = {
-      val ops = if (useDoc) containingDocument.getStaticOps else null
-      XFormsFeatures.getJavaScriptResources(ops).asScala
-    }
-
     // Output all JS
     XBLResources.outputResources(
       outputJSElement,
-      getJavaScriptResources,
+      XFormsFeatures.javaScriptResources.asScala,
       headElements,
       baselineResources,
       minimal

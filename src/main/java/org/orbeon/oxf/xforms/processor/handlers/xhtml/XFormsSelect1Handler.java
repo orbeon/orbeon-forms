@@ -164,6 +164,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     itemset.visit(xmlReceiver, new ItemsetListener<ContentHandler>() {
 
                         private boolean inOptgroup = false; // nesting opgroups is not allowed, avoid it
+                        private boolean gotSelected = false;
 
                         public void startLevel(ContentHandler contentHandler, Item item) {}
 
@@ -198,7 +199,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
                                 inOptgroup = true;
                             } else {
-                                handleItemCompact(contentHandler, optionQName, control, isMultiple, item, encode);
+                                gotSelected |= handleItemCompact(contentHandler, optionQName, control, isMultiple, item, encode, gotSelected);
                             }
                         }
 
@@ -535,13 +536,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         return isSelected;
     }
 
-    private void handleItemCompact(
+    private boolean handleItemCompact(
         ContentHandler contentHandler,
         String optionQName,
         XFormsValueControl xformsControl,
         boolean isMultiple,
         Item item,
-        boolean encode
+        boolean encode,
+        boolean gotSelected
     ) throws SAXException {
 
         final String itemClasses = getItemClasses(item, null);
@@ -551,8 +553,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         optionAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode));
 
         // Figure out whether what items are selected
-        boolean isSelected = isSelected(handlerContext, xformsControl, isMultiple, item);
-        if (isSelected)
+        // Don't output more than one `selected` in the case of single-selection, see:
+        // https://github.com/orbeon/orbeon-forms/issues/2901
+        boolean mustSelect = (isMultiple || ! gotSelected) && isSelected(handlerContext, xformsControl, isMultiple, item);
+        if (mustSelect)
             optionAttributes.addAttribute("", "selected", "selected", XMLReceiverHelper.CDATA, "selected");
 
         // xhtml:option
@@ -562,6 +566,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         if (label != null)
             contentHandler.characters(label.toCharArray(), 0, label.length());
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName);
+
+        return mustSelect;
     }
 
     private static void addItemAttributes(Item item, AttributesImpl spanAttributes) {

@@ -115,7 +115,7 @@ trait Reindex extends FormDefinition {
             |          max(last_modified_time) last_modified_time
             |        FROM
             |          orbeon_form_data
-            |        WHERE
+            |        ${whereConditions.nonEmpty.string("WHERE")}
             |          ${whereConditions.mkString(" AND ")}
             |        GROUP BY
             |          document_id,

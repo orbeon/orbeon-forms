@@ -777,7 +777,7 @@
         </yui-compressor>
 
         <!-- Form Runner JavaScript -->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="src/resources" todir="build/orbeon-war/WEB-INF/resources">
+        <yui-compressor warn="false" charset="UTF-8" fromdir="form-runner/src/main/resources" todir="build/orbeon-war/WEB-INF/resources">
             <include name="apps/fr/script/form-runner.js"/>
         </yui-compressor>
 

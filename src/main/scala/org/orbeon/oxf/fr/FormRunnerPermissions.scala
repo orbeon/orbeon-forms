@@ -42,8 +42,7 @@ trait FormRunnerPermissions {
    * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
    */
   //@XPathFunction
-  def authorizedOperationsBasedOnRoles(permissionsElOrNull: NodeInfo): List[String] = {
-
+  def authorizedOperationsBasedOnRoles(permissionsElOrNull: NodeInfo): List[String] =
     Option(permissionsElOrNull) match {
       case None ⇒
         // No permissions defined for this form, authorize any operation
@@ -68,7 +67,6 @@ trait FormRunnerPermissions {
             // Remove duplicate operations
             .distinct
     }
-  }
 
   //@XPathFunction
   def xpathAllAuthorizedOperations(

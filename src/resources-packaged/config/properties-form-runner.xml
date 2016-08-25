@@ -216,20 +216,6 @@
         refresh edit pdf save
     </property>
 
-    <!-- Register and license forms -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.register.form"           value="resource"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.register"                      value="refresh review"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.register"                 value="refresh edit send"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.success.uri.orbeon.register">
-        /fr/orbeon/license/view/bc3b89cdb12968bb96a8dd6b69fbf85a
-    </property>
-    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.register"                    value="false"/>
-
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.license.form"            value="resource"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.license"                       value="close"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.license"                  value="home"/>
-    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>
-
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 
     <!-- Button processes -->

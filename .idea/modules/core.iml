@@ -114,6 +114,7 @@
           <root url="jar://$MODULE_DIR$/../../lib/json-20090211.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/jtidy-8.0-20060801.131059-3.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/junit-4.11.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/liferay-portal-kernel-7.0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/liferay-portal-service-6.1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/log4j-1.2.17.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/looks-1_1_2.jar!/" />

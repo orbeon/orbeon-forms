@@ -16,8 +16,6 @@ package org.orbeon.oxf.portlet.liferay
 import javax.portlet._
 import javax.portlet.filter._
 
-import com.liferay.portal.model.User
-import com.liferay.portal.util.PortalUtil
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
 import org.orbeon.oxf.util.ScalaUtils
@@ -93,16 +91,16 @@ object FormRunnerAuthFilter {
 
   // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to either
   // userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the user.
-  def amendRequestWithUser[T <: PortletRequest](req: T)(amend: (T, User) ⇒ T): T =
-    PortalUtil.getUser(PortalUtil.getHttpServletRequest(req)) match {
-      case user: User ⇒ amend(req, user)
-      case _          ⇒ req
+  def amendRequestWithUser[T <: PortletRequest](req: T)(amend: (T, LiferayUser) ⇒ T): T =
+    LiferaySupport.getLiferayUser(req) match {
+      case Some(user) ⇒ amend(req, user)
+      case None       ⇒ req
     }
 
-  def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: User): T = {
+  def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: LiferayUser): T = {
 
     val liferayUserHeaders =
-      ScalaUtils.combineValues[String, String, Array](LiferaySupport.userHeaders(user)) map
+      ScalaUtils.combineValues[String, String, Array](user.userHeaders) map
         { case (name, value) ⇒ name.toLowerCase → value } toMap
 
     wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)

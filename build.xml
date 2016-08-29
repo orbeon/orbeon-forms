@@ -319,8 +319,10 @@
 
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
+            -libraryjars lib/portlet-api_2.0.jar
             -libraryjars lib/slf4j-api-1.7.7.jar
             -libraryjars lib/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/liferay-portal-kernel-7.0.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
@@ -378,6 +380,8 @@
             -libraryjars lib/servlet-2_3-4_0_4.jar
             -libraryjars lib/portlet-api_2.0.jar
             -libraryjars lib/slf4j-api-1.7.7.jar
+            -libraryjars lib/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/liferay-portal-kernel-7.0.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
@@ -428,6 +432,10 @@
 
             -libraryjars ${java.home}/lib/rt.jar
             -libraryjars lib/servlet-2_3-4_0_4.jar
+            -libraryjars lib/portlet-api_2.0.jar
+            -libraryjars lib/slf4j-api-1.7.7.jar
+            -libraryjars lib/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/liferay-portal-kernel-7.0.jar
 
             -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter {
                 public static *;
@@ -1002,6 +1010,7 @@
                         <pathelement location="lib/servlet-2_3-4_0_4.jar"/>
                         <pathelement location="lib/portlet-api_2.0.jar"/>
                         <pathelement location="lib/liferay-portal-service-6.1.1.jar"/>
+                        <pathelement location="lib/liferay-portal-kernel-7.0.jar"/>
                         <pathelement location="${oracle.jar}"/>
                         <pathelement location="${mysql.jar}"/>
                         <pathelement location="${sqlserver.jar}"/>

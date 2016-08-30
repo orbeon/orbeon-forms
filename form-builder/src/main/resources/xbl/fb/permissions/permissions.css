@@ -1,33 +1,24 @@
 .orbeon .xforms-dialog.fb-permissions-dialog {
-  width: 450px;
+  width: 500px;
 }
-.orbeon .xforms-dialog.fb-permissions-dialog .xforms-select-appearance-full label {
-  display: inline-block;
-  padding-top: 5px;
-  margin-bottom: 0;
-  vertical-align: middle;
-  white-space: nowrap;
-  padding-top: 0;
-}
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat {
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid {
   margin-top: 1em;
-  width: 100%;
 }
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat .fb-role {
-  width: 100%;
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-col-1 {
+  width: 150px;
 }
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat .xforms-input input {
-  width: 100%;
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-td,
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-th {
+  text-align: center;
 }
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat th {
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-th .xforms-label {
   font-weight: bold;
+  text-align: center;
 }
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat th,
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat td {
-  padding-right: 10px;
-  height: 28px;
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-th.fb-role .xforms-label,
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-td.fb-role {
+  text-align: left;
 }
-.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-repeat i.disabled {
-  opacity: 0.4;
-  filter: alpha(opacity=40);
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .checkbox > span {
+  display: none;
 }

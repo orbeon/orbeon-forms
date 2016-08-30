@@ -10,32 +10,40 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import (reference) "../../../../resources/apps/fr/style/bootstrap-src/less/variables";
-@import (reference) "../../../../resources/apps/fr/style/bootstrap-src/less/mixins";
-@import (reference) "../../../../resources/apps/fr/style/bootstrap-src/less/forms";
-@import (reference) "../../../../resources/apps/fr/style/form-runner-bootstrap-override";
+@import (reference) "../../../../../../../bootstrap-src/less/variables";
+@import (reference) "../../../../../../../bootstrap-src/less/mixins";
+@import (reference) "../../../../../../../bootstrap-src/less/forms";
+@import (reference) "../../../../../../../form-runner/src/main/resources/apps/fr/style/form-runner-bootstrap-override";
 
 .orbeon {
     .xforms-dialog.fb-permissions-dialog {
-        width: 450px;                                   // Large dialog, to have space for editing roles
-        .xforms-select-appearance-full {
-            label {
-                .checkbox.inline();                     // Re-use Bootstrap style for inline checkboxes
-                white-space: nowrap;                    // Not sure why, but browser splits text in inline-block over multiple lines even if not needed
-                padding-top: 0;
-            }
-        }
-        .fb-permissions-repeat {
+
+        width: 500px;                                   // Large dialog, to have space for editing roles
+
+        .fb-permissions-grid {
+
             margin-top: 1em;                            // Spacing before the roles table
-            width: 100%;                                // Table to use the whole width of the dialog
-            .fb-role { width: 100% }                    // First column with the input fields to use all the remaining space
-            .xforms-input input { width: 100% }         // Input field to use all the space in the column
-            th { font-weight: bold }
-            th, td {
-                padding-right: 10px;                    // Padding in cells of table
-                height: @controlsHeight;                // So the lines all have the same height
+
+            .fr-grid-col-1 {
+                width: 150px;
             }
-            i.disabled { .opacity(40) }
+
+            .fr-grid-td, .fr-grid-th {
+                text-align: center;
+            }
+
+            .fr-grid-th .xforms-label {
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .fr-grid-th.fb-role .xforms-label, .fr-grid-td.fb-role {
+                text-align: left;
+            }
+
+            .checkbox > span {
+                display: none;
+            }
         }
     }
 }

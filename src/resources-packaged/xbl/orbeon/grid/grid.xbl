@@ -603,6 +603,14 @@
                     </xf:group>
                 </xsl:template>
 
+                <!-- Allow xf:var within xh:tr/xh:td but must add outer scope -->
+                <xsl:template match="xf:var" mode="grid-content">
+                    <xsl:copy>
+                        <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
                 <xsl:template match="*:tr" mode="grid-content">
                     <xsl:element name="{$tr-elem}">
                         <xsl:copy-of select="@* except @class"/>

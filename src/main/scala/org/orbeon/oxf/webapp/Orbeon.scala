@@ -27,7 +27,7 @@ object Orbeon {
 
   private val PropertiesProperty = "oxf.properties"
   private val LoggingProperty    = "oxf.initialize-logging"
-  private val logger = LoggerFactory.createLogger(Orbeon.getClass)
+  private val logger             = LoggerFactory.createLogger(Orbeon.getClass)
 
   val OrbeonFormsAscii =
     """   ____       __                        ______

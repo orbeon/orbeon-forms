@@ -19,6 +19,9 @@
 .orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .fr-grid-td.fb-role {
   text-align: left;
 }
+.orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .checkbox {
+  margin: 0;
+}
 .orbeon .xforms-dialog.fb-permissions-dialog .fb-permissions-grid .checkbox > span {
   display: none;
 }

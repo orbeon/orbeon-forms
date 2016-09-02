@@ -21,14 +21,6 @@
 @fbGridIconsGutter: 22px;
 @fbIconsHeight: 16px;
 
-// Mixin to create a scrollable area in a dialog
-.dialog-scrollable(@height) {
-    max-height: @height;
-    overflow-y: auto;
-    padding: 0;
-    &> * { background-color: white }
-}
-
 // Overwrite definition in form-runner-orbeon.css if any
 html {
     overflow-y: scroll;
@@ -276,34 +268,6 @@ body {
             th { text-align: left }
             td { text-align: right; padding-left: .5em }
             &> .xforms-label { border-bottom: 1px solid #DDE }
-        }
-    }
-
-    // Itemset editor dialog
-    // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
-    .fb-dialog-itemsets {
-        width: 600px;
-        max-width: none;
-
-        .xbl-fr-grid {
-            .dialog-scrollable(450px);
-            table.fr-grid { table-layout: auto }                        // So we can remove columns (hint) with display: none
-            clear: both;
-        }
-
-        .fb-itemset-hint-cell { width: 200px }                          // Make hint section wider than the label/value
-        .fr-grid-2-columns .xforms-input input { width: 13em }
-        .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
-        .xbl-fr-link-select1 .xforms-label { display: none }
-        .xforms-invalid .xforms-input-input { border-color: #DF731B }   // Show errors also for fields that aren't visited
-
-        // Ideally boolean inputs should display better by default (https://github.com/orbeon/orbeon-forms/issues/854)
-        .xforms-type-boolean {
-            display: block;
-            float: left;
-            margin-bottom: 5px;
-            input { margin-top: -3px }
-            label { display: inline }
         }
     }
 
@@ -754,7 +718,7 @@ body {
 
     // Hide XForms Inspector in Form Builder, since it doesn't show properly in Form Builder
     .xbl-fr-xforms-inspector {
-        display: none;
+        //display: none;
     }
 }
 

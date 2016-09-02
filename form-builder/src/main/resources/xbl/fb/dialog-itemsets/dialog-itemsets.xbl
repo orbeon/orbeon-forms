@@ -58,6 +58,11 @@
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
 
+            <!-- Remove all values -->
+            <xbl:handler event="DOMActivate" observer="remove-all-trigger">
+                <xf:delete ref="$i/items/item"/>
+            </xbl:handler>
+
             <!-- Clear Value -->
             <xbl:handler event="DOMActivate" observer="clear-value-trigger">
                 <xf:setvalue ref="$i/control-value" />
@@ -204,6 +209,9 @@
                     </xf:group>
 
                     <xh:div class="fr-dialog-buttons">
+                        <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left">
+                            <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>
+                        </xf:trigger>
                         <xf:trigger id="clear-value-trigger">
                             <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
                         </xf:trigger>

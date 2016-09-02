@@ -121,7 +121,7 @@ trait ResourcesOps extends BaseOps {
       yield
         <item>
           {
-            for (lang  ← allLangs)
+            for (lang ← allLangs)
             yield
               <label lang={lang}>{lhhaForLangAndValue(lang, value, "label")}</label> ::
               (addHints list <hint lang={lang}>{lhhaForLangAndValue(lang, value, "hint")}</hint>)
@@ -132,9 +132,9 @@ trait ResourcesOps extends BaseOps {
     def emptyItemElem =
       <item>
         {
-          for (lang  ← allLangs)
+          for (lang ← allLangs)
           yield
-            <label lang=""/> :: (addHints list <hint lang=""/>)
+            <label lang={lang}/> :: (addHints list <hint lang={lang}/>)
         }
         <value/>
       </item>

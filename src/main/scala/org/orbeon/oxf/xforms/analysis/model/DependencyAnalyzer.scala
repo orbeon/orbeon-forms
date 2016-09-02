@@ -58,7 +58,15 @@ object DependencyAnalyzer {
       }
   }
 
-  def determineEvaluationOrder(tree: BindTree, mip: Model.StringMIP): List[StaticBind] = {
+  //
+  // Return an evaluation order or a `ValidationException` if there is a cycle.
+  //
+  // NOTE: If a variable reference is not found, this behaves as if the variabel reference was missing.
+  //
+  def determineEvaluationOrder(
+    tree : BindTree,
+    mip  : Model.StringMIP // `Model.Calculate` or `Model.Default`.
+  ): List[StaticBind] = {
 
     if (Logger.isDebugEnabled)
       Logger.debug(s"analyzing ${mip.name} dependencies for model ${tree.model.staticId}")

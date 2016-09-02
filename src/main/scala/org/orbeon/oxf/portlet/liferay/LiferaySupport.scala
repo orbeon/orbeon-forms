@@ -35,7 +35,7 @@ object LiferaySupport {
   // We must abstract over code which changed packages between Liferay 6.2 and 7.0. We achieve this
   // using Java reflection.
 
-  // Abstract `PortalUtil` static methods which we use
+  // `PortalUtil` methods which we use. We can't use structural types as the methods are static.
   private val (getHttpServletRequestMethod, getUserMethod) = {
 
     val portalUtilClass =
@@ -43,7 +43,7 @@ object LiferaySupport {
         Class.forName("com.liferay.portal.util.PortalUtil")
 
     portalUtilClass.getMethod("getHttpServletRequest", classOf[PortletRequest]) →
-    portalUtilClass.getMethod("getUser", classOf[HttpServletRequest])
+    portalUtilClass.getMethod("getUser",               classOf[HttpServletRequest])
   }
 
   def getHttpServletRequest(req: PortletRequest): HttpServletRequest =

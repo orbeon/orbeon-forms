@@ -646,8 +646,6 @@
                             else
                                 xs:boolean($inverse-override)"/>
 
-                    "/>
-
                     <!-- Message shown next to the buttons (empty by default) -->
                     <xh:span class="fr-buttons-message">
                         <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>

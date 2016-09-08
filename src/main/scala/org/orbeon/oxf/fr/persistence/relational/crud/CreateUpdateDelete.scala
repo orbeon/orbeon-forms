@@ -45,7 +45,8 @@ object RequestReader {
   private val MetadataElementsToKeep = Set(
     "metadata",
     "title",
-    "permissions"
+    "permissions",
+    "available"
   )
 
   // NOTE: Tested that the pattern match works optimally: with form-with-metadata.xhtml, JQName.unapply is

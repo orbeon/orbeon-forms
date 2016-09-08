@@ -43,6 +43,7 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
           </permission>
           <permission operations="create"/>
         </permissions>
+        <available>false</available>
       </metadata>
 
     assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map Dom4jUtils.readDom4j get)

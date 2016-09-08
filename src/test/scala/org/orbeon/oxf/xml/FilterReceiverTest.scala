@@ -82,6 +82,8 @@ class FilterReceiverTest extends ResourceManagerTestBase with AssertionsForJUnit
             StartElement("permission", Atts(Seq(Operations → "create"))),
             EndElement("permission"),
           EndElement("permissions"),
+        StartElement("available", Atts(Nil)),
+        EndElement("available"),
         EndElement("metadata"),
         EndPrefixMapping("sql"),
         EndPrefixMapping("fr"),

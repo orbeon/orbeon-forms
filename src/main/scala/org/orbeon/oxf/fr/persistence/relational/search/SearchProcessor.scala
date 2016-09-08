@@ -47,7 +47,6 @@ class SearchProcessor
           // Generate and send output
           val (result, count) = doSearch(request)
           outputResult(request, result, count, xmlReceiver)
-
         }
       }
     )

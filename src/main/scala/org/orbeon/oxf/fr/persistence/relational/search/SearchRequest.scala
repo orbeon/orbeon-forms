@@ -62,7 +62,8 @@ trait SearchRequest {
               .drop(1)
               .map(c ⇒
                 Column(
-                  path       = c.attValue("path"),
+                  // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
+                  path       = c.attValue("path").replaceAllLiterally("[1]", ""),
                   filterWith = ScalaUtils.trimAllToOpt(c.stringValue)
                 )
               ),

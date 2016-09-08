@@ -11,19 +11,18 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.portlet
+package org.orbeon.oxf.portlet.liferay
 
 import java.{util ⇒ ju}
 import javax.portlet.filter.PortletRequestWrapper
 import javax.portlet.{PortletRequest, PortletSession}
 
-import com.liferay.portal.model.{Group, Role, User}
 import org.junit.Test
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter
+import org.orbeon.oxf.portlet.liferay.LiferaySupport.RoleFacade
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
@@ -61,28 +60,30 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
       override def getPortletSession(create: Boolean) = mockSession
     }
 
-    val mockRoleManager = mock[Role]
-    Mockito when mockRoleManager.getName  thenReturn "manager"
+    class MyGroup {
+      def getName         = "universe"
+      def getGroupId      = 42L
+    }
 
-    val mockRoleEmployee = mock[Role]
-    Mockito when mockRoleEmployee.getName thenReturn "employee"
+    case class MyRole(
+      getName             : String
+    )
 
-    val mockGroup = mock[Group]
-    Mockito when mockGroup.getGroupId     thenReturn 42
-    Mockito when mockGroup.getName        thenReturn "universe"
-
-    val mockUser = mock[User]
-    Mockito when mockUser.getUserId       thenReturn 123
-    Mockito when mockUser.getScreenName   thenReturn "jsmith"
-    Mockito when mockUser.getFullName     thenReturn "John Smith"
-    Mockito when mockUser.getEmailAddress thenReturn "test@orbeon.com"
-    Mockito when mockUser.getRoles        thenReturn ju.Arrays.asList(mockRoleManager, mockRoleEmployee)
-    Mockito when mockUser.getGroup        thenReturn mockGroup
+    class MyUser {
+      def getUserId       = 123L
+      def getScreenName   = "jsmith"
+      def getFullName     = "John Smith"
+      def getEmailAddress = "test@orbeon.com"
+      def getGroup        = new MyGroup
+      def getRoles        = ju.Arrays.asList(MyRole("manager"): RoleFacade, MyRole("employee"): RoleFacade)
+    }
 
     import FormRunnerAuthFilter._
 
     val amendedRequest =
-      wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(mockRequest, mockUser))
+      wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(mockRequest, new LiferayUser {
+        override def userHeaders = LiferaySupport.userHeaders(new MyUser)
+      }))
 
     val expectedProperties =
       initialProperties ++ Map(

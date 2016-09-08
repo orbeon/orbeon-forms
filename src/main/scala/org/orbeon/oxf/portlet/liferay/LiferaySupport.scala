@@ -36,7 +36,7 @@ object LiferaySupport {
   // using Java reflection.
 
   // `PortalUtil` methods which we use. We can't use structural types as the methods are static.
-  private val (getHttpServletRequestMethod, getUserMethod) = {
+  private lazy val (getHttpServletRequestMethod, getUserMethod) = {
 
     val portalUtilClass =
       Try(Class.forName("com.liferay.portal.kernel.util.PortalUtil")) getOrElse
@@ -53,7 +53,8 @@ object LiferaySupport {
     getUserMethod.invoke(req).asInstanceOf[UserFacade]
 
   // Facade types as structural types so that we get Java reflective calls with little boilerplate!
-  private type UserFacade = {
+  // NOTE: Package private for tests.
+  private[liferay] type UserFacade = {
     def getUserId       : Long
     def getScreenName   : String
     def getFullName     : String
@@ -62,12 +63,12 @@ object LiferaySupport {
     def getRoles        : ju.List[RoleFacade]
   }
 
-  private type GroupFacade = {
+  private[liferay] type GroupFacade = {
     def getName         : String
     def getGroupId      : Long
   }
 
-  private type RoleFacade = {
+  private[liferay] type RoleFacade = {
     def getName         : String
   }
 
@@ -89,15 +90,17 @@ object LiferaySupport {
   def languageHeader(req: PortletRequest) =
     LanguageUtil.getLanguageId(req).trimAllToOpt map ("Orbeon-Liferay-Language" →)
 
+  def userHeaders(user: UserFacade): List[(String, String)] =
+    for {
+      (name, getter) ← HeaderNamesGetters
+      value          ← getter(user)
+    } yield
+      name → value
+
   def getLiferayUser(req: PortletRequest): Option[LiferayUser] =
     Option(getUser(getHttpServletRequest(req))) map { user ⇒
       new LiferayUser {
-        def userHeaders: List[(String, String)] =
-          for {
-            (name, getter) ← HeaderNamesGetters
-            value          ← getter(user)
-          } yield
-            name → value
+        def userHeaders = LiferaySupport.userHeaders(user)
       }
     }
 }

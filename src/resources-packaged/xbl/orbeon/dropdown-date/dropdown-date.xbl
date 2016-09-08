@@ -90,7 +90,7 @@
 
                 <!-- TODO: would need global instances! -->
                 <xf:instance id="years-itemset">
-                    <years/>
+                    <years start="" end=""/>
                 </xf:instance>
 
                 <xf:instance id="months-itemset">
@@ -103,8 +103,26 @@
 
                 <!-- Initialize itemsets upon initialization -->
                 <xf:action ev:event="xforms-model-construct-done">
-                    <xf:var name="start-year" value="saxon:evaluate(xxf:property('oxf.xforms.xbl.fr.dropdown-date.start-year'))" as="xs:integer"/>
-                    <xf:var name="end-year"   value="saxon:evaluate(xxf:property('oxf.xforms.xbl.fr.dropdown-date.end-year'  ))" as="xs:integer"/>
+
+                    <!-- Figure start-end years -->
+                    <xf:action iterate="instance('years-itemset')/@*">
+                        <xf:var name="start-end" value="."/>
+                        <xf:var name="prop-name" value="concat('oxf.xforms.xbl.fr.dropdown-date.', local-name($start-end), '-year')"/>
+                        <!-- If in Form Runner, try using app/form property -->
+                        <xf:action if="exists(xxf:instance('fr-form-instance'))">
+                            <xf:setvalue
+                                ref="$start-end"
+                                value="saxon:evaluate(xxf:property(string-join(($prop-name, fr:app-name(), fr:form-name()), '.')))"/>
+                        </xf:action>
+                        <!-- In all cases, if we haven't found an app/form property, use the global property -->
+                        <xf:setvalue
+                            if="$start-end = ''"
+                            ref="$start-end"
+                            value="saxon:evaluate(xxf:property($prop-name))"/>
+                    </xf:action>
+                    <xf:var name="start-year" value="instance('years-itemset')/@start" as="xs:integer"/>
+                    <xf:var name="end-year"   value="instance('years-itemset')/@end  " as="xs:integer"/>
+
                     <xf:action iterate="($start-year to $end-year)">
                         <xf:var name="year" value="." as="xs:string"/>
                         <xf:insert context="instance('years-itemset')" origin="xf:element('year', $year)"/>

@@ -215,7 +215,9 @@
                     method="get"
                     resource="/fr/service/persistence/reindex"
                     replace="none"
-                    mode="asynchronous"/>
+                    mode="asynchronous">
+                <xf:setvalue event="xforms-submit" ref="instance('fr-reindex-instance')/status">starting</xf:setvalue>
+            </xf:submission>
 
             <!-- Refresh page every 2s -->
             <xf:action

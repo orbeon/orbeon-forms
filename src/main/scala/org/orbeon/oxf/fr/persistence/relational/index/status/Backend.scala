@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
-import org.orbeon.oxf.fr.persistence.relational.Provider.Provider
-
 // Functions called by the backend
 
 object Backend {
 
-  def reindexingProviders[T](
-    providers     : List[Provider],
-    indexProvider : Provider ⇒ Unit)
+  def reindexingProviders(
+    providers     : List[String],
+    indexProvider : String ⇒ Unit)
   : Unit = {
     providers
       .zipWithIndex

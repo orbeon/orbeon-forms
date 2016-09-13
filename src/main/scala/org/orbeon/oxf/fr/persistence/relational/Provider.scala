@@ -22,7 +22,10 @@ import org.orbeon.saxon.om.DocumentInfo
 
 object Provider {
 
-  sealed trait Provider    extends Product with Serializable { val name: String }
+  sealed trait Provider    extends Product with Serializable {
+    val name: String
+    def uri : String = "/fr/service/" + name
+  }
 
   case object  MySQL       extends Provider { val name = "mysql"      }
   case object  PostgreSQL  extends Provider { val name = "postgresql" }

@@ -39,7 +39,7 @@ object StatusStore {
         case Starting ⇒ log("starting")
         case Stopping ⇒ log("stopping")
         case Indexing(provider, providerCount, documentCount) ⇒
-          val providerInfo = s"${provider.name} ${providerCount.current}/${providerCount.total}"
+          val providerInfo = s"${provider} ${providerCount.current}/${providerCount.total}"
           val documentInfo = documentCount.map(dc ⇒ s"document ${dc.current}/${dc.total}").getOrElse("")
           log(s"indexing $providerInfo $documentInfo")
       }

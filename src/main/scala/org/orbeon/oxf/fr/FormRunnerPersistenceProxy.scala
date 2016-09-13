@@ -19,7 +19,6 @@ import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
@@ -231,15 +230,21 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
   private def proxyReindex(
     request  : Request,
     response : Response
-  ): Unit =
-    getProviders(usableFor = FormRunner.Data)
-      .filter  (Index.ProvidersWithIndexSupport.map(_.name).contains)
-      .map     (Provider.providerFromToken)
-      .kestrel (Backend.reindexingProviders(_, p ⇒ {
-        val (baseURI, headers) = FormRunner.getPersistenceURLHeadersFromProvider(p.name)
+  ): Unit = {
+    val dataProviders = getProviders(usableFor = FormRunner.Data)
+    val dataProvidersWithIndexSupport =
+      dataProviders.filter { provider ⇒
+        val providerURI = FormRunner.providerPropertyAsURL(provider, "uri")
+        Index.ProvidersWithIndexSupport.map(_.uri).contains(providerURI)
+      }
+    Backend.reindexingProviders(
+      dataProvidersWithIndexSupport, p ⇒ {
+        val (baseURI, headers) = FormRunner.getPersistenceURLHeadersFromProvider(p)
         val serviceURI = baseURI + "/reindex"
         proxyRequest(request, serviceURI, headers, response)
-      }))
+      }
+    )
+  }
 
   // Get all providers that can be used either for form data or for form definitions
   private def getProviders(usableFor: FormRunner.FormOrData): List[String] = {

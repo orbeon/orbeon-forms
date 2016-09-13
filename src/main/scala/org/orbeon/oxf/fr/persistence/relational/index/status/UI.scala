@@ -27,7 +27,7 @@ object UI {
   def start(): Unit = StatusStore.setStatus(Starting)
   def stop() : Unit = StatusStore.setStatus(Stopping)
 
-  def getProviderToken   = Some(StatusStore.getStatus).collect{case Indexing(p, _, _) ⇒ p.name          }.getOrElse("")
+  def getProviderToken   = Some(StatusStore.getStatus).collect{case Indexing(p, _, _) ⇒ p               }.getOrElse("")
   def getProviderCurrent = Some(StatusStore.getStatus).collect{case Indexing(_, c, _) ⇒ c.current       }.getOrElse(0)
   def getProviderTotal   = Some(StatusStore.getStatus).collect{case Indexing(_, c, _) ⇒ c.total         }.getOrElse(0)
   def getDocumentCurrent = Some(StatusStore.getStatus).collect{case Indexing(_, _, Some(d)) ⇒ d.current }.getOrElse(0)

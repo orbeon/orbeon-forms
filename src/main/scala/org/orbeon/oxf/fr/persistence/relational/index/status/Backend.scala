@@ -21,6 +21,7 @@ object Backend {
     providers     : List[String],
     indexProvider : String ⇒ Unit)
   : Unit = {
+    StatusStore.setStatus(Starting(providers))
     providers
       .zipWithIndex
       .foreach { case (provider, index) ⇒

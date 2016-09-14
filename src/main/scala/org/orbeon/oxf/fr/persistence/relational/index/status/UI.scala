@@ -19,12 +19,11 @@ object UI {
 
   def status: String = StatusStore.getStatus match {
     case Stopped           ⇒ "stopped"
-    case Starting          ⇒ "starting"
+    case Starting(_)       ⇒ "starting"
     case Stopping          ⇒ "stopping"
     case Indexing(_, _, _) ⇒ "indexing"
   }
 
-  def start(): Unit = StatusStore.setStatus(Starting)
   def stop() : Unit = StatusStore.setStatus(Stopping)
 
   def getProviderToken   = Some(StatusStore.getStatus).collect{case Indexing(p, _, _) ⇒ p               }.getOrElse("")

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils._
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.util.NetUtils
 
 import scala.collection.JavaConverters._
@@ -32,16 +32,21 @@ object StatusStore {
   def setStatus(status: Status): Unit = {
 
     // Log status
-    if (Logger.isDebugEnabled) {
-      def log = Logger.logDebug("reindex status", _: String)
+    if (RelationalUtils.Logger.isDebugEnabled) {
+      def liftLog(log: (String, String) ⇒ Unit): (String ⇒ Unit) = log("Reindex status", _: String)
+      def logInfo  = liftLog(RelationalUtils.Logger.logInfo)
+      def logDebug = liftLog(RelationalUtils.Logger.logDebug)
       status match {
-        case Stopped ⇒ log("stopped")
-        case Starting ⇒ log("starting")
-        case Stopping ⇒ log("stopping")
-        case Indexing(provider, providerCount, documentCount) ⇒
-          val providerInfo = s"${provider} ${providerCount.current}/${providerCount.total}"
-          val documentInfo = documentCount.map(dc ⇒ s"document ${dc.current}/${dc.total}").getOrElse("")
-          log(s"indexing $providerInfo $documentInfo")
+        case Stopped                         ⇒ logInfo("Stopped" )
+        case Starting(providers)             ⇒ logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))
+        case Stopping                        ⇒ logInfo("Stopping")
+        case Indexing(provider, providerCount, maybeDocumentCount) ⇒
+          def providerInfo = s"$provider ${providerCount.current}/${providerCount.total}"
+          maybeDocumentCount match {
+            case None                        ⇒ logInfo (s"Indexing $providerInfo")
+            case Some(dc) if dc.current == 0 ⇒ logInfo (s"Indexing $providerInfo, ${dc.total} documents")
+            case Some(dc) if dc.current != 0 ⇒ logDebug(s"Indexing $providerInfo, document ${dc.current}/${dc.total}")
+          }
       }
     }
 

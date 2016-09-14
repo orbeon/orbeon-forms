@@ -16,15 +16,12 @@ package org.orbeon.oxf.fr.persistence.relational.index.status
 // Case classes for information what we store in the session
 
 sealed trait Status
-case object  Stopped    extends Status
-case object  Starting   extends Status
-case object  Stopping   extends Status
-case class   Indexing(
-  provider      : String,
-  providerCount : Count,
-  documentCount : Option[Count]
-)                              extends Status
-case class Count(
-  current       : Int,
-  total         : Int
-)
+case object  Stopped                                  extends Status
+case class   Starting (providers     : List[String])  extends Status
+case object  Stopping                                 extends Status
+case class   Indexing (provider      : String,
+                       providerCount : Count,
+                       documentCount : Option[Count]) extends Status
+
+case class   Count    (current       : Int,
+                       total         : Int)

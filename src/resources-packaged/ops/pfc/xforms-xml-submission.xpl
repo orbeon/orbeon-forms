@@ -196,6 +196,7 @@
                 <p:input name="config">
                     <xsl:stylesheet version="2.0" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                         <xsl:template match="/">
+                            <!-- $instance must be created by `InstanceToParametersProcessor`, which is always encrypted -->
                             <xsl:copy-of select="xpl:decodeXML(normalize-space(/*/parameters/parameter[name = '$instance']/value))"/>
                         </xsl:template>
                     </xsl:stylesheet>

@@ -16,11 +16,10 @@ package org.orbeon.oxf.fr.persistence.relational.index
 import java.sql.{Connection, PreparedStatement}
 
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, StatusStore, Stopping}
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
@@ -30,8 +29,6 @@ import org.orbeon.scaxon.XML._
 import scala.collection.JavaConverters._
 
 trait Reindex extends FormDefinition {
-
-  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[Reindex]))
 
   sealed trait                                                              WhatToReindex
   case object  AllData                                              extends WhatToReindex
@@ -185,9 +182,9 @@ trait Reindex extends FormDefinition {
             indexedControls
           case _ ⇒
             // Compute indexed controls reading the form definition
-            FormRunner.readPublishedForm(app, form) match {
+            FormRunner.readPublishedForm(app, form)(RelationalUtils.Logger) match {
               case None ⇒
-                Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
+                RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                 Seq.empty
               case Some(formDefinition) ⇒
                 findIndexedControls(formDefinition)

@@ -210,7 +210,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Serialize/deserialize
     val serialized = doc.getStaticState.encodedState
-    val restored = XFormsStaticStateImpl.restore(None, serialized)
+    val restored = XFormsStaticStateImpl.restore(None, serialized, forceEncryption = false)
     val restoredXML = restored.staticStateDocument.xmlDocument
 
     // Compare expected/actual XML representation of the static state
@@ -257,7 +257,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
       dynamicState      = DynamicState(doc)
     )
 
-    val restoredDoc = new XFormsContainingDocument(serializedState, false)
+    val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
 
     assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
   }
@@ -310,7 +310,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
       dynamicState      = DynamicState(doc)
     )
 
-    val restoredDoc = new XFormsContainingDocument(serializedState, false)
+    val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
 
     for (id ← List("my-foo", "my-bar", "my-number"))
       assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)

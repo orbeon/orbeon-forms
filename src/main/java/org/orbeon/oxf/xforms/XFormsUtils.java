@@ -70,6 +70,7 @@ public class XFormsUtils {
         return encodeXML(documentToEncode, XFormsProperties.isGZIPState(), true, encodeLocationData);
     }
 
+    // 2016-09-14: `encrypt = false` only when encoding static state when using server-side state handling.
     public static String encodeXML(Document document, boolean compress, boolean encrypt, boolean location) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
@@ -95,6 +96,8 @@ public class XFormsUtils {
         return encodeBytes(bytes, compress, encrypt);
     }
 
+    // 2016-09-14: `encrypt = false` only when encoding static state when using server-side state handling, and
+    // for some unit tests.
     public static String encodeBytes(byte[] bytesToEncode, boolean compress, boolean encrypt) {
         // Compress if needed
         final byte[] gzipByteArray = compress ? XFormsCompressor.compressBytes(bytesToEncode) : null;
@@ -378,9 +381,9 @@ public class XFormsUtils {
         return valueRepresentation;
     }
 
-    public static Document decodeXML(String encodedXML) {
+    public static Document decodeXML(String encodedXML, boolean forceEncryption) {
 
-        final byte[] bytes = decodeBytes(encodedXML);
+        final byte[] bytes = decodeBytes(encodedXML, forceEncryption);
 
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
@@ -405,7 +408,7 @@ public class XFormsUtils {
         return result.getDocument();
     }
 
-    public static byte[] decodeBytes(String encoded) {
+    public static byte[] decodeBytes(String encoded, boolean forceEncryption) {
         // Get raw text
         byte[] resultBytes;
         {
@@ -422,11 +425,11 @@ public class XFormsUtils {
                 // Encryption + compressed
                 resultBytes1 = null;
                 gzipByteArray = SecureUtils.decrypt(encodedString);
-            } else if (prefix.equals("X3")) {
+            } else if (! forceEncryption && prefix.equals("X3")) {
                 // No encryption + uncompressed
                 resultBytes1 = org.orbeon.oxf.util.Base64.decode(encodedString);
                 gzipByteArray = null;
-            } else if (prefix.equals("X4")) {
+            } else if (! forceEncryption && prefix.equals("X4")) {
                 // No encryption + compressed
                 resultBytes1 = null;
                 gzipByteArray = org.orbeon.oxf.util.Base64.decode(encodedString);

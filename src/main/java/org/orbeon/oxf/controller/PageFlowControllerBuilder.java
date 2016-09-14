@@ -537,8 +537,7 @@ public class PageFlowControllerBuilder {
                 if (isTransformedInstance) {
                     parametersOutput = new ASTOutput(null, "parameters");
                     // Pass parameters only if needed
-                    final QName instanceToParametersProcessor = XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME;
-                    when.addStatement(new ASTProcessorCall(instanceToParametersProcessor) {{
+                    when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", parametersOutput));

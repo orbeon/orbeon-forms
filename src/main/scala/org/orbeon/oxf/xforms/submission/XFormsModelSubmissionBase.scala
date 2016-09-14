@@ -146,7 +146,7 @@ object XFormsModelSubmissionBase {
           for {
             level                ← control.alertLevel
             controlAlert         ← Option(control.getAlert)
-            failedValidationsIds = (control.failedValidations map (_.id) toSet)
+            failedValidationsIds = control.failedValidations.map(_.id).toSet
             elementsMap          ← elementsToAnnotate.get(level)
             element              ← elementsMap.get(failedValidationsIds)
             qName                = QName.get(level.name, XXFORMS_NAMESPACE_SHORT)

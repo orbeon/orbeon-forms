@@ -193,34 +193,35 @@ trait Reindex extends FormDefinition {
 
         // Insert into the "current data" table
         val position = Iterator.from(1)
-        val insert = connection.prepareStatement(
-          """INSERT INTO orbeon_i_current
-            |           (data_id,
-            |            created,
-            |            last_modified_time,
-            |            last_modified_by,
-            |            username,
-            |            groupname,
-            |            app,
-            |            form,
-            |            form_version,
-            |            document_id,
-            |            draft)
-            |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          """.stripMargin
-        )
-        insert.setInt(position.next(), currentData.getInt("id"))
-        insert.setTimestamp(position.next(), currentData.getTimestamp("created"))
-        insert.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time"))
-        insert.setString(position.next(), currentData.getString("last_modified_by"))
-        insert.setString(position.next(), currentData.getString("username"))
-        insert.setString(position.next(), currentData.getString("groupname"))
-        insert.setString(position.next(), app)
-        insert.setString(position.next(), form)
-        insert.setInt(position.next(), currentData.getInt("form_version"))
-        insert.setString(position.next(), currentData.getString("document_id"))
-        insert.setString(position.next(), currentData.getString("draft"))
-        insert.execute()
+        connection
+          .prepareStatement(
+            """INSERT INTO orbeon_i_current
+              |           (data_id,
+              |            created,
+              |            last_modified_time,
+              |            last_modified_by,
+              |            username,
+              |            groupname,
+              |            app,
+              |            form,
+              |            form_version,
+              |            document_id,
+              |            draft)
+              |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """.stripMargin)
+          .kestrel(_.setInt      (position.next(), currentData.getInt("id")))
+          .kestrel(_.setTimestamp(position.next(), currentData.getTimestamp("created")))
+          .kestrel(_.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time")))
+          .kestrel(_.setString   (position.next(), currentData.getString("last_modified_by")))
+          .kestrel(_.setString   (position.next(), currentData.getString("username")))
+          .kestrel(_.setString   (position.next(), currentData.getString("groupname")))
+          .kestrel(_.setString   (position.next(), app))
+          .kestrel(_.setString   (position.next(), form))
+          .kestrel(_.setInt      (position.next(), currentData.getInt("form_version")))
+          .kestrel(_.setString   (position.next(), currentData.getString("document_id")))
+          .kestrel(_.setString   (position.next(), currentData.getString("draft")))
+          .kestrel(_.executeUpdate())
+          .kestrel(_.close())
 
         // Read data (XML)
         // - using lazy, as we might not need the data, if there are no controls to index
@@ -239,23 +240,21 @@ trait Reindex extends FormDefinition {
             // For indexing, we are not interested in empty values
             if (!nodeValue.isEmpty) {
               val position = Iterator.from(1)
-              val insert = connection.prepareStatement(
-                """INSERT INTO orbeon_i_control_text
-                  |           (data_id,
-                  |            pos,
-                  |            control,
-                  |            val)
-                  |    VALUES (? , ? , ? , ? )
-                """.stripMargin
-              )
-              insert.setInt(position.next(), currentData.getInt("id"))
-              insert.setInt(position.next(), pos + 1)
-              insert.setString(position.next(), control.xpath)
-              insert.setString(position.next(), nodeValue)
-              insert.executeUpdate()
-              // For a query, we need to close so not to keep an open cursor; it's unclear if this
-              // is really needed with executeUpdate(), but it shouldn't hurt
-              insert.close()
+              connection
+                .prepareStatement(
+                  """INSERT INTO orbeon_i_control_text
+                    |           (data_id,
+                    |            pos,
+                    |            control,
+                    |            val)
+                    |    VALUES (? , ? , ? , ? )
+                  """.stripMargin)
+                .kestrel(_.setInt   (position.next(), currentData.getInt("id")))
+                .kestrel(_.setInt   (position.next(), pos + 1))
+                .kestrel(_.setString(position.next(), control.xpath))
+                .kestrel(_.setString(position.next(), nodeValue))
+                .kestrel(_.executeUpdate())
+                .kestrel(_.close())
             }
           }
         }

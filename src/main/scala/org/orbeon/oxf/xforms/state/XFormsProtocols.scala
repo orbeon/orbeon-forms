@@ -51,15 +51,17 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
   // Base trait for stuff that should be serialized via Serializable/Externalizable
   trait SerializableFormat[T <: java.io.Serializable] extends Format[T] {
 
+    def allowedClass: Class[_]
+
     def writes(output: Output, o: T) =
       new ObjectOutputStream(new JavaOutputStream(output)).writeObject(o)
 
     def reads(input: Input) =
-      new ObjectInputStream(new JavaInputStream(input)).readObject.asInstanceOf[T]
+      new WhitelistObjectInputStream(new JavaInputStream(input), allowedClass).readObject.asInstanceOf[T]
   }
 
-  implicit object DynamicStateFormat extends SerializableFormat[DynamicState]
-  implicit object SAXStoreFormat extends SerializableFormat[SAXStore]
+  implicit object DynamicStateFormat extends SerializableFormat[DynamicState] { def allowedClass = classOf[DynamicState] }
+  implicit object SAXStoreFormat     extends SerializableFormat[SAXStore]     { def allowedClass = classOf[SAXStore]     }
 
   implicit object Dom4jFormat extends Format[Document] {
     def writes(output: Output, document: Document) = {

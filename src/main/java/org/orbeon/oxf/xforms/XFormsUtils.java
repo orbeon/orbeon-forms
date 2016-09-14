@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.state.ControlState;
+import org.orbeon.oxf.xforms.state.WhitelistObjectInputStream;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
@@ -388,12 +389,7 @@ public class XFormsUtils {
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        final SAXStore saxStore;
-        try {
-            saxStore = new SAXStore(new ObjectInputStream(byteArrayInputStream));
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
+        final SAXStore saxStore = new SAXStore(new WhitelistObjectInputStream(byteArrayInputStream, SAXStore.class));
 
         // Deserialize SAXStore to dom4j document
         // TODO: This is not optimal

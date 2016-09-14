@@ -95,7 +95,7 @@
         <include name="commons-beanutils-1_5.jar"/>
         <include name="commons-cli-1_0.jar"/>
         <include name="commons-codec-1.6.jar"/>
-        <include name="commons-collections-3.2.1.jar"/>
+        <include name="commons-collections-3.2.2.jar"/>
         <include name="commons-digester-1_5.jar"/>
         <include name="commons-discovery-0.4.jar"/>
         <include name="commons-fileupload-1.2.2.jar"/>

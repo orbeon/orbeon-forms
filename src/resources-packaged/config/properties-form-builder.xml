@@ -84,7 +84,6 @@
     <property as="xs:boolean" name="oxf.fb.menu.schema"                                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                            value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                                    value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.custom-xml"                                     value="false"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions"                                    value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.http"                                  value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.database"                              value="true"/>

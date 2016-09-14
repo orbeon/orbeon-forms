@@ -162,18 +162,6 @@
         <xh:div class="fb-tools">
             <xh:legend class="a-m-t"><xf:output value="$form-resources/advanced/label"/></xh:legend>
             <xh:div class="fb-tool">
-                <xf:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
-                    <!-- Custom XML -->
-                    <!--<fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>-->
-                    <xf:trigger>
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
-                            <xf:output ref="$form-resources/custom-xml/label"/>
-                        </xf:label>
-                        <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-custom-xml"/>
-                        <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                    </xf:trigger>
-                </xf:group>
                 <xf:group ref="instance('fb-metadata-instance')/toolbox/schema">
                     <!-- Upload XML Schema -->
                     <xf:trigger>

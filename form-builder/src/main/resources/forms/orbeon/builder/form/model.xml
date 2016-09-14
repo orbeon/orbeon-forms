@@ -665,7 +665,6 @@
                 <css/>
                 <pdf/>
                 <edit-source/>
-                <custom-xml/>
                 <permissions/>
                 <services>
                     <http/>
@@ -680,7 +679,6 @@
         <xf:bind ref="toolbox/schema"            relevant="xxf:property('oxf.fb.menu.schema')"/>
         <xf:bind ref="toolbox/pdf"               relevant="xxf:property('oxf.fb.menu.pdf')"/>
         <xf:bind ref="toolbox/edit-source"       relevant="xxf:property('oxf.fb.menu.edit-source')"/>
-        <xf:bind ref="toolbox/custom-xml"        relevant="xxf:property('oxf.fb.menu.custom-xml')"/>
         <xf:bind ref="toolbox/permissions"       relevant="xxf:property('oxf.fb.menu.permissions')"/>
         <xf:bind ref="toolbox/services/http"     relevant="xxf:property('oxf.fb.menu.services.http')"/>
         <xf:bind ref="toolbox/services/database" relevant="xxf:property('oxf.fb.menu.services.database')"/>

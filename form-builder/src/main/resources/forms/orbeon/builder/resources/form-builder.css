@@ -410,18 +410,15 @@ body {
   display: block;
   margin-left: 1em;
 }
-.orbeon .fb-edit-source-dialog,
-.orbeon .fb-custom-xml-dialog {
+.orbeon .fb-edit-source-dialog {
   width: 900px;
   max-width: none;
 }
-.orbeon .fb-edit-source-dialog .CodeMirror,
-.orbeon .fb-custom-xml-dialog .CodeMirror {
+.orbeon .fb-edit-source-dialog .CodeMirror {
   font-size: 12px;
   height: 100%;
 }
-.orbeon .fb-edit-source-dialog .xforms-alert.xforms-active,
-.orbeon .fb-custom-xml-dialog .xforms-alert.xforms-active {
+.orbeon .fb-edit-source-dialog .xforms-alert.xforms-active {
   display: block;
 }
 .orbeon .fb-publish-dialog {

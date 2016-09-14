@@ -197,7 +197,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @param xformsState       XFormsState containing static and dynamic state
      * @param disableUpdates    whether to disable updates (for recreating initial document upon browser back)
      */
-    public XFormsContainingDocument(XFormsState xformsState, boolean disableUpdates) {
+    public XFormsContainingDocument(XFormsState xformsState, boolean disableUpdates, boolean forceEncryption) {
         super(disableUpdates);
 
         // 1. Restore the static state
@@ -214,7 +214,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
                     // Not found static state in cache, create static state from input
                     indentedLogger().logDebug("", "did not find static state by digest in cache");
                     indentedLogger().startHandleOperation("initialization", "restoring static state");
-                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
+                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState(), forceEncryption);
                     indentedLogger().endHandleOperation();
 
                     // Store in cache
@@ -225,7 +225,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             } else {
                 // Not digest provided, create static state from input
                 indentedLogger().logDebug("", "did not find static state by digest in cache");
-                this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
+                this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState(), forceEncryption);
 
                 assert this.staticState.isClientStateHandling();
             }

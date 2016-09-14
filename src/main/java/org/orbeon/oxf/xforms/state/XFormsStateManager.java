@@ -487,7 +487,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         }
 
         // Create document
-        final XFormsContainingDocument document = new XFormsContainingDocument(xformsState, disableUpdates);
+        final XFormsContainingDocument document = new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState);
         assert isServerState ? document.getStaticState().isServerStateHandling() : document.getStaticState().isClientStateHandling();
         return document;
     }

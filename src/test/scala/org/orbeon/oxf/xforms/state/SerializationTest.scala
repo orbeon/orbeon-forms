@@ -28,291 +28,291 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
-    // NOTE: For #1890, place and use lang AVTs, see https://github.com/orbeon/orbeon-forms/issues/1890
-    val simpleDoc: Document =
+  // NOTE: For #1890, place and use lang AVTs, see https://github.com/orbeon/orbeon-forms/issues/1890
+  val simpleDoc: Document =
+    <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         lang="{xxf:instance('fr-language-instance')}"
+         xml:lang="{xxf:instance('fr-language-instance')}"
+         xxf:xpath-analysis="true">
+      <xh:head>
+        <xh:title><xf:output value="xxf:lang()"/></xh:title>
+        <xf:model>
+          <xf:instance id="instance">
+            <value>0</value>
+          </xf:instance>
+          <xf:instance id="fr-language-instance">
+            <value>en</value>
+          </xf:instance>
+        </xf:model>
+      </xh:head>
+      <xh:body>
+        <xf:input id="input" ref="instance()"/>
+        <xf:trigger id="trigger"><xf:label/></xf:trigger>
+      </xh:body>
+    </xh:html>
+
+  @Test def saxStore(): Unit = {
+
+    // Serialize then deserialize
+    val saxStore = TransformerUtils.dom4jToSAXStore(simpleDoc, false)
+    val serializedBytes = toByteSeq(saxStore)
+    val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
+    val deserializedDoc = TransformerUtils.saxStoreToDom4jDocument(deserializedSAXStore)
+
+    // Compare
+    assertXMLDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc)
+  }
+
+  @Test def saxStoreWithMarks(): Unit = {
+
+    // Transform to SAXStore while collecting marks
+    val saxStore = new SAXStore
+    TransformerUtils.writeDom4j(simpleDoc, new ForwardingXMLReceiver(saxStore) {
+      override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+        // Mark all elements with an id
+        Option(attributes.getValue("id")) foreach
+          saxStore.getMark
+
+        super.startElement(uri, localname, qName, attributes)
+      }
+    })
+
+    val serializedBytes = toByteSeq(saxStore)
+    val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
+
+    // All expected documents
+    val expectedDocs = Seq[Document](
+      <xf:instance id="instance" xmlns:xf="http://www.w3.org/2002/xforms">
+        <value>0</value>
+      </xf:instance>,
+      <xf:instance id="fr-language-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+        <value>en</value>
+      </xf:instance>,
+      <xf:input id="input" ref="instance()" xmlns:xf="http://www.w3.org/2002/xforms"/>,
+      <xf:trigger id="trigger" xmlns:xf="http://www.w3.org/2002/xforms"><xf:label/></xf:trigger>
+    )
+
+    // All actual documents
+    val actualDocs =
+      deserializedSAXStore.getMarks.asScala map
+        TransformerUtils.saxStoreMarkToDom4jDocument
+
+    // Compare all
+    assert(actualDocs.size === expectedDocs.size)
+    for ((expected, actual) ← expectedDocs zip actualDocs)
+      assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
+  }
+
+  @Test def dynamicState(): Unit = {
+    val originalDoc = this setupDocument simpleDoc
+
+    val serialized = DynamicState(originalDoc)
+    val serializedBytes = toByteSeq(serialized)
+
+    val deserialized = fromByteSeq[DynamicState](serializedBytes)
+    assert(serialized === deserialized)
+  }
+
+  @Test def template(): Unit = {
+
+    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+
+    // Template not stored
+    locally {
+      val doc = this setupDocument
         <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                 xmlns:xh="http://www.w3.org/1999/xhtml"
-                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                 lang="{xxf:instance('fr-language-instance')}"
-                 xml:lang="{xxf:instance('fr-language-instance')}"
-                 xxf:xpath-analysis="true">
-            <xh:head>
-                <xh:title><xf:output value="xxf:lang()"/></xh:title>
-                <xf:model>
-                    <xf:instance id="instance">
-                        <value>0</value>
-                    </xf:instance>
-                    <xf:instance id="fr-language-instance">
-                        <value>en</value>
-                    </xf:instance>
-                </xf:model>
-            </xh:head>
-            <xh:body>
-                <xf:input id="input" ref="instance()"/>
-                <xf:trigger id="trigger"><xf:label/></xf:trigger>
-            </xh:body>
+             xmlns:xh="http://www.w3.org/1999/xhtml"
+             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          <xh:head>
+            <xf:model xxf:noscript-support="false" xxf:noscript="false">
+              <xf:instance id="instance">
+                <value/>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
         </xh:html>
 
-    @Test def saxStore(): Unit = {
 
-        // Serialize then deserialize
-        val saxStore = TransformerUtils.dom4jToSAXStore(simpleDoc, false)
-        val serializedBytes = toByteSeq(saxStore)
-        val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
-        val deserializedDoc = TransformerUtils.saxStoreToDom4jDocument(deserializedSAXStore)
-
-        // Compare
-        assertXMLDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc)
+      assert(doc.getStaticState.template.isEmpty)
+      assert(doc.getTemplate.isEmpty)
     }
 
-    @Test def saxStoreWithMarks(): Unit = {
+    // Template stored in the static state because of noscript mode
+    locally {
+      val doc = this setupDocument
+        <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+             xmlns:xh="http://www.w3.org/1999/xhtml"
+             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          <xh:head>
+            <xf:model xxf:noscript-support="true" xxf:noscript="true">
+              <xf:instance id="instance">
+                <value/>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+        </xh:html>
 
-        // Transform to SAXStore while collecting marks
-        val saxStore = new SAXStore
-        TransformerUtils.writeDom4j(simpleDoc, new ForwardingXMLReceiver(saxStore) {
-            override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-                // Mark all elements with an id
-                Option(attributes.getValue("id")) foreach
-                    saxStore.getMark
 
-                super.startElement(uri, localname, qName, attributes)
-            }
-        })
-
-        val serializedBytes = toByteSeq(saxStore)
-        val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
-
-        // All expected documents
-        val expectedDocs = Seq[Document](
-            <xf:instance id="instance" xmlns:xf="http://www.w3.org/2002/xforms">
-                <value>0</value>
-            </xf:instance>,
-            <xf:instance id="fr-language-instance" xmlns:xf="http://www.w3.org/2002/xforms">
-                <value>en</value>
-            </xf:instance>,
-            <xf:input id="input" ref="instance()" xmlns:xf="http://www.w3.org/2002/xforms"/>,
-            <xf:trigger id="trigger" xmlns:xf="http://www.w3.org/2002/xforms"><xf:label/></xf:trigger>
-        )
-
-        // All actual documents
-        val actualDocs =
-            deserializedSAXStore.getMarks.asScala map
-                TransformerUtils.saxStoreMarkToDom4jDocument
-
-        // Compare all
-        assert(actualDocs.size === expectedDocs.size)
-        for ((expected, actual) ← expectedDocs zip actualDocs)
-            assertXMLDocumentsIgnoreNamespacesInScope(expected, actual)
+      assert(doc.getStaticState.template.isDefined)
+      assert(doc.getTemplate.isEmpty)
     }
 
-    @Test def dynamicState(): Unit = {
-        val originalDoc = this setupDocument simpleDoc
+    // Template stored in the dynamic state because of noscript mode
+    locally {
+      val doc = this setupDocument
+        <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+             xmlns:xh="http://www.w3.org/1999/xhtml"
+             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          <xh:head>
+            <xf:model xxf:noscript-support="true" xxf:noscript="true" xxf:noscript-template="dynamic">
+              <xf:instance id="instance">
+                <value/>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+        </xh:html>
 
-        val serialized = DynamicState(originalDoc)
-        val serializedBytes = toByteSeq(serialized)
-
-        val deserialized = fromByteSeq[DynamicState](serializedBytes)
-        assert(serialized === deserialized)
+      assert(doc.getStaticState.template.isEmpty)
+      assert(doc.getTemplate.isDefined)
     }
 
-    @Test def template(): Unit = {
+    // Template stored in the static state because of full updates
+    locally {
+      val doc = this setupDocument
+        <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+             xmlns:xh="http://www.w3.org/1999/xhtml"
+             xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+          <xh:head>
+            <xf:model xxf:noscript-support="false" xxf:noscript="false">
+              <xf:instance id="instance">
+                <value/>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xf:group xxf:update="full"/>
+          </xh:body>
+        </xh:html>
 
-        Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
-
-        // Template not stored
-        locally {
-            val doc = this setupDocument
-                <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                         xmlns:xh="http://www.w3.org/1999/xhtml"
-                         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                    <xh:head>
-                        <xf:model xxf:noscript-support="false" xxf:noscript="false">
-                            <xf:instance id="instance">
-                                <value/>
-                            </xf:instance>
-                        </xf:model>
-                    </xh:head>
-                </xh:html>
-
-
-            assert(doc.getStaticState.template.isEmpty)
-            assert(doc.getTemplate.isEmpty)
-        }
-
-        // Template stored in the static state because of noscript mode
-        locally {
-            val doc = this setupDocument
-                <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                         xmlns:xh="http://www.w3.org/1999/xhtml"
-                         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                    <xh:head>
-                        <xf:model xxf:noscript-support="true" xxf:noscript="true">
-                            <xf:instance id="instance">
-                                <value/>
-                            </xf:instance>
-                        </xf:model>
-                    </xh:head>
-                </xh:html>
-
-
-            assert(doc.getStaticState.template.isDefined)
-            assert(doc.getTemplate.isEmpty)
-        }
-
-        // Template stored in the dynamic state because of noscript mode
-        locally {
-            val doc = this setupDocument
-                <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                         xmlns:xh="http://www.w3.org/1999/xhtml"
-                         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                    <xh:head>
-                        <xf:model xxf:noscript-support="true" xxf:noscript="true" xxf:noscript-template="dynamic">
-                            <xf:instance id="instance">
-                                <value/>
-                            </xf:instance>
-                        </xf:model>
-                    </xh:head>
-                </xh:html>
-
-            assert(doc.getStaticState.template.isEmpty)
-            assert(doc.getTemplate.isDefined)
-        }
-
-        // Template stored in the static state because of full updates
-        locally {
-            val doc = this setupDocument
-                <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                         xmlns:xh="http://www.w3.org/1999/xhtml"
-                         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                    <xh:head>
-                        <xf:model xxf:noscript-support="false" xxf:noscript="false">
-                            <xf:instance id="instance">
-                                <value/>
-                            </xf:instance>
-                        </xf:model>
-                    </xh:head>
-                    <xh:body>
-                        <xf:group xxf:update="full"/>
-                    </xh:body>
-                </xh:html>
-
-            assert(doc.getStaticState.template.isDefined)
-            assert(doc.getTemplate.isEmpty)
-        }
+      assert(doc.getStaticState.template.isDefined)
+      assert(doc.getTemplate.isEmpty)
     }
+  }
 
-    @Test def staticState(): Unit = {
+  @Test def staticState(): Unit = {
 
-        Assume.assumeTrue(Version.isPE)
+    Assume.assumeTrue(Version.isPE)
 
-        val doc = this setupDocument simpleDoc
-        val staticStateXML = doc.getStaticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocument.xmlDocument
+    val doc = this setupDocument simpleDoc
+    val staticStateXML = doc.getStaticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocument.xmlDocument
 
-        // Serialize/deserialize
-        val serialized = doc.getStaticState.encodedState
-        val restored = XFormsStaticStateImpl.restore(None, serialized)
-        val restoredXML = restored.staticStateDocument.xmlDocument
+    // Serialize/deserialize
+    val serialized = doc.getStaticState.encodedState
+    val restored = XFormsStaticStateImpl.restore(None, serialized, forceEncryption = false)
+    val restoredXML = restored.staticStateDocument.xmlDocument
 
-        // Compare expected/actual XML representation of the static state
-        assertXMLDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML)
+    // Compare expected/actual XML representation of the static state
+    assertXMLDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML)
 
-        // Check other aspects of the restored state
-        val part = restored.topLevelPart
-        assert(part.hasControls)
+    // Check other aspects of the restored state
+    val part = restored.topLevelPart
+    assert(part.hasControls)
 
-        val models = part.getModelsForScope(part.startScope)
-        assert(models.size === 1)
-        assert(models.head.instances.head._2.staticId === "instance")
+    val models = part.getModelsForScope(part.startScope)
+    assert(models.size === 1)
+    assert(models.head.instances.head._2.staticId === "instance")
 
-        assert(part.getControlAnalysis("input") ne null)
-        assert(part.getControlAnalysis("trigger") ne null)
-    }
+    assert(part.getControlAnalysis("input") ne null)
+    assert(part.getControlAnalysis("trigger") ne null)
+  }
+  
+  @Test def issue2197RestoreIdsOfBoundControls(): Unit = {
     
-    @Test def issue2197RestoreIdsOfBoundControls(): Unit = {
-        
-        val doc = this setupDocument
-            <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:xh="http://www.w3.org/1999/xhtml"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                <xh:head>
-                    <xf:model>
-                        <xf:instance id="instance">
-                            <value/>
-                        </xf:instance>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <fr:number id="my-number" ref="instance()">
-                        <xf:label>Number</xf:label>
-                    </fr:number>
-                </xh:body>
-            </xh:html>
-        
-        assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-        
-        val serializedState = XFormsState(
-            staticStateDigest = Option(doc.getStaticState.digest),
-            staticState       = doc.getStaticState.encodedState,
-            dynamicState      = DynamicState(doc)
-        )
-        
-        val restoredDoc = new XFormsContainingDocument(serializedState, false)
-        
-        assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-    }
+    val doc = this setupDocument
+      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+           xmlns:xh="http://www.w3.org/1999/xhtml"
+           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+           xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <xh:head>
+          <xf:model>
+            <xf:instance id="instance">
+              <value/>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <fr:number id="my-number" ref="instance()">
+            <xf:label>Number</xf:label>
+          </fr:number>
+        </xh:body>
+      </xh:html>
     
-    @Test def issue2197RestoreInlineXBL(): Unit = {
-        
-        val doc = this setupDocument
-            <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:xh="http://www.w3.org/1999/xhtml"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl">
-                <xh:head>
-                    <xf:model>
-                        <xf:instance id="instance">
-                            <value/>
-                        </xf:instance>
-                    </xf:model>
-                    <xbl:xbl>
-                        <xbl:binding id="fr-foo" element="fr|foo">
-                            <xbl:template>
-                                <xbl:content/>
-                            </xbl:template>
-                        </xbl:binding>
-                    </xbl:xbl>
-                    <xbl:xbl>
-                        <xbl:binding id="fr-bar" element="fr|bar">
-                            <xbl:template>
-                                <xbl:content/>
-                            </xbl:template>
-                        </xbl:binding>
-                    </xbl:xbl>
-                </xh:head>
-                <xh:body>
-                    <fr:bar id="my-bar">
-                        <fr:foo id="my-foo">
-                            <fr:number id="my-number" ref="instance()">
-                                <xf:label>Number</xf:label>
-                            </fr:number>
-                        </fr:foo>
-                    </fr:bar>
-                </xh:body>
-            </xh:html>
-        
-        assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-        
-        val serializedState = XFormsState(
-            staticStateDigest = Option(doc.getStaticState.digest),
-            staticState       = doc.getStaticState.encodedState,
-            dynamicState      = DynamicState(doc)
-        )
-        
-        val restoredDoc = new XFormsContainingDocument(serializedState, false)
-        
-        for (id ← List("my-foo", "my-bar", "my-number"))
-            assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)
-    }
+    assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
+    
+    val serializedState = XFormsState(
+      staticStateDigest = Option(doc.getStaticState.digest),
+      staticState       = doc.getStaticState.encodedState,
+      dynamicState      = DynamicState(doc)
+    )
+
+    val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
+
+    assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
+  }
+  
+  @Test def issue2197RestoreInlineXBL(): Unit = {
+    
+    val doc = this setupDocument
+      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+           xmlns:xh="http://www.w3.org/1999/xhtml"
+           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+           xmlns:xbl="http://www.w3.org/ns/xbl">
+        <xh:head>
+          <xf:model>
+            <xf:instance id="instance">
+              <value/>
+            </xf:instance>
+          </xf:model>
+          <xbl:xbl>
+            <xbl:binding id="fr-foo" element="fr|foo">
+              <xbl:template>
+                <xbl:content/>
+              </xbl:template>
+            </xbl:binding>
+          </xbl:xbl>
+          <xbl:xbl>
+            <xbl:binding id="fr-bar" element="fr|bar">
+              <xbl:template>
+                <xbl:content/>
+              </xbl:template>
+            </xbl:binding>
+          </xbl:xbl>
+        </xh:head>
+        <xh:body>
+          <fr:bar id="my-bar">
+            <fr:foo id="my-foo">
+              <fr:number id="my-number" ref="instance()">
+                <xf:label>Number</xf:label>
+              </fr:number>
+            </fr:foo>
+          </fr:bar>
+        </xh:body>
+      </xh:html>
+    
+    assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
+    
+    val serializedState = XFormsState(
+      staticStateDigest = Option(doc.getStaticState.digest),
+      staticState       = doc.getStaticState.encodedState,
+      dynamicState      = DynamicState(doc)
+    )
+
+    val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
+
+    for (id ← List("my-foo", "my-bar", "my-number"))
+      assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)
+  }
 }

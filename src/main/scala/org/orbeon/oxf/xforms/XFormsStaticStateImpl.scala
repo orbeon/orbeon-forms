@@ -133,9 +133,9 @@ object XFormsStaticStateImpl {
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
-  def restore(digest: Option[String], encodedState: String) = {
+  def restore(digest: Option[String], encodedState: String, forceEncryption: Boolean) = {
 
-    val staticStateDocument = new StaticStateDocument(XFormsUtils.decodeXML(encodedState))
+    val staticStateDocument = new StaticStateDocument(XFormsUtils.decodeXML(encodedState, forceEncryption))
 
     // Restore template
     val template = staticStateDocument.template map AnnotatedTemplate.apply

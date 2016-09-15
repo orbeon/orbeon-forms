@@ -46,7 +46,7 @@
           <root url="jar://$MODULE_DIR$/../../lib/commons-beanutils-1_5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-cli-1_0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-codec-1.6.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/commons-collections-3.2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-collections-3.2.2.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-dbcp-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-digester-1_5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/commons-discovery-0.4.jar!/" />
@@ -121,7 +121,6 @@
           <root url="jar://$MODULE_DIR$/../../lib/metadata-extractor-dependency-xmpcore-5.1.2.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/mockito-all-1.8.5.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/msv-20081113-orbeon.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../lib/mysql-2_0_12.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/mysql-connector-java-5.1.26-bin.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/oracle-weblogic-7.0.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/orbeon-errorified-20150511.jar!/" />

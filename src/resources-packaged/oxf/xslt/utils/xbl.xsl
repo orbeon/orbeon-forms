@@ -75,7 +75,6 @@
                     xxbl:scope="outer">&#xb7;</xf:var>
                 <xf:var name="{$property}">
                     <xxf:value
-                        xbl:attr="model context ref bind"
                         value="
                             if (${$property}-orbeon-xbl != '&#xb7;') then
                                 xxf:evaluate-avt(${$property}-orbeon-xbl)

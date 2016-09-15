@@ -64,11 +64,26 @@
             </xsl:when>
             <xsl:otherwise>
                 <!-- Parameter is constant -->
-                <!-- NOTE: We have a "default" value in the variable so we can detect the difference between the attribute value being the empty string vs. the attribute not being there -->
-                <xf:var name="{$property}-orbeon-xbl" xbl:attr="xbl:text={$property}">&#xb7;</xf:var>
-                <xf:var name="{$property}" value="if (${$property}-orbeon-xbl != '&#xb7;') then ${$property}-orbeon-xbl else xxf:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
+                <!-- NOTE: We have a "default" value in the variable so we can detect the difference between the
+                     attribute value being the empty string vs. the attribute not being there -->
+                <xf:var
+                    name="{$property}-orbeon-xbl"
+                    xbl:attr="xbl:text={$property}"
+                    xxbl:scope="outer">&#xb7;</xf:var>
+                <xf:var name="{$property}">
+                    <xxf:value
+                        xbl:attr="model context ref bind"
+                        value="
+                            if (${$property}-orbeon-xbl != '&#xb7;') then
+                                xxf:evaluate-avt(${$property}-orbeon-xbl)
+                            else
+                                xxf:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"
+                        xxbl:scope="outer"/>
+                </xf:var>
                 <xsl:if test="not($server-only)">
-                    <xf:output class="xbl-{$prefix}-{$component}-{$property} xforms-hidden" value="${$property}"/>
+                    <xf:output
+                        class="xbl-{$prefix}-{$component}-{$property} xforms-hidden"
+                        value="${$property}"/>
                 </xsl:if>
             </xsl:otherwise>
         </xsl:choose>

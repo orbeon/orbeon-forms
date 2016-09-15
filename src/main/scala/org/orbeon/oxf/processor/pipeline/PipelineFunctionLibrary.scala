@@ -52,7 +52,7 @@ class PipelineFunctionLibrary extends {
   // === Functions made accessible to XSLT/XPL via Java calls
 
   // Add these to XXFormsIndependentFunctions?
-  def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML, forceEncryption = true) // only used by `xforms-xml-submission.xpl`
+  def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML, true) // only used by `xforms-xml-submission.xpl`
 
   def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)                                  // for unit tests only
   def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML   // for unit tests only

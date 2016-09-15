@@ -389,7 +389,7 @@ public class XFormsUtils {
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        final SAXStore saxStore = new SAXStore(new WhitelistObjectInputStream(byteArrayInputStream, SAXStore.class));
+        final SAXStore saxStore = new SAXStore(WhitelistObjectInputStream.apply(byteArrayInputStream, SAXStore.class));
 
         // Deserialize SAXStore to dom4j document
         // TODO: This is not optimal

@@ -18,15 +18,32 @@ import java.io.{InputStream, ObjectInputStream, ObjectStreamClass}
 
 class WhitelistObjectInputStream(is: InputStream, classNames: Set[String]) extends ObjectInputStream(is) {
 
-  def this(is: InputStream, clazz: Class[_]) = this(is, Set(clazz.getName))
-
   override def resolveClass(desc: ObjectStreamClass): Class[_] = {
 
-    println(s"xxx resolveClass: ${desc.getName}")
+    val name = desc.getName
 
-    if (! classNames(desc.getName))
-      throw new IllegalArgumentException(s"cannot deserialize class `${desc.getName}`")
+    if (! (classNames(name) || WhitelistObjectInputStream.AllowedPrefixes.exists(name.startsWith)))
+      throw new IllegalArgumentException(s"cannot deserialize class `$name`")
 
     super.resolveClass(desc)
   }
+}
+
+object WhitelistObjectInputStream {
+
+  def apply(is: InputStream, clazz: Class[_]): WhitelistObjectInputStream =
+    new WhitelistObjectInputStream(is, AllowedClasses ++ Set(clazz.getName))
+
+  private val AllowedPrefixes = List(
+    "scala.collection.",
+    "scala.Tuple",
+    "["
+  )
+
+  private val AllowedClasses = Set(
+    "scala.None$",
+    "scala.Some",
+    "scala.Option"
+  )
+
 }

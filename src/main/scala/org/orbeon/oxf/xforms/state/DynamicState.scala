@@ -20,7 +20,6 @@ import XFormsProtocols._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.xforms._
 import control.Controls.ControlsIterator
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.dom.{DocumentFactory, Element}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
@@ -280,7 +279,7 @@ object DynamicState {
 
   // Create a DynamicState from an encoded string representation
   def apply(encoded: String): DynamicState = {
-    val bytes = XFormsUtils.decodeBytes(encoded, forceEncryption = false)
+    val bytes = XFormsUtils.decodeBytes(encoded, false)
     fromByteArray[DynamicState](bytes)
   }
 

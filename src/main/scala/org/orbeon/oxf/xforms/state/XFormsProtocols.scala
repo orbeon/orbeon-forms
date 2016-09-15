@@ -57,7 +57,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
       new ObjectOutputStream(new JavaOutputStream(output)).writeObject(o)
 
     def reads(input: Input) =
-      new WhitelistObjectInputStream(new JavaInputStream(input), allowedClass).readObject.asInstanceOf[T]
+      WhitelistObjectInputStream(new JavaInputStream(input), allowedClass).readObject.asInstanceOf[T]
   }
 
   implicit object DynamicStateFormat extends SerializableFormat[DynamicState] { def allowedClass = classOf[DynamicState] }

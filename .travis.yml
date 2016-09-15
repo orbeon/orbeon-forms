@@ -16,8 +16,6 @@ env:
   matrix:
   - TARGET=test-unit
   - TARGET=orbeon-dist
-before_script:
-- curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 script: "ant $TARGET"
 addons:
   artifacts:

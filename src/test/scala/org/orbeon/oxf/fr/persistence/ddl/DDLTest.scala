@@ -107,13 +107,14 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   @Test def createAndUpgradeTest(): Unit = {
     ProvidersTestedAutomatically.foreach {
       case provider @ MySQL ⇒
-        assertSameTable(provider, "4_3",  "4_4")
-        assertSameTable(provider, "4_4",  "4_5")
-        assertSameTable(provider, "4_5",  "4_6")
-        assertSameTable(provider, "4_5",  "4_6")
-        assertSameTable(provider, "4_6",  "2016_2")
+        assertSameTable(provider, "4_3"   ,  "4_4")
+        assertSameTable(provider, "4_4"   ,  "4_5")
+        assertSameTable(provider, "4_5"   ,  "4_6")
+        assertSameTable(provider, "4_5"   ,  "4_6")
+        assertSameTable(provider, "4_6"   ,  "2016_2")
+        assertSameTable(provider, "2016_2",  "2016_3")
       case provider @ PostgreSQL ⇒
-        assertSameTable(provider, "4_8",  "2016_2")
+        assertSameTable(provider, "4_8"   ,  "2016_2")
     }
   }
 }

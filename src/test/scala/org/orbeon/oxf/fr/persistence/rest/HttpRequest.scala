@@ -14,11 +14,11 @@
 package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayOutputStream
-import java.net.URI
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.{PUT, _}
+import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -27,7 +27,7 @@ import scala.util.Try
 
 private object HttpRequest {
 
-  private val PersistenceBase = "http://localhost:8080/orbeon/fr/service/persistence/"
+  private val PersistenceBase = "/fr/service/persistence/"
 
   case class Credentials(username: String, roles: Set[String], group: String)
 
@@ -42,9 +42,9 @@ private object HttpRequest {
     body        : Option[Body],
     credentials : Option[Credentials])(implicit
     logger      : IndentedLogger
-  ): ConnectionResult = {
+  ): ClosableHttpResponse = {
 
-    val documentURL = new URI(PersistenceBase + path)
+    val documentURL = PersistenceBase + path
 
     val headers = {
 
@@ -64,7 +64,7 @@ private object HttpRequest {
       )).to[List].flatten
 
       Connection.buildConnectionHeadersLowerIfNeeded(
-        scheme           = documentURL.getScheme,
+        scheme           = "http",
         hasCredentials   = false,
         customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
         headersToForward = Connection.headersToForwardFromProperty,
@@ -86,33 +86,38 @@ private object HttpRequest {
     val content = messageBody map
       (StreamedContent.fromBytes(_, contentType))
 
-    Connection(
-      method      = method,
-      url         = documentURL,
-      credentials = None,
-      content     = content,
-      headers     = headers,
-      loadState   = true,
-      logBody     = false
-    ).connect(
-      saveState = true
-    )
+    val (_, httpResponse, _) =
+      TestHttpClient.connect(
+        url         = documentURL,
+        method      = method,
+        headers     = headers,
+        content     = content
+      )
+
+    new ClosableHttpResponse(httpResponse)
+  }
+
+  // Wrap `HttpResponse`, so we can later use `ScalaUtils.useAndClose()`, which expects a `.close()`,
+  // while `HttpResponse` has a `.disconnect()`.
+  private class ClosableHttpResponse(val httpResponse: HttpResponse) {
+    def close(): Unit = httpResponse.disconnect()
   }
 
   def put(url: String, version: Version, body: Body, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, PUT, version, Some(body), credentials))(_.statusCode)
+    useAndClose(request(url, PUT, version, Some(body), credentials))(_.httpResponse.statusCode)
 
   def del(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): Int =
-    useAndClose(request(url, DELETE, version, None, credentials))(_.statusCode)
+    useAndClose(request(url, DELETE, version, None, credentials))(_.httpResponse.statusCode)
 
   def get(url: String, version: Version, credentials: Option[Credentials] = None)(implicit logger: IndentedLogger): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
-    useAndClose(request(url, GET, version, None, credentials)) { cxr ⇒
+    useAndClose(request(url, GET, version, None, credentials)) { chr ⇒
 
-      val statusCode = cxr.statusCode
-      val headers    = cxr.headers
+      val httpResponse = chr.httpResponse
+      val statusCode   = httpResponse.statusCode
+      val headers      = httpResponse.headers
 
       val body =
-        useAndClose(cxr.content.inputStream) { inputStream ⇒
+        useAndClose(httpResponse.content.inputStream) { inputStream ⇒
           Try {
             val outputStream = new ByteArrayOutputStream
             NetUtils.copyStream(inputStream, outputStream)

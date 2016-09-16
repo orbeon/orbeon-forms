@@ -90,7 +90,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
 
       // Decode encrypted server events
       def decodeServerEvents(text: String) =
-        Dom4j.elements(decodeXML(text, forceEncryption = true).getRootElement, XXFORMS_EVENT_QNAME) map
+        Dom4j.elements(decodeXML(text, true).getRootElement, XXFORMS_EVENT_QNAME) map
           (LocalEvent(_, trusted = true)) toList
 
       // All global server events

@@ -50,6 +50,6 @@ trait PublishOps {
         toggle("fb-publish-dialog-error")
     }
 
-    setfocus("fb-publish-dialog")
+    setfocus("fb-publish-dialog", includes = Set.empty, excludes = Set.empty)
   }
 }

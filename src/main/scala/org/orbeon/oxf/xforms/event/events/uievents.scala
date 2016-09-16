@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsControl}
+import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -37,9 +38,17 @@ class XFormsHintEvent(target: XFormsEventTarget, properties: PropertyGetter)
 
 class XFormsFocusEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XFORMS_FOCUS, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
-  def this(target: XFormsEventTarget, inputOnly: Boolean = false) = this(target, Map("input-only" → Some(inputOnly)))
+  def this(target: XFormsEventTarget, includes: Set[QName], excludes: Set[QName]) =
+    this(
+      target,
+      Map(
+        "includes" → Some(includes),
+        "excludes" → Some(excludes)
+      )
+    )
 
-  def inputOnly = propertyOrDefault[Boolean]("input-only", default = false)
+  def includes = propertyOrDefault[Set[QName]]("includes", Set.empty)
+  def excludes = propertyOrDefault[Set[QName]]("excludes", Set.empty)
 }
 
 class XXFormsBlurEvent(target: XFormsEventTarget, properties: PropertyGetter)

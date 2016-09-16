@@ -13,14 +13,18 @@
 */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.orbeon.dom.QName
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 /**
-* 10.1.7 The setfocus Element
-*/
+ * 10.1.7 The setfocus Element
+ */
 class XFormsSetfocusAction extends XFormsAction {
 
   override def execute(context: DynamicActionContext): Unit = {
@@ -29,14 +33,21 @@ class XFormsSetfocusAction extends XFormsAction {
     synchronizeAndRefreshIfNeeded(context)
 
     // Extension: whether to focus on input controls only
-    val inputOnly = resolveBooleanAVT("input-only", default = false)(context)
+    def fromInputOnlyAttribute =
+      resolveBooleanAVT("input-only", default = false)(context) option Set(XFORMS_INPUT_QNAME)
+
+    def extractQNames(s: String) =
+      split[Set](s) map (Dom4jUtils.extractTextValueQName(context.element, _, true))
+
+    val includesQNamesOpt = resolveStringAVT("includes")(context) map extractQNames orElse fromInputOnlyAttribute getOrElse Set.empty
+    val excludesQNamesOpt = resolveStringAVT("excludes")(context) map extractQNames getOrElse Set.empty
 
     // Resolve and update control
     resolveControl("control")(context) foreach
-      (XFormsSetfocusAction.setfocus(_, inputOnly))
+      (XFormsSetfocusAction.setfocus(_, includesQNamesOpt, excludesQNamesOpt))
   }
 }
 object XFormsSetfocusAction {
-  def setfocus(control: XFormsControl, inputOnly: Boolean = false): Unit =
-    Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly))
+  def setfocus(control: XFormsControl, includes: Set[QName], excludes: Set[QName]): Unit =
+    Dispatch.dispatchEvent(new XFormsFocusEvent(control, includes, excludes))
 }

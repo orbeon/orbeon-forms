@@ -805,8 +805,10 @@
     <xsd:element name="setfocus">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="control" type="xsd:NMTOKEN" use="required"/>
-            <xsd:attribute name="input-only" type="xsd:boolean" use="optional"/>
+            <xsd:attribute name="control"    type="xsd:NMTOKEN"  use="required"/>
+            <xsd:attribute name="input-only" type="xsd:boolean"  use="optional"/>
+            <xsd:attribute name="includes"   type="xsd:NMTOKENS" use="optional"/>
+            <xsd:attribute name="excludes"   type="xsd:NMTOKENS" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
 

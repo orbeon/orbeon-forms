@@ -65,11 +65,15 @@ trait ControlEventSupport extends ListenersTrait {
           val allIt =
             focusableControls filterNot Focus.isHidden
 
-          val filteredIt =
-            if (focusEvent.inputOnly)
-              allIt collectFirst { case input: XFormsInputControl ⇒ input }
-            else
-              allIt.nextOption()
+          val includes = focusEvent.includes
+          val excludes = focusEvent.excludes
+
+          def satisfiesIncludesAndExcludes(c: XFormsControl): Boolean = {
+            val qName = c.staticControl.element.getQName
+            (includes.isEmpty || includes.contains(qName)) && ! excludes.contains(qName)
+          }
+
+          val filteredIt = allIt find satisfiesIncludesAndExcludes
 
           filteredIt foreach Focus.focusWithEvents
         case _ ⇒

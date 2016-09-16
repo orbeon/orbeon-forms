@@ -345,7 +345,7 @@ object XFormsAPI {
     XFormsLoadAction.resolveStoreLoadValue(inScopeContainingDocument, null, true, NetUtils.encodeHRRI(url, true), target.orNull, null, false, false)
 
   // xf:setfocus
-  def setfocus(controlId: String, inputOnly: Boolean = false): Unit =
+  def setfocus(controlId: String, includes: Set[QName], excludes: Set[QName]): Unit =
     resolveAs[XFormsControl](controlId) foreach
-      (XFormsSetfocusAction.setfocus(_, inputOnly))
+      (XFormsSetfocusAction.setfocus(_, includes, excludes))
 }

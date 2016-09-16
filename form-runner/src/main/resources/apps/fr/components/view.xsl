@@ -818,7 +818,11 @@
             <!-- Clicking sets the focus -->
             <xf:trigger appearance="minimal">
                 <xf:label value="xxf:label('{@id}')"/>
-                <xf:setfocus ev:event="DOMActivate" control="{@id}" input-only="true"/>
+                <xf:setfocus
+                    event="DOMActivate"
+                    control="{@id}"
+                    includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                    excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
             </xf:trigger>
             <!-- Sub-sections if any -->
             <xsl:if test="exists(fr:section)">

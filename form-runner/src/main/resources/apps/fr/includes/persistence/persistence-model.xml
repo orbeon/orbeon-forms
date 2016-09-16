@@ -329,7 +329,10 @@
 
         <!-- Clear error summary and focus -->
         <xf:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
-        <xf:setfocus control="fr-form-group" input-only="true"/>
+        <xf:setfocus
+            control="fr-form-group"
+            includes="{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}"
+            excludes="{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}"/>
     </xf:action>
 
     <!-- New document operation -->

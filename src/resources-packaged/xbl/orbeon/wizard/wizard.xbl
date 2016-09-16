@@ -300,6 +300,7 @@
                                     value="
                                         $nav-section-or-grid-ids[xxf:is-control-relevant(.)]"/>
 
+                                <!-- TODO: maybe use xxf:is-control-relevant(.) too -->
                                 <xf:var
                                     name="relevant-top-level-section-ids"
                                     value="
@@ -465,7 +466,8 @@
                                                             case="{{$prev-nav-case-ids[last()]}}"/>
                                                         <xf:setfocus
                                                             control="{{$prev-nav-case-ids[last()]}}"
-                                                            input-only="true"/>
+                                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
                                                     </xf:action>
                                                 </xf:trigger>
                                             </xh:li>
@@ -499,10 +501,14 @@
                                                                 case="{{$next-nav-case-ids[1]}}"/>
                                                             <xf:setfocus
                                                                 control="{{$next-nav-case-ids[1]}}"
-                                                                input-only="true"/>
+                                                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
                                                         </xf:action>
                                                         <xf:action if="not($allow-next)">
-                                                            <xf:setfocus control="{{$current-nav-case-id}}" input-only="true"/>
+                                                            <xf:setfocus
+                                                                control="{{$current-nav-case-id}}"
+                                                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
                                                         </xf:action>
                                                     </xf:action>
                                                 </xf:trigger>
@@ -675,7 +681,10 @@
                                         case="{$static-nav-section-id}-case"/>
 
                                     <!-- ...and always focus on specific sub-section -->
-                                    <xf:setfocus control="{$static-section-id}" input-only="true"/>
+                                    <xf:setfocus
+                                        control="{$static-section-id}"
+                                        includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                        excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
 
                                     <!-- Show body if needed -->
                                     <xf:var name="local" value="xxf:instance('local')"/>

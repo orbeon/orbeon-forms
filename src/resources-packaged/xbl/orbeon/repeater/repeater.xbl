@@ -150,7 +150,12 @@
                                 at="$p"
                                 xxf:defaults="{$apply-defaults}"/>
                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf0"/>
+                            <xf:setfocus
+                                control="repeat-group"
+                                xxf:repeat-indexes="{{$p + 1}}"
+                                id="sf0"
+                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
                             <!-- Let the outside world know -->
                             <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-added"/>
                         </xf:action>
@@ -160,7 +165,12 @@
                             <xf:delete
                                 ref="$repeat-sequence[last()]"/>
                             <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                            <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf6"/>
+                            <xf:setfocus
+                                control="repeat-group"
+                                xxf:repeat-indexes="{{$p - 1}}"
+                                id="sf6"
+                                includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
                             <!-- Let the outside world know -->
                             <xf:dispatch targetid="fr-repeater-binding" name="fr-iteration-removed"/>
                         </xf:action>
@@ -234,7 +244,12 @@
                                             position="before"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p - 1}}" id="sf1" input-only="true"/>
+                                        <xf:setfocus
+                                            control="repeat-group"
+                                            xxf:repeat-indexes="{{$p - 1}}"
+                                            id="sf1"
+                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
 
                                     </xf:action>
 
@@ -247,7 +262,12 @@
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf2" input-only="true"/>
+                                        <xf:setfocus
+                                            control="repeat-group"
+                                            xxf:repeat-indexes="{{$p + 1}}"
+                                            id="sf2"
+                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
 
                                     </xf:action>
 
@@ -260,7 +280,12 @@
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p}}" id="sf3" input-only="true"/>
+                                        <xf:setfocus
+                                            control="repeat-group"
+                                            xxf:repeat-indexes="{{$p}}"
+                                            id="sf3"
+                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
 
                                     </xf:action>
 
@@ -273,7 +298,12 @@
                                             position="after"/>
 
                                         <!-- HACK: Specify id so that action id remains stable in Form Builder -->
-                                        <xf:setfocus control="repeat-group" xxf:repeat-indexes="{{$p + 1}}" id="sf4" input-only="true"/>
+                                        <xf:setfocus
+                                            control="repeat-group"
+                                            xxf:repeat-indexes="{{$p + 1}}"
+                                            id="sf4"
+                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
 
                                     </xf:action>
                                 </xf:action>

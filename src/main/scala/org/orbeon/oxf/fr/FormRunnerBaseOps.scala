@@ -160,6 +160,10 @@ trait FormRunnerBaseOps {
     else
       name
 
+  //@XPathFunction
+  def xpathFormRunnerStringProperty(name: String) =
+    formRunnerProperty(name)(FormRunnerParams())
+
   // Return a property using the form's app/name, None if the property is not defined
   def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
     Option(properties.getObject(buildPropertyName(name))) map (_.toString)

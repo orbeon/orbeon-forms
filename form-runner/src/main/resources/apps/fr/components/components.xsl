@@ -114,7 +114,10 @@
 
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
-    <xsl:variable name="enable-initial-focus" select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))" as="xs:boolean"/>
+    <xsl:variable
+        name="enable-initial-focus"
+        select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))"
+        as="xs:boolean"/>
 
     <!-- fr:section and fr:grid configuration -->
     <xsl:variable
@@ -475,7 +478,11 @@
                  understand that if a modal dialog is currently visible, setting focus to a control outside that dialog
                  should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
             <xsl:if test="$enable-initial-focus">
-                <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
+                <xf:setfocus
+                    event="xforms-ready"
+                    control="fr-form-group"
+                    includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
+                    excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
             </xsl:if>
 
             <!-- Custom model content -->

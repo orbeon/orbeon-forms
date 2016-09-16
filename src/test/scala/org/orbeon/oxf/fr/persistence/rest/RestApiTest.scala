@@ -53,20 +53,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         withDebug("on database", List("provider" → provider.name)) {
           Connect.withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
-            try {
-              // Create tables
-              val sql = provider match {
-                case MySQL      ⇒ "mysql-4_6.sql"
-                case PostgreSQL ⇒ "postgresql-4_8.sql"
-              }
-              val createDDL = SQL.read(sql)
-              withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
-              withDebug("run actual test") { block(connection, provider) }
-            } finally {
-              // Clean-up database dropping tables
-              for (tableName ← Connect.getTableNames(provider, connection))
-                statement.executeUpdate(s"DROP TABLE $tableName")
+            // Create tables
+            val sql = provider match {
+              case MySQL      ⇒ "mysql-2016_2.sql"
+              case PostgreSQL ⇒ "postgresql-2016_2.sql"
             }
+            val createDDL = SQL.read(sql)
+            withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
+            withDebug("run actual test") { block(connection, provider) }
           }
         }
       }

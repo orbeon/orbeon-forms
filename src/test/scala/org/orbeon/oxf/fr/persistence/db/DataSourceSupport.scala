@@ -1,44 +1,24 @@
-package org.orbeon.oxf.fr
+/**
+ * Copyright (C) 2016 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.fr.persistence.db
 
 import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 
 import org.apache.commons.dbcp.BasicDataSource
-import org.orbeon.oxf.fr.persistence.relational.Provider._
 import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.immutable
-
-case class DatasourceDescriptor(name: String, driver: String, url: String, username: String, password: String)
-
-object DatasourceDescriptor {
-
-  def apply(provider: Provider, user: Option[String]): DatasourceDescriptor = {
-
-    val url = provider match {
-      case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
-      case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("/")
-    }
-
-    val username = provider match {
-      case _      ⇒ "orbeon"
-    }
-
-    val password = System.getenv("RDS_PASSWORD")
-
-    DatasourceDescriptor(
-      name     = provider.name,
-      driver   = DriverClassNames(provider),
-      url      = url,
-      username = username,
-      password = password
-    )
-  }
-
-  private val DriverClassNames = Map(
-    MySQL      → "com.mysql.jdbc.Driver",
-    PostgreSQL → "org.postgresql.Driver"
-  )
-}
 
 // Utility to setup datasources outside of a servlet container environment, such as when running tests.
 object DataSourceSupport {
@@ -57,8 +37,7 @@ object DataSourceSupport {
 
   private val BuildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
 
-  def ddlUserFromBuildNumber    = s"orbeon_${BuildNumber}_ddl"
-  def tomcatUserFromBuildNumber = s"orbeon_${BuildNumber}_tomcat"
+  def orbeonUserWithBuildNumber    = s"orbeon_$BuildNumber"
 
   private val NamingPrefix = "java:comp/env/jdbc/"
 

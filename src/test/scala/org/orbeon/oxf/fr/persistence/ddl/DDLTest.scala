@@ -32,7 +32,8 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true)
 
   private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
-    val schema = s"orbeon_${System.getenv("TRAVIS_BUILD_NUMBER")}_ddl"
+    val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
+    val schema = s"orbeon_$buildNumber"
     val createUserAndDatabase = provider match {
       case _          ⇒ Seq(s"CREATE DATABASE $schema")
     }
@@ -41,7 +42,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
     }
     try {
       Connect.asRoot(provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
-      Connect.asDDL(provider)(block)
+      Connect.asOrbeon (provider)(block)
     } finally {
       Connect.asRoot(provider)(dropUserAndDatabase foreach _.createStatement.executeUpdate)
     }

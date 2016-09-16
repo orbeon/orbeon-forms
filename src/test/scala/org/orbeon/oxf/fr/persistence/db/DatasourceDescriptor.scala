@@ -1,0 +1,51 @@
+/**
+ * Copyright (C) 2016 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.fr.persistence.db
+
+import org.orbeon.oxf.fr.persistence.relational.Provider._
+
+case class DatasourceDescriptor(
+  name     : String,
+  driver   : String,
+  url      : String,
+  username : String,
+  password : String
+)
+
+object DatasourceDescriptor {
+
+  def apply(provider: Provider, user: Option[String]): DatasourceDescriptor = {
+
+    val url = provider match {
+      case MySQL      ⇒ System.getenv("MYSQL_URL")      + user.map("/" + _).getOrElse("")
+      case PostgreSQL ⇒ System.getenv("POSTGRESQL_URL") + user.map("/" + _).getOrElse("/")
+    }
+
+    val username = "orbeon"
+    val password = System.getenv("RDS_PASSWORD")
+
+    DatasourceDescriptor(
+      name     = provider.name,
+      driver   = DriverClassNames(provider),
+      url      = url,
+      username = username,
+      password = password
+    )
+  }
+
+  private val DriverClassNames = Map(
+    MySQL      → "com.mysql.jdbc.Driver",
+    PostgreSQL → "org.postgresql.Driver"
+  )
+}

@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr.persistence.db
 import java.sql.{Connection, DriverManager}
 
 import org.orbeon.oxf.fr.persistence.relational.Provider._
-import org.orbeon.oxf.fr.{DataSourceSupport, DatasourceDescriptor}
 import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
@@ -24,8 +23,7 @@ private[persistence] object Connect {
   import DataSourceSupport._
 
   def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                           , block)
-  def asDDL   [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(ddlUserFromBuildNumber)   , block)
-  def asTomcat[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(tomcatUserFromBuildNumber), block)
+  def asOrbeon[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(orbeonUserWithBuildNumber), block)
 
   private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
     val descriptor = DatasourceDescriptor(provider, user)

@@ -54,7 +54,7 @@ private[persistence] object SQL extends Logging {
       // To be the end of a statement, we must end with a `;`
       line.endsWith(";") &&
       // But also we don't start with space, or we're at the end of the file, or the next line is empty
-      (! line.startsWith(" ") || next.map(_.length == 0).getOrElse(true))
+      (! line.startsWith(" ") || next.forall(_.length == 0))
     )}
 
     // Group lines in statements

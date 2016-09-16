@@ -51,7 +51,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     withDebug(message) {
       ProvidersTestedAutomatically.foreach { provider ⇒
         withDebug("on database", List("provider" → provider.name)) {
-          Connect.asOrbeon(provider) { connection ⇒
+          Connect.withNewDatabase(provider) { connection ⇒
             val statement = connection.createStatement
             try {
               // Create tables

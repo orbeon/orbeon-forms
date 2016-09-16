@@ -22,8 +22,23 @@ private[persistence] object Connect {
 
   import DataSourceSupport._
 
-  def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, None                           , block)
-  def asOrbeon[T](provider: Provider)(block: Connection ⇒ T): T = asUser(provider, Some(orbeonUserWithBuildNumber), block)
+  def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
+    val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
+    val schema = s"orbeon_$buildNumber"
+    val createUserAndDatabase = Seq(s"CREATE DATABASE $schema")
+    val dropUserAndDatabase   = Seq(s"DROP DATABASE $schema")
+    try {
+      Connect.asRoot(provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
+      Connect.asOrbeon (provider)(block)
+    } finally {
+      Connect.asRoot(provider)(dropUserAndDatabase foreach _.createStatement.executeUpdate)
+    }
+  }
+
+  private def asRoot  [T](provider: Provider)(block: Connection ⇒ T): T =
+    asUser(provider, None, block)
+  private def asOrbeon[T](provider: Provider)(block: Connection ⇒ T): T =
+    asUser(provider, Some(orbeonUserWithBuildNumber), block)
 
   private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
     val descriptor = DatasourceDescriptor(provider, user)

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.fr.persistence.ddl
 
-import java.sql.Connection
-
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence._
@@ -31,23 +29,6 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[DDLTest]), true)
 
-  private def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
-    val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
-    val schema = s"orbeon_$buildNumber"
-    val createUserAndDatabase = provider match {
-      case _          ⇒ Seq(s"CREATE DATABASE $schema")
-    }
-    val dropUserAndDatabase = provider match {
-      case _          ⇒ Seq(s"DROP DATABASE $schema")
-    }
-    try {
-      Connect.asRoot(provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
-      Connect.asOrbeon (provider)(block)
-    } finally {
-      Connect.asRoot(provider)(dropUserAndDatabase foreach _.createStatement.executeUpdate)
-    }
-  }
-
   case class TableMeta(tableName: String, colsMeta: Seq[ColMeta])
   case class ColMeta(colName: String, meta: Set[ColKeyVal])
   case class ColKeyVal(key: String, value: AnyRef)
@@ -57,7 +38,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
    * information is returned varies depending on the database, hence the Any return type.
    */
   private def sqlToTableInfo(provider: Provider, sql: Seq[String]): List[TableMeta] = {
-    withNewDatabase(provider) { connection ⇒
+    Connect.withNewDatabase(provider) { connection ⇒
       val statement = connection.createStatement
       SQL.executeStatements(provider, statement, sql)
       val query = provider match {

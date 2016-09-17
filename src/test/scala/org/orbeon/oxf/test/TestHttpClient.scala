@@ -17,6 +17,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
+import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
@@ -54,12 +55,12 @@ object TestHttpClient {
 
   private object ServerState {
 
-    val Port        = 8080
-    val Host        = "localhost"
-    val ContextPath = "/orbeon"
-
-    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]()
-    val sessions: mutable.Map[String, Session] = mutable.HashMap[String, Session]()
+    val Port             = 8080
+    val Host             = "localhost"
+    val ContextPath      = "/orbeon"
+    var OrbeonTokenValue = SecureUtils.randomHexId
+    val serverAttributes = mutable.LinkedHashMap[String, AnyRef]() + (OrbeonTokenLower → OrbeonTokenValue)
+    val sessions         = mutable.HashMap[String, Session]()
   }
 
   def connect(
@@ -154,7 +155,7 @@ object TestHttpClient {
             contextPath             = ServerState.ContextPath,
             pathQuery               = url,
             method                  = method,
-            headersMaybeCapitalized = headers,
+            headersMaybeCapitalized = headers + (OrbeonTokenLower → List(ServerState.OrbeonTokenValue)),
             content                 = content
           )
 

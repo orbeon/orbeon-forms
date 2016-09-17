@@ -479,6 +479,7 @@
                  should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
             <xsl:if test="$enable-initial-focus">
                 <xf:setfocus
+                    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                     event="xforms-ready"
                     control="fr-form-group"
                     includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"

@@ -17,14 +17,8 @@ package org.orbeon.oxf.fr.persistence.relational.index.status
 
 object UI {
 
-  def status: String = StatusStore.getStatus match {
-    case Stopped           ⇒ "stopped"
-    case Starting(_)       ⇒ "starting"
-    case Stopping          ⇒ "stopping"
-    case Indexing(_, _, _) ⇒ "indexing"
-  }
-
-  def stop() : Unit = StatusStore.setStatus(Stopping)
+  def status : String = StatusStore.getStatus.name
+  def stop() : Unit   = StatusStore.setStatus(Stopping)
 
   def getProviderToken   = Some(StatusStore.getStatus).collect{case Indexing(p, _, _) ⇒ p               }.getOrElse("")
   def getProviderCurrent = Some(StatusStore.getStatus).collect{case Indexing(_, c, _) ⇒ c.current       }.getOrElse(0)

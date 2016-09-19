@@ -289,7 +289,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     for ((prefixedId, elementInSource) ← groupChanges(xblChanges)) {
       // Get control
-      val control = tree.getControl(prefixedId) // TODO: should use effective id if in repeat and process all
+      val control = tree.findControlOrNull(prefixedId) // TODO: should use effective id if in repeat and process all
 
       control match {
         case componentControl: XFormsComponentControl ⇒

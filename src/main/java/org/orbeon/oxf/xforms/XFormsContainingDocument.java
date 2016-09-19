@@ -273,7 +273,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
                         // Once the control tree is rebuilt, restore focus if needed
                         if (dynamicState.decodeFocusedControlJava() != null)
-                            xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().getControl(dynamicState.decodeFocusedControlJava()));
+                            xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().findControlOrNull(dynamicState.decodeFocusedControlJava()));
                     }
                 });
             }
@@ -797,7 +797,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
 
     @Override
     public List<XFormsControl> getChildrenControls(XFormsControls controls) {
-        return controls.getCurrentControlTree().getChildren();
+        return controls.getCurrentControlTree().children();
     }
 
     /**

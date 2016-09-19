@@ -17,10 +17,11 @@ import java.{util ⇒ ju}
 
 import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.{ScriptInvocation, XFormsContainingDocument, XFormsUtils}
-import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper}
 
 import scala.collection.JavaConverters._
+import scala.collection.{mutable ⇒ m}
 
 object XFormsServerBase {
 
@@ -55,4 +56,29 @@ object XFormsServerBase {
       }
     }
   }
+
+  def diffIndexState(
+    ch                     : XMLReceiverHelper,
+    ns                     : String,
+    initialRepeatIdToIndex : m.Map[String, Int],
+    currentRepeatIdToIndex : m.Map[String, Int]
+  ): Unit =
+    if (currentRepeatIdToIndex.nonEmpty) {
+      var found = false
+      for {
+        (repeatId, newIndex) ← currentRepeatIdToIndex
+        oldIndex             ← initialRepeatIdToIndex.get(repeatId) // may be None if there was no iteration
+        if newIndex != oldIndex
+      } locally {
+          if (! found) {
+            ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "repeat-indexes")
+            found = true
+          }
+          // Make sure to namespace the id
+          ch.element("xxf", XXFORMS_NAMESPACE_URI, "repeat-index", Array("id", ns + repeatId, "new-index", newIndex.toString))
+      }
+
+      if (found)
+        ch.endElement()
+    }
 }

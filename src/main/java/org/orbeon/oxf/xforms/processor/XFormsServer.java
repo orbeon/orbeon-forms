@@ -607,8 +607,8 @@ public class XFormsServer extends ProcessorImpl {
 
                         diffControls(
                             containingDocument,
-                            initialControlTree.getChildren(),
-                            currentControlTree.getChildren(),
+                            initialControlTree.children(),
+                            currentControlTree.children(),
                             null,
                             testOutputAllActions,
                             ch,
@@ -619,8 +619,8 @@ public class XFormsServer extends ProcessorImpl {
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         diffControls(
                             containingDocument,
-                            xformsControls.getInitialControlTree().getChildren(),
-                            currentControlTree.getChildren(),
+                            xformsControls.getInitialControlTree().children(),
+                            currentControlTree.children(),
                             valueChangeControlIdsAndValues,
                             testOutputAllActions,
                             ch,
@@ -649,12 +649,20 @@ public class XFormsServer extends ProcessorImpl {
                     if (allEvents) {
                         // All events
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
-                        diffIndexState(ch, ns, XFormsRepeatControl.initialIndexesJava(initialContainingDocument),
-                                XFormsRepeatControl.currentIndexesJava(containingDocument));
+                        XFormsServerBase.diffIndexState(
+                            ch,
+                            ns,
+                            XFormsRepeatControl.initialIndexes(initialContainingDocument),
+                            XFormsRepeatControl.currentIndexes(containingDocument)
+                        );
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
-                        diffIndexState(ch, ns, xformsControls.getInitialControlTree().getIndexes(),
-                                XFormsRepeatControl.currentIndexesJava(containingDocument));
+                        XFormsServerBase.diffIndexState(
+                            ch,
+                            ns,
+                            xformsControls.getInitialControlTree().indexes(),
+                            XFormsRepeatControl.currentIndexes(containingDocument)
+                        );
                     }
                 }
 
@@ -723,7 +731,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (beforeFocusEffectiveId != null && afterFocusEffectiveId == null) {
                         // Focus removed: notify the client only if the control still exists
-                        if (containingDocument.getControls().getCurrentControlTree().getControl(beforeFocusEffectiveId) != null)
+                        if (containingDocument.getControls().getCurrentControlTree().findControlOrNull(beforeFocusEffectiveId) != null)
                             outputFocusInfo(ch, containingDocument, false, beforeFocusEffectiveId);
 
                     } else if (afterFocusEffectiveId != null && ! afterFocusEffectiveId.equals(beforeFocusEffectiveId)) {
@@ -755,33 +763,6 @@ public class XFormsServer extends ProcessorImpl {
             ch.endDocument();
         } catch (SAXException e) {
             throw new OXFException(e);
-        }
-    }
-
-    private static void diffIndexState(XMLReceiverHelper ch, String ns, Map<String, Integer> initialRepeatIdToIndex,
-                                       Map<String, Integer> currentRepeatIdToIndex) {
-        if (currentRepeatIdToIndex.size() != 0) {
-            boolean found = false;
-            for (Map.Entry<String, Integer> currentEntry: currentRepeatIdToIndex.entrySet()) {
-                final String repeatId = currentEntry.getKey();
-                final Integer newIndex = currentEntry.getValue();
-
-                // Output information if there is a difference
-                final Integer oldIndex = initialRepeatIdToIndex.get(repeatId);// may be null if there was no iteration
-                if (!newIndex.equals(oldIndex)) {
-
-                    if (!found) {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
-                        found = true;
-                    }
-
-                    // Make sure to namespace the id
-                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                            new String[] {"id", ns + repeatId, "new-index", newIndex.toString()});
-                }
-            }
-            if (found)
-                ch.endElement();
         }
     }
 

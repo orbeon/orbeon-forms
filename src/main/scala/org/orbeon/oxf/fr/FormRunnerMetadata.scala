@@ -16,15 +16,14 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
+import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
-import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
-import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
-import scala.collection.JavaConverters._
 import scala.xml.Elem
 
 trait FormRunnerMetadata {
@@ -35,7 +34,7 @@ trait FormRunnerMetadata {
 
     val doc = XFormsAPI.inScopeContainingDocument
 
-    val controls = doc.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala
+    val controls = doc.getControls.getCurrentControlTree.effectiveIdsToControls
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.getEffectiveId, staticId, None) flatMap

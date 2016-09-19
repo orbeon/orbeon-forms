@@ -165,7 +165,7 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
       assert(controlIndexes.sorted === controlIndexes)
 
       val effectiveAbsoluteIds =
-        doc.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala map
+        doc.getControls.getCurrentControlTree.effectiveIdsToControls map
         { case (id, _) ⇒ effectiveIdToAbsoluteId(id) } toList
 
       val sortStrings =

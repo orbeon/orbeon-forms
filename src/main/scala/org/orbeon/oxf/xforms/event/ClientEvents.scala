@@ -216,12 +216,12 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         LocalEvent(newEventElement, trusted = false)
       }
 
-      val selectFullControls = doc.getControls.getCurrentControlTree.getSelectFullControls
+      val selectFullControls = doc.getControls.getCurrentControlTree.getSelectFullControlsAsMap
 
       // Find all relevant and non-readonly select controls for which no value change event arrived. For each such
       // control, create a new event that will blank its value.
-      selectFullControls.asScala.keySet -- getValueChangeIds map
-        (id ⇒ selectFullControls.get(id).asInstanceOf[XFormsSelectControl]) filter
+      selectFullControls.keySet -- getValueChangeIds map
+        (id ⇒ selectFullControls.getOrElse(id, null).asInstanceOf[XFormsSelectControl]) filter
           (control ⇒ control.isRelevant && ! control.isReadonly) map
             createBlankingEvent toList
     }

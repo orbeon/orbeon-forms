@@ -152,7 +152,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
             val tree = doc.getControls.getCurrentControlTree
 
             val repeat =
-              tree.getControl(ancestorRepeatPrefixedId + Controls.buildSuffix(commonIndexesLeafToRoot.tail.reverse)).asInstanceOf[XFormsRepeatControl]
+              tree.findControlOrNull(ancestorRepeatPrefixedId + Controls.buildSuffix(commonIndexesLeafToRoot.tail.reverse)).asInstanceOf[XFormsRepeatControl]
 
             val iterationBoundNode = repeat.children(commonIndexesLeafToRoot.head - 1).boundNode
 

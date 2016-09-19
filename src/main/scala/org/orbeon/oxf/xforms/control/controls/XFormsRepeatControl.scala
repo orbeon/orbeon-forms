@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.lang.{Integer ⇒ JInteger}
-import java.util.{ArrayList, Collections, Map ⇒ JMap}
+import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
@@ -34,7 +33,8 @@ import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ArrayBuffer, LinkedHashMap, ListBuffer}
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.{mutable ⇒ m}
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(
@@ -165,7 +165,7 @@ class XFormsRepeatControl(
           // DnD destination is the current repeat control
           this
 
-      (new ArrayList[Item](destinationControl.bindingContext.nodeset), dndEnd(dndEnd.length - 1).toInt)
+      (new ju.ArrayList[Item](destinationControl.bindingContext.nodeset), dndEnd(dndEnd.length - 1).toInt)
     }
 
     // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
@@ -301,11 +301,11 @@ class XFormsRepeatControl(
       // Evaluate all controls and then dispatches creation events
       val currentControlTree = containingDocument.getControls.getCurrentControlTree
       for (newIteration ← newIterations)
-        currentControlTree.initializeSubTree(newIteration, true)
+        currentControlTree.initializeSubTree(newIteration, includeCurrent = true)
 
       // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events
       // if needed on the repeat control itself (subtrees are handled above).
-      containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(Seq(getEffectiveId).asJava)
+      containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(List(getEffectiveId))
 
       // Handle focus changes
       Focus.updateFocusWithEvents(focusedBefore, partialFocusRepeatOption)
@@ -377,7 +377,7 @@ class XFormsRepeatControl(
                 }
 
                 // Dispatch destruction events
-                currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, true)
+                currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, includeCurrent = true)
 
                 // Indicate to iteration that it is being removed
                 // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
@@ -387,7 +387,7 @@ class XFormsRepeatControl(
             }
 
             // Deindex old iteration
-            currentControlTree.deindexSubtree(movedOrRemovedIteration, true)
+            currentControlTree.deindexSubtree(movedOrRemovedIteration, includeCurrent = true)
             updated = true
           }
         }
@@ -513,7 +513,7 @@ class XFormsRepeatControl(
               updateBindingsIfNeeded()
 
               // Index iteration
-              currentControlTree.indexSubtree(existingIteration, true)
+              currentControlTree.indexSubtree(existingIteration, includeCurrent = true)
               updated = true
 
               // Add information for moved iterations
@@ -555,8 +555,8 @@ class XFormsRepeatControl(
             "index" → removedIteration.iterationIndex.toString
           )) {
             // Dispatch destruction events and deindex old iteration
-            currentControlTree.dispatchDestructionEventsForRemovedContainer(removedIteration, true)
-            currentControlTree.deindexSubtree(removedIteration, true)
+            currentControlTree.dispatchDestructionEventsForRemovedContainer(removedIteration, includeCurrent = true)
+            currentControlTree.deindexSubtree(removedIteration, includeCurrent = true)
           }
 
           updated = true
@@ -613,8 +613,8 @@ class XFormsRepeatControl(
   }
 
   // Serialize index
-  override def serializeLocal: JMap[String, String] =
-    Collections.singletonMap("index", Integer.toString(getIndex))
+  override def serializeLocal: ju.Map[String, String] =
+    ju.Collections.singletonMap("index", Integer.toString(getIndex))
 
   // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
   // repeat object associated with the repeat index"
@@ -670,20 +670,15 @@ object XFormsRepeatControl {
   )
 
   // Find the initial repeat indexes for the given doc
-  // NOTE: cast is ugly, but we know Scala boxes Int as java.lang.Integer, however asJava doesn't reflect this
-  def initialIndexesJava(doc: XFormsContainingDocument): JMap[String, JInteger] =
+  def initialIndexes(doc: XFormsContainingDocument) =
     findIndexes(
       doc.getControls.getCurrentControlTree,
       doc.getStaticOps.repeats,
       _.initialLocal.asInstanceOf[XFormsRepeatControlLocal].index
-    ).asJava.asInstanceOf[JMap[String, JInteger]]
+    )
 
   // Find the current repeat indexes for the given doc
-  // NOTE: cast is ugly, but we know Scala boxes Int as java.lang.Integer, however asJava doesn't reflect this
-  def currentIndexesJava(doc: XFormsContainingDocument): JMap[String, JInteger]  =
-    currentIndexes(doc).asJava.asInstanceOf[JMap[String, JInteger]]
-
-  private def currentIndexes(doc: XFormsContainingDocument) =
+  def currentIndexes(doc: XFormsContainingDocument) =
     findIndexes(doc.getControls.getCurrentControlTree, doc.getStaticOps.repeats, _.getIndex)
 
   // Find the current repeat indexes for the given doc, as a string
@@ -712,7 +707,7 @@ object XFormsRepeatControl {
     // Build a suffix based on the ancestor repeats' current indexes
     val suffix = suffixForRepeats(indexes, ancestorRepeatsFromRoot)
 
-    Option(tree.getControl(addSuffix(control.prefixedId, suffix)))
+    Option(tree.findControlOrNull(addSuffix(control.prefixedId, suffix)))
   }
 
   // Return all the controls with the same prefixed id as the control specified
@@ -729,7 +724,7 @@ object XFormsRepeatControl {
         case head :: tail ⇒
 
           val repeatEffectiveId = addSuffix(head.prefixedId, suffix)
-          val repeatControl     = tree.getControl(repeatEffectiveId).asInstanceOf[XFormsRepeatControl]
+          val repeatControl     = tree.findControlOrNull(repeatEffectiveId).asInstanceOf[XFormsRepeatControl]
 
           for {
             index ← Iterator.from(1).take(repeatControl.getSize)
@@ -738,12 +733,12 @@ object XFormsRepeatControl {
             i
       }
 
-    search(control.staticControl.ancestorRepeatsAcrossParts.reverse, "") map tree.getControl
+    search(control.staticControl.ancestorRepeatsAcrossParts.reverse, "") map tree.findControlOrNull
   }
 
   // Find indexes for the given repeats in the current document
   private def findIndexes(tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl ⇒ Int) =
-    repeats.foldLeft(LinkedHashMap[String, Int]()) {
+    repeats.foldLeft(m.LinkedHashMap[String, Int]()) {
       (indexes, repeat) ⇒
 
         // Build the suffix based on all the ancestor repeats' indexes
@@ -754,7 +749,7 @@ object XFormsRepeatControl {
 
         // Add the index to the map (0 if the control is not found)
         indexes += (repeat.prefixedId → {
-          tree.getControl(effectiveId) match {
+          tree.findControlOrNull(effectiveId) match {
             case control: XFormsRepeatControl ⇒ index(control)
             case _ ⇒ 0
           }

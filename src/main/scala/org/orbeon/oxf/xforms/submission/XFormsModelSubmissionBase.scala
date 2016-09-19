@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
-
-import collection.JavaConverters._
-import collection.mutable
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ListenersTrait
-import org.orbeon.oxf.xforms.{InstanceData, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.model.BindNode
+import org.orbeon.oxf.xforms.{InstanceData, XFormsContainingDocument}
+import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+
+import scala.collection.mutable
 
 abstract class XFormsModelSubmissionBase extends ListenersTrait
 
@@ -128,7 +127,7 @@ object XFormsModelSubmissionBase {
       })
 
       if (elementsToAnnotate.nonEmpty) {
-        val controls = xfcd.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala
+        val controls = xfcd.getControls.getCurrentControlTree.effectiveIdsToControls
 
         val relevantLevels = elementsToAnnotate.keySet
 

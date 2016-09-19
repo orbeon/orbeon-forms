@@ -233,7 +233,7 @@ object Controls {
   ): List[String] = {
 
     // Don't do anything if there are no controls
-    if (tree.getChildren.isEmpty)
+    if (tree.children.isEmpty)
       return null
 
     // NOTE: The implementation tries to do a maximum using the static state. One reason is that the source
@@ -259,7 +259,7 @@ object Controls {
         case repeatPrefixedId :: remainingPrefixedIds ⇒
 
           val repeatControl =
-            tree.getControl(repeatPrefixedId + buildSuffix(indexes)).asInstanceOf[XFormsRepeatControl]
+            tree.findControlOrNull(repeatPrefixedId + buildSuffix(indexes)).asInstanceOf[XFormsRepeatControl]
 
           if (repeatControl eq null) {
             Nil // control might not exist (but why?)
@@ -330,7 +330,7 @@ object Controls {
     val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext())
     visitAllControls(containingDocument, updater)
 
-    Option(containingDocument.getControls.getCurrentControlTree.getRoot) foreach
+    containingDocument.getControls.getCurrentControlTree.rootOpt foreach
       logTreeIfNeeded("after full tree update")
 
     updater
@@ -487,7 +487,7 @@ object Controls {
 
   // Visit all the controls
   def visitAllControls(tree: ControlTree, listener: XFormsControlVisitorListener): Unit =
-    visitSiblings(listener, tree.getChildren.asScala)
+    visitSiblings(listener, tree.children.asScala)
 
   // Iterator over the given control and its descendants
   class ControlsIterator(
@@ -555,7 +555,7 @@ object Controls {
   private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]
 
   // Visit all the descendant controls of the given container control
-  // FIXME: Use ControlsIterator instead and then remove this when done
+  // 2016-09-20: 3 uses left.
   def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean): Unit =
     control match {
       case containerControl: XFormsContainerControl ⇒

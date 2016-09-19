@@ -49,7 +49,7 @@ object XMLOutput extends XMLReceiverSupport {
     xmlReceiver     : XMLReceiver
   ): Unit =
     withDocument {
-      applyMatchers(xfcd.getControls.getCurrentControlTree.getRoot, xmlReceiver)
+      xfcd.getControls.getCurrentControlTree.rootOpt foreach (root ⇒ applyMatchers(root, xmlReceiver))
     }
 
   def writeTextOrHTML(name: String, value: String, html: Boolean)(implicit xmlReceiver: XMLReceiver): Unit =

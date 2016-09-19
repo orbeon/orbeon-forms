@@ -102,7 +102,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
       outputJavaScriptInitialData(
         xhtmlPrefix,
-        gatherJavaScriptInitializations(containingDocument.getControls.getCurrentControlTree.getRoot)
+        containingDocument.getControls.getCurrentControlTree.rootOpt map gatherJavaScriptInitializations getOrElse (Nil, Nil)
       )
     }
   }
@@ -288,21 +288,13 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     val focusElementIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.getEffectiveId)
     val messagesToRun     = containingDocument.getMessagesToRun.asScala filter (_.getLevel == "modal")
 
-    val dialogsToOpen = {
-
-      val dialogsMap = (
-        Option(containingDocument.getControls.getCurrentControlTree.getDialogControls)
-        map (_.asScala)
-        getOrElse Map.empty
-      )
-
+    val dialogsToOpen =
       for {
-        control       ← dialogsMap.values
+        control       ← containingDocument.getControls.getCurrentControlTree.getDialogControls
         dialogControl = control.asInstanceOf[XXFormsDialogControl]
         if dialogControl.isVisible
       } yield
         dialogControl
-    }
 
     val javascriptLoads =
       containingDocument.getLoadsToRun.asScala filter (_.getResource.startsWith("javascript:"))

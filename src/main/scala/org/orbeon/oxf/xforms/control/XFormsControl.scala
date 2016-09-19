@@ -151,7 +151,6 @@ class XFormsControl(
     _childrenActions ::= actionControl
 
   final def childrenActions = _childrenActions
-  final def getChildrenActions = _childrenActions.asJava
 
   final def previousEffectiveIdCommit() = {
     val result = previousEffectiveId

@@ -215,7 +215,7 @@ object DynamicState {
 
   // Create a DynamicState from a document
   def apply(document: XFormsContainingDocument): DynamicState =
-    apply(document, Option(document.getControls.getCurrentControlTree.getRoot))
+    apply(document, document.getControls.getCurrentControlTree.rootOpt)
 
   // Create a DynamicState from a control
   def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState = {

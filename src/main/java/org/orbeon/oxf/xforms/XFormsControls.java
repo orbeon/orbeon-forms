@@ -55,7 +55,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private boolean inRefresh = false;
 
     private final XFormsContainingDocument containingDocument;
-    
+
     private Map<String, Itemset> constantItems;
 
     private final XPathDependencies xpathDependencies;
@@ -82,7 +82,7 @@ public class XFormsControls implements XFormsObjectResolver {
     public boolean isDirtySinceLastRequest() {
         return dirtySinceLastRequest;
     }
-    
+
     public void markDirtySinceLastRequest(boolean bindingsAffected) {
         dirtySinceLastRequest = true;
         if (bindingsAffected)
@@ -237,7 +237,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @return              object, or null if not found
      */
     public XFormsControl getObjectByEffectiveId(String effectiveId) {
-        return currentControlTree.getControl(effectiveId);
+        return currentControlTree.findControlOrNull(effectiveId);
     }
 
     /**
@@ -277,7 +277,7 @@ public class XFormsControls implements XFormsObjectResolver {
             constantItems = new HashMap<String, Itemset>();
         constantItems.put(controlId, itemset);
     }
-    
+
     public void doRefresh() {
 
         if (inRefresh) {
@@ -291,7 +291,7 @@ public class XFormsControls implements XFormsObjectResolver {
         // http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-refresh-events
 
         // Don't do anything if there are no children controls
-        if (getCurrentControlTree().getChildren().isEmpty()) {
+        if (getCurrentControlTree().children().isEmpty()) {
             indentedLogger.logDebug("controls", "not performing refresh because no controls are available");
             refreshStart();
             refreshDone();
@@ -332,7 +332,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 if (updater != null) {
                     // Dispatch events
-                    currentControlTree.dispatchRefreshEvents(controlsEffectiveIds);
+                    currentControlTree.dispatchRefreshEventsJava(controlsEffectiveIds);
 
                     // Handle focus changes
                     Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
@@ -356,7 +356,7 @@ public class XFormsControls implements XFormsObjectResolver {
             // This is the regular case
 
             // Don't do anything if bindings are clean
-            if (!currentControlTree.isBindingsDirty())
+            if (!currentControlTree.bindingsDirty())
                 return null;
 
             // Clone if needed
@@ -414,7 +414,7 @@ public class XFormsControls implements XFormsObjectResolver {
         final List<String> eventsToDispatch = gatherControlsForRefresh(containerControl);
 
         // Dispatch events
-        currentControlTree.dispatchRefreshEvents(eventsToDispatch);
+        currentControlTree.dispatchRefreshEventsJava(eventsToDispatch);
 
         // Handle focus changes
         Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
@@ -436,7 +436,7 @@ public class XFormsControls implements XFormsObjectResolver {
             "bindings evaluated", Integer.toString(updater.updatedCount()),
             "bindings optimized", Integer.toString(updater.optimizedCount())
         );
-        
+
         return updater;
     }
 

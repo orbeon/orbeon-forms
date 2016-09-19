@@ -41,7 +41,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Utilities for XForms submission processing.
@@ -296,27 +295,23 @@ public class XFormsSubmissionUtils {
      * @param currentInstance       instance containing the nodes to check
      */
     public static void annotateBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
-        final XFormsControls xformsControls = containingDocument.getControls();
-        final Map<String, XFormsControl> uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
-        if (uploadControls != null) {
-            for (Object o: uploadControls.values()) {
-                final XFormsUploadControl currentControl = (XFormsUploadControl) o;
-                if (currentControl.isRelevant()) {
-                    final Item controlBoundItem = currentControl.getBoundItem();
-                    if (controlBoundItem instanceof NodeInfo) {
-                        final NodeInfo controlBoundNodeInfo = (NodeInfo) controlBoundItem;
-                        if (currentInstance == currentInstance.model().getInstanceForNode(controlBoundNodeInfo)) {
-                            // Found one relevant upload control bound to the instance we are submitting
-                            // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
-                            // will be removed during the next recalculate.
-                            final String fileName = currentControl.boundFilename();
-                            if (fileName != null) {
-                                InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
-                            }
-                            final String mediatype = currentControl.boundFileMediatype();
-                            if (mediatype != null) {
-                                InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
-                            }
+        for (XFormsControl currentControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
+            if (currentControl.isRelevant()) {
+                final XFormsUploadControl currentUploadControl = (XFormsUploadControl) currentControl;
+                final Item controlBoundItem = currentUploadControl.getBoundItem();
+                if (controlBoundItem instanceof NodeInfo) {
+                    final NodeInfo controlBoundNodeInfo = (NodeInfo) controlBoundItem;
+                    if (currentInstance == currentInstance.model().getInstanceForNode(controlBoundNodeInfo)) {
+                        // Found one relevant upload control bound to the instance we are submitting
+                        // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
+                        // will be removed during the next recalculate.
+                        final String fileName = currentUploadControl.boundFilename();
+                        if (fileName != null) {
+                            InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
+                        }
+                        final String mediatype = currentUploadControl.boundFileMediatype();
+                        if (mediatype != null) {
+                            InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
                         }
                     }
                 }
@@ -333,17 +328,13 @@ public class XFormsSubmissionUtils {
      */
     public static boolean hasBoundRelevantPendingUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
         if (containingDocument.countPendingUploads() > 0) { // don't bother if there is no pending upload
-            final XFormsControls xformsControls = containingDocument.getControls();
-            final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
-            if (uploadControls != null) {
-                for (Object o: uploadControls.values()) {
-                    final XFormsUploadControl currentControl = (XFormsUploadControl) o;
-                    if (currentControl.isRelevant() && containingDocument.isUploadPendingFor(currentControl)) {
-                        final Item controlBoundItem = currentControl.getBoundItem();
-                        if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.model().getInstanceForNode((NodeInfo) controlBoundItem)) {
-                            // Found one relevant upload control with pending upload bound to the instance we are submitting
-                            return true;
-                        }
+            for (XFormsControl currentControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
+                final XFormsUploadControl currentUploadControl = (XFormsUploadControl) currentControl;
+                if (currentUploadControl.isRelevant() && containingDocument.isUploadPendingFor(currentUploadControl)) {
+                    final Item controlBoundItem = currentUploadControl.getBoundItem();
+                    if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.model().getInstanceForNode((NodeInfo) controlBoundItem)) {
+                        // Found one relevant upload control with pending upload bound to the instance we are submitting
+                        return true;
                     }
                 }
             }

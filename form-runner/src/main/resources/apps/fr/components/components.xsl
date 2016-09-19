@@ -16,7 +16,6 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"

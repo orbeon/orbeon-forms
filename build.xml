@@ -955,8 +955,6 @@
                         <fileset dir="src/target/scala-2.11/test-classes">
                             <include name="org/orbeon/**/*Test.class"/>
                             <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
-                            <!-- 2016-08-05: Temporary exclude until we figure out how to run on Travis. -->
-                            <exclude name="org/orbeon/oxf/fr/persistence/rest/*Test.class"/>
                         </fileset>
                         <fileset dir="dom/target/scala-2.11/test-classes">
                             <include name="org/orbeon/**/*Test.class"/>

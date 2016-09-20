@@ -1011,6 +1011,7 @@
                         <pathelement location="lib/portlet-api_2.0.jar"/>
                         <pathelement location="lib/liferay-portal-service-6.1.1.jar"/>
                         <pathelement location="lib/liferay-portal-kernel-7.0.jar"/>
+                        <pathelement location="lib/tomcat-7.0.68-catalina.jar"/>
                         <pathelement location="${oracle.jar}"/>
                         <pathelement location="${mysql.jar}"/>
                         <pathelement location="${sqlserver.jar}"/>

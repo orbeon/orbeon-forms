@@ -303,21 +303,25 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   @Test def extractMetadata(): Unit =
     withOrbeonTables("extract metadata") { (connection, provider) ⇒
 
-      val FormURL     = crudURLPrefix(provider) + "form/form.xhtml"
-      val MetadataURL = metadataURL(provider)
+      val currentFormURL        = crudURLPrefix(provider) + "form/form.xhtml"
+      val currentMetadataURL    = metadataURL(provider)
+      val formDefinition        = formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create")))))
 
-      HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
+      HttpAssert.put(currentFormURL, Unspecified, HttpRequest.XML(formDefinition), 201)
 
       val expectedBody: Document =
         <forms>
-          <form operations="read create">
-            <permissions>
-              <permission operations="read create"/>
-            </permissions>
-          </form>
+            <form operations="read create">
+                <application-name>{provider.name}</application-name>
+                <form-name>my-form</form-name>
+                <form-version>1</form-version>
+                <permissions>
+                    <permission operations="read create"/>
+                </permissions>
+            </form>
         </forms>
 
-      val (resultCode, _, resultBodyTry) = HttpRequest.get(MetadataURL, Unspecified, None)
+      val (resultCode, _, resultBodyTry) = HttpRequest.get(currentMetadataURL, Unspecified, None)
 
       assert(resultCode === 200)
 

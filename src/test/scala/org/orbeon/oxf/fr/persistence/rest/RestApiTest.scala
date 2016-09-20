@@ -43,9 +43,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   val AllOperations = Set("create", "read", "update", "delete")
+  val FormName = "my-form"
 
-  private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/my-form/"
-  private def metadataURL  (provider: Provider) = s"form/${provider.name}/my-form"
+  private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/$FormName/"
+  private def metadataURL  (provider: Provider) = s"form/${provider.name}/$FormName"
 
   private def withOrbeonTables[T](message: String)(block: (java.sql.Connection, Provider) ⇒ T): Unit = {
     withDebug(message) {
@@ -161,15 +162,15 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val FormURL       = crudURLPrefix(provider) + "form/form.xhtml"
       val FirstDataURL  = crudURLPrefix(provider) + "data/123/data.xml"
       val SecondDataURL = crudURLPrefix(provider) + "data/456/data.xml"
-      val first         = <gaga1/>
-      val second        = <gaga2/>
+      val first         = buildFormDefinition(provider, permissions = None, title = Some("first"))
+      val second        = buildFormDefinition(provider, permissions = None, title = Some("second"))
       val data          = <gaga/>
 
-      HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(first), 201)
-      HttpAssert.put(FormURL, Next, HttpRequest.XML(second), 201)
-      HttpAssert.put(FirstDataURL, Specific(1), HttpRequest.XML(data), 201)
-      HttpAssert.put(SecondDataURL, Specific(2), HttpRequest.XML(data), 201)
-      HttpAssert.get(FormURL, ForDocument("123"), HttpAssert.ExpectedBody(HttpRequest.XML(first), Set.empty, Some(1)))
+      HttpAssert.put(FormURL      , Unspecified, HttpRequest.XML(first) , 201)
+      HttpAssert.put(FormURL      , Next       , HttpRequest.XML(second), 201)
+      HttpAssert.put(FirstDataURL , Specific(1), HttpRequest.XML(data)  , 201)
+      HttpAssert.put(SecondDataURL, Specific(2), HttpRequest.XML(data)  , 201)
+      HttpAssert.get(FormURL, ForDocument("123"), HttpAssert.ExpectedBody(HttpRequest.XML(first) , Set.empty, Some(1)))
       HttpAssert.get(FormURL, ForDocument("456"), HttpAssert.ExpectedBody(HttpRequest.XML(second), Set.empty, Some(2)))
       HttpAssert.get(FormURL, ForDocument("789"), HttpAssert.ExpectedCode(404))
     }
@@ -177,12 +178,19 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   import Permissions._
 
-  private def formDefinitionWithPermissions(permissions: Permissions): Elem =
+  private def buildFormDefinition(
+    provider     : Provider,
+    permissions  : Permissions,
+    title        : Option[String] = None
+  ): Elem =
     <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
       <xh:head>
         <xf:model id="fr-form-model">
           <xf:instance id="fr-form-metadata">
             <metadata>
+              <application-name>{provider.name}</application-name>
+              <form-name>{FormName}</form-name>
+              <title xml:lang="en">{title.getOrElse("")}</title>
               { serialize(permissions).getOrElse("") }
             </metadata>
           </xf:instance>
@@ -207,23 +215,23 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val DataURL = crudURLPrefix(provider) + "data/123/data.xml"
 
         // Anonymous: no permission defined
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(None)), 201)
+        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, None)), 201)
         HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), AllOperations, Some(1)))
 
         // Anonymous: create and read
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
+        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), Some(1)))
 
         // Anonymous: just create, then can't read data
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("create")))))), 201)
+        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("create")))))), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
       }
       {
         val DataURL = crudURLPrefix(provider) + "data/456/data.xml"
 
         // More complex permissions based on roles
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(formDefinitionWithPermissions(Some(Seq(
+        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(
           Permission(Anyone,          Set("create")),
           Permission(Role("clerk"),   Set("read")),
           Permission(Role("manager"), Set("read update")),
@@ -305,7 +313,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       val currentFormURL        = crudURLPrefix(provider) + "form/form.xhtml"
       val currentMetadataURL    = metadataURL(provider)
-      val formDefinition        = formDefinitionWithPermissions(Some(Seq(Permission(Anyone, Set("read", "create")))))
+      val formDefinition        = buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("read", "create")))))
 
       HttpAssert.put(currentFormURL, Unspecified, HttpRequest.XML(formDefinition), 201)
 
@@ -315,6 +323,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
                 <application-name>{provider.name}</application-name>
                 <form-name>my-form</form-name>
                 <form-version>1</form-version>
+                <title xml:lang="en"/>
                 <permissions>
                     <permission operations="read create"/>
                 </permissions>

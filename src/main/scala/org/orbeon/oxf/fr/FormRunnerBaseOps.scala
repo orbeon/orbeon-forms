@@ -118,7 +118,7 @@ trait FormRunnerBaseOps {
   }
 
   // Get the form model
-  def findModelElement(inDoc: NodeInfo) = {
+  def findModelElement(inDoc: NodeInfo): NodeInfo = {
 
     def fromHead           = inDoc.rootElement \ "*:head" \ XFModelTest find (hasIdValue(_, FormModel))
     def fromImplementation = inDoc.rootElement \ XBLImplementationTest \ XFModelTest headOption

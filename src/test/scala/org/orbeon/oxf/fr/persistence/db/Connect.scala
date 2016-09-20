@@ -28,8 +28,8 @@ private[persistence] object Connect {
     val createUserAndDatabase = Seq(s"CREATE DATABASE $schema")
     val dropUserAndDatabase   = Seq(s"DROP DATABASE $schema")
     try {
-      Connect.asRoot(provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
-      Connect.asOrbeon (provider)(block)
+      Connect.asRoot  (provider)(createUserAndDatabase foreach _.createStatement.executeUpdate)
+      Connect.asOrbeon(provider)(block)
     } finally {
       Connect.asRoot(provider)(dropUserAndDatabase foreach _.createStatement.executeUpdate)
     }
@@ -42,7 +42,10 @@ private[persistence] object Connect {
 
   private def asUser[T](provider: Provider, user: Option[String], block: Connection ⇒ T): T = {
     val descriptor = DatasourceDescriptor(provider, user)
-    useAndClose(DriverManager.getConnection(descriptor.url, descriptor.username, descriptor.password))(block)
+    DataSourceSupport.withDatasources(List(descriptor)) {
+      val connection = DriverManager.getConnection(descriptor.url, descriptor.username, descriptor.password)
+      useAndClose(connection)(block)
+    }
   }
 
   def getTableNames(provider: Provider, connection: Connection): List[String] = {

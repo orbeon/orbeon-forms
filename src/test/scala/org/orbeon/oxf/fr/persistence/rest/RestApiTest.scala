@@ -231,7 +231,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         )))), 201)
         HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
 
-        // Everyone can read
+        // Check who can read
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), Some(1)), clerk)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update"), Some(1)), manager)

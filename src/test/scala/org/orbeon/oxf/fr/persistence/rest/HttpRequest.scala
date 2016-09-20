@@ -51,22 +51,16 @@ private object HttpRequest {
       import Version._
 
       val versionHeader = version match {
-        case Unspecified             ⇒ Nil
-        case Next                    ⇒ List(OrbeonFormDefinitionVersion → List("next"))
-        case Specific(version)       ⇒ List(OrbeonFormDefinitionVersion → List(version.toString))
-        case ForDocument(documentId) ⇒ List(OrbeonForDocumentId         → List(documentId))
+        case Unspecified             ⇒ Headers.EmptyHeaders
+        case Next                    ⇒ Map(OrbeonFormDefinitionVersion → List("next"))
+        case Specific(version)       ⇒ Map(OrbeonFormDefinitionVersion → List(version.toString))
+        case ForDocument(documentId) ⇒ Map(OrbeonForDocumentId         → List(documentId))
       }
-
-      val credentialHeaders = credentials.map(c ⇒ List(
-        Headers.OrbeonUsernameLower → List(c.username),
-        Headers.OrbeonGroupLower    → List(c.group),
-        Headers.OrbeonRolesLower    → c.roles.to[List]
-      )).to[List].flatten
 
       Connection.buildConnectionHeadersLowerIfNeeded(
         scheme           = "http",
         hasCredentials   = false,
-        customHeaders    = List(versionHeader, credentialHeaders).flatten.toMap,
+        customHeaders    = versionHeader,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = _ ⇒ None
@@ -91,7 +85,10 @@ private object HttpRequest {
         url         = documentURL,
         method      = method,
         headers     = headers,
-        content     = content
+        content     = content,
+        username    = credentials.map(_.username),
+        group       = credentials.map(_.group),
+        roles       = credentials.map(_.roles.toList).getOrElse(Nil)
       )
 
     new ClosableHttpResponse(httpResponse)

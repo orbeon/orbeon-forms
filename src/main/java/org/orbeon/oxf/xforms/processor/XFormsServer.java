@@ -660,7 +660,7 @@ public class XFormsServer extends ProcessorImpl {
                         XFormsServerBase.diffIndexState(
                             ch,
                             ns,
-                            xformsControls.getInitialControlTree().indexes(),
+                            xformsControls.getInitialControlTree().initialRepeatIndexes(),
                             XFormsRepeatControl.currentIndexes(containingDocument)
                         );
                     }

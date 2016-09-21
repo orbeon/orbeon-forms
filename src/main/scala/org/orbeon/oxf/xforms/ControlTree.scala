@@ -105,10 +105,10 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   private var _controlIndex = new ControlIndex
 
   // Repeat indexes for Ajax updates only
-  private var _indexes = m.LinkedHashMap.empty[String, Int]
+  private var _initialRepeatIndexes = m.LinkedHashMap.empty[String, Int]
 
   // Only for initial tree after getBackCopy has been called
-  def indexes = _indexes
+  def initialRepeatIndexes = _initialRepeatIndexes
 
   // Whether the bindings must be reevaluated
   var bindingsDirty = false
@@ -209,7 +209,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
       case Some(root) ⇒
         // Gather repeat indexes if any
         // Do this before cloning controls so that initial/current locals are still different
-        cloned._indexes = XFormsRepeatControl.initialIndexes(root.containingDocument)
+        cloned._initialRepeatIndexes = XFormsRepeatControl.initialIndexes(root.containingDocument)
         // Clone children if any
         cloned._root = Some(root.getBackCopy.asInstanceOf[XFormsContainerControl])
       case None ⇒

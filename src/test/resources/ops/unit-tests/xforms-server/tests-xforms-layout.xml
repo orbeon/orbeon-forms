@@ -1989,7 +1989,6 @@
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/button/assets/skins/sam/button.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
-                <xh:link href="/xbl/orbeon/currency/currency.css"/>
                 <xh:script src="/ops/jquery/jquery-1.12.0.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/jquery/jquery-browser-mobile.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>

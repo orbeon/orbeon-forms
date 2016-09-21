@@ -1,6 +1,0 @@
-@media print {
-    .xbl-fr-currency .xbl-fr-number-xforms-input,                               /* Show xf:input in print mode */
-    .fr-grid .fr-grid-content .xbl-fr-currency .xbl-fr-number-xforms-input
-        { display: inline }
-    .xbl-fr-currency input { display: none }                                    /* Hide the xh:input */
-}

@@ -1,6 +1,6 @@
 @media print {
-    .xbl-fr-number .xbl-fr-number-xforms-input,                               /* Show xf:input in print mode */
-    .fr-grid .fr-grid-content .xbl-fr-number .xbl-fr-number-xforms-input
-        { display: inline }
-    .xbl-fr-number input { display: none }                                    /* Hide the xh:input */
+  .orbeon .xbl-fr-number,
+  .orbeon .xbl-fr-currency {
+    display: inline;
+  }
 }

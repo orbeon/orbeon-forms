@@ -57,7 +57,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/currency/currency.css"/>
+            <xbl:style src="/xbl/orbeon/number/number.css"/>
         </xbl:resources>
         <!-- Delegate to fr:number -->
         <xi:include

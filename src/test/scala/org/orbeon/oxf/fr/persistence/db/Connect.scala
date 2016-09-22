@@ -15,12 +15,39 @@ package org.orbeon.oxf.fr.persistence.db
 
 import java.sql.{Connection, DriverManager}
 
+import org.orbeon.oxf.fr.persistence._
 import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.util.ScalaUtils._
 
 private[persistence] object Connect {
 
   import DataSourceSupport._
+
+  def withOrbeonTables[T]
+    (message: String)
+    (block: (java.sql.Connection, Provider) ⇒ T)
+    (implicit logger: IndentedLogger)
+  : Unit = {
+    Logging.withDebug(message) {
+      ProvidersTestedAutomatically.foreach { provider ⇒
+        Logging.withDebug("on database", List("provider" → provider.name)) {
+          Connect.withNewDatabase(provider) { connection ⇒
+            val statement = connection.createStatement
+            // Create tables
+            val sql = provider match {
+              case MySQL      ⇒ "mysql-2016_3.sql"
+              case PostgreSQL ⇒ "postgresql-2016_2.sql"
+            }
+            val createDDL = SQL.read(sql)
+            Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }
+            Logging.withDebug("run actual test") { block(connection, provider) }
+          }
+        }
+      }
+    }
+  }
+
 
   def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
     val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")

@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xml
 
-import collection.JavaConverters._
-import java.util.{Enumeration ⇒ JEnumeration}
+import java.{util ⇒ ju}
+
+import scala.collection.JavaConverters._
 
 // Better implementation of SAX NamespaceSupport/NamespaceSupport2
 //
@@ -46,11 +47,11 @@ class NamespaceContext {
       mappings.get(prefix) filterNot (_ == "")
 
     // Get all prefixes in scope ("" is not considered a prefix)
-    def prefixes: Seq[String] =
+    def prefixes: List[String] =
       mappings.collect { case (prefix, uri) if prefix != "" && uri != "" ⇒ prefix } toList
 
     // Get all prefixes in scope, include returning "" for the default namespace if present
-    def prefixesWithDefault: Seq[String] =
+    def prefixesWithDefault: List[String] =
       mappingsWithDefault map { case (prefix, _) ⇒ prefix } toList
 
     // Get all mappings, including the default namespace if present
@@ -58,8 +59,8 @@ class NamespaceContext {
       mappings filterNot { case (_, uri) ⇒ uri == "" }
 
     // Get all prefixes for the given URI ("" is not considered a prefix)
-    def prefixesForURI(uri: String): Seq[String] =
     // NOTE: This is not efficient if the map is large as we iterate through all map values.
+    def prefixesForURI(uri: String): List[String] =
       mappings.collect { case (prefix, `uri`) if prefix != "" && uri != "" ⇒ prefix } toList
 
     // Get one prefix for the given URI ("" is not considered a prefix)
@@ -73,19 +74,19 @@ class NamespaceContext {
   def current = _current
 
   // Pending mappings, which will be in force for the next element
-  private var _pending: Map[String, String] = Map()
+  private var _pending = Map.empty[String, String]
   def pending = _pending
 
   // When an element starts, we freeze its mappings
   def startElement(): Unit = {
     _current = Context(Some(_current), _current.mappings ++ _pending)
-    _pending = Map()
+    _pending = Map.empty
   }
 
   // When an element ends, the mappings become again those of the parent element
   def endElement(): Unit = {
     _current = _current.parent.get
-    _pending = Map()
+    _pending = Map.empty
   }
 
   // Add the mapping
@@ -95,10 +96,10 @@ class NamespaceContext {
 
   // For compatibility with NamespaceSupport/NamespaceSupport2
   def getURI(prefix: String): String = current.uriForPrefix(prefix).orNull
-  def getPrefixes: JEnumeration[String] = current.prefixes.iterator.asJavaEnumeration
+  def getPrefixes: ju.Enumeration[String] = current.prefixes.iterator.asJavaEnumeration
   def getPrefix(uri: String) = current.firstPrefixForURI(uri).orNull
 
   // See http://www.w3.org/TR/REC-xml-names/#xmlReserved
   // We ignore these 2 prefixes but do not reject other prefixes starting with "xml"
-  private def isLegalPrefix(prefix: String) = ! Set("xml", "xmlns")(prefix)
+  private def isLegalPrefix(prefix: String) = prefix != "xml" && prefix != "xmlns"
 }

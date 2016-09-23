@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xf:group xmlns:xh="http://www.w3.org/1999/xhtml"
+<xh:div xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -23,6 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
+      xmlns:xbl="http://www.w3.org/ns/xbl"
 
       class="fb-toolbox">
 
@@ -306,4 +307,4 @@
         <fr:neutral-choice/>
     </fr:alert-dialog>
 
-</xf:group>
+</xh:div>

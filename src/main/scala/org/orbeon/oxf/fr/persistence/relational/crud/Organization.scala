@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Orbeon, Inc.
+  * Copyright (C) 2016 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -22,12 +22,19 @@ import org.orbeon.oxf.util.ScalaUtils._
 // - When creating data, if we have an organization, we want to create it or return it
 // - When reading data, we want to make sure the user
 
+// An organization is a list of level, with the root-level first, leaf-level last
+case class Organization(levels: List[String])
+
+// Type for organization id, which is stored as an int
+case class OrganizationId(underlying: Int) extends AnyVal
+
 object Organization {
 
-  // An organization is a list of level, with the root-level first, leaf-level last
-  type Organization = List[String]
-
-  def createIfNecessary(connection: Connection, provider: Provider, organization: Organization): Int = {
+  def createIfNecessary(
+    connection   : Connection,
+    provider     : Provider,
+    organization : Organization
+  ): OrganizationId = {
 
     // See if have this organization already in the database
     val existingOrganization = {
@@ -37,6 +44,7 @@ object Organization {
         // Generate lists for each level or the organization
         def perLevel(f: Int ⇒ List[String]): List[String] =
           organization
+            .levels
             .zipWithIndex
             .flatMap { case (_, pos) ⇒ f(pos + 1) }
 
@@ -56,8 +64,8 @@ object Organization {
       }
 
       useAndClose(connection.prepareStatement(sql)) { statement ⇒
-        organization.zipWithIndex.foreach { case (name, pos) ⇒
-            statement.setInt   (pos*2 + 1, organization.length)
+        organization.levels.zipWithIndex.foreach { case (name, pos) ⇒
+            statement.setInt   (pos*2 + 1, organization.levels.length)
             statement.setString(pos*2 + 2, name)
         }
         useAndClose(statement.executeQuery()) { resultSet ⇒
@@ -68,31 +76,34 @@ object Organization {
     }
 
     // If not, create the organization in the database
-    existingOrganization.getOrElse(
-      Provider
-        .seqNextVal(connection, provider)
-        .kestrel { orgId ⇒
-          organization
-            .zipWithIndex
-            .foreach { case (name, pos) ⇒
-              val Sql =
-                """INSERT
-                  |  INTO orbeon_form_organization (id, depth, pos, name)
-                  |  VALUES                        (? , ?    , ?  , ?)
-                  |  """.stripMargin
-              useAndClose(connection.prepareStatement(Sql)) { statement ⇒
-                statement.setInt   (1, orgId)
-                statement.setInt   (2, organization.length)
-                statement.setInt   (3, pos + 1)
-                statement.setString(4, name)
-                statement.executeUpdate()
+    val intOrganizationId =
+      existingOrganization.getOrElse(
+        Provider
+          .seqNextVal(connection, provider)
+          .kestrel { orgId ⇒
+            organization
+              .levels
+              .zipWithIndex
+              .foreach { case (name, pos) ⇒
+                val Sql =
+                  """INSERT
+                    |  INTO orbeon_form_organization (id, depth, pos, name)
+                    |  VALUES                        (? , ?    , ?  , ?)
+                    |  """.stripMargin
+                useAndClose(connection.prepareStatement(Sql)) { statement ⇒
+                  statement.setInt   (1, orgId)
+                  statement.setInt   (2, organization.levels.length)
+                  statement.setInt   (3, pos + 1)
+                  statement.setString(4, name)
+                  statement.executeUpdate()
+                }
               }
-            }
-        }
-    )
+          }
+      )
+    OrganizationId(intOrganizationId)
   }
 
-  def read(connection: Connection, id: Int): Option[Organization] = {
+  def read(connection: Connection, id: OrganizationId): Option[Organization] = {
 
     val Sql =
       """  SELECT name
@@ -102,15 +113,15 @@ object Organization {
         |""".stripMargin
 
     useAndClose(connection.prepareStatement(Sql)) { statement ⇒
-      statement.setInt(1, id)
+      statement.setInt(1, id.underlying)
       useAndClose(statement.executeQuery()) { resultSet ⇒
-        val organization = Iterator.iterateWhile(
+        val levels = Iterator.iterateWhile(
           resultSet.next(),
           resultSet.getString("name")
         ).toList
-        organization match {
+        levels match {
           case Nil ⇒ None
-          case _   ⇒ Some(organization)
+          case _   ⇒ Some(Organization(levels))
         }
       }
     }

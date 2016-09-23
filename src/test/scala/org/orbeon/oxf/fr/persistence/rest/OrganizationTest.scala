@@ -17,7 +17,7 @@ import java.sql.Connection
 
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db.Connect
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
+import org.orbeon.oxf.fr.persistence.relational.crud.{Organization, OrganizationId}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.orbeon.oxf.util.ScalaUtils._
@@ -29,8 +29,8 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[OrganizationTest]), true)
 
-  private val CA = List("usa", "ca")
-  private val SF = List("usa", "ca", "sf")
+  private val CA = Organization(List("usa", "ca"))
+  private val SF = Organization(List("usa", "ca", "sf"))
 
   def recordsCount(connection: Connection): Int = {
     val Sql = "SELECT count(*) FROM orbeon_form_organization"
@@ -59,7 +59,7 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   @Test def readEmptyWhenNotFound(): Unit = {
     Connect.withOrbeonTables("create and read") { (connection, provider) ⇒
       Organization.createIfNecessary(connection, provider, CA)
-      val read = Organization.read(connection, 42)
+      val read = Organization.read(connection, OrganizationId(42))
       assert(read.isEmpty)
     }
   }

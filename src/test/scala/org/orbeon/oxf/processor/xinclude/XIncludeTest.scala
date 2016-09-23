@@ -23,7 +23,7 @@ import JXQName._
 import org.orbeon.scaxon.DocumentAndElementsCollector
 
 class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
-  
+
   val XML     = "http://www.w3.org/XML/1998/namespace"
   val XI      = "http://www.w3.org/2001/XInclude"
   val HTML    = "http://www.w3.org/1999/xhtml"
@@ -35,10 +35,10 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
   @Test def basicInclude(): Unit = {
 
     val collector = new DocumentAndElementsCollector
-    
+
     XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include11.xml", collector, XINCLUDE_ONLY, true)
-    
-    val expected = Seq(
+
+    val expected = List(
       StartDocument,
         StartPrefixMapping("", HTML),
         StartPrefixMapping("xf", XForms),
@@ -47,7 +47,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
             StartPrefixMapping("xf", ""),
             StartPrefixMapping("xi", ""),
             StartPrefixMapping("svg", SVG),
-              StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include12.xml")))),
+              StartElement(HTML → "body", Atts(List((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include12.xml")))),
                 StartElement(HTML → "div", Atts(Nil)),
                 EndElement(HTML → "div"),
               EndElement(HTML → "body"),
@@ -69,8 +69,8 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
     val collector = new DocumentAndElementsCollector
 
     XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include21.xml", collector, XINCLUDE_ONLY, true)
-    
-    val expected = Seq(
+
+    val expected = List(
       StartDocument,
         StartPrefixMapping("", HTML),
         StartPrefixMapping("xf", XForms),
@@ -78,7 +78,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
           StartElement(HTML → "html", Atts(Nil)),
             StartPrefixMapping("xf", ""),
             StartPrefixMapping("xi", ""),
-              StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include23.xml")))),
+              StartElement(HTML → "body", Atts(List((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include23.xml")))),
                 StartElement(HTML → "div", Atts(Nil)),
                 EndElement(HTML → "div"),
               EndElement(HTML → "body"),
@@ -100,12 +100,12 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include31.xml", collector, XINCLUDE_ONLY, true)
 
-    val expected = Seq(
+    val expected = List(
       StartDocument,
         StartPrefixMapping("", HTML),
         StartPrefixMapping("xf", XForms),
           StartElement(HTML → "html", Atts(Nil)),
-            StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include32.xml")))),
+            StartElement(HTML → "body", Atts(List((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include32.xml")))),
             EndElement(HTML → "body"),
           EndElement(HTML → "html"),
         EndPrefixMapping(""),
@@ -122,7 +122,7 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include41.xml", collector, XINCLUDE_ONLY, true)
 
-    val expected = Seq(
+    val expected = List(
       StartDocument,
         StartPrefixMapping("", HTML),
         StartPrefixMapping("xf", XForms),
@@ -130,13 +130,13 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
             StartPrefixMapping("", ""),
             StartPrefixMapping("xf", ""),
             StartPrefixMapping("xh", HTML),
-              StartElement(HTML → "head", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include42.xml")))),
+              StartElement(HTML → "head", Atts(List((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include42.xml")))),
               EndElement(HTML → "head"),
             EndPrefixMapping(""),
             EndPrefixMapping("xf"),
             EndPrefixMapping("xh"),
             StartPrefixMapping("xf", ""),
-              StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include43.xml")))),
+              StartElement(HTML → "body", Atts(List((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include43.xml")))),
               EndElement(HTML → "body"),
             EndPrefixMapping("xf"),
           EndElement(HTML → "html"),

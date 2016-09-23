@@ -1,0 +1,8 @@
+<xh:div
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:foo="http://example.org/foo">
+
+    <xf:var id="my-var1" name="lang" value="()"/>
+    <xf:var id="my-var2" name="v2" value="foo:bar()"/>
+</xh:div>

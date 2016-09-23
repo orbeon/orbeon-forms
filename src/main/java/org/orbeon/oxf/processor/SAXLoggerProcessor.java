@@ -68,7 +68,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
 
         @Override
         public void characters(char[] chars, int start, int length) throws SAXException {
-            log("characters('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
+            log("characters('" + new String(chars, start, length) + "', " + start + ", " + length + "')");
             super.characters(chars, start, length);
         }
 

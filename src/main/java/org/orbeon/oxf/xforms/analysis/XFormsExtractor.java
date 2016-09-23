@@ -19,7 +19,10 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.SAXUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -28,7 +31,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Enumeration;
 import java.util.Stack;
 
 /**
@@ -40,15 +42,15 @@ import java.util.Stack;
  * The static state document contains only models and controls, without interleaved XHTML elements in order to save
  * memory and to facilitate visiting controls. The exceptions are:
  *
- * o The content of inline XForms instances (xf:instance)
- * o The content of inline XML Schemas (xs:schema)
- * o The content of inline XBL definitions (xbl:xbl)
- * o The content of xf:label, xf:hint, xf:help, xf:alert (as they can contain XHTML)
+ * - The content of inline XForms instances (xf:instance)
+ * - The content of inline XML Schemas (xs:schema)
+ * - The content of inline XBL definitions (xbl:xbl)
+ * - The content of xf:label, xf:hint, xf:help, xf:alert (as they can contain XHTML)
  *
  * Notes:
  *
- * o xml:base attributes are added on the models and root control elements.
- * o XForms controls and AVTs outside the HTML body are also extracted.
+ * - xml:base attributes are added on the models and root control elements.
+ * - XForms controls and AVTs outside the HTML body are also extracted.
  *
  * Structure:
  *
@@ -85,8 +87,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
     private LocationData locationData;
 
     private int level;
-
-    private NamespaceContext namespaceContext = new NamespaceContext();
 
     private boolean mustOutputFirstElement = true;
 
@@ -219,7 +219,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
 
     @Override
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        namespaceContext.startElement();
+        inputNamespaceContext().startElement();
 
         // Handle location data
         if (locationData == null && locator != null && mustOutputFirstElement) {
@@ -243,7 +243,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
 
         final XMLElementDetails parentElementDetails = elementStack.peek();
 
-        if (! inPreserve && ! inForeign) {
+        if (! inPreserve && ! inForeign) { // optimization
             final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
             final String xmlLangAttribute = attributes.getValue(XMLConstants.XML_URI, "lang");
             final String xblScopeAttribute = attributes.getValue(XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI(), XFormsConstants.XXBL_SCOPE_QNAME.getName());
@@ -345,8 +345,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
 
                     attributes = SAXUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "lang", newXMLLang);
                 }
-
-                sendStartPrefixMappings();
             }
 
             // Check for preserved, foreign, or LHHA content
@@ -389,7 +387,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
 
             if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || isXFormsOrExtension)) {
                 // We are within preserved content or we output regular XForms content
-                super.startElement(uri, localname, qName, attributes);
+                startStaticStateElement(uri, localname, qName, attributes);
             } else if (inXFormsOrExtension && ! isXFormsOrExtension && parentElementDetails.isModel()) {
                 // Start foreign content in the model
                 inForeign = true;
@@ -398,7 +396,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
         } else {
             // Just open the root element
             outputFirstElementIfNeeded();
-            sendStartPrefixMappings();
             super.startElement(uri, localname, qName, attributes);
         }
 
@@ -410,23 +407,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
         return currentXMLBaseURI.toString();
     }
 
-    private void sendStartPrefixMappings() throws SAXException {
-        for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
-            final String namespacePrefix = (String) e.nextElement();
-            final String namespaceURI = namespaceContext.getURI(namespacePrefix);
-            if (! namespacePrefix.startsWith("xml"))
-                super.startPrefixMapping(namespacePrefix, namespaceURI);
-        }
-    }
-
-    private void sendEndPrefixMappings() throws SAXException {
-        for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
-            final String namespacePrefix = (String) e.nextElement();
-            if (! namespacePrefix.startsWith("xml"))
-                super.endPrefixMapping(namespacePrefix);
-        }
-    }
-
     @Override
     public void endElement(String uri, String localname, String qName) throws SAXException {
         level--;
@@ -434,7 +414,7 @@ public class XFormsExtractor extends XFormsExtractorBase {
         if (level > 0 || ! ignoreRootElement) {
             // We are within preserved content or we output regular XForms content
             if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || elementStack.peek().isXFormsOrExtension())) {
-                super.endElement(uri, localname, qName);
+                endStaticStateElement(uri, localname, qName);
             }
 
             if ((inPreserve || inLHHA || inForeign) && level == preserveOrLHHAOrForeignLevel) {
@@ -447,19 +427,17 @@ public class XFormsExtractor extends XFormsExtractorBase {
             if (inXFormsOrExtension && level == xformsLevel) {
                 // Leaving model or controls
                 inXFormsOrExtension = false;
-                sendEndPrefixMappings();
             }
         } else {
             // Just close the root element
             super.endElement(uri, localname, qName);
-            sendEndPrefixMappings();
         }
 
         if (! inPreserve && ! inForeign) {
             elementStack.pop();
         }
 
-        namespaceContext.endElement();
+        inputNamespaceContext().endElement();
     }
 
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -484,19 +462,6 @@ public class XFormsExtractor extends XFormsExtractorBase {
     @Override
     public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
         // ignore, should not happen
-    }
-
-    @Override
-    public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        namespaceContext.startPrefixMapping(prefix, uri);
-        if (inXFormsOrExtension)
-            super.startPrefixMapping(prefix, uri);
-    }
-
-    @Override
-    public void endPrefixMapping(String s) throws SAXException {
-        if (inXFormsOrExtension)
-            super.endPrefixMapping(s);
     }
 
     @Override

@@ -15,27 +15,24 @@ package org.orbeon.oxf.xforms.analysis
 
 import java.net.URI
 
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLReceiver, ForwardingXMLReceiver}
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsConstants, XFormsProperties}
-import XFormsProperties._
-import XFormsConstants._
-import scala.collection.JavaConverters._
-import org.xml.sax.helpers.AttributesImpl
-import org.xml.sax.Attributes
-import collection.mutable
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl
+import org.orbeon.oxf.xml.{ForwardingXMLReceiver, NamespaceContext, XMLReceiver, XMLReceiverHelper}
+import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
-abstract class XFormsExtractorBase(xmlReceiver: XMLReceiver)
-  extends ForwardingXMLReceiver(xmlReceiver)
-  with ExtractorProperties
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 case class XMLElementDetails(
   id                  : String,
   xmlBase             : URI,
   xmlLang             : String,
   xmlLangAvtId        : String,
-  scope               : XFormsConstants.XXBLScope,
+  scope               : XXBLScope,
   isModel             : Boolean,
   isXForms            : Boolean,
   isXXForms           : Boolean,
@@ -45,6 +42,65 @@ case class XMLElementDetails(
   isExtension         : Boolean,
   isXFormsOrExtension : Boolean
 )
+
+abstract class XFormsExtractorBase(xmlReceiver: XMLReceiver)
+  extends ForwardingXMLReceiver(xmlReceiver)
+  with ExtractorProperties
+  with ExtractorOutput
+
+trait ExtractorOutput extends XMLReceiver {
+
+  // Output receiver, which can be null when our subclass is `ScopeExtractor`. Urgh.
+  // NOTE: Ugly until we get trait parameters!
+  def getXMLReceiver: XMLReceiver
+
+  protected val inputNamespaceContext       = new NamespaceContext
+  private   var outputNamespaceContextStack = inputNamespaceContext.current :: Nil
+
+  override def startPrefixMapping(prefix: String, uri: String): Unit =
+    if (getXMLReceiver ne null)
+      inputNamespaceContext.startPrefixMapping(prefix, uri)
+
+  override def endPrefixMapping(s: String): Unit = ()
+
+  def startStaticStateElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
+    if (getXMLReceiver ne null) {
+      outputNamespaceContextStack ::= inputNamespaceContext.current
+      iterateChangedMappings foreach (getXMLReceiver.startPrefixMapping _).tupled
+      getXMLReceiver.startElement(uri, localname, qName, attributes)
+    }
+
+  def endStaticStateElement(uri: String, localname: String, qName: String): Unit =
+    if (getXMLReceiver ne null) {
+      getXMLReceiver.endElement(uri, localname, qName)
+      iterateChangedMappings foreach { case (prefix, _) ⇒ getXMLReceiver.endPrefixMapping(prefix) }
+      outputNamespaceContextStack = outputNamespaceContextStack.tail
+    }
+
+  // Compare the mappings for the last two elements output and return the mappings that have changed
+  private def iterateChangedMappings = {
+
+    val oldMappings = outputNamespaceContextStack.tail.head.mappings
+    val newMappings = outputNamespaceContextStack.head.mappings
+
+    if (oldMappings eq newMappings) {
+      // Optimized case where mappings haven't changed at all
+      Iterator.empty
+    } else {
+      for {
+        newMapping @ (newPrefix, newURI) ← newMappings.iterator
+        if (
+          oldMappings.get(newPrefix) match {
+            case None                             ⇒ true  // new mapping
+            case Some(oldURI) if oldURI != newURI ⇒ true  // changed mapping, including to/from undeclaration with ""
+            case _                                ⇒ false // unchanged mapping
+          }
+        )
+      } yield
+        newMapping
+    }
+  }
+}
 
 trait ExtractorProperties extends ForwardingXMLReceiver {
 

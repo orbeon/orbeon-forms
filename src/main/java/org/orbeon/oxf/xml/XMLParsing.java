@@ -82,8 +82,8 @@ public class XMLParsing {
             return (validating ? "1" : "0") + (handleXInclude ? "1" : "0") + (externalEntities ? "1" : "0");
         }
 
-        public static final ParserConfiguration PLAIN = new ParserConfiguration(false, false, false);
-        public static final ParserConfiguration XINCLUDE_ONLY = new ParserConfiguration(false, true, false);
+        public static final ParserConfiguration PLAIN         = new ParserConfiguration(false, false, false);
+        public static final ParserConfiguration XINCLUDE_ONLY = new ParserConfiguration(false, true,  false);
     }
 
     static {
@@ -244,12 +244,12 @@ public class XMLParsing {
      * Parse a string into SAX events. If the string is empty or only contains white space, output an empty document.
      *
      * @param xml                   XML string
-     * @param systemId              system id of the document, or null
+     * @param urlString             URL of the document, or null
      * @param xmlReceiver           receiver to output to
      * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    public static void stringToSAX(String xml, String systemId, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public static void stringToSAX(String xml, String urlString, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
         if (ScalaUtils.trimAllToEmpty(xml).equals("")) {
             try {
                 xmlReceiver.startDocument();
@@ -258,24 +258,24 @@ public class XMLParsing {
                 throw new OXFException(e);
             }
         } else {
-            readerToSAX(new StringReader(xml), systemId, xmlReceiver, parserConfiguration, handleLexical);
+            readerToSAX(new StringReader(xml), urlString, xmlReceiver, parserConfiguration, handleLexical);
         }
     }
 
     /**
      * Read a URL into SAX events.
      *
-     * @param systemId              system id of the document
+     * @param urlString             URL of the document
      * @param xmlReceiver           receiver to output to
      * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    public static void urlToSAX(String systemId, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public static void urlToSAX(String urlString, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
         try {
-            final URL url = URLFactory.createURL(systemId);
+            final URL url = URLFactory.createURL(urlString);
             final InputStream is = url.openStream();
             final InputSource inputSource = new InputSource(is);
-            inputSource.setSystemId(systemId);
+            inputSource.setSystemId(urlString);
             try {
                 inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical);
             } finally {
@@ -286,15 +286,15 @@ public class XMLParsing {
         }
     }
 
-    public static void inputStreamToSAX(InputStream inputStream, String systemId, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public static void inputStreamToSAX(InputStream inputStream, String urlString, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
         final InputSource inputSource = new InputSource(inputStream);
-        inputSource.setSystemId(systemId);
+        inputSource.setSystemId(urlString);
         inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical);
     }
 
-    public static void readerToSAX(Reader reader, String systemId, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public static void readerToSAX(Reader reader, String urlString, XMLReceiver xmlReceiver, ParserConfiguration parserConfiguration, boolean handleLexical) {
         final InputSource inputSource = new InputSource(reader);
-        inputSource.setSystemId(systemId);
+        inputSource.setSystemId(urlString);
         inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical);
     }
 

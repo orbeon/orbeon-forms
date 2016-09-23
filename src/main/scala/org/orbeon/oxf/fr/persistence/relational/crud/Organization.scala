@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 import java.sql.Connection
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.Provider
 import org.orbeon.oxf.util.ScalaUtils._
 
 // Operations on organizations

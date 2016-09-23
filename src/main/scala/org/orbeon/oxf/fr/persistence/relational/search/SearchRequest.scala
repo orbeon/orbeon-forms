@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
@@ -43,7 +43,7 @@ trait SearchRequest {
         val group         = Option(httpRequest.getUserGroup)
 
         Request(
-          provider       = providerFromToken(provider),
+          provider       = Provider.providerFromToken(provider),
           app            = app,
           form           = form,
           username       = username,

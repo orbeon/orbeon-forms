@@ -21,12 +21,12 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.DocumentInfo
 
-object Provider {
+sealed trait Provider    extends Product with Serializable {
+  val name: String
+  def uri : String = "/fr/service/" + name
+}
 
-  sealed trait Provider    extends Product with Serializable {
-    val name: String
-    def uri : String = "/fr/service/" + name
-  }
+object Provider {
 
   case object  MySQL       extends Provider { val name = "mysql"      }
   case object  PostgreSQL  extends Provider { val name = "postgresql" }

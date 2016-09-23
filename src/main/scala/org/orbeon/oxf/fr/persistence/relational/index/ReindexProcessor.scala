@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
 
 /**
  * Processor repopulating the relational indices. This doesn't create the tables, but deletes their content
@@ -33,7 +33,7 @@ class ReindexProcessor extends ProcessorImpl {
   override def start(pipelineContext: PipelineContext): Unit = {
 
     val ReindexPathRegex(providerToken) = NetUtils.getExternalContext.getRequest.getRequestPath
-    val provider = providerFromToken(providerToken)
+    val provider = Provider.providerFromToken(providerToken)
     RelationalUtils.withConnection(Index.reindex(provider, _, Index.AllData))
   }
 

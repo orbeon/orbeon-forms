@@ -24,7 +24,8 @@ import org.orbeon.scaxon.XML._
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 
 private object FlatView {
 

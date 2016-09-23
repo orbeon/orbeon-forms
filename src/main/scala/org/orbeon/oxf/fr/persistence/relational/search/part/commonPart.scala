@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.part
 
+import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.Statement.StatementPart
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Request
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.persistence.relational.Provider._
 
 object commonPart  {
 

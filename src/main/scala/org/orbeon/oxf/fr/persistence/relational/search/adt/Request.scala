@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
 
 case class Request(
     provider       : Provider,

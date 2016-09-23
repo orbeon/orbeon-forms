@@ -16,9 +16,9 @@ package org.orbeon.oxf.fr.persistence.relational.index
 import java.sql.{Connection, PreparedStatement}
 
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, StatusStore, Stopping}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
@@ -227,7 +227,7 @@ trait Reindex extends FormDefinition {
         // - using lazy, as we might not need the data, if there are no controls to index
         // - return root element, as XPath this is the node XPath expressions are relative to
         lazy val dataRootElement: NodeInfo = {
-          val document = readXmlColumn(provider, currentData)
+          val document = Provider.readXmlColumn(provider, currentData)
           document.descendant(*).head
         }
 

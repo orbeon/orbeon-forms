@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 
 package object persistence {
 

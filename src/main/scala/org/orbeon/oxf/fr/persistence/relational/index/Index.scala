@@ -13,12 +13,16 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 
 object Index
   extends FormDefinition
   with Reindex {
 
-  val ProvidersWithIndexSupport: Set[Provider] = Set(MySQL, PostgreSQL)
+  val ProvidersWithIndexSupport: Set[Provider] = Set(
+    MySQL,
+    PostgreSQL
+  )
 
 }

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Request
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 
 object mySqlOrderForRowNumPart {
 

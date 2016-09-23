@@ -16,7 +16,8 @@ package org.orbeon.oxf.fr.persistence.db
 import java.sql.{Connection, DriverManager}
 
 import org.orbeon.oxf.fr.persistence._
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.util.ScalaUtils._
 

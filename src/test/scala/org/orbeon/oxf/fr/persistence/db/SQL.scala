@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
-import java.io.{InputStreamReader, StringWriter}
-import java.sql.Statement
-
-import org.orbeon.oxf.fr.persistence.relational.Provider.Provider
 import org.orbeon.oxf.resources.URLFactory
+import java.io.{InputStreamReader, StringWriter}
+
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
 import scala.collection.mutable.ArrayBuffer
+import java.sql.Statement
+
+import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
 private[persistence] object SQL extends Logging {
 

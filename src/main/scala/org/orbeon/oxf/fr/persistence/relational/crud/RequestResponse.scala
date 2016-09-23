@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider
 
 case class DataPart(isDraft: Boolean, documentId: String)
 
@@ -65,11 +65,11 @@ trait RequestResponse {
     httpRequest.getRequestPath match {
       case CrudFormPath(provider, app, form, filename) ⇒
         val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(providerFromToken(provider), app, form, file, version, None)
+        Request(Provider.providerFromToken(provider), app, form, file, version, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) ⇒
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId)
-        Request(providerFromToken(provider), app, form, file, version, Some(dataPart))
+        Request(Provider.providerFromToken(provider), app, form, file, version, Some(dataPart))
     }
   }
 

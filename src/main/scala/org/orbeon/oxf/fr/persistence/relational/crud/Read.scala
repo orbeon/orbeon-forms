@@ -22,7 +22,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 

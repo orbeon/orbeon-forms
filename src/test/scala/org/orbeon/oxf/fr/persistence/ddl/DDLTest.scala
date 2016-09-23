@@ -14,13 +14,14 @@
 package org.orbeon.oxf.fr.persistence.ddl
 
 import org.junit.Test
-import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence._
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 
 /**
  * Test the DDL we provide to create and update databases.

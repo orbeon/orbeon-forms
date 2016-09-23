@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.{PreparedStatement, Timestamp}
-import org.orbeon.oxf.fr.persistence.relational.Provider._
+import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 
 trait CreateCols extends RequestResponse with Common {
 

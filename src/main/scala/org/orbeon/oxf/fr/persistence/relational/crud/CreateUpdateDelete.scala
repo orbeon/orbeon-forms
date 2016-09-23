@@ -146,21 +146,21 @@ trait CreateUpdateDelete
     val resultSet = {
       val ps = connection.prepareStatement(
         s"""|SELECT created
-          |       ${if (req.forData) ", username , groupname, form_version" else ""}
-          |FROM   $table t,
-          |       (
-          |           SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
-          |           FROM     $table
-          |           WHERE    app  = ?
-          |                    and form = ?
-          |                    ${if (! req.forData)     "and form_version = ?" else ""}
-          |                    ${if (req.forData)       "and document_id  = ?" else ""}
-          |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
-          |           GROUP BY ${idCols.mkString(", ")}
-          |       ) m
-          |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
-          |       AND deleted = 'N'
-          |""".stripMargin)
+            |       ${if (req.forData) ", username , groupname, form_version" else ""}
+            |FROM   $table t,
+            |       (
+            |           SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+            |           FROM     $table
+            |           WHERE    app  = ?
+            |                    and form = ?
+            |                    ${if (! req.forData)     "and form_version = ?" else ""}
+            |                    ${if (req.forData)       "and document_id  = ?" else ""}
+            |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
+            |           GROUP BY ${idCols.mkString(", ")}
+            |       ) m
+            |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
+            |       AND deleted = 'N'
+            |""".stripMargin)
       val position = Iterator.from(1)
       ps.setString(position.next(), req.app)
       ps.setString(position.next(), req.form)
@@ -238,9 +238,9 @@ trait CreateUpdateDelete
 
       val ps = connection.prepareStatement(
         s"""|INSERT INTO $table
-          |            ( $colNames  )
-          |     VALUES ( $colValues )
-          |""".stripMargin)
+            |            ( $colNames  )
+            |     VALUES ( $colValues )
+            |""".stripMargin)
 
       // Set parameters in prepared statement for the dynamic values
       includedCols

@@ -6,7 +6,7 @@ CREATE TABLE orbeon_form_definition (
     last_modified_by    VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     app                 VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     form                VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
-    form_version        INT NOT NULL                                                              ,
+    form_version        INT                                                               NOT NULL,
     form_metadata       VARCHAR(4000)                             COLLATE utf8_bin                ,
     deleted             CHAR(1)                                   COLLATE utf8_bin        NOT NULL,
     xml                 MEDIUMTEXT             CHARACTER SET utf8 COLLATE utf8_unicode_ci
@@ -18,7 +18,7 @@ CREATE TABLE orbeon_form_definition_attach (
     last_modified_by    VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     app                 VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     form                VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
-    form_version        INT NOT NULL                                                              ,
+    form_version        INT                                                               NOT NULL,
     deleted             CHAR(1)                                   COLLATE utf8_bin        NOT NULL,
     file_name           VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     file_content        LONGBLOB
@@ -34,7 +34,7 @@ CREATE TABLE orbeon_form_data (
     organization_id     INT                                                                       ,
     app                 VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     form                VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
-    form_version        INT NOT NULL                                                              ,
+    form_version        INT                                                               NOT NULL,
     document_id         VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     draft               CHAR(1)                                   COLLATE utf8_bin        NOT NULL,
     deleted             CHAR(1)                                   COLLATE utf8_bin        NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE orbeon_form_data_attach (
     groupname           VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     app                 VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     form                VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
-    form_version        INT NOT NULL                                                              ,
+    form_version        INT                                                               NOT NULL,
     document_id         VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     draft               CHAR(1)                                   COLLATE utf8_bin        NOT NULL,
     deleted             CHAR(1)                                   COLLATE utf8_bin        NOT NULL,
@@ -59,8 +59,13 @@ CREATE TABLE orbeon_form_data_attach (
 
 CREATE TABLE orbeon_form_organization (
     id                  INT                                                               NOT NULL,
+    depth               INT                                                               NOT NULL,
     pos                 INT                                                               NOT NULL,
     name                VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin        NOT NULL
+)   ENGINE = InnoDB;
+
+CREATE TABLE orbeon_seq (
+    val                 INT                    PRIMARY KEY AUTO_INCREMENT                 NOT NULL
 )   ENGINE = InnoDB;
 
 CREATE TABLE orbeon_i_current (

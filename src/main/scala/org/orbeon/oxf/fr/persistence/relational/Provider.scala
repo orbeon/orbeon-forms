@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.relational
 
-import java.sql.ResultSet
+import java.sql.{Connection, ResultSet}
 import javax.xml.transform.stream.StreamSource
 
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.DocumentInfo
 
 object Provider {
@@ -76,4 +77,16 @@ object Provider {
     }
   }
 
+  def seqNextVal(connection: Connection, provider: Provider): Int = {
+    val nextValSql = {
+      useAndClose(connection.prepareStatement("INSERT INTO orbeon_seq VALUES ()"))(_.executeUpdate())
+      "SELECT max(val) FROM orbeon_seq"
+    }
+    useAndClose(connection.prepareStatement(nextValSql)){ statement ⇒
+      useAndClose(statement.executeQuery()) { resultSet ⇒
+        resultSet.next()
+        resultSet.getInt(1)
+      }
+    }
+  }
 }

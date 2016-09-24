@@ -32,7 +32,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
+import scala.collection.{mutable ⇒ m}
 
 object XFormsExtractor {
   val LastIdQName = QName.get("last-id")
@@ -162,15 +162,8 @@ class XFormsExtractor(
     xmlReceiverOpt foreach { implicit xmlReceiver ⇒
       if (mustOutputFirstElement && ! outputSingleTemplate) {
 
-        openElement(
-          localName = "static-state",
-          atts      = List("is-html" → isHTMLDocument.toString)
-        )
-
-        openElement(
-          localName = "root",
-          atts      = List("id" → "#document")
-        )
+        openElement(localName = "static-state", atts = List("is-html" → isHTMLDocument.toString))
+        openElement(localName = "root",         atts = List("id"      → "#document"))
 
         mustOutputFirstElement = false
       }
@@ -219,11 +212,11 @@ class XFormsExtractor(
     inputNamespaceContext.startElement()
 
     // Check for XForms or extension namespaces
-    val isXForms            = XFORMS_NAMESPACE_URI  == uri
-    val isXXForms           = XXFORMS_NAMESPACE_URI == uri
-    val isEXForms           = EXFORMS_NAMESPACE_URI == uri
-    val isXBL               = XBL_NAMESPACE_URI     == uri
-    val isXXBL              = XXBL_NAMESPACE_URI    == uri // for xxbl:global
+    val isXForms            = uri == XFORMS_NAMESPACE_URI
+    val isXXForms           = uri == XXFORMS_NAMESPACE_URI
+    val isEXForms           = uri == EXFORMS_NAMESPACE_URI
+    val isXBL               = uri == XBL_NAMESPACE_URI
+    val isXXBL              = uri == XXBL_NAMESPACE_URI // for xxbl:global
 
     val staticId            = attributes.getValue("", "id")
     val prefixedId          = if (staticId ne null) getPrefixedId(staticId) else null
@@ -507,7 +500,7 @@ trait ExtractorProperties {
   // (although this case is degenerate: `TRUE` really shouldn't be allowed, but it is by Java!). In general, this
   // is not a problem, and the worst case scenario is that a few too many properties are kept in the static state.
 
-  private val unparsedLocalProperties = mutable.HashMap[String, String]()
+  private val unparsedLocalProperties = m.HashMap[String, String]()
 
   protected def outputNonDefaultProperties(): Unit =
     xmlReceiverOpt foreach { implicit xmlReceiver ⇒
@@ -532,10 +525,7 @@ trait ExtractorProperties {
         newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, "xxf:" + name, XMLReceiverHelper.CDATA, value)
 
       xmlReceiver.startPrefixMapping("xxf", XXFORMS_NAMESPACE_URI)
-      element(
-        localName = "properties",
-        atts      = newAttributes
-      )
+      element(localName = "properties", atts = newAttributes)
       xmlReceiver.endPrefixMapping("xxf")
     }
 

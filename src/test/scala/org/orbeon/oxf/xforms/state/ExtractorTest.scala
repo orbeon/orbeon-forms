@@ -59,7 +59,6 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
             baseURI                      = ".",
             startScope                   = XFormsConstants.XXBLScope.inner,
             isTopLevel                   = true,
-            ignoreRootElement            = false,
             outputSingleTemplate         = false
           ),
           metadata,

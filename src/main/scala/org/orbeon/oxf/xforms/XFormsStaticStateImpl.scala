@@ -234,7 +234,6 @@ object XFormsStaticStateImpl {
     baseURI                      = ".",
     startScope                   = XXBLScope.inner,
     isTopLevel                   = startScope.isTopLevelScope,
-    ignoreRootElement            = false,
     outputSingleTemplate         = false
   ) {
 

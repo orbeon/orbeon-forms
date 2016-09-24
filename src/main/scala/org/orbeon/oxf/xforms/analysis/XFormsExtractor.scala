@@ -91,7 +91,6 @@ class XFormsExtractor(
   val baseURI                      : String,
   val startScope                   : XXBLScope,
   val isTopLevel                   : Boolean,
-  val ignoreRootElement            : Boolean, // NOTE: unused as of 2013-10-11
   val outputSingleTemplate         : Boolean
 ) extends XMLReceiver
      with XMLReceiverUnneededEvents
@@ -292,117 +291,106 @@ class XFormsExtractor(
     if (level == 0 && isTopLevel)
       isHTMLDocument = localname == "html" && (uri == "" || uri == XHTML_NAMESPACE_URI)
 
-    if (level > 0 || ! ignoreRootElement) {
+    var outputAttributes = attributes
 
-      var outputAttributes = attributes
+    // Start extracting model or controls
+    if (! inXFormsOrExtension && isXFormsOrExtension) {
 
-      // Start extracting model or controls
-      if (! inXFormsOrExtension && isXFormsOrExtension) {
+      inXFormsOrExtension = true
+      xformsLevel         = level
 
-        inXFormsOrExtension = true
-        xformsLevel         = level
+      // Handle properties on top-level model elements
+      if (isXForms && localname == "model")
+        addPropertiesIfAny(attributes)
 
-        // Handle properties on top-level model elements
-        if (isXForms && localname == "model")
-          addPropertiesIfAny(attributes)
-
-        outputFirstElementIfNeeded()
-
-        // Add xml:base on element
-        outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
-
-        // Add xml:lang on element if found
-        elementStack.head.xmlLangOpt foreach { xmlLang ⇒
-          val newXMLLang =
-            elementStack.head.xmlLangAvtIdOpt match {
-              case Some(xmlLangAvtId) if XFormsUtils.maybeAVT(xmlLang) ⇒
-                // In this case the latest xml:lang on the stack might be an AVT and we set a special value for
-                // xml:lang containing the id of the control that evaluates the runtime value.
-                "#" + xmlLangAvtId
-              case _ ⇒
-                // No AVT
-                xmlLang
-            }
-
-          outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "lang", newXMLLang)
-        }
-      }
-
-      // Check for preserved, foreign, or LHHA content
-      if (inXFormsOrExtension && ! inPreserve && ! inForeign) {
-
-        // TODO: Just warn?
-        if (isXXForms) {
-          if (! ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName.get(localname, XXFORMS_NAMESPACE)))
-            throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", LocationData.createIfPresent(locator))
-        } else if (isEXForms) {
-          if (! ALLOWED_EXFORMS_ELEMENTS.contains(localname))
-            throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", LocationData.createIfPresent(locator))
-        } else if (isXBL) {
-          if (! ALLOWED_XBL_ELEMENTS.contains(localname))
-            throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", LocationData.createIfPresent(locator))
-        }
-
-        // Preserve as is the content of labels, etc., instances, and schemas
-        if (! inLHHA) {
-          if (LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname) && isXForms) { // LHHA may contain XHTML
-            inLHHA                       = true
-            preserveOrLHHAOrForeignLevel = level
-          } else if (
-               localname == "instance" && isXForms       // XForms instance
-            || localname == "schema"   && uri == XSD_URI // XML schema
-            || localname == "xbl"      && isXBL          // preserve everything under xbl:xbl so that templates may be processed by static state
-            || isExtension
-          ) {
-            inPreserve                   = true
-            preserveOrLHHAOrForeignLevel = level
-          }
-        }
-
-        // Callback for elements of interest
-        // NOTE: We call this also for HTML elements within LHHA so we can gather scope information for AVTs
-        if (isXFormsOrExtension || inLHHA)
-          indexElementWithScope(uri, localname, outputAttributes, elementStack.head.scope)
-      }
-
-      if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || isXFormsOrExtension)) {
-        // We are within preserved content or we output regular XForms content
-        startStaticStateElement(uri, localname, qName, outputAttributes)
-      } else if (inXFormsOrExtension && ! isXFormsOrExtension && parentElementDetails.isModel) {
-        // Start foreign content in the model
-        inForeign                    = true
-        preserveOrLHHAOrForeignLevel = level
-      }
-    } else {
-      // Just open the root element
       outputFirstElementIfNeeded()
-      xmlReceiverOpt foreach (_.startElement(uri, localname, qName, attributes))
+
+      // Add xml:base on element
+      outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "base", elementStack.head.xmlBase.toString)
+
+      // Add xml:lang on element if found
+      elementStack.head.xmlLangOpt foreach { xmlLang ⇒
+        val newXMLLang =
+          elementStack.head.xmlLangAvtIdOpt match {
+            case Some(xmlLangAvtId) if XFormsUtils.maybeAVT(xmlLang) ⇒
+              // In this case the latest xml:lang on the stack might be an AVT and we set a special value for
+              // xml:lang containing the id of the control that evaluates the runtime value.
+              "#" + xmlLangAvtId
+            case _ ⇒
+              // No AVT
+              xmlLang
+          }
+
+        outputAttributes = SAXUtils.addOrReplaceAttribute(outputAttributes, XML_URI, "xml", "lang", newXMLLang)
+      }
     }
+
+    // Check for preserved, foreign, or LHHA content
+    if (inXFormsOrExtension && ! inPreserve && ! inForeign) {
+
+      // TODO: Just warn?
+      if (isXXForms) {
+        if (! ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName.get(localname, XXFORMS_NAMESPACE)))
+          throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+      } else if (isEXForms) {
+        if (! ALLOWED_EXFORMS_ELEMENTS.contains(localname))
+          throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+      } else if (isXBL) {
+        if (! ALLOWED_XBL_ELEMENTS.contains(localname))
+          throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+      }
+
+      // Preserve as is the content of labels, etc., instances, and schemas
+      if (! inLHHA) {
+        if (LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname) && isXForms) { // LHHA may contain XHTML
+          inLHHA                       = true
+          preserveOrLHHAOrForeignLevel = level
+        } else if (
+             localname == "instance" && isXForms       // XForms instance
+          || localname == "schema"   && uri == XSD_URI // XML schema
+          || localname == "xbl"      && isXBL          // preserve everything under xbl:xbl so that templates may be processed by static state
+          || isExtension
+        ) {
+          inPreserve                   = true
+          preserveOrLHHAOrForeignLevel = level
+        }
+      }
+
+      // Callback for elements of interest
+      // NOTE: We call this also for HTML elements within LHHA so we can gather scope information for AVTs
+      if (isXFormsOrExtension || inLHHA)
+        indexElementWithScope(uri, localname, outputAttributes, elementStack.head.scope)
+    }
+
+    if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || isXFormsOrExtension)) {
+      // We are within preserved content or we output regular XForms content
+      startStaticStateElement(uri, localname, qName, outputAttributes)
+    } else if (inXFormsOrExtension && ! isXFormsOrExtension && parentElementDetails.isModel) {
+      // Start foreign content in the model
+      inForeign                    = true
+      preserveOrLHHAOrForeignLevel = level
+    }
+
     level += 1
   }
 
   override def endElement(uri: String, localname: String, qName: String): Unit = {
     level -= 1
 
-    if (level > 0 || ! ignoreRootElement) {
-      // We are within preserved content or we output regular XForms content
-      if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || elementStack.head.isXFormsOrExtension))
-        endStaticStateElement(uri, localname, qName)
+    // We are within preserved content or we output regular XForms content
+    if (inXFormsOrExtension && ! inForeign && (inPreserve || inLHHA || elementStack.head.isXFormsOrExtension))
+      endStaticStateElement(uri, localname, qName)
 
-      if ((inPreserve || inLHHA || inForeign) && level == preserveOrLHHAOrForeignLevel) {
-        // Leaving preserved, foreign or LHHA content
-        inPreserve = false
-        inForeign  = false
-        inLHHA     = false
-      }
+    if ((inPreserve || inLHHA || inForeign) && level == preserveOrLHHAOrForeignLevel) {
+      // Leaving preserved, foreign or LHHA content
+      inPreserve = false
+      inForeign  = false
+      inLHHA     = false
+    }
 
-      if (inXFormsOrExtension && level == xformsLevel) {
-        // Leaving model or controls
-        inXFormsOrExtension = false
-      }
-    } else {
-      // Just close the root element
-      xmlReceiverOpt foreach (_.endElement(uri, localname, qName))
+    if (inXFormsOrExtension && level == xformsLevel) {
+      // Leaving model or controls
+      inXFormsOrExtension = false
     }
 
     if (! inPreserve && ! inForeign)

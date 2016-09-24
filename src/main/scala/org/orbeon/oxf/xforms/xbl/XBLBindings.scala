@@ -387,7 +387,6 @@ class XBLBindings(
     baseURI                      = baseURI,
     startScope                   = startScope,
     isTopLevel                   = false,
-    ignoreRootElement            = false,
     outputSingleTemplate         = true
   ) {
 

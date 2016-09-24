@@ -360,7 +360,6 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                             ".",
                             XFormsConstants.XXBLScope.inner,
                             true,
-                            false,
                             false
                         ),
                         metadata,

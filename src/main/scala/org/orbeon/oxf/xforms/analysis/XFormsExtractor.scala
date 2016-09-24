@@ -106,6 +106,7 @@ class XFormsExtractor(
   val ignoreRootElement            : Boolean, // NOTE: unused as of 2013-10-11
   val outputSingleTemplate         : Boolean
 ) extends XMLReceiver
+     with XMLReceiverUnneededEvents
      with ExtractorProperties
      with ExtractorOutput {
 
@@ -452,16 +453,6 @@ class XFormsExtractor(
       if (inPreserve)
         xmlReceiver.processingInstruction(target, data)
     }
-
-  // Things we don't care about, ever
-  def ignorableWhitespace(ch: Array[Char], start: Int, length: Int) = ()
-  def startDTD(name: String, publicId: String, systemId: String)    = ()
-  def endDTD()                                                      = ()
-  def startEntity(name: String)                                     = ()
-  def endEntity(name: String)                                       = ()
-  def startCDATA()                                                  = ()
-  def endCDATA()                                                    = ()
-  def skippedEntity(name: String): Unit                             = ()
 }
 
 trait ExtractorOutput extends XMLReceiver {

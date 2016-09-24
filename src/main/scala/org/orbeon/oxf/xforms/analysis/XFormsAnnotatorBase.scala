@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xml.XMLConstants._
-import org.xml.sax.{Locator, Attributes}
 import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverUnneededEvents}
+import org.xml.sax.{Attributes, Locator}
 
 abstract class XFormsAnnotatorBase(
   templateReceiver  : XMLReceiver,
   extractorReceiver : XMLReceiver
-) extends XMLReceiverAdapter {
+) extends XMLReceiver
+     with XMLReceiverUnneededEvents {
 
   private val keepLocationData = XFormsProperties.isKeepLocation
   private var _documentLocator: Locator = null
@@ -137,8 +138,7 @@ abstract class XFormsAnnotatorBase(
         extractorReceiver.characters(ch, start, length)
     }
 
-  // ignore, should not happen
-  override def ignorableWhitespace(ch: Array[Char], start: Int, length: Int) = ()
+  def endPrefixMapping(prefix: String): Unit = ()
 
   override def processingInstruction(target: String, data: String): Unit =
     if (isInPreserve) {
@@ -157,7 +157,6 @@ abstract class XFormsAnnotatorBase(
       if (extractorReceiver ne null)
         extractorReceiver.comment(ch, start, length)
     }
-
 
   private def startElement2(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit = {
     if (isOutputToTemplate)

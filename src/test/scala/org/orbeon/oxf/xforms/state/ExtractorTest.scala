@@ -20,28 +20,11 @@ import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xml.XMLParsing.ParserConfiguration._
 import org.orbeon.oxf.xml.{JXQName, _}
+import org.orbeon.scaxon.DocumentAndElementsCollector
 import org.orbeon.scaxon.SAXEvents._
 import org.scalatest.junit.AssertionsForJUnit
-import org.xml.sax.Attributes
-
-import scala.collection.mutable.ListBuffer
 
 class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
-
-  class Collector extends XMLReceiverAdapter {
-
-    import org.orbeon.scaxon.SAXEvents._
-
-    private var _events = ListBuffer[SAXEvent]()
-    def events = _events.result
-
-    override def startDocument()                                                               : Unit = _events += StartDocument
-    override def endDocument()                                                                 : Unit = _events += EndDocument
-    override def startPrefixMapping(prefix: String, uri: String)                               : Unit = _events += StartPrefixMapping(prefix, uri)
-    override def endPrefixMapping(prefix: String)                                              : Unit = _events += EndPrefixMapping(prefix)
-    override def startElement(uri: String, localName: String, qName: String, atts: Attributes) : Unit = _events += StartElement(uri, localName, qName, atts)
-    override def endElement(uri: String, localName: String, qName: String)                     : Unit = _events += EndElement(uri, localName, qName)
-  }
 
   @Test def issue1897namespacesWithXIncludes(): Unit = {
 
@@ -50,7 +33,7 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
     val metadata = new Metadata
     val template = AnnotatedTemplate(new SAXStore)
 
-    val extractorCollector = new Collector
+    val extractorCollector = new DocumentAndElementsCollector
 
     // Filter out properties and other elements which we don't want to test
     val ElementsToExclude = Set("properties", "last-id", "template")
@@ -89,6 +72,7 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
     )
 
     import javax.xml.namespace.{QName ⇒ JQName}
+
     import JXQName._
 
     val XMLURI    = "http://www.w3.org/XML/1998/namespace"

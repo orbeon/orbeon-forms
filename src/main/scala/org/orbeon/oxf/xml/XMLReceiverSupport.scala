@@ -57,6 +57,23 @@ trait XMLReceiverSupport {
         support.text(text)
     }
 
+  def openElement(
+    localName : String,
+    prefix    : String = "",
+    uri       : String = "",
+    atts      : Attributes = SAXUtils.EMPTY_ATTRIBUTES)(implicit
+    receiver  : XMLReceiver
+  ): Unit =
+    receiver.startElement(uri, localName, XMLUtils.buildQName(prefix, localName), atts)
+
+  def closeElement(
+    localName : String,
+    prefix    : String = "",
+    uri       : String = "")(implicit
+    receiver  : XMLReceiver
+  ): Unit =
+    receiver.endElement(uri, localName, XMLUtils.buildQName(prefix, localName))
+
   def text(text: String)(implicit receiver: XMLReceiver) =
     if (text.nonEmpty) {
       val chars = text.toCharArray

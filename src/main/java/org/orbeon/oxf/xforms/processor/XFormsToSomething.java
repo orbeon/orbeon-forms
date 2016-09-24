@@ -348,13 +348,15 @@ abstract public class XFormsToSomething extends ProcessorImpl {
                     new XFormsAnnotator(
                         this.template.saxStore(),
                         new XFormsExtractor(
-                            new WhitespaceXMLReceiver(
-                                extractorOutput,
-                                WhitespaceMatching.defaultBasePolicy(),
-                                WhitespaceMatching.basePolicyMatcher()
+                            scala.Option.<XMLReceiver>apply(
+                                new WhitespaceXMLReceiver(
+                                    extractorOutput,
+                                    WhitespaceMatching.defaultBasePolicy(),
+                                    WhitespaceMatching.basePolicyMatcher()
+                                )
                             ),
                             metadata,
-                            template,
+                            scala.Option.<AnnotatedTemplate>apply(template),
                             ".",
                             XFormsConstants.XXBLScope.inner,
                             true,

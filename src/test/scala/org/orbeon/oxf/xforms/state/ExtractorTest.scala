@@ -31,7 +31,6 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
     val url = "oxf:/org/orbeon/oxf/xforms/state/form-with-include.xhtml"
 
     val metadata = new Metadata
-    val template = AnnotatedTemplate(new SAXStore)
 
     val extractorCollector = new DocumentAndElementsCollector
 
@@ -48,18 +47,20 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
         new XFormsAnnotator(
           new SAXStore,
           new XFormsExtractor(
-            new WhitespaceXMLReceiver(
-              extractorOutput,
-              WhitespaceMatching.defaultBasePolicy,
-              WhitespaceMatching.basePolicyMatcher
+            xmlReceiverOpt = Some(
+              new WhitespaceXMLReceiver(
+                extractorOutput,
+                WhitespaceMatching.defaultBasePolicy,
+                WhitespaceMatching.basePolicyMatcher
+              )
             ),
-            metadata,
-            template,
-            ".",
-            XFormsConstants.XXBLScope.inner,
-            true,
-            false,
-            false
+            metadata                     = metadata,
+            templateUnderConstructionOpt = Some(AnnotatedTemplate(new SAXStore)),
+            baseURI                      = ".",
+            startScope                   = XFormsConstants.XXBLScope.inner,
+            isTopLevel                   = true,
+            ignoreRootElement            = false,
+            outputSingleTemplate         = false
           ),
           metadata,
           true

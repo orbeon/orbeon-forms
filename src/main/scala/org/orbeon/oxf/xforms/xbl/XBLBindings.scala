@@ -69,7 +69,7 @@ class XBLBindings(
    *   - simpler
    *   - drawback: automatic ids grow larger
    *   - works for id allocation, but not for checking duplicate ids, but we do duplicate id check separately for XBL
-   *     anyway in ScopeExtractorContentHandler
+   *     anyway in `ScopeExtractor`
    * - use separate outer/inner scope IdGenerator
    *   - more complex
    *   - requires to know inner/outer scope at annotation time
@@ -203,7 +203,7 @@ class XBLBindings(
 
     TransformerUtils.writeDom4j(
       fullAnnotatedTree,
-      new ScopeExtractor(null, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
+      new ScopeExtractor(None, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
     )
 
     fullAnnotatedTree
@@ -236,10 +236,12 @@ class XBLBindings(
           new XFormsAnnotator(
             templateOutput,
             new ScopeExtractor(
-              new WhitespaceXMLReceiver(
-                extractorOutput,
-                WhitespaceMatching.defaultBasePolicy,
-                WhitespaceMatching.basePolicyMatcher
+              Some(
+                new WhitespaceXMLReceiver(
+                  extractorOutput,
+                  WhitespaceMatching.defaultBasePolicy,
+                  WhitespaceMatching.basePolicyMatcher
+                )
               ),
               innerScope,
               outerScope,
@@ -372,16 +374,25 @@ class XBLBindings(
   }
 
   private class ScopeExtractor(
-    xmlReceiver : XMLReceiver,  // output of transformation or null
-    innerScope  : Scope,        // inner scope
-    outerScope  : Scope,        // outer scope, i.e. scope of the bound
-    startScope  : XXBLScope,    // scope of root element
-    prefix      : String,       // prefix of the ids within the new shadow tree
-    baseURI     : String)       // base URI of new tree
-  extends XFormsExtractor(xmlReceiver, metadata, null, baseURI, startScope, false, false, true) {
+    xmlReceiver : Option[XMLReceiver], // output of transformation or `None`
+    innerScope  : Scope,               // inner scope
+    outerScope  : Scope,               // outer scope, i.e. scope of the bound
+    startScope  : XXBLScope,           // scope of root element
+    prefix      : String,              // prefix of the ids within the new shadow tree
+    baseURI     : String               // base URI of new tree
+  ) extends XFormsExtractor(
+    xmlReceiverOpt               = xmlReceiver,
+    metadata                     = metadata,
+    templateUnderConstructionOpt = None,
+    baseURI                      = baseURI,
+    startScope                   = startScope,
+    isTopLevel                   = false,
+    ignoreRootElement            = false,
+    outputSingleTemplate         = true
+  ) {
 
-    assert(innerScope ne null)
-    assert(outerScope ne null)
+    require(innerScope ne null)
+    require(outerScope ne null)
 
     override def getPrefixedId(staticId: String) = prefix + staticId
 

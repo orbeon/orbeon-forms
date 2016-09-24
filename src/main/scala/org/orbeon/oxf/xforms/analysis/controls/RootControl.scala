@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.{LangRef, ChildrenBuilderTrait}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LAST_ID_QNAME
+import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
@@ -60,7 +60,7 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
   // might place them there.
   override def findRelevantChildrenElements =
     findAllChildrenElements filterNot
-      { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LAST_ID_QNAME)(e.getQName) }
+      { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LastIdQName)(e.getQName) }
 
   override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
   override val externalEvents              = externalEventsDef

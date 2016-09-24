@@ -220,6 +220,61 @@ object XFormsStaticStateImpl {
       part
     })
 
+  // Extractor with prefix
+  private class Extractor(
+    extractorReceiver : XMLReceiver,
+    metadata          : Metadata,
+    startScope        : Scope,
+    template          : SAXStore,
+    prefix            : String
+  ) extends XFormsExtractor(
+    xmlReceiverOpt               = Some(extractorReceiver),
+    metadata                     = metadata,
+    templateUnderConstructionOpt = Some(AnnotatedTemplate(template)),
+    baseURI                      = ".",
+    startScope                   = XXBLScope.inner,
+    isTopLevel                   = startScope.isTopLevelScope,
+    ignoreRootElement            = false,
+    outputSingleTemplate         = false
+  ) {
+
+    override def getPrefixedId(staticId: String) = prefix + staticId
+
+    override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope): Unit = {
+      val staticId = attributes.getValue("id")
+      if (staticId ne null) {
+        val prefixedId = prefix + staticId
+        if (metadata.getNamespaceMapping(prefixedId) ne null) {
+          if (startScope.contains(staticId))
+            throw new OXFException("Duplicate id found for static id: " + staticId)
+          startScope += staticId → prefixedId
+
+          if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
+            val forStaticId = attributes.getValue("for")
+            val forPrefixedId = prefix + forStaticId
+            startScope += forStaticId → forPrefixedId
+          }
+        }
+      }
+    }
+  }
+
+  // Annotator with prefix
+  private class Annotator(
+    extractorReceiver : XMLReceiver,
+    metadata          : Metadata,
+    startScope        : Scope,
+    template          : XMLReceiver,
+    prefix            : String
+  ) extends XFormsAnnotator(
+    template,
+    extractorReceiver,
+    metadata,
+    startScope.isTopLevelScope
+  ) {
+    protected override def rewriteId(id: String) = prefix + id
+  }
+
   // Used by xxf:dynamic and unit tests.
   private def createFromDocument[T](
     formDocument : Document,
@@ -231,41 +286,10 @@ object XFormsStaticStateImpl {
     val documentResult = new LocationDocumentResult
     identity.setResult(documentResult)
 
-    val metadata = new Metadata
+    val metadata             = new Metadata
     val digestContentHandler = new DigestContentHandler
-    val template = new SAXStore
-
-    val prefix = startScope.fullPrefix
-
-    // Annotator with prefix
-    class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotator(template, extractorReceiver, metadata, startScope.isTopLevelScope) {
-      protected override def rewriteId(id: String) = prefix + id
-    }
-
-    // Extractor with prefix
-    class Extractor(xmlReceiver: XMLReceiver)
-        extends XFormsExtractor(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
-
-      override def getPrefixedId(staticId: String) = prefix + staticId
-
-      override def indexElementWithScope(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope): Unit = {
-        val staticId = attributes.getValue("id")
-        if (staticId ne null) {
-          val prefixedId = prefix + staticId
-          if (metadata.getNamespaceMapping(prefixedId) ne null) {
-            if (startScope.contains(staticId))
-              throw new OXFException("Duplicate id found for static id: " + staticId)
-            startScope += staticId → prefixedId
-
-            if (uri == XXFORMS_NAMESPACE_URI && localname == "attribute") {
-              val forStaticId = attributes.getValue("for")
-              val forPrefixedId = prefix + forStaticId
-              startScope += forStaticId → forPrefixedId
-            }
-          }
-        }
-      }
-    }
+    val template             = new SAXStore
+    val prefix               = startScope.fullPrefix
 
     // Read the input through the annotator and gather namespace mappings
     TransformerUtils.writeDom4j(
@@ -277,8 +301,16 @@ object XFormsStaticStateImpl {
               new TeeXMLReceiver(identity, digestContentHandler),
               WhitespaceMatching.defaultBasePolicy,
               WhitespaceMatching.basePolicyMatcher
-            )
-          )
+            ),
+            metadata,
+            startScope,
+            template,
+            prefix
+          ),
+          metadata,
+          startScope,
+          template,
+          prefix
         ),
         WhitespaceMatching.defaultHTMLPolicy,
         WhitespaceMatching.htmlPolicyMatcher
@@ -327,7 +359,7 @@ object XFormsStaticStateImpl {
 
     // Return the last id generated
     def lastId: Int = {
-      val idElement = staticStateElement.element(XFormsExtractor.LAST_ID_QNAME)
+      val idElement = staticStateElement.element(XFormsExtractor.LastIdQName)
       require(idElement ne null)
       val lastId = XFormsUtils.getElementId(idElement)
       require(lastId ne null)

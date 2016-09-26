@@ -418,4 +418,27 @@ object ScalaUtils extends PathOps {
   implicit def ordered: Ordering[Timestamp] = new Ordering[Timestamp] {
       def compare(x: Timestamp, y: Timestamp): Int = x compareTo y
   }
+
+  sealed trait InsertPosition
+  case object InsertBefore extends InsertPosition
+  case object InsertAfter  extends InsertPosition
+
+  implicit class VectorOps[T](val values: Vector[T]) extends AnyVal {
+
+    def insertAt(index: Int, value: T, position: InsertPosition): Vector[T] =
+      position match {
+        case InsertBefore ⇒ (values.take(index) :+ value) ++ values.drop(index)
+        case InsertAfter  ⇒ (values.take(index + 1) :+ value) ++ values.drop(index + 1)
+      }
+
+    def insertAt(index: Int, newValues: Traversable[T], position: InsertPosition): Vector[T] =
+    position match {
+      case InsertBefore ⇒ values.take(index) ++ newValues ++ values.drop(index)
+      case InsertAfter  ⇒ values.take(index + 1) ++ newValues ++ values.drop(index + 1)
+    }
+
+    def removeAt(index: Int): Vector[T] = {
+      values.take(index) ++ values.drop(index + 1)
+    }
+  }
 }

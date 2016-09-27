@@ -469,7 +469,7 @@ object Connection extends Logging {
   }
 
   private def valueAs[T[_]](value: String)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] =
-    value.trimAllToOpt map (split[T](_)) getOrElse cbf().result()
+    value.trimAllToOpt map (_.splitTo[T]()) getOrElse cbf().result()
 
   // Get a Set of header names to forward from the configuration properties
   def headersToForwardFromProperty: Set[String] =

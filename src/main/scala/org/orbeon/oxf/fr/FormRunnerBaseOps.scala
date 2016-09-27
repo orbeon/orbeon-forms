@@ -196,7 +196,7 @@ trait FormRunnerBaseOps {
   private val UpdateOps    = Set("*", "update")
   private val DeleteOps    = Set("*", "delete")
 
-  def authorizedOperations = split[Set](authorizedOperationsInstance.rootElement.stringValue)
+  def authorizedOperations = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
 
   def canCreate = authorizedOperations intersect CreateOps nonEmpty
   def canRead   = authorizedOperations intersect ReadOps   nonEmpty

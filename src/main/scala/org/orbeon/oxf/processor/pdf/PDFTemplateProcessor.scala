@@ -588,7 +588,7 @@ object PDFTemplateProcessor {
     // tries to find an actual character encoding based on the value passed. For other font types, Identity-H and
     // Identity-V are handled.
     def isType1Font(name: String) =
-      BuiltinFonts(name) || (StringUtils.split(name, """.""").lastOption map (_.toLowerCase) exists Set("afm", "pfm"))
+      BuiltinFonts(name) || (name.splitTo(""".""").lastOption map (_.toLowerCase) exists Set("afm", "pfm"))
 
     if (isType1Font(fontFamilyName))
       BaseFont.CP1252

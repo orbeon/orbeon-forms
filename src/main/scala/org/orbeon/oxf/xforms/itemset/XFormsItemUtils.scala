@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.itemset
 import org.apache.commons.lang3
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{StringUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
@@ -53,7 +54,7 @@ object XFormsItemUtils {
           trimmedItemValue == ""
         } else {
           // Case of multiple tokens
-          StringUtils.split[scala.Iterator](trimmedControlValue) contains trimmedItemValue
+          trimmedControlValue.splitTo[scala.Iterator]() contains trimmedItemValue
         }
       } else {
         // Do exact string comparison for select1

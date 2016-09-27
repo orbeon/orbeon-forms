@@ -62,9 +62,9 @@ class XXFormsResource extends XFormsFunction {
     // resources would cause a miss. But I don't think we have a way to express this right now. Note that the case
     // where a single resource changes is rare as we tend to use a readonly instance for resources anyway. But the
     // function must work in either case, readonly and readwrite.
-    val resourcePath = arguments(0) match {
+    val resourcePath = arguments.head match {
       case s: StringLiteral ⇒
-        split[List](s.getStringValue, "/.")
+        s.getStringValue.splitTo[List]("/.")
       case _ ⇒
         pathMap.setInvalidated(true)
         return null

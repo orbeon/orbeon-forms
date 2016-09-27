@@ -557,7 +557,7 @@ object XML {
           case None    ⇒ None
         }
 
-    val tokens = split[List](path, "/")
+    val tokens = path.splitTo[List]("/")
 
     findChild(Some(context), tokens)
   }

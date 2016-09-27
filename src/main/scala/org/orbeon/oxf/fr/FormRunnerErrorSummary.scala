@@ -57,7 +57,7 @@ trait FormRunnerErrorSummary {
     findErrorsInstance match {
       case Some(errorsInstance) ⇒
 
-        val sectionNamesSet = split[Set](sectionNames)
+        val sectionNamesSet = sectionNames.splitTo[Set]()
 
         def allErrorsIt =
           (errorsInstance.rootElement / "error").iterator

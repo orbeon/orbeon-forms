@@ -61,7 +61,7 @@ object DataMigration {
           // NOTE: The format of the path is like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
           // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
           // the migration data. As long as we know that there are no `/` within the parentheses we are fine.
-          val parts                          = split[List](path, "/")
+          val parts                          = path.splitTo[List]("/")
           val TrimPathElementRE(trimmedLast) = parts.last
 
           (parts.init mkString "/", trimmedLast)

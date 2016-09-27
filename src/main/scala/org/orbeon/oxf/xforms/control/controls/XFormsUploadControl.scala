@@ -235,7 +235,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 object XFormsUploadControl {
 
   // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
-  def mediatypeToAccept(s: String): String = split(s) mkString ","
+  def mediatypeToAccept(s: String): String = s.splitTo() mkString ","
 
   // Append metadata and MAC to the URl
   // The idea is that whenever the upload control stores a local file: URL, that URL contains a MAC (message

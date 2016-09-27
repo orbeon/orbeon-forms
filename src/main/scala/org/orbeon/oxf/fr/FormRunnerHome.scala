@@ -27,7 +27,7 @@ import scala.util.Try
 trait FormRunnerHome {
 
   private def appForm(s: String) = {
-    val parts = split[List](s, "/")
+    val parts = s.splitTo[List]("/")
     parts(0) → parts(1)
   }
 
@@ -79,7 +79,7 @@ trait FormRunnerHome {
 
   private def formsForSelection(selection: String, forms: SequenceIterator) = {
 
-    val appFormsSet = split[List](selection) map appForm toSet
+    val appFormsSet = selection.splitTo[List]() map appForm toSet
 
     def formIsSelected(form: NodeInfo) =
       appFormsSet((form elemValue "application-name") → (form elemValue "form-name"))

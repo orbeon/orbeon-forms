@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.StringUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
+
 
 /**
  * xxf:invalid-binds()
@@ -27,13 +28,13 @@ class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunct
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     // First item or context node if any
-    val item = argument.lift(0) map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
+    val item = argument.headOption map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
 
     item match {
       case Some(nodeInfo: NodeInfo) ⇒
         Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
           case Some(invalidBindIdsString) ⇒
-            asIterator(StringUtils.split[Array](invalidBindIdsString))
+            asIterator(invalidBindIdsString.splitTo[Array]())
           case None ⇒
             // No invalid bind ids
             EmptyIterator.getInstance

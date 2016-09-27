@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
-import org.orbeon.oxf.util.StringUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
@@ -40,7 +40,7 @@ trait FormDefinition {
     val migrationPaths =
       metadataInstanceRoot(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
       DataMigration.decodeMigrationsFromJSON map { case (path, iterationName) ⇒
-        StringUtils.split[List](path, "/")
+        path.splitTo[List]("/")
       }
 
     indexedControlElements map { control ⇒

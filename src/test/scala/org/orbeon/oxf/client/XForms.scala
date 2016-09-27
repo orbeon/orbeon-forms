@@ -24,7 +24,7 @@ import scala.util.Try
 
 trait XForms extends AssertionsForJUnit with FormRunnerOps {
 
-  def isInvalid(el: WebElement): Boolean = split[Set](el.getAttribute("class")).contains("xforms-invalid")
+  def isInvalid(el: WebElement): Boolean = el.getAttribute("class").splitTo[Set]().contains("xforms-invalid")
   def inErrorSummary(id: String): Boolean = Try(webDriver.findElement(By.linkText(id))).isSuccess
 
   // Load the page, and clears the regular input. At that point, it won't yet be marked as invalid.

@@ -38,7 +38,7 @@ class XFormsSetfocusAction extends XFormsAction {
       resolveBooleanAVT("input-only", default = false)(context) option Set(XFORMS_INPUT_QNAME)
 
     def extractQNames(s: String) =
-      split[Set](s) map (Dom4jUtils.extractTextValueQName(context.element, _, true))
+      s.splitTo[Set]() map (Dom4jUtils.extractTextValueQName(context.element, _, true))
 
     val includesQNamesOpt = resolveStringAVT("includes")(context) map extractQNames orElse fromInputOnlyAttribute getOrElse Set.empty
     val excludesQNamesOpt = resolveStringAVT("excludes")(context) map extractQNames getOrElse Set.empty

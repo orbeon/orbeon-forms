@@ -170,10 +170,10 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     )
 
     for ((in, out) ← expected) {
-      assert(out === split[List](in))
-      assert(out === split[Array](in).to[List])
-      assert(out.to[Set] === split[Set](in))
-      assert(out.to[mutable.LinkedHashSet].to[List] === split[mutable.LinkedHashSet](in).to[List])
+      assert(out === in.splitTo[List]())
+      assert(out === in.splitTo[Array]().to[List])
+      assert(out.to[Set] === in.splitTo[Set]())
+      assert(out.to[mutable.LinkedHashSet].to[List] === in.splitTo[mutable.LinkedHashSet]().to[List])
     }
   }
 

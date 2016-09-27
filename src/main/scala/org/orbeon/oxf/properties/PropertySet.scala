@@ -73,7 +73,7 @@ class PropertySet {
 
     // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
     var currentNode = wildcardProperties
-    for (currentToken ← split[List](name, ".")) {
+    for (currentToken ← name.splitTo[List](".")) {
       if (currentNode.children eq null)
         currentNode.children = mutable.LinkedHashMap[String, PropertyNode]()
 
@@ -138,7 +138,7 @@ class PropertySet {
       }
     }
 
-    processNode(wildcardProperties, "", split[List](name, "."), 0)
+    processNode(wildcardProperties, "", name.splitTo[List]("."), 0)
 
     result.toList
   }
@@ -182,11 +182,13 @@ class PropertySet {
 
     def getExact = exactProperties.get(name)
 
-    def getWildcard = Option(getPropertyWorker(wildcardProperties, split[List](name, "."), 0))
+    def getWildcard = Option(getPropertyWorker(wildcardProperties, name.splitTo[List]("."), 0))
 
     def checkType(p: Property) =
       if ((typ ne null) && typ != p.typ)
-        throw new OXFException("Invalid attribute type requested for property '" + name + "': expected " + typ.getQualifiedName + ", found " + p.typ.getQualifiedName)
+        throw new OXFException(
+          s"Invalid attribute type requested for property `$name`: expected `${typ.getQualifiedName}`, found `${p.typ.getQualifiedName}`"
+        )
       else
         p
 

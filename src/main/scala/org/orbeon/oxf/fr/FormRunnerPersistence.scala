@@ -71,7 +71,7 @@ trait FormRunnerPersistence {
 
   // Whether the given path is an attachment path (ignoring an optional query string)
   def isAttachmentURLFor(basePath: String, url: String) =
-    url.startsWith(basePath) && (split[List](splitQuery(url)._1, ".").lastOption exists RecognizedAttachmentExtensions)
+    url.startsWith(basePath) && (splitQuery(url)._1.splitTo[List](".").lastOption exists RecognizedAttachmentExtensions)
 
   // For a given attachment path, return the filename
   def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last
@@ -114,13 +114,13 @@ trait FormRunnerPersistence {
   def getPersistenceURLHeadersFromProvider(provider: String) = {
 
     val propertyPrefix = PersistencePropertyPrefix :: provider :: Nil mkString "."
-    val propertyPrefixTokenCount = split[List](propertyPrefix, ".").size
+    val propertyPrefixTokenCount = propertyPrefix.splitTo[List](".").size
 
     // Build headers map
     val headers = (
       for {
         propertyName ← properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
-        lowerSuffix  ← split[List](propertyName, ".").drop(propertyPrefixTokenCount).headOption
+        lowerSuffix  ← propertyName.splitTo[List](".").drop(propertyPrefixTokenCount).headOption
         if ! StandardProviderProperties(lowerSuffix)
         headerName  = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
         headerValue = properties.getObject(propertyName).toString

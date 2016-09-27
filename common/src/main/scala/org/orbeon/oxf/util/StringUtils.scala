@@ -20,75 +20,12 @@ import scala.collection.generic.CanBuildFrom
 object StringUtils {
 
   // Convert a string of tokens to a set
-  def stringToSet(s: String)               = split[Set](s)
+  // TODO: Move to StringOps.
+  def stringToSet(s: String)               = s.splitTo[Set]()
   def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
 
-  /*
-   * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).
-   *
-   * This implementation can return any collection type for which there is a builder:
-   *
-   * split[List]("a b")
-   * split[Array]("a b")
-   * split[Set]("a b")
-   * split[LinkedHashSet]("a b")
-   * split("a b")
-   *
-   * Or:
-   *
-   * val result: List[String]          = split("a b")(breakOut)
-   * val result: Array[String]         = split("a b")(breakOut)
-   * val result: Set[String]           = split("a b")(breakOut)
-   * val result: LinkedHashSet[String] = split("a b")(breakOut)
-   */
-  def split[T[_]](str: String, sep: String = null, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
-
-    val builder = cbf()
-
-    if (str ne null) {
-      val len = str.length
-      if (len != 0) {
-        var sizePlus1 = 1
-        var i = 0
-        var start = 0
-        var doMatch = false
-
-        val test: Char ⇒ Boolean =
-          if (sep eq null)
-            Character.isWhitespace
-          else if (sep.length == 1) {
-            val sepChar = sep.charAt(0)
-            sepChar ==
-          } else
-            sep.indexOf(_) >= 0
-
-        while (i < len) {
-          if (test(str.charAt(i))) {
-            if (doMatch) {
-              if (sizePlus1 == max)
-                i = len
-
-              sizePlus1 += 1
-
-              builder += str.substring(start, i)
-              doMatch = false
-            }
-            i += 1
-            start = i
-          } else {
-            doMatch = true
-            i += 1
-          }
-        }
-
-        if (doMatch)
-          builder += str.substring(start, i)
-      }
-    }
-    builder.result()
-  }
-
   //@XPathFunction
+  // TODO: Move to StringOps.
   def truncateWithEllipsis(s: String, maxLength: Int, tolerance: Int): String =
     if (s.length <= maxLength + tolerance) {
       s
@@ -107,6 +44,71 @@ object StringUtils {
   def trimAllToOpt(s: String)   = s.trimAllToOpt
 
   implicit class StringOps(val s: String) extends AnyVal {
+
+    /*
+     * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).
+     *
+     * This implementation can return any collection type for which there is a builder:
+     *
+     * split[List]("a b")
+     * split[Array]("a b")
+     * split[Set]("a b")
+     * split[LinkedHashSet]("a b")
+     * split("a b")
+     *
+     * Or:
+     *
+     * val result: List[String]          = split("a b")(breakOut)
+     * val result: Array[String]         = split("a b")(breakOut)
+     * val result: Set[String]           = split("a b")(breakOut)
+     * val result: LinkedHashSet[String] = split("a b")(breakOut)
+     */
+    def splitTo[T[_]](sep: String = null, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
+
+      val builder = cbf()
+
+      if (s ne null) {
+        val len = s.length
+        if (len != 0) {
+          var sizePlus1 = 1
+          var i = 0
+          var start = 0
+          var doMatch = false
+
+          val test: Char ⇒ Boolean =
+            if (sep eq null)
+              Character.isWhitespace
+            else if (sep.length == 1) {
+              val sepChar = sep.charAt(0)
+              sepChar ==
+            } else
+              sep.indexOf(_) >= 0
+
+          while (i < len) {
+            if (test(s.charAt(i))) {
+              if (doMatch) {
+                if (sizePlus1 == max)
+                  i = len
+
+                sizePlus1 += 1
+
+                builder += s.substring(start, i)
+                doMatch = false
+              }
+              i += 1
+              start = i
+            } else {
+              doMatch = true
+              i += 1
+            }
+          }
+
+          if (doMatch)
+            builder += s.substring(start, i)
+        }
+      }
+      builder.result()
+    }
 
     private def isNonBreakingSpace(c: Int) =
       c == '\u00A0' || c == '\u2007' || c == '\u202F'

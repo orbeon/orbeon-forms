@@ -131,7 +131,7 @@ private object PropertyStore {
   }
 
   def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
-    val tokens = split[Set](value)
+    val tokens = value.splitTo[Set]()
     for (token ← tokens) {
       if (! Name10Checker.getInstance.isValidNmtoken(token))
         throw new ValidationException(s"Not an NMTOKENS: $value" , null)

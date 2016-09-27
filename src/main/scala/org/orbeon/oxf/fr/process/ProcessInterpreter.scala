@@ -278,7 +278,7 @@ trait ProcessInterpreter extends Logging {
     val serialized = readSuspendedProcess
 
     // TODO: Restore processId
-    val processId :: continuation = split[List](serialized, "|")
+    val processId :: continuation = serialized.splitTo[List]("|")
 
     writeSuspendedProcess("")
     runSubProcess(continuation mkString "|")

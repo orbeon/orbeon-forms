@@ -18,7 +18,7 @@ import java.{util ⇒ ju}
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{StringUtils, XPathCache}
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -164,7 +164,7 @@ object XBLTransformer {
 
             val xblAttrString = xblAttr.getValue
 
-            for (currentValue ← StringUtils.split[Iterator](xblAttrString)) {
+            for (currentValue ← xblAttrString.splitTo[Iterator]()) {
 
               val equalIndex = currentValue.indexOf('=')
               if (equalIndex == -1) {

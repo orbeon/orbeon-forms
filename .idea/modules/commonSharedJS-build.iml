@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="core-build" external.linked.project.path="$MODULE_DIR$/../../src/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="$149b22bf8618f6487f09.common, $149b22bf8618f6487f09.commonSharedJS, $149b22bf8618f6487f09.commonSharedJVM, $149b22bf8618f6487f09.copyJarToExplodedWar, $149b22bf8618f6487f09.core, $149b22bf8618f6487f09.dom, $149b22bf8618f6487f09.fastOptJSToExplodedWar, $149b22bf8618f6487f09.formBuilder, $149b22bf8618f6487f09.formBuilderClient, $149b22bf8618f6487f09.formBuilderSharedJS, $149b22bf8618f6487f09.formBuilderSharedJVM, $149b22bf8618f6487f09.formRunner, $149b22bf8618f6487f09.fullOptJSToExplodedWar, $149b22bf8618f6487f09.orbeonEditionFromProperties, $149b22bf8618f6487f09.orbeonVersionFromProperties, $149b22bf8618f6487f09.root, $149b22bf8618f6487f09.xupdate, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="commonSharedJS-build" external.linked.project.path="$MODULE_DIR$/../../common-shared/.js/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="$149b22bf8618f6487f09.common, $149b22bf8618f6487f09.commonSharedJS, $149b22bf8618f6487f09.commonSharedJVM, $149b22bf8618f6487f09.copyJarToExplodedWar, $149b22bf8618f6487f09.core, $149b22bf8618f6487f09.dom, $149b22bf8618f6487f09.fastOptJSToExplodedWar, $149b22bf8618f6487f09.formBuilder, $149b22bf8618f6487f09.formBuilderClient, $149b22bf8618f6487f09.formBuilderSharedJS, $149b22bf8618f6487f09.formBuilderSharedJVM, $149b22bf8618f6487f09.formRunner, $149b22bf8618f6487f09.fullOptJSToExplodedWar, $149b22bf8618f6487f09.orbeonEditionFromProperties, $149b22bf8618f6487f09.orbeonVersionFromProperties, $149b22bf8618f6487f09.root, $149b22bf8618f6487f09.xupdate, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../src/project/target/idea-classes" />
-    <output-test url="file://$MODULE_DIR$/../../src/project/target/idea-test-classes" />
+    <output url="file://$MODULE_DIR$/../../common-shared/.js/project/target/idea-classes" />
+    <output-test url="file://$MODULE_DIR$/../../common-shared/.js/project/target/idea-test-classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../src/project">
-      <sourceFolder url="file://$MODULE_DIR$/../../src/project" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/../../src/project/project/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../src/project/target" />
+    <content url="file://$MODULE_DIR$/../../common-shared/.js/project">
+      <sourceFolder url="file://$MODULE_DIR$/../../common-shared/.js/project" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../common-shared/.js/project/project/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../common-shared/.js/project/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -10,7 +10,7 @@
     <option name="uncheckedWarnings" value="true" />
     <option name="incrementalityType" value="SBT" />
     <profile name="SBT 1" modules="root" />
-    <profile name="SBT 3" modules="formBuilderClient,formBuilderSharedJS">
+    <profile name="SBT 3" modules="clientServerSharedJS,common,commonSharedJS,formBuilderClient,formBuilderSharedJS">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />
@@ -25,7 +25,7 @@
         <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.9.jar" />
       </plugins>
     </profile>
-    <profile name="SBT 5" modules="common,dom,formBuilder,formBuilderSharedJVM,formRunner,core,xupdate">
+    <profile name="SBT 5" modules="clientServerSharedJVM,commonSharedJVM,dom,formBuilder,formBuilderSharedJVM,formRunner,core,xupdate">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />

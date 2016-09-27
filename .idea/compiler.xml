@@ -29,7 +29,11 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.6">
+      <module name="clientServerSharedJS" target="1.6" />
+      <module name="clientServerSharedJVM" target="1.6" />
       <module name="common" target="1.6" />
+      <module name="commonSharedJS" target="1.6" />
+      <module name="commonSharedJVM" target="1.6" />
       <module name="core" target="1.6" />
       <module name="dom" target="1.6" />
       <module name="formBuilder" target="1.6" />

@@ -21,7 +21,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.Multipart._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._

@@ -28,6 +28,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLUtils

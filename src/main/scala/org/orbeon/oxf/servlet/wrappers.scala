@@ -13,15 +13,17 @@
  */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.ScalaUtils._
-import javax.servlet.ServletInputStream
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletRequestWrapper
 import java.io._
-import java.util.{Map ⇒ JMap, Enumeration ⇒ JEnumeration}
-import collection.JavaConverters._
+import java.util.{Enumeration ⇒ JEnumeration, Map ⇒ JMap}
+import javax.servlet.ServletInputStream
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
+
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.ScalaUtils._
+
+import scala.collection.JavaConverters._
 
 // Request wrapper for forwarding a request which simulates a server-side redirect.
 class ForwardServletRequestWrapper(

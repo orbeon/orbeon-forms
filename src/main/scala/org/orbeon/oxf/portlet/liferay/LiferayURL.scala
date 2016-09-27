@@ -17,8 +17,8 @@ import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.PathUtils._
 
 // Liferay-specific portlet support
 object LiferayURL {

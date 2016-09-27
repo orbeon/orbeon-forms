@@ -23,7 +23,7 @@ import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.PathUtils._
 
 import scala.collection.JavaConverters._
 

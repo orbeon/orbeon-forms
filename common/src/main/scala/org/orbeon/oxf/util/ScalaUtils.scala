@@ -26,7 +26,7 @@ import scala.util.{Failure, Success, Try}
 // For Java callers only
 abstract class Function1Adapter[-T1, +R] extends (T1 ⇒ R)
 
-object ScalaUtils extends PathOps {
+object ScalaUtils {
 
   // Combine the second values of each tuple that have the same name
   // The caller can specify the type of the resulting values, e.g.:

@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash ⇒ _, _}
 import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.StringReplacer._
 import org.orbeon.oxf.util.StringUtils._
@@ -24,6 +25,7 @@ import org.orbeon.scaxon.XML._
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.Try
+
 trait FormRunnerHome {
 
   private def appForm(s: String) = {

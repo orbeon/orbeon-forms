@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-
-import XFormsUploadControl._
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.PathOps
+import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
+import org.scalatest.junit.AssertionsForJUnit
 
-class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsForJUnit with PathOps {
+class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsForJUnit {
   @Test def hmac(): Unit = {
 
     val parameters = List(

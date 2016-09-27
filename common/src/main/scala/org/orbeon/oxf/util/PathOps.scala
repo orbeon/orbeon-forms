@@ -78,4 +78,4 @@ trait PathOps {
     }
 }
 
-object PathOps extends PathOps
+object PathUtils extends PathOps

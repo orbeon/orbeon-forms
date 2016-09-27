@@ -27,7 +27,7 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.NetUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xml.XMLUtils
 import org.slf4j.LoggerFactory
 

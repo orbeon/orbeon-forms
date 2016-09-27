@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.PathUtils._
 
 private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {
   // NOTE: Never match anything if there is no context path

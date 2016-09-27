@@ -31,7 +31,7 @@ class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsFor
 
     def hmacFromList(p: List[String]) =
       hmacURL(p(0), Some(p(1)), Some(p(2)), Some(p(3)))
-    
+
     val signed = hmacFromList(parameters)
 
     // Basic asserts
@@ -48,7 +48,7 @@ class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsFor
       assert(Some(expected) === getFirstQueryParameter(signed, name))
 
     // Modify each parameter in turn and make sure the MAC is different
-    for (pos ← 0 to parameters.size - 1) {
+    for (pos ← parameters.indices) {
       val newParameters = parameters.updated(pos, parameters(pos) + 'x')
       assert(getMAC(signed) != getMAC(hmacFromList(newParameters)))
     }

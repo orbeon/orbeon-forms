@@ -1280,6 +1280,13 @@
                             var mustInitialize   = ORBEON.util.Dom.getAttribute(elem, "init") == "true";
 
                             var documentElement = ORBEON.util.Dom.get(controlId);
+
+                            // Done to fix #2935; can be removed when we have taken care of #2940
+                            if (documentElement == null &&
+                                (controlId      == "fb-static-upload-empty" ||
+                                 controlId      == "fb-static-upload-non-empty"))
+                                return;
+
                             if (documentElement == null) {
                                 documentElement = ORBEON.util.Dom.get("group-begin-" + controlId);
                                 if (documentElement == null) ORBEON.util.Utils.logMessage ("Can't find element or iteration with ID '" + controlId + "'");

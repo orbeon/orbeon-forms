@@ -17,7 +17,7 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.event.XFormsEvent

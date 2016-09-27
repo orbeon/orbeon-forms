@@ -16,13 +16,13 @@ package org.orbeon.oxf.common
 import java.security.SignatureException
 
 import junit.framework.Assert._
-import org.orbeon.dom.Document
 import org.junit.Test
+import org.orbeon.dom.Document
 import org.orbeon.oxf.common.PEVersion._
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.DateUtils
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.scalatest.junit.AssertionsForJUnit
 

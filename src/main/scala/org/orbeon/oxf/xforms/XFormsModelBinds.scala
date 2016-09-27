@@ -20,7 +20,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}

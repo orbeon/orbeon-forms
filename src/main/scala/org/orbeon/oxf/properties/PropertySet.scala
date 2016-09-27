@@ -19,7 +19,7 @@ import java.{lang ⇒ jl, util ⇒ ju}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -94,7 +94,7 @@ class PropertySet {
     val tuples =
       for {
         key   ← exactProperties.keys
-        value ← ScalaUtils.collectByErasedType[java.lang.Boolean](getObject(key))
+        value ← CollectionUtils.collectByErasedType[java.lang.Boolean](getObject(key))
       } yield
         key → value
 

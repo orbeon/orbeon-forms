@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.generator
 import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.{DateUtils, ScalaUtils}
+import org.orbeon.oxf.util.{DateUtils, CollectionUtils}
 import org.orbeon.oxf.xml.Dom4j
 
 import scala.collection.JavaConverters._
@@ -34,7 +34,7 @@ object URLGeneratorBase {
       } yield
         headerName → headerValue
 
-    ScalaUtils.combineValues[String, String, Array](headerPairs).toMap
+    CollectionUtils.combineValues[String, String, Array](headerPairs).toMap
   }
 
   def setIfModifiedIfNeeded(

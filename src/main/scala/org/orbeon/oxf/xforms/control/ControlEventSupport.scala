@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator

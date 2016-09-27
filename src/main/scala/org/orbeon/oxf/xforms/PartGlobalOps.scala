@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms
 import java.util.{Collection ⇒ JCollection}
 
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}

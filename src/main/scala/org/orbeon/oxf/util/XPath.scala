@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils._
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, ShareableXPathStaticContext, XMLParsing}
 import org.orbeon.saxon.Configuration

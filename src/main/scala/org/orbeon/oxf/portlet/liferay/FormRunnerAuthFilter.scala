@@ -18,7 +18,7 @@ import javax.portlet.filter._
 
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.CollectionUtils
 
 import scala.collection.JavaConverters._
 
@@ -100,7 +100,7 @@ object FormRunnerAuthFilter {
   def wrapWithLiferayUserHeaders[T <: PortletRequest](req: T, user: LiferayUser): T = {
 
     val liferayUserHeaders =
-      ScalaUtils.combineValues[String, String, Array](user.userHeaders) map
+      CollectionUtils.combineValues[String, String, Array](user.userHeaders) map
         { case (name, value) ⇒ name.toLowerCase → value } toMap
 
     wrap(req, LiferaySupport.AllHeaderNamesLower, liferayUserHeaders)

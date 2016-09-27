@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
 private[persistence] object Connect {

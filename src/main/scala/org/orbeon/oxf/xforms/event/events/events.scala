@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import XFormsEvent._
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.xforms.control.controls.{XFormsUploadControl, FileMetadata}
 import org.orbeon.oxf.util.Multipart.{SizeReason, Interrupted, UploadProgress}
 
@@ -155,7 +155,7 @@ class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 object XXFormsUploadErrorEvent {
   // Attempt to retrieve a reason if any
   def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] = (
-    ScalaUtils.collectByErasedType[XFormsUploadControl](target).to[List]
+    CollectionUtils.collectByErasedType[XFormsUploadControl](target).to[List]
     flatMap FileMetadata.progress
     flatMap {
       case UploadProgress(_, _, _, Interrupted(Some(SizeReason(permitted, actual)))) ⇒

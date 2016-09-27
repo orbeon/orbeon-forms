@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 
 import scala.util.control.NonFatal
 

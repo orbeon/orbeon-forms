@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.embedding
 import java.io.{OutputStream, Writer}
 
 import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
-import org.orbeon.oxf.util.ScalaUtils.combineValues
+import org.orbeon.oxf.util.CollectionUtils.combineValues
 
 import scala.collection.immutable
 

@@ -13,20 +13,14 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{TraversableLike, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
-import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
 
-// For Java callers only
-abstract class Function1Adapter[-T1, +R] extends (T1 ⇒ R)
-
-object ScalaUtils {
+object CollectionUtils {
 
   // Combine the second values of each tuple that have the same name
   // The caller can specify the type of the resulting values, e.g.:
@@ -114,42 +108,6 @@ object ScalaUtils {
       }
       result.to[List]
     }
-  }
-
-  private class OnFailurePF[U](f: PartialFunction[Throwable, Any]) extends PartialFunction[Throwable, Try[U]] {
-    def isDefinedAt(x: Throwable) = f.isDefinedAt(x)
-    def apply(v1: Throwable) = {
-      f.apply(v1)
-      Failure(v1)
-    }
-  }
-
-  private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = {
-    case NonFatal(t) ⇒ Failure(Exceptions.getRootThrowable(t))
-  }
-
-  // Operations on Try
-  implicit class TryOps[U](val t: Try[U]) extends AnyVal {
-
-    def onFailure(f: PartialFunction[Throwable, Any]) =
-      t recoverWith new OnFailurePF(f)
-
-    def rootFailure: Try[U] = {
-      if (t.isFailure)
-        t recoverWith RootThrowablePF
-      else
-        t
-    }
-
-    def doEitherWay(f: ⇒ Any): Try[U] =
-      try t match {
-        case result @ Success(_) ⇒ f; result
-        case result @ Failure(_) ⇒ f; result
-      } catch {
-        case NonFatal(e) ⇒ Failure(e)
-      }
-
-    def iterator: Iterator[U] = t.toOption.iterator
   }
 
   implicit class anyToCollectable[A](val a: A) extends AnyVal {

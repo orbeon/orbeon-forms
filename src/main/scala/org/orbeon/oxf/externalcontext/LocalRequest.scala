@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util._
 
 import scala.collection.JavaConverters._

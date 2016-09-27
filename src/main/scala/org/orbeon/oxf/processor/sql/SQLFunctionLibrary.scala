@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.sql
 
 import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.{ScalaUtils, XPath}
+import org.orbeon.oxf.util.{CollectionUtils, XPath}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
@@ -35,7 +35,7 @@ object SQLFunctionLibrary extends OrbeonFunctionLibrary {
   abstract class Function2Base[V1, V2, R] extends Function2[V1, V2, R]
 
   private def functionContextOpt =
-    XPath.functionContext flatMap ScalaUtils.collectByErasedType[SQLFunctionContext]
+    XPath.functionContext flatMap CollectionUtils.collectByErasedType[SQLFunctionContext]
 
   Namespace(SQLProcessor.SQL_NAMESPACE_URI) {
     Fun("current",    classOf[CurrentFunction],  op = 0, min = 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE)

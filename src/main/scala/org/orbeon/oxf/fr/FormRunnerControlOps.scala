@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._

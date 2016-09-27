@@ -37,7 +37,7 @@ import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 
 
 class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {

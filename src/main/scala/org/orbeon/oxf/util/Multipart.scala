@@ -27,7 +27,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 
 import scala.collection.JavaConverters._

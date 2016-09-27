@@ -17,7 +17,7 @@ import org.junit.Test
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{XMLSupport, DocumentTestBase}
-import org.orbeon.oxf.util.{ScalaUtils, XPath}
+import org.orbeon.oxf.util.{CollectionUtils, XPath}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.scalatest.junit.AssertionsForJUnit

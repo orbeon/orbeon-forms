@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl, XFormsEvents}

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._

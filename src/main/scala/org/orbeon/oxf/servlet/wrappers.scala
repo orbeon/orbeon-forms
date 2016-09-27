@@ -21,7 +21,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 
 import scala.collection.JavaConverters._
 

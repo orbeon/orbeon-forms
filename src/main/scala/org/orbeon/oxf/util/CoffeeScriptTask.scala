@@ -19,7 +19,7 @@ import java.nio.charset.Charset
 import org.apache.tools.ant.BuildException
 import org.apache.tools.ant.taskdefs.MatchingTask
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler
 
 import scala.beans.BeanProperty

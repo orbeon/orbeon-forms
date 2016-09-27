@@ -15,7 +15,7 @@ package org.orbeon.oxf.util
 
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace._
 import org.xml.sax.Attributes
 

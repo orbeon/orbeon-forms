@@ -17,7 +17,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.{By, Keys, WebElement}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.junit.AssertionsForJUnit
 
 import scala.util.Try

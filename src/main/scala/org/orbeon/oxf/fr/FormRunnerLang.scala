@@ -14,16 +14,18 @@
 package org.orbeon.oxf.fr
 
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.NetUtils
-import org.orbeon.saxon.instruct.NumberInstruction
-import org.orbeon.saxon.number.Numberer
-import org.orbeon.saxon.om.{NodeInfo, Item}
-import collection.JavaConverters._
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
-import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.saxon.instruct.NumberInstruction
+import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
 
 // NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {

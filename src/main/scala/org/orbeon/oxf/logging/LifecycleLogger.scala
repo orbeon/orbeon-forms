@@ -15,13 +15,13 @@ package org.orbeon.oxf.logging
 
 import java.util
 import java.util.concurrent.atomic.AtomicInteger
-import javax.servlet.http.{HttpSession, HttpServletRequest}
+import javax.servlet.http.{HttpServletRequest, HttpSession}
 
 import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session.SessionListener
-import org.orbeon.oxf.pipeline.api.ExternalContext.{Session, Request}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.pipeline.api.ExternalContext.{Request, Session}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{JSON, NetUtils}
 import org.slf4j.LoggerFactory
 

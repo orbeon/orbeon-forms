@@ -19,20 +19,21 @@ import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.fop.util.bitmap.JAIMonochromeBitmapConverter
-import org.orbeon.dom.{Element ⇒ DOM4JElement}
-import org.icepdf.core.pobjects.{Document ⇒ ICEDocument, Page}
+import org.icepdf.core.pobjects.{Page, Document ⇒ ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
+import org.orbeon.dom.{Element ⇒ DOM4JElement}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.XMLReceiver
 
 import scala.collection.JavaConverters._
-
 // This processor converts a PDF, provided as a binary document on its `data` input, into an image (possibly a
 // multi-page TIFF image) on its `data` output. It is configurable via its `config` input.
 //

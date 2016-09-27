@@ -17,10 +17,9 @@ import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.{NetUtils, StringUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
@@ -56,7 +55,7 @@ trait FormRunnerPermissions {
             .filter(_.child("user-role").forall(
               // User must have at least one of the roles in any-of="…"
               _.attValue("any-of")
-                .pipe(ScalaUtils.split[List](_))
+                .pipe(StringUtils.split[List](_))
                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space
                 .map(_.replace("%20", " "))
                 .intersect(orbeonRoles.toSeq)

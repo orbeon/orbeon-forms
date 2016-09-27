@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom._
 import org.junit.Test
+import org.orbeon.dom._
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.Dom4j.elemToDocument

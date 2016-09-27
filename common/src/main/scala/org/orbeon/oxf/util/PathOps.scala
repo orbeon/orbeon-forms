@@ -77,3 +77,5 @@ trait PathOps {
       case index ⇒ Some(path.substring(index + 1))
     }
 }
+
+object PathOps extends PathOps

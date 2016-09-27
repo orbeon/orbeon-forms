@@ -15,17 +15,18 @@ package org.orbeon.oxf.test
 
 import org.orbeon.dom.{Document ⇒ JDocument, Element ⇒ JElement}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.{XPath, ScalaUtils}
-import org.orbeon.oxf.xml.{TransformerUtils, Dom4j}
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 import org.scalatest.junit.AssertionsForJUnit
 
 trait XMLSupport extends AssertionsForJUnit {
 
   def readURLAsImmutableXMLDocument(url: String) =
-    ScalaUtils.useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
+    useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
     }
 

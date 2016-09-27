@@ -26,7 +26,7 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
@@ -50,7 +50,7 @@ public class URLSerializer extends ProcessorImpl {
                 public URL read(PipelineContext context, ProcessorInput input) {
                     final Document configDocument = readInputAsDOM4J(context, input);
                     final String urlString = XPathUtils.selectStringValueNormalize(configDocument, "/config/url");
-                    return URLFactory.createURL(ScalaUtils.trimAllToEmpty(urlString));
+                    return URLFactory.createURL(StringUtils.trimAllToEmpty(urlString));
                 }
             });
             serialize(pipelineContext, url);

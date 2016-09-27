@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.sql.interpreters.*;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -138,7 +138,7 @@ public class SQLProcessor extends ProcessorImpl {
                         private boolean endTextSequence(Element element, Text previousText) {
                             if (previousText != null) {
                                 String value = previousText.getText();
-                                if (value == null || ScalaUtils.trimAllToEmpty(value).equals("")) {
+                                if (value == null || StringUtils.trimAllToEmpty(value).equals("")) {
                                     element.remove(previousText);
                                     return true;
                                 }
@@ -591,7 +591,7 @@ public class SQLProcessor extends ProcessorImpl {
             if (currentHandler == null) {
                 // Output only if the string is non-blank [FIXME: Incorrect white space handling!]
 //                String s = new String(chars, start, length);
-//                if (!ScalaUtils.trimAllToEmpty(s).equals(""))
+//                if (!StringUtils.trimAllToEmpty(s).equals(""))
                 super.characters(chars, start, length);
             } else {
                 super.characters(chars, start, length);

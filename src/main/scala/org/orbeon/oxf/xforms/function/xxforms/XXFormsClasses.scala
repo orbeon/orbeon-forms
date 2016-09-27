@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.NodeInfo

@@ -14,18 +14,19 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.oxf.util._
-import ScalaUtils._
 import java.io._
 import java.util.regex.Matcher
+
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
+
 import scala.util.Try
 import scala.util.control.NonFatal
 

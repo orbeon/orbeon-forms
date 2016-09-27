@@ -214,7 +214,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
         if (!hiding) {
             // Output only if the string is non-blank [FIXME: Incorrect white space handling!]
 //                                String s = new String(chars, start, length);
-//                                if (!ScalaUtils.trimAllToEmpty(s).equals(""))
+//                                if (!StringUtils.trimAllToEmpty(s).equals(""))
             super.characters(chars, start, length);
         }
     }

@@ -19,6 +19,7 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http.{PUT, _}
 import org.orbeon.oxf.test.TestHttpClient
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils

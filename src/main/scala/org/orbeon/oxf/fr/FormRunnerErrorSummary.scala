@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._

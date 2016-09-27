@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
+import java.{util ⇒ ju}
 import javax.portlet._
 import javax.servlet.http.HttpServletRequest
 
 import com.liferay.portal.kernel.language.LanguageUtil
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.util.Try
-
-import java.{util ⇒ ju}
 
 trait LiferayUser {
   // Return Liferay user, group and role information as headers. There can be multiple role headers.

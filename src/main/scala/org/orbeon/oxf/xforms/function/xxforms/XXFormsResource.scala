@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.saxon.`type`.Type

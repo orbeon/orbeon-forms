@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML

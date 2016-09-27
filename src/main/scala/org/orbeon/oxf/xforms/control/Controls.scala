@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import controls._
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms._
-import analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.BindingContext
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.DynamicVariable
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.control.controls._
+import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+
+import scala.collection.JavaConverters._
 
 object Controls {
 

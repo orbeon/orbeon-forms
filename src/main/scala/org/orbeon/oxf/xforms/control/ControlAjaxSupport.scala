@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
@@ -144,7 +144,7 @@ trait ControlAjaxSupport {
 
 object ControlAjaxSupport {
 
-  private def tokenize(value: String) = ScalaUtils.split[mutable.LinkedHashSet](value)
+  private def tokenize(value: String) = StringUtils.split[mutable.LinkedHashSet](value)
 
   // Diff two sets of classes
   def diffClasses(class1: String, class2: String) =

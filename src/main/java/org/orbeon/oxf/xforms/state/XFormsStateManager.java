@@ -21,7 +21,7 @@ import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.webapp.SessionExpiredException;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -271,7 +271,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     public static String getRequestUUID(Document request) {
         final Element uuidElement = request.getRootElement().element(XFormsConstants.XXFORMS_UUID_QNAME);
         assert uuidElement != null;
-        return ScalaUtils.trimAllToNull(uuidElement.getTextTrim());
+        return StringUtils.trimAllToNull(uuidElement.getTextTrim());
     }
 
     /**
@@ -283,7 +283,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     public static long getRequestSequence(Document request) {
         final Element sequenceElement = request.getRootElement().element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
         assert sequenceElement != null;
-        final String text = ScalaUtils.trimAllToNull(sequenceElement.getTextTrim());
+        final String text = StringUtils.trimAllToNull(sequenceElement.getTextTrim());
         return (text != null) ? Long.parseLong(text) : -1; // allow for empty value for non-Ajax cases
     }
 
@@ -399,7 +399,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         final String encodedStaticState;
         {
             final Element staticStateElement = request.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
-            encodedStaticState = (staticStateElement != null) ? ScalaUtils.trimAllToNull(staticStateElement.getTextTrim()) : null;
+            encodedStaticState = (staticStateElement != null) ? StringUtils.trimAllToNull(staticStateElement.getTextTrim()) : null;
         }
 
         // Get dynamic state if any
@@ -407,7 +407,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         {
             final QName qName = isInitialState ? XFormsConstants.XXFORMS_INITIAL_DYNAMIC_STATE_QNAME : XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME;
             final Element dynamicStateElement = request.getRootElement().element(qName);
-            encodedDynamicState = (dynamicStateElement != null) ? ScalaUtils.trimAllToNull(dynamicStateElement.getTextTrim()) : null;
+            encodedDynamicState = (dynamicStateElement != null) ? StringUtils.trimAllToNull(dynamicStateElement.getTextTrim()) : null;
         }
 
         assert (encodedStaticState != null && encodedDynamicState != null) || (encodedStaticState == null && encodedDynamicState == null);

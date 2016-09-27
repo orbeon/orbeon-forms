@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fb.Names._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._

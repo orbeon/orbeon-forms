@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{JXQName, _}

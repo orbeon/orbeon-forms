@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -266,7 +266,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         final StringBuilder sb = new StringBuilder(archiveAttribute.length() * 2);
                         boolean first = true;
                         while (st.hasMoreTokens()) {
-                            final String currentArchive = ScalaUtils.trimAllToEmpty(st.nextToken());
+                            final String currentArchive = StringUtils.trimAllToEmpty(st.nextToken());
                             final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
                             if (!first) {
                                 sb.append(' ');
@@ -313,7 +313,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     final StringBuilder sb = new StringBuilder(archiveAttribute.length() * 2);
                     boolean first = true;
                     while (st.hasMoreTokens()) {
-                        final String currentArchive = ScalaUtils.trimAllToEmpty(st.nextToken());
+                        final String currentArchive = StringUtils.trimAllToEmpty(st.nextToken());
                         final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
                         if (!first) {
                             sb.append(' ');
@@ -350,13 +350,13 @@ abstract class AbstractRewrite extends ProcessorImpl {
     			ret = this;
     			final AttributesImpl newAtts = SAXUtils.getAttributesFromDefaultNamespace(atts);
 
-    			if ("archive".equals(ScalaUtils.trimAllToEmpty(nameAttribute)))
+    			if ("archive".equals(StringUtils.trimAllToEmpty(nameAttribute)))
     			{
     				final StringTokenizer st = new StringTokenizer(valueAttribute, ",");
     				final StringBuilder sb = new StringBuilder(valueAttribute.length() * 2);
     				boolean first = true;
     				while (st.hasMoreTokens()) {
-    					final String currentArchive = ScalaUtils.trimAllToEmpty(st.nextToken());
+    					final String currentArchive = StringUtils.trimAllToEmpty(st.nextToken());
     					final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
     					if (!first) {
     						sb.append(' ');

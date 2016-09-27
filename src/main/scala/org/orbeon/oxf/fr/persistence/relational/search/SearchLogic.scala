@@ -21,6 +21,8 @@ import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, _}
 import org.orbeon.oxf.fr.persistence.relational.search.part._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.SQLUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.scaxon.XML._
 

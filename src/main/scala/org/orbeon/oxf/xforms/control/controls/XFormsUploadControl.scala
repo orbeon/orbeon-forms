@@ -13,27 +13,29 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import java.io.File
+import java.net.{URI, URLEncoder}
+
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.Multipart._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{NetUtils, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.xml.sax.helpers.AttributesImpl
-import java.io.File
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events._
-import XFormsUploadControl._
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.util.{SecureUtils, NetUtils}
-import org.orbeon.oxf.util.Multipart._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import java.net.{URLEncoder, URI}
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.xml.sax.helpers.AttributesImpl
+
 import scala.util.control.NonFatal
 
 /**

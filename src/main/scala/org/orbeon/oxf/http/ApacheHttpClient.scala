@@ -35,7 +35,10 @@ import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+
 
 class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 

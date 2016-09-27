@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
-import org.orbeon.oxf.xforms.analysis.StaticStateContext
-import org.orbeon.oxf.xforms.analysis.{ChildrenLHHAAndActionsTrait, ChildrenBuilderTrait, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ChildrenLHHAAndActionsTrait, ElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.Scope

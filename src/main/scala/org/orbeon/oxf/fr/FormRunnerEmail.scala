@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.StringUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
@@ -84,7 +84,7 @@ trait FormRunnerEmail {
     classNames  : String
   ): Seq[NodeInfo] = {
 
-    val classNamesList = ScalaUtils.split[List](classNames)
+    val classNamesList = StringUtils.split[List](classNames)
 
     for {
       control        ← controls

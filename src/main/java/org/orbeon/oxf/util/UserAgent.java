@@ -45,7 +45,7 @@ public class UserAgent {
         final int msieIndex = userAgent.indexOf("msie");
 
         try {
-            final String versionString = ScalaUtils.trimAllToEmpty(userAgent.substring(msieIndex + 4, userAgent.indexOf(';', msieIndex + 5)));
+            final String versionString = StringUtils.trimAllToEmpty(userAgent.substring(msieIndex + 4, userAgent.indexOf(';', msieIndex + 5)));
 
             final int dotIndex = versionString.indexOf('.');
             if (dotIndex == -1)

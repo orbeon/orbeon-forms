@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.apache.commons.lang3.StringUtils._
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._

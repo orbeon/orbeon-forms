@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
 import org.orbeon.oxf.util.NetUtils.{getContentTypeCharset, getContentTypeMediaType}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Base64XMLReceiver, DateUtils, TextXMLReceiver}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter, XMLUtils}

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils._
@@ -30,7 +30,6 @@ import org.orbeon.scaxon.XML._
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-
 /*
  * Form Builder: operations on controls.
  */

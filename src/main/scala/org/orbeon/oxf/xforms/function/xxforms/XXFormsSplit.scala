@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 
@@ -21,7 +21,7 @@ class XXFormsSplit extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext) = {
     val separator = stringArgumentOpt(1)(xpathContext)
-    stringArgumentOrContextOpt(0)(xpathContext) map (ScalaUtils.split(_, separator.orNull))
+    stringArgumentOrContextOpt(0)(xpathContext) map (StringUtils.split(_, separator.orNull))
   }
 
   // Needed otherwise xpathContext.getContextItem doesn't return the correct value

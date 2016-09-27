@@ -14,19 +14,20 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.oxf.util.ScalaUtils._
-import collection.mutable.{Buffer, LinkedHashSet}
-import net.sf.ehcache.{Element ⇒ EhElement }
+import net.sf.ehcache.{Element ⇒ EhElement}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+
+import scala.collection.mutable.{Buffer, LinkedHashSet}
 
 /**
  * Aggregate CSS and JS resources under <head>.

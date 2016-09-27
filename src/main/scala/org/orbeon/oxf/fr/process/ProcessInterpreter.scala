@@ -17,10 +17,12 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, GroupNode, _}
 import org.orbeon.oxf.logging.LifecycleLogger
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.{util ⇒ u}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.{util ⇒ u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue

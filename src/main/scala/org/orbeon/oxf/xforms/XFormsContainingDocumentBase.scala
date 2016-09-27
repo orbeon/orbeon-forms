@@ -22,7 +22,8 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util._

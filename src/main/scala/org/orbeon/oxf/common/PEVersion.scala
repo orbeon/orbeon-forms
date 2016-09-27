@@ -24,8 +24,10 @@ import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, SignatureVerifierProcessor}
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundException}
 import org.orbeon.oxf.util.DateUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PathMapXPathDependencies}
 import org.orbeon.oxf.xml.XMLParsing

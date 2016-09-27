@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{LocalVariableReference, VariableReference}
 import org.slf4j.LoggerFactory

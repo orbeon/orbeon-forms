@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener

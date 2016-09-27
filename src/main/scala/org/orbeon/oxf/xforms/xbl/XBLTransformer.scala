@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.xbl
 
 import java.{util ⇒ ju}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{StringUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
@@ -142,7 +142,7 @@ object XBLTransformer {
             element.detach()
 
             resultingNodes = contentToInsert
-            if (StringUtils.isNotBlank(scopeAttribute)) {
+            if (scopeAttribute.nonBlank) {
               // If author specified scope attribute, use it
               setAttribute(resultingNodes, XXBL_SCOPE_QNAME, scopeAttribute, null)
             } else {
@@ -164,7 +164,7 @@ object XBLTransformer {
 
             val xblAttrString = xblAttr.getValue
 
-            for (currentValue ← ScalaUtils.split[Iterator](xblAttrString)) {
+            for (currentValue ← StringUtils.split[Iterator](xblAttrString)) {
 
               val equalIndex = currentValue.indexOf('=')
               if (equalIndex == -1) {

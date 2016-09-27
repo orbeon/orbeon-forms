@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.util.{NetUtils, Multipart}
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.{Multipart, NetUtils}
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
+import org.orbeon.oxf.xforms.control.controls.FileMetadata._
+import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
-import org.orbeon.oxf.xforms.control.XFormsControl.{ImmutableControlProperty, MutableControlProperty, ControlProperty}
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xforms.control.{XFormsValueControl, ControlAjaxSupport, XFormsControl}
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.control.controls.FileMetadata._
-import org.apache.commons.io.FileUtils
+
 import scala.util.control.NonFatal
 
 // This trait is used by controls that support nested file metadata such as "filename"
@@ -93,7 +93,7 @@ trait FileMetadata extends XFormsValueControl {
 
     // Depending on web browsers, the filename may contain a path or not (sending the path is fairly insecure and a
     // bad idea but some browsers do it. For consistency and security we just keep the filename.
-    val justFileName = split(filename, """\/""").lastOption getOrElse ""
+    val justFileName = StringUtils.split(filename, """\/""").lastOption getOrElse ""
     setInfoValue(filenameElement, justFileName)
   }
 

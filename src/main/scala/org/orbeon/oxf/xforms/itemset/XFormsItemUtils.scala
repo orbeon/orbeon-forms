@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3
 import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
+import org.orbeon.oxf.util.{StringUtils, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SelectionControlUtil}
@@ -45,15 +45,15 @@ object XFormsItemUtils {
     } else {
       if (isMultiple) {
         // Trim for select only
-        val trimmedControlValue = ScalaUtils.trimAllToEmpty(controlValue)
-        val trimmedItemValue    = ScalaUtils.trimAllToEmpty(itemValue)// TODO: maybe this should be trimmed in the itemset in the first place
+        val trimmedControlValue = StringUtils.trimAllToEmpty(controlValue)
+        val trimmedItemValue    = StringUtils.trimAllToEmpty(itemValue)// TODO: maybe this should be trimmed in the itemset in the first place
 
         if (trimmedControlValue == "") {
           // Special case of empty string: check the item that has empty string if any
           trimmedItemValue == ""
         } else {
           // Case of multiple tokens
-          ScalaUtils.split[scala.Iterator](trimmedControlValue) contains trimmedItemValue
+          StringUtils.split[scala.Iterator](trimmedControlValue) contains trimmedItemValue
         }
       } else {
         // Do exact string comparison for select1
@@ -112,7 +112,7 @@ object XFormsItemUtils {
                       label      = getLabelValue(elem.element(LABEL_QNAME), required = true).orNull,
                       help       = getLabelValue(elem.element(HELP_QNAME),  required = false),
                       hint       = getLabelValue(elem.element(HINT_QNAME),  required = false),
-                      value      = StringUtils.defaultString(getValueValueOrNull(elem.element(XFORMS_VALUE_QNAME)))
+                      value      = lang3.StringUtils.defaultString(getValueValueOrNull(elem.element(XFORMS_VALUE_QNAME)))
                     )
                   )
                   position += 1
@@ -260,9 +260,9 @@ object XFormsItemUtils {
               val label = XFormsUtils.getChildElementValue(container, elemEffectiveId, elemScope, labelElem, supportsHTML, defaultToHTML, containsHTML)
 
               if (required)
-                Some(LHHAValue(ScalaUtils.trimAllToEmpty(label), containsHTML(0)))
+                Some(LHHAValue(StringUtils.trimAllToEmpty(label), containsHTML(0)))
               else
-                ScalaUtils.trimAllToOpt(label) map (LHHAValue(_, containsHTML(0)))
+                StringUtils.trimAllToOpt(label) map (LHHAValue(_, containsHTML(0)))
             }
 
             private def getAttributes(elem: Element): List[(QName, String)] =

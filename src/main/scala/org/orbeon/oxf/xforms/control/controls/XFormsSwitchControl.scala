@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.{CaseControl, SwitchControl}
@@ -26,10 +26,9 @@ import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEven
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, XFormsContainingDocument, XFormsUtils}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om.Item
-import org.xml.sax.helpers.AttributesImpl
 
 /**
  * Represents an xf:switch container control.

@@ -16,9 +16,9 @@ package org.orbeon.oxf.fr.persistence.relational
 import java.sql.{Connection, ResultSet}
 import javax.xml.transform.stream.StreamSource
 
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.{StringUtils, XPath}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.DocumentInfo
 
 sealed trait Provider    extends Product with Serializable {

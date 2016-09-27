@@ -13,17 +13,20 @@
  */
 package org.orbeon.oxf.util
 
+import java.io._
+import java.nio.charset.Charset
+
 import org.apache.tools.ant.BuildException
 import org.apache.tools.ant.taskdefs.MatchingTask
-import java.nio.charset.Charset
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler
-import beans.BeanProperty
-import ScalaUtils._
-import java.io._
+
+import scala.beans.BeanProperty
 import scala.util.control.NonFatal
 
 class CoffeeScriptTask extends MatchingTask {
-  
+
   @BeanProperty var fromDir: File = _
   @BeanProperty var toDir: File = _
 

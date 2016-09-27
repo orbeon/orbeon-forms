@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.db
 import javax.naming.{Context, InitialContext, NameAlreadyBoundException}
 
 import org.apache.commons.dbcp.BasicDataSource
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.immutable
 

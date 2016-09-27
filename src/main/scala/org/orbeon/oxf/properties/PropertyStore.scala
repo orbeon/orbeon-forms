@@ -19,7 +19,8 @@ import java.{lang ⇒ jl, util ⇒ ju}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.{DateUtils, ScalaUtils, XPath}
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{DateUtils, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.Name10Checker
@@ -56,7 +57,7 @@ class PropertyStore(propertiesDocument: Document) {
         val value =
           Option(propertyElement.attributeValue("value")) match {
             case Some(valueFromAttribute) ⇒valueFromAttribute
-            case None                     ⇒ ScalaUtils.trimAllToEmpty(propertyElement.getText)
+            case None                     ⇒ trimAllToEmpty(propertyElement.getText)
           }
 
         Option(propertyElement.attributeValue("processor-name")) match {
@@ -130,7 +131,7 @@ private object PropertyStore {
   }
 
   def convertNMTOKENS(value: String, element: Element): ju.Set[String] = {
-    val tokens = ScalaUtils.split[Set](value)
+    val tokens = split[Set](value)
     for (token ← tokens) {
       if (! Name10Checker.getInstance.isValidNmtoken(token))
         throw new ValidationException(s"Not an NMTOKENS: $value" , null)

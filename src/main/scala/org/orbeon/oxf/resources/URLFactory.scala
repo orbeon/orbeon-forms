@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.resources
 
-import org.orbeon.oxf.resources.handler.{DataHandler, HTTPHandler, OXFHandler, SystemHandler}
 import java.net._
-import org.orbeon.oxf.util.ScalaUtils._
+
+import org.orbeon.oxf.resources.handler.{DataHandler, HTTPHandler, OXFHandler, SystemHandler}
 import org.orbeon.oxf.util.NetUtils.{getProtocol, removeQueryString}
+import org.orbeon.oxf.util.StringUtils._
 
 /**
  * This factory should be used (instead of new URL(...)) to create URL objects. It:

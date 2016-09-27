@@ -18,7 +18,7 @@ import org.orbeon.dom.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
@@ -71,7 +71,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         if (content == null)
             contentString = "";
         else
-            contentString = ScalaUtils.trimAllToEmpty(content.toString());
+            contentString = StringUtils.trimAllToEmpty(content.toString());
 
         // Output attribute
         final QName attributeQName = getQName(getDocumentLocator(), attributeName, getInterpreterContext().getPrefixesMap());

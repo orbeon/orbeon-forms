@@ -19,7 +19,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.webapp.HttpStatusCode
 import org.orbeon.oxf.xforms.action.XFormsAPI._

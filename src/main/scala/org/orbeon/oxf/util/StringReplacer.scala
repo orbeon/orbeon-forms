@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import spray.json._
 
 import scala.util.control.NonFatal

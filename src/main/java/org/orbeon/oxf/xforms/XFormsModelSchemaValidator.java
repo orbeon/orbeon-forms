@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Attribute;
 import org.orbeon.dom.Element;
@@ -48,7 +47,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
 import org.orbeon.oxf.xforms.schema.SchemaDependencies;
@@ -100,7 +99,7 @@ public class XFormsModelSchemaValidator {
         // Check for external schemas
         final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
         if (schemaAttribute != null)
-            this.schemaURIs = StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
+            this.schemaURIs = org.apache.commons.lang3.StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
@@ -506,7 +505,7 @@ public class XFormsModelSchemaValidator {
                 }
             case Acceptor.STRING_PROHIBITED:
                 {
-                    final String trimmed = ScalaUtils.trimAllToEmpty(text);
+                    final String trimmed = StringUtils.trimAllToEmpty(text);
                     if (trimmed.length() > 0) {
                         if (isReportErrors) {
                             addSchemaError(element, stringRef.str);

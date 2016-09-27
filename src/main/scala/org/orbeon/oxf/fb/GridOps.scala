@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.fb
 
-import collection.mutable
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+
+import scala.collection.mutable
 
 /*
  * Form Builder: operations on grids.

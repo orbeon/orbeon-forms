@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
@@ -199,7 +199,7 @@ public class XFormsSubmissionUtils {
                             if (XMLConstants.XS_ANYURI_QNAME.equals(nodeType)) {
                                 // Interpret value as xs:anyURI
 
-                                if (InstanceData.getValid(element) && ScalaUtils.trimAllToEmpty(value).length() > 0) {
+                                if (InstanceData.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
                                     // Value is valid as per xs:anyURI
                                     // Don't close the stream here, as it will get read later when the MultipartEntity
                                     // we create here is written to an output stream
@@ -213,7 +213,7 @@ public class XFormsSubmissionUtils {
                             } else if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
                                 // Interpret value as xs:base64Binary
 
-                                if (InstanceData.getValid(element) && ScalaUtils.trimAllToEmpty(value).length() > 0) {
+                                if (InstanceData.getValid(element) && StringUtils.trimAllToEmpty(value).length() > 0) {
                                     // Value is valid as per xs:base64Binary
                                     addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element, null);
                                 } else {

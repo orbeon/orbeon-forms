@@ -23,6 +23,7 @@ import org.orbeon.oxf.http.{EmptyInputStream, HttpMethod, StreamedContent}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.HttpStatusCodeException

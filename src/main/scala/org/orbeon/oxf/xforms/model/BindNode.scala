@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.model
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.Node
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._

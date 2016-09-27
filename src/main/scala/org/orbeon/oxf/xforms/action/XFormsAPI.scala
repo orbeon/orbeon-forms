@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.action
 import java.util.{List ⇒ JList}
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl

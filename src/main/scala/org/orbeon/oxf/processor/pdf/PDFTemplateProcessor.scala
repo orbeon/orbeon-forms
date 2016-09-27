@@ -18,20 +18,21 @@ import java.net.URI
 import java.net.URLDecoder.{decode ⇒ decodeURL}
 import java.util.{List ⇒ JList}
 
-import com.lowagie.text.{Image, Rectangle}
 import com.lowagie.text.pdf._
+import com.lowagie.text.{Image, Rectangle}
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
-import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor._
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer
 import org.orbeon.oxf.processor.serializer.{BinaryTextXMLReceiver, HttpSerializerBase}
+import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInput, ProcessorInputOutputInfo}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
@@ -587,7 +588,7 @@ object PDFTemplateProcessor {
     // tries to find an actual character encoding based on the value passed. For other font types, Identity-H and
     // Identity-V are handled.
     def isType1Font(name: String) =
-      BuiltinFonts(name) || (split(name, """.""").lastOption map (_.toLowerCase) exists Set("afm", "pfm"))
+      BuiltinFonts(name) || (StringUtils.split(name, """.""").lastOption map (_.toLowerCase) exists Set("afm", "pfm"))
 
     if (isType1Font(fontFamilyName))
       BaseFont.CP1252

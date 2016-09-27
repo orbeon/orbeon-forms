@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils

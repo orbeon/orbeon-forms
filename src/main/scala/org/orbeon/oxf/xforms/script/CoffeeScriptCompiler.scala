@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.script
 
-import org.mozilla.javascript.Context
 import java.io.InputStreamReader
+
+import org.mozilla.javascript.Context
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 
 /**

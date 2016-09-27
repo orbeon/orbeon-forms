@@ -28,8 +28,8 @@ import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.{HttpStatusCodeException, WebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo

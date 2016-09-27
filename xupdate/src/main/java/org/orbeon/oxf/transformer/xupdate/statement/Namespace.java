@@ -18,7 +18,7 @@ import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
 import org.orbeon.oxf.transformer.xupdate.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -39,7 +39,7 @@ public class Namespace extends Statement {
     }
 
     public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
-        name = ScalaUtils.trimAllToEmpty(name);
+        name = StringUtils.trimAllToEmpty(name);
         String prefix = name.startsWith("{")
                 ? (String) Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), "string(" + name.substring(1, name.length() - 1) + ")", namespaceContext)
                 : name;

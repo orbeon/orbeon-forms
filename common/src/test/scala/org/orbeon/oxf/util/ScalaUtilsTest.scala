@@ -14,7 +14,10 @@
 package org.orbeon.oxf.util
 
 import org.junit.Test
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.junit.AssertionsForJUnit
 
 import scala.collection.mutable

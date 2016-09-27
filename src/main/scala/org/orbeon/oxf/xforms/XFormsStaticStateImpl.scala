@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants._

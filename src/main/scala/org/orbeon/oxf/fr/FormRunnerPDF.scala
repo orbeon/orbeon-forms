@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import java.util.{Map ⇒ JMap}
 
 import org.orbeon.oxf.fr.FormRunner.{FormRunnerParams, _}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLFinder
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsPropertiesStartsWith, XXFormsProperty}

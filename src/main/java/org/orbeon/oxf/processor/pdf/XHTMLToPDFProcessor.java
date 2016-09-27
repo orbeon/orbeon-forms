@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.pdf;
 
 import com.lowagie.text.pdf.BaseFont;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Headers;
@@ -231,15 +230,15 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
     public static void embedFonts(ITextRenderer renderer) {
         final PropertySet propertySet = Properties.instance().getPropertySet();
         for (final String propertyName : propertySet.getPropertiesStartsWith("oxf.fr.pdf.font.path")) {
-            final String path = ScalaUtils.trimAllToNull(propertySet.getString(propertyName));
+            final String path = StringUtils.trimAllToNull(propertySet.getString(propertyName));
             if (path != null) {
                 try {
                     // Overriding the font family is optional
                     final String family; {
-                        final String[] tokens = StringUtils.split(propertyName, '.');
+                        final String[] tokens = org.apache.commons.lang3.StringUtils.split(propertyName, '.');
                         if (tokens.length >= 6) {
                             final String id = tokens[5];
-                            family = ScalaUtils.trimAllToNull(propertySet.getString("oxf.fr.pdf.font.family" + '.' + id));
+                            family = StringUtils.trimAllToNull(propertySet.getString("oxf.fr.pdf.font.family" + '.' + id));
                         } else {
                             family = null;
                         }

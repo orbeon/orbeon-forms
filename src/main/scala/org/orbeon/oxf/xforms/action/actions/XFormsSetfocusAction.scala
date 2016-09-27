@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.XFormsControl

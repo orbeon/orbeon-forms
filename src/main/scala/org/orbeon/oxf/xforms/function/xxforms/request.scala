@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{NetUtils, StringConversions}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
-import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.mutable
 

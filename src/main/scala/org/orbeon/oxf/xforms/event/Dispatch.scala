@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.event
 
 
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{Logging, ScalaUtils}
+import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.XBLContainer

@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.{OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStream}
 import java.net._
 
 import org.apache.http.impl.client.BasicCookieStore
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

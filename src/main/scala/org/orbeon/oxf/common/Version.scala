@@ -14,8 +14,8 @@
 package org.orbeon.oxf.common
 
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 

@@ -15,17 +15,18 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.dom.{Document, QName, Element}
-import org.orbeon.oxf.xforms._
-import analysis.ElementAnalysis.attSet
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xml.Dom4j
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
+import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+
 import scala.collection.JavaConverters._
 
 trait IndexableBinding {

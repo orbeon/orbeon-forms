@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 
 // Trait indicating that the control can directly receive keyboard focus
 trait FocusableTrait extends VisitableTrait {

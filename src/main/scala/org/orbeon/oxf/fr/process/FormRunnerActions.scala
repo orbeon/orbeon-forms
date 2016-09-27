@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
@@ -26,7 +27,6 @@ import org.orbeon.scaxon.XML._
 
 import scala.language.postfixOps
 import scala.util.Try
-
 trait FormRunnerActions {
 
   def runningProcessId: Option[String]

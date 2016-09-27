@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.util
 
-import collection.JavaConverters._
+import java.io.InputStream
+
 import com.drew.imaging.ImageMetadataReader
 import com.drew.metadata.bmp.BmpHeaderDirectory
 import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
-import java.io.InputStream
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
 
 // Functions to extract image metadata from a stream
 object ImageMetadata {

@@ -16,7 +16,8 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.XML._
@@ -55,7 +56,7 @@ trait SearchRequest {
               // Free text is in the first <query>
               .headOption.map(_.stringValue)
               // Empty means no search
-              .flatMap(ScalaUtils.trimAllToOpt),
+              .flatMap(trimAllToOpt),
           columns        =
             queryEls
               // First is for free text search
@@ -64,7 +65,7 @@ trait SearchRequest {
                 Column(
                   // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
                   path       = c.attValue("path").replaceAllLiterally("[1]", ""),
-                  filterWith = ScalaUtils.trimAllToOpt(c.stringValue)
+                  filterWith = trimAllToOpt(c.stringValue)
                 )
               ),
           drafts         =

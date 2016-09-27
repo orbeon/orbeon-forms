@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}

@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.servlet.ServletExternalContext.DEFAULT_HEADER_ENCODING
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Multipart, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}

@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -423,7 +423,7 @@ public class Dom4jUtils {
     public static QName extractTextValueQName(Map<String, String> namespaces, String qNameString, boolean unprefixedIsNoNamespace) {
         if (qNameString == null)
             return null;
-        qNameString = ScalaUtils.trimAllToEmpty(qNameString);
+        qNameString = StringUtils.trimAllToEmpty(qNameString);
         if (qNameString.length() == 0)
             return null;
 

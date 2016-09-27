@@ -22,7 +22,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, URLRewriterUtils}
 import org.orbeon.oxf.webapp.{ProcessorService, TestWebAppContext}
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer

@@ -26,7 +26,7 @@ import org.orbeon.oxf.transformer.xupdate.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.transformer.xupdate.dom4j.NonLazyUserDataElement;
 import org.orbeon.oxf.transformer.xupdate.statement.*;
 import org.orbeon.oxf.transformer.xupdate.statement.Error;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.sax.TemplatesHandler;
@@ -53,8 +53,8 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
         for (Iterator i = nodes.iterator(); i.hasNext();) {
             Node node = (Node) i.next();
             if (node.getNodeType() == Node.TEXT_NODE) {
-                if (! "".equals(ScalaUtils.trimAllToEmpty(node.getText())))
-                    statements.add(new Text(ScalaUtils.trimAllToEmpty(node.getText())));
+                if (! "".equals(StringUtils.trimAllToEmpty(node.getText())))
+                    statements.add(new Text(StringUtils.trimAllToEmpty(node.getText())));
             } else if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
                 NamespaceContext namespaceContext = new SimpleNamespaceContext(Dom4jUtils.getNamespaceContext(element));

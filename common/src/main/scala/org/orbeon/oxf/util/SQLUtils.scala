@@ -11,20 +11,14 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms
+package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
-import org.orbeon.saxon.value.StringValue
+import java.sql.Timestamp
 
-class XXFormsTrim extends XFormsFunction {
+object SQLUtils {
 
-  override def evaluateItem(context: XPathContext): StringValue =
-    stringArgumentOrContextOpt(0)(context) map (_.trimAllToEmpty)
-
-  // Needed otherwise xpathContext.getContextItem doesn't return the correct value
-  override def getIntrinsicDependencies =
-    if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
+  implicit def ordered: Ordering[Timestamp] = new Ordering[Timestamp] {
+      def compare(x: Timestamp, y: Timestamp): Int = x compareTo y
+  }
 
 }

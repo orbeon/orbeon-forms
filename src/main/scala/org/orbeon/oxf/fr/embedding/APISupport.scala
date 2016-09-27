@@ -24,6 +24,8 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.XMLUtils

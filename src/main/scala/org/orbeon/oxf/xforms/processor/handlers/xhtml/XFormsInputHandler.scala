@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
+
 /**
  * Handle xf:input.
  *

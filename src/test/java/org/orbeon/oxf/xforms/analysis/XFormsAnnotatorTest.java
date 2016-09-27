@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
+import org.junit.Test;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
-import org.junit.Test;
+import org.orbeon.dom.saxon.DocumentWrapper;
+import org.orbeon.dom.saxon.NodeWrapper;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -28,8 +30,6 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.dom.saxon.DocumentWrapper;
-import org.orbeon.dom.saxon.NodeWrapper;
 
 import java.util.List;
 
@@ -95,7 +95,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         assertNotNull(result);
         assertEquals(1, result.size());
         Element resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(ScalaUtils.trimAllToEmpty(XFormsUtils.getElementId(resultElement)).length() > 0);
+        assertTrue(StringUtils.trimAllToEmpty(XFormsUtils.getElementId(resultElement)).length() > 0);
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxf:attribute for "span" with correct name
@@ -114,7 +114,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
         assertNotNull(result);
         assertEquals(1, result.size());
         resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(ScalaUtils.trimAllToEmpty(XFormsUtils.getElementId(resultElement)).length() > 0);
+        assertTrue(StringUtils.trimAllToEmpty(XFormsUtils.getElementId(resultElement)).length() > 0);
         assertEquals("style", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
     }
 }

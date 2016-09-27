@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import org.orbeon.oxf.xforms.XFormsInstance

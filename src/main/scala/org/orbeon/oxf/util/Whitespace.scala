@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon
 
 object Whitespace  {

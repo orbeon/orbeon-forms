@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
-import scala.collection.{Set ⇒ CSet, mutable}
+import scala.collection.{mutable, Set ⇒ CSet}
 
 /**
  * Represents an xf:select control.

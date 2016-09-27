@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.dom.QName
 import org.orbeon.css.CSSSelectorParser
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.dom.QName
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._

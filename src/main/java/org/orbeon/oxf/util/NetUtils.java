@@ -17,7 +17,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -276,19 +275,19 @@ public class NetUtils {
         // Parse parameters
         final Map<String, String> parameters = new HashMap<String, String>();
         while (st.hasMoreTokens()) {
-            final String parameter = ScalaUtils.trimAllToEmpty(st.nextToken());
+            final String parameter = StringUtils.trimAllToEmpty(st.nextToken());
             final int equalIndex = parameter.indexOf('=');
             if (equalIndex == -1)
                 continue;
-            final String name = ScalaUtils.trimAllToEmpty(parameter.substring(0, equalIndex));
-            final String value = ScalaUtils.trimAllToEmpty(parameter.substring(equalIndex + 1));
+            final String name = StringUtils.trimAllToEmpty(parameter.substring(0, equalIndex));
+            final String value = StringUtils.trimAllToEmpty(parameter.substring(equalIndex + 1));
             parameters.put(name, value);
         }
         return parameters;
     }
 
     public static String getContentTypeMediaType(String contentType) {
-        contentType = ScalaUtils.trimAllToNull(contentType);
+        contentType = StringUtils.trimAllToNull(contentType);
         if (contentType == null)
             return null;
 
@@ -296,7 +295,7 @@ public class NetUtils {
         if (semicolonIndex == -1)
             return contentType;
 
-        final String mediatype = ScalaUtils.trimAllToNull(contentType.substring(0, semicolonIndex));
+        final String mediatype = StringUtils.trimAllToNull(contentType.substring(0, semicolonIndex));
         if (mediatype == null || mediatype.equalsIgnoreCase("content/unknown"))
             return null;
         else
@@ -457,7 +456,7 @@ public class NetUtils {
      * @return              resulting URL
      */
     public static String appendQueryString(String urlString, String queryString) {
-        if (StringUtils.isBlank(queryString)) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(queryString)) {
             return urlString;
         } else {
             final StringBuilder updatedActionStringBuilder = new StringBuilder(urlString);
@@ -803,7 +802,7 @@ public class NetUtils {
         // however, their use is highly discouraged (unless they are encoded by %20).".
 
         // We assume that we never want leading or trailing spaces. You can use %20 if you really want this.
-        uriString = ScalaUtils.trimAllToEmpty(uriString);
+        uriString = StringUtils.trimAllToEmpty(uriString);
 
         // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.
         // * the control characters #x0 to #x1F and #x7F to #x9F

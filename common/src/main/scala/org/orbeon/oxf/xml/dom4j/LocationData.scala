@@ -16,7 +16,7 @@ package org.orbeon.oxf.xml.dom4j
 import java.{lang ⇒ jl}
 import javax.xml.transform.SourceLocator
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.xml.sax.{Locator, SAXParseException}
 
 object LocationData {

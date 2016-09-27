@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsModelBinds
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl

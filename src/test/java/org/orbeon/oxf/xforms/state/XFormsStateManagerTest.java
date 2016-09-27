@@ -18,8 +18,8 @@ import org.orbeon.oxf.externalcontext.TestSession;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.ScalaUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsStaticState;
@@ -108,8 +108,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
 
             assertEquals(state1.uuid.length(), SecureUtils.HexIdLength());
-            assertNotNull(ScalaUtils.trimAllToNull(state1.staticStateString));
-            assertNotNull(ScalaUtils.trimAllToNull(state1.dynamicStateString));
+            assertNotNull(StringUtils.trimAllToNull(state1.staticStateString));
+            assertNotNull(StringUtils.trimAllToNull(state1.dynamicStateString));
 
             // Initial response sent
             state1.document.afterInitialResponse();
@@ -173,8 +173,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
 
             assertEquals(state1.uuid.length(), SecureUtils.HexIdLength());
-            assertNull(ScalaUtils.trimAllToNull(state1.staticStateString));
-            assertNull(ScalaUtils.trimAllToNull(state1.dynamicStateString));
+            assertNull(StringUtils.trimAllToNull(state1.staticStateString));
+            assertNull(StringUtils.trimAllToNull(state1.dynamicStateString));
 
             // Initial response sent
             state1.document.afterInitialResponse();
@@ -198,8 +198,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Sequence must be updated
         assertEquals(2, state2.document.getSequence());
         // State strings must be null
-        assertNull(ScalaUtils.trimAllToNull(state2.staticStateString));
-        assertNull(ScalaUtils.trimAllToNull(state2.dynamicStateString));
+        assertNull(StringUtils.trimAllToNull(state2.staticStateString));
+        assertNull(StringUtils.trimAllToNull(state2.dynamicStateString));
 
         // Run update
         final State state3 = doUpdate(isCache, state2, null);
@@ -209,8 +209,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Sequence must be updated
         assertEquals(3, state3.document.getSequence());
         // State strings must be null
-        assertNull(ScalaUtils.trimAllToNull(state3.staticStateString));
-        assertNull(ScalaUtils.trimAllToNull(state3.dynamicStateString));
+        assertNull(StringUtils.trimAllToNull(state3.staticStateString));
+        assertNull(StringUtils.trimAllToNull(state3.dynamicStateString));
 
         // Get back to initial state
         final State state4 = getInitialState(state1);
@@ -220,8 +220,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Sequence must be updated
         assertEquals(1, state4.document.getSequence());
         // State strings must be null
-        assertNull(ScalaUtils.trimAllToNull(state4.staticStateString));
-        assertNull(ScalaUtils.trimAllToNull(state4.dynamicStateString));
+        assertNull(StringUtils.trimAllToNull(state4.staticStateString));
+        assertNull(StringUtils.trimAllToNull(state4.dynamicStateString));
         // Make sure we found the initial dynamic state
         {
             assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState(), false)));

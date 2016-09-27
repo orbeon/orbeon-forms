@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 

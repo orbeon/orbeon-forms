@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal

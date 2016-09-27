@@ -18,7 +18,7 @@ import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 
 import org.orbeon.oxf.logging.{LifecycleLogger, MinimalRequest}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.slf4j.LoggerFactory
 
 import scala.util.matching.Regex

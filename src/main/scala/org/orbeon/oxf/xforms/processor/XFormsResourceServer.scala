@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Session.APPLICATION_SCOPE
 import org.orbeon.oxf.pipeline.api.ExternalContext._
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}

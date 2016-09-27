@@ -18,7 +18,7 @@ import java.{util ⇒ ju}
 import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api._
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.SessionExpiredException
 import org.orbeon.oxf.xforms.XFormsConstants._

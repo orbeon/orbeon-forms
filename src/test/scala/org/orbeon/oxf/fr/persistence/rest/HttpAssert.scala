@@ -14,9 +14,10 @@
 package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
+
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.util.{IndentedLogger, ScalaUtils}
+import org.orbeon.oxf.util.{IndentedLogger, StringUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 private object HttpAssert extends XMLSupport {
@@ -52,7 +53,7 @@ private object HttpAssert extends XMLSupport {
         }
         // Check operations
         val resultOperationsString = headers.get("orbeon-operations").map(_.head)
-        val resultOperationsSet = resultOperationsString.map(ScalaUtils.split[Set](_)).getOrElse(Set.empty)
+        val resultOperationsSet = resultOperationsString.map(StringUtils.split[Set](_)).getOrElse(Set.empty)
         assert(expectedOperations === resultOperationsSet)
         // Check form version
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)

@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.dom.Element
 import org.junit.Test
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.dom.Element
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit

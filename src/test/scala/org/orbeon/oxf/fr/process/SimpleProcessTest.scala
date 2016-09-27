@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.junit.Test
 import org.orbeon.oxf.fr.process.ProcessParser._
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
@@ -25,6 +25,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 import scala.collection.mutable.ListBuffer
 import scala.util.{Success, Try}
+
 
 class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit {
 

@@ -14,13 +14,12 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.util.ScalaUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 import scala.util.control.NonFatal
-
 trait PublishOps {
 
   // Publish a form and its attachments

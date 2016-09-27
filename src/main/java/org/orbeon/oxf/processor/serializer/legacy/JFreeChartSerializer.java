@@ -45,7 +45,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.util.ScalaUtils;
+import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.awt.*;
@@ -121,7 +121,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         while (cats.hasNext() && series.hasNext()) {
             Element s = (Element) series.next();
             Element c = (Element) cats.next();
-            Double d = new Double(ScalaUtils.trimAllToEmpty(s.getText()));
+            Double d = new Double(StringUtils.trimAllToEmpty(s.getText()));
             Paint p = null;
             double ep = 0;
 

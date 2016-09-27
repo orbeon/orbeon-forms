@@ -14,17 +14,17 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom._
-import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms._
-import analysis._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import xbl.Scope
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import XFormsProperties._
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 class LHHAAnalysis(
   staticStateContext : StaticStateContext,

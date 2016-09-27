@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._

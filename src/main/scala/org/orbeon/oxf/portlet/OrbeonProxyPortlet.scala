@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http.{ApacheHttpClient, HttpClient, HttpClientSettings, StreamedContent}
 import org.orbeon.oxf.portlet.liferay.LiferaySupport
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.breakOut
 import scala.util.control.NonFatal

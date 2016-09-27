@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.util.ScalaUtils.StringOps
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 
 class BindingTest extends DocumentTestBase with AssertionsForJUnit {
 

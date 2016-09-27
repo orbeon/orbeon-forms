@@ -16,21 +16,20 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{Logging, NetUtils}
-import org.orbeon.oxf.xforms.{BindingContext, _}
-import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, RepeatControl, SingleNodeTrait}
+import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLUtils}
 import org.orbeon.saxon.om.Item
 import org.xml.sax.Attributes
 
-import scala.collection.JavaConverters._
 import scala.collection.Seq
 
 /**

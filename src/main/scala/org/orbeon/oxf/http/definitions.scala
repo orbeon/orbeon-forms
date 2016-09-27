@@ -17,10 +17,10 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.immutable.Seq
-
 trait Content {
   def inputStream   : InputStream
   def contentType   : Option[String]

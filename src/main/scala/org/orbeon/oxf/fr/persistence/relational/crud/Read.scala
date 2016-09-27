@@ -16,13 +16,13 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
 import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
-import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 

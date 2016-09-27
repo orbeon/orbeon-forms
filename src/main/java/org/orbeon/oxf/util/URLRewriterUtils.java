@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
@@ -98,14 +97,14 @@ public class URLRewriterUtils {
             return urlString;
 
         final String baseURIProperty = getServiceBaseURI();
-        if (StringUtils.isBlank(baseURIProperty)) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(baseURIProperty)) {
             // Property not specified, use request to build base URI
             return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString),
                     request.getRequestPath(), urlString, rewriteMode);
         } else {
             // Property specified
             try {
-                final URI baseURI = new URI(ScalaUtils.trimAllToEmpty(baseURIProperty));
+                final URI baseURI = new URI(StringUtils.trimAllToEmpty(baseURIProperty));
                 // NOTE: Force absolute URL to be returned in this case anyway
                 return rewriteURL(baseURI.getScheme() != null ? baseURI.getScheme() : request.getScheme(),
                         baseURI.getHost() != null ? baseURI.getHost() : request.getServerName(),
@@ -386,7 +385,7 @@ public class URLRewriterUtils {
 
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
-        return StringUtils.isBlank(propertyString) ? null : ScalaUtils.trimAllToEmpty(propertyString);
+        return org.apache.commons.lang3.StringUtils.isBlank(propertyString) ? null : StringUtils.trimAllToEmpty(propertyString);
     }
 
     // Return the version string either in clear or encoded with HMAC depending on configuration

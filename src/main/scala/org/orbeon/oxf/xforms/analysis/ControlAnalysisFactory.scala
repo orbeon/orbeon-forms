@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils

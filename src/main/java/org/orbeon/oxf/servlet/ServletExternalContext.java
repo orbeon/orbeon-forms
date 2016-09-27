@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ServletToExternalContextRequestDispatcherWrapper;
@@ -73,10 +72,10 @@ public class ServletExternalContext implements ExternalContext  {
 
         final String value = Properties.instance().getPropertySet().getString(name, defaultValue);
 
-        for (final String header : StringUtils.split(value, ';')) {
-            final String[] parts = StringUtils.split(header, ':');
+        for (final String header : org.apache.commons.lang3.StringUtils.split(value, ';')) {
+            final String[] parts = org.apache.commons.lang3.StringUtils.split(header, ':');
             if (parts.length == 2) {
-                result.put(ScalaUtils.trimAllToEmpty(parts[0]), ScalaUtils.trimAllToEmpty(parts[1]));
+                result.put(StringUtils.trimAllToEmpty(parts[0]), StringUtils.trimAllToEmpty(parts[1]));
             }
         }
 

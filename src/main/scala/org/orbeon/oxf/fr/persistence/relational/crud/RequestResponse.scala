@@ -14,11 +14,10 @@
 package org.orbeon.oxf.fr.persistence.relational.crud
 
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.persistence.relational.Provider
 
 case class DataPart(isDraft: Boolean, documentId: String)
 

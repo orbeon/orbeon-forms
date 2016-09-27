@@ -18,8 +18,9 @@ import java.{util ⇒ ju}
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath.FunctionContext
-import org.orbeon.oxf.util.{ScalaUtils, XPath, XPathCache}
+import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xml.{dom4j ⇒ _}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om._
@@ -99,7 +100,7 @@ object XPathUtils {
 
   // 167 usages
   def selectStringValueNormalize(node: dom.Node, expr: String): String =
-    ScalaUtils.trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
+    trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
 
   // 3 external usages from SQL interpreter
   // Expects: List<Node>, Node, Number (Float, Double, Long, any other?), String.

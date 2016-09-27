@@ -13,22 +13,25 @@
  */
 package org.orbeon.oxf.util
 
+import java.util.{Map ⇒ JMap}
+
+import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.apache.commons.fileupload._
-import org.apache.commons.fileupload.util.Streams
 import org.apache.commons.fileupload.disk.DiskFileItemFactory
 import org.apache.commons.fileupload.servlet.ServletFileUpload
+import org.apache.commons.fileupload.util.Streams
+import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.pipeline.api.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import java.util.{Map ⇒ JMap}
-import ScalaUtils._
-
-import collection.JavaConverters._
-import org.orbeon.oxf.pipeline.api.ExternalContext._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import collection.{immutable ⇒ i, mutable ⇒ m}
-import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
-import org.orbeon.errorified.Exceptions
+
+import scala.collection.JavaConverters._
+import scala.collection.{immutable ⇒ i, mutable ⇒ m}
 import scala.util.control.NonFatal
 
 

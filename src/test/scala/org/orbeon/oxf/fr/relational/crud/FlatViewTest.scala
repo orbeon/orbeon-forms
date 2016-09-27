@@ -14,12 +14,14 @@
 package org.orbeon.oxf.fr.persistence.relational.crud
 
 import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xml.TransformerUtils
+import org.scalatest.junit.AssertionsForJUnit
+
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 

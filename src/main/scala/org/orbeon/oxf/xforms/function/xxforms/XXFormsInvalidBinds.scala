@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
@@ -33,7 +33,7 @@ class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunct
       case Some(nodeInfo: NodeInfo) ⇒
         Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
           case Some(invalidBindIdsString) ⇒
-            asIterator(ScalaUtils.split[Array](invalidBindIdsString))
+            asIterator(StringUtils.split[Array](invalidBindIdsString))
           case None ⇒
             // No invalid bind ids
             EmptyIterator.getInstance

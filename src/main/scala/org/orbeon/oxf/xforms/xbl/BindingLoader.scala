@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, XMLParsing}

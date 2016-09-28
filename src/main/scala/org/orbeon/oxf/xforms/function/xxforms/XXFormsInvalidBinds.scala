@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 
@@ -23,7 +24,9 @@ import org.orbeon.saxon.om._
 /**
  * xxf:invalid-binds()
  */
-class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunction as addToPathMap returns something different
+class XXFormsInvalidBinds
+  extends XFormsFunction
+     with DependsOnContextItemIfSingleArgumentMissing { // don't extend XFormsMIPFunction as addToPathMap returns something different
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
@@ -49,8 +52,4 @@ class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunct
   // TODO: something smart
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
     super.addToPathMap(pathMap, pathMapNodeSet)
-
-  // Needed otherwise xpathContext.getContextItem doesn't return the correct value
-  override def getIntrinsicDependencies =
-    if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }

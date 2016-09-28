@@ -29,6 +29,12 @@ trait RuntimeDependentFunction extends SystemFunction {
   override def preEvaluate(visitor: ExpressionVisitor): Expression = this
 }
 
+// Mix-in for functions which use the context if single optional argument is missing
+trait DependsOnContextItemIfSingleArgumentMissing extends FunctionSupport {
+  override def getIntrinsicDependencies =
+    super.getIntrinsicDependencies | (if (arguments.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0)
+}
+
 abstract class FunctionSupport extends SystemFunction {
 
   // Public accessor for Scala traits

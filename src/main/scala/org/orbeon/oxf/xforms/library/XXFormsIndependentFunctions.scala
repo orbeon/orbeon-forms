@@ -196,5 +196,13 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
       Arg(ITEM_TYPE, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("json-to-xml", classOf[JsonStringToXml], op = 0, min = 0, NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+
+    Fun("xml-to-json", classOf[XmlToJsonString], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
   }
 }

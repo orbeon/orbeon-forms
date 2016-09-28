@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="formRunner-build" external.linked.project.path="$MODULE_DIR$/../../form-runner/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="$149b22bf8618f6487f09.common, $149b22bf8618f6487f09.commonSharedJS, $149b22bf8618f6487f09.commonSharedJVM, $149b22bf8618f6487f09.copyJarToExplodedWar, $149b22bf8618f6487f09.core, $149b22bf8618f6487f09.dom, $149b22bf8618f6487f09.fastOptJSToExplodedWar, $149b22bf8618f6487f09.formBuilder, $149b22bf8618f6487f09.formBuilderClient, $149b22bf8618f6487f09.formBuilderSharedJS, $149b22bf8618f6487f09.formBuilderSharedJVM, $149b22bf8618f6487f09.formRunner, $149b22bf8618f6487f09.fullOptJSToExplodedWar, $149b22bf8618f6487f09.orbeonEditionFromProperties, $149b22bf8618f6487f09.orbeonVersionFromProperties, $149b22bf8618f6487f09.root, $149b22bf8618f6487f09.xupdate, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="formRunner-build" external.linked.project.path="$MODULE_DIR$/../../form-runner/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="$48a4e0e4085a6435b29e.common, $48a4e0e4085a6435b29e.commonSharedJS, $48a4e0e4085a6435b29e.commonSharedJVM, $48a4e0e4085a6435b29e.copyJarToExplodedWar, $48a4e0e4085a6435b29e.core, $48a4e0e4085a6435b29e.dom, $48a4e0e4085a6435b29e.fastOptJSToExplodedWar, $48a4e0e4085a6435b29e.formBuilder, $48a4e0e4085a6435b29e.formBuilderClient, $48a4e0e4085a6435b29e.formBuilderSharedJS, $48a4e0e4085a6435b29e.formBuilderSharedJVM, $48a4e0e4085a6435b29e.formRunner, $48a4e0e4085a6435b29e.fullOptJSToExplodedWar, $48a4e0e4085a6435b29e.orbeonEditionFromProperties, $48a4e0e4085a6435b29e.orbeonVersionFromProperties, $48a4e0e4085a6435b29e.root, $48a4e0e4085a6435b29e.xupdate, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../form-runner/project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../form-runner/project/target/idea-test-classes" />
@@ -14,23 +14,24 @@
     <orderEntry type="module-library">
       <library name="SBT: sbt-and-plugins">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.ivy2/cache/args4j/args4j/jars/args4j-2.0.16.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/args4j/args4j/bundles/args4j-2.0.26.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/com.google.code.findbugs/jsr305/jars/jsr305-1.3.9.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/com.google.guava/guava/bundles/guava-14.0.1.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/com.google.javascript/closure-compiler/jars/closure-compiler-v20130603.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/com.google.protobuf/protobuf-java/jars/protobuf-java-2.4.1.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/com.google.code.gson/gson/jars/gson-2.2.4.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/com.google.guava/guava/bundles/guava-19.0.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/com.google.protobuf/protobuf-java/bundles/protobuf-java-2.5.0.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/com.googlecode.json-simple/json-simple/bundles/json-simple-1.1.1.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/io.apigee/rhino/jars/rhino-1.7R5pre4.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/org.json/json/jars/json-20090211.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-ir_2.10/jars/scalajs-ir_2.10-0.6.9.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-js-envs_2.10/jars/scalajs-js-envs_2.10-0.6.9.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-sbt-test-adapter_2.10/jars/scalajs-sbt-test-adapter_2.10-0.6.9.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-tools_2.10/jars/scalajs-tools_2.10-0.6.9.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/closure-compiler-externs-java-6/jars/closure-compiler-externs-java-6-v20160517.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/closure-compiler-java-6/jars/closure-compiler-java-6-v20160517.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-ir_2.10/jars/scalajs-ir_2.10-0.6.12.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-js-envs_2.10/jars/scalajs-js-envs_2.10-0.6.12.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-sbt-test-adapter_2.10/jars/scalajs-sbt-test-adapter_2.10-0.6.12.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-tools_2.10/jars/scalajs-tools_2.10-0.6.12.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.webjars/envjs/jars/envjs-1.2.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/com.eed3si9n/sbt-buildinfo/jars/sbt-buildinfo-0.6.1.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/com.orrsella/sbt-sound/jars/sbt-sound-1.0.4.jar!/" />
-          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.scala-js/sbt-scalajs/jars/sbt-scalajs-0.6.9.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.scala-js/sbt-scalajs/jars/sbt-scalajs-0.6.12.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/lib/jansi.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/lib/jline.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/lib/scala-compiler.jar!/" />

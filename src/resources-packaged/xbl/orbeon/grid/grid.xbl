@@ -324,7 +324,7 @@
                                                     <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
                                                     <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"  /></xsl:if>
                                                     <xsl:copy-of select="@colspan"/>
-                                                    <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
+                                                    <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger) and exists($control)">
                                                         <!--
                                                             1.  See also https://github.com/orbeon/orbeon-forms/issues/241
                                                             2.  In order to determine an LHH when there is no iteration,
@@ -385,9 +385,10 @@
                                                                 <!-- Keep control id info in id of the editor, used when fb-update-control-lhha is received -->
                                                                 <xsl:attribute name="id" select="concat('fb-lhh-editor-for-', $control/@id)"/>
                                                             </xsl:if>
-                                                            <xsl:if test="node-name($control) = xs:QName('xf:input')">
-                                                                <xsl:attribute name="class" select="'fr-grid-lhh-for-xforms-input'"/>
-                                                            </xsl:if>
+                                                            <xsl:attribute name="class" select="
+                                                                if (node-name($control) = xs:QName('xf:input')) then 'fr-grid-lhh-for-xforms-input' else (),
+                                                                fr:fb-is-html-classes($control)
+                                                            "/>
                                                             <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                         </xf:output>
                                                     </xsl:if>
@@ -782,23 +783,11 @@
                                         <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                             <!-- Limitation of the editable mode: only handle the first control -->
                                             <xsl:copy>
-                                                <!-- So the client-side code can populate populate the checkbox when editing the label -->
-                                                <xsl:variable
-                                                    name="label-mediatype-class"
-                                                    select="if (xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
-                                                <xsl:variable
-                                                    name="hint-mediatype-class"
-                                                    select="if (xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
-                                                <xsl:variable
-                                                    name="text-mediatype-class"
-                                                    select="if (fr:text/@mediatype = 'text/html') then 'fb-text-is-html'  else ()"/>
                                                 <xsl:attribute
                                                     name="class"
                                                     select="
                                                         @class,
-                                                        $label-mediatype-class,
-                                                        $hint-mediatype-class,
-                                                        $text-mediatype-class"
+                                                        fr:fb-is-html-classes(.)"
                                                 />
                                                 <xsl:copy-of select="@* except @class | node()"/>
                                             </xsl:copy>
@@ -831,6 +820,16 @@
                             if ($is-editable and $th-td = 'td') then ($fb-selected-avt, 'xforms-activable')  else ()"
                     />
                     <xsl:if test="exists($classes)"><xsl:attribute name="class" select="$classes"/></xsl:if>
+                </xsl:function>
+
+                <!-- Classes so the client-side code can populate the checkbox when editing the label -->
+                <xsl:function name="fr:fb-is-html-classes" as="xs:string*">
+                    <xsl:param name="control" as="element()"/>
+                    <xsl:value-of select="(
+                        if ($control/xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else (),
+                        if ($control/xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else (),
+                        if ($control/fr:text/@mediatype = 'text/html')  then 'fb-text-is-html'  else ()
+                    )"/>
                 </xsl:function>
 
             </xsl:transform>

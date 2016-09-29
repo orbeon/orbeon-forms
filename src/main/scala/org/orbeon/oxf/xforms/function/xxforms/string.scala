@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import org.w3c.dom.Node.ELEMENT_NODE
@@ -46,6 +46,10 @@ class XXFormsIsBlank extends XFormsFunction with DependsOnContextItemIfSingleArg
 class XXFormsHasClass extends XFormsFunction with ClassSupport {
   override def evaluateItem(xpathContext: XPathContext) =
     classes(1)(xpathContext)(stringArgument(0)(xpathContext))
+
+  // Needed otherwise xpathContext.getContextItem doesn't return the correct value
+   override def getIntrinsicDependencies =
+     if (argument.size == 1) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }
 
 class XXFormsClasses extends XFormsFunction with ClassSupport {

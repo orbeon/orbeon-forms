@@ -28,3 +28,12 @@ addons:
   artifacts:
     paths:
     - $(ls build/distrib/* | tr "\n" ":")
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+    - $HOME/node_modules
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete

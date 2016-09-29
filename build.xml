@@ -895,7 +895,7 @@
                         <!-- Uncompress Tomcat -->
                         <if>
                             <not><available file="build/apache-tomcat-${tomcat-version}"/></not>
-                            <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
+                            <then><unzip src="test/lib/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
                         </if>
 
                         <!-- Put database driver in Tomcat's lib -->
@@ -937,6 +937,14 @@
                         </waitfor>
                     </then>
                 </if>
+
+                <!-- Run sbt tests -->
+                <exec executable="sbt" failonerror="true">
+                    <arg value="-Dorbeon.version=${release.number}"/>
+                    <arg value="-Dorbeon.edition=${edition}"/>
+                    <arg value="project root"/>
+                    <arg value="test"/>
+                </exec>
 
                 <delete dir="build/temp/test"/>
                	<mkdir  dir="build/temp/test"/>
@@ -1020,14 +1028,6 @@
                     </classpath>
                     <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
                 </junit>
-
-                <!-- Run sbt tests -->
-                <exec executable="sbt" failonerror="true">
-                    <arg value="-Dorbeon.version=${release.number}"/>
-                    <arg value="-Dorbeon.edition=${edition}"/>
-                    <arg value="project root"/>
-                    <arg value="test"/>
-                </exec>
 
                 <!-- Stop Tomcat -->
                 <if>

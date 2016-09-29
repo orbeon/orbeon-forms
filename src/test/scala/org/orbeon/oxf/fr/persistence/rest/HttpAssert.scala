@@ -25,7 +25,11 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 private object HttpAssert extends XMLSupport {
 
   sealed trait Expected
-  case   class ExpectedBody(body: HttpRequest.Body, operations: Set[String], formVersion: Option[Int]) extends Expected
+  case   class ExpectedBody(
+    body        : HttpRequest.Body,
+    operations  : Set[String],
+    formVersion : Option[Int]
+  ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected
 
   def get(

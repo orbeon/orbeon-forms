@@ -134,18 +134,17 @@ object CollectionUtils {
 
     def insertAt(index: Int, value: T, position: InsertPosition): Vector[T] =
       position match {
-        case InsertBefore ⇒ (values.take(index) :+ value) ++ values.drop(index)
+        case InsertBefore ⇒ (values.take(index)     :+ value) ++ values.drop(index)
         case InsertAfter  ⇒ (values.take(index + 1) :+ value) ++ values.drop(index + 1)
       }
 
     def insertAt(index: Int, newValues: Traversable[T], position: InsertPosition): Vector[T] =
-    position match {
-      case InsertBefore ⇒ values.take(index) ++ newValues ++ values.drop(index)
-      case InsertAfter  ⇒ values.take(index + 1) ++ newValues ++ values.drop(index + 1)
-    }
+      position match {
+        case InsertBefore ⇒ values.take(index)     ++ newValues ++ values.drop(index)
+        case InsertAfter  ⇒ values.take(index + 1) ++ newValues ++ values.drop(index + 1)
+      }
 
-    def removeAt(index: Int): Vector[T] = {
+    def removeAt(index: Int): Vector[T] =
       values.take(index) ++ values.drop(index + 1)
-    }
   }
 }

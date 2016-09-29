@@ -1,0 +1,13 @@
+{
+  "name": "orbeon-forms",
+  "version": "2016.3.0-SNAPSHOT",
+  "author": "Orbeon, Inc.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbeon/orbeon-forms/"
+  },
+  "dependencies": {
+    "jsdom": "9.5"
+  },
+  "license": "LGPL-2.1"
+}

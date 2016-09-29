@@ -943,7 +943,7 @@
            	    <delete dir="${test.exist-db.dir}"/>
                	<mkdir  dir="${test.exist-db.dir}"/>
 
-                <!-- Run tests -->
+                <!-- Run JUnit tests -->
                 <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed" logfailedtests="true">
                     <!-- Enable assertions -->
                     <jvmarg value="-ea"/>
@@ -1020,6 +1020,14 @@
                     </classpath>
                     <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
                 </junit>
+
+                <!-- Run sbt tests -->
+                <exec executable="sbt" failonerror="true">
+                    <arg value="-Dorbeon.version=${release.number}"/>
+                    <arg value="-Dorbeon.edition=${edition}"/>
+                    <arg value="project root"/>
+                    <arg value="test"/>
+                </exec>
 
                 <!-- Stop Tomcat -->
                 <if>

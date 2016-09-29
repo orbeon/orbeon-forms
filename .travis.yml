@@ -1,6 +1,8 @@
 language: java
 jdk:
-- oraclejdk7
+  - oraclejdk7
+node_js:
+  - "node"
 env:
   global:
   - secure: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
@@ -16,7 +18,12 @@ env:
   matrix:
   - TARGET=test-unit
   - TARGET=orbeon-dist
-script: "ant $TARGET"
+# From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
+# specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
+install:
+  - npm install
+script:
+  - "ant $TARGET"
 addons:
   artifacts:
     paths:

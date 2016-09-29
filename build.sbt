@@ -149,10 +149,6 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
   .settings(
     name                           := "orbeon-form-builder-client",
 
-    scalaSource         in Compile := baseDirectory.value / "src" / "builder" / "scala",
-    javaSource          in Compile := baseDirectory.value / "src" / "builder" / "java",
-    resourceDirectory   in Compile := baseDirectory.value / "src" / "builder" / "resources",
-
     libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
     libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
 

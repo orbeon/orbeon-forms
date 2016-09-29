@@ -36,7 +36,7 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[OrganizationTest]), true)
 
   def recordsCount(connection: Connection): Int = {
-    val Sql = "SELECT count(*) FROM orbeon_form_organization"
+    val Sql = "SELECT count(*) FROM orbeon_organization"
     useAndClose(connection.prepareStatement(Sql)) { statement ⇒
       useAndClose(statement.executeQuery()) { resultSet ⇒
         resultSet.next()

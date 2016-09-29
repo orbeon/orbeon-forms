@@ -1,4 +1,4 @@
-CREATE TABLE orbeon_form_organization (
+CREATE TABLE orbeon_organization (
     id                  INT                                                               NOT NULL,
     depth               INT                                                               NOT NULL,
     pos                 INT                                                               NOT NULL,

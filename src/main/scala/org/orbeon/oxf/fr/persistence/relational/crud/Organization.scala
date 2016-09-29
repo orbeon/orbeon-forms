@@ -51,7 +51,7 @@ object Organization {
             .flatMap { case (_, pos) ⇒ f(pos + 1) }
 
         val sqlFrom  = perLevel{pos ⇒
-          List(s"orbeon_form_organization o$pos")
+          List(s"orbeon_organization o$pos")
         }.mkString(", ")
         val sqlWhere = perLevel{pos ⇒
           // Join organization tables on id
@@ -89,8 +89,8 @@ object Organization {
               .foreach { case (name, pos) ⇒
                 val Sql =
                   """INSERT
-                    |  INTO orbeon_form_organization (id, depth, pos, name)
-                    |  VALUES                        (? , ?    , ?  , ?)
+                    |  INTO orbeon_organization (id, depth, pos, name)
+                    |  VALUES                   (? , ?    , ?  , ?)
                     |  """.stripMargin
                 useAndClose(connection.prepareStatement(Sql)) { statement ⇒
                   statement.setInt   (1, orgId)
@@ -109,7 +109,7 @@ object Organization {
 
     val Sql =
       """  SELECT name
-        |    FROM orbeon_form_organization
+        |    FROM orbeon_organization
         |   WHERE id = ?
         |ORDER BY pos
         |""".stripMargin

@@ -22,8 +22,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.scala-js:scalajs-test-interface_2.11:0.6.12:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.12:jar" level="project" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -171,5 +169,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="commonSharedJVM" exported="" />
+    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.12:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-js:scalajs-test-interface_2.11:0.6.12:jar" level="project" />
   </component>
 </module>

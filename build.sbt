@@ -71,6 +71,8 @@ lazy val commonSettings = Seq(
   version                       := orbeonVersionFromProperties.value,
   scalaVersion                  := ScalaVersion,
 
+  jsEnv                         := JSDOMNodeJSEnv().value,
+
   javacOptions  ++= Seq(
     "-encoding", "utf8",
     "-source", "1.6",
@@ -141,6 +143,7 @@ lazy val formBuilderSharedJS  = formBuilderShared.js.dependsOn(commonSharedJS)
 
 lazy val formBuilderClient = (project in file("form-builder-client"))
   .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSJUnitPlugin)
   .dependsOn(formBuilderSharedJS)
   .settings(commonSettings: _*)
   .settings(
@@ -150,14 +153,14 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
     javaSource          in Compile := baseDirectory.value / "src" / "builder" / "java",
     resourceDirectory   in Compile := baseDirectory.value / "src" / "builder" / "resources",
 
-    jsDependencies                 += RuntimeDOM,
-
     libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
     libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
 
     skip in packageJSDependencies  := false,
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     persistLauncher     in Compile := true,
+    persistLauncher     in Test    := true,
 
     fastOptJSToExplodedWar := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,

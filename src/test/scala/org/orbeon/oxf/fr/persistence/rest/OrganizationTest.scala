@@ -18,20 +18,22 @@ import java.sql.Connection
 import org.junit.Test
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.relational.crud.{Organization, OrganizationId}
+import org.orbeon.oxf.fr.persistence.rest.OrganizationTest.{CA, SF}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
+
+object OrganizationTest {
+  val CA = Organization(List("usa", "ca"))
+  val SF = Organization(List("usa", "ca", "sf"))
+}
 
 
 // Test organization-related code used by the REST API
 class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[OrganizationTest]), true)
-
-  private val CA = Organization(List("usa", "ca"))
-  private val SF = Organization(List("usa", "ca", "sf"))
 
   def recordsCount(connection: Connection): Int = {
     val Sql = "SELECT count(*) FROM orbeon_form_organization"

@@ -17,6 +17,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
+import org.orbeon.oxf.fr.persistence.relational.UserRole
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
@@ -70,7 +71,7 @@ object TestHttpClient {
     content     : Option[StreamedContent],
     username    : Option[String] = None,
     group       : Option[String] = None,
-    roles       : List[String]   = Nil
+    roles       : List[UserRole]   = Nil
   ): (ProcessorService, HttpResponse, List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
@@ -127,7 +128,7 @@ object TestHttpClient {
             override val getRequestedSessionId                   = null
 
             override val getUsername                             = username.orNull
-            override val getUserRoles                            = roles.toArray
+            override val getUserRoles                            = roles.map(_.roleName).toArray
             override val getUserGroup                            = group.orNull
 
             // The following are never used by our code

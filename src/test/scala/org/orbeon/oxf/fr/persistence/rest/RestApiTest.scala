@@ -183,33 +183,33 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
     Connect.withOrbeonTables("permissions") { (connection, provider) ⇒
 
-      val FormURL = crudURLPrefix(provider) + "form/form.xhtml"
+      val formURL = crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>
-      val clerk   = Some(HttpRequest.Credentials("tom", Set("clerk"  ), "clerk"))
-      val manager = Some(HttpRequest.Credentials("jim", Set("manager"), "manager"))
-      val admin   = Some(HttpRequest.Credentials("tim", Set("admin"  ), "admin"))
+      val clerk   = Some(HttpRequest.Credentials("tom", Set(SimpleRole("clerk"  )), Some("clerk")  , None))
+      val manager = Some(HttpRequest.Credentials("jim", Set(SimpleRole("manager")), Some("manager"), None))
+      val admin   = Some(HttpRequest.Credentials("tim", Set(SimpleRole("admin"  )), Some("admin")  , None))
 
       {
         val DataURL = crudURLPrefix(provider) + "data/123/data.xml"
 
         // Anonymous: no permission defined
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, None)), 201)
+        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, None)), 201)
         HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), AllOperations, Some(1)))
 
         // Anonymous: create and read
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
+        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("read", "create")))))), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), Some(1)))
 
         // Anonymous: just create, then can't read data
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("create")))))), 201)
+        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(Permission(Anyone, Set("create")))))), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
       }
       {
         val DataURL = crudURLPrefix(provider) + "data/456/data.xml"
 
         // More complex permissions based on roles
-        HttpAssert.put(FormURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(
+        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(
           Permission(Anyone,          Set("create")),
           Permission(Role("clerk"),   Set("read")),
           Permission(Role("manager"), Set("read update")),
@@ -327,5 +327,22 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       }
 
       assertXMLDocumentsIgnoreNamespacesInScope(filterResultBody(resultBodyTry.get), expectedBody)
+    }
+
+  @Test def readWriteOrganization(): Unit =
+    Connect.withOrbeonTables("read/write organization") { (connection, provider) ⇒
+
+      val formURL   = crudURLPrefix(provider) + "form/form.xhtml"
+      val sfUser    = Some(HttpRequest.Credentials("sfuser", Set.empty, None, Some(OrganizationTest.SF)))
+      val sfManager = Some(HttpRequest.Credentials("sfmanager", Set.empty, None, Some(OrganizationTest.SF)))
+      val caManager = Some(HttpRequest.Credentials("camanager", Set.empty, None, Some(OrganizationTest.CA)))
+      val dataURL   = crudURLPrefix(provider) + "data/123/data.xml"
+      val dataBody  = HttpRequest.XML(<gaga/>)
+
+//      HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, None)), 201)
+//      HttpAssert.put(dataURL, Unspecified, dataBody, 201, john)
+//      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, AllOperations, Some(1)))
+
+
     }
 }

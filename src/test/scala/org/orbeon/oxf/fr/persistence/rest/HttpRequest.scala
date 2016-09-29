@@ -17,10 +17,10 @@ import java.io.ByteArrayOutputStream
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.{PUT, _}
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
@@ -30,7 +30,12 @@ private object HttpRequest {
 
   private val PersistenceBase = "/fr/service/persistence/"
 
-  case class Credentials(username: String, roles: Set[String], group: String)
+  case class Credentials(
+    username     : String,
+    roles        : Set[UserRole],
+    group        : Option[String],
+    organization : Option[Organization]
+  )
 
   sealed trait Body
   case class XML   (doc : Document   ) extends Body
@@ -88,7 +93,7 @@ private object HttpRequest {
         headers     = headers,
         content     = content,
         username    = credentials.map(_.username),
-        group       = credentials.map(_.group),
+        group       = credentials.flatMap(_.group),
         roles       = credentials.map(_.roles.toList).getOrElse(Nil)
       )
 

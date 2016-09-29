@@ -22,10 +22,9 @@
  */
 package org.orbeon.oxf.json
 
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.SaxonUtils.makeNCName
 import spray.json._
 
 import scala.language.postfixOps
@@ -42,6 +41,8 @@ protected trait JsonToXmlAlgorithm {
   def endElem     (rcv: XmlStream, name: String): Unit
   def addAttribute(rcv: XmlStream, name: String, value: String): Unit
   def text        (rcv: XmlStream, value: String): Unit
+
+  def makeNCName(name: String): String
 
   // Convert a JSON AST to a stream of XML events
   def jsonToXmlImpl(ast: JsValue, rcv: XmlStream): Unit = {
@@ -79,7 +80,7 @@ protected trait JsonToXmlAlgorithm {
           addAttribute(rcv, Symbols.Type, Symbols.Object)
           fields foreach { case (name, value) ⇒
 
-            val ncName  = makeNCName(name, keepFirstIfPossible = true)
+            val ncName  = makeNCName(name)
             val nameAtt = ncName != name list (Symbols.Name → escapeString(name))
 
             withElement(ncName, nameAtt) {

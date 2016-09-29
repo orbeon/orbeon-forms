@@ -31,6 +31,8 @@ import spray.json._
 
 import scala.language.postfixOps
 
+import org.orbeon.oxf.xml.SaxonUtils
+
 //
 // Concrete functions to convert JSON to XML and back following the XForms 2.0 specification.
 //
@@ -58,6 +60,8 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
   def endElem(rcv: XmlStream, name: String)                     = rcv.endElement("", name, name)
   def addAttribute(rcv: XmlStream, name: String, value: String) = rcv.addAttribute("", name, name, value)
   def text(rcv: XmlStream, value: String)                       = { val a = value.toCharArray; rcv.characters(a, 0, a.length) }
+
+  def makeNCName(name: String): String                          = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
 
   // Convert a JSON String to a readonly DocumentInfo
   def jsonStringToXml(source: String): DocumentInfo = {

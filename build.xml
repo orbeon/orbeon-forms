@@ -967,9 +967,6 @@
                         <fileset dir="dom/target/scala-2.11/test-classes">
                             <include name="org/orbeon/**/*Test.class"/>
                         </fileset>
-                        <fileset dir="common/target/scala-2.11/test-classes">
-                            <include name="org/orbeon/**/*Test.class"/>
-                        </fileset>
                     </batchtest>
 
                     <!-- Configure resource manager -->
@@ -1006,7 +1003,6 @@
                         </fileset>
                         <!-- Test classes -->
                         <pathelement location="src/target/scala-2.11/test-classes"/>
-                        <pathelement location="common/target/scala-2.11/test-classes"/>
                         <pathelement location="dom/target/scala-2.11/test-classes"/>
                         <!-- JUnit proper -->
                         <pathelement location="lib/junit-4.11.jar"/>

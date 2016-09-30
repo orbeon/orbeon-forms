@@ -13,72 +13,52 @@
  */
 package org.orbeon.oxf.util
 
-import org.junit.Test
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.util.StringUtils._
+import org.scalatest.FunSuite
 
 import scala.collection.mutable
 
-class ScalaUtilsTest extends AssertionsForJUnit {
+class SharedUtilsTest extends FunSuite {
 
-  @Test def testUseAndClose(): Unit = {
-
-    val closable = new {
-      var closed = false
-      def close() = closed = true
-      def value = 42
-    }
-
-    assert(42 === useAndClose(closable)(_.value))
-    assert(closable.closed)
-
-    assert(null eq useAndClose(null: {def close()})(identity))
-  }
-
-  @Test def testRunQuietly(): Unit = {
-    assert(() === runQuietly(throw new RuntimeException))
-  }
-
-  @Test def testDropTrailingSlash(): Unit = {
+  test("DropTrailingSlash") {
     assert("/a" === dropTrailingSlash("/a/"))
     assert("/a" === dropTrailingSlash("/a"))
     assert(""   === dropTrailingSlash("/"))
     assert("/"  === dropTrailingSlash("//"))
   }
 
-  @Test def testDropStartingSlash(): Unit = {
+  test("DropStartingSlash") {
     assert("a/" === dropStartingSlash("/a/"))
     assert("a/" === dropStartingSlash("a/"))
     assert(""   === dropStartingSlash("/"))
     assert("/"  === dropStartingSlash("//"))
   }
 
-  @Test def testAppendStartingSlash(): Unit = {
+  test("AppendStartingSlash") {
     assert("/a/" === appendStartingSlash("/a/"))
     assert("/a/" === appendStartingSlash("a/"))
     assert("/"   === appendStartingSlash("/"))
     assert("//"  === appendStartingSlash("//"))
   }
 
-  @Test def testPipeOps(): Unit = {
+  test("PipeOps") {
 
     def inc(i: Int) = i + 1
 
     assert("43" === (42 |> inc |> (_.toString)))
   }
 
-  @Test def testStringToSet(): Unit = {
+  test("StringToSet") {
     assert(Set()                     == stringToSet(""))
     assert(Set()                     == stringToSet("  "))
     assert(Set("GET")                == stringToSet(" GET "))
     assert(Set("GET", "POST", "PUT") == stringToSet(" GET  POST  PUT "))
   }
 
-  @Test def testSplitQuery(): Unit = {
+  test("SplitQuery") {
     assert(("", None)                === splitQuery(""))
     assert(("", Some("bar"))         === splitQuery("?bar"))
     assert(("/foo", None)            === splitQuery("/foo"))
@@ -86,7 +66,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     assert(("/foo", Some("bar?baz")) === splitQuery("/foo?bar?baz"))
   }
 
-  @Test def testDecodeSimpleQuery(): Unit = {
+  test("DecodeSimpleQuery") {
 
     val query    = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
     val expected = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "")
@@ -94,7 +74,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     assert(expected === decodeSimpleQuery(query))
   }
 
-  @Test def testGetFirstQueryParameter(): Unit = {
+  test("GetFirstQueryParameter") {
 
     val pathQuery = """/foo?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
 
@@ -103,15 +83,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     assert(None        === getFirstQueryParameter(pathQuery, "p3"))
   }
 
-  @Test def testEncodeSimpleQuery(): Unit = {
-
-    val query1 = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
-    assert(query1 === encodeSimpleQuery(decodeSimpleQuery(query1)))
-
-    assert("name=%C3%89rik" === encodeSimpleQuery(Seq("name" → "Érik")))
-  }
-
-  @Test def testCombineValues(): Unit = {
+  test("CombineValues") {
 
     val parameters = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "")
     val expectedAsList   = Seq(("p1", List("v11", "v12", "")), ("p2", List("v21", "", "v23")))
@@ -124,14 +96,14 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
   }
 
-  @Test def testTrimAllToOpt(): Unit = {
+  test("TrimAllToOpt") {
     assert(None        === "".trimAllToOpt)
     assert(None        === "  ".trimAllToOpt)
     assert(Some("foo") === "foo".trimAllToOpt)
     assert(Some("foo") === "  foo  ".trimAllToOpt)
   }
 
-  @Test def testBooleanOption(): Unit = {
+  test("BooleanOption") {
     locally {
       var invoked = false
       assert(Some("foo") === true.option({invoked = true; "foo"}))
@@ -145,7 +117,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     }
   }
 
-  @Test def testCollectByType(): Unit = {
+  test("CollectByType") {
 
     class Foo
     class Bar extends Foo
@@ -160,7 +132,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     assert(collectByErasedType[Seq[String]](Seq(42)).isDefined) // erasure!
   }
 
-  @Test def testSplit(): Unit = {
+  test("Split") {
 
     val expected = Seq(
       ""                    → Seq(),
@@ -178,7 +150,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     }
   }
 
-  @Test def testTruncateWithEllipsis(): Unit = {
+  test("TruncateWithEllipsis") {
 
     val expected = Seq(
       ("abcdef",        3,  0) → "abc…",
@@ -202,7 +174,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
       assert(out === truncateWithEllipsisTupled(in))
   }
 
-  @Test def testTrim(): Unit = {
+  test("Trim") {
 
     val zeroWidthSpaces   = "\u200b\u200c\u200d\ufeff" // last one is the BOM
     val nonBreakingSpaces = "\u00A0\u2007\u202F"

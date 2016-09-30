@@ -115,6 +115,22 @@ lazy val commonSettings = Seq(
   }
 )
 
+lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-common"
+  )
+  .jvmSettings(
+    unmanagedBase := baseDirectory.value / ".." / ".." / "lib"
+  )
+  .jsSettings(
+    libraryDependencies += "org.scalactic" %%% "scalactic" % "3.0.0" % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
+  )
+
+lazy val commonJVM = common.jvm
+lazy val commonJS = common.js
+
 lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("form-builder-shared"))
   .settings(commonSettings: _*)
   .settings(
@@ -158,20 +174,6 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
       baseDirectory.value.getParentFile
     )
   )
-
-lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "orbeon-common"
-  )
-  .jvmSettings(
-    unmanagedBase := baseDirectory.value / ".." / ".." / "lib"
-  )
-  .jsSettings(
-  )
-
-lazy val commonJVM = common.jvm
-lazy val commonJS = common.js
 
 lazy val xupdate = (project in file("xupdate"))
   .dependsOn(commonJVM)

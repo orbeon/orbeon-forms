@@ -2,13 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common.iml" filepath="$PROJECT_DIR$/.idea/modules/common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-build.iml" filepath="$PROJECT_DIR$/.idea/modules/common-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-shared-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/common-shared-sources.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonSharedJS.iml" filepath="$PROJECT_DIR$/.idea/modules/commonSharedJS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonSharedJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/commonSharedJS-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonSharedJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/commonSharedJVM.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonSharedJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/commonSharedJVM-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/common-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonJS.iml" filepath="$PROJECT_DIR$/.idea/modules/commonJS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/commonJS-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/commonJVM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commonJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/commonJVM-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core.iml" filepath="$PROJECT_DIR$/.idea/modules/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-build.iml" filepath="$PROJECT_DIR$/.idea/modules/core-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom.iml" filepath="$PROJECT_DIR$/.idea/modules/dom.iml" />

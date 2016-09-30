@@ -115,19 +115,6 @@ lazy val commonSettings = Seq(
   }
 )
 
-lazy val commonShared = (crossProject.crossType(CrossType.Pure) in file("common-shared"))
-  .settings(commonSettings: _*)
-  .settings(
-    name := "orbeon-common-shared"
-  )
-  .jvmSettings(
-  )
-  .jsSettings(
-  )
-
-lazy val commonSharedJVM = commonShared.jvm
-lazy val commonSharedJS  = commonShared.js
-
 lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("form-builder-shared"))
   .settings(commonSettings: _*)
   .settings(
@@ -138,8 +125,8 @@ lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("fo
   .jsSettings(
   )
 
-lazy val formBuilderSharedJVM = formBuilderShared.jvm.dependsOn(commonSharedJVM)
-lazy val formBuilderSharedJS  = formBuilderShared.js.dependsOn(commonSharedJS)
+lazy val formBuilderSharedJVM = formBuilderShared.jvm.dependsOn(commonJVM)
+lazy val formBuilderSharedJS  = formBuilderShared.js.dependsOn(commonJS)
 
 lazy val formBuilderClient = (project in file("form-builder-client"))
   .enablePlugins(ScalaJSPlugin)
@@ -158,6 +145,9 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
     persistLauncher     in Compile := true,
     persistLauncher     in Test    := true,
 
+    testOptions         in Test    += Tests.Setup(() ⇒ println("Setup")),
+    testOptions         in Test    += Tests.Cleanup(() ⇒ println("Cleanup")),
+
     fastOptJSToExplodedWar := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
       baseDirectory.value.getParentFile
@@ -169,17 +159,22 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
     )
   )
 
-lazy val common = (project in file("common"))
-  .enablePlugins(ScalaJSPlugin)
-  .dependsOn(commonSharedJVM)
+lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
-    name          := "orbeon-common",
-    unmanagedBase := baseDirectory.value / ".." / "lib"
+    name := "orbeon-common"
+  )
+  .jvmSettings(
+    unmanagedBase := baseDirectory.value / ".." / ".." / "lib"
+  )
+  .jsSettings(
   )
 
+lazy val commonJVM = common.jvm
+lazy val commonJS = common.js
+
 lazy val xupdate = (project in file("xupdate"))
-  .dependsOn(common)
+  .dependsOn(commonJVM)
   .settings(commonSettings: _*)
   .settings(
     name          := "orbeon-xupdate"
@@ -206,7 +201,7 @@ lazy val formBuilder = (project in file("form-builder"))
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(common, dom, formBuilderSharedJVM, xupdate, formRunner, formBuilder)
+  .dependsOn(commonJVM, dom, formBuilderSharedJVM, xupdate, formRunner, formBuilder)
   .settings(commonSettings: _*)
   .settings(
     name                         := "orbeon-core",
@@ -235,7 +230,7 @@ lazy val core = (project in file("src"))
   )
 
 lazy val root = (project in file("."))
-  .aggregate(common, commonSharedJVM, dom, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient)
+  .aggregate(commonJVM, commonJS, dom, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient)
   .settings(
 
     scalaVersion                 := ScalaVersion,

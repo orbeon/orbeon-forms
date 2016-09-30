@@ -21,8 +21,154 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="commonSharedJVM" exported="" />
     <orderEntry type="module" module-name="form-builder-shared-sources" exported="" />
+    <orderEntry type="module-library">
+      <library name="SBT: unmanaged-jars">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../lib/activation-1.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ant-1_6_5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ant-contrib-1.0b3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ant-jsch-1_6_5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ant-junit-1.7.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/apache-mime4j-0.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/avalon-framework-4_2_0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/avalon-framework-cvs-20020315.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/axis_1_2_1-axis.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/axis_1_2_1-jaxrpc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/axis_1_2_1-saaj.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/axis_1_2_1-wsdl4j-1.5.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/barcode4j-1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/batic-dependency-xmlgraphics-commons-1.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/batik-all-1_7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/bsf-2_2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/castor-0_9_4_3-xml.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/classes12.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-beanutils-1_5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-cli-1_0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-codec-1.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-collections-3.2.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-dbcp-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-digester-1_5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-discovery-0.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-exec-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-exec-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-fileupload-1.2.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-io-2.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-lang3-3.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-pool-1.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/commons-validator-1.4.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ehcache-core-2.6.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ejb-2_0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-1_4_1_dev_orbeon_20110104.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-antlr-2.7.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-jgroups-all-2.2.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-jta-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-lucene-core-2.9.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-lucene-regex-2.9.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-quartz-1.6.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-resolver-1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-stax-api-1.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-ws-commons-util-1.0.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-xmldb.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-xmlrpc-client-3.1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-xmlrpc-common-3.1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-dependency-xmlrpc-server-3.1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-lucene-module-1_4_1_dev_orbeon_20110104.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-modules-1_4_1_dev_orbeon_20110104.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-ngram-module-1_4_1_dev_orbeon_20110104.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-optional-1_4_1_dev_orbeon_20110104.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/exist-xqj-1.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/fluent-hc-4.3.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/flying-saucer-core-9.0.2-20140523.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/flying-saucer-dependency-itext-2.1.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/flying-saucer-pdf-9.0.2-20140523.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/fop-1_0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/gson-2.3.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/guava-13.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/hamcrest-core-1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/httpclient-4.3.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/httpclient-cache-4.3.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/httpcore-4.3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/httpmime-4.3.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/icepdf-core-5.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ironjacamar-jdbc-1.0.9.Final.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/itext-bcmail-jdk14-138.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/itext-bcprov-jdk14-138.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jai-core-1.1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jai-imageio-core-1.3.1-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jakarta-poi-1.11.0-dev-20030610.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jarjar-1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jaxen-1_1_beta_9.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jboss-common-jdbc-wrapper.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jcifs-1.3.14.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jcl-over-slf4j-1.7.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jfreechart-1.0.9.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jfreechart-dependency-jcommon-1.0.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jgraph-1_0_4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jms-api-1_1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/joda-convert-1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/joda-time-2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jsch-0.1.42.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/json-20090211.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/jtidy-8.0-20060801.131059-3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/junit-4.11.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/liferay-portal-kernel-7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/liferay-portal-service-6.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/log4j-1.2.17.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/looks-1_1_2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/mail-1_3_2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/metadata-extractor-2.7.0.SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/metadata-extractor-dependency-xmpcore-5.1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/mockito-all-1.8.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/msv-20081113-orbeon.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/mysql-connector-java-5.1.26-bin.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/oracle-weblogic-7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/orbeon-errorified-20150511.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/parboiled-core-1.1.7-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/parboiled-core-1.1.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/parboiled-scala_2.11-1.1.7-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/parboiled-scala_2.11-1.1.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/portlet-api_2.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/postgresql-9.3-1102.jdbc4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/proguard-5.2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/resolver-xerces_2_6_2_orbeon.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/rhino-1.7R2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/saxon-9-1-0-8_orbeon_20160615.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/saxpath-dev_orbeon.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/sbinary_2.11-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/scala-library-2.11.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/scala-reflect-2.11.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/scala-xml_2.11-1.0.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/scalatest_2.11-2.2.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/selenium-java-2.45.0-srcs.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/selenium-java-2.45.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/servlet-2_3-4_0_4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/simplecaptcha-1.2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/slf4j-api-1.7.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/slf4j-log4j12-1.7.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/spray-json_2.11-1.3.2-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/spray-json_2.11-1.3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/sqljdbc4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tagsoup-1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tomcat-5_5-naming-factory-dbcp.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tomcat-7.0.68-catalina.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tomcat-7.0.68-juli.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/typesafe-config-2.10.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/tyrex-1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xdb.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xerces-2.11-orbeon.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xmlparserv2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xqj2-0.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xqjapi.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/xsu12.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/yui-compressor-ant-task-0.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/yuicompressor-2.4.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="commonJVM" exported="" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
   </component>
 </module>

@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="common" external.linked.project.path="$MODULE_DIR$/../../common" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="commonJVM" external.linked.project.path="$MODULE_DIR$/../../common/jvm" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../common/target/scala-2.11/classes" />
-    <output-test url="file://$MODULE_DIR$/../../common/target/scala-2.11/test-classes" />
+    <output url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/classes" />
+    <output-test url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/test-classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../common">
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/main/scala" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/main/scala-2.11" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/target/scala-2.11/src_managed/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/test/scala" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/test/scala-2.11" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/target/scala-2.11/src_managed/test" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/target/scala-2.11/resource_managed/main" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/src/test/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../common/target/scala-2.11/resource_managed/test" type="java-test-resource" />
-      <excludeFolder url="file://$MODULE_DIR$/../../common/target" />
+    <content url="file://$MODULE_DIR$/../../common/jvm">
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/main/scala" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/main/scala-2.11" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/src_managed/main" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/test/scala" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/test/scala-2.11" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/src_managed/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/resource_managed/main" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/test/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/resource_managed/test" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/../../common/jvm/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.scala-js:scalajs-test-interface_2.11:0.6.12:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.12:jar" level="project" />
-    <orderEntry type="module" module-name="commonSharedJVM" exported="" />
+    <orderEntry type="module" module-name="common-sources" exported="" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -171,5 +168,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
   </component>
 </module>

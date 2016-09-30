@@ -8,13 +8,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/common" />
-            <option value="$PROJECT_DIR$/common-shared" />
-            <option value="$PROJECT_DIR$/common-shared/.js" />
-            <option value="$PROJECT_DIR$/common-shared/.js/project" />
-            <option value="$PROJECT_DIR$/common-shared/.jvm" />
-            <option value="$PROJECT_DIR$/common-shared/.jvm/project" />
-            <option value="$PROJECT_DIR$/common/project" />
+            <option value="$PROJECT_DIR$/common/js" />
+            <option value="$PROJECT_DIR$/common/js/project" />
+            <option value="$PROJECT_DIR$/common/jvm" />
+            <option value="$PROJECT_DIR$/common/jvm/project" />
+            <option value="$PROJECT_DIR$/common/shared" />
             <option value="$PROJECT_DIR$/dom" />
             <option value="$PROJECT_DIR$/dom/project" />
             <option value="$PROJECT_DIR$/form-builder" />

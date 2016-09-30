@@ -13,30 +13,23 @@
   */
 package org.orbeon.builder
 
-import org.junit.Assert._
-import org.junit.Test
 import org.scalajs.dom
+import org.scalatest.FunSuite
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 
-class DemoFormBuilderClientTest {
+class DemoFormBuilderClientTest extends FunSuite {
 
-  @Test def userAgent(): Unit = {
+  test("Node.js user agent string") {
     val userAgent = dom.window.navigator.userAgent
-
-    println(s"Test user agent: $userAgent")
-
-    assertTrue(userAgent contains "Node.js")
+    assert(userAgent contains "Node.js")
   }
 
-  @Test def jQuery(): Unit = {
+  test("jQuery is in scope and matches version we are expecting") {
     val $ = g.$.asInstanceOf[org.scalajs.jquery.JQueryStatic]
     val jQueryVersion = $.fn.asInstanceOf[js.Dynamic].jquery.asInstanceOf[String]
-
-    println(s"jQuery version: $jQueryVersion")
-
-    assertTrue(jQueryVersion.startsWith("1."))
+    assert(jQueryVersion.startsWith("1."))
   }
 
 }

@@ -146,7 +146,6 @@ lazy val formBuilderSharedJS  = formBuilderShared.js.dependsOn(commonJS)
 
 lazy val formBuilderClient = (project in file("form-builder-client"))
   .enablePlugins(ScalaJSPlugin)
-  .enablePlugins(ScalaJSJUnitPlugin)
   .dependsOn(formBuilderSharedJS)
   .settings(commonSettings: _*)
   .settings(
@@ -154,6 +153,9 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
 
     libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
     libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+
+    libraryDependencies            += "org.scalactic" %%% "scalactic" % "3.0.0" % "test",
+    libraryDependencies            += "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
 
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",

@@ -30,7 +30,7 @@ object CoreUtils {
   }
 
   // Extensions on Boolean
-  implicit class BooleanWrapper(val b: Boolean) extends AnyVal {
+  implicit class BooleanOps(val b: Boolean) extends AnyVal {
     def option[A](a: ⇒ A)   = if (b) Option(a)   else None
     def string(s: String)   = if (b) s           else ""
     def list[A](a: ⇒ A)     = if (b) List(a)     else Nil

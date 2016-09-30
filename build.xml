@@ -300,7 +300,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      common/target/scala-2.11/classes
+            -injars      common/jvm/target/scala-2.11/classes
             -injars      src/target/scala-2.11/classes
 
             -injars      lib/commons-io-2.0.1.jar
@@ -359,7 +359,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      common/target/scala-2.11/classes
+            -injars      common/jvm/target/scala-2.11/classes
             -injars      src/target/scala-2.11/classes
 
             -injars      lib/commons-io-2.0.1.jar
@@ -420,7 +420,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      common/target/scala-2.11/classes
+            -injars      common/jvm/target/scala-2.11/classes
             -injars      src/target/scala-2.11/classes
 
             -injars      lib/commons-io-2.0.1.jar
@@ -705,7 +705,7 @@
         <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask">
             <classpath>
 
-                <pathelement location="common/target/scala-2.11/classes"/>
+                <pathelement location="common/jvm/target/scala-2.11/classes"/>
                 <pathelement location="src/target/scala-2.11/classes"/>
 
                 <pathelement location="src/main/resources"/>

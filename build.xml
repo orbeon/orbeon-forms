@@ -1148,7 +1148,7 @@
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
                 <path refid="class.path"/>
-                <pathelement location="common/target/scala-2.11/classes"/>
+                <pathelement location="common/jvm/target/scala-2.11/classes"/>
                 <pathelement location="dom/target/scala-2.11/classes"/>
                 <pathelement location="src/target/scala-2.11/classes"/>
             </classpath>

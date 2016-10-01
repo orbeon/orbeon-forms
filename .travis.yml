@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 language: java
 jdk:
   - oraclejdk7
@@ -5,6 +7,7 @@ node_js:
   - "node"
 env:
   global:
+  - ANT_OPTS=-Xmx2048m
   - secure: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
   - secure: "bAgBFLf9R51upNAWfHJyBsByveotFRwCUAWFIiVTgCGxAE5mhWFMZl9HsAL0oiacjzmQ03u2toboOdTH/tfm2bohtQZknFleO0rDhLyW3ZmYI65vmFm1uYVrbyzMI0l7t/Ws4gZW9SC5cUl7m2GjTnB/qKg/O6uohPU7uqf8KEU="
   - secure: "PhGOPRzoUKHmJxytdzA78+veaDi6Xm1JzcTFb1tHIna1DV8gjSR7YHMuuxbJCrhF719ubGJlgE8LndLolkMGVq/3GL8XA6rV5RQeNZ+FnNgcQ+KCo4NYH8Zpyb3zn2Bp0L3Q1XSWjXoTEeVwjwDEVOpdBxLTvD+LorLVuC0cEMc="

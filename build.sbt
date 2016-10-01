@@ -105,7 +105,9 @@ lazy val commonSettings = Seq(
     val MatchRawJarNameRE(sourceJarRawName) = sourceJarFile.name
     val targetJarFile = new File(ExplodedWarLibPath + '/' + sourceJarRawName + ".jar")
 
-    if (sourceJarRawName != "orbeon-form-builder-client" && (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
+    if (! sourceJarFile.name.contains("_sjs") &&
+        sourceJarRawName != "orbeon-form-builder-client" &&
+        (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
       println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
       IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
       Some(targetJarFile)

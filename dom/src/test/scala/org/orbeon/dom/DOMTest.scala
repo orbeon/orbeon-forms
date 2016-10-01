@@ -13,14 +13,13 @@
   */
 package org.orbeon.dom
 
-import org.junit.Test
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSuite
 
 import scala.collection.JavaConverters._
 
-class DOMTest extends AssertionsForJUnit {
+class DOMTest extends FunSuite {
 
-  @Test def clearContentWithNamespaces(): Unit = {
+  test("clearContentWithNamespaces") {
 
     val doc = DocumentFactory.createDocument("root")
 
@@ -42,7 +41,7 @@ class DOMTest extends AssertionsForJUnit {
     assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
   }
 
-  @Test def clearContentWithoutNamespaces(): Unit = {
+  test("clearContentWithoutNamespaces") {
 
     val doc = DocumentFactory.createDocument("root")
 

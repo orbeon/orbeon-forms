@@ -103,6 +103,7 @@ object TestHttpClient {
           // Create a request with only the methods used by `LocalRequest.incomingRequest` parameter
           val baseRequest = new RequestAdapter {
 
+            override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
             override val getAttributesMap                        = ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef]())
             override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
 

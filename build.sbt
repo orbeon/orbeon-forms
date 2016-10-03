@@ -259,7 +259,7 @@ lazy val core = (project in file("src"))
     testOptions                  += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
     parallelExecution in Test    := false,
     fork              in Test    := true, // "By default, tests executed in a forked JVM are executed sequentially"
-    javaOptions       in Test    ++= Seq("-ea", "-server", "-Djava.awt.headless=true", "-Xms256m", "-Xmx1024m", "-XX:MaxPermSize=256m"),
+    javaOptions       in Test    ++= Seq("-ea", "-server", "-Djava.awt.headless=true", "-Xms256m", "-Xmx2G", "-XX:MaxPermSize=512m"),
     baseDirectory     in Test    := baseDirectory.value / "..",
 
 //    libraryDependencies          += "com.lihaoyi" %% "pprint" % "0.4.1",

@@ -45,7 +45,7 @@ import java.util.concurrent.Callable;
  *
  * TODO: Refactor handling of serialization to separate classes.
  */
-public class XFormsModelSubmission extends XFormsModelSubmissionBase implements XFormsEventTarget, XFormsEventObserver {
+public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     public static final String LOGGING_CATEGORY = "submission";
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
@@ -476,7 +476,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                             throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xf:submission", "processing submission");
                         } else {
                             // Any exception will cause an error event to be dispatched
-                            sendSubmitError(resolvedActionOrResourceVal, throwable);
+                            sendSubmitError(throwable, resolvedActionOrResourceVal);
                         }
                     }
                 };
@@ -617,52 +617,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(XFormsModelSubmission.this, connectionResult));
             }
         };
-    }
-
-    private void sendSubmitError(Throwable throwable, SubmissionResult submissionResult) {
-
-        // After a submission, the context might have changed
-        model.resetAndEvaluateVariables();
-
-        // Try to get error event from exception
-        XFormsSubmitErrorEvent submitErrorEvent = null;
-        if (throwable instanceof XFormsSubmissionException) {
-            final XFormsSubmissionException submissionException = (XFormsSubmissionException) throwable;
-            submitErrorEvent = submissionException.getXFormsSubmitErrorEvent();
-        }
-
-        // If no event obtained, create default event
-        if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this,
-                XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), submissionResult.getConnectionResult());
-        }
-
-        // Dispatch event
-        submitErrorEvent.logThrowable(throwable);
-        Dispatch.dispatchEvent(submitErrorEvent);
-    }
-
-    private void sendSubmitError(String resolvedActionOrResource, Throwable throwable) {
-
-        // After a submission, the context might have changed
-        model.resetAndEvaluateVariables();
-
-        // Try to get error event from exception
-        XFormsSubmitErrorEvent submitErrorEvent = null;
-        if (throwable instanceof XFormsSubmissionException) {
-            final XFormsSubmissionException submissionException = (XFormsSubmissionException) throwable;
-            submitErrorEvent = submissionException.getXFormsSubmitErrorEvent();
-        }
-
-        // If no event obtained, create default event
-        if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, scala.Option.apply(resolvedActionOrResource),
-                XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), 0);
-        }
-
-        // Dispatch event
-        submitErrorEvent.logThrowable(throwable);
-        Dispatch.dispatchEvent(submitErrorEvent);
     }
 
     public Replacer getReplacer(ConnectionResult connectionResult, SubmissionParameters p) throws IOException {

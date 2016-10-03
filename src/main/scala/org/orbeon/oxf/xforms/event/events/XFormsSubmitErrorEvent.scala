@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import XFormsSubmitErrorEvent._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 
 
@@ -61,6 +61,10 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   def logThrowable(throwable: Throwable): Unit =
     if (errorType != VALIDATION_ERROR)
       indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable))
+
+  def logMessage(throwable: Throwable): Unit =
+    if (errorType != VALIDATION_ERROR)
+      indentedLogger.logError("xforms-submit-error", OrbeonFormatter.message(throwable))
 }
 
 object XFormsSubmitErrorEvent {

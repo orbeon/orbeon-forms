@@ -21,16 +21,53 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
-import org.orbeon.oxf.xforms.event.ListenersTrait
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR
+import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventObserver, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.BindNode
-import org.orbeon.oxf.xforms.{InstanceData, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{InstanceData, XFormsContainingDocument, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 
 import scala.collection.mutable
 
-abstract class XFormsModelSubmissionBase extends ListenersTrait
+abstract class XFormsModelSubmissionBase
+  extends ListenersTrait
+     with XFormsEventTarget
+     with XFormsEventObserver {
+
+  thisXFormsModelSubmission ⇒
+
+  def getModel: XFormsModel
+
+  protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
+    sendSubmitErrorWithDefault(
+      throwable,
+      new XFormsSubmitErrorEvent(thisXFormsModelSubmission, XXFORMS_INTERNAL_ERROR, submissionResult.getConnectionResult)
+    )
+
+  protected def sendSubmitError(throwable: Throwable, resolvedActionOrResource: String): Unit =
+    sendSubmitErrorWithDefault(
+      throwable,
+      new XFormsSubmitErrorEvent(thisXFormsModelSubmission, Option(resolvedActionOrResource), XXFORMS_INTERNAL_ERROR, 0)
+    )
+
+  private def sendSubmitErrorWithDefault(throwable: Throwable, default: ⇒ XFormsSubmitErrorEvent): Unit = {
+
+    // After a submission, the context might have changed
+    getModel.resetAndEvaluateVariables()
+
+    // Try to get error event from exception and if not possible create default event
+    val submitErrorEvent =
+      (throwable collect { case se: XFormsSubmissionException ⇒ Option(se.getXFormsSubmitErrorEvent) } flatten) getOrElse default
+
+    // Dispatch event
+    submitErrorEvent.logMessage(throwable)
+    Dispatch.dispatchEvent(submitErrorEvent)
+  }
+
+}
 
 object XFormsModelSubmissionBase {
 

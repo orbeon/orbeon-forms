@@ -274,16 +274,6 @@
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
-            <arg value="compile"/>
-        </exec>
-    </target>
-
-    <!-- Compile test source -->
-    <target name="test-classes" depends="init" unless="skip.compilation">
-        <exec executable="sbt" failonerror="true">
-            <arg value="-Dorbeon.version=${release.number}"/>
-            <arg value="-Dorbeon.edition=${edition}"/>
-            <arg value="project root"/>
             <arg value="test:compile"/>
         </exec>
     </target>
@@ -818,7 +808,7 @@
 
     <target name="test-unit" depends="skip-selenium, test"/>
 
-    <target name="test" depends="test-expand-war, test-classes">
+    <target name="test" depends="test-expand-war, classes">
 
         <property name="tomcat-version" value="6.0.36"/>
         <parallel failonany="true">

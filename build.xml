@@ -806,9 +806,17 @@
         <property name="skip.database" value="true"/>
     </target>
 
-    <target name="test-unit" depends="skip-selenium, test"/>
+    <target name="test-unit" depends="init">
+        <exec executable="sbt" failonerror="true">
+            <arg value="-Dorbeon.version=${release.number}"/>
+            <arg value="-Dorbeon.edition=${edition}"/>
+            <arg value="project root"/>
+            <arg value="test"/>
+        </exec>
+    </target>
 
-    <target name="test" depends="test-expand-war, classes">
+    <!-- TODO -->
+    <target name="test-integration" depends="test-expand-war, classes">
 
         <property name="tomcat-version" value="6.0.36"/>
         <parallel failonany="true">
@@ -937,7 +945,7 @@
                     <arg value="-Dorbeon.version=${release.number}"/>
                     <arg value="-Dorbeon.edition=${edition}"/>
                     <arg value="project root"/>
-                    <arg value="test"/>
+                    <arg value="it"/>
                 </exec>
 
                 <!-- Stop Tomcat -->

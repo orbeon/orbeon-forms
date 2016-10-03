@@ -185,7 +185,7 @@ object XFormsError {
 
       val template =
         new DocumentWrapper(
-          ResourceManagerWrapper.instance().getContentAsDOM4J(resourcePath),
+          ResourceManagerWrapper.instance.getContentAsDOM4J(resourcePath),
           null,
           XPath.GlobalConfiguration
         )

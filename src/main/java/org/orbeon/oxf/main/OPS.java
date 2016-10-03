@@ -102,7 +102,8 @@ public class OPS {
         props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FilesystemResourceManagerFactory");
         props.put("oxf.resources.priority.2", "org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory");
         if (logger.isInfoEnabled())
-            logger.info("Initializing Resource Manager with: " + props);
+            logger.info("Initializing Resource Manager with: " + ResourceManagerWrapper.propertiesAsJson(props));
+
         ResourceManagerWrapper.init(props);
 
         // 3. Initialize properties with default properties file.

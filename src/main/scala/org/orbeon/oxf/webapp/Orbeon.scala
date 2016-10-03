@@ -59,20 +59,7 @@ object Orbeon {
       { case (name, value) ⇒ name.startsWith("oxf.resources.")} updated
         (WebAppResourceManagerImpl.WEB_APP_CONTEXT_KEY, context) asJava
 
-    locally {
-
-      val propertiesAsScala = properties.asScala
-
-      val maxKeyLength =
-        if (propertiesAsScala.nonEmpty) propertiesAsScala.keysIterator.maxBy(_.length).length else 0
-
-      val sorted = propertiesAsScala.to[List].sortBy(_._1).collect{
-        case (key, value: String) ⇒ s""" "$key":${" " * (maxKeyLength + 1 - key.length)}"$value" """.trim
-      }.mkString("{\n  ", ",\n  ", "\n}")
-
-      logger.info(s"Initializing Resource Manager with: $sorted")
-    }
-
+    logger.info(s"Initializing Resource Manager with: ${ResourceManagerWrapper.propertiesAsJson(properties)}")
     ResourceManagerWrapper.init(properties)
 
     // 2. Initialize properties

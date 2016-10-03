@@ -63,8 +63,7 @@ public abstract class ResourceManagerTestBase {
                     props.put(name, properties.getProperty(name));
             }
 
-            logger.info("Initializing Resource Manager with: " + props);
-
+            logger.info("Initializing Resource Manager with: " + ResourceManagerWrapper.propertiesAsJson(props));
             ResourceManagerWrapper.init(props);
             // Initialize properties
             org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");

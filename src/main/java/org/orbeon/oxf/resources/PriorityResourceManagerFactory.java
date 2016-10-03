@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Creates a priority resource manager.
  */
-public class PriorityResourceManagerFactory implements ResourceManagerFactoryFunctor {
+public class PriorityResourceManagerFactory implements ResourceManagerFactory {
 
     public static final String PRIORITY_PROPERTY = "oxf.resources.priority.";
     private Map<String, String> props;

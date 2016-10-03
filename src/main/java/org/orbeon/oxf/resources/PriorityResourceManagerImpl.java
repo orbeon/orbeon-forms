@@ -69,12 +69,12 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             final Map<String, String> localProperties = entry.getValue();
             try {
                 // Create instance
-                final Class<ResourceManagerFactoryFunctor> clazz =
-                    (Class<ResourceManagerFactoryFunctor>) Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
-                final Constructor<ResourceManagerFactoryFunctor> constructor = clazz.getConstructor(Map.class);
+                final Class<ResourceManagerFactory> clazz =
+                    (Class<ResourceManagerFactory>) Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
+                final Constructor<ResourceManagerFactory> constructor = clazz.getConstructor(Map.class);
                 final Map<String, String> allProps = new HashMap<String, String>(props);
                 allProps.putAll(localProperties);
-                final ResourceManagerFactoryFunctor factory = constructor.newInstance(allProps);
+                final ResourceManagerFactory factory = constructor.newInstance(allProps);
                 final ResourceManager instance = factory.makeInstance();
 
                 resourceManagers.add(instance);

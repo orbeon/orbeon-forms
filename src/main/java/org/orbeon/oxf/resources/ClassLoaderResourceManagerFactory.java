@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * This factory creates a Classloader resource manager.
  */
-public class ClassLoaderResourceManagerFactory implements ResourceManagerFactoryFunctor {
+public class ClassLoaderResourceManagerFactory implements ResourceManagerFactory {
 
     private Map props;
 

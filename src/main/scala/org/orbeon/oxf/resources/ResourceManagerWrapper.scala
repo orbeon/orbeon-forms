@@ -19,6 +19,10 @@ import org.orbeon.oxf.common.OXFException
 
 import scala.collection.JavaConverters._
 
+trait ResourceManagerFactory {
+  def makeInstance: ResourceManager
+}
+
 /**
   * This is the main interface the to the Resource Manager system.
   */
@@ -26,14 +30,14 @@ object ResourceManagerWrapper {
 
   private val FactoryProperty = "oxf.resources.factory"
 
-  private var _factory: ResourceManagerFactoryFunctor = null
+  private var _factory: ResourceManagerFactory = null
 
   def init(props: ju.Map[String, AnyRef]): Unit = synchronized {
     _factory =
       props.get(FactoryProperty) match {
         case factoryImpl: String ⇒
           try {
-            val factoryClass = Class.forName(factoryImpl).asInstanceOf[Class[ResourceManagerFactoryFunctor]]
+            val factoryClass = Class.forName(factoryImpl).asInstanceOf[Class[ResourceManagerFactory]]
             val constructor = factoryClass.getConstructor(classOf[ju.Map[_, _]])
             constructor.newInstance(props)
           } catch {

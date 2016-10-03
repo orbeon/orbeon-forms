@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * This factory creates a URL resource manager
  */
-public class URLResourceManagerFactory implements ResourceManagerFactoryFunctor {
+public class URLResourceManagerFactory implements ResourceManagerFactory {
 
     public static final String BASE_URL = "oxf.resources.url.base";
 

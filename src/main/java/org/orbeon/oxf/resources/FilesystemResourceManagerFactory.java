@@ -15,7 +15,7 @@ package org.orbeon.oxf.resources;
 
 import java.util.Map;
 
-public class FilesystemResourceManagerFactory implements ResourceManagerFactoryFunctor {
+public class FilesystemResourceManagerFactory implements ResourceManagerFactory {
 
     public static final String SANDBOX_DIRECTORY_PROPERTY = "oxf.resources.filesystem.sandbox-directory";
 

@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * This factory creates a WebApp resource manager.
  */
-public class WebAppResourceManagerFactory implements ResourceManagerFactoryFunctor {
+public class WebAppResourceManagerFactory implements ResourceManagerFactory {
 
     private Map props;
 

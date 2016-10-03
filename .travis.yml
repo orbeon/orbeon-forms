@@ -35,6 +35,7 @@ cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot
+    - $HOME/.sbt/launchers
     - $HOME/node_modules
 before_cache:
   # Tricks to avoid unnecessary cache updates

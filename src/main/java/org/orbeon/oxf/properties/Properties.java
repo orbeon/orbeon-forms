@@ -100,7 +100,7 @@ public class Properties {
      * Make sure we have the latest properties, and if we don't (resource changed), reload them.
      */
     private void update() {
-        if (!initializing) {
+        if (! initializing) {
             done:
             try {
                 initializing = true;
@@ -150,7 +150,7 @@ public class Properties {
 
                     success = true;
                 } catch (Throwable t) {
-                    System.out.println(t);
+                    LoggerFactory.logger.error(t);
                 } finally {
                     pipelineContext.destroy(success);
                 }

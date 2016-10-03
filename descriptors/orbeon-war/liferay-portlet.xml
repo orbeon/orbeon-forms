@@ -3,5 +3,6 @@
 	<portlet>
 		<portlet-name>orbeon-forms-portlet</portlet-name>
 		<instanceable>true</instanceable>
+		<requires-namespaced-parameters>false</requires-namespaced-parameters>
 	</portlet>
 </liferay-portlet-app>

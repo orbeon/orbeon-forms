@@ -59,7 +59,7 @@
     </filter-mapping>
 
     <filter-mapping>
-        <filter-name>orbeon-add-orbeon-auth-headers</filter-name>
+        <filter-name>orbeon-add-orbeon-auth-headers-portlet-filter</filter-name>
         <portlet-name>orbeon-forms-portlet</portlet-name>
     </filter-mapping>
 

@@ -189,7 +189,6 @@
         <property name="unversioned-proxy-portlet-name" value="orbeon-proxy-portlet"/>
 
         <property name="examples-cli-src.dir"           value="src/examples-cli"/>
-        <property name="test.exist-db.dir"              location="src/resources-packaged/ops/unit-tests/exist-data"/>
 
         <property name="xforms-filter.jar.file"         value="build/lib/orbeon-xforms-filter.jar"/>
         <property name="cli.jar.file"                   value="build/lib/orbeon-cli.jar"/>
@@ -938,6 +937,11 @@
                     </then>
                 </if>
 
+                <delete dir="build/temp/test"/>
+               	<mkdir  dir="build/temp/test"/>
+           	    <delete dir="src/resources-packaged/ops/unit-tests/exist-data"/>
+               	<mkdir  dir="src/resources-packaged/ops/unit-tests/exist-data"/>
+
                 <!-- Run sbt tests -->
                 <exec executable="sbt" failonerror="true">
                     <arg value="-Dorbeon.version=${release.number}"/>
@@ -945,81 +949,6 @@
                     <arg value="project root"/>
                     <arg value="test"/>
                 </exec>
-
-                <delete dir="build/temp/test"/>
-               	<mkdir  dir="build/temp/test"/>
-           	    <delete dir="${test.exist-db.dir}"/>
-               	<mkdir  dir="${test.exist-db.dir}"/>
-
-                <!-- Run JUnit tests -->
-                <junit fork="true" printsummary="true" showoutput="yes" failureproperty="test.failed" logfailedtests="true">
-                    <!-- Enable assertions -->
-                    <jvmarg value="-ea"/>
-                    <jvmarg line="-server -Djava.awt.headless=true"/>
-                    <jvmarg line="-Xms256m -Xmx1024m -XX:MaxPermSize=256m"/>
-                    <!--<jvmarg line="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=61155"/>-->
-
-                    <batchtest>
-                        <fileset dir="src/target/scala-2.11/test-classes">
-                            <include name="org/orbeon/**/*Test.class"/>
-                            <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
-                        </fileset>
-                    </batchtest>
-
-                    <!-- Configure resource manager -->
-                    <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-                    <!-- 1: test/resources first, as we need to touch files and compile Java files there -->
-                    <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="src/test/resources"/>
-                    <!-- 2: resources -->
-                    <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="src/resources"/>
-                    <!-- 3: resources-packaged -->
-                    <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="src/resources-packaged"/>
-                    <!-- 4: main/resources (associated with Java test files) -->
-                    <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory" value="src/main/resources"/>
-                    <!-- Classpath -->
-                    <sysproperty key="oxf.resources.priority.5" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
-                    <!-- Other properties -->
-                    <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
-                    <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
-                	<sysproperty key="java.io.tmpdir" value="build/temp/test"/>
-
-                    <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitly -->
-                	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
-                    <!-- Getting a JDK error, per http://stackoverflow.com/a/13575810/5295 -->
-                	<sysproperty key="java.util.Arrays.useLegacyMergeSort" value="true"/>
-
-                    <classpath>
-                        <!-- Target classes -->
-                        <!-- Could also be: build/orbeon-war-tomcat/WEB-INF/lib-->
-                        <fileset dir="build/orbeon-war/WEB-INF/lib">
-                            <include name="*.jar"/>
-                        </fileset>
-                        <!-- Test classes -->
-                        <pathelement location="src/target/scala-2.11/test-classes"/>
-                        <!-- JUnit proper -->
-                        <pathelement location="lib/junit-4.11.jar"/>
-                        <pathelement location="lib/ant-junit-1.7.1.jar"/>
-                        <pathelement location="lib/mockito-all-1.8.5.jar"/>
-                        <pathelement location="lib/scalatest_2.11-2.2.4.jar"/>
-                        <pathelement location="lib/servlet-2_3-4_0_4.jar"/>
-                        <pathelement location="lib/portlet-api_2.0.jar"/>
-                        <pathelement location="lib/liferay-portal-service-6.1.1.jar"/>
-                        <pathelement location="lib/liferay-portal-kernel-7.0.jar"/>
-                        <pathelement location="lib/tomcat-5_5-naming-factory-dbcp.jar"/>
-                        <pathelement location="lib/tomcat-7.0.68-catalina.jar"/>
-                        <pathelement location="lib/tomcat-7.0.68-juli.jar"/>
-                        <pathelement location="lib/commons-dbcp-1.1.jar"/>
-                        <pathelement location="${oracle.jar}"/>
-                        <pathelement location="${mysql.jar}"/>
-                        <pathelement location="${sqlserver.jar}"/>
-                        <pathelement location="${postgresql.jar}"/>
-                    </classpath>
-                    <formatter usefile="false" classname="org.orbeon.junit.LiveResultFormatter"/>
-                </junit>
 
                 <!-- Stop Tomcat -->
                 <if>

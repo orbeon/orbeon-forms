@@ -13,31 +13,22 @@
 -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" xmlns="http://jakarta.apache.org/log4j/">
 
-    <!--<category name="org.orbeon.oxf.xforms.processor.XFormsServer">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
-    <!--<category name="org.orbeon.oxf.xforms.state.XFormsStateManager">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
-    <category name="org.orbeon.oxf.fr.persistence.ddl.DDLTest">
-        <priority value="debug"/>
-    </category>
-    <category name="org.orbeon.oxf.fr.persistence.rest.RestApiTest">
-        <priority value="debug"/>
-    </category>
-
-    <!-- This is the standard log appender to the console (System.out) -->
     <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ISO8601} %-5p %c %x - %m%n"/>
         </layout>
         <filter class="org.apache.log4j.varia.LevelRangeFilter">
-            <param name="LevelMin" value="debug" />
+            <param name="LevelMin" value="debug"/>
         </filter>
     </appender>
 
-    <!-- This is the root logger -->
+    <!-- So that these are not too noisy during tests -->
+    <category name="org.orbeon.lifecycle">                        <priority value="warn"/></category>
+    <category name="org.orbeon.oxf.xforms.processor.XFormsServer"><priority value="warn"/></category>
+    <category name="org.orbeon.oxf.webapp.ProcessorService">      <priority value="warn"/></category>
+    <category name="org.orbeon.oxf.processor.DatabaseContext">    <priority value="warn"/></category>
+
     <root>
         <priority value="info"/>
         <appender-ref ref="ConsoleAppender"/>

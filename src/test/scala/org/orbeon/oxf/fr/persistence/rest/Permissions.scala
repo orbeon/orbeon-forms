@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import scala.xml.Elem
 
+// TODO: right now just test code, but should be moved and used by Form Runner's code, e.g. FormRunnerPermissions.scala
 private object Permissions {
 
   type Permissions = Option[Seq[Permission]]

@@ -76,6 +76,7 @@ public interface ExternalContext {
         String getUsername();
         String getUserGroup();
         String[] getUserRoles();
+        String[] getUserOrganization();
         boolean isUserInRole(String role);
 
         Principal getUserPrincipal();

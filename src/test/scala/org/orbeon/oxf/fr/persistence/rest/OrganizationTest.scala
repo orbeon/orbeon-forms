@@ -27,6 +27,7 @@ import org.scalatest.junit.AssertionsForJUnit
 object OrganizationTest {
   val CA = Organization(List("usa", "ca"))
   val SF = Organization(List("usa", "ca", "sf"))
+  val PA = Organization(List("usa", "ca", "pa"))
 }
 
 

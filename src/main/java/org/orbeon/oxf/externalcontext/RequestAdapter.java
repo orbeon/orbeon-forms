@@ -139,6 +139,8 @@ public class RequestAdapter implements ExternalContext.Request {
 
     public String getUserGroup() { return null; }
 
+    public String[] getUserOrganization() { return null; }
+
     public String[] getUserRoles() { return new String[0]; }
 
     public boolean isUserInRole(String role) {

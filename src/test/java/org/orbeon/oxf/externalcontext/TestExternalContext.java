@@ -299,6 +299,14 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-group");
         }
 
+        public String[] getUserOrganization() {
+            final String organizationOrNull = XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-organization");
+            if (organizationOrNull == null)
+                return null;
+            else
+                return organizationOrNull.split("\\s+");
+        }
+
         public String[] getUserRoles() {
             final String rolesOrNull = XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-roles");
             if (rolesOrNull == null)

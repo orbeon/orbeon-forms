@@ -228,6 +228,10 @@ public class ServletExternalContext implements ExternalContext  {
                 return headers[0];
         }
 
+        public String[] getUserOrganization() {
+            return null;
+        }
+
         public String[] getUserRoles() {
             final String[] headers = getHeaderValuesMap().get(Headers.OrbeonRolesLower());
             if (headers == null || headers.length == 0)

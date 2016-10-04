@@ -83,6 +83,8 @@ class SimpleExternalContext implements ExternalContext {
 
         public String getUserGroup() { return null; }
 
+        public String[] getUserOrganization() { return null; }
+
         public String[] getUserRoles() { return new String[0]; }
 
         public boolean isSecure() {

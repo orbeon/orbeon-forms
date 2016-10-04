@@ -18,6 +18,7 @@ import java.{util ⇒ ju}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
 import org.orbeon.oxf.fr.persistence.relational.UserRole
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
@@ -65,13 +66,14 @@ object TestHttpClient {
   }
 
   def connect(
-    url         : String,
-    method      : HttpMethod,
-    headers     : Map[String, List[String]],
-    content     : Option[StreamedContent],
-    username    : Option[String] = None,
-    group       : Option[String] = None,
-    roles       : List[UserRole]   = Nil
+    url          : String,
+    method       : HttpMethod,
+    headers      : Map[String, List[String]],
+    content      : Option[StreamedContent],
+    username     : Option[String] = None,
+    group        : Option[String] = None,
+    roles        : List[UserRole] = Nil,
+    organization : Option[Organization] = None
   ): (ProcessorService, HttpResponse, List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
@@ -130,6 +132,7 @@ object TestHttpClient {
             override val getUsername                             = username.orNull
             override val getUserRoles                            = roles.map(_.roleName).toArray
             override val getUserGroup                            = group.orNull
+            override val getUserOrganization                     = organization.map(_.levels.toArray).orNull
 
             // The following are never used by our code
             override val isRequestedSessionIdValid               = false   // only delegated

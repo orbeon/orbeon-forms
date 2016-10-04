@@ -88,13 +88,14 @@ private object HttpRequest {
 
     val (_, httpResponse, _) =
       TestHttpClient.connect(
-        url         = documentURL,
-        method      = method,
-        headers     = headers,
-        content     = content,
-        username    = credentials.map(_.username),
-        group       = credentials.flatMap(_.group),
-        roles       = credentials.map(_.roles.toList).getOrElse(Nil)
+        url          = documentURL,
+        method       = method,
+        headers      = headers,
+        content      = content,
+        username     = credentials.map(_.username),
+        group        = credentials.flatMap(_.group),
+        roles        = credentials.map(_.roles.toList).getOrElse(Nil),
+        organization = credentials.flatMap(_.organization)
       )
 
     new ClosableHttpResponse(httpResponse)

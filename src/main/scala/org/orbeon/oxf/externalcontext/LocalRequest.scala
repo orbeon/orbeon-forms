@@ -214,6 +214,7 @@ class LocalRequest(
   def getUsername                             = incomingRequest.getUsername
   def getUserRoles                            = incomingRequest.getUserRoles
   def getUserGroup                            = incomingRequest.getUserGroup
+  def getUserOrganization                     = incomingRequest.getUserOrganization
   def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
 
   def getUserPrincipal                        = incomingRequest.getUserPrincipal

@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream
 import org.junit.Test
 import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
@@ -41,6 +42,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   val AllOperations = Set("create", "read", "update", "delete")
+  val CanCreate     = Set("create")
+  val CanRead       = Set("read")
+  val CanCreateRead = CanCreate ++ CanRead
   val FormName = "my-form"
 
   private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/$FormName/"
@@ -185,6 +189,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       val formURL = crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>
+      val guest   = None
       val clerk   = Some(HttpRequest.Credentials("tom", Set(SimpleRole("clerk"  )), Some("clerk")  , None))
       val manager = Some(HttpRequest.Credentials("jim", Set(SimpleRole("manager")), Some("manager"), None))
       val admin   = Some(HttpRequest.Credentials("tim", Set(SimpleRole("admin"  )), Some("admin")  , None))
@@ -218,31 +223,72 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
 
         // Check who can read
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read"), Some(1)), clerk)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update"), Some(1)), manager)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403)                                                                      , guest)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read")                    , Some(1)), clerk)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update")          , Some(1)), manager)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), Set("create", "read", "update", "delete"), Some(1)), admin)
 
         // Only managers and admins can update
-        HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 403)
+        HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 403, guest)
         HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 403, clerk)
         HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 201, manager)
         HttpAssert.put(DataURL, Unspecified, HttpRequest.XML(data), 201, admin)
 
         // Only admins can delete
-        HttpAssert.del(DataURL, Unspecified, 403)
+        HttpAssert.del(DataURL, Unspecified, 403, guest)
         HttpAssert.del(DataURL, Unspecified, 403, clerk)
         HttpAssert.del(DataURL, Unspecified, 403, manager)
         HttpAssert.del(DataURL, Unspecified, 204, admin)
 
         // Status code when deleting non-existent data depends on permissions
-        HttpAssert.del(DataURL, Unspecified, 403)
+        HttpAssert.del(DataURL, Unspecified, 403, guest)
         HttpAssert.del(DataURL, Unspecified, 404, clerk)
         HttpAssert.del(DataURL, Unspecified, 404, manager)
         HttpAssert.del(DataURL, Unspecified, 404, admin)
       }
     }
   }
+
+  def organizationPermissions(): Unit =
+    Connect.withOrbeonTables("read/write organization") { (connection, provider) ⇒
+
+      val formURL   = crudURLPrefix(provider) + "form/form.xhtml"
+
+      // Leaf users
+      val sfUserA   = Some(HttpRequest.Credentials("sfUserA"  , Set.empty, None, Some(OrganizationTest.SF)))
+      val sfUserB   = Some(HttpRequest.Credentials("sfUserB"  , Set.empty, None, Some(OrganizationTest.SF)))
+
+      // Managers
+      def createManager(username: String, organization: Organization) = {
+        val role: Set[UserRole] = Set(ParametrizedRole("manager", organization.levels.last))
+        Some(HttpRequest.Credentials(username, role, None, Some(organization)))
+      }
+      val sfManager = createManager("sfManager", OrganizationTest.SF)
+      val paManager = createManager("paManager", OrganizationTest.PA)
+      val caManager = createManager("caManager", OrganizationTest.CA)
+
+      val dataURL   = crudURLPrefix(provider) + "data/123/data.xml"
+      val dataBody  = HttpRequest.XML(<gaga/>)
+
+      // User can read their own data, as well as their managers
+      HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(
+        Permission(Anyone         , CanCreate),
+        Permission(Owner          , CanRead),
+        Permission(Role("manager"), CanRead)
+      )))), 201)
+
+      // Data initially created by sfUserA
+      HttpAssert.put(dataURL, Specific(1), dataBody, 201, sfUserA)
+      // Owner can read their own data
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateRead, Some(1)), sfUserA)
+      // Other users can't read the data
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                             , sfUserB)
+      // Managers of the user up the organization structure can read the data
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateRead, Some(1)), sfManager)
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateRead, Some(1)), caManager)
+      // Other managers can't read the data
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                             , paManager)
+    }
 
   // Try uploading files of 1 KB, 1 MB
   @Test def attachmentsTest(): Unit = {
@@ -327,22 +373,5 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       }
 
       assertXMLDocumentsIgnoreNamespacesInScope(filterResultBody(resultBodyTry.get), expectedBody)
-    }
-
-  @Test def readWriteOrganization(): Unit =
-    Connect.withOrbeonTables("read/write organization") { (connection, provider) ⇒
-
-      val formURL   = crudURLPrefix(provider) + "form/form.xhtml"
-      val sfUser    = Some(HttpRequest.Credentials("sfuser", Set.empty, None, Some(OrganizationTest.SF)))
-      val sfManager = Some(HttpRequest.Credentials("sfmanager", Set.empty, None, Some(OrganizationTest.SF)))
-      val caManager = Some(HttpRequest.Credentials("camanager", Set.empty, None, Some(OrganizationTest.CA)))
-      val dataURL   = crudURLPrefix(provider) + "data/123/data.xml"
-      val dataBody  = HttpRequest.XML(<gaga/>)
-
-//      HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, None)), 201)
-//      HttpAssert.put(dataURL, Unspecified, dataBody, 201, john)
-//      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, AllOperations, Some(1)))
-
-
     }
 }

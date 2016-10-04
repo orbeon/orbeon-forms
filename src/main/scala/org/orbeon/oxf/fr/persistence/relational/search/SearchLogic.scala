@@ -139,7 +139,7 @@ trait SearchLogic extends SearchRequest {
             .map{ case (metadata, values) ⇒
               val operations =
                 permissions.formPermissionsElOpt
-                .map(FormRunner.allAuthorizedOperations(_, metadata.username, metadata.groupname))
+                .map(FormRunner.allAuthorizedOperations(_, metadata.username, metadata.groupname, None))
                 .getOrElse(SearchOperations)
               Document(metadata, operations, values)
             }

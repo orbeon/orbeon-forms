@@ -282,13 +282,13 @@ trait CreateUpdateDelete
               // Check we're allowed to update or delete this resource
               val username      = existing.get.username
               val groupname     = existing.get.group
-              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, username → groupname)
+              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, (username, groupname, None))
               val requiredOp    = if (delete) "delete" else "update"
               authorizedOps.contains(requiredOp)
             } else {
               // For deletes, if there is no data to delete, it is a 403 if could not read, update,
               // or delete if it existed (otherwise code later will return a 404)
-              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, None → None)
+              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, (None, None, None))
               val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
               authorizedOps.intersect(requiredOps).nonEmpty
             }

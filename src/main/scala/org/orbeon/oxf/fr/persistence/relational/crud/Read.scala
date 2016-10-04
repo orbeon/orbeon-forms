@@ -51,8 +51,8 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         val xmlCol = Provider.xmlCol(req.provider, "t")
         val ps = connection.prepareStatement(
           s"""|SELECT  t.last_modified_time
-              |        ${if (req.forAttachment) ", t.file_content"            else s", $xmlCol"}
-              |        ${if (req.forData)       ", t.username, t.groupname"   else ""}
+              |        ${if (req.forAttachment) ", t.file_content"                               else s", $xmlCol"}
+              |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id"   else ""}
               |        , t.form_version, t.deleted
               |FROM    $table t,
               |        (
@@ -99,12 +99,17 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
         // Check user can read and set Orbeon-Operations header
         formMetadataForDataRequestOpt foreach { formMetadata ⇒
-          val dataUserGroup = {
+          val dataUserGroupOrganization = {
             val username  = resultSet.getString("username")
             val groupname = resultSet.getString("groupname")
-            Option(username) → Option(groupname)
+            val organization = {
+              val id        = resultSet.getInt("organization_id")
+              val isValidId = ! resultSet.wasNull()
+              isValidId.option(Organization.read(connection, OrganizationId(id))).flatten
+            }
+            (Option(username), Option(groupname), organization)
           }
-          val operations = RelationalUtils.allAuthorizedOperations(formMetadata, dataUserGroup)
+          val operations = RelationalUtils.allAuthorizedOperations(formMetadata, dataUserGroupOrganization)
           if (! operations.contains("read"))
             throw new HttpStatusCodeException(403)
           httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))

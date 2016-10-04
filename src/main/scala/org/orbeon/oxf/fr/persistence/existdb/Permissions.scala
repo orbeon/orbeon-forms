@@ -27,7 +27,7 @@ object Permissions {
             }
             val dataUsername = dataUserGroupName("username")
             val dataGroupname = dataUserGroupName("groupname")
-            FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname).toSet
+            FormRunner.allAuthorizedOperations(permissionsEl, dataUsername, dataGroupname, None).toSet
           } else {
             FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet
           }

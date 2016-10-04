@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilder
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
@@ -75,7 +76,7 @@ trait FormRunnerPermissions {
     dataGroupname      : String
   ): Seq[String] = {
     def toOption(s: String) = if (s == null || s == "") None else Some(s)
-    allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname))
+    allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname), None)
   }
 
   // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and
@@ -83,7 +84,8 @@ trait FormRunnerPermissions {
   def allAuthorizedOperations(
     permissionsElement : NodeInfo,
     dataUsername       : Option[String],
-    dataGroupname      : Option[String]
+    dataGroupname      : Option[String],
+    organization       : Option[Organization]
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
@@ -134,7 +136,7 @@ trait FormRunnerPermissions {
     val username = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
     val group    = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
 
-    allAuthorizedOperations(permissionsElement, username, group)
+    allAuthorizedOperations(permissionsElement, username, group, None)
   }
 
   /** Given a list of forms metadata:

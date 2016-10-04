@@ -21,8 +21,8 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -93,15 +93,15 @@ object RelationalUtils extends Logging {
       .child("forms").child("form").child("permissions")
       .headOption
 
-  // Given a user/group name coming from the data, tells us what operations we can do in this data,
+  // Given a user/group/organization coming from the data, tells us what operations we can do on this data,
   // assuming that it is for the current request app/form
   def allAuthorizedOperations(
-    permissionsElOpt: Option[NodeInfo],
-    dataUserGroup: (Option[String], Option[String])
+    permissionsElOpt : Option[NodeInfo],
+    dataUserGroup    : (Option[String], Option[String], Option[Organization])
   ): Set[String] =
     crudOperationsIfNoPermissions(permissionsElOpt, (permissionsEl) ⇒ {
-      val (username, groupname) = dataUserGroup
-      FormRunner.allAuthorizedOperations(permissionsEl, username, groupname).toSet
+      val (username, groupname, organization) = dataUserGroup
+      FormRunner.allAuthorizedOperations(permissionsEl, username, groupname, None).toSet
     })
 
   def authorizedOperationsBasedOnRoles(permissionsElOpt: Option[NodeInfo]): Set[String] =

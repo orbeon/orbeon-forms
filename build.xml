@@ -811,7 +811,8 @@
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
-            <arg value="test"/>
+            <arg value="test:test"/>
+            <arg value="db:test"/>
         </exec>
     </target>
 
@@ -945,7 +946,8 @@
                     <arg value="-Dorbeon.version=${release.number}"/>
                     <arg value="-Dorbeon.edition=${edition}"/>
                     <arg value="project root"/>
-                    <arg value="it"/>
+                    <arg value="test:test"/>
+                    <arg value="db:test"/>
                 </exec>
 
                 <!-- Stop Tomcat -->

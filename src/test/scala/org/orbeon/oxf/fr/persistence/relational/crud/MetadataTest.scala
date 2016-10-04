@@ -11,16 +11,15 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational.crud
+package org.orbeon.oxf.fr.persistence.relational.crud
 
 import org.junit.Test
-import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.dom.Document
 import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.xml.Dom4j._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.dom.Document
-import org.orbeon.oxf.fr.persistence.relational.crud.RequestReader
+import org.scalatest.junit.AssertionsForJUnit
 
 class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport {
 

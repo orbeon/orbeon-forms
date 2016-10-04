@@ -17,7 +17,6 @@ import org.junit.Test
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.junit.AssertionsForJUnit

@@ -18,7 +18,6 @@ import java.sql.Connection
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.persistence.relational.crud.RequestReader._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
@@ -54,7 +53,7 @@ private object FlatView {
 
     // Compute columns in the view
     val cols = {
-      val userCols  = extractPathsCols(xmlDocument()) map { case (path, col) ⇒
+      val userCols  = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) ⇒
         val extractFunction = req.provider match {
           case PostgreSQL ⇒ s"(xpath('/*/$path/text()', d.xml))[1]::text"
           case _          ⇒ throw new UnsupportedOperationException

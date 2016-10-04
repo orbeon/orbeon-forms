@@ -14,22 +14,29 @@
 package org.orbeon.builder
 
 import org.scalajs.dom
-import org.scalatest.FunSuite
+import org.scalatest.FunSpec
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 
-class DemoFormBuilderClientTest extends FunSuite {
+class DemoFormBuilderClientTest extends FunSpec {
 
-  test("Node.js user agent string") {
+  describe("The environment's user agent string") {
     val userAgent = dom.window.navigator.userAgent
-    assert(userAgent contains "Node.js")
+    it("must be the Node.js one") {
+      assert(userAgent contains "Node.js")
+    }
   }
 
-  test("jQuery is in scope and matches version we are expecting") {
+  describe("jQuery") {
     val $ = g.$.asInstanceOf[org.scalajs.jquery.JQueryStatic]
-    val jQueryVersion = $.fn.asInstanceOf[js.Dynamic].jquery.asInstanceOf[String]
-    assert(jQueryVersion.startsWith("1."))
+    it ("must be in scope") {
+      assert(! js.isUndefined($))
+    }
+    it ("must match the version we are expecting") {
+      val jQueryVersion = $.fn.asInstanceOf[js.Dynamic].jquery.asInstanceOf[String]
+      assert(jQueryVersion.startsWith("1."))
+    }
   }
 
 }

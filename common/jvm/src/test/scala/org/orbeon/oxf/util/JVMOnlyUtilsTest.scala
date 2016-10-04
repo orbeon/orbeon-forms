@@ -15,33 +15,44 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.scalatest.FunSuite
+import org.scalatest.FunSpec
 
-class JVMOnlyUtilsTest extends FunSuite {
+class JVMOnlyUtilsTest extends FunSpec {
 
-  test("UseAndClose") {
+  describe("The `useAndClose()` function") {
 
-    val closable = new {
-      var closed = false
-      def close() = closed = true
-      def value = 42
+    it("must call the `close()` method and return a value") {
+
+      val closable = new {
+        var closed = false
+        def close() = closed = true
+        def value = 42
+      }
+
+      assert(42 === useAndClose(closable)(_.value))
+      assert(closable.closed)
     }
 
-    assert(42 === useAndClose(closable)(_.value))
-    assert(closable.closed)
+    it("must support a `null` closable") {
+      assert(null eq useAndClose(null: {def close()})(identity))
+    }
 
-    assert(null eq useAndClose(null: {def close()})(identity))
   }
 
-  test("RunQuietly") {
-    assert(() === runQuietly(throw new RuntimeException))
+  describe("The `runQuietly()` function") {
+    it("must not throw") {
+      assert(() === runQuietly(throw new RuntimeException))
+    }
   }
 
-  test("EncodeSimpleQuery") {
+  describe("The `encodeSimpleQuery()` and `decodeSimpleQuery()` functions") {
+    they("must compose to identity") {
+      val query1 = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
+      assert(query1 === encodeSimpleQuery(decodeSimpleQuery(query1)))
+    }
 
-    val query1 = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
-    assert(query1 === encodeSimpleQuery(decodeSimpleQuery(query1)))
-
-    assert("name=%C3%89rik" === encodeSimpleQuery(Seq("name" → "Érik")))
+    they("must encode special characters") {
+      assert("name=%C3%89rik" === encodeSimpleQuery(Seq("name" → "Érik")))
+    }
   }
 }

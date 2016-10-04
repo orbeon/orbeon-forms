@@ -17,48 +17,56 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.scalatest.FunSuite
+import org.scalatest.FunSpec
 
 import scala.collection.mutable
 
-class SharedUtilsTest extends FunSuite {
+class SharedUtilsTest extends FunSpec {
 
-  test("DropTrailingSlash") {
+  describe("the `dropTrailingSlash()` function") {
     assert("/a" === dropTrailingSlash("/a/"))
     assert("/a" === dropTrailingSlash("/a"))
     assert(""   === dropTrailingSlash("/"))
     assert("/"  === dropTrailingSlash("//"))
   }
 
-  test("DropStartingSlash") {
+  describe("the `dropStartingSlash()` function") {
     assert("a/" === dropStartingSlash("/a/"))
     assert("a/" === dropStartingSlash("a/"))
     assert(""   === dropStartingSlash("/"))
     assert("/"  === dropStartingSlash("//"))
   }
 
-  test("AppendStartingSlash") {
-    assert("/a/" === appendStartingSlash("/a/"))
-    assert("/a/" === appendStartingSlash("a/"))
-    assert("/"   === appendStartingSlash("/"))
-    assert("//"  === appendStartingSlash("//"))
+  describe("the `appendStartingSlash()` function") {
+    it("must not append if already present") {
+      assert("/a/" === appendStartingSlash("/a/"))
+    }
+    it("must append if not present") {
+      assert("/a/" === appendStartingSlash("a/"))
+    }
+    it("must keep single slash") {
+      assert("/"   === appendStartingSlash("/"))
+    }
+    it("must keep double slash") {
+      assert("//"  === appendStartingSlash("//"))
+    }
   }
 
-  test("PipeOps") {
+  describe("The `|>` pipe operator") {
 
     def inc(i: Int) = i + 1
 
     assert("43" === (42 |> inc |> (_.toString)))
   }
 
-  test("StringToSet") {
+  describe("The `stringToSet()` function") {
     assert(Set()                     == stringToSet(""))
     assert(Set()                     == stringToSet("  "))
     assert(Set("GET")                == stringToSet(" GET "))
     assert(Set("GET", "POST", "PUT") == stringToSet(" GET  POST  PUT "))
   }
 
-  test("SplitQuery") {
+  describe("The `splitQuery()` function") {
     assert(("", None)                === splitQuery(""))
     assert(("", Some("bar"))         === splitQuery("?bar"))
     assert(("/foo", None)            === splitQuery("/foo"))
@@ -66,7 +74,7 @@ class SharedUtilsTest extends FunSuite {
     assert(("/foo", Some("bar?baz")) === splitQuery("/foo?bar?baz"))
   }
 
-  test("DecodeSimpleQuery") {
+  describe("The `decodeSimpleQuery()` function") {
 
     val query    = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
     val expected = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "")
@@ -74,7 +82,7 @@ class SharedUtilsTest extends FunSuite {
     assert(expected === decodeSimpleQuery(query))
   }
 
-  test("GetFirstQueryParameter") {
+  describe("The `getFirstQueryParameter()` function") {
 
     val pathQuery = """/foo?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
 
@@ -83,7 +91,7 @@ class SharedUtilsTest extends FunSuite {
     assert(None        === getFirstQueryParameter(pathQuery, "p3"))
   }
 
-  test("CombineValues") {
+  describe("The `combineValues()` function") {
 
     val parameters = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "")
     val expectedAsList   = Seq(("p1", List("v11", "v12", "")), ("p2", List("v21", "", "v23")))
@@ -96,14 +104,14 @@ class SharedUtilsTest extends FunSuite {
     assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
   }
 
-  test("TrimAllToOpt") {
+  describe("The `trimAllToOpt` function") {
     assert(None        === "".trimAllToOpt)
     assert(None        === "  ".trimAllToOpt)
     assert(Some("foo") === "foo".trimAllToOpt)
     assert(Some("foo") === "  foo  ".trimAllToOpt)
   }
 
-  test("BooleanOption") {
+  describe("The boolean `option` function") {
     locally {
       var invoked = false
       assert(Some("foo") === true.option({invoked = true; "foo"}))
@@ -117,7 +125,7 @@ class SharedUtilsTest extends FunSuite {
     }
   }
 
-  test("CollectByType") {
+  describe("The `collectByErasedType()` function") {
 
     class Foo
     class Bar extends Foo
@@ -132,7 +140,7 @@ class SharedUtilsTest extends FunSuite {
     assert(collectByErasedType[Seq[String]](Seq(42)).isDefined) // erasure!
   }
 
-  test("Split") {
+  describe("The `splitTo()` function") {
 
     val expected = Seq(
       ""                    → Seq(),
@@ -150,7 +158,7 @@ class SharedUtilsTest extends FunSuite {
     }
   }
 
-  test("TruncateWithEllipsis") {
+  describe("The `truncateWithEllipsis()` function") {
 
     val expected = Seq(
       ("abcdef",        3,  0) → "abc…",
@@ -174,7 +182,7 @@ class SharedUtilsTest extends FunSuite {
       assert(out === truncateWithEllipsisTupled(in))
   }
 
-  test("Trim") {
+  describe("The `trimAllToEmpty` function") {
 
     val zeroWidthSpaces   = "\u200b\u200c\u200d\ufeff" // last one is the BOM
     val nonBreakingSpaces = "\u00A0\u2007\u202F"

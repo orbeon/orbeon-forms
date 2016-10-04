@@ -34,6 +34,14 @@ val PathsToExcludeFromCoreJAR = List(
   "org/orbeon/oxf/fr/embedding/servlet/API"
 )
 
+def deleteAndCreateTempTestDirectory(base: File) = {
+
+  val dir = base / "build" / "temp" / "test"
+
+  IO.delete(dir)
+  IO.createDirectory(dir)
+}
+
 def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
 
   val (prefix, optType) =
@@ -257,6 +265,7 @@ lazy val core = (project in file("src"))
                                       "-Djava.util.Arrays.useLegacyMergeSort=true"
                                     ),
     testOptions                  += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
+    testOptions       in Test    += Tests.Setup(() ⇒ deleteAndCreateTempTestDirectory(baseDirectory.value / "..")),
     parallelExecution in Test    := false,
     fork              in Test    := true, // "By default, tests executed in a forked JVM are executed sequentially"
     javaOptions       in Test    ++= Seq("-ea", "-server", "-Djava.awt.headless=true", "-Xms256m", "-Xmx2G", "-XX:MaxPermSize=512m"),

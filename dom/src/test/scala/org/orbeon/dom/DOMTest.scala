@@ -13,59 +13,59 @@
   */
 package org.orbeon.dom
 
-import org.scalatest.FunSuite
+import org.scalatest.FunSpec
 
 import scala.collection.JavaConverters._
 
-class DOMTest extends FunSuite {
+class DOMTest extends FunSpec {
 
-  test("clearContentWithNamespaces") {
+  val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
+  val XF = Namespace("xf", "http://www.w3.org/2002/xforms")
 
+  def newRootElem = {
     val doc = DocumentFactory.createDocument("root")
 
     val rootElem = doc.getRootElement
 
-    val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
-    val XF = Namespace("xf", "http://www.w3.org/2002/xforms")
-
     rootElem.add(XS)
     rootElem.add(XF)
-    rootElem.addText("Deneb")
 
-    assert("Deneb" === rootElem.getText)
-    assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
-
-    rootElem.clearContent()
-
-    assert("" === rootElem.getText)
-    assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
+    rootElem
   }
 
-  test("clearContentWithoutNamespaces") {
+  describe("The `clearContent()` method on an `Element`") {
 
-    val doc = DocumentFactory.createDocument("root")
+    it("must clear text content but not remove namespaces on that element") {
 
-    val rootElem = doc.getRootElement
+      val rootElem = newRootElem
+      rootElem.addText("Deneb")
 
-    val XS = Namespace("xs", "http://www.w3.org/2001/XMLSchema")
-    val XF = Namespace("xf", "http://www.w3.org/2002/xforms")
+      assert("Deneb" === rootElem.getText)
+      assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
 
-    rootElem.add(XS)
-    rootElem.add(XF)
+      rootElem.clearContent()
 
-    val nestedElem = rootElem.addElement("nested")
+      assert("" === rootElem.getText)
+      assert(Set(XS, XF) === rootElem.declaredNamespaces.asScala.toSet)
+    }
 
-    nestedElem.addText("Deneb")
+    it("must clear text content also when no namespaces are present (following another code path)") {
 
-    assert("Deneb" === nestedElem.getText)
-    assert(Set(XS, XF)      === rootElem.declaredNamespaces.asScala.toSet)
-    assert(Set[Namespace]() === nestedElem.declaredNamespaces.asScala.toSet)
+      val rootElem = newRootElem
+      val nestedElem = rootElem.addElement("nested")
 
-    nestedElem.clearContent()
+      nestedElem.addText("Deneb")
 
-    assert("" === nestedElem.getText)
-    assert(Set(XS, XF)      === rootElem.declaredNamespaces.asScala.toSet)
-    assert(Set[Namespace]() === nestedElem.declaredNamespaces.asScala.toSet)
+      assert("Deneb" === nestedElem.getText)
+      assert(Set(XS, XF)      === rootElem.declaredNamespaces.asScala.toSet)
+      assert(Set[Namespace]() === nestedElem.declaredNamespaces.asScala.toSet)
+
+      nestedElem.clearContent()
+
+      assert("" === nestedElem.getText)
+      assert(Set(XS, XF)      === rootElem.declaredNamespaces.asScala.toSet)
+      assert(Set[Namespace]() === nestedElem.declaredNamespaces.asScala.toSet)
+    }
   }
 
 }

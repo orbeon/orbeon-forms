@@ -26,8 +26,35 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
+import scala.xml.Elem
 
 trait FormRunnerPermissions {
+
+  object Permissions {
+
+    type Permissions = Option[Seq[Permission]]
+
+    sealed trait PermissionFor
+    case object Anyone            extends PermissionFor
+    case object Owner             extends PermissionFor
+    case object Group             extends PermissionFor
+    case class Role(role: String) extends PermissionFor
+    case class Permission(permissionFor: PermissionFor, operations: Set[String])
+
+    def serialize(permissions: Permissions): Option[Elem] =
+      permissions map ( ps ⇒
+        <permissions>{ ps map ( p ⇒
+          <permission operations={p.operations.mkString(" ")}>{
+            p.permissionFor match {
+              case Anyone  ⇒ ""
+              case Owner   ⇒ <owner/>
+              case Group   ⇒ <group-member/>
+              case Role(r) ⇒ <user-role any-of={r}/>
+            }
+          }</permission>
+        )}</permissions>
+      )
+  }
 
   /**
    * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
@@ -43,7 +70,10 @@ trait FormRunnerPermissions {
    * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
    */
   //@XPathFunction
-  def authorizedOperationsBasedOnRoles(permissionsElOrNull: NodeInfo): List[String] =
+  def authorizedOperationsBasedOnRoles(
+    permissionsElOrNull : NodeInfo,
+    userRoles           : List[String] = orbeonRoles.toList
+  ): List[String] =
     Option(permissionsElOrNull) match {
       case None ⇒
         // No permissions defined for this form, authorize any operation
@@ -60,7 +90,7 @@ trait FormRunnerPermissions {
                 .pipe(_.splitTo[List]())
                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space
                 .map(_.replace("%20", " "))
-                .intersect(orbeonRoles.toSeq)
+                .intersect(userRoles)
                 .nonEmpty
             ))
             // Extract the operations on each <permission>
@@ -85,7 +115,7 @@ trait FormRunnerPermissions {
     permissionsElement : NodeInfo,
     dataUsername       : Option[String],
     dataGroupname      : Option[String],
-    organization       : Option[Organization]
+    dataOrganization   : Option[Organization]
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string

@@ -158,7 +158,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     }
   }
 
-  import Permissions._
+  import org.orbeon.oxf.fr.FormRunner.Permissions._
 
   private def buildFormDefinition(
     provider     : Provider,

@@ -17,11 +17,24 @@ import org.junit.Test
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.Logging
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.fr.FormRunner.Permissions._
+import org.orbeon.scaxon.XML._
 
 class PermissionsTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
-  @Test def formWithNoPermissions(): Unit = {
-    FormRunner.authorizedOperationsBasedOnRoles(null) === List("*")
+  @Test def basedOnRoles(): Unit = {
+
+    // If the form has no permissions, then we can perform all operations
+    assert(FormRunner.authorizedOperationsBasedOnRoles(null) === List("*"))
+
+    // With the "clerk can read" permission, check the a clerk actually can read, and another user can't
+    val clerkCanRead = serialize(Some(Seq(Permission(Role("clerk"), Set("read"))))).get
+    assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("clerk" )) === List("read"))
+    assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("intake")) === List())
+
   }
 
+  @Test def basedOnData(): Unit = {
+
+  }
 }

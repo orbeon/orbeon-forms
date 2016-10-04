@@ -288,8 +288,7 @@ lazy val core = (project in file("src"))
   )
   .settings(
     scalaSource       in DatabaseTest  := baseDirectory.value / "db" / "scala",
-    resourceDirectory in DatabaseTest  := baseDirectory.value / "db" / "resources",
-    testOptions       in DatabaseTest  ++= Seq(Tests.Filter(s ⇒ s.endsWith("Test") && s.contains("persistence")))
+    resourceDirectory in DatabaseTest  := baseDirectory.value / "db" / "resources"
   )
 
 lazy val root = (project in file("."))

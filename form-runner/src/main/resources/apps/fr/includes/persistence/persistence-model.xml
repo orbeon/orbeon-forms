@@ -264,7 +264,7 @@
                     else if ($mode = 'new') then
                        frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions)
                     else
-                       frf:authorizedOperationsBasedOnRoles               (xxf:instance('fr-form-metadata')/permissions)
+                       frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions)
                 "/>
 
             <xf:setvalue

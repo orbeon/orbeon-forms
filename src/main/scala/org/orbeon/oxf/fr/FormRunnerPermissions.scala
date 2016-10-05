@@ -63,13 +63,17 @@ trait FormRunnerPermissions {
   private def permissionOperations(permissionElement: NodeInfo): List[String] =
     permissionElement attTokens "operations" toList
 
+
+  //@XPathFunction
+  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo) =
+    authorizedOperationsBasedOnRoles(permissionsElOrNull)
+
   /**
    * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
    * just based on the user's roles. Users might be able to perform additional operations on specific data, which
    * can be tested with allAuthorizedOperations().
    * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
    */
-  //@XPathFunction
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
     userRoles           : List[String] = request.getUserRoles.to[List]

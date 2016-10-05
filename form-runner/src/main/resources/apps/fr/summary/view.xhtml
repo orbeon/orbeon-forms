@@ -248,7 +248,7 @@
                 <xf:var name="search-permissions"         value="$permissions/permission[xxf:split(@operations) = $search-operations]"/>
 
                 <!-- Are we authorized to see all the data based because of our role? -->
-                <xf:var name="operations-from-role"       value="frf:authorizedOperationsBasedOnRoles($permissions)"/>
+                <xf:var name="operations-from-role"       value="frf:authorizedOperationsBasedOnRolesXPath($permissions)"/>
                 <xf:var name="authorized-based-on-role"   value="$operations-from-role = $search-operations"/>
 
                 <!-- Are we authorized to see data if we are the owner / group member? -->

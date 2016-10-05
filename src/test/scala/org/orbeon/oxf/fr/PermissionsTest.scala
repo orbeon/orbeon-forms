@@ -14,11 +14,12 @@
 package org.orbeon.oxf.fr
 
 import org.junit.Test
+import org.orbeon.oxf.fr.FormRunner.Permissions._
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.Logging
-import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.fr.FormRunner.Permissions._
 import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.util.CoreUtils._
 
 class PermissionsTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
@@ -35,6 +36,38 @@ class PermissionsTest extends ResourceManagerTestBase with AssertionsForJUnit wi
   }
 
   @Test def basedOnData(): Unit = {
+
+    // Pretty typical permissions defined in the form
+    val formPermissions = serialize(Some(Seq(
+      Permission(Anyone         , Set("create")),
+      Permission(Owner          , Set("read", "update")),
+      Permission(Role("clerk")  , Set("read")),
+      Permission(Role("manager"), Set("read", "update"))
+    ))).get
+
+    // Anonymous users can only create
+    FormRunner
+      .allAuthorizedOperations(
+        permissionsElement  = formPermissions,
+        dataUsername        = None,
+        dataGroupname       = None,
+        dataOrganization    = None,
+        currentUsername     = Some("jsmith"),
+        currentGroupname    = None,
+        currentOrganization = None)
+      .kestrel{ ops ⇒ assert(ops === List("create"))}
+
+    // The owner can also read and update
+    FormRunner
+      .allAuthorizedOperations(
+        permissionsElement  = formPermissions,
+        dataUsername        = Some("jsmith"),
+        dataGroupname       = None,
+        dataOrganization    = None,
+        currentUsername     = Some("jsmith"),
+        currentGroupname    = None,
+        currentOrganization = None)
+      .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
 
   }
 }

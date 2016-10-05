@@ -72,7 +72,7 @@ trait FormRunnerPermissions {
   //@XPathFunction
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
-    userRoles           : List[String] = orbeonRoles.toList
+    userRoles           : List[String] = request.getUserRoles.to[List]
   ): List[String] =
     Option(permissionsElOrNull) match {
       case None ⇒
@@ -112,10 +112,13 @@ trait FormRunnerPermissions {
   // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and
   // allAuthorizedOperationsAssumingOwnerGroupMember
   def allAuthorizedOperations(
-    permissionsElement : NodeInfo,
-    dataUsername       : Option[String],
-    dataGroupname      : Option[String],
-    dataOrganization   : Option[Organization]
+    permissionsElement  : NodeInfo,
+    dataUsername        : Option[String],
+    dataGroupname       : Option[String],
+    dataOrganization    : Option[Organization],
+    currentUsername     : Option[String]       = Option(request.getUsername),
+    currentGroupname    : Option[String]       = Option(request.getUserGroup),
+    currentOrganization : Option[Organization] = Organization.fromJava(request.getUserOrganization)
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
@@ -125,15 +128,10 @@ trait FormRunnerPermissions {
     require(!dataGroupname.contains(""))
 
     def ownerGroupMemberOperations(
-      headerWithUsernameOrGroupname : String,
-      maybeDataUsernameOrGroupname  : Option[String],
-      condition                     : String
+      maybeCurrentUsernameOrGroupname : Option[String],
+      maybeDataUsernameOrGroupname    : Option[String],
+      condition                       : String
     ): List[String] = {
-      val request = NetUtils.getExternalContext.getRequest
-
-      val maybeCurrentUsernameOrGroupname =
-        request.getHeaderValuesMap.asScala.get(headerWithUsernameOrGroupname).to[List].flatten.headOption
-
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
           if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
@@ -149,8 +147,8 @@ trait FormRunnerPermissions {
     rolesOperations match {
       case Seq("*") ⇒ List("*")
       case _ ⇒
-        val ownerOperations       = ownerGroupMemberOperations(Headers.OrbeonUsernameLower, dataUsername,  "owner")
-        val groupMemberOperations = ownerGroupMemberOperations(Headers.OrbeonGroupLower   , dataGroupname, "group-member")
+        val ownerOperations       = ownerGroupMemberOperations(currentUsername , dataUsername,  "owner")
+        val groupMemberOperations = ownerGroupMemberOperations(currentGroupname, dataGroupname, "group-member")
         (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }
@@ -230,6 +228,8 @@ trait FormRunnerPermissions {
       }
     }
   }
+
+  def request = NetUtils.getExternalContext.getRequest
 
   def orbeonRoles: Set[String] =
     NetUtils.getExternalContext.getRequest.getUserRoles.to[Set]

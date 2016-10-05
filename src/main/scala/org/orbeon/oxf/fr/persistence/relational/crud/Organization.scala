@@ -32,6 +32,12 @@ case class OrganizationId(underlying: Int) extends AnyVal
 
 object Organization {
 
+  def fromJava(organization: Array[String]): Option[Organization] =
+    organization match {
+      case null ⇒ None
+      case _    ⇒ Some(Organization(organization.to[List]))
+    }
+
   def createIfNecessary(
     connection   : Connection,
     provider     : Provider,

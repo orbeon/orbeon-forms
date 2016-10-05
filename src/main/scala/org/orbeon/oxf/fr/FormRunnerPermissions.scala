@@ -122,7 +122,8 @@ trait FormRunnerPermissions {
     dataOrganization    : Option[Organization],
     currentUsername     : Option[String]       = Option(request.getUsername),
     currentGroupname    : Option[String]       = Option(request.getUserGroup),
-    currentOrganization : Option[Organization] = Organization.fromJava(request.getUserOrganization)
+    currentOrganization : Option[Organization] = Organization.fromJava(request.getUserOrganization),
+    userRoles           : List[String]         = request.getUserRoles.to[List]
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
@@ -146,7 +147,7 @@ trait FormRunnerPermissions {
       }
     }
 
-    val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
+    val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement, userRoles)
 
     rolesOperations match {
       case Seq("*") ⇒ List("*")

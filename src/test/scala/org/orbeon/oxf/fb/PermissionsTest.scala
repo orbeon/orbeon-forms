@@ -13,16 +13,14 @@
  */
 package org.orbeon.oxf.fb
 
-import org.junit.Test
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class PermissionsTest extends DocumentTestBase with AssertionsForJUnit {
+class PermissionsTest extends FunSpecLike {
 
-  @Test def fbPermissions(): Unit = {
+  describe("The `formBuilderPermissions()` function") {
 
     val frRoles: NodeInfo =
       <roles>
@@ -36,37 +34,43 @@ class PermissionsTest extends DocumentTestBase with AssertionsForJUnit {
 
     val frRolesOpt = Some(frRoles)
 
-    // Test inclusion of form that is always permitted
     val always = Map("app-always" → Set("form-always"))
 
-    assert(formBuilderPermissions(frRolesOpt, Set("some", "other"))                         === always)
-    assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role"))                    === always + ("foo" → Set("*")))
-    assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role"))                          === always + ("bar" → Set("baz")))
-    assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "bar-baz-role"))    === always + ("foo" → Set("*")) + ("bar" → Set("baz")))
+    it ("must always return app/form which matches all roles") {
+      assert(formBuilderPermissions(frRolesOpt, Set("some", "other"))                         === always)
+      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role"))                    === always + ("foo" → Set("*")))
+      assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role"))                          === always + ("bar" → Set("baz")))
+      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "bar-baz-role"))    === always + ("foo" → Set("*")) + ("bar" → Set("baz")))
+    }
 
-    // Test match for all roles
-    val all = Map("*" → Set("*"))
+    it ("must return `*` with role which matches all app/form names") {
+      val all = Map("*" → Set("*"))
 
-    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role"))                        === all)
-    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "some", "other"))       === all)
-    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "all-foo-forms-role"))  === all)
-    assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "bar-baz-role"))        === all)
+      assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role"))                        === all)
+      assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "some", "other"))       === all)
+      assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "all-foo-forms-role"))  === all)
+      assert(formBuilderPermissions(frRolesOpt, Set("all-forms-role", "bar-baz-role"))        === all)
+    }
 
-    // Combine roles with wildcard and specific app
-    assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "foo-baz-role"))    === always + ("foo" → Set("*")))
+    it ("must combine roles with wildcard and specific app") {
+      assert(formBuilderPermissions(frRolesOpt, Set("all-foo-forms-role", "foo-baz-role"))    === always + ("foo" → Set("*")))
+    }
 
-    // Different baz forms
-    assert(formBuilderPermissions(frRolesOpt, Set("foo-baz-role", "bar-baz-role"))          === always + ("foo" → Set("baz")) + ("bar" → Set("baz")))
+    it ("must combine app/form names") {
+      assert(formBuilderPermissions(frRolesOpt, Set("foo-baz-role", "bar-baz-role"))          === always + ("foo" → Set("baz")) + ("bar" → Set("baz")))
+    }
 
-    // Multiple forms per app
-    assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role", "bar-baz2-role"))         === always + ("bar" → Set("baz", "baz2")))
+    it ("must combine form names with same app name") {
+      assert(formBuilderPermissions(frRolesOpt, Set("bar-baz-role", "bar-baz2-role"))         === always + ("bar" → Set("baz", "baz2")))
+    }
 
-    // Empty roles
-    val emptyRoles = Some(<roles/>: NodeInfo)
-    assert(formBuilderPermissions(emptyRoles, Set("some")) === Map())
+    it ("must return an empty result when empty roles are passed") {
+      val emptyRoles = Some(<roles/>: NodeInfo)
+      assert(formBuilderPermissions(emptyRoles, Set("some")) === Map())
+    }
   }
 
-  @Test def issue2737And1963(): Unit = {
+  describe("Issue #1963/#2737 'FB user sees all forms in summary page if role is not found'") {
 
      val frRoles: NodeInfo =
       <roles>
@@ -76,7 +80,16 @@ class PermissionsTest extends DocumentTestBase with AssertionsForJUnit {
 
     val frRolesOpt = Some(frRoles)
 
-    assert(formBuilderPermissions(frRolesOpt, Set("foo-role", "bar-role"))              === Map.empty)
-    assert((formBuilderPermissionsForCurrentUserAsXML(frRolesOpt) attValue "has-roles") === "true")
+    describe("The `formBuilderPermissions()` function") {
+      it ("must return an empty result when no role matches the configured roles") {
+        assert(formBuilderPermissions(frRolesOpt, Set("foo-role", "bar-role"))              === Map.empty)
+      }
+    }
+
+    describe("The `formBuilderPermissionsForCurrentUserAsXML()` function") {
+      it ("must report that roles are configured in this case") {
+        assert((formBuilderPermissionsForCurrentUserAsXML(frRolesOpt, Set.empty) attValue "has-roles") === "true")
+      }
+    }
   }
 }

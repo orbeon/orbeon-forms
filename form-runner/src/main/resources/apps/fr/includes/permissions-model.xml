@@ -23,7 +23,7 @@
 
         <xf:insert
             ref="instance('fb-permissions')"
-            origin="fbf:formBuilderPermissionsForCurrentUserAsXML(fbf:formBuilderPermissionsConfiguration())"/>
+            origin="fbf:formBuilderPermissionsForCurrentUserXPath(fbf:formBuilderPermissionsConfiguration())"/>
 
         <xf:message level="xxf:log-debug">
             ORBEON FORM BUILDER ROLES DEBUG INFORMATION:

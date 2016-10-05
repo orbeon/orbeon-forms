@@ -43,15 +43,18 @@ trait PermissionsOps {
     case None                ⇒ Nil
   }
 
+  //@XPathFunction
+  def formBuilderPermissionsForCurrentUserXPath(configurationOpt: Option[NodeInfo]) =
+    formBuilderPermissionsForCurrentUserAsXML(configurationOpt, orbeonRoles)
+
   // Result document contains a tree structure of apps and forms if roles are configured
   // NOTE: The result is sorted by app name first, then form name.
-  //@XPathFunction
-  def formBuilderPermissionsForCurrentUserAsXML(configurationOpt: Option[NodeInfo]): NodeInfo =
+  def formBuilderPermissionsForCurrentUserAsXML(configurationOpt: Option[NodeInfo], incomingRoleNames: Set[String]): NodeInfo =
     if (findConfiguredRoles(configurationOpt).isEmpty) {
       <apps has-roles="false"/>
     } else {
       <apps has-roles="true">{
-        formBuilderPermissions(configurationOpt, orbeonRoles).to[List].sortBy(_._1) map { case (app, forms) ⇒
+        formBuilderPermissions(configurationOpt, incomingRoleNames).to[List].sortBy(_._1) map { case (app, forms) ⇒
           <app name={app}>{ forms.to[List].sorted map { form ⇒ <form name={form}/> } }</app>
         }
       }</apps>

@@ -13,29 +13,29 @@
  */
 package org.orbeon.oxf.fr
 
-import org.junit.Test
 import org.orbeon.oxf.fr.FormRunner.Permissions._
-import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
-import org.orbeon.oxf.util.Logging
-import org.orbeon.scaxon.XML._
-import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.scaxon.XML._
+import org.scalatest.FunSpecLike
 
-class PermissionsTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
+class PermissionsTest extends FunSpecLike {
 
-  @Test def basedOnRoles(): Unit = {
+  describe("The `authorizedOperationsBasedOnRoles()` function") {
 
-    // If the form has no permissions, then we can perform all operations
-    assert(FormRunner.authorizedOperationsBasedOnRoles(null) === List("*"))
+    it("must return all operations if the form has no permissions") {
+      for (userRoles ← List(Nil, List("clerk")))
+        assert(FormRunner.authorizedOperationsBasedOnRoles(permissionsElOrNull = null, userRoles) === List("*"))
+    }
 
-    // With the "clerk can read" permission, check the a clerk actually can read, and another user can't
-    val clerkCanRead = serialize(Some(Seq(Permission(Role("clerk"), Set("read"))))).get
-    assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("clerk" )) === List("read"))
-    assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("intake")) === List())
+    it("must, with the 'clerk can read' permission, check the a clerk actually can read, and another user can't") {
+      val clerkCanRead = serialize(Some(Seq(Permission(Role("clerk"), Set("read"))))).get
+      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("clerk" )) === List("read"))
+      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("intake")) === List())
+    }
 
   }
 
-  @Test def basedOnData(): Unit = {
+  describe("The `allAuthorizedOperations()` function (based on data)") {
 
     // Pretty typical permissions defined in the form
     val formPermissions = serialize(Some(Seq(
@@ -45,29 +45,35 @@ class PermissionsTest extends ResourceManagerTestBase with AssertionsForJUnit wi
       Permission(Role("manager"), Set("read", "update"))
     ))).get
 
-    // Anonymous users can only create
-    FormRunner
-      .allAuthorizedOperations(
-        permissionsElement  = formPermissions,
-        dataUsername        = None,
-        dataGroupname       = None,
-        dataOrganization    = None,
-        currentUsername     = Some("jsmith"),
-        currentGroupname    = None,
-        currentOrganization = None)
-      .kestrel{ ops ⇒ assert(ops === List("create"))}
+    it ("must let anonymous users only create") {
+      FormRunner
+        .allAuthorizedOperations(
+          permissionsElement  = formPermissions,
+          dataUsername        = None,
+          dataGroupname       = None,
+          dataOrganization    = None,
+          currentUsername     = Some("jsmith"),
+          currentGroupname    = None,
+          currentOrganization = None,
+          userRoles           = Nil
+        )
+        .kestrel{ ops ⇒ assert(ops === List("create"))}
+    }
 
-    // The owner can also read and update
-    FormRunner
-      .allAuthorizedOperations(
-        permissionsElement  = formPermissions,
-        dataUsername        = Some("jsmith"),
-        dataGroupname       = None,
-        dataOrganization    = None,
-        currentUsername     = Some("jsmith"),
-        currentGroupname    = None,
-        currentOrganization = None)
-      .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
+    it ("must let the owner also read and update") {
+      FormRunner
+        .allAuthorizedOperations(
+          permissionsElement  = formPermissions,
+          dataUsername        = Some("jsmith"),
+          dataGroupname       = None,
+          dataOrganization    = None,
+          currentUsername     = Some("jsmith"),
+          currentGroupname    = None,
+          currentOrganization = None,
+          userRoles           = Nil
+        )
+        .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
+    }
 
   }
 }

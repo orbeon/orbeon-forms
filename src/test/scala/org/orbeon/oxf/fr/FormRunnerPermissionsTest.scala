@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.scaxon.XML._
 import org.scalatest.FunSpecLike
 
-class PermissionsTest extends FunSpecLike {
+class FormRunnerPermissionsTest extends FunSpecLike {
 
   describe("The `authorizedOperationsBasedOnRoles()` function") {
 

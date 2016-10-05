@@ -4,6 +4,7 @@ val ScalaVersion                  = "2.11.8"
 val ScalaJsDomVersion             = "0.9.0"
 val ScalaJsJQueryVersion          = "0.9.0"
 val JUnitInterfaceVersion         = "0.11"
+val UPickleVersion                = "0.4.1"
 
 val DefaultOrbeonFormsVersion     = "2016.2-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
@@ -35,22 +36,35 @@ val PathsToExcludeFromCoreJAR = List(
   "org/orbeon/oxf/fr/embedding/servlet/API"
 )
 
-val JUnitOptions = List(
+val TestResourceManagerPaths = List(
+  "src/test/resources", // so that Java processor tests work
+  "src/resources",
+  "src/resources-packaged"
+)
+
+def resourceManagerProperties: List[String] = {
+
+  val pkg = "org.orbeon.oxf.resources"
+
+  val props =
+    for ((dir, i) ← TestResourceManagerPaths.zipWithIndex)
+      yield
+        s"-Doxf.resources.priority.${i + 1}=$pkg.FilesystemResourceManagerFactory"           ::
+        s"-Doxf.resources.priority.${i + 1}.oxf.resources.filesystem.sandbox-directory=$dir" ::
+        Nil
+
+  s"-Doxf.resources.factory=$pkg.PriorityResourceManagerFactory"                             ::
+    props.flatten                                                                            :::
+    s"-Doxf.resources.priority.${props.size + 1}=$pkg.ClassLoaderResourceManagerFactory"     ::
+    Nil
+}
+
+val JUnitTestArguments = List(
   //"-q",
   "-v",
   "-s",
   "-a",
   //"--run-listener=org.orbeon.junit.OrbeonJUnitRunListener",
-  "-Doxf.resources.factory=org.orbeon.oxf.resources.PriorityResourceManagerFactory",
-  "-Doxf.resources.priority.1=org.orbeon.oxf.resources.FilesystemResourceManagerFactory",
-  "-Doxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory=src/test/resources",
-  "-Doxf.resources.priority.2=org.orbeon.oxf.resources.FilesystemResourceManagerFactory",
-  "-Doxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory=src/resources",
-  "-Doxf.resources.priority.3=org.orbeon.oxf.resources.FilesystemResourceManagerFactory",
-  "-Doxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory=src/resources-packaged",
-  "-Doxf.resources.priority.4=org.orbeon.oxf.resources.FilesystemResourceManagerFactory",
-  "-Doxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory=src/main/resources",
-  "-Doxf.resources.priority.5=org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory",
   "-Doxf.resources.common.min-reload-interval=50",
   "-Doxf.test.config=oxf:/ops/unit-tests/tests.xml",
   "-Djava.io.tmpdir=build/temp/test",
@@ -58,6 +72,19 @@ val JUnitOptions = List(
   "-Duser.timezone=America/Los_Angeles",
   // Getting a JDK error, per http://stackoverflow.com/a/13575810/5295
   "-Djava.util.Arrays.useLegacyMergeSort=true"
+) ++ resourceManagerProperties
+
+val JunitTestOptions = List(
+  libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % "test",
+  //    libraryDependencies          += "com.lihaoyi" %% "pprint" % "0.4.1" % "test",
+
+  testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, JUnitTestArguments: _*),
+  testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
+  testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
+  parallelExecution in Test          := false,
+  fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
+  javaOptions       in Test          ++= Seq("-ea", "-server", "-Djava.awt.headless=true", "-Xms256m", "-Xmx2G", "-XX:MaxPermSize=512m"),
+  baseDirectory     in Test          := baseDirectory.value / ".."
 )
 
 def deleteAndCreateTempTestDirectory(base: File) = {
@@ -100,10 +127,8 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
   }
 }
 
-// Configuration to run database tests only
 lazy val DatabaseTest = config("db") extend Test
-
-lazy val DebugTest = config("debug-test") extend Test
+lazy val DebugTest    = config("debug-test") extend Test
 
 lazy val commonSettings = Seq(
   organization                  := "org.orbeon",
@@ -233,23 +258,44 @@ lazy val dom = (project in file("dom"))
   )
 
 lazy val formRunner = (project in file("form-runner"))
+  .dependsOn(core % "test->test;compile->compile")
+  .configs(DatabaseTest, DebugTest)
   .settings(commonSettings: _*)
+  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
+  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(
     name := "orbeon-form-runner"
   )
+  .settings(JunitTestOptions: _*)
+  .settings(
+    scalaSource       in DatabaseTest  := baseDirectory.value / "db" / "scala",
+    resourceDirectory in DatabaseTest  := baseDirectory.value / "db" / "resources"
+  )
+  .settings(
+    scalaSource       in DebugTest     := baseDirectory.value / "test" / "scala",
+    javaSource        in DebugTest     := baseDirectory.value / "test" / "java",
+    resourceDirectory in DebugTest     := baseDirectory.value / "test" / "resources",
+
+    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+  )
 
 lazy val formBuilder = (project in file("form-builder"))
+  .dependsOn(
+    formBuilderSharedJVM,
+    formRunner % "test->test;compile->compile",
+    core       % "test->test;compile->compile"
+  )
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-form-builder"
   )
+  .settings(JunitTestOptions: _*)
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(commonJVM, dom, formBuilderSharedJVM, xupdate, formRunner, formBuilder)
-  .configs(DatabaseTest, DebugTest)
+  .dependsOn(commonJVM, dom, xupdate)
+  .configs(DebugTest)
   .settings(commonSettings: _*)
-  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(
     name                               := "orbeon-core",
@@ -260,7 +306,7 @@ lazy val core = (project in file("src"))
       "orbeonEdition" → orbeonEditionFromProperties.value
     ),
 
-    defaultConfiguration := Some(Compile),
+    defaultConfiguration               := Some(Compile),
 
     scalaSource       in Compile       := baseDirectory.value / "main" / "scala",
     javaSource        in Compile       := baseDirectory.value / "main" / "java",
@@ -272,26 +318,11 @@ lazy val core = (project in file("src"))
     // http://www.scala-sbt.org/0.13/docs/Mapping-Files.html
     mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
   )
+  .settings(JunitTestOptions: _*)
   .settings(
-    libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % "test",
-
     scalaSource       in Test          := baseDirectory.value / "test" / "scala",
     javaSource        in Test          := baseDirectory.value / "test" / "java",
-    resourceDirectory in Test          := baseDirectory.value / "test" / "resources",
-
-    testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, JUnitOptions: _*),
-    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
-    testOptions       in Test          += Tests.Setup(() ⇒ deleteAndCreateTempTestDirectory(baseDirectory.value / "..")),
-    parallelExecution in Test          := false,
-    fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
-    javaOptions       in Test          ++= Seq("-ea", "-server", "-Djava.awt.headless=true", "-Xms256m", "-Xmx2G", "-XX:MaxPermSize=512m"),
-    baseDirectory     in Test          := baseDirectory.value / ".."
-
-    //    libraryDependencies          += "com.lihaoyi" %% "pprint" % "0.4.1",
-  )
-  .settings(
-    scalaSource       in DatabaseTest  := baseDirectory.value / "db" / "scala",
-    resourceDirectory in DatabaseTest  := baseDirectory.value / "db" / "resources"
+    resourceDirectory in Test          := baseDirectory.value / "test" / "resources"
   )
   .settings(
     scalaSource       in DebugTest     := baseDirectory.value / "test" / "scala",

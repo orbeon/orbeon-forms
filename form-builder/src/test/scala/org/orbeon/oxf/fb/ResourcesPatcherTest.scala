@@ -11,21 +11,23 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.fb
 
 import org.junit.Test
 import org.orbeon.dom._
+import org.orbeon.oxf.fr.ResourcesPatcher
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.scalatest.junit.AssertionsForJUnit
 
+// NOTE: Test this in the `form-builder` module as we depend on Form Builder's `resources.xml`.
 class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
   @Test def patchingScenarios(): Unit = {

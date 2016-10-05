@@ -31,8 +31,6 @@
     <xi:include href="xforms-server/tests-xforms-ajax.xml"/>
     <xi:include href="xforms-server/tests-xforms-actions.xml"/>
 
-    <xi:include href="form-builder/tests-form-builder.xml"/>
-
     <xi:include href="tests-xpl.xml"/>
     <xi:include href="processor/file.xml"/>
 

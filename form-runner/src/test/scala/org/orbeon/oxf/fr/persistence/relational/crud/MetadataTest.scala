@@ -25,7 +25,7 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
 
   @Test def extractMetadata(): Unit = {
 
-    val is = ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/fb/form-with-metadata.xhtml")
+    val is = ResourceManagerWrapper.instance.getContentAsStream("/org/orbeon/oxf/fr/form-with-metadata.xhtml")
 
     val (_, metadataOpt) = RequestReader.dataAndMetadataAsString(is, metadata = true)
 

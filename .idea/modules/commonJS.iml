@@ -22,11 +22,11 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common-sources" exported="" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.scala-js:scalajs-test-interface_2.11:0.6.12:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.12:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.scala-lang:scala-reflect:2.11.8:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.scalactic:scalactic_sjs0.6_2.11:3.0.0:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.scalatest:scalatest_sjs0.6_2.11:3.0.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalactic:scalactic_sjs0.6_2.11:3.0.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-lang:scala-reflect:2.11.8:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-js:scalajs-library_2.11:0.6.12:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-js:scalajs-test-interface_2.11:0.6.12:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
   </component>
 </module>

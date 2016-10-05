@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
-  val WarningsInfosTemplate = "oxf:/org/orbeon/oxf/fr/form-with-alert-levels.xhtml"
+  val WarningsInfosTemplate = "oxf:/org/orbeon/oxf/xforms/form-with-alert-levels.xhtml"
 
   val NumberControlId     = "number-control"
   val TextControlId       = "text-control"

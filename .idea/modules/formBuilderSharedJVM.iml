@@ -155,6 +155,10 @@
           <root url="jar://$MODULE_DIR$/../../lib/tomcat-7.0.68-juli.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/typesafe-config-2.10.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/tyrex-1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/upickle-derive_2.11-0.4.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/upickle-jawn-parser_2.11-0.8.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/upickle-sourcecode_2.11-0.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/upickle-upickle_2.11-0.4.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/xdb.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/xerces-2.11-orbeon.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/xmlparserv2.jar!/" />
@@ -168,7 +172,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="commonJVM" exported="" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
+    <orderEntry type="module" module-name="commonJVM" exported="" />
   </component>
 </module>

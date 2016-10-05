@@ -15,13 +15,10 @@ package org.orbeon.oxf.fb
 
 import org.junit.Test
 import org.orbeon.oxf.fr.DataMigration
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.test.{XMLSupport, DocumentTestBase}
-import org.orbeon.oxf.util.{CollectionUtils, XPath}
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.test.{DocumentTestBase, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
-import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
 
 class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSupport with AssertionsForJUnit {
 

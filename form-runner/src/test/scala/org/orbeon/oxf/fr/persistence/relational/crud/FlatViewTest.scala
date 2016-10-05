@@ -49,11 +49,11 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
       }
 
     val expectedForDocuments = List(
-      "oxf:/org/orbeon/oxf/fb/form-with-itemsets.xhtml"             → List(
+      "oxf:/org/orbeon/oxf/fr/form-with-itemsets.xhtml"             → List(
         "section-1/dropdown"                                                   → "SECTION_1_DROPDOWN",
         "section-1/radios"                                                     → "SECTION_1_RADIOS"
       ),
-      "oxf:/org/orbeon/oxf/fb/template-for-repeated-sections.xhtml" → List(
+      "oxf:/org/orbeon/oxf/fr/template-for-repeated-sections.xhtml" → List(
         "my-section/my-input"                                                  → "MY_SECTION_MY_INPUT",
         "other-section/other-input"                                            → "OTHER_SECTION_OTHER_INPUT"
       ),
@@ -73,7 +73,7 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
     )
 
     for ((url, expected) ← expectedForDocuments)
-      assert(expected === FlatView.extractPathsCols(readDocument(url)).to[List])
+      assert(expected === FlatView.extractPathsCols(readDocument(url)))
   }
 
   @Test def xmlToSQLIdTest(): Unit = {

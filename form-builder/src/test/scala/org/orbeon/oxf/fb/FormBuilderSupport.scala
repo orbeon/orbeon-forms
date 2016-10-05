@@ -15,11 +15,11 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
-import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
 trait FormBuilderSupport extends XFormsSupport {
 

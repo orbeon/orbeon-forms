@@ -22,7 +22,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
-  val Doc = "oxf:/org/orbeon/oxf/fb/template-for-repeated-sections.xhtml"
+  val Doc = "oxf:/org/orbeon/oxf/fr/template-for-repeated-sections.xhtml"
 
   @Test def modelInstanceBodyElements(): Unit =
     withActionAndFBDoc(Doc) { doc ⇒

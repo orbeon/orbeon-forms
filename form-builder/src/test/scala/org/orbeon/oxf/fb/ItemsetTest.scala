@@ -14,19 +14,20 @@
 package org.orbeon.oxf.fb
 
 import org.junit.Test
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
+
 import scala.xml.Elem
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.xforms.action.XFormsAPI
 
 class ItemsetTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
-  val ItemsetsDoc = "oxf:/org/orbeon/oxf/fb/form-with-itemsets.xhtml"
+  val ItemsetsDoc = "oxf:/org/orbeon/oxf/fr/form-with-itemsets.xhtml"
 
   @Test def readAndWriteControlItems(): Unit =
     withActionAndFBDoc(ItemsetsDoc) { doc ⇒

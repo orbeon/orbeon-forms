@@ -88,7 +88,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       val caserefItem =
         Option(
           XPathCache.evaluateSingleKeepItems(
-            contextItems       = bindingContext.childContext,
+            contextItems       = bindingContext.nodeset,
             contextPosition    = bindingContext.position,
             xpathString        = caseref,
             namespaceMapping   = staticControl.namespaceMapping,
@@ -139,7 +139,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     def fromExpression(c: CaseControl) = c.valueExpression flatMap { expr ⇒
       Option(
         XPathCache.evaluateAsString(
-          contextItems       = bindingContext.childContext,
+          contextItems       = bindingContext.nodeset,
           contextPosition    = bindingContext.position,
           xpathString        = expr,
           namespaceMapping   = c.namespaceMapping,

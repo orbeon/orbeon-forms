@@ -98,14 +98,6 @@ case class BindingContext(
     else
       nodeset.get(position - 1)
 
-  def childContext: ju.List[Item] =
-    if (newBind)
-      nodeset
-    else if (contextItem eq null)
-      ju.Collections.emptyList()
-    else
-      ju.Collections.singletonList(contextItem)
-
   def getInScopeVariables: ju.Map[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
 
   def getInScopeVariables(scopeModelVariables: Boolean): ju.Map[String, ValueRepresentation] = {

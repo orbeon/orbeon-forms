@@ -41,7 +41,6 @@ val JUnitOptions = List(
   "-s",
   "-a",
   //"--run-listener=org.orbeon.junit.OrbeonJUnitRunListener",
-  //"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=61155",
   "-Doxf.resources.factory=org.orbeon.oxf.resources.PriorityResourceManagerFactory",
   "-Doxf.resources.priority.1=org.orbeon.oxf.resources.FilesystemResourceManagerFactory",
   "-Doxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory=src/test/resources",
@@ -103,6 +102,8 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
 
 // Configuration to run database tests only
 lazy val DatabaseTest = config("db") extend Test
+
+lazy val DebugTest = config("debug-test") extend Test
 
 lazy val commonSettings = Seq(
   organization                  := "org.orbeon",
@@ -246,9 +247,10 @@ lazy val formBuilder = (project in file("form-builder"))
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
   .dependsOn(commonJVM, dom, formBuilderSharedJVM, xupdate, formRunner, formBuilder)
-  .configs(DatabaseTest)
+  .configs(DatabaseTest, DebugTest)
   .settings(commonSettings: _*)
-  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*) // and not `Defaults.testTasks`!
+  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
+  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
   .settings(
     name                               := "orbeon-core",
 
@@ -271,11 +273,12 @@ lazy val core = (project in file("src"))
     mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
   )
   .settings(
+    libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % "test",
+
     scalaSource       in Test          := baseDirectory.value / "test" / "scala",
     javaSource        in Test          := baseDirectory.value / "test" / "java",
     resourceDirectory in Test          := baseDirectory.value / "test" / "resources",
 
-    libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % "test",
     testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, JUnitOptions: _*),
     testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
     testOptions       in Test          += Tests.Setup(() ⇒ deleteAndCreateTempTestDirectory(baseDirectory.value / "..")),
@@ -289,6 +292,13 @@ lazy val core = (project in file("src"))
   .settings(
     scalaSource       in DatabaseTest  := baseDirectory.value / "db" / "scala",
     resourceDirectory in DatabaseTest  := baseDirectory.value / "db" / "resources"
+  )
+  .settings(
+    scalaSource       in DebugTest     := baseDirectory.value / "test" / "scala",
+    javaSource        in DebugTest     := baseDirectory.value / "test" / "java",
+    resourceDirectory in DebugTest     := baseDirectory.value / "test" / "resources",
+
+    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   )
 
 lazy val root = (project in file("."))
@@ -306,9 +316,7 @@ lazy val root = (project in file("."))
     javaSource        in Test          := baseDirectory.value / "root" / "src" / "test" / "java",
     resourceDirectory in Test          := baseDirectory.value / "root" / "src" / "test" / "resources",
 
-    publishArtifact                    := false,
-
-    test              in  DatabaseTest := test in core in DatabaseTest
+    publishArtifact                    := false
   )
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

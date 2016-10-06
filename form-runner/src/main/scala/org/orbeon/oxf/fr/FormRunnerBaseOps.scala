@@ -15,8 +15,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -181,6 +182,7 @@ trait FormRunnerBaseOps {
   def errorSummaryInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
   def persistenceInstance          = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
   def authorizedOperationsInstance = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
+  def documentMetadataInstance     = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
 
   // See also FormRunnerHome
   private val CreateOps    = Set("*", "create")
@@ -194,6 +196,12 @@ trait FormRunnerBaseOps {
   def canRead   = authorizedOperations intersect ReadOps   nonEmpty
   def canUpdate = authorizedOperations intersect UpdateOps nonEmpty
   def canDelete = authorizedOperations intersect DeleteOps nonEmpty
+
+  private def documentMetadataDate(name: String) =
+    documentMetadataInstance.rootElement.attValueOpt(name.toLowerCase) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
+
+  def documentCreatedDate  = documentMetadataDate(Headers.Created)
+  def documentModifiedDate = documentMetadataDate(Headers.LastModified)
 
   // Captcha support
   def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")

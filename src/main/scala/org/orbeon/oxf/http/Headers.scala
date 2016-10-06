@@ -33,6 +33,7 @@ object Headers {
   val Authorization           = "Authorization"
   val Location                = "Location"
   val OrbeonClient            = "Orbeon-Client"
+  val Created                 = "Created"
 
   val OrbeonTokenLower        = OrbeonToken.toLowerCase
   val OrbeonUsernameLower     = OrbeonUsername.toLowerCase
@@ -46,6 +47,7 @@ object Headers {
   val AuthorizationLower      = Authorization.toLowerCase
   val LocationLower           = Location.toLowerCase
   val OrbeonClientLower       = OrbeonClient.toLowerCase
+  val CreatedLower            = Created.toLowerCase
 
   val EmbeddedClientValues    = Set("embedded", "portlet")
 

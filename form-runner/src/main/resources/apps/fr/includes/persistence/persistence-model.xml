@@ -387,6 +387,15 @@
                 if="exists($operations-header)"
                 context="instance('fr-authorized-operations')"
                 origin="xf:attribute('from-persistence', $operations-header/string())"/>
+            <!-- Save value of date headers -->
+            <xf:insert
+                context="instance('fr-document-metadata')"
+                origin="
+                    for $header in event('response-headers')[
+                        lower-case(name) = ('created', 'last-modified')
+                    ]
+                    return
+                        xf:attribute(lower-case($header/name/string()), $header/value/string())"/>
         </xf:action>
     </xf:submission>
 
@@ -422,6 +431,11 @@
     <!-- Which operations the user can perform -->
     <xf:instance id="fr-authorized-operations">
         <operations/>
+    </xf:instance>
+
+    <!-- Metadata associated with a GET of the document -->
+    <xf:instance id="fr-document-metadata">
+        <metadata/>
     </xf:instance>
 
     <xf:instance id="fr-persistence-instance">

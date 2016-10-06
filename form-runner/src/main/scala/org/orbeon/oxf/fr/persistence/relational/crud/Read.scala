@@ -16,17 +16,17 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
 import org.joda.time.DateTime
-import org.orbeon.oxf.fr.{FormRunnerPersistence, permission}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.{FormRunnerPersistence, permission}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.{DateUtils, NetUtils}
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
@@ -53,13 +53,13 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         val table  = tableName(req)
         val idCols = idColumns(req)
         val xmlCol = Provider.xmlCol(req.provider, "t")
-        s"""|SELECT  t.last_modified_time
+        s"""|SELECT  t.last_modified_time, t.created
             |        ${if (req.forAttachment) ", t.file_content"                               else s", $xmlCol"}
             |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id"   else ""}
             |        , t.form_version, t.deleted
             |FROM    $table t,
             |        (
-            |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+            |            SELECT   max(last_modified_time) last_modified_time, max(created) created, ${idCols.mkString(", ")}
             |              FROM   $table
             |             WHERE   app  = ?
             |                     and form = ?
@@ -116,6 +116,9 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
             }
 
+            val createdDateTime      = resultSet.getTimestamp("created")
+            val lastModifiedDateTime = resultSet.getTimestamp("last_modified_time")
+
             // Set form version header
             httpResponse.setHeader(OrbeonFormDefinitionVersion, dbFormVersion.toString)
 
@@ -132,6 +135,11 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 case _          ⇒ resultSet.getClob("xml").getCharacterStream
               }
               httpResponse.setHeader(Headers.ContentType, "application/xml")
+
+              // Date headers
+              httpResponse.setHeader(Headers.Created,      DateUtils.RFC1123Date.print(new DateTime(createdDateTime)))
+              httpResponse.setHeader(Headers.LastModified, DateUtils.RFC1123Date.print(new DateTime(lastModifiedDateTime)))
+
               val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
               NetUtils.copyStream(stream, writer)
               writer.close()

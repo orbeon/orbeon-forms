@@ -264,6 +264,7 @@
                                 </header>
                             </xsl:for-each>
                         </xsl:for-each>
+                        <read-header>created</read-header>
                     </config>
                 </p:input>
                 <p:output name="data" id="document"/>
@@ -276,6 +277,7 @@
                         <cache-control>
                             <use-local-cache>false</use-local-cache>
                         </cache-control>
+                        <forward-headers>created</forward-headers>
                     </config>
                 </p:input>
                 <p:input name="data" href="#document"/>

@@ -25,7 +25,7 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.value.{BooleanValue, IntegerValue, StringValue}
+import org.orbeon.saxon.value.{BooleanValue, DateTimeValue, IntegerValue, StringValue}
 import org.orbeon.scaxon.XML._
 import org.orbeon.xbl.Wizard
 
@@ -55,6 +55,13 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       ((name, _), index) ← IntGettersByName.zipWithIndex
     } locally {
       Fun(name, classOf[IntFunction], index, 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    }
+
+    // Register simple dateTime functions
+    for {
+      ((name, _), index) ← DateTimeGettersByName.zipWithIndex
+    } locally {
+      Fun(name, classOf[DateTimeFunction], index, 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
     }
 
     // Other functions
@@ -109,6 +116,11 @@ private object FormRunnerFunctions {
     "form-version"         → (() ⇒ FormRunner.FormRunnerParams().formVersion)
   )
 
+  val DateTimeGettersByName = List(
+    "created-date"         → (() ⇒ FormRunner.documentCreatedDate),
+    "modified-date"        → (() ⇒ FormRunner.documentModifiedDate)
+  )
+
   val IndexedStringFunctions = (
     for {
       ((_, fun), index) ← StringGettersByName.zipWithIndex
@@ -130,6 +142,13 @@ private object FormRunnerFunctions {
       index → fun
   ).toMap
 
+  val IndexedDateTimeFunctions = (
+    for {
+      ((_, fun), index) ← DateTimeGettersByName.zipWithIndex
+    } yield
+      index → fun
+  ).toMap
+
   class StringFunction extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): StringValue =
       IndexedStringFunctions(operation).apply()
@@ -143,6 +162,13 @@ private object FormRunnerFunctions {
   class IntFunction extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(xpathContext: XPathContext): IntegerValue =
       IndexedIntFunctions(operation).apply()
+  }
+
+  class DateTimeFunction extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(xpathContext: XPathContext): DateTimeValue =
+      IndexedDateTimeFunctions(operation).apply() map
+        (new java.util.Date(_))                   map
+        DateTimeValue.fromJavaDate                orNull
   }
 
   class FRRunProcessByName extends FunctionSupport with RuntimeDependentFunction {

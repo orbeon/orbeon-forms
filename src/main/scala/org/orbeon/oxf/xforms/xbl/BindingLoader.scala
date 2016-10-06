@@ -38,9 +38,8 @@ trait BindingLoader extends Logging {
 
   def getUpToDateLibraryAndBaseline(
     index         : BindingIndex[IndexableBinding],
-    checkUpToDate : Boolean
+    checkUpToDate : Boolean // 2016-10-06: always set to `true`
   ): (BindingIndex[IndexableBinding], Set[String], List[String], List[String]) = {
-
 
     var originalOrUpdatedIndex = index
 
@@ -112,6 +111,8 @@ trait BindingLoader extends Logging {
 
       libraryProperty.associatedValue(evaluate)
       baselineProperty.associatedValue(evaluate)
+
+      // Right here, `reloadLibraryAndBaseline` has been called exactly once
     }
 
     // If the index is unmodified, it might contain out-of-date bindings. If it is modified, it is guaranteed by

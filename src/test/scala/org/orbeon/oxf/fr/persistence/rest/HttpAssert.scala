@@ -27,7 +27,7 @@ private object HttpAssert extends XMLSupport {
   sealed trait Expected
   case   class ExpectedBody(
     body        : HttpRequest.Body,
-    operations  : Set[String],
+    operations  : List[String],
     formVersion : Option[Int]
   ) extends Expected
   case   class ExpectedCode(code: Int) extends Expected

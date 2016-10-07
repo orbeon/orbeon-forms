@@ -52,7 +52,7 @@ class FormRunnerPermissionsTest extends FunSpecLike {
     it("must let anonymous users only create") {
       FormRunner
         .allAuthorizedOperations(
-          permissionsElement  = formPermissions,
+          permissionsElOrNull = formPermissions,
           dataUsername        = None,
           dataGroupname       = None,
           dataOrganization    = None,
@@ -67,7 +67,7 @@ class FormRunnerPermissionsTest extends FunSpecLike {
     it("must let owners access their data") {
       FormRunner
         .allAuthorizedOperations(
-          permissionsElement  = formPermissions,
+          permissionsElOrNull = formPermissions,
           dataUsername        = Some("juser"),
           dataGroupname       = None,
           dataOrganization    = None,

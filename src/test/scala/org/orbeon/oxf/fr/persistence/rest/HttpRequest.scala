@@ -33,7 +33,7 @@ private object HttpRequest {
 
   case class Credentials(
     username     : String,
-    roles        : Set[UserRole],
+    roles        : List[UserRole],
     group        : Option[String],
     organization : Option[Organization]
   )

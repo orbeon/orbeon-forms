@@ -217,9 +217,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         // More complex permissions based on roles
         HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(
           Permission(Anyone,          Set("create")),
-          Permission(Role("clerk"),   Set("read")),
-          Permission(Role("manager"), Set("read update")),
-          Permission(Role("admin"),   Set("read update delete"))
+          Permission(RolesAnyOf("clerk"),   Set("read")),
+          Permission(RolesAnyOf("manager"), Set("read update")),
+          Permission(RolesAnyOf("admin"),   Set("read update delete"))
         )))), 201)
         HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
 
@@ -275,7 +275,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(Seq(
         Permission(Anyone         , CanCreate),
         Permission(Owner          , CanRead),
-        Permission(Role("manager"), CanRead)
+        Permission(RolesAnyOf("manager"), CanRead)
       )))), 201)
 
       // Data initially created by sfUserA

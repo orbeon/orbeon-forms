@@ -20,10 +20,10 @@ import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.xml.Elem
@@ -34,30 +34,33 @@ trait FormRunnerPermissions {
 
     type Permissions = Option[List[Permission]]
 
-    sealed trait                          Condition
-    case object Owner             extends Condition
-    case object Group             extends Condition
-    case class Role(role: String) extends Condition
+    sealed trait                                        Condition
+    case object Owner                           extends Condition
+    case object Group                           extends Condition
+    case class  RolesAnyOf(roles: List[String]) extends Condition
 
     case class Permission(
       conditions: List[Condition],
-      operations: Set[String]
+      operations: List[String]
     )
 
     def serialize(permissions: Permissions): Option[Elem] =
       permissions map (ps ⇒
-        <permissions>
-          {ps map (p ⇒
-          <permission operations={p.operations.mkString(" ")}>
-            {p.conditions map {
-            case Owner ⇒ <owner/>
-            case Group ⇒ <group-member/>
-            case Role(r) ⇒ <user-role any-of={r}/>
-          }}
-          </permission>
-          )}
-        </permissions>
-        )
+        <permissions>{
+          ps map (p ⇒
+            <permission operations={p.operations.mkString(" ")}>{
+              p.conditions map {
+                case Owner             ⇒ <owner/>
+                case Group             ⇒ <group-member/>
+                case RolesAnyOf(roles) ⇒
+                    val escapedSpaces = roles.map(_.replaceAllLiterally(" ", "%20"))
+                    val anyOfAttValue = escapedSpaces.mkString(" ")
+                    <user-role any-of={anyOfAttValue}/>
+              }
+            }</permission>
+          )
+        }</permissions>
+      )
 
     def parse(permissionsElOrNull: NodeInfo): Permissions =
       Option(permissionsElOrNull)
@@ -69,13 +72,17 @@ trait FormRunnerPermissions {
         permissionEl.child(*).toList.map(
           conditionEl ⇒
             conditionEl.localname match {
-              case "owner" ⇒ Owner
+              case "owner"        ⇒ Owner
               case "group-member" ⇒ Group
-              case "user-role" ⇒ Role(conditionEl.attValue("any-of"))
+              case "user-role"    ⇒
+                val anyOfAttValue = conditionEl.attValue("any-of")
+                val rawRoles      = anyOfAttValue.splitTo[List](" ")
+                val roles         = rawRoles.map(_.replaceAllLiterally("%20", " "))
+                RolesAnyOf(roles)
               case _ ⇒ throw new RuntimeException("")
             }
         )
-      Permission(conditions, operations.toSet)
+      Permission(conditions, operations)
     }
   }
 
@@ -101,31 +108,30 @@ trait FormRunnerPermissions {
     permissionsElOrNull : NodeInfo,
     userRoles           : List[UserRole] = request.getUserRoles.to[List]
   ): List[String] =
-    Option(permissionsElOrNull) match {
+    Permissions.parse(permissionsElOrNull) match {
       case None ⇒
         // No permissions defined for this form, authorize any operation
         List("*")
-      case Some(permissionsEl) ⇒
-        permissionsEl
-            .child("permission").toList
-            // Only consider permissions with no constraints, or where all constraints are for a role
-            .filter(_.child(*).forall(_.localname == "user-role"))
-            // User must match all the <user-role>
-            .filter(_.child("user-role").forall(
-              // User must have at least one of the roles in any-of="…"
-              _.attValue("any-of")
-                .pipe(_.splitTo[List]())
-                // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space
-                .map(_.replace("%20", " "))
-                .exists(permissionRole ⇒ userRoles.exists {
-                  case SimpleRole(userRoleName) ⇒ permissionRole == userRoleName
-                  case ParametrizedRole(userRoleName, userOrganizationName) ⇒ false
-                })
-            ))
-            // Extract the operations on each <permission>
-            .flatMap(permissionOperations)
-            // Remove duplicate operations
-            .distinct
+      case Some(permissions) ⇒
+        permissions
+          .flatMap(permission ⇒ {
+            val satisfied = permission.conditions.forall {
+                case Permissions.RolesAnyOf(permissionRoleNames) ⇒
+                  permissionRoleNames.exists(permissionRoleName ⇒
+                    userRoles.exists {
+                        case SimpleRole(userRoleName) ⇒
+                          permissionRoleName == userRoleName
+                        case ParametrizedRole(userRoleName, userOrganizationName) ⇒
+                          // We can't check this, as we'd have to
+                          false
+                    }
+                  )
+                case _ ⇒
+                  // We can't satisfy any other constraint, as we don't know anything about the data
+                  false
+              }
+            if (satisfied) permission.operations else Nil })
+          .distinct
     }
 
   //@XPathFunction

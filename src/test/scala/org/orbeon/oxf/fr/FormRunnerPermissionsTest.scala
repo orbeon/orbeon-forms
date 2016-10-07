@@ -28,7 +28,7 @@ class FormRunnerPermissionsTest extends FunSpecLike {
     }
 
     it("must, with the 'clerk can read' permission, check the a clerk actually can read, and another user can't") {
-      val clerkCanRead = serialize(Some(List(Permission(List(Role("clerk")), Set("read"))))).get
+      val clerkCanRead = serialize(Some(List(Permission(List(RolesAnyOf(List("clerk"))), List("read"))))).get
       assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List(SimpleRole("clerk" ))) === List("read"))
       assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List(SimpleRole("other")))  === List())
     }
@@ -37,12 +37,17 @@ class FormRunnerPermissionsTest extends FunSpecLike {
   describe("The `allAuthorizedOperations()` function (based on data)") {
 
     // Pretty typical permissions defined in the form
-    val formPermissions = serialize(Some(List(
-      Permission(Nil                  , Set("create")),
-      Permission(List(Owner)          , Set("read", "update")),
-      Permission(List(Role("clerk"))  , Set("read")),
-      Permission(List(Role("manager")), Set("read", "update"))
-    ))).get
+    val formPermissions =
+      serialize(
+        Some(
+          List(
+            Permission(Nil                              , List("create")),
+            Permission(List(Owner)                      , List("read", "update")),
+            Permission(List(RolesAnyOf(List("clerk")))  , List("read")),
+            Permission(List(RolesAnyOf(List("manager"))), List("read", "update"))
+          )
+        )
+      ).get
 
     it("must let anonymous users only create") {
       FormRunner

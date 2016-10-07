@@ -116,50 +116,6 @@
         </output>
     </test>
 
-    <test description="Delegation Processor" name="oxf:delegation" ignore="true">
-        <input name="interface">
-            <config>
-                <service id="ca-traffic" type="webservice"
-                    endpoint="http://services.xmethods.net:80/soap/servlet/rpcrouter">
-                    <operation nsuri="urn:xmethods-CATraffic" name="getTraffic"/>
-                </service>
-                <service id="deep-thought-ws" type="webservice"
-                    endpoint="http://www.scdi.org/~avernet/webservice/">
-                    <operation nsuri="urn:avernet" name="answerUltimateQuestionOfLife"/>
-                    <operation nsuri="urn:avernet" name="getRandomQuote"/>
-                </service>
-                <service id="gaga" type="stateless-ejb" uri="...">
-                    <operation name="methodCall"/>
-                </service>
-                <service id="deep-thought-jb" type="javabean"
-                    class="org.orbeon.oxf.test.DelegationHello"/>
-            </config>
-        </input>
-        <input name="data">
-            <dummy/>
-        </input>
-        <input name="call">
-            <answers>
-                <ultimate-answer-1>
-                    <delegation:execute service="deep-thought-ws" operation="answerUltimateQuestionOfLife"/>
-                </ultimate-answer-1>
-                <ultimate-answer-2>
-                    <delegation:execute service="deep-thought-jb" operation="congratulate">
-                        <name xsi:type="xs:string">John</name>
-                    </delegation:execute>
-                </ultimate-answer-2>
-            </answers>
-        </input>
-        <output name="data">
-            <answers>
-                <ultimate-answer-1>
-                    <text xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">42</text>
-                </ultimate-answer-1>
-                <ultimate-answer-2>Congratulations John!</ultimate-answer-2>
-            </answers>
-        </output>
-    </test>
-
     <test description="XPath Processor" name="oxf:xpath">
         <input name="config">
             <config>

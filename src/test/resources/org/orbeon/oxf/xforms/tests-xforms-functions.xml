@@ -145,9 +145,9 @@
                             </other-instance>
                         </xf:instance>
                         <xf:bind ref="instance('instance2')/first"
-                            calculate="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                            calculate="xxf:call-xpl('oxf:/org/orbeon/oxf/xforms/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
                         <xf:bind ref="instance('instance2')/second"
-                            calculate="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1'), 'result')/*/second"/>
+                            calculate="xxf:call-xpl('oxf:/org/orbeon/oxf/xforms/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1'), 'result')/*/second"/>
                         <xf:bind ref="/*/screen"
                             constraint="false()"/>
 
@@ -167,8 +167,8 @@
                             <xf:label>Clear</xf:label>
                             <xf:action ev:event="DOMActivate">
                                 <xf:setvalue ref="/*/first" value="'3.141592'"/>
-                                <xf:setvalue ref="instance('instance2')/third" value="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-                                <xf:setvalue ref="instance('instance2')/fourth" value="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1')/memory, 'result')"/>
+                                <xf:setvalue ref="instance('instance2')/third" value="xxf:call-xpl('oxf:/org/orbeon/oxf/xforms/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                                <xf:setvalue ref="instance('instance2')/fourth" value="xxf:call-xpl('oxf:/org/orbeon/oxf/xforms/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1')/memory, 'result')"/>
                             </xf:action>
                         </xf:trigger>
                     </xf:group>

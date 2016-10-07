@@ -27,7 +27,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="Basic retry sequence number handling: 1) resend the previous Ajax response 2) throw an exception for out of sequence number." name="oxf:pipeline"
-          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+          request="oxf:/org/orbeon/oxf/xforms/ajax-request.xml">
 
         <input name="config">
             <p:config>
@@ -145,7 +145,7 @@
     </test>
 
     <test description="[ #315661 ] Read-only control becoming relevant a second time does not appear as read-only" name="oxf:pipeline"
-          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+          request="oxf:/org/orbeon/oxf/xforms/ajax-request.xml">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315661&group_id=168&atid=350207 -->
 
         <input name="config">
@@ -271,7 +271,7 @@
     </test>
 
     <test description="External entity in request is ignored" name="oxf:pipeline"
-          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+          request="oxf:/org/orbeon/oxf/xforms/ajax-request.xml">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315668&group_id=168&atid=350207 -->
 
         <input name="config">
@@ -345,7 +345,7 @@
     </test>
 
     <test description="xxforms-server-events Ajax event" name="oxf:pipeline"
-          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+          request="oxf:/org/orbeon/oxf/xforms/ajax-request.xml">
 
         <input name="config">
             <p:config>
@@ -467,7 +467,7 @@
     </test>
 
     <test description="[ #316269 ] RFE: More user-friendly XForms error handling" name="oxf:pipeline"
-          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+          request="oxf:/org/orbeon/oxf/xforms/ajax-request.xml">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316269&group_id=168&atid=350207 -->
 
         <input name="config">
@@ -597,7 +597,7 @@
     </test>
 
     <test description="#54: Browser back causes server exception" name="oxf:pipeline"
-          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+          request="oxf:/org/orbeon/oxf/xforms/ajax-request.xml">
 
         <input name="config">
             <p:config>

@@ -14,4 +14,5 @@
 package org.orbeon.oxf.test
 
 
-class ProcessorTest extends ProcessorTestBase("oxf:/ops/unit-tests/tests.xml")
+class PlatformProcessorTest extends
+  ProcessorTestBase("oxf:/ops/unit-tests/tests-platform.xml")

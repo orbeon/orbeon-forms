@@ -1292,7 +1292,7 @@
         <input name="document">
             <xh:html xmlns:test1="http://orbeon.org/oxf/examples/test1" xmlns:test2="http://orbeon.org/oxf/examples/test2">
                 <xh:head>
-                    <xf:model xxf:xpath-analysis="true" schema="oxf:/ops/unit-tests/xforms-server/schema-importing.xsd">
+                    <xf:model xxf:xpath-analysis="true" schema="oxf:/org/orbeon/oxf/xforms/schema-importing.xsd">
                         <xf:instance>
                             <form>
                                 <zip1>12345</zip1>

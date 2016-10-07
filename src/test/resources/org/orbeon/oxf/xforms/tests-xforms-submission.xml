@@ -315,7 +315,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance"/>
 
                         <!-- TEST: Events to gather -->
@@ -385,7 +385,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="instance('source-instance')"/>
 
                         <!-- TEST: Events to gather -->
@@ -459,7 +459,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="instance('source-instance')/here"/>
 
                         <!-- TEST: Events to gather -->
@@ -538,7 +538,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" instance="destination-instance"/>
 
                         <!-- TEST: Events to gather -->
@@ -612,7 +612,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" instance="destination-instance" targetref="."/>
 
                         <!-- TEST: Events to gather -->
@@ -686,7 +686,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="instance('destination-instance')"/>
 
                         <!-- TEST: Events to gather -->
@@ -764,7 +764,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="instance('destination-instance')/here"/>
 
                         <!-- TEST: Events to gather -->
@@ -844,15 +844,15 @@
                         </xf:action>
                         <!-- Attribute node -->
                         <xf:submission id="replace-instance-1" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="/*/@bar"/>
                         <!-- Document node -->
                         <xf:submission id="replace-instance-2" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="/"/>
                         <!-- Non-instance element -->
                         <xf:submission id="replace-instance-3" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="xf:element('foobar')"/>
 
                         <!-- TEST: Events to gather -->
@@ -930,7 +930,7 @@
                             <xf:send submission="replace-instance"/>
                         </xf:action>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="instance('source-instance')/book"/>
 
                         <!-- TEST: Events to gather -->
@@ -1038,7 +1038,7 @@
 
                         <xf:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
                         <xf:submission id="replace-instance" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="text" targetref="instance('source-instance')"/>
 
                         <!-- TEST: Events to gather -->
@@ -1114,15 +1114,15 @@
                         </xf:action>
                         <!-- xxf:readonly -->
                         <xf:submission id="replace-instance-1" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="/*/nested-element" xxf:readonly="true"/>
                         <!-- xxf:shared -->
                         <xf:submission id="replace-instance-2" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="/*/nested-element" xxf:readonly="true" xxf:shared="application"/>
                         <!-- Regular case -->
                         <xf:submission id="replace-instance-3" method="get" serialization="none"
-                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml"
                                 replace="instance" targetref="/*/nested-element" />
 
                         <!-- TEST: Events to gather -->
@@ -1580,7 +1580,7 @@
 
     <test description="oxf:xforms-submission with actions upon successful result" name="oxf:xforms-submission">
         <input name="submission">
-            <xf:submission method="get" resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml">
+            <xf:submission method="get" resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml">
                 <!-- Try some actions -->
                 <xf:action ev:event="xforms-submit-done">
                     <xf:insert ref="/*" origin="xf:element('envelope', /*)"/>
@@ -1632,7 +1632,7 @@
                         </xf:instance>
                         <!-- Simulate activation of submit button -->
                         <xf:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-submit"/>
-                        <xf:submission id="my-submission" method="get" resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replace="instance"/>
+                        <xf:submission id="my-submission" method="get" resource="oxf:/org/orbeon/oxf/xforms/sample-instance.xml" replace="instance"/>
                     </xf:model>
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">

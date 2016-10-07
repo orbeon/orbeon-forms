@@ -31,7 +31,10 @@ import org.scalatest.FunSpecLike
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
-abstract class ProcessorTestBase(testsDocUrl: String) extends ResourceManagerTestBase with FunSpecLike with XMLSupport {
+abstract class ProcessorTestBase(testsDocUrl: String)
+  extends ResourceManagerTestBase
+     with FunSpecLike
+     with XMLSupport {
 
   case class TestDescriptor(
     description        : Option[String],

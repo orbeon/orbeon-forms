@@ -121,7 +121,7 @@ object XPathCache {
   def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
 
   // Evaluate an XPath expression on the document and keep Item objects in the result
-  // 4 external usages
+  // 5 external usages
   def evaluateKeepItems(
     contextItems       : JList[Item],
     contextPosition    : Int,

@@ -15,17 +15,20 @@ package org.orbeon.oxf.test
 
 import java.{util ⇒ ju}
 
-import org.orbeon.dom.{Document, Element}
+import org.orbeon.dom.Document
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
-import org.orbeon.oxf.common.{OXFException, Version}
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, Processor, ProcessorUtils}
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
+import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, XPathUtils}
+import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
+import org.orbeon.scaxon.XML._
 import org.scalatest.FunSpecLike
 
 import scala.collection.JavaConverters._
@@ -37,10 +40,10 @@ abstract class ProcessorTestBase(testsDocUrl: String)
      with XMLSupport {
 
   case class TestDescriptor(
-    description        : Option[String],
-    group              : Option[String],
+    descriptionOpt     : Option[String],
+    groupOpt           : Option[String],
     processor          : Processor,
-    requestURL         : String,
+    requestUrlOpt      : Option[String],
     docsAndSerializers : List[(Document, DOMSerializer)]
   )
 
@@ -51,10 +54,10 @@ abstract class ProcessorTestBase(testsDocUrl: String)
 
   ResourceManagerTestBase.staticSetup()
 
-  findTestsToRun groupByKeepOrder (_.group) foreach { case (groupOpt, descriptors) ⇒
+  findTestsToRun groupByKeepOrder (_.groupOpt) foreach { case (groupOpt, descriptors) ⇒
     describe(groupOpt getOrElse "[No group description provided]") {
       descriptors foreach { descriptor ⇒
-        it (s"must pass ${descriptor.description getOrElse "[No test description provided]"}") {
+        it (s"must pass ${descriptor.descriptionOpt getOrElse "[No test description provided]"}") {
           runTest(descriptor) match {
             case SuccessTestResult ⇒
             case FailedTestResult(expected, actual) ⇒
@@ -73,10 +76,10 @@ abstract class ProcessorTestBase(testsDocUrl: String)
     try {
       // Create pipeline context
       val pipelineContext =
-        if (d.requestURL.nonBlank)
-          createPipelineContextWithExternalContext(d.requestURL)
-        else
-          createPipelineContextWithExternalContext
+        d.requestUrlOpt match {
+          case Some(requestURL) ⇒ createPipelineContextWithExternalContext(requestURL)
+          case None             ⇒ createPipelineContextWithExternalContext
+        }
 
       d.processor.reset(pipelineContext)
 
@@ -121,64 +124,74 @@ abstract class ProcessorTestBase(testsDocUrl: String)
       domSerializer.runGetDocument(new PipelineContext)
     }
 
-    // If there are tests with a true "only" attribute but not a true "exclude" attribute, execute only those
-    var i = XPathUtils.selectNodeIterator(
-      testsDoc,
-      "(/tests/test | /tests/group/test)[ancestor-or-self::*/@only = 'true' and not(ancestor-or-self::*/@exclude = 'true')]"
-    )
+    val expr =
+      """
+          let $only := (/tests/test | /tests/group/test)[
+              ancestor-or-self::*/@only = 'true' and not(ancestor-or-self::*/@exclude = 'true')
+          ] return
+            if (exists($only)) then
+                $only
+            else
+                (/tests/test | /tests/group/test)[
+                    not(ancestor-or-self::*/@exclude = 'true')
+                ]
+      """
 
-    // Otherwise, run all tests that are not excluded
-    if (! i.hasNext)
-      i = XPathUtils.selectNodeIterator(
-        testsDoc,
-        "(/tests/test | /tests/group/test)[not(ancestor-or-self::*/@exclude = 'true')]"
-      )
+    val items =
+      XPathCache.evaluateKeepItems(
+        contextItems        = ju.Collections.singletonList(new DocumentWrapper(testsDoc, null, XPath.GlobalConfiguration)),
+        contextPosition     = 1,
+        xpathString         = expr,
+        namespaceMapping    = null,
+        variableToValueMap  = ju.Collections.emptyMap[String, ValueRepresentation](),
+        functionLibrary     = null,
+        functionContext     = null,
+        baseURI             = null,
+        locationData        = null,
+        reporter            = null
+      ).asInstanceOf[ju.List[NodeInfo]].asScala
 
-    // Iterate over tests
-    val testDescriptorsIt =
+    val testDescriptors =
       for {
-        testElem ← i.asInstanceOf[ju.Iterator[Element]].asScala
-        if ! (testElem.attributeValue("ignore") == "true")
-        if ! ("pe".equalsIgnoreCase(testElem.attributeValue("edition")) && ! Version.isPE)
-        if ! ("ce".equalsIgnoreCase(testElem.attributeValue("edition")) && Version.isPE)
+        testElem       ← items
+        groupElem      ← testElem.parentOption
+
+        editionOpt     = testElem.attValueNonBlankOpt("edition") map (_.toLowerCase)
+        if ! (Version.isPE   && editionOpt.contains("ce"))
+        if ! (! Version.isPE && editionOpt.contains("pe"))
+
+        descriptionOpt = testElem.attValueNonBlankOpt("description")
+        groupOpt       = if (groupElem.localname == "group") groupElem.attValueNonBlankOpt("description") else None
+        requestUrlOpt  = testElem.attValueNonBlankOpt("request")
       } yield {
 
-        val descriptionOpt = Option(testElem.attributeValue("description"))
-
-        val groupOpt = {
-          val groupElem = testElem.getParent
-          if (groupElem.getName == "group")
-            Option(groupElem.attributeValue("description"))
-          else
-            None
-        }
-
         // Create processor and connect its inputs
-        val processor = ProcessorUtils.createProcessorWithInputs(testElem)
-        processor.setId("Main Test Processor")
+        val processor =
+          ProcessorUtils.createProcessorWithInputs(unsafeUnwrapElement(testElem)) |!>
+            (_.setId("Main Test Processor"))
 
         // Connect outputs
-        val docsAndSerializersIt =
-          for (outputElem ← XPathUtils.selectNodeIterator(testElem, "output").asInstanceOf[ju.Iterator[Element]].asScala) yield {
-
-            val name = XPathUtils.selectStringValue(outputElem, "@name")
-            if (name.isBlank)
-              throw new OXFException("Output name is mandatory")
-
-            val doc = ProcessorUtils.createDocumentFromEmbeddedOrHref(outputElem, XPathUtils.selectStringValue(outputElem, "@href"))
-            val serializer = new DOMSerializer
-
+        val docsAndSerializers =
+          for {
+            outputElem ← testElem child "output"
+            name       = outputElem.attValueNonBlankOpt("name") getOrElse (throw new IllegalArgumentException("Output `name` is mandatory"))
+            doc        = ProcessorUtils.createDocumentFromEmbeddedOrHref(unsafeUnwrapElement(outputElem), outputElem.attValueNonBlankOpt("href").orNull)
+            serializer = new DOMSerializer
+          } yield {
             PipelineUtils.connect(processor, name, serializer, "data")
-
             (doc, serializer)
           }
 
-        val requestURL = testElem.attributeValue("request", "")
-
-        TestDescriptor(descriptionOpt, groupOpt, processor, requestURL, docsAndSerializersIt.to[List])
+        TestDescriptor(
+          descriptionOpt,
+          groupOpt,
+          processor,
+          requestUrlOpt,
+          docsAndSerializers.to[List]
+        )
       }
 
-    testDescriptorsIt.to[List]
+    testDescriptors.to[List]
   }
 
 }

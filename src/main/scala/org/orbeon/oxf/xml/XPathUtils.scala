@@ -44,7 +44,7 @@ object XPathUtils {
   private val EmptyVariables  = ju.Collections.emptyMap[String, ValueRepresentation]()
   private val EmptyNamespaces = ju.Collections.emptyMap[String, String]()
 
-  // 49 usages
+  // 46 usages
   def selectNodeIterator(contextNode: dom.Node, expr: String): ju.Iterator[dom.Node] =
     selectNodeIterator(contextNode, expr, EmptyNamespaces)
 
@@ -98,7 +98,7 @@ object XPathUtils {
   def selectStringValue(node: dom.Node, expr: String): String =
     selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)
 
-  // 167 usages
+  // 168 usages
   def selectStringValueNormalize(node: dom.Node, expr: String): String =
     trimAllToNull(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null))
 
@@ -132,7 +132,7 @@ object XPathUtils {
       resultWithJava collect { case v: dom.Node ⇒ v } asJava
   }
 
-  // 2 external usages
+  // 1 external usage
   def selectObjectValue(contextNode: dom.Node, expr: String): AnyRef =
     selectObjectValue(contextNode, expr, EmptyNamespaces, null, null)
 
@@ -167,7 +167,7 @@ object XPathUtils {
   }
 
   // IMPORTANT: If the XPath expressions select an empty node set, return `null`!
-  // 27 usages
+  // 26 usages
   def selectIntegerValue(node: dom.Node, expr: String): Integer =
     Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)) map (new java.lang.Integer(_)) orNull
 

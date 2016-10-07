@@ -381,6 +381,11 @@ object XML {
       case s     ⇒ Some(s.stringValue)
     }
 
+    def attValueNonBlankOpt(attName: String) = /@(attName) match {
+      case Seq() ⇒ None
+      case s     ⇒ Some(s.stringValue) filter (_.nonBlank)
+    }
+
     def attValueOpt(attName: QName) = /@(attName) match {
       case Seq() ⇒ None
       case s     ⇒ Some(s.stringValue)

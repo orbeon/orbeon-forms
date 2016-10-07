@@ -14,6 +14,7 @@
 package org.orbeon.oxf.pipeline.api;
 
 import org.orbeon.oxf.externalcontext.URLRewriter;
+import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.webapp.WebAppContext;
 
 import java.io.*;
@@ -75,7 +76,7 @@ public interface ExternalContext {
         // NOTE: Consider using a class such as `Credentials` (there is one in used in test code).
         String getUsername();
         String getUserGroup();
-        String[] getUserRoles();
+        UserRole[] getUserRoles();
         String[] getUserOrganization();
         boolean isUserInRole(String role);
 

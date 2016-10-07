@@ -76,7 +76,7 @@ trait FormRunnerPermissions {
    */
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
-    userRoles           : List[String] = request.getUserRoles.to[List]
+    userRoles           : List[UserRole] = request.getUserRoles.to[List]
   ): List[String] =
     Option(permissionsElOrNull) match {
       case None ⇒
@@ -94,8 +94,10 @@ trait FormRunnerPermissions {
                 .pipe(_.splitTo[List]())
                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space
                 .map(_.replace("%20", " "))
-                .intersect(userRoles)
-                .nonEmpty
+                .exists(permissionRole ⇒ userRoles.exists {
+                  case SimpleRole(userRoleName) ⇒ permissionRole == userRoleName
+                  case ParametrizedRole(userRoleName, userOrganizationName) ⇒ false
+                })
             ))
             // Extract the operations on each <permission>
             .flatMap(permissionOperations)
@@ -123,7 +125,7 @@ trait FormRunnerPermissions {
     currentUsername     : Option[String]       = Option(request.getUsername),
     currentGroupname    : Option[String]       = Option(request.getUserGroup),
     currentOrganization : Option[Organization] = Organization.fromJava(request.getUserOrganization),
-    userRoles           : List[String]         = request.getUserRoles.to[List]
+    currentRoles        : List[UserRole]       = request.getUserRoles.to[List]
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
@@ -147,7 +149,7 @@ trait FormRunnerPermissions {
       }
     }
 
-    val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement, userRoles)
+    val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement, currentRoles)
 
     rolesOperations match {
       case Seq("*") ⇒ List("*")
@@ -237,9 +239,9 @@ trait FormRunnerPermissions {
   def request = NetUtils.getExternalContext.getRequest
 
   def orbeonRoles: Set[String] =
-    NetUtils.getExternalContext.getRequest.getUserRoles.to[Set]
+    NetUtils.getExternalContext.getRequest.getUserRoles.to[Set].map(_.roleName)
 
   //@XPathFunction
   def orbeonRolesSequence: SequenceIterator =
-    orbeonRoles.iterator map stringToStringValue
+    orbeonRoles.iterator
 }

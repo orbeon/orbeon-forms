@@ -18,6 +18,8 @@ import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.fr.UserRole;
+import org.orbeon.oxf.fr.UserRole$;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -307,12 +309,17 @@ public class TestExternalContext implements ExternalContext  {
                 return organizationOrNull.split("\\s+");
         }
 
-        public String[] getUserRoles() {
+        public UserRole[] getUserRoles() {
             final String rolesOrNull = XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-roles");
             if (rolesOrNull == null)
-                return new String[0];
-            else
-                return rolesOrNull.split("\\s+");
+                return new UserRole[0];
+            else {
+                String[] serializedRoles = rolesOrNull.split("\\s+");
+                UserRole[] parsedRoles = new UserRole[serializedRoles.length];
+                for (int i = 0; i < serializedRoles.length; i++)
+                    parsedRoles[i] = UserRole$.MODULE$.parse(serializedRoles[i]);
+                return parsedRoles;
+            }
         }
 
         public Session getSession(boolean create) {

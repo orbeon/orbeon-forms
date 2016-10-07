@@ -17,6 +17,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
+import org.orbeon.oxf.fr.UserRole;
+import org.orbeon.oxf.fr.UserRole$;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -155,12 +157,16 @@ public class Portlet2ExternalContext implements ExternalContext {
             return null;
         }
 
-        public String[] getUserRoles() {
+        public UserRole[] getUserRoles() {
             final String[] headers = getHeaderValuesMap().get(Headers.OrbeonRolesLower());
             if (headers == null || headers.length == 0)
-                return new String[0];
-            else
-                return headers;
+                return new UserRole[0];
+            else {
+                final UserRole[] result = new UserRole[headers.length];
+                for (int i = 0; i < headers.length; i++)
+                    result[i] = UserRole$.MODULE$.parse(headers[i]);
+                return result;
+            }
         }
 
         public boolean isSecure() {
@@ -168,12 +174,10 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public boolean isUserInRole(String role) {
-
-            final String[] roles = getUserRoles();
-            for (final String r : roles)
-                if (r.equals(role))
+            final UserRole[] roles = getUserRoles();
+            for (final UserRole r : roles)
+                if (r.roleName() == role)
                     return true;
-
             return false;
         }
 

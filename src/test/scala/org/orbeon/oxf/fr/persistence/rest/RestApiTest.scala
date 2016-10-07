@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream
 
 import org.junit.Test
 import org.orbeon.dom.{Document, DocumentFactory}
+import org.orbeon.oxf.fr.{ParametrizedRole, SimpleRole, UserRole}
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}

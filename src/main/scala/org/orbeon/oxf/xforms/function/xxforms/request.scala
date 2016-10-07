@@ -97,7 +97,7 @@ class XXFormsUserGroup extends XFormsFunction with RuntimeDependentFunction {
 // xxf:user-roles() as xs:string*
 class XXFormsUserRoles extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(NetUtils.getExternalContext.getRequest.getUserRoles)
+    asIterator(NetUtils.getExternalContext.getRequest.getUserRoles.map(_.roleName))
 }
 
 // xxf:is-user-in-role(xs:string) as xs:boolean

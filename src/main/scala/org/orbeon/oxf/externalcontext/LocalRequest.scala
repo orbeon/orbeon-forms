@@ -16,6 +16,7 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
+import org.orbeon.oxf.fr.UserRole
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.servlet.ServletExternalContext
@@ -23,6 +24,7 @@ import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -50,9 +52,9 @@ class LocalRequest(
 
     def userGroupRoleHeadersIterator =
       Iterator(
-        Option(incomingRequest.getUsername)                      map (Headers.OrbeonUsernameLower → List(_)),
-        Option(incomingRequest.getUserGroup)                     map (Headers.OrbeonGroupLower    → List(_)),
-        Option(incomingRequest.getUserRoles) filter (_.nonEmpty) map (Headers.OrbeonRolesLower    → _.to[List])
+        Option(incomingRequest.getUsername)                                        .map (Headers.OrbeonUsernameLower → List(_)),
+        Option(incomingRequest.getUserGroup)                                       .map (Headers.OrbeonGroupLower    → List(_)),
+        Option(incomingRequest.getUserRoles).map(_.to[List].map(UserRole.serialize).pipe(Headers.OrbeonRolesLower    → _))
       ).flatten
 
     def bodyHeadersIterator =

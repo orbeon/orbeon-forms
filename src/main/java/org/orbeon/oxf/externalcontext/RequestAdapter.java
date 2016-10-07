@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext;
 
+import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 import java.io.IOException;
@@ -141,7 +142,7 @@ public class RequestAdapter implements ExternalContext.Request {
 
     public String[] getUserOrganization() { return null; }
 
-    public String[] getUserRoles() { return new String[0]; }
+    public UserRole[] getUserRoles() { return new UserRole[0]; }
 
     public boolean isUserInRole(String role) {
         return false;

@@ -23,16 +23,15 @@ class FormRunnerPermissionsTest extends FunSpecLike {
   describe("The `authorizedOperationsBasedOnRoles()` function") {
 
     it("must return all operations if the form has no permissions") {
-      for (userRoles ← List(Nil, List("clerk")))
+      for (userRoles ← List(Nil, List(SimpleRole("clerk"))))
         assert(FormRunner.authorizedOperationsBasedOnRoles(permissionsElOrNull = null, userRoles) === List("*"))
     }
 
     it("must, with the 'clerk can read' permission, check the a clerk actually can read, and another user can't") {
       val clerkCanRead = serialize(Some(Seq(Permission(Role("clerk"), Set("read"))))).get
-      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("clerk" )) === List("read"))
-      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List("intake")) === List())
+      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List(SimpleRole("clerk" ))) === List("read"))
+      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List(SimpleRole("other")))  === List())
     }
-
   }
 
   describe("The `allAuthorizedOperations()` function (based on data)") {
@@ -45,35 +44,64 @@ class FormRunnerPermissionsTest extends FunSpecLike {
       Permission(Role("manager"), Set("read", "update"))
     ))).get
 
-    it ("must let anonymous users only create") {
+    it("must let anonymous users only create") {
       FormRunner
         .allAuthorizedOperations(
           permissionsElement  = formPermissions,
           dataUsername        = None,
           dataGroupname       = None,
           dataOrganization    = None,
-          currentUsername     = Some("jsmith"),
+          currentUsername     = Some("juser"),
           currentGroupname    = None,
           currentOrganization = None,
-          userRoles           = Nil
+          currentRoles        = Nil
         )
         .kestrel{ ops ⇒ assert(ops === List("create"))}
     }
 
-    it ("must let the owner also read and update") {
+    it("must let owners access their data") {
       FormRunner
         .allAuthorizedOperations(
           permissionsElement  = formPermissions,
-          dataUsername        = Some("jsmith"),
+          dataUsername        = Some("juser"),
           dataGroupname       = None,
           dataOrganization    = None,
-          currentUsername     = Some("jsmith"),
+          currentUsername     = Some("juser"),
           currentGroupname    = None,
           currentOrganization = None,
-          userRoles           = Nil
+          currentRoles        = Nil
         )
         .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
     }
 
+//    it ("must let direct managers access the data") {
+//      FormRunner
+//        .allAuthorizedOperations(
+//          permissionsElement  = formPermissions,
+//          dataUsername        = Some("juser"),
+//          dataGroupname       = None,
+//          dataOrganization    = Some(Organization(List("a", "b", "c"))),
+//          currentUsername     = Some("jmanager"),
+//          currentGroupname    = None,
+//          currentOrganization = None,
+//          currentRoles        = List(ParametrizedRole("manager", "c"))
+//        )
+//        .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
+//    }
+//
+//    it ("must not let unrelated managers access the data") {
+//      FormRunner
+//        .allAuthorizedOperations(
+//          permissionsElement  = formPermissions,
+//          dataUsername        = Some("juser"),
+//          dataGroupname       = None,
+//          dataOrganization    = Some(Organization(List("a", "b", "c"))),
+//          currentUsername     = Some("jmanager"),
+//          currentGroupname    = None,
+//          currentOrganization = None,
+//          currentRoles        = List(ParametrizedRole("manager", "d"))
+//        )
+//        .kestrel{ ops ⇒ assert(ops === List("create"))}
+//    }
   }
 }

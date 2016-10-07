@@ -98,6 +98,16 @@ trait FormRunnerPermissions {
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo) =
     authorizedOperationsBasedOnRoles(permissionsElOrNull)
 
+  private def allOperationsIfNoPermissionsDefined
+    (permissionsElOrNull : NodeInfo)
+    (computePermissions  : List[Permissions.Permission] ⇒ List[String])
+  : List[String] =
+    Permissions.parse(permissionsElOrNull) match {
+      // No permissions defined for this form, authorize any operation
+      case None ⇒ List("*")
+      case Some(permissions) ⇒ computePermissions(permissions)
+    }
+
   /**
    * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
    * just based on the user's roles. Users might be able to perform additional operations on specific data, which
@@ -108,30 +118,26 @@ trait FormRunnerPermissions {
     permissionsElOrNull : NodeInfo,
     userRoles           : List[UserRole] = request.getUserRoles.to[List]
   ): List[String] =
-    Permissions.parse(permissionsElOrNull) match {
-      case None ⇒
-        // No permissions defined for this form, authorize any operation
-        List("*")
-      case Some(permissions) ⇒
-        permissions
-          .flatMap(permission ⇒ {
-            val satisfied = permission.conditions.forall {
-                case Permissions.RolesAnyOf(permissionRoleNames) ⇒
-                  permissionRoleNames.exists(permissionRoleName ⇒
-                    userRoles.exists {
-                        case SimpleRole(userRoleName) ⇒
-                          permissionRoleName == userRoleName
-                        case ParametrizedRole(userRoleName, userOrganizationName) ⇒
-                          // We can't check this, as we'd have to
-                          false
-                    }
-                  )
-                case _ ⇒
-                  // We can't satisfy any other constraint, as we don't know anything about the data
-                  false
-              }
-            if (satisfied) permission.operations else Nil })
-          .distinct
+    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
+      permissions
+        .flatMap(permission ⇒ {
+          val satisfied = permission.conditions.forall {
+              case Permissions.RolesAnyOf(permissionRoleNames) ⇒
+                permissionRoleNames.exists(permissionRoleName ⇒
+                  userRoles.exists {
+                    case SimpleRole(userRoleName) ⇒
+                      permissionRoleName == userRoleName
+                    case ParametrizedRole(userRoleName, userOrganizationName) ⇒
+                      // We can't check this, as we'd have to
+                      false
+                  }
+                )
+              case _ ⇒
+                // We can't satisfy any other constraint, as we don't know anything about the data
+                false
+            }
+          if (satisfied) permission.operations else Nil })
+        .distinct
     }
 
   //@XPathFunction
@@ -147,7 +153,7 @@ trait FormRunnerPermissions {
   // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and
   // allAuthorizedOperationsAssumingOwnerGroupMember
   def allAuthorizedOperations(
-    permissionsElement  : NodeInfo,
+    permissionsElOrNull : NodeInfo,
     dataUsername        : Option[String],
     dataGroupname       : Option[String],
     dataOrganization    : Option[Organization],
@@ -160,7 +166,7 @@ trait FormRunnerPermissions {
     // For both username and groupname, we don't want nulls, or if specified empty string
     require(dataUsername  ne null)
     require(dataGroupname ne null)
-    require(!dataUsername.contains(""))
+    require(!dataUsername .contains(""))
     require(!dataGroupname.contains(""))
 
     def ownerGroupMemberOperations(
@@ -171,21 +177,18 @@ trait FormRunnerPermissions {
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
           if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
-            val allPermissions                   = permissionsElement.child("permission").toList
+            val allPermissions                   = permissionsElOrNull.child("permission").toList
             val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
             permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
         case _ ⇒ Nil
       }
     }
 
-    val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement, currentRoles)
-
-    rolesOperations match {
-      case Seq("*") ⇒ List("*")
-      case _ ⇒
-        val ownerOperations       = ownerGroupMemberOperations(currentUsername , dataUsername,  "owner")
-        val groupMemberOperations = ownerGroupMemberOperations(currentGroupname, dataGroupname, "group-member")
-        (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
+    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
+      val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElOrNull, currentRoles)
+      val ownerOperations       = ownerGroupMemberOperations(currentUsername , dataUsername,  "owner")
+      val groupMemberOperations = ownerGroupMemberOperations(currentGroupname, dataGroupname, "group-member")
+      (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }
 

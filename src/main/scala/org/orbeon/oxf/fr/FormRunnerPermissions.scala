@@ -32,28 +32,51 @@ trait FormRunnerPermissions {
 
   object Permissions {
 
-    type Permissions = Option[Seq[Permission]]
+    type Permissions = Option[List[Permission]]
 
-    sealed trait PermissionFor
-    case object Anyone            extends PermissionFor
-    case object Owner             extends PermissionFor
-    case object Group             extends PermissionFor
-    case class Role(role: String) extends PermissionFor
-    case class Permission(permissionFor: PermissionFor, operations: Set[String])
+    sealed trait                          Condition
+    case object Owner             extends Condition
+    case object Group             extends Condition
+    case class Role(role: String) extends Condition
+
+    case class Permission(
+      conditions: List[Condition],
+      operations: Set[String]
+    )
 
     def serialize(permissions: Permissions): Option[Elem] =
-      permissions map ( ps ⇒
-        <permissions>{ ps map ( p ⇒
-          <permission operations={p.operations.mkString(" ")}>{
-            p.permissionFor match {
-              case Anyone  ⇒ ""
-              case Owner   ⇒ <owner/>
-              case Group   ⇒ <group-member/>
-              case Role(r) ⇒ <user-role any-of={r}/>
+      permissions map (ps ⇒
+        <permissions>
+          {ps map (p ⇒
+          <permission operations={p.operations.mkString(" ")}>
+            {p.conditions map {
+            case Owner ⇒ <owner/>
+            case Group ⇒ <group-member/>
+            case Role(r) ⇒ <user-role any-of={r}/>
+          }}
+          </permission>
+          )}
+        </permissions>
+        )
+
+    def parse(permissionsElOrNull: NodeInfo): Permissions =
+      Option(permissionsElOrNull)
+        .map(_.child("permission").toList.map(parsePermission))
+
+    private def parsePermission(permissionEl: NodeInfo): Permission = {
+      val operations = permissionOperations(permissionEl)
+      val conditions =
+        permissionEl.child(*).toList.map(
+          conditionEl ⇒
+            conditionEl.localname match {
+              case "owner" ⇒ Owner
+              case "group-member" ⇒ Group
+              case "user-role" ⇒ Role(conditionEl.attValue("any-of"))
+              case _ ⇒ throw new RuntimeException("")
             }
-          }</permission>
-        )}</permissions>
-      )
+        )
+      Permission(conditions, operations.toSet)
+    }
   }
 
   /**

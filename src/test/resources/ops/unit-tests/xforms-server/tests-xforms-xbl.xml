@@ -27,7 +27,7 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="Event handler observing XBL bound element" name="oxf:pipeline">
+    <test description="Event handler observing XBL bound element 1" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -2281,7 +2281,7 @@
         </output>
     </test>
 
-    <test description="Event handler observing XBL bound element" name="oxf:pipeline">
+    <test description="Event handler observing XBL bound element 2" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

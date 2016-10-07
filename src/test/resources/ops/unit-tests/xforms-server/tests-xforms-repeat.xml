@@ -2033,7 +2033,7 @@
         </output>
     </test>
 
-    <test description="xxf:index() function" name="oxf:pipeline">
+    <test description="xxf:index() function 1" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -2212,7 +2212,7 @@
         </output>
     </test>
 
-    <test description="xxf:index() function" name="oxf:pipeline">
+    <test description="xxf:index() function 2" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

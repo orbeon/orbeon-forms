@@ -11,8 +11,7 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.fb
+package org.orbeon.oxf.test
 
-import org.orbeon.oxf.test.ProcessorTestBase
 
-class FormBuilderProcessorTest extends ProcessorTestBase("oxf:/org/orbeon/oxf/fb/tests-form-builder.xml")
+class ProcessorTest extends ProcessorTestBase("oxf:/ops/unit-tests/tests.xml")

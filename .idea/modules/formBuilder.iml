@@ -22,10 +22,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="library" name="SBT: org.spire-math:jawn-parser_2.11:0.8.3:jar" level="project" />
-    <orderEntry type="library" name="SBT: com.lihaoyi:upickle_2.11:0.4.1:jar" level="project" />
-    <orderEntry type="library" name="SBT: com.lihaoyi:sourcecode_2.11:0.1.1:jar" level="project" />
-    <orderEntry type="library" name="SBT: com.lihaoyi:derive_2.11:0.4.1:jar" level="project" />
     <orderEntry type="module" module-name="core" exported="" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">

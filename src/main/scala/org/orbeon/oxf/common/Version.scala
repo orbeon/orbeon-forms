@@ -84,5 +84,5 @@ object Version {
   }
 
   //@XPathFunction
-  def isPE = Edition == "PE"
+  def isPE: Boolean = Edition == "PE"
 }

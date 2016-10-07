@@ -37,12 +37,12 @@ val PathsToExcludeFromCoreJAR = List(
 )
 
 val TestResourceManagerPaths = List(
-  "src/test/resources", // so that Java processor tests work
-  "src/resources",
-  "src/resources-packaged"
+  "src/test/resources",    // so that Java processor tests work
+  "src/resources",         // ultimately should be moved
+  "src/resources-packaged" // ultimately should be moved
 )
 
-def resourceManagerProperties: List[String] = {
+val ResourceManagerProperties: List[String] = {
 
   val pkg = "org.orbeon.oxf.resources"
 
@@ -59,6 +59,15 @@ def resourceManagerProperties: List[String] = {
     Nil
 }
 
+val TestJavaOptions = List(
+  "-ea",
+  "-server",
+  "-Djava.awt.headless=true",
+  "-Xms256m",
+  "-Xmx2G",
+  "-XX:MaxPermSize=512m" // unneeded with Java 8
+) ++ ResourceManagerProperties
+
 val JUnitTestArguments = List(
   //"-q",
   "-v",
@@ -66,13 +75,12 @@ val JUnitTestArguments = List(
   "-a",
   //"--run-listener=org.orbeon.junit.OrbeonJUnitRunListener",
   "-Doxf.resources.common.min-reload-interval=50",
-  "-Doxf.test.config=oxf:/ops/unit-tests/tests.xml",
   "-Djava.io.tmpdir=build/temp/test",
   // Some code uses the default time zone, which might different on different system, so we need to set it explicitly
   "-Duser.timezone=America/Los_Angeles",
   // Getting a JDK error, per http://stackoverflow.com/a/13575810/5295
   "-Djava.util.Arrays.useLegacyMergeSort=true"
-) ++ resourceManagerProperties
+) ++ ResourceManagerProperties
 
 val JunitTestOptions = List(
   libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % "test",
@@ -83,7 +91,7 @@ val JunitTestOptions = List(
   testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
   parallelExecution in Test          := false,
   fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
-  javaOptions       in Test          ++= Seq("-ea", "-server", "-Djava.awt.headless=true", "-Xms256m", "-Xmx2G", "-XX:MaxPermSize=512m"),
+  javaOptions       in Test          ++= TestJavaOptions,
   baseDirectory     in Test          := baseDirectory.value / ".."
 )
 
@@ -290,6 +298,12 @@ lazy val formBuilder = (project in file("form-builder"))
     name := "orbeon-form-builder"
   )
   .settings(JunitTestOptions: _*)
+  .settings(
+    parallelExecution in Test          := false,
+    fork              in Test          := true,
+    javaOptions       in Test          ++= TestJavaOptions,
+    baseDirectory     in Test          := baseDirectory.value / ".."
+  )
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)

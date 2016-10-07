@@ -24,14 +24,6 @@
     <!-- Expose environment variables -->
     <property environment="env"/>
 
-    <!-- JUnit tasks -->
-    <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-        <classpath>
-            <pathelement location="lib/junit-4.11.jar"/>
-            <pathelement location="lib/ant-junit-1.7.1.jar"/>
-        </classpath>
-    </taskdef>
-
     <!-- Ant task for the YUI Compressor -->
     <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
     <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
@@ -981,9 +973,6 @@
                         </sql>
                     </then>
                 </if>
-
-                <!-- If tests failed, stop after cleanup -->
-                <fail message="JUnit tests failed" if="test.failed"/>
 
             </sequential>
         </parallel>

@@ -136,7 +136,7 @@ def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
   }
 }
 
-lazy val DatabaseTest = config("db") extend Test
+lazy val DatabaseTest = config("db")         extend Test
 lazy val DebugTest    = config("debug-test") extend Test
 
 lazy val commonSettings = Seq(

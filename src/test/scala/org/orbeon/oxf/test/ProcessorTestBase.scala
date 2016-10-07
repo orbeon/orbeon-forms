@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
 import org.orbeon.scaxon.XML._
 import org.scalatest.{BeforeAndAfter, FunSpecLike}
+import org.scalatest.FunSpecLike
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal

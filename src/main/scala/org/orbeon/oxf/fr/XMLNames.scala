@@ -14,12 +14,18 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.{Namespace, QName}
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.scaxon.XML.Test
 
 object XMLNames {
 
   val FR = "http://orbeon.org/oxf/xml/form-runner"
+
+  val XH = XHTML_NAMESPACE_URI
+  val XF = XFORMS_NAMESPACE_URI
+  val XS = XSD_URI
+  val XBL = XBL_NAMESPACE_URI
 
   val XBLXBLTest            : Test = XBL → "xbl"
   val XBLBindingTest        : Test = XBL → "binding"

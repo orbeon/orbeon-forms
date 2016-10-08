@@ -15,14 +15,14 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.util.{Logging, UserAgent, NetUtils}
+import org.orbeon.oxf.util.{Logging, NetUtils, UserAgent}
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsModel}
+import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.TransformerUtils._
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 trait BaseOps extends Logging {
 
@@ -40,29 +40,6 @@ trait BaseOps extends Logging {
   // All xbl:binding elements available
   def componentBindings =
     asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
-
-  // All xbl:binding elements available for section templates
-  def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
-    componentBindings filter (_.attClasses("fr-section-component"))
-
-  // Find the binding's first URI qualified name
-  // For now takes the first CSS rule and assume the form foo|bar.
-  def bindingFirstURIQualifiedName(binding: NodeInfo) = {
-    val firstElementCSSName = (binding /@ "element" stringValue) split "," head
-    val elementQName        = firstElementCSSName.replace('|', ':')
-
-    binding.resolveURIQualifiedName(elementQName)
-  }
-
-  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]) = {
-
-    val bindingsForSectionTemplates =
-      availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
-
-    bindingsForSectionTemplates map { binding ⇒
-      bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
-    } toMap
-  }
 
   // Return fb-form-instance
   def fbFormInstance = topLevelInstance("fr-form-model", "fb-form-instance").get

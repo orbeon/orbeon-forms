@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -30,6 +31,7 @@ import org.orbeon.scaxon.XML._
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+
 /*
  * Form Builder: operations on controls.
  */
@@ -42,8 +44,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
   private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → toQName(FB → ("fb:" + mip.name))) toMap
 
-  val BindElementTest: Test = XF → "bind"
-
   private val topLevelBindTemplate: NodeInfo =
     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
            xmlns:xf="http://www.w3.org/2002/xforms"/>
@@ -53,32 +53,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
     findDataHoldersInDocument(inDoc, controlName, formInstanceRoot(inDoc))
-
-  def findDataHoldersInDocument(inDoc: NodeInfo, controlName: String, contextItem: Item): Seq[NodeInfo] =
-    findBindAndPathStatically(inDoc, controlName) map { case (bind, path) ⇒
-
-      // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
-      // overridden along the way!)
-      val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
-
-      // Evaluate path from instance root element
-      // NOTE: Don't pass Reporter as not very useful and some tests don't have a containingDocument scoped.
-      eval(
-        item       = contextItem,
-        expr       = path,
-        namespaces = namespaces
-      ).asInstanceOf[Seq[NodeInfo]]
-    } getOrElse
-      Nil
-
-  def buildBindPath(bind: NodeInfo) =
-    (bind ancestorOrSelf BindElementTest flatMap bindRefOrNodeset).reverse.tail map ("(" + _ + ")") mkString "/"
-
-  def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, String)] = {
-    findBindByName(inDoc, controlName) map { bind ⇒
-      (bind, buildBindPath(bind))
-    }
-  }
 
   def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 

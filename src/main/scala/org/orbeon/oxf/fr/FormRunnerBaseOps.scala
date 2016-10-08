@@ -19,21 +19,13 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 import scala.util.Try
 
 trait FormRunnerBaseOps {
-
-  val XH = XHTML_NAMESPACE_URI
-  val XF = XFORMS_NAMESPACE_URI
-  val XS = XSD_URI
-  val XBL = XBL_NAMESPACE_URI
-  val FR = XMLNames.FR
 
   val NoscriptParam         = "fr-noscript"
   val LanguageParam         = "fr-language"

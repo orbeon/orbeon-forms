@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.NodeInfo
 import XMLNames._
+import org.orbeon.oxf.xml.TransformerUtils._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
@@ -62,6 +63,35 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
     container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
+
+  def sectionTemplateBindingName(section: NodeInfo) =
+    section / * filter IsSectionTemplateContent map (_.uriQualifiedName) headOption
+
+  def findSectionsWithTemplates(view: NodeInfo) =
+    view descendant * filter IsSection filter (_ \ * exists IsSectionTemplateContent)
+
+  // All xbl:binding elements available for section templates
+  def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
+    componentBindings filter (_.attClasses("fr-section-component"))
+
+  // Find the binding's first URI qualified name
+  // For now takes the first CSS rule and assume the form foo|bar.
+  def bindingFirstURIQualifiedName(binding: NodeInfo) = {
+    val firstElementCSSName = (binding /@ "element" stringValue) split "," head
+    val elementQName        = firstElementCSSName.replace('|', ':')
+
+    binding.resolveURIQualifiedName(elementQName)
+  }
+
+  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]) = {
+
+    val bindingsForSectionTemplates =
+      availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
+
+    bindingsForSectionTemplates map { binding ⇒
+      bindingFirstURIQualifiedName(binding) → extractAsMutableDocument(binding)
+    } toMap
+  }
 
   // XForms callers: get the name for a section or grid element or null (the empty sequence)
   def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOpt(elem).orNull

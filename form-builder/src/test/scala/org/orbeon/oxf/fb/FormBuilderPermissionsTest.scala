@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.scalatest.FunSpec

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Names._
-import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
@@ -174,12 +174,6 @@ trait ContainerOps extends ControlOps {
   // Later: fr:tab (maybe fr:tabview), wizard
   def canMoveInto(container: NodeInfo) =
     IsSection(container) && ! (container \ * exists IsSectionTemplateContent)
-
-  def findSectionsWithTemplates(view: NodeInfo) =
-    view descendant * filter IsSection filter (_ \ * exists IsSectionTemplateContent)
-
-  def sectionTemplateBindingName(section: NodeInfo) =
-    section / * filter IsSectionTemplateContent map (_.uriQualifiedName) headOption
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
   def deleteSectionTemplateContentHolders(inDoc: NodeInfo) = {

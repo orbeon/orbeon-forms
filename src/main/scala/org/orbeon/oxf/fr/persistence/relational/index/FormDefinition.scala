@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
-import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.DataMigration
+import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
@@ -38,15 +38,15 @@ trait FormDefinition {
     }
 
     val migrationPaths =
-      metadataInstanceRoot(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
+      FormRunner.metadataInstanceRoot(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
       DataMigration.decodeMigrationsFromJSON map { case (path, iterationName) ⇒
         path.splitTo[List]("/")
       }
 
     indexedControlElements map { control ⇒
 
-      val controlName    = getControlName(control)
-      val bindForControl = findBindByName(formDoc, controlName).get
+      val controlName    = FormRunner.getControlName(control)
+      val bindForControl = FormRunner.findBindByName(formDoc, controlName).get
       val bindsToControl = bindForControl.ancestorOrSelf("*:bind").reverse.tail // skip instance root bind
       val bindRefs       =
         for (bind ← bindsToControl) yield {
@@ -75,7 +75,7 @@ trait FormDefinition {
         xpath     = adjustedBindRefs mkString "/",
         xsType    = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
-        htmlLabel = hasHTMLMediatype(control \ (XF → "label"))
+        htmlLabel = FormRunner.hasHTMLMediatype(control \ (XF → "label"))
        )
     }
   }

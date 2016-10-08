@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.FormBuilder._
+import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.xml.XMLConstants.XML_URI
-import org.orbeon.oxf.fr.FormRunner
 
 /*
  * Form Builder: toolbox operations.

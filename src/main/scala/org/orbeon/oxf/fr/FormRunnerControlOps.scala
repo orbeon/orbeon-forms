@@ -13,10 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.XML._
+
+import scala.collection.JavaConverters._
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
@@ -99,6 +103,32 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   def findBindName(bind: NodeInfo) =
     bind attValueOpt "name"
+
+  def buildBindPath(bind: NodeInfo) =
+    (bind ancestorOrSelf XFBindTest flatMap bindRefOrNodeset).reverse.tail map ("(" + _ + ")") mkString "/"
+
+  def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, String)] = {
+    findBindByName(inDoc, controlName) map { bind ⇒
+      (bind, buildBindPath(bind))
+    }
+  }
+
+  def findDataHoldersInDocument(inDoc: NodeInfo, controlName: String, contextItem: Item): Seq[NodeInfo] =
+    findBindAndPathStatically(inDoc, controlName) map { case (bind, path) ⇒
+
+      // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
+      // overridden along the way!)
+      val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
+
+      // Evaluate path from instance root element
+      // NOTE: Don't pass Reporter as not very useful and some tests don't have a containingDocument scoped.
+      eval(
+        item       = contextItem,
+        expr       = path,
+        namespaces = namespaces
+      ).asInstanceOf[Seq[NodeInfo]]
+    } getOrElse
+      Nil
 
   def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
     nodes exists (element ⇒ (element attValue "mediatype") == "text/html")

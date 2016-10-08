@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fb
+package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner.orbeonRoles
@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
-trait PermissionsOps {
+trait FormBuilderPermissionsOps {
 
   // Load form-builder-permissions.xml. For code called from XForms, that instance is loaded in permissions-model.xml.
   //@XPathFunction

@@ -17,6 +17,7 @@ import org.orbeon.oxf.util.PathOps
 
 object FormRunner
   extends FormRunnerPersistence
+  with FormBuilderPermissionsOps
   with FormRunnerPermissions
   with FormRunnerPDF
   with FormRunnerEmail

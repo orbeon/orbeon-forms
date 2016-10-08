@@ -277,13 +277,9 @@ lazy val formRunner = (project in file("form-runner"))
   )
   .settings(JunitTestOptions: _*)
   .settings(
-    scalaSource       in DatabaseTest  := baseDirectory.value / "db" / "scala",
-    resourceDirectory in DatabaseTest  := baseDirectory.value / "db" / "resources"
-  )
-  .settings(
-    scalaSource       in DebugTest     := baseDirectory.value / "test" / "scala",
-    javaSource        in DebugTest     := baseDirectory.value / "test" / "java",
-    resourceDirectory in DebugTest     := baseDirectory.value / "test" / "resources",
+    scalaSource       in DebugTest     := baseDirectory.value / "src" / "test" / "scala",
+    javaSource        in DebugTest     := baseDirectory.value / "src" / "test" / "java",
+    resourceDirectory in DebugTest     := baseDirectory.value / "src" / "test" / "resources",
 
     javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   )

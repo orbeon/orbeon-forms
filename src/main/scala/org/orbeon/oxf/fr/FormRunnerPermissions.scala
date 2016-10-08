@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fb.FormBuilder
 import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
@@ -216,7 +215,7 @@ trait FormRunnerPermissions {
     // We only need one wrapper; create it when we encounter the first <form>
     var wrapperOpt: Option[DocumentWrapper] = None
 
-    val fbPermissions = FormBuilder.formBuilderPermissions(FormBuilder.formBuilderPermissionsConfiguration, orbeonRoles)
+    val fbPermissions = FormRunner.formBuilderPermissions(FormRunner.formBuilderPermissionsConfiguration, orbeonRoles)
 
     formsEls.flatMap { formEl ⇒
 

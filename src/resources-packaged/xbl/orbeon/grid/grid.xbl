@@ -88,8 +88,8 @@
                 <xsl:variable name="is-editable"              select="exists($edit-ref)"/>
 
                 <!-- Support legacy repeat for backward compatibility -->
-                <xsl:variable name="is-content-repeat"        select="fbf:isContentRepeat($root)"/>
-                <xsl:variable name="is-legacy-repeat"         select="fbf:isLegacyRepeat($root)"/>
+                <xsl:variable name="is-content-repeat"        select="frf:isContentRepeat($root)"/>
+                <xsl:variable name="is-legacy-repeat"         select="frf:isLegacyRepeat($root)"/>
 
                 <xsl:variable name="is-repeat"                select="$is-content-repeat or $is-legacy-repeat"/>
                 <xsl:variable name="apply-defaults"           select="$root/@apply-defaults = 'true'"/>
@@ -256,14 +256,17 @@
 
                             <!-- Grid table -->
                             <xsl:element name="{$table-elem}">
+
+                                <!-- Annoying duplication below, but we don't have `fbf:gridCanDoClasses` when running Form Runner tests. -->
                                 <xsl:attribute
+                                    use-when="function-available('fbf:gridCanDoClasses')"
                                     name="class"
                                     select="
                                         (
                                             'fr-grid',
                                              concat('fr-grid-', $static-col-count),
                                              (: Control name might not be available (unclear why normalize-space() is needed) :)
-                                             for $name in fbf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
+                                             for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
                                              if ($is-repeat) then (
                                                  'table',
                                                  'table-bordered'[$appearance = 'full'],
@@ -281,6 +284,30 @@
                                                  ()
                                         )
                                     "/>
+
+                                <xsl:attribute
+                                    use-when="not(function-available('fbf:gridCanDoClasses'))"
+                                    name="class"
+                                    select="
+                                        (
+                                            'fr-grid',
+                                             concat('fr-grid-', $static-col-count),
+                                             (: Control name might not be available (unclear why normalize-space() is needed) :)
+                                             for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
+                                             if ($is-repeat) then (
+                                                 'table',
+                                                 'table-bordered'[$appearance = 'full'],
+                                                 'table-condensed',
+                                                 'fr-repeat',
+                                                 if ($static-row-count le 1) then
+                                                     'fr-repeat-single-row'
+                                                 else
+                                                     'fr-repeat-multiple-rows'
+                                             ) else
+                                                 'fr-norepeat'
+                                        )
+                                    "/>
+
                                 <!-- This can possibly help accessibility -->
                                 <xsl:if test="$is-table">
                                     <xsl:attribute name="role" select="'presentation'"/>

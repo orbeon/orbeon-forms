@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.Connection
 
-import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -25,6 +24,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
+
 
 private object FlatView {
 

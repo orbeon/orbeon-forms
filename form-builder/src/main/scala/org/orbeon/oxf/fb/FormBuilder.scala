@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.FormRunnerContainerOps
+import org.orbeon.oxf.fr.{FormBuilderPermissionsOps, FormRunnerContainerOps}
 
 /**
  * Form Builder functions.
@@ -27,6 +27,5 @@ object FormBuilder
   with SectionOps
   with AlertsAndConstraintsOps
   with SchemaOps
-  with PermissionsOps
   with PublishOps
   with BindingOps

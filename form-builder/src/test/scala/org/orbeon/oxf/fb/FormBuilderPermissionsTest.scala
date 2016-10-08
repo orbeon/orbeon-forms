@@ -16,9 +16,9 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.scalatest.FunSpecLike
+import org.scalatest.FunSpec
 
-class FormBuilderPermissionsTest extends FunSpecLike {
+class FormBuilderPermissionsTest extends FunSpec {
 
   describe("The `formBuilderPermissions()` function") {
 

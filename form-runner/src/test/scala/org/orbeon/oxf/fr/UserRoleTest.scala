@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import org.scalatest.FunSpecLike
+import org.scalatest.FunSpec
 
-class UserRoleTest extends FunSpecLike {
+
+class UserRoleTest extends FunSpec {
 
   val TestRoles = List(
     """clerk"""                        → SimpleRole("clerk"),

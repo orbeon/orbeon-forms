@@ -16,9 +16,9 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.Permissions._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.scaxon.XML._
-import org.scalatest.FunSpecLike
+import org.scalatest.FunSpec
 
-class FormRunnerPermissionsTest extends FunSpecLike {
+class FormRunnerPermissionsTest extends FunSpec {
 
   describe("The `authorizedOperationsBasedOnRoles()` function") {
 

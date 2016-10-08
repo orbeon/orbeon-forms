@@ -35,7 +35,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
     private PipelineContext pipelineContext;
 
     @Before
-    public void setup() throws Exception {
+    public void setupResourceManagerTestPipelineContext() {
 
         pipelineContext = new PipelineContext();
 
@@ -45,7 +45,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
     }
 
     @After
-    public void tearDown() {
+    public void tearDownResourceManagerTestPipelineContext() {
         pipelineContext.destroy(true);
     }
 

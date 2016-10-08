@@ -39,7 +39,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     private ExternalContext.Request filterRequest;
 
     @Before
-    public void setup() throws Exception {
+    public void setupResourceManagerTestPipelineContext() {
 
         {
             directPipelineContext = new PipelineContext();
@@ -72,7 +72,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     }
 
     @After
-    public void tearDown() {
+    public void tearDownResourceManagerTestPipelineContext() {
         directPipelineContext.destroy(true);
         forwardPipelineContext.destroy(true);
         filterPipelineContext.destroy(true);

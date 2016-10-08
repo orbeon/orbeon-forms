@@ -29,7 +29,7 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
 import org.orbeon.scaxon.XML._
-import org.scalatest.FunSpecLike
+import org.scalatest.{BeforeAndAfter, FunSpecLike}
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -37,6 +37,7 @@ import scala.util.control.NonFatal
 abstract class ProcessorTestBase(testsDocUrl: String)
   extends ResourceManagerTestBase
      with FunSpecLike
+     with BeforeAndAfter
      with XMLSupport {
 
   case class TestDescriptor(
@@ -52,8 +53,23 @@ abstract class ProcessorTestBase(testsDocUrl: String)
   case class  FailedTestResult(expected: Document, actual: Document) extends TestResult
   case class  ErrorTestResult(t: Throwable)                          extends TestResult
 
-  ResourceManagerTestBase.staticSetup()
+  // Setup and tear-down
+  locally {
 
+    ResourceManagerTestBase.staticSetup() // don't like this much, find another solution.
+
+    var pipelineContext: Option[PipelineContext] = None
+
+    before {
+      pipelineContext = Some(createPipelineContextWithExternalContext)
+    }
+
+    after {
+      pipelineContext foreach (_.destroy(true))
+    }
+  }
+
+  // Run tests
   findTestsToRun groupByKeepOrder (_.groupOpt) foreach { case (groupOpt, descriptors) ⇒
     describe(groupOpt getOrElse "[No group description provided]") {
       descriptors foreach { descriptor ⇒

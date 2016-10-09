@@ -12,15 +12,13 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 
-<tests xmlns:oxf="http://www.orbeon.com/oxf/processors"
-       xmlns:xi="http://www.w3.org/2001/XInclude">
+<tests xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="tests-xforms-misc.xml"/>
     <xi:include href="tests-xforms-focus.xml"/>
     <xi:include href="tests-xforms-mips.xml"/>
     <xi:include href="tests-xforms-submission.xml"/>
     <xi:include href="tests-xforms-xbl.xml"/>
-    <xi:include href="tests-xforms-components.xml"/>
     <xi:include href="tests-xforms-itemset.xml"/>
     <xi:include href="tests-xforms-layout.xml"/>
     <xi:include href="tests-xforms-repeat.xml"/>

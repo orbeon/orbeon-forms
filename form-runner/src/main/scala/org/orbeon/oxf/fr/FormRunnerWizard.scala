@@ -20,6 +20,7 @@ import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{BooleanValue, EmptySequence, Value}
 import org.orbeon.scaxon.XML._
 
+// TODO: Move as an `object` to `org.orbeon.xbl` package.
 trait FormRunnerWizard extends FormRunnerBaseOps {
 
   //@XPathFunction

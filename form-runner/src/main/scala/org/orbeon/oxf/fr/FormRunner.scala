@@ -22,7 +22,6 @@ object FormRunner
   with FormRunnerPDF
   with FormRunnerEmail
   with FormRunnerLang
-  with FormRunnerErrorSummary
   with FormRunnerBaseOps
   with FormRunnerControlOps
   with FormRunnerContainerOps

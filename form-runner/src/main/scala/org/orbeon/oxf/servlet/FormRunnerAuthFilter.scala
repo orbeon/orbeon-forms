@@ -17,7 +17,6 @@ import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 
 import org.orbeon.oxf.fr.FormRunnerAuth
-import org.orbeon.oxf.servlet.{BaseServletRequestWrapper, RequestPrependHeaders, RequestRemoveHeaders}
 
 import scala.collection.JavaConversions._
 

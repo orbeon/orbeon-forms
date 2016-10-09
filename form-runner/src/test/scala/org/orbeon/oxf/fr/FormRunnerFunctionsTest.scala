@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom.{Document ⇒ JDocument}
 import org.junit.Test
+import org.orbeon.dom.{Document ⇒ JDocument}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.NetUtils
@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.xbl.ErrorSummary
 import org.scalatest.junit.AssertionsForJUnit
 
 import scala.collection.JavaConverters._
@@ -169,7 +170,7 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         { case (id, _) ⇒ effectiveIdToAbsoluteId(id) } toList
 
       val sortStrings =
-        effectiveAbsoluteIds map (controlSortString(_, 3))
+        effectiveAbsoluteIds map (ErrorSummary.controlSortString(_, 3))
 
       // Effective sort strings follow document order
       assert(sortStrings.sorted === sortStrings)

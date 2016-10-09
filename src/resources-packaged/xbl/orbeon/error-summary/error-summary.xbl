@@ -19,7 +19,8 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary">
 
     <!--
         Component to represent a reusable error summary.
@@ -167,8 +168,8 @@ Inserting error information into error list:
 
                     <xf:var
                         name="insert-position"
-                        value="count(error[frf:controlSortString(@absolute-id, 4)
-                                        lt frf:controlSortString($absolute-id, 4)])"/>
+                        value="count(error[ErrorSummary:controlSortString(@absolute-id, 4)
+                                        lt ErrorSummary:controlSortString($absolute-id, 4)])"/>
 
                     <!-- Now that we have found the position, simply insert -->
                     <xf:insert context="." ref="error[$insert-position]" origin="instance('fr-error-template')"/>
@@ -179,7 +180,7 @@ Inserting error information into error list:
                         <xf:setvalue ref="@level"        value="$level"/>
                         <xf:setvalue ref="@alert"        value="$alert"/>
                         <xf:setvalue ref="@label"        value="$label"/>
-                        <xf:setvalue ref="@section-name" value="frf:topLevelSectionNameForControlId($absolute-id)"/>
+                        <xf:setvalue ref="@section-name" value="ErrorSummary:topLevelSectionNameForControlId($absolute-id)"/>
                     </xf:action>
 
                 </xf:action>
@@ -291,7 +292,7 @@ Inserting error information into error list:
                                 <xf:var
                                     name="affected-errors"
                                     as="element(error)*"
-                                    value="error[@absolute-id != frf:updateIteration(@absolute-id, $target-absolute-id, $from-positions, $to-positions)]"/>
+                                    value="error[@absolute-id != ErrorSummary:updateIteration(@absolute-id, $target-absolute-id, $from-positions, $to-positions)]"/>
 
                                 <!-- Remove affected errors from instance -->
                                 <xf:delete ref="$affected-errors"/>
@@ -301,7 +302,7 @@ Inserting error information into error list:
                                     <xf:var name="error" value="."/>
 
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <xf:property name="absolute-id"         value="frf:updateIteration($error/@absolute-id, $target-absolute-id, $from-positions, $to-positions)"/>
+                                        <xf:property name="absolute-id"         value="ErrorSummary:updateIteration($error/@absolute-id, $target-absolute-id, $from-positions, $to-positions)"/>
                                         <xf:property name="control-position"    value="$error/@position"/>
                                         <xf:property name="level"               value="$error/@level"/>
                                         <xf:property name="alert"               value="$error/@alert"/>

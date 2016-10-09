@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.Names._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XF
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.xbl.ErrorSummary
 
 import scala.xml.Elem
 
@@ -95,7 +96,7 @@ trait FormRunnerMetadata {
     val repeatDepth = doc.getStaticState.topLevelPart.repeatDepthAcrossParts
 
     def sortString(control: XFormsControl) =
-      FormRunner.controlSortString(control.absoluteId, repeatDepth)
+      ErrorSummary.controlSortString(control.absoluteId, repeatDepth)
 
     val sortedControls =
       selectedControls.to[List].sortWith(sortString(_) < sortString(_))

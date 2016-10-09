@@ -21,7 +21,8 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary">
 
     <xbl:binding id="fr-wizard" element="fr|wizard">
         <xbl:resources>
@@ -327,7 +328,7 @@
                                 <xf:var
                                     name="top-level-sections-with-visible-errors"
                                     value="
-                                        frf:topLevelSectionsWithErrors(
+                                        ErrorSummary:topLevelSectionsWithErrors(
                                             string-join(
                                                 for $id in $relevant-top-level-section-ids
                                                 return frf:controlNameFromIdOpt($id),
@@ -339,7 +340,7 @@
                                 <xf:var
                                     name="top-level-sections-with-errors"
                                     value="
-                                        frf:topLevelSectionsWithErrors(
+                                        ErrorSummary:topLevelSectionsWithErrors(
                                             string-join(
                                                 for $id in $relevant-top-level-section-ids
                                                 return frf:controlNameFromIdOpt($id),
@@ -394,7 +395,7 @@
                                          or xxf:visited($next-top-level-case-ids[1])
                                          or not(
                                             exists(
-                                                frf:topLevelSectionsWithErrors(
+                                                ErrorSummary:topLevelSectionsWithErrors(
                                                     string-join(
                                                         for $c in ($prev-top-level-case-ids, $current-top-level-case-id)
                                                         return frf:controlNameFromIdOpt(replace($c, '-case$', '')),

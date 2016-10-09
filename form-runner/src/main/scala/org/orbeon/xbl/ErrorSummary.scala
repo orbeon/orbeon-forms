@@ -11,8 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.xbl
 
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -23,7 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
-trait FormRunnerErrorSummary {
+object ErrorSummary {
 
   private val ErrorSummaryIds = List("error-summary-control-top", "error-summary-control-bottom")
 

@@ -27,10 +27,9 @@ package org.orbeon.oxf.servlet
 
 import java.io._
 import java.{util ⇒ ju}
+import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
-import javax.servlet.{ServletContext, ServletException}
 
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ServletToExternalContextRequestDispatcherWrapper, ServletURLRewriter, URLRewriter, WSRPURLRewriter}
 import org.orbeon.oxf.fr.UserRole
 import org.orbeon.oxf.http.Headers
@@ -62,7 +61,8 @@ object ServletExternalContext {
   private val HttpNocacheCacheHeadersDefault   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"
   private val HttpNocacheCacheHeadersProperty  = "oxf.http.nocache.cache-headers"
 
-  lazy val defaultFormCharset           = Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, DefaultFormCharsetDefault)
+  lazy val defaultFormCharset =
+    Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, DefaultFormCharsetDefault)
 
   private lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
   private lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
@@ -71,7 +71,7 @@ object ServletExternalContext {
   private def decodeCacheString(name: String, defaultValue: String): List[(String, String)] =
     for {
       header ← Properties.instance.getPropertySet.getString(name, defaultValue).splitTo[List](sep = ";")
-      parts = header.splitTo[List](":")
+      parts = header.splitTo[List](sep = ":")
       if parts.size == 2
       name :: value :: Nil = parts
     } yield
@@ -95,7 +95,7 @@ class ServletExternalContext(
 
     private var getParameterMapMultipartFormDataCalled = false
     private var getInputStreamCalled                   = false
-    private var inputStreamCharsetOpt: Option[String]     = None
+    private var inputStreamCharsetOpt: Option[String]  = None
 
     // Delegate to underlying request
     def getPathInfo                = nativeRequest.getPathInfo
@@ -122,20 +122,39 @@ class ServletExternalContext(
     def getContainerType           = "servlet"
     def getContainerNamespace      = getResponse.getNamespacePrefix
 
-    lazy val getContextPath: String = {
-      // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
-      // included servlet via the getAttribute method on the request object and their values must be equal to
-      // the request URI, context path, servlet path, path info, and query string of the included servlet,
-      // respectively."
-      // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
-      // first servlet in the chain!
-      val dispatcherContext = nativeRequest.getAttribute("javax.servlet.include.context_path").asInstanceOf[String]
+    private def servletIncludeAttributeOpt(name: String) =
+      Option(nativeRequest.getAttribute(s"javax.servlet.include.$name").asInstanceOf[String])
 
-      if (dispatcherContext ne null)
-        dispatcherContext            // this ensures we return the included / forwarded servlet's value
-      else
-        nativeRequest.getContextPath // use regular context
-    }
+    // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+    // included servlet via the getAttribute method on the request object and their values must be equal to
+    // the request URI, context path, servlet path, path info, and query string of the included servlet,
+    // respectively."
+    // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
+    // first servlet in the chain!
+    lazy val getContextPath: String =
+      servletIncludeAttributeOpt("context_path") getOrElse nativeRequest.getContextPath
+
+    // Use included / forwarded servlet's value
+    // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+    // included servlet via the getAttribute method on the request object and their values must be equal to the
+    // request URI, context path, servlet path, path info, and query string of the included servlet,
+    // respectively."
+    // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
+    // first servlet in the chain!
+    lazy val getQueryString: String =
+      servletIncludeAttributeOpt("query_string") getOrElse nativeRequest.getQueryString
+
+    // Use included / forwarded servlet's value
+    // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+    // included servlet via the getAttribute method on the request object and their values must be equal to the
+    // request URI, context path, servlet path, path info, and query string of the included servlet,
+    // respectively."
+    // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
+    // first servlet in the chain!
+    lazy val getRequestURI: String =
+      servletIncludeAttributeOpt("request_uri") getOrElse nativeRequest.getRequestURI
+
+    def getRequestPath = NetUtils.getRequestPathInfo(nativeRequest)
 
     lazy val getAttributesMap: ju.Map[String, AnyRef] = new InitUtils.RequestMap(nativeRequest)
 
@@ -154,7 +173,9 @@ class ServletExternalContext(
       if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
         // Special handling for multipart/form-data
         if (getInputStreamCalled)
-          throw new OXFException(s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `multipart/form-data`")
+          throw new IllegalStateException(
+            s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `multipart/form-data`"
+          )
 
         // Decode the multipart data
         val result = Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, DefaultHeaderEncoding)
@@ -163,20 +184,14 @@ class ServletExternalContext(
         result
       } else {
         // Set the input character encoding before getting the stream as this can cause issues with Jetty
-        try {
-          handleInputEncoding()
-        } catch {
-          case e: UnsupportedEncodingException ⇒
-            throw new OXFException(e)
-        }
+        handleInputEncoding()
+
         // Just use native request parameters
-        val result = new ju.HashMap[String, Array[AnyRef]]
-        val e = nativeRequest.getParameterNames.asInstanceOf[ju.Enumeration[String]]
-        while (e.hasMoreElements) {
-          val name = e.nextElement()
-          result.put(name, nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]])
-        }
-        result
+        val paramsIt =
+          for (name ← nativeRequest.getParameterNames.asInstanceOf[ju.Enumeration[String]].asScala)
+            yield name → nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]]
+
+        paramsIt.toMap.asJava
       }
     }
 
@@ -205,37 +220,6 @@ class ServletExternalContext(
     def getCharacterEncoding: String =
       inputStreamCharsetOpt getOrElse nativeRequest.getCharacterEncoding
 
-    def getQueryString: String = {
-      // Use included / forwarded servlet's value
-      // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
-      // included servlet via the getAttribute method on the request object and their values must be equal to the
-      // request URI, context path, servlet path, path info, and query string of the included servlet,
-      // respectively."
-      // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
-      // first servlet in the chain!
-      val dispatcherQueryString = nativeRequest.getAttribute("javax.servlet.include.query_string").asInstanceOf[String]
-      if (dispatcherQueryString ne null)
-        dispatcherQueryString
-      else
-        nativeRequest.getQueryString
-    }
-
-    def getRequestPath = NetUtils.getRequestPathInfo(nativeRequest)
-
-    def getRequestURI: String = {
-      // Use included / forwarded servlet's value
-      // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
-      // included servlet via the getAttribute method on the request object and their values must be equal to the
-      // request URI, context path, servlet path, path info, and query string of the included servlet,
-      // respectively."
-      // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
-      // first servlet in the chain!
-      val dispatcherRequestURI = nativeRequest.getAttribute("javax.servlet.include.request_uri").asInstanceOf[String]
-      if (dispatcherRequestURI ne null)
-        dispatcherRequestURI
-      else
-        nativeRequest.getRequestURI
-    }
 
     def getRequestURL: String = {
       // NOTE: If this is included from a portlet, we may not have a request URL
@@ -263,10 +247,13 @@ class ServletExternalContext(
 
     def getInputStream: InputStream = {
       if (getParameterMapMultipartFormDataCalled)
-        throw new OXFException(s"Cannot call `getInputStream` after `getParameterMap` when a form was posted with `multipart/form-data`")
+        throw new IllegalStateException(
+          s"Cannot call `getInputStream` after `getParameterMap` when a form was posted with `multipart/form-data`"
+        )
 
       // Set the input character encoding before getting the stream as this can cause issues with Jetty
       handleInputEncoding()
+
       // Remember that we were called, so we can display a meaningful exception if getParameterMap() is called after this
       getInputStreamCalled = true
       nativeRequest.getInputStream
@@ -328,18 +315,17 @@ class ServletExternalContext(
       if (isServerSide) {
         // Server-side redirect: do a forward
         val requestDispatcher = nativeRequest.getRequestDispatcher(location)
-        // TODO: handle isNoRewrite like in XFormsSubmissionUtils.openOptimizedConnection(): absolute path can then be used to redirect to other servlet context
-        try {
-          // Destroy the pipeline context before doing the forward. Nothing significant
-          // should be allowed on "this side" of the forward after the forward return.
-          pipelineContext.destroy(true)
-          // Execute the forward
-          val wrappedRequest = new ForwardServletRequestWrapper(nativeRequest, location)
-          requestDispatcher.forward(wrappedRequest, nativeResponse)
-        }catch {
-          case e: ServletException ⇒
-            throw new OXFException(e)
-        }
+        // TODO: handle `isNoRewrite` like in XFormsSubmissionUtils.openOptimizedConnection(): absolute path can then
+        // be used to redirect to other servlet context
+
+        // Destroy the pipeline context before doing the forward. Nothing significant
+        // should be allowed on "this side" of the forward after the forward return.
+        pipelineContext.destroy(true)
+
+        // Execute the forward
+        val wrappedRequest = new ForwardServletRequestWrapper(nativeRequest, location)
+        requestDispatcher.forward(wrappedRequest, nativeResponse)
+
       } else {
         // Client-side redirect: send the redirect to the client
         nativeResponse.sendRedirect(
@@ -348,8 +334,8 @@ class ServletExternalContext(
               URLRewriterUtils.rewriteServiceURL(
                 getRequest,
                 location,
-                URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
-              ,
+                URLRewriter.REWRITE_MODE_ABSOLUTE_PATH
+              ),
               "orbeon-embeddable=true"
             )
           else
@@ -453,7 +439,9 @@ class ServletExternalContext(
     def addListener(sessionListener: ExternalContext.Session.SessionListener): Unit = {
       val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
       if (listeners eq null)
-        throw new IllegalStateException("SessionListeners object not found in session. OrbeonSessionListener might be missing from web.xml.")
+        throw new IllegalStateException(
+          "`SessionListeners` object not found in session. `OrbeonSessionListener` might be missing from web.xml."
+        )
 
       listeners.addListener(sessionListener)
     }
@@ -520,7 +508,10 @@ class ServletExternalContext(
     if (isContextRelative) {
       // Path is relative to the current context root
       val slashServletContext = servletContext.getContext("/")
-      new ServletToExternalContextRequestDispatcherWrapper(servletContext.getRequestDispatcher(path), slashServletContext eq servletContext)
+      new ServletToExternalContextRequestDispatcherWrapper(
+        servletContext.getRequestDispatcher(path),
+        slashServletContext eq servletContext
+      )
     } else {
       // Path is relative to the server document root
       val otherServletContext = servletContext.getContext(path)
@@ -541,7 +532,10 @@ class ServletExternalContext(
           path → true
         }
 
-      new ServletToExternalContextRequestDispatcherWrapper(otherServletContext.getRequestDispatcher(modifiedPath), isDefaultContext)
+      new ServletToExternalContextRequestDispatcherWrapper(
+        otherServletContext.getRequestDispatcher(modifiedPath),
+        isDefaultContext
+      )
     }
   }
 }

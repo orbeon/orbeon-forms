@@ -60,7 +60,7 @@ private object HttpAssert extends XMLSupport {
         // Check operations
         val resultOperationsString = headers.get("orbeon-operations").map(_.head)
         val resultOperationsSet = resultOperationsString.map(_.splitTo[Set]()).getOrElse(Set.empty)
-        assert(expectedOperations === resultOperationsSet)
+        assert(expectedOperations.to[Set] === resultOperationsSet)
         // Check form version
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
         assert(expectedFormVersion === resultFormVersion)

@@ -20,8 +20,9 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.ProcessorUtils._
 import org.orbeon.oxf.processor.generator.URLGenerator
-import org.orbeon.oxf.processor.{DOMSerializer, Processor, ProcessorUtils}
+import org.orbeon.oxf.processor.{DOMSerializer, Processor}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
@@ -177,15 +178,16 @@ abstract class ProcessorTestBase(testsDocUrl: String)
 
         // Create processor and connect its inputs
         val processor =
-          ProcessorUtils.createProcessorWithInputs(unsafeUnwrapElement(testElem)) |!>
+          createProcessorWithInputs(unsafeUnwrapElement(testElem)) |!>
             (_.setId("Main Test Processor"))
 
         // Connect outputs
         val docsAndSerializers =
           for {
             outputElem ← testElem child "output"
-            name       = outputElem.attValueNonBlankOpt("name") getOrElse (throw new IllegalArgumentException("Output `name` is mandatory"))
-            doc        = ProcessorUtils.createDocumentFromEmbeddedOrHref(unsafeUnwrapElement(outputElem), outputElem.attValueNonBlankOpt("href").orNull)
+            name       = outputElem.attValueNonBlankOrThrow("name")
+            unwrapped  = unsafeUnwrapElement(outputElem)
+            doc        = createDocumentFromEmbeddedOrHref(unwrapped, outputElem.attValueNonBlankOpt("href").orNull)
             serializer = new DOMSerializer
           } yield {
             PipelineUtils.connect(processor, name, serializer, "data")

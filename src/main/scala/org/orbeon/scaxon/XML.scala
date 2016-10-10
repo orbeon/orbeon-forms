@@ -386,6 +386,10 @@ object XML {
       case s     ⇒ Some(s.stringValue) filter (_.nonBlank)
     }
 
+    def attValueNonBlankOrThrow(attName: String): String =
+      attValueNonBlankOpt(attName) getOrElse
+        (throw new IllegalArgumentException(s"attribute `$attName` is required on element `$name`"))
+
     def attValueOpt(attName: QName) = /@(attName) match {
       case Seq() ⇒ None
       case s     ⇒ Some(s.stringValue)

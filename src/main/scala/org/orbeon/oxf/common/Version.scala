@@ -38,8 +38,8 @@ object Version {
 
   private val PossibleEditions = Set("CE", "PE")
 
-  val VersionNumber = org.orbeon.oxf.common.BuildInfo.orbeonVersion
-  val Edition       = org.orbeon.oxf.common.BuildInfo.orbeonEdition
+  val VersionNumber : String = org.orbeon.oxf.common.BuildInfo.orbeonVersion
+  val Edition       : String = org.orbeon.oxf.common.BuildInfo.orbeonEdition
 
   val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 

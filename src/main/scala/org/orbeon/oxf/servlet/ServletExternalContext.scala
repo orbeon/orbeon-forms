@@ -142,15 +142,15 @@ class ServletExternalContext(
     lazy val getRequestURI: String =
       servletIncludeAttributeOpt("request_uri") getOrElse nativeRequest.getRequestURI
 
-    def getRequestPath = NetUtils.getRequestPathInfo(nativeRequest)
+    lazy val getRequestPath = NetUtils.getRequestPathInfo(nativeRequest)
 
     lazy val getAttributesMap: ju.Map[String, AnyRef] = new InitUtils.RequestMap(nativeRequest)
 
     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
     private lazy val headerValuesMap: Map[String, Array[String]] = (
-        for (name ← nativeRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala)
-          yield name.toLowerCase → StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
-      ).toMap
+      for (name ← nativeRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala)
+        yield name.toLowerCase → StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
+    ).toMap
 
     def getHeaderValuesMap = headerValuesMap.asJava
 
@@ -208,8 +208,7 @@ class ServletExternalContext(
     def getCharacterEncoding: String =
       inputStreamCharsetOpt getOrElse nativeRequest.getCharacterEncoding
 
-
-    def getRequestURL: String = {
+    lazy val getRequestURL: String = {
       // NOTE: If this is included from a portlet, we may not have a request URL
       val requestUrl = nativeRequest.getRequestURL
       // TODO: check if we should return null or "" or sth else

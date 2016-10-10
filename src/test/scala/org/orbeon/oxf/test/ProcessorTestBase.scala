@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
 import org.orbeon.scaxon.XML._
 import org.scalatest.{BeforeAndAfter, FunSpecLike}
-import org.scalatest.FunSpecLike
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -101,7 +100,7 @@ abstract class ProcessorTestBase(testsDocUrl: String)
       d.processor.reset(pipelineContext)
 
       if (d.docsAndSerializers.isEmpty) {
-        // Processor with no output: just run it
+        // Just run (start) a processor with no output
         d.processor.start(pipelineContext)
         SuccessTestResult
       } else {
@@ -109,10 +108,8 @@ abstract class ProcessorTestBase(testsDocUrl: String)
         val resultsIt =
           for {
             (doc, serializer) ← d.docsAndSerializers.iterator
+            actualDoc         = serializer.runGetDocument(pipelineContext)
           } yield {
-
-            val actualDoc = serializer.runGetDocument(pipelineContext)
-
             // NOTE: We could make the comparison more configurable, for example to not collapse white space
             if (Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(doc, actualDoc))
               SuccessTestResult
@@ -120,14 +117,10 @@ abstract class ProcessorTestBase(testsDocUrl: String)
               FailedTestResult(doc, actualDoc)
           }
 
-        resultsIt collectFirst { case f: FailedTestResult ⇒ f } match {
-          case Some(firstFailure) ⇒ firstFailure
-          case None               ⇒ SuccessTestResult
-        }
-
+        resultsIt collectFirst { case f: FailedTestResult ⇒ f } getOrElse SuccessTestResult
       }
     } catch {
-      case NonFatal(t)⇒ ErrorTestResult(t)
+      case NonFatal(t) ⇒ ErrorTestResult(t)
     }
   }
 

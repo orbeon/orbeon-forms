@@ -28,7 +28,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.scaxon.XML._
 import org.scalatest.{BeforeAndAfter, FunSpecLike}
 
@@ -135,6 +135,8 @@ abstract class ProcessorTestBase(testsDocUrl: String)
       domSerializer.runGetDocument(new PipelineContext)
     }
 
+
+
     val expr =
       """
           let $only := (/tests/test | /tests/group/test)[
@@ -144,17 +146,17 @@ abstract class ProcessorTestBase(testsDocUrl: String)
                 $only
             else
                 (/tests/test | /tests/group/test)[
-                    not(ancestor-or-self::*/@exclude = 'true')
+                    empty(ancestor-or-self::*[@exclude = 'true' or exists(@edition) and @edition != $edition])
                 ]
       """
 
     val items =
       XPathCache.evaluateKeepItems(
-        contextItems        = ju.Collections.singletonList(new DocumentWrapper(testsDoc, null, XPath.GlobalConfiguration)),
+        contextItems        = List(new DocumentWrapper(testsDoc, null, XPath.GlobalConfiguration): Item).asJava,
         contextPosition     = 1,
         xpathString         = expr,
         namespaceMapping    = null,
-        variableToValueMap  = ju.Collections.emptyMap[String, ValueRepresentation](),
+        variableToValueMap  = Map[String, ValueRepresentation]("edition" → stringToStringValue(Version.Edition)).asJava,
         functionLibrary     = null,
         functionContext     = null,
         baseURI             = null,
@@ -166,10 +168,6 @@ abstract class ProcessorTestBase(testsDocUrl: String)
       for {
         testElem       ← items
         groupElem      ← testElem.parentOption
-
-        editionOpt     = testElem.attValueNonBlankOpt("edition") map (_.toLowerCase)
-        if ! (Version.isPE   && editionOpt.contains("ce"))
-        if ! (! Version.isPE && editionOpt.contains("pe"))
 
         descriptionOpt = testElem.attValueNonBlankOpt("description")
         groupOpt       = if (groupElem.localname == "group") groupElem.attValueNonBlankOpt("description") else None

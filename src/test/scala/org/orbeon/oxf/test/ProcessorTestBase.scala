@@ -25,14 +25,15 @@ import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.{DOMSerializer, Processor}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.XML._
 import org.scalatest.{BeforeAndAfter, FunSpecLike}
 
-import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 abstract class ProcessorTestBase(testsDocUrl: String)
@@ -132,10 +133,13 @@ abstract class ProcessorTestBase(testsDocUrl: String)
       val domSerializer = new DOMSerializer
 
       PipelineUtils.connect(urlGenerator, "data", domSerializer, "data")
-      domSerializer.runGetDocument(new PipelineContext)
+
+      new DocumentWrapper(
+        domSerializer.runGetDocument(new PipelineContext),
+        null,
+        XPath.GlobalConfiguration
+      )
     }
-
-
 
     val expr =
       """
@@ -146,27 +150,19 @@ abstract class ProcessorTestBase(testsDocUrl: String)
                 $only
             else
                 (/tests/test | /tests/group/test)[
-                    empty(ancestor-or-self::*[@exclude = 'true' or exists(@edition) and @edition != $edition])
+                    empty(
+                      ancestor-or-self::*[
+                        @exclude = 'true' or
+                        exists(@edition) and lower-case(@edition) != lower-case($edition)]
+                    )
                 ]
       """
 
-    val items =
-      XPathCache.evaluateKeepItems(
-        contextItems        = List(new DocumentWrapper(testsDoc, null, XPath.GlobalConfiguration): Item).asJava,
-        contextPosition     = 1,
-        xpathString         = expr,
-        namespaceMapping    = null,
-        variableToValueMap  = Map[String, ValueRepresentation]("edition" → stringToStringValue(Version.Edition)).asJava,
-        functionLibrary     = null,
-        functionContext     = null,
-        baseURI             = null,
-        locationData        = null,
-        reporter            = null
-      ).asInstanceOf[ju.List[NodeInfo]].asScala
+    implicit val ctx = XPathContext(vars = Map("edition" → stringToStringValue(Version.Edition.toLowerCase)))
 
     val testDescriptors =
       for {
-        testElem       ← items
+        testElem       ← XPathCache.evaluateKeepItems(expr, testsDoc) collect { case i: NodeInfo ⇒ i }
         groupElem      ← testElem.parentOption
 
         descriptionOpt = testElem.attValueNonBlankOpt("description")

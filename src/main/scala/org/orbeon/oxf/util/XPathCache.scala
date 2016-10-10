@@ -50,6 +50,28 @@ object XPathCache {
     locationData       : LocationData
   )
 
+  object XPathContext {
+
+    def apply(
+      ns              : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
+      vars            : Map[String, ValueRepresentation] = Map.empty,
+      functionLibrary : FunctionLibrary                  = null,
+      functionContext : FunctionContext                  = null,
+      baseURI         : String                           = null,
+      locationData    : LocationData                     = null,
+      reporter        : Reporter                         = null
+    ): XPathContext =
+      XPathContext(
+        namespaceMapping   = ns,
+        variableToValueMap = vars.asJava,
+        functionLibrary    = null,
+        functionContext    = null,
+        baseURI            = null,
+        locationData       = null
+      )
+
+  }
+
   def isDynamicXPathError(t: Throwable) = t match {
     case e: XPathException if ! e.isStaticError ⇒ true
     case _ ⇒ false
@@ -121,7 +143,28 @@ object XPathCache {
   def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq.head else seq
 
   // Evaluate an XPath expression on the document and keep Item objects in the result
-  // 5 external usages
+  // 2 external usages
+  def evaluateKeepItems(
+    xpathString     : String,
+    contextItem     : Item,
+    contextPosition : Int = 1)(implicit
+    xpathContext    : XPathContext
+  ): Seq[Item] =
+    evaluateKeepItems(
+      contextItems       = List(contextItem).asJava,
+      contextPosition    = contextPosition,
+      xpathString        = xpathString,
+      namespaceMapping   = xpathContext.namespaceMapping,
+      variableToValueMap = xpathContext.variableToValueMap,
+      functionLibrary    = xpathContext.functionLibrary,
+      functionContext    = xpathContext.functionContext,
+      baseURI            = xpathContext.baseURI,
+      locationData       = xpathContext.locationData,
+      reporter           = null
+    ).asScala
+
+  // Evaluate an XPath expression on the document and keep Item objects in the result
+  // 4 external usages
   def evaluateKeepItems(
     contextItems       : JList[Item],
     contextPosition    : Int,

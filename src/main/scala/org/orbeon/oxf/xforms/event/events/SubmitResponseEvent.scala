@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om._
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -49,7 +48,6 @@ trait SubmitResponseEvent extends XFormsEvent {
 private object SubmitResponseEvent {
 
   import org.orbeon.oxf.util.XPathCache._
-  import org.orbeon.oxf.xml.NamespaceMapping.EMPTY_MAPPING
 
   // "Zero or more elements, each one representing a content header in the error response received by a
   // failed submission. The returned node-set is empty if the failed submission did not receive an error
@@ -75,15 +73,9 @@ private object SubmitResponseEvent {
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, sb.toString, false, false) // handleXInclude, handleLexical
     }
 
-  def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = headersDocument(e.headers) map { document: Item ⇒
-    evaluateKeepItems(
-      Seq(document).asJava,
-      1,
-      "/headers/header",
-      EMPTY_MAPPING,
-      null, null, null, null,
-      e.locationData,
-      e.containingDocument.getRequestStats.addXPathStat).asScala
+  def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = {
+    implicit val ctx = XPathContext(locationData = e.locationData)
+    headersDocument(e.headers) map (evaluateKeepItems("/headers/header", _))
   }
 
   def body(e: SubmitResponseEvent): Option[AnyRef] = {

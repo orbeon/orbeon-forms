@@ -204,7 +204,7 @@ public class Portlet2ExternalContext implements ExternalContext {
                     // Special handling for multipart/form-data
 
                     // Decode the multipart data
-                    parameterMap = Multipart.jGetParameterMapMultipart(pipelineContext, request, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
+                    parameterMap = Multipart.jGetParameterMapMultipart(pipelineContext, request, ServletExternalContext.DefaultFormCharsetDefault());
                 } else if (portletRequest instanceof ResourceRequest) {
                     // We encoded query parameters directly into the resource id in this case
                     final String queryString = NetUtils.getQueryString(((ResourceRequest) portletRequest).getResourceID());

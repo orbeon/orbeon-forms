@@ -73,11 +73,11 @@ public interface ExternalContext {
         String getAuthType();
         boolean isSecure();
 
-        // NOTE: Consider using a class such as `Credentials` (there is one in used in test code).
+        // TODO: Consider using a class such as `HttpRequest.Credentials`
         String getUsername();
         String getUserGroup();
-        UserRole[] getUserRoles();
-        String[] getUserOrganization();
+        UserRole[] getUserRoles();      // TODO: Don't use `Array`
+        String[] getUserOrganization(); // TODO: Don't use `Array`
         boolean isUserInRole(String role);
 
         Principal getUserPrincipal();

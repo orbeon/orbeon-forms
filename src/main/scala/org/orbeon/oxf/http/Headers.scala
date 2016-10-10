@@ -15,7 +15,7 @@ package org.orbeon.oxf.http
 
 import org.orbeon.oxf.util.DateUtils
 
-import collection.breakOut
+import scala.collection.breakOut
 
 object Headers {
 
@@ -110,15 +110,20 @@ object Headers {
   def capitalizeSplitHeader(name: String) =
     name split '-' map (_.toLowerCase.capitalize) mkString "-"
 
-  def firstHeaderIgnoreCase(headers: Iterable[(String, Seq[String])], name: String): Option[String] =
+  def nonEmptyHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[T] =
+    headers collectFirst {
+      case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value
+    }
+
+  def firstHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[String] =
     headers collectFirst {
       case (key, value) if name.equalsIgnoreCase(key) && value.nonEmpty ⇒ value.head
     }
 
-  def firstLongHeaderIgnoreCase(headers: Iterable[(String, Seq[String])], name: String): Option[Long] =
+  def firstLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[Long] =
     firstHeaderIgnoreCase(headers, name) map (_.toLong) filter (_ >= 0L)
 
-  def firstDateHeaderIgnoreCase(headers: Iterable[(String, Seq[String])], name: String): Option[Long] =
+  def firstDateHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T ⇒ Traversable[String]): Option[Long] =
     firstHeaderIgnoreCase(headers, name) flatMap DateUtils.tryParseRFC1123 filter (_ > 0L)
 
   // List of common HTTP headers

@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.servlet.ServletExternalContext.DEFAULT_HEADER_ENCODING
+import org.orbeon.oxf.servlet.ServletExternalContext.DefaultHeaderEncoding
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Multipart, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
@@ -32,7 +32,7 @@ class Upload extends ProcessorImpl {
   override def createOutput(name: String) =
     addOutput(name, new ProcessorOutputImpl(Upload.this, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
-        Multipart.parseMultipartRequest(NetUtils.getExternalContext.getRequest, RequestGenerator.getMaxSizeProperty, DEFAULT_HEADER_ENCODING) match {
+        Multipart.parseMultipartRequest(NetUtils.getExternalContext.getRequest, RequestGenerator.getMaxSizeProperty, DefaultHeaderEncoding) match {
           case (nameValues, None) ⇒
 
             // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to

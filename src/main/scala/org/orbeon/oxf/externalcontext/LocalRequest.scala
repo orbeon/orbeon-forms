@@ -90,7 +90,7 @@ class LocalRequest(
         content collect {
           case StreamedContent(is, Some("application/x-www-form-urlencoded"), _, _) ⇒
             useAndClose(is) { is ⇒
-              decodeSimpleQuery(IOUtils.toString(is, ServletExternalContext.getDefaultFormCharset))
+              decodeSimpleQuery(IOUtils.toString(is, ServletExternalContext.defaultFormCharset))
             }
         }
       else

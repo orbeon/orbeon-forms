@@ -15,7 +15,6 @@ package org.orbeon.oxf.fb
 
 import org.junit.Test
 import org.orbeon.oxf.fr.DataMigration
-import org.orbeon.oxf.fb.MigrationOps
 import org.orbeon.oxf.test.{DocumentTestBase, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._

@@ -37,6 +37,9 @@ public interface ExternalContext {
     int SC_NOT_MODIFIED = 304;
     int SC_INTERNAL_SERVER_ERROR = 500;
 
+    String DefaultHeaderEncoding     = "utf-8";
+    String DefaultFormCharsetDefault = "utf-8";
+
     interface Request {
         String getContainerType();
         String getContainerNamespace();

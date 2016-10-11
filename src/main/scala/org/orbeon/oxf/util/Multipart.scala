@@ -23,12 +23,12 @@ import org.apache.commons.fileupload.util.Streams
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.ExternalContext._
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.pipeline.api.PipelineContext // TODO: undesirable dependency
+import org.orbeon.oxf.processor.generator.RequestGenerator // TODO: undesirable dependency
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.XFormsValueControl // TODO: undesirable dependency
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable ⇒ i, mutable ⇒ m}

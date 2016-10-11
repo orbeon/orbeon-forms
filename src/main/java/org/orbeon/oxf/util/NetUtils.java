@@ -58,17 +58,6 @@ public class NetUtils {
     }
 
     /**
-     * Return the first header for the given name in a headers map, or null
-     */
-    public static String getFirstHeaderOrNull(Map<String, String[]> headers, String name) {
-        final String[] results = headers.get(name);
-        if (results == null || results.length < 1)
-            return null;
-        else
-            return results[0];
-    }
-
-    /**
      * Return true if the document was modified since the given date, based on the If-Modified-Since
      * header. If the request method was not "GET", or if no valid lastModified value was provided,
      * consider the document modified.
@@ -474,14 +463,6 @@ public class NetUtils {
             return urlString.substring(0, questionIndex);
     }
 
-    public static String getQueryString(String urlString) {
-        final int questionIndex = urlString.indexOf('?');
-        if (questionIndex == -1)
-            return null;
-        else
-            return urlString.substring(questionIndex + 1);
-    }
-
     /**
      * Check whether a URL starts with a protocol.
      *
@@ -571,6 +552,7 @@ public class NetUtils {
     }
 
     // NOTE: Used by create-test-data.xpl
+    //@XPathFunction
     public static String createTemporaryFile(int scope) {
         return inputStreamToAnyURI(new InputStream() {
             @Override

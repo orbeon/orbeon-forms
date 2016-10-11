@@ -37,9 +37,6 @@ object ServletExternalContext {
 
   val Logger = LoggerFactory.createLogger(classOf[ServletExternalContext])
 
-  val DefaultHeaderEncoding                    = "utf-8"
-  val DefaultFormCharsetDefault                = "utf-8"
-
   private val DefaultFormCharsetProperty       = "oxf.servlet.default-form-charset"
   private val HttpPageCacheHeadersDefault      = "Cache-Control: private, max-age=0; Pragma:"
   private val HttpPageCacheHeadersProperty     = "oxf.http.page.cache-headers"
@@ -49,7 +46,7 @@ object ServletExternalContext {
   private val HttpNocacheCacheHeadersProperty  = "oxf.http.nocache.cache-headers"
 
   lazy val defaultFormCharset =
-    Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, DefaultFormCharsetDefault)
+    Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, ExternalContext.DefaultFormCharsetDefault)
 
   private lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
   private lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
@@ -146,7 +143,7 @@ class ServletExternalContext(
     lazy val getAttributesMap: ju.Map[String, AnyRef] = new InitUtils.RequestMap(nativeRequest)
 
     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-    protected lazy val headerValuesMap: Map[String, Array[String]] = (
+    protected[ServletExternalContext] lazy val headerValuesMap: Map[String, Array[String]] = (
       for (name ← nativeRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala)
         yield name.toLowerCase → StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
     ).toMap
@@ -164,7 +161,7 @@ class ServletExternalContext(
           )
 
         // Decode the multipart data
-        val result = Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, DefaultHeaderEncoding)
+        val result = Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ExternalContext.DefaultHeaderEncoding)
         // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
         getParameterMapMultipartFormDataCalled = true
         result
@@ -288,13 +285,13 @@ class ServletExternalContext(
         // Client-side redirect: send the redirect to the client
         nativeResponse.sendRedirect(
           if (isEmbedded)
-            NetUtils.appendQueryString(
+            PathUtils.recombineQuery(
               URLRewriterUtils.rewriteServiceURL(
                 getRequest,
                 location,
                 URLRewriter.REWRITE_MODE_ABSOLUTE_PATH
               ),
-              "orbeon-embeddable=true"
+              List("orbeon-embeddable" → "true")
             )
           else
             location
@@ -412,13 +409,14 @@ class ServletExternalContext(
 
   def getWebAppContext: WebAppContext = webAppContext
 
-  lazy val getRequest: ExternalContext.Request = new RequestImpl
+  private lazy val requestImpl = new RequestImpl
+  def getRequest: ExternalContext.Request = requestImpl
 
   private def isEmbedded: Boolean = {
     // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
     // the headers map is generated internally as in that case it might be lowercase already.
-    val doOverride = NetUtils.getFirstHeaderOrNull(getRequest.getHeaderValuesMap, Headers.OrbeonClientLower)
-    Headers.EmbeddedClientValues.contains(doOverride)
+    val clientHeaderOpt = Headers.firstHeaderIgnoreCase(requestImpl.headerValuesMap, Headers.OrbeonClient)
+    clientHeaderOpt exists Headers.EmbeddedClientValues.contains
   }
 
   // NOTE: This whole logic below could be used by ServletExternalContext and PortletExternalContext

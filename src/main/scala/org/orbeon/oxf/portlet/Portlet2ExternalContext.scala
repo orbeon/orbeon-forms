@@ -23,8 +23,6 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{PortletToExternalContextRequestDispatcherWrapper, WSRPURLRewriter}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
-import org.orbeon.oxf.processor.serializer.CachedSerializer
-import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -48,10 +46,10 @@ object Portlet2ExternalContext {
     )
 
     // Response state
-    private var contentType          : String              = null
-    private var redirectLocation     : String              = null
-    private var redirectIsExitPortal : Boolean             = false
-    private var title                : String              = null
+    private var contentType          : String  = null
+    private var redirectLocation     : String  = null
+    private var redirectIsExitPortal : Boolean = false
+    private var title                : String  = null
 
     private lazy val streams = {
       val stringBuilderWriter = new StringBuilderWriter
@@ -64,7 +62,7 @@ object Portlet2ExternalContext {
     // Not handled right now or because it doesn't make sense
     def setContentLength(len: Int)                            = ()
     def checkIfModifiedSince(lastModified: Long)              = true
-    def sendError(code: Int): Unit                            = throw new OXFException(s"Error while processing request: $code")
+    def sendError(code: Int)                                  = throw new OXFException(s"Error while processing request: $code")
     def setPageCaching(lastModified: Long)                    = ()
     def setResourceCaching(lastModified: Long, expires: Long) = ()
     def setHeader(name: String, value: String)                = ()
@@ -121,7 +119,7 @@ object Portlet2ExternalContext {
     // and used only to compute the size of the resulting byte
     // stream, size which is then set but not used when working with
     // portlets.
-    def getCharacterEncoding: String = CachedSerializer.DEFAULT_ENCODING
+    def getCharacterEncoding: String = ExternalContext.DefaultHeaderEncoding
 
     def getContentType         : String  = contentType
     def getRedirectLocation    : String  = redirectLocation
@@ -202,7 +200,7 @@ class Portlet2ExternalContext(
     def getReader                 : Reader            = clientDataRequestOpt map (_.getReader)             orNull
     def getInputStream            : InputStream       = clientDataRequestOpt map (_.getPortletInputStream) orNull
 
-    // Not available or no implemented
+    // Not available or not implemented
     def getRemoteAddr             : String            = null
     def getPathTranslated         : String            = null
     def getProtocol               : String            = null
@@ -217,7 +215,7 @@ class Portlet2ExternalContext(
       // In that case, remove the query string part of the resource id, that's handled by getParameterMap()
       val rawResult =
         portletRequest match {
-          case rr: ResourceRequest ⇒ NetUtils.removeQueryString(rr.getResourceID)
+          case rr: ResourceRequest ⇒ PathUtils.splitQuery(rr.getResourceID)._1
           case _                   ⇒ portletRequest.getParameter(WSRPURLRewriter.PathParameterName)
         }
 
@@ -261,24 +259,20 @@ class Portlet2ExternalContext(
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] =
       if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
-        Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ServletExternalContext.DefaultFormCharsetDefault)
+        Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ExternalContext.DefaultFormCharsetDefault)
       } else {
         portletRequest match {
           case rr: ResourceRequest ⇒
             // We encoded query parameters directly into the resource id in this case
-            val queryString = NetUtils.getQueryString(rr.getResourceID)
-            if (queryString ne null)
-              ju.Collections.unmodifiableMap(StringConversions.stringArrayMapToObjectArrayMap(NetUtils.decodeQueryString(queryString)))
-            else
-              ju.Collections.emptyMap()
+            val (_, queryString) = PathUtils.splitQueryDecodeParams(rr.getResourceID)
+            CollectionUtils.combineValues[String, AnyRef, Array](queryString).toMap.asJava
           case _ ⇒
-            // Not a resource request, so just use native request parameters
-
+            // Use native request parameters
+            // Filter out `PathParameterName`, make values `Array[AnyRef]` (not great), and make immutable `Map`.
             val filteredParams =
               portletRequest.getParameterMap.asScala collect {
                 case pair @ (k, v) if k != WSRPURLRewriter.PathParameterName ⇒ (k, v.toArray[AnyRef])
               }
-
             filteredParams.asJava
         }
       }

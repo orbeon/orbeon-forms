@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
-import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
+import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
 
@@ -116,7 +116,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   // Call the Orbeon Forms pipeline processor service
   private def callService(context: AsyncContext): StreamedContentOrRedirect = {
     processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
-    bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponse])
+    bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponseImpl])
   }
 
   private def directServeResource(request: ResourceRequest, response: ResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
@@ -126,7 +126,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     processorService.service(pipelineContext, externalContext)
 
     // Write out the response
-    val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]
+    val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponseImpl]
     Option(directResponse.getContentType) foreach response.setContentType
     APISupport.writeResponseBody(
       BufferedContent(
@@ -137,7 +137,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     )
   }
 
-  private def bufferedResponseToResponse(bufferedResponse: BufferedResponse): StreamedContentOrRedirect =
+  private def bufferedResponseToResponse(bufferedResponse: BufferedResponseImpl): StreamedContentOrRedirect =
     if (bufferedResponse.isRedirect)
       Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
     else {

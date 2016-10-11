@@ -19,7 +19,6 @@ import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
 
 import org.orbeon.oxf.externalcontext.{ServletToExternalContextRequestDispatcherWrapper, ServletURLRewriter, URLRewriter, WSRPURLRewriter}
-import org.orbeon.oxf.fr.UserRole
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
@@ -27,7 +26,7 @@ import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.{SessionListeners, WebAppContext}
+import org.orbeon.oxf.webapp.{SessionListeners, WebAppContext, WebAppRequest}
 
 import scala.collection.JavaConverters._
 
@@ -79,7 +78,7 @@ class ServletExternalContext(
 
   import ServletExternalContext._
 
-  private class RequestImpl extends ExternalContext.Request {
+  private class RequestImpl extends ExternalContext.Request with WebAppRequest {
 
     private var getParameterMapMultipartFormDataCalled = false
     private var getInputStreamCalled                   = false
@@ -147,7 +146,7 @@ class ServletExternalContext(
     lazy val getAttributesMap: ju.Map[String, AnyRef] = new InitUtils.RequestMap(nativeRequest)
 
     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-    private lazy val headerValuesMap: Map[String, Array[String]] = (
+    protected lazy val headerValuesMap: Map[String, Array[String]] = (
       for (name ← nativeRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala)
         yield name.toLowerCase → StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
     ).toMap
@@ -155,11 +154,10 @@ class ServletExternalContext(
     def getHeaderValuesMap = headerValuesMap.asJava
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] = {
-      // Two conditions: file upload ("multipart/form-data") or not
       // NOTE: Regular form POST uses application/x-www-form-urlencoded. In this case, the servlet container
       // exposes parameters with getParameter*() methods (see SRV.4.1.1).
       if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
-        // Special handling for multipart/form-data
+
         if (getInputStreamCalled)
           throw new IllegalStateException(
             s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `multipart/form-data`"
@@ -183,19 +181,6 @@ class ServletExternalContext(
       }
     }
 
-    def getUsername: String  = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername).orNull
-    def getUserGroup: String = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup).orNull
-    def getUserOrganization = null
-
-    lazy val getUserRoles: Array[UserRole] =
-      Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles) match {
-        case Some(headers) ⇒ headers map UserRole.parse
-        case None          ⇒ Array.empty[UserRole]
-      }
-
-    def isUserInRole(role: String): Boolean =
-      getUserRoles exists (_.roleName == role)
-
     def getSession(create: Boolean): ExternalContext.Session =
       ServletExternalContext.this.getSession(create)
 
@@ -217,20 +202,6 @@ class ServletExternalContext(
       else
         null
     }
-
-    def getClientContextPath(urlString: String): String = {
-      // Return depending on whether passed URL is a platform URL or not
-      if (URLRewriterUtils.isPlatformPath(urlString))
-        platformClientContextPath
-      else
-        applicationClientContextPath
-    }
-
-    private lazy val platformClientContextPath: String =
-      URLRewriterUtils.getClientContextPath(this, true)
-
-    private lazy val applicationClientContextPath: String =
-      URLRewriterUtils.getClientContextPath(this, false)
 
     def getInputStream: InputStream = {
       if (getParameterMapMultipartFormDataCalled)
@@ -429,13 +400,11 @@ class ServletExternalContext(
         throw new IllegalStateException(
           "`SessionListeners` object not found in session. `OrbeonSessionListener` might be missing from web.xml."
         )
-
       listeners.addListener(sessionListener)
     }
 
     def removeListener(sessionListener: ExternalContext.Session.SessionListener): Unit = {
       val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
-
       if (listeners ne null)
         listeners.removeListener(sessionListener)
     }
@@ -484,11 +453,8 @@ class ServletExternalContext(
         null
     }
 
-  def getStartLoggerString: String =
-    getRequest.getRequestPath + " - Received request"
-
-  def getEndLoggerString: String =
-    getRequest.getRequestPath
+  def getStartLoggerString: String = getRequest.getRequestPath + " - Received request"
+  def getEndLoggerString  : String = getRequest.getRequestPath
 
   def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = {
     val servletContext = webAppContext.getNativeContext.asInstanceOf[ServletContext]

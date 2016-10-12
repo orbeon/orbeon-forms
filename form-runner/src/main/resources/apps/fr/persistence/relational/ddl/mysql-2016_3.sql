@@ -47,6 +47,7 @@ CREATE TABLE orbeon_form_data_attach (
     last_modified_by    VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     username            VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     groupname           VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
+    organization_id     INT                                                                       ,
     app                 VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     form                VARCHAR(255)           CHARACTER SET utf8 COLLATE utf8_bin                ,
     form_version        INT                                                               NOT NULL,

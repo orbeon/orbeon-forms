@@ -49,7 +49,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         val table  = tableName(req)
         val idCols = idColumns(req)
         val xmlCol = Provider.xmlCol(req.provider, "t")
-        val ps = connection.prepareStatement(
+        val sql =
           s"""|SELECT  t.last_modified_time
               |        ${if (req.forAttachment) ", t.file_content"                               else s", $xmlCol"}
               |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id"   else ""}
@@ -66,7 +66,8 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               |            GROUP BY ${idCols.mkString(", ")}
               |        ) m
               |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
-              |""".stripMargin)
+              |""".stripMargin
+        val ps = connection.prepareStatement(sql)
 
         val position = Iterator.from(1)
         ps.setString(position.next(), req.app)

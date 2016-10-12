@@ -8,6 +8,9 @@ CREATE TABLE orbeon_organization (
 ALTER TABLE orbeon_form_data
 ADD organization_id     INT                                                                       ;
 
+ALTER TABLE orbeon_form_data_attach
+ADD organization_id     INT                                                                       ;
+
 ALTER TABLE orbeon_i_current
 ADD organization_id     INT                                                                       ;
 

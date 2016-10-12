@@ -116,7 +116,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
   // Call the Orbeon Forms pipeline processor service
   private def callService(context: AsyncContext): StreamedContentOrRedirect = {
     processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
-    bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponseImpl])
+    context.externalContext.getResponse.asInstanceOf[BufferedResponseImpl].responseContent
   }
 
   private def directServeResource(request: ResourceRequest, response: ResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
@@ -126,22 +126,12 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     processorService.service(pipelineContext, externalContext)
 
     // Write out the response
-    val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponseImpl]
-    Option(directResponse.getContentType) foreach response.setContentType
-    APISupport.writeResponseBody(
-      BufferedContent(
-        directResponse.getBytes,
-        Option(directResponse.getContentType),
-        None
-      )
-    )
-  }
-
-  private def bufferedResponseToResponse(bufferedResponse: BufferedResponseImpl): StreamedContentOrRedirect =
-    if (bufferedResponse.isRedirect)
-      Redirect(bufferedResponse.getRedirectLocation, bufferedResponse.isRedirectIsExitPortal)
-    else {
-      val bytes = bufferedResponse.getBytes
-      StreamedContent.fromBytes(bytes, Option(bufferedResponse.getContentType), Option(bufferedResponse.getTitle))
+    externalContext.getResponse.responseContent match {
+      case _: Redirect ⇒
+        throw new NotImplementedError("redirect not supported when serving resource")
+      case s @ StreamedContent(_, contentType, _, _) ⇒
+        contentType foreach response.setContentType
+        APISupport.writeResponseBody(s)
     }
+  }
 }

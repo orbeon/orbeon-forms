@@ -21,7 +21,7 @@ import javax.portlet._
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{PortletToExternalContextRequestDispatcherWrapper, WSRPURLRewriter}
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, Redirect, StreamedContent, StreamedContentOrRedirect}
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
@@ -46,10 +46,9 @@ object Portlet2ExternalContext {
     )
 
     // Response state
-    private var contentType          : String  = null
-    private var redirectLocation     : String  = null
-    private var redirectIsExitPortal : Boolean = false
-    private var title                : String  = null
+    private var _responseContentType  : Option[String]   = None
+    private var _responseRedirect     : Option[Redirect] = None
+    private var _responseTitle        : Option[String]   = None
 
     private lazy val streams = {
       val stringBuilderWriter = new StringBuilderWriter
@@ -100,36 +99,37 @@ object Portlet2ExternalContext {
     def getNamespacePrefix: String = urlRewriter.getNamespacePrefix
     def getNativeResponse: AnyRef  = throw new NotImplementedError
 
-    def setContentType(contentType: String) = this.contentType = NetUtils.getContentTypeMediaType(contentType)
-    def setTitle(title: String)             = this.title = title
+    def setContentType(contentType: String) = this._responseContentType = Option(NetUtils.getContentTypeMediaType(contentType))
+    def setTitle(title: String)             = this._responseTitle       = Option(title)
 
     def getWriter: PrintWriter         = streams._2
     def getOutputStream: OutputStream  = streams._3
 
     def sendRedirect(
-      location     : String,
-      isServerSide : Boolean, // ignored for portlets
-      isExitPortal : Boolean  // if this is true, the redirect will exit the portal
-    ): Unit = {
-      this.redirectLocation     = location
-      this.redirectIsExitPortal = isExitPortal
-    }
+      location   : String,
+      serverSide : Boolean, // ignored for portlets
+      exitPortal : Boolean  // if this is true, the redirect will exit the portal
+    ): Unit =
+      _responseRedirect = Some(Redirect(location ensuring (_ ne null), exitPortal))
 
+    // FIXME: The following comment is obsolete.
     // NOTE: This is used only by ResultStoreWriter as of 8/12/03,
     // and used only to compute the size of the resulting byte
     // stream, size which is then set but not used when working with
     // portlets.
     def getCharacterEncoding: String = ExternalContext.DefaultHeaderEncoding
 
-    def getContentType         : String  = contentType
-    def getRedirectLocation    : String  = redirectLocation
-    def isRedirectIsExitPortal : Boolean = redirectIsExitPortal
-    def isRedirect             : Boolean = redirectLocation ne null
-    def getTitle               : String  = title
+    def responseContent: StreamedContentOrRedirect =
+      _responseRedirect getOrElse StreamedContent.fromBytes(
+        bytes       = getBytes,
+        contentType = _responseContentType,
+        title       = _responseTitle
+      )
 
-    def getBytes: Array[Byte] =
+    private def getBytes: Array[Byte] =
       if (streams._1.getBuilder.length > 0)
-        streams._1.toString.getBytes(getContentType) // TODO: what if content type not specified?
+        // NetUtils.getContentTypeCharset() _responseContentType.getOrElse(throw new IllegalStateException("setContentType not called"))
+        streams._1.toString.getBytes() // TODO: what if content type not specified?
       else if (streams._3.size > 0)
         streams._3.toByteArray
       else
@@ -160,7 +160,7 @@ object Portlet2ExternalContext {
 class Portlet2ExternalContext(
   val pipelineContext : PipelineContext,
   val webAppContext   : WebAppContext,
-  var portletRequest  : PortletRequest,
+  val portletRequest  : PortletRequest,
   val amendRequest    : Boolean
 ) extends ExternalContext {
 
@@ -325,7 +325,7 @@ class Portlet2ExternalContext(
   }
 
   lazy val getRequest  : ExternalContext.Request  = new RequestImpl
-  lazy val getResponse : ExternalContext.Response = new BufferedResponseImpl(getRequest)
+  lazy val getResponse : BufferedResponseImpl     = new BufferedResponseImpl(getRequest)
 
   private var sessionImplOpt: Option[SessionImpl] = None
 

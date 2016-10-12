@@ -30,6 +30,12 @@ import java.util.Locale;
  * Methods with counterparts in ExternalContext.Response use the wrapped
  * ExternalContext.Response object and can be overridden using ResponseWrapper. Other methods
  * directly forward to the native response.
+ *
+ * 2016-10-12: Usages:
+ *
+ * - `ServletToExternalContextRequestDispatcherWrapper`
+ *   - `ServletExternalContext.getRequestDispatcher
+ *     - `RequestDispatcherSubmission` (see https://github.com/orbeon/orbeon-forms/issues/2809)
  */
 public class ExternalContextToHttpServletResponseWrapper extends HttpServletResponseWrapper {
 

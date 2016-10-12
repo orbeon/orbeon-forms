@@ -20,7 +20,7 @@ import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{PortletToExternalContextRequestDispatcherWrapper, WSRPURLRewriter}
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.http.{Headers, Redirect, StreamedContent, StreamedContentOrRedirect}
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util.CollectionUtils._
@@ -344,8 +344,5 @@ class Portlet2ExternalContext(
   def getStartLoggerString: String = getRequest.getRequestPath + " - Received request"
   def getEndLoggerString  : String = getRequest.getRequestPath
 
-  def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher =
-    new PortletToExternalContextRequestDispatcherWrapper(
-      webAppContext.getNativeContext.asInstanceOf[PortletContext].getRequestDispatcher(path)
-    )
+  def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new NotImplementedError
 }

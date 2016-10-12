@@ -16,6 +16,7 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
+import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.util.StringBuilderWriter
 
@@ -54,7 +55,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
     if (_inputStream eq null) {
       _inputStream =
         if (_stringWriter ne null) {
-          val bytes = _stringWriter.getBuilder.toString.getBytes("UTF-8")
+          val bytes = _stringWriter.getBuilder.toString.getBytes(ExternalContext.StandardCharacterEncoding)
           new ByteArrayInputStream(bytes, 0, bytes.length)
         } else if (_byteStream ne null) {
           new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)

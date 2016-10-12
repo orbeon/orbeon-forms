@@ -46,7 +46,7 @@ object ServletExternalContext {
   private val HttpNocacheCacheHeadersProperty  = "oxf.http.nocache.cache-headers"
 
   lazy val defaultFormCharset =
-    Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, ExternalContext.DefaultFormCharsetDefault)
+    Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, ExternalContext.StandardFormCharacterEncoding)
 
   private lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
   private lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
@@ -161,7 +161,7 @@ class ServletExternalContext(
           )
 
         // Decode the multipart data
-        val result = Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ExternalContext.DefaultHeaderEncoding)
+        val result = Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ExternalContext.StandardHeaderCharacterEncoding)
         // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
         getParameterMapMultipartFormDataCalled = true
         result
@@ -246,7 +246,12 @@ class ServletExternalContext(
     def addHeader(name: String, value: String) = nativeResponse.addHeader(name, value)
     def setContentLength(len: Int)             = nativeResponse.setContentLength(len)
     def sendError(code: Int)                   = nativeResponse.sendError(code)
-    def getCharacterEncoding: String           = nativeResponse.getCharacterEncoding
+
+    // We assume below that `nativeResponse.getCharacterEncoding` reflects the encoding set with
+    // `nativeResponse.setContentType` if any.
+    def getCharacterEncoding: String =
+      Option(nativeResponse.getCharacterEncoding) getOrElse
+        ExternalContext.StandardCharacterEncoding
 
     def setStatus(status: Int): Unit = {
       // If anybody ever sets a non-success status code, we disable caching of the output. This covers the

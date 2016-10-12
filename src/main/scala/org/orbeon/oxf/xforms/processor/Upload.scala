@@ -31,7 +31,7 @@ class Upload extends ProcessorImpl {
   override def createOutput(name: String) =
     addOutput(name, new ProcessorOutputImpl(Upload.this, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
-        Multipart.parseMultipartRequest(NetUtils.getExternalContext.getRequest, RequestGenerator.getMaxSizeProperty, ExternalContext.DefaultHeaderEncoding) match {
+        Multipart.parseMultipartRequest(NetUtils.getExternalContext.getRequest, RequestGenerator.getMaxSizeProperty, ExternalContext.StandardHeaderCharacterEncoding) match {
           case (nameValues, None) ⇒
 
             // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to

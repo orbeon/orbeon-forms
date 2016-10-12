@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import java.io.PrintWriter
+import java.io.{BufferedWriter, OutputStreamWriter, PrintWriter}
 import javax.naming.InitialContext
 
 import org.orbeon.exception.OrbeonFormatter
@@ -87,11 +87,12 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
     if (! response.isCommitted) {
       // Send new headers and HTML prologue
       response.reset()
-      response.setContentType("text/html")
+      response.setContentType("text/html; charset=utf-8")
       response.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR)
-    } else
+    } else {
       // Try to close table that may still be open
       sb.append("</p></table></table></table></table></table>")
+    }
 
     // HTML doc
     sb.append("<html><head><title>Orbeon Forms Error</title></head><body>")
@@ -106,8 +107,19 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
     sb.append("</body></html>")
 
     val writer =
-      try response.getWriter
-      catch { case e: IllegalStateException ⇒ new PrintWriter(response.getOutputStream) } // this uses the platform's default encoding, which is not good
+      try {
+        response.getWriter
+      } catch {
+        case e: IllegalStateException ⇒
+          new PrintWriter(
+            new BufferedWriter(
+              new OutputStreamWriter(
+                response.getOutputStream,
+                response.getCharacterEncoding
+              )
+            )
+          )
+      }
 
     writer.print(sb.toString)
   }

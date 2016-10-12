@@ -51,11 +51,11 @@ object Portlet2ExternalContext {
     private var _responseTitle        : Option[String]   = None
 
     private lazy val streams = {
+      val outputStream        = new ByteArrayOutputStream
       val stringBuilderWriter = new StringBuilderWriter
       val printWriter         = new PrintWriter(stringBuilderWriter)
-      val outputStream        = new ByteArrayOutputStream
 
-      (stringBuilderWriter, printWriter, outputStream)
+      (outputStream, stringBuilderWriter, printWriter)
     }
 
     // Not handled right now or because it doesn't make sense
@@ -99,11 +99,11 @@ object Portlet2ExternalContext {
     def getNamespacePrefix: String = urlRewriter.getNamespacePrefix
     def getNativeResponse: AnyRef  = throw new NotImplementedError
 
-    def setContentType(contentType: String) = this._responseContentType = Option(NetUtils.getContentTypeMediaType(contentType))
+    def setContentType(contentType: String) = this._responseContentType = Option(contentType)
     def setTitle(title: String)             = this._responseTitle       = Option(title)
 
-    def getWriter: PrintWriter         = streams._2
-    def getOutputStream: OutputStream  = streams._3
+    def getWriter: PrintWriter         = streams._3
+    def getOutputStream: OutputStream  = streams._1
 
     def sendRedirect(
       location   : String,
@@ -117,7 +117,7 @@ object Portlet2ExternalContext {
     // and used only to compute the size of the resulting byte
     // stream, size which is then set but not used when working with
     // portlets.
-    def getCharacterEncoding: String = ExternalContext.DefaultHeaderEncoding
+    def getCharacterEncoding: String = ExternalContext.StandardHeaderCharacterEncoding
 
     def responseContent: StreamedContentOrRedirect =
       _responseRedirect getOrElse StreamedContent.fromBytes(
@@ -127,13 +127,21 @@ object Portlet2ExternalContext {
       )
 
     private def getBytes: Array[Byte] =
-      if (streams._1.getBuilder.length > 0)
-        // NetUtils.getContentTypeCharset() _responseContentType.getOrElse(throw new IllegalStateException("setContentType not called"))
-        streams._1.toString.getBytes() // TODO: what if content type not specified?
-      else if (streams._3.size > 0)
-        streams._3.toByteArray
-      else
+      if (streams._1.size > 0) {
+        streams._1.toByteArray
+      } else if (streams._2.getBuilder.length > 0) {
+        // 2016-10-12: We never really use `getWriter` except in `BaseSubmission` to force a close and in
+        // `ProcessorService` to try to write out an error message. So we should not have to deal with character
+        // encoding here.
+        val characterEncoding =
+          _responseContentType flatMap
+            (ct ⇒ Option(NetUtils.getContentTypeCharset(ct))) getOrElse
+            ExternalContext.StandardCharacterEncoding
+
+        streams._2.toString.getBytes(characterEncoding)
+      } else {
         Array.empty[Byte]
+      }
   }
 
   // Present a view of the HttpServletRequest properties as a Map.
@@ -259,7 +267,7 @@ class Portlet2ExternalContext(
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] =
       if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
-        Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ExternalContext.DefaultFormCharsetDefault)
+        Multipart.jGetParameterMapMultipart(pipelineContext, getRequest, ExternalContext.StandardFormCharacterEncoding)
       } else {
         portletRequest match {
           case rr: ResourceRequest ⇒

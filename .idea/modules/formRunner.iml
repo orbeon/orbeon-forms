@@ -2,33 +2,29 @@
 <module external.linked.project.id="formRunner" external.linked.project.path="$MODULE_DIR$/../../form-runner" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/classes" />
-    <output-test url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/db-classes" />
+    <output-test url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../form-runner">
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/main/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/main/scala-2.11" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/src_managed/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/db/scala" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/db/scala-2.11" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/db/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/db/scala" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/db/scala-2.11" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/test/scala" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/test/scala-2.11" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/src_managed/db" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/src_managed/debug-test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/src_managed/test" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/test/scala" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/test/scala-2.11" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/resource_managed/main" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/db/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/db/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/resource_managed/db" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/resource_managed/debug-test" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/resource_managed/test" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../form-runner/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../../form-runner/target" />
       <excludeFolder url="file://$MODULE_DIR$/../../form-runner/target/resolution-cache" />
       <excludeFolder url="file://$MODULE_DIR$/../../form-runner/target/streams" />
@@ -37,6 +33,11 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
+    <orderEntry type="module" module-name="core" exported="" />
+    <orderEntry type="library" scope="TEST" name="SBT: com.novocode:junit-interface:0.11:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: junit:junit:4.11:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.hamcrest:hamcrest-core:1.3:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-sbt:test-interface:1.0:jar" level="project" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -187,10 +188,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="TEST" name="SBT: org.scala-sbt:test-interface:1.0:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.hamcrest:hamcrest-core:1.3:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: junit:junit:4.11:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: com.novocode:junit-interface:0.11:jar" level="project" />
-    <orderEntry type="module" module-name="core" exported="" />
   </component>
 </module>

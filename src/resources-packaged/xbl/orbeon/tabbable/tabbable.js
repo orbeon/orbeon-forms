@@ -14,18 +14,37 @@
 (function() {
 
     var $ = ORBEON.jQuery;
-    YAHOO.namespace("xbl.fr");
-    YAHOO.xbl.fr.Tabbable = function() {};
-    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Tabbable, "xbl-fr-tabbable");
-    YAHOO.xbl.fr.Tabbable.prototype = {
+    var RepeatClassesSelector = ':not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end)';
+
+    ORBEON.xforms.XBL.declareCompanion('fr|tabbable', {
 
         init: function() {
-            $(this.container).find('.nav-tabs a').click(function (e) {
-                e.preventDefault();
-                $(this).tab('show');
-            })
+
+            // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
+            // support dynamically repeated tabs.
+            $(this.container).on('click.tabbable.data-api', '[data-toggle = "tabbable"]', function (e) {
+
+                e.preventDefault();  // don't allow anchor navigation
+                e.stopPropagation(); // prevent ancestor tab handlers from running
+
+                var newLi       = $(this).parent(RepeatClassesSelector);
+                var allLis      = newLi.parent().children(RepeatClassesSelector);
+                var tabPosition = newLi.prevAll(RepeatClassesSelector).length;
+
+                if (newLi.is('.active'))
+                    return;
+
+                var allTabPanes = newLi.closest('.nav-tabs').nextAll('.tab-content').children('.tab-pane').filter(RepeatClassesSelector);
+                var newTabPane  = allTabPanes[tabPosition];
+
+                allLis.removeClass('active');
+                allTabPanes.removeClass('active');
+
+                newLi.addClass('active');
+                $(newTabPane).addClass('active');
+            });
         }
-    };
+    });
 
 })();
 

@@ -57,10 +57,6 @@
 
                     <!-- Tab group, cannot be internal because accessed with "this" in TabView JS initialization -->
                     <xf:group id="fr-tabview-group">
-
-                        <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
-                             https://github.com/orbeon/orbeon-forms/issues/339 -->
-                        <xsl:copy-of select="namespace::*"/>
                         <xsl:copy-of select="@class"/>
 
                         <!-- Initialization event -->

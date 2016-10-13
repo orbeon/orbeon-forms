@@ -14,95 +14,146 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0">
+         xmlns:p="http://www.orbeon.com/oxf/pipeline"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/xbl/orbeon/tabbable/tabbable.js"/>
-    <xbl:binding id="fr-tabbable" element="fr|tabbable" xxbl:mode="binding">
+
+    <xbl:binding
+            id="fr-tabbable"
+            element="fr|tabbable"
+            xxbl:mode="binding javascript-lifecycle">
+
         <xbl:resources>
             <xbl:style>
                 .orbeon .xbl-fr-tabbable .nav-tabs > li > a { text-decoration: none }
                 .orbeon .xbl-fr-tabbable .nav-tabs { margin-bottom: 0 }
             </xbl:style>
         </xbl:resources>
-        <xbl:handlers>
-            <xbl:handler event="xforms-enabled" target="#observer" type="javascript">
-                YAHOO.xbl.fr.Tabbable.instance(this).init();
-            </xbl:handler>
-        </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
+                <xsl:variable name="root" select="/*[1]"/>
+
                 <xsl:template match="/*">
-                    <xf:group>
-                        <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
-                             https://github.com/orbeon/orbeon-forms/issues/339 -->
-                        <xsl:copy-of select="namespace::*"/>
-                        <xsl:copy-of select="@class"/>
+                    <xh:div class="{'tabs-left'[p:split($root/@appearance) = 'left']}">
 
                         <!-- Tab labels -->
                         <xh:ul class="nav nav-tabs">
                             <xsl:for-each select="fr:tab">
-                                <xsl:variable name="pos" select="position()"/>
-                                <xsl:variable name="label" select="fr:label[1]"/>
+                                <xsl:variable name="tab"    select="."/>
+                                <xsl:variable name="pos"    select="position()"/>
+                                <xsl:variable name="repeat" select="exists($tab/(@bind | @ref))"/>
+                                <xsl:variable name="label"  select="$tab/(fr:label | xf:label)[1]"/>
+
                                 <xf:group appearance="xxf:internal">
 
                                     <!-- Whether the tab is visible -->
-                                    <xsl:if test="@visible">
+                                    <xsl:if test="$tab/@visible">
                                         <xf:var name="visible">
-                                            <xxf:value value="{@visible}" xxbl:scope="outer"/>
+                                            <xxf:value value="{$tab/@visible}" xxbl:scope="outer"/>
                                         </xf:var>
                                     </xsl:if>
 
-                                    <xh:li class="{if (position() = 1) then 'active' else (), if (@visible) then '{if ($visible) then '''' else ''xforms-hidden''}' else ()}">
+                                    <xsl:variable name="content">
+                                        <xh:li
+                                            class="{
+                                                if ($repeat and $pos = 1) then
+                                                    '{''active''[xxf:repeat-position() = 1]}'
+                                                else
+                                                    'active'[$pos = 1],
+                                                '{''xforms-hidden''[not($visible)]}'[$tab/@visible]
+                                            }">
+                                            <!-- Transform *:label into xf:output -->
+                                            <xh:a data-toggle="tabbable">
+                                                <xsl:choose>
+                                                    <!-- Static label, just copy content -->
+                                                    <xsl:when test="empty($label/(@ref | @bind | @value))">
+                                                        <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                            <xh:span>
+                                                                <xsl:copy-of select="$label/(@* | node())"/>
+                                                            </xh:span>
+                                                        </xf:group>
+                                                    </xsl:when>
+                                                    <!-- Dynamic label, generate xf:output -->
+                                                    <xsl:otherwise>
+                                                        <!-- Put content in outer scope -->
+                                                        <xf:output xxbl:scope="outer">
+                                                            <xsl:copy-of select="$label/@*"/>
+                                                        </xf:output>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </xh:a>
+                                        </xh:li>
+                                    </xsl:variable>
 
-                                        <!-- Transform xf:label into xf:output -->
-                                        <xh:a href="#{{xxf:client-id('tab-pane-{$pos}')}}" data-toggle="tab">
-                                            <xsl:choose>
-                                                <!-- Static label, just copy content -->
-                                                <xsl:when test="empty($label/(@ref | @bind | @value))">
-                                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                        <xh:span>
-                                                            <xsl:copy-of select="$label/(@* | node())"/>
-                                                        </xh:span>
-                                                    </xf:group>
-                                                </xsl:when>
-                                                <!-- Dynamic label, generate xf:output -->
-                                                <xsl:otherwise>
-                                                    <!-- Put content in outer scope -->
-                                                    <xf:output xxbl:scope="outer">
-                                                        <xsl:copy-of select="$label/@*"/>
-                                                    </xf:output>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xh:a>
-                                    </xh:li>
+                                    <xsl:choose>
+                                        <xsl:when test="$repeat">
+                                            <xf:repeat xxbl:scope="outer">
+                                                <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
+                                                <xf:group xxbl:scope="inner" appearance="xxf:internal">
+                                                    <xsl:copy-of select="$content"/>
+                                                </xf:group>
+                                            </xf:repeat>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:copy-of select="$content"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+
                                 </xf:group>
                             </xsl:for-each>
                         </xh:ul>
+
                         <!-- Tab content -->
                         <xh:div class="tab-content">
                             <xsl:for-each select="fr:tab">
-                                <!-- NOTE: Use xxf:control so that xxf:client-id() can resolve, as it needs a concrete control to work. -->
-                                <xh:div class="tab-pane{if (position() = 1) then ' active' else '', @class}" id="tab-pane-{position()}" xxf:control="true">
-                                    <xf:group xxbl:scope="outer">
+                                <xsl:variable name="tab"    select="."/>
+                                <xsl:variable name="pos"    select="position()"/>
+                                <xsl:variable name="repeat" select="exists($tab/(@bind | @ref))"/>
+
+                                <xsl:variable name="content">
+                                    <xf:group
+                                        xxbl:scope="outer"
+                                        xxf:element="div"
+                                        class="{
+                                            'tab-pane',
+                                            if ($repeat and $pos = 1) then
+                                                '{''active''[xxf:repeat-position() = 1]}'
+                                            else
+                                                'active'[$pos = 1],
+                                            @class
+                                        }">
                                         <xsl:if test="@visible">
                                             <xsl:attribute name="ref" select="concat('.[boolean(', @visible, ')]')"/>
                                         </xsl:if>
-                                        <xsl:apply-templates select="@model | @context | @ref | @bind | node() except fr:label"/>
+                                        <xsl:apply-templates select="node() except (fr:label, xf:label)"/>
                                     </xf:group>
-                                </xh:div>
+                                </xsl:variable>
+
+                                <xsl:choose>
+                                    <xsl:when test="$repeat">
+                                        <xf:repeat xxbl:scope="outer">
+                                            <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
+                                            <xf:group xxbl:scope="inner" appearance="xxf:internal">
+                                                <xsl:copy-of select="$content"/>
+                                            </xf:group>
+                                        </xf:repeat>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:copy-of select="$content"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xsl:for-each>
                         </xh:div>
-                    </xf:group>
+                    </xh:div>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

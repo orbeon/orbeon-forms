@@ -282,6 +282,7 @@ trait CreateUpdateDelete
               // Check we're allowed to update or delete this resource
               val username      = existing.get.username
               val groupname     = existing.get.group
+
               val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, (username, groupname, None))
               val requiredOp    = if (delete) "delete" else "update"
               authorizedOps.contains(requiredOp)

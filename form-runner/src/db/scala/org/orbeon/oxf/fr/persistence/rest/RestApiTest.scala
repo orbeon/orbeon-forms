@@ -31,7 +31,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 import scala.util.Random
 import scala.xml.Elem
-import org.orbeon.oxf.fr.permission.Permissions._
+import org.orbeon.oxf.fr.permission._
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -49,8 +49,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   val CanCreateRead = CanCreate ++ CanRead
   val FormName = "my-form"
 
-  val AnyoneCanCreateAndRead = Some(List(Permission(Nil, List("read", "create"))))
-  val AnyoneCanCreate        = Some(List(Permission(Nil, List("create"))))
+  val AnyoneCanCreateAndRead = DefinedPermissions(List(Permission(Nil, List("read", "create"))))
+  val AnyoneCanCreate        = DefinedPermissions(List(Permission(Nil, List("create"))))
 
   private def crudURLPrefix(provider: Provider) = s"crud/${provider.name}/$FormName/"
   private def metadataURL  (provider: Provider) = s"form/${provider.name}/$FormName"
@@ -149,8 +149,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val FormURL       = crudURLPrefix(provider) + "form/form.xhtml"
       val FirstDataURL  = crudURLPrefix(provider) + "data/123/data.xml"
       val SecondDataURL = crudURLPrefix(provider) + "data/456/data.xml"
-      val first         = buildFormDefinition(provider, permissions = None, title = Some("first"))
-      val second        = buildFormDefinition(provider, permissions = None, title = Some("second"))
+      val first         = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first"))
+      val second        = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("second"))
       val data          = <gaga/>
 
       HttpAssert.put(FormURL      , Unspecified, HttpRequest.XML(first) , 201)
@@ -177,7 +177,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
               <application-name>{provider.name}</application-name>
               <form-name>{FormName}</form-name>
               <title xml:lang="en">{title.getOrElse("")}</title>
-              { serialize(permissions).getOrElse("") }
+              { PermissionsXML.serialize(permissions).getOrElse("") }
             </metadata>
           </xf:instance>
         </xf:model>
@@ -202,7 +202,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val DataURL = crudURLPrefix(provider) + "data/123/data.xml"
 
         // Anonymous: no permission defined
-        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, None)), 201)
+        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, UndefinedPermissions)), 201)
         HttpAssert.put(DataURL, Specific(1), HttpRequest.XML(data), 201)
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpRequest.XML(data), AllOperations, Some(1)))
 
@@ -218,7 +218,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val DataURL = crudURLPrefix(provider) + "data/456/data.xml"
 
         // More complex permissions based on roles
-        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(List(
+        HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, DefinedPermissions(List(
           Permission(Nil                        , List("create")),
           Permission(List(RolesAnyOf(List("clerk"  ))), List("read")),
           Permission(List(RolesAnyOf(List("manager"))), List("read update")),
@@ -275,7 +275,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val dataBody  = HttpRequest.XML(<gaga/>)
 
       // User can read their own data, as well as their managers
-      HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, Some(List(
+      HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, DefinedPermissions(List(
         Permission(Nil         , CanCreate),
         Permission(List(Owner)          , CanRead),
         Permission(List(RolesAnyOf(List("manager"))), CanRead)

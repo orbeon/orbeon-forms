@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
@@ -79,9 +80,12 @@ trait FormRunnerPermissionsOps {
     permissionsElement : NodeInfo,
     dataUsername       : String,
     dataGroupname      : String
+    // TODO: take additional organization parameter
   ): Seq[String] = {
-    def toOption(s: String) = if (s == null || s == "") None else Some(s)
-    allAuthorizedOperations(permissionsElement, toOption(dataUsername), toOption(dataGroupname), None)
+    val permissions = PermissionsXML.parse(permissionsElement)
+    val user        = PermissionsAuthorization.currentUserFromSession
+    val check       = CheckWithDataUser(Option(dataUsername), Option(dataGroupname), None)
+    PermissionsAuthorization.authorizedOperations(permissions, user, check)
   }
 
   // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and
@@ -119,7 +123,8 @@ trait FormRunnerPermissionsOps {
     }
 
     allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
-      val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElOrNull, ???)
+      val rolesOperations       = authorizedOperationsBasedOnRoles(permissionsElOrNull, CurrentUser(
+        currentUsername, currentGroupname, currentOrganization, currentRoles))
       val ownerOperations       = ownerGroupMemberOperations(currentUsername , dataUsername,  "owner")
       val groupMemberOperations = ownerGroupMemberOperations(currentGroupname, dataGroupname, "group-member")
       (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct

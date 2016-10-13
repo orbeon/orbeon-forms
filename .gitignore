@@ -5,6 +5,8 @@ target/
 build-local.properties
 .idea/shelf/
 src/resources-packaged-target/
+src/resources-packaged/xbl/orbeon/code-mirror/CodeMirror-2.34/
 src/resources-local/
+node_modules/
 tmp
 *~

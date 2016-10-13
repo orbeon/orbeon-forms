@@ -19,7 +19,7 @@ case class  DefinedPermissions(permissionsList: List[Permission]) extends Permis
 
 case class Permission(
   conditions: List[Condition],
-  operations: List[String]
+  operations: Operations
 )
 
 sealed trait                                                              Condition

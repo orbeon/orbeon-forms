@@ -30,7 +30,7 @@ object PermissionsXML {
         Some(
           <permissions>
             {permissionsList map (p ⇒
-            <permission operations={p.operations.mkString(" ")}>
+            <permission operations={Operations.serialize(p.operations).mkString(" ")}>
               {p.conditions map {
               case Owner ⇒ <owner/>
               case Group ⇒ <group-member/>
@@ -54,7 +54,7 @@ object PermissionsXML {
     }
 
   private def parsePermission(permissionEl: NodeInfo): Permission = {
-    val operations = FormRunner.permissionOperations(permissionEl)
+    val operations = Operations.parse(FormRunner.permissionOperations(permissionEl))
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl ⇒

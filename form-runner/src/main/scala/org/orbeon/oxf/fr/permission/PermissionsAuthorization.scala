@@ -50,23 +50,24 @@ object PermissionsAuthorization {
     permissions : Permissions,
     currentUser : CurrentUser,
     check       : PermissionsCheck
-  ): List[String] =
+  ): Operations =
     permissions match {
       case DefinedPermissions(permissionsList) ⇒
-        permissionsList.flatMap(authorizedOperations(_, currentUser, check)).distinct
+        val operationsList = permissionsList.map(authorizedOperations(_, currentUser, check))
+        Operations.combine(operationsList)
       case UndefinedPermissions ⇒
-        List("*")
+        AnyOperation
     }
 
   private def authorizedOperations(
     permission  : Permission,
     currentUser : CurrentUser,
     check       : PermissionsCheck
-  ): List[String] =
+  ): Operations =
     if (permission.conditions.forall(conditionPasses(_, currentUser, check)))
       permission.operations
     else
-      Nil
+      Operations.None
 
   private def conditionPasses(
     condition   : Condition,

@@ -68,11 +68,12 @@ trait FormRunnerPermissionsOps {
       )
   ): List[String] = {
     val permissions = PermissionsXML.parse(permissionsElOrNull)
-    PermissionsAuthorization.authorizedOperations(
+    val operations  = PermissionsAuthorization.authorizedOperations(
       permissions,
       currentUser,
       PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
     )
+    Operations.serialize(operations)
   }
 
   //@XPathFunction
@@ -85,7 +86,7 @@ trait FormRunnerPermissionsOps {
     val permissions = PermissionsXML.parse(permissionsElement)
     val user        = PermissionsAuthorization.currentUserFromSession
     val check       = CheckWithDataUser(Option(dataUsername), Option(dataGroupname), None)
-    PermissionsAuthorization.authorizedOperations(permissions, user, check)
+    Operations.serialize(PermissionsAuthorization.authorizedOperations(permissions, user, check))
   }
 
   // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and

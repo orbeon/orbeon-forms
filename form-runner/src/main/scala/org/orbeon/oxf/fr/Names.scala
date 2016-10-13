@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-
 object Names {
   val Constraint       = "constraint"
   val Validation       = "validation"

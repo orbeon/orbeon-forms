@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
@@ -22,74 +23,16 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
-import scala.xml.Elem
 
-trait FormRunnerPermissions {
-
-  object Permissions {
-
-    type Permissions = Option[List[Permission]]
-
-    sealed trait                                        Condition
-    case object Owner                           extends Condition
-    case object Group                           extends Condition
-    case class  RolesAnyOf(roles: List[String]) extends Condition
-
-    case class Permission(
-      conditions: List[Condition],
-      operations: List[String]
-    )
-
-    def serialize(permissions: Permissions): Option[Elem] =
-      permissions map (ps ⇒
-        <permissions>{
-          ps map (p ⇒
-            <permission operations={p.operations.mkString(" ")}>{
-              p.conditions map {
-                case Owner             ⇒ <owner/>
-                case Group             ⇒ <group-member/>
-                case RolesAnyOf(roles) ⇒
-                    val escapedSpaces = roles.map(_.replaceAllLiterally(" ", "%20"))
-                    val anyOfAttValue = escapedSpaces.mkString(" ")
-                    <user-role any-of={anyOfAttValue}/>
-              }
-            }</permission>
-          )
-        }</permissions>
-      )
-
-    def parse(permissionsElOrNull: NodeInfo): Permissions =
-      Option(permissionsElOrNull)
-        .map(_.child("permission").toList.map(parsePermission))
-
-    private def parsePermission(permissionEl: NodeInfo): Permission = {
-      val operations = permissionOperations(permissionEl)
-      val conditions =
-        permissionEl.child(*).toList.map(
-          conditionEl ⇒
-            conditionEl.localname match {
-              case "owner"        ⇒ Owner
-              case "group-member" ⇒ Group
-              case "user-role"    ⇒
-                val anyOfAttValue = conditionEl.attValue("any-of")
-                val rawRoles      = anyOfAttValue.splitTo[List](" ")
-                val roles         = rawRoles.map(_.replaceAllLiterally("%20", " "))
-                RolesAnyOf(roles)
-              case _ ⇒ throw new RuntimeException("")
-            }
-        )
-      Permission(conditions, operations)
-    }
-  }
+trait FormRunnerPermissionsOps {
 
   /**
    * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
    * the operations attribute.
    */
-  private def permissionOperations(permissionElement: NodeInfo): List[String] =
+  def permissionOperations(permissionElement: NodeInfo): List[String] =
     permissionElement attTokens "operations" toList
 
 
@@ -99,12 +42,12 @@ trait FormRunnerPermissions {
 
   private def allOperationsIfNoPermissionsDefined
     (permissionsElOrNull : NodeInfo)
-    (computePermissions  : List[Permissions.Permission] ⇒ List[String])
+    (computePermissions  : List[Permission] ⇒ List[String])
   : List[String] =
-    Permissions.parse(permissionsElOrNull) match {
+    PermissionsXML.parse(permissionsElOrNull) match {
       // No permissions defined for this form, authorize any operation
-      case None ⇒ List("*")
-      case Some(permissions) ⇒ computePermissions(permissions)
+      case UndefinedPermissions ⇒ List("*")
+      case DefinedPermissions(permissions) ⇒ computePermissions(permissions)
     }
 
   /**
@@ -115,29 +58,21 @@ trait FormRunnerPermissions {
    */
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
-    userRoles           : List[UserRole] = request.getUserRoles.to[List]
-  ): List[String] =
-    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
-      permissions
-        .flatMap(permission ⇒ {
-          val satisfied = permission.conditions.forall {
-              case Permissions.RolesAnyOf(permissionRoleNames) ⇒
-                permissionRoleNames.exists(permissionRoleName ⇒
-                  userRoles.exists {
-                    case SimpleRole(userRoleName) ⇒
-                      permissionRoleName == userRoleName
-                    case ParametrizedRole(userRoleName, userOrganizationName) ⇒
-                      // We can't check this, as we'd have to
-                      false
-                  }
-                )
-              case _ ⇒
-                // We can't satisfy any other constraint, as we don't know anything about the data
-                false
-            }
-          if (satisfied) permission.operations else Nil })
-        .distinct
-    }
+    currentUser         : PermissionsAuthorization.CurrentUser =
+      PermissionsAuthorization.CurrentUser(
+        username     = Option(request.getUsername),
+        groupname    = Option(request.getUserGroup),
+        organization = Organization.fromJava(request.getUserOrganization),
+        roles        = request.getUserRoles.to[List]
+      )
+  ): List[String] = {
+    val permissions = PermissionsXML.parse(permissionsElOrNull)
+    PermissionsAuthorization.authorizedOperations(
+      permissions,
+      currentUser,
+      PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
+    )
+  }
 
   //@XPathFunction
   def xpathAllAuthorizedOperations(
@@ -184,7 +119,7 @@ trait FormRunnerPermissions {
     }
 
     allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
-      val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElOrNull, currentRoles)
+      val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElOrNull, ???)
       val ownerOperations       = ownerGroupMemberOperations(currentUsername , dataUsername,  "owner")
       val groupMemberOperations = ownerGroupMemberOperations(currentGroupname, dataGroupname, "group-member")
       (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct

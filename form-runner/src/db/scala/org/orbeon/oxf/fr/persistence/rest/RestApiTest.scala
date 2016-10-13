@@ -31,7 +31,7 @@ import org.scalatest.junit.AssertionsForJUnit
 
 import scala.util.Random
 import scala.xml.Elem
-import org.orbeon.oxf.fr.FormRunner.Permissions._
+import org.orbeon.oxf.fr.permission.Permissions._
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:

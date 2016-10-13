@@ -13,100 +13,123 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner.Permissions._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
+import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.scalatest.FunSpec
 
 class FormRunnerPermissionsTest extends FunSpec {
 
+  val guest = CurrentUser(
+      username     = Some("juser"),
+      groupname    = None,
+      organization = None,
+      roles        = Nil
+    )
+  val juser    = guest.copy(username = Some("juser"))
+  val jmanager = guest.copy(username = Some("jmanager"))
+
   describe("The `authorizedOperationsBasedOnRoles()` function") {
 
-    it("must return all operations if the form has no permissions") {
-      for (userRoles ← List(Nil, List(SimpleRole("clerk"))))
-        assert(FormRunner.authorizedOperationsBasedOnRoles(permissionsElOrNull = null, userRoles) === List("*"))
+    it("Returns all operations if the form has no permissions") {
+      for (userRoles ← List(Nil, List(SimpleRole("clerk")))) {
+        val user = juser.copy(roles = userRoles)
+        val ops  = authorizedOperations(
+          UndefinedPermissions,
+          user,
+          CheckWithoutDataUser(optimistic = false)
+        )
+        assert(ops === List("*"))
+
+      }
     }
 
-    it("must, with the 'clerk can read' permission, check the a clerk actually can read, and another user can't") {
-      val clerkCanRead = serialize(Some(List(Permission(List(RolesAnyOf(List("clerk"))), List("read"))))).get
-      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List(SimpleRole("clerk" ))) === List("read"))
-      assert(FormRunner.authorizedOperationsBasedOnRoles(clerkCanRead, List(SimpleRole("other")))  === List())
+    describe("With the 'clerk can read' permission") {
+      val clerkCanRead = DefinedPermissions(List(
+        Permission(List(RolesAnyOf(List("clerk"))), List("read")))
+      )
+      it("Allows clerk to read") {
+        val ops = authorizedOperations(
+          clerkCanRead,
+          juser.copy(roles = List(SimpleRole("clerk" ))),
+          CheckWithoutDataUser(optimistic = false)
+        )
+        assert(ops === List("read"))
+      }
+      it("Prevents a user with another role from reading") {
+        val ops = authorizedOperations(
+          clerkCanRead,
+          juser.copy(roles = List(SimpleRole("other" ))),
+          CheckWithoutDataUser(optimistic = false)
+        )
+        assert(ops === Nil)
+      }
     }
   }
 
   describe("The `allAuthorizedOperations()` function (based on data)") {
 
     // Pretty typical permissions defined in the form
-    val formPermissions =
-      serialize(
-        Some(
-          List(
-            Permission(Nil                              , List("create")),
-            Permission(List(Owner)                      , List("read", "update")),
-            Permission(List(RolesAnyOf(List("clerk")))  , List("read")),
-            Permission(List(RolesAnyOf(List("manager"))), List("read", "update"))
+    val formPermissions = DefinedPermissions(List(
+      Permission(Nil                              , List("create")),
+      Permission(List(Owner)                      , List("read", "update")),
+      Permission(List(RolesAnyOf(List("clerk")))  , List("read")),
+      Permission(List(RolesAnyOf(List("manager"))), List("read", "update"))
+    ))
+
+    val guestOperations = List("create")
+    val fullOperations  = List("create", "read", "update")
+
+    it("Lets anonymous users only create") {
+      val ops = authorizedOperations(
+        formPermissions,
+        juser,
+        CheckWithDataUser(
+          username     = None,
+          groupname    = None,
+          organization = None
+        )
+      )
+      assert(ops === guestOperations)
+    }
+
+    it("Lets owners access their data") {
+      val ops = authorizedOperations(
+        formPermissions,
+        juser,
+        CheckWithDataUser(
+          username     = Some("juser"),
+          groupname    = None,
+          organization = None
+        )
+      )
+      assert(ops === fullOperations)
+    }
+
+    describe("Organization-based permissions") {
+
+      val dataUser = CheckWithDataUser(
+        username     = Some("juser"),
+        groupname    = None,
+        organization = Some(Organization(List("a", "b", "c")))
+      )
+
+      val checks = List(
+        "Lets direct manager access the data"                → ParametrizedRole("manager", "c") → fullOperations,
+        "Lets manager of manager access the data"            → ParametrizedRole("manager", "b") → fullOperations,
+        "Prevents unrelated manager from accessing the data" → ParametrizedRole("manager", "d") → guestOperations
+      )
+
+      for (((specText, roles), operations) ← checks) {
+        it(specText) {
+          val ops = authorizedOperations(
+            formPermissions,
+            jmanager.copy(roles = List(roles)),
+            dataUser
           )
-        )
-      ).get
-
-    it("must let anonymous users only create") {
-      FormRunner
-        .allAuthorizedOperations(
-          permissionsElOrNull = formPermissions,
-          dataUsername        = None,
-          dataGroupname       = None,
-          dataOrganization    = None,
-          currentUsername     = Some("juser"),
-          currentGroupname    = None,
-          currentOrganization = None,
-          currentRoles        = Nil
-        )
-        .kestrel{ ops ⇒ assert(ops === List("create"))}
+          assert(ops === operations)
+        }
+      }
     }
-
-    it("must let owners access their data") {
-      FormRunner
-        .allAuthorizedOperations(
-          permissionsElOrNull = formPermissions,
-          dataUsername        = Some("juser"),
-          dataGroupname       = None,
-          dataOrganization    = None,
-          currentUsername     = Some("juser"),
-          currentGroupname    = None,
-          currentOrganization = None,
-          currentRoles        = Nil
-        )
-        .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
-    }
-
-//    it ("must let direct managers access the data") {
-//      FormRunner
-//        .allAuthorizedOperations(
-//          permissionsElement  = formPermissions,
-//          dataUsername        = Some("juser"),
-//          dataGroupname       = None,
-//          dataOrganization    = Some(Organization(List("a", "b", "c"))),
-//          currentUsername     = Some("jmanager"),
-//          currentGroupname    = None,
-//          currentOrganization = None,
-//          currentRoles        = List(ParametrizedRole("manager", "c"))
-//        )
-//        .kestrel{ ops ⇒ assert(ops === List("create", "read", "update"))}
-//    }
-//
-//    it ("must not let unrelated managers access the data") {
-//      FormRunner
-//        .allAuthorizedOperations(
-//          permissionsElement  = formPermissions,
-//          dataUsername        = Some("juser"),
-//          dataGroupname       = None,
-//          dataOrganization    = Some(Organization(List("a", "b", "c"))),
-//          currentUsername     = Some("jmanager"),
-//          currentGroupname    = None,
-//          currentOrganization = None,
-//          currentRoles        = List(ParametrizedRole("manager", "d"))
-//        )
-//        .kestrel{ ops ⇒ assert(ops === List("create"))}
-//    }
   }
 }

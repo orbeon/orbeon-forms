@@ -102,6 +102,6 @@ private object XFormsTriggerFullHandler {
 
   // Map appearances to Bootstrap classes, e.g. xxf:primary → btn-primary
   val BootstrapAppearances =
-    Seq("primary", "info", "success", "warning", "danger", "inverse") map
+    Seq("primary", "info", "success", "warning", "danger", "inverse", "mini", "small", "large", "block") map
       (name ⇒ QName.get(name, XXFORMS_NAMESPACE_URI) → ("btn-" + name)) toMap
 }

@@ -13,25 +13,23 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.util.{Enumeration ⇒ JEnumeration}
+import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 
-import org.junit.Test
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpec
 import org.scalatest.mock.MockitoSugar
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
-class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
+class FormRunnerRequestFilterTest extends FunSpec with MockitoSugar {
 
-  @Test def amendServletRequest(): Unit = {
+  describe("The `amendRequest()` function") {
 
     // Initial headers
     val initialHeaders = Map(
@@ -70,12 +68,14 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     )
 
     // NOTE: Use asInstanceOf because servlet API doesn't have generics
-    val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[JEnumeration[String]] map
-      (n ⇒ n → amendedRequest.getHeaders(n).asInstanceOf[JEnumeration[String]].toList) toMap
+    val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]] map
+      (n ⇒ n → amendedRequest.getHeaders(n).asInstanceOf[ju.Enumeration[String]].toList) toMap
 
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map
 
-    assert(toTreeMap(expectedHeaders) === toTreeMap(actualHeaders))
+    it ("must set authentication headers based on incoming headers") {
+      assert(toTreeMap(expectedHeaders) === toTreeMap(actualHeaders))
+    }
   }
 }

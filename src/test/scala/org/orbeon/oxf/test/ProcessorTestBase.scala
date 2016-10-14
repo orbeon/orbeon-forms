@@ -56,17 +56,12 @@ abstract class ProcessorTestBase(testsDocUrl: String)
   case class  FailedTestResult(expected: Document, actual: Document) extends TestResult
   case class  ErrorTestResult(t: Throwable)                          extends TestResult
 
-  // Setup and tear-down
+  // Setup and tear-down for each test
   locally {
     var pipelineContext: Option[PipelineContext] = None
 
-    before {
-      pipelineContext = Some(createPipelineContextWithExternalContext)
-    }
-
-    after {
-      pipelineContext foreach (_.destroy(true))
-    }
+    before { pipelineContext = Some(createPipelineContextWithExternalContext) }
+    after  { pipelineContext foreach (_.destroy(true)) }
   }
 
   // Run tests
@@ -85,10 +80,9 @@ abstract class ProcessorTestBase(testsDocUrl: String)
         }
       }
     }
-
   }
 
-  private def runTest(d: TestDescriptor): TestResult = {
+  private def runTest(d: TestDescriptor): TestResult =
     try {
       // Create pipeline context
       val pipelineContext =
@@ -122,7 +116,6 @@ abstract class ProcessorTestBase(testsDocUrl: String)
     } catch {
       case NonFatal(t) ⇒ ErrorTestResult(t)
     }
-  }
 
   private def findTestsToRun: List[TestDescriptor] = {
 

@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI._

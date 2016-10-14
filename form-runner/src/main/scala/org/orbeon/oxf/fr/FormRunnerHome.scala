@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner.{dropTrailingSlash ⇒ _, _}
+import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringReplacer._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}

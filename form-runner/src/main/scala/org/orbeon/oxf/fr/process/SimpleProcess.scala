@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunner.{recombineQuery ⇒ _, _}
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, XPath}

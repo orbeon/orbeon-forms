@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.FormRunner.{recombineQuery ⇒ _, splitQueryDecodeParams ⇒ _, _}
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import org.orbeon.oxf.util.NetUtils

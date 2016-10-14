@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.util.PathOps
-
 object FormRunner
   extends FormRunnerPersistence
   with FormBuilderPermissionsOps
@@ -29,4 +27,3 @@ object FormRunner
   with FormRunnerSummary
   with FormRunnerHome
   with FormRunnerMetadata
-  with PathOps

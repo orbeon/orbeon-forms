@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.FormRunner.{recombineQuery ⇒ _, splitQueryDecodeParams ⇒ _, _}
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._

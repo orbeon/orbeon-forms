@@ -17,7 +17,7 @@ import java.net.URLDecoder.{decode ⇒ decodeURL}
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 
 
-trait PathOps {
+object PathUtils {
 
   def dropTrailingSlash(s: String)   = if (s.isEmpty || s.last != '/') s else s.init
   def dropStartingSlash(s: String)   = if (s.isEmpty || s.head != '/') s else s.tail
@@ -77,5 +77,3 @@ trait PathOps {
       case index ⇒ Some(path.substring(index + 1))
     }
 }
-
-object PathUtils extends PathOps

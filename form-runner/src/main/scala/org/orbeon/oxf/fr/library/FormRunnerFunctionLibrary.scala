@@ -27,6 +27,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{BooleanValue, IntegerValue, StringValue}
 import org.orbeon.scaxon.XML._
+import org.orbeon.xbl.Wizard
 
 // The Form Runner function library
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
@@ -89,10 +90,10 @@ private object FormRunnerFunctions {
     "is-noscript"          → (() ⇒ FormRunner.isNoscript),
     "is-form-data-valid"   → (() ⇒ countValidationsByLevel(ErrorLevel) == 0),
     "is-form-data-saved"   → (() ⇒ FormRunner.isFormDataSaved),
-    "is-wizard-toc-shown"  → (() ⇒ FormRunner.isWizardTocShown),
-    "is-wizard-body-shown" → (() ⇒ FormRunner.isWizardBodyShown),
-    "is-wizard-first-page" → (() ⇒ FormRunner.isWizardFirstPage),
-    "is-wizard-last-page"  → (() ⇒ FormRunner.isWizardLastPage),
+    "is-wizard-toc-shown"  → (() ⇒ Wizard.isWizardTocShown),
+    "is-wizard-body-shown" → (() ⇒ Wizard.isWizardBodyShown),
+    "is-wizard-first-page" → (() ⇒ Wizard.isWizardFirstPage),
+    "is-wizard-last-page"  → (() ⇒ Wizard.isWizardLastPage),
     "can-create"           → (() ⇒ FormRunner.canCreate),
     "can-read"             → (() ⇒ FormRunner.canRead),
     "can-update"           → (() ⇒ FormRunner.canUpdate),

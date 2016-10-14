@@ -22,7 +22,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-    xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary">
+    xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary"
+    xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
     <xbl:binding id="fr-wizard" element="fr|wizard">
         <xbl:resources>
@@ -61,10 +62,10 @@
 
                 <xf:var name="local" value="instance('local')"/>
 
-                <xf:bind ref="validate"     type="xs:boolean" xxf:default="frf:isWizardValidate()"/>
-                <xf:bind ref="separate-toc" type="xs:boolean" xxf:default="frf:isWizardSeparateToc()"/>
+                <xf:bind ref="validate"     type="xs:boolean" xxf:default="Wizard:isWizardValidate()"/>
+                <xf:bind ref="separate-toc" type="xs:boolean" xxf:default="Wizard:isWizardSeparateToc()"/>
                 <xf:bind ref="show-toc"     type="xs:boolean" xxf:default="true()"/>
-                <xf:bind ref="show-body"    type="xs:boolean" xxf:default="not(frf:isWizardSeparateToc())"/>
+                <xf:bind ref="show-body"    type="xs:boolean" xxf:default="not(Wizard:isWizardSeparateToc())"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

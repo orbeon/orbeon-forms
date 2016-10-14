@@ -11,17 +11,17 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.xbl
 
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
-import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
-import org.orbeon.saxon.value.{BooleanValue, EmptySequence, Value}
+import org.orbeon.saxon.om.ValueRepresentation
+import org.orbeon.saxon.value.Value
 import org.orbeon.scaxon.XML._
 
-// TODO: Move as an `object` to `org.orbeon.xbl` package.
-trait FormRunnerWizard extends FormRunnerBaseOps {
+object Wizard {
 
   //@XPathFunction
   def isWizardValidate =
@@ -55,4 +55,5 @@ trait FormRunnerWizard extends FormRunnerBaseOps {
 
   def isWizardFirstPage =
     findWizardVariableValue("fr-wizard-is-first-nav") exists booleanValue
+
 }

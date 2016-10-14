@@ -38,6 +38,7 @@ import scala.util.control.NonFatal
 
 abstract class ProcessorTestBase(testsDocUrl: String)
   extends ResourceManagerTestBase
+     with ResourceManagerSupport
      with FunSpecLike
      with BeforeAndAfter
      with XMLSupport {
@@ -57,9 +58,6 @@ abstract class ProcessorTestBase(testsDocUrl: String)
 
   // Setup and tear-down
   locally {
-
-    ResourceManagerTestBase.staticSetup() // don't like this much, find another solution.
-
     var pipelineContext: Option[PipelineContext] = None
 
     before {

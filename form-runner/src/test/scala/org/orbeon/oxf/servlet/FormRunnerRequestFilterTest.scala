@@ -20,14 +20,15 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
-import org.scalatest.FunSpec
+import org.orbeon.oxf.test.ResourceManagerSupport
+import org.scalatest.FunSpecLike
 import org.scalatest.mock.MockitoSugar
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
-class FormRunnerRequestFilterTest extends FunSpec with MockitoSugar {
+class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLike with MockitoSugar {
 
   describe("The `amendRequest()` function") {
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.json
 
-private object Symbols {
+object Symbols {
   val String    = "string"
   val Number    = "number"
   val Boolean   = "boolean"

@@ -64,27 +64,27 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
   def makeNCName(name: String): String                          = SaxonUtils.makeNCName(name, keepFirstIfPossible = true)
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonStringToXml(source: String): DocumentInfo = {
+  def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): DocumentInfo = {
     val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
-    jsonStringToXml(source, receiver)
+    jsonStringToXmlStream(source, receiver, rootElementName)
     builder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonToXml(ast: JsValue): DocumentInfo = {
+  def jsonToXmlDoc(ast: JsValue): DocumentInfo = {
     val (builder, receiver) = TransformerUtils.createTinyBuilder(XPath.GlobalConfiguration)
-    jsonToXml(ast, receiver)
+    jsonToXmlStream(ast, receiver)
     builder.getCurrentRoot.asInstanceOf[DocumentInfo]
   }
 
   // Convert a JSON String to a stream of XML events
-  def jsonStringToXml(source: String, receiver: XMLReceiver): Unit =
-    jsonToXml(source.parseJson, receiver)
+  def jsonStringToXmlStream(source: String, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit =
+    jsonToXmlStream(source.parseJson, receiver, rootElementName)
 
   // Convert a JSON AST to a stream of XML events
-  def jsonToXml(ast: JsValue, receiver: XMLReceiver): Unit = {
+  def jsonToXmlStream(ast: JsValue, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit = {
     receiver.startDocument()
-    jsonToXmlImpl(ast, new DeferredXMLReceiverImpl(receiver))
+    jsonToXmlImpl(ast, new DeferredXMLReceiverImpl(receiver), rootElementName)
     receiver.endDocument()
   }
 

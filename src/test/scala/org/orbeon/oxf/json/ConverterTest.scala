@@ -163,7 +163,7 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
   @Test def testJsonToXml(): Unit = {
     for ((json, xml) ← ExpectedJsonToXml) {
       val store = new SAXStore
-      Converter.jsonStringToXml(json, store)
+      Converter.jsonStringToXmlStream(json, store)
       val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
 
       assertXMLDocumentsIgnoreNamespacesInScope(elemToDom4j(xml), resultXML)
@@ -196,7 +196,7 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
     val jsonString = """ { "foo""" + unicodeEscapedString + """": "bar""" + unicodeEscapedString + """" } """
     val json       = jsonString.parseJson
 
-    val xml           = Converter.jsonToXml(json)
+    val xml           = Converter.jsonToXmlDoc(json)
     val firstElem     = xml.rootElement / * head
     val firstElemName = firstElem attValueOpt "name" getOrElse firstElem.localname
     val firstValue    = firstElem.stringValue

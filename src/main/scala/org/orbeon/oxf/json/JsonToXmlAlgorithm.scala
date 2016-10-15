@@ -45,7 +45,7 @@ protected trait JsonToXmlAlgorithm {
   def makeNCName(name: String): String
 
   // Convert a JSON AST to a stream of XML events
-  def jsonToXmlImpl(ast: JsValue, rcv: XmlStream): Unit = {
+  def jsonToXmlImpl(ast: JsValue, rcv: XmlStream, rootElementName: String = Symbols.JSON): Unit = {
 
     def escapeString(s: String) =
       s.iterateCodePoints map { cp ⇒
@@ -96,7 +96,7 @@ protected trait JsonToXmlAlgorithm {
           }
       }
 
-    withElement(Symbols.JSON) {
+    withElement(rootElementName) {
       processValue(ast)
     }
   }

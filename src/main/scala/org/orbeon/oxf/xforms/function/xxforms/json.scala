@@ -22,7 +22,7 @@ import org.orbeon.saxon.value.StringValue
 
 class JsonStringToXml extends XFormsFunction with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): DocumentInfo =
-    stringArgumentOrContextOpt(0)(xpathContext) map Converter.jsonStringToXml orNull
+    stringArgumentOrContextOpt(0)(xpathContext) map (Converter.jsonStringToXmlDoc(_)) orNull
 }
 
 class XmlToJsonString extends XFormsFunction with DependsOnContextItemIfSingleArgumentMissing {

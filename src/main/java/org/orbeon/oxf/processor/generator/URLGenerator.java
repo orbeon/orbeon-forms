@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.json.Converter;
+import org.orbeon.oxf.json.Symbols;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -809,7 +810,7 @@ public class URLGenerator extends ProcessorImpl {
             final Reader reader     = new InputStreamReader(is, "utf-8");
             final String jsonString = NetUtils.readStreamAsString(reader);
 
-            Converter.jsonStringToXml(jsonString, output);
+            Converter.jsonStringToXmlStream(jsonString, output, Symbols.JSON());
         }
     }
 

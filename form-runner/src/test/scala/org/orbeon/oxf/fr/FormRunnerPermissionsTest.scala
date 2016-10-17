@@ -39,7 +39,7 @@ class FormRunnerPermissionsTest extends FunSpec {
           user,
           CheckWithoutDataUser(optimistic = false)
         )
-        assert(ops === AnyOperation)
+        assert(ops === SpecificOperations(Operations.All))
 
       }
     }

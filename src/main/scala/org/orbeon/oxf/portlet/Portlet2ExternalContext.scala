@@ -51,11 +51,8 @@ object Portlet2ExternalContext {
     private var _responseTitle        : Option[String]   = None
 
     private lazy val streams = {
-      val outputStream        = new ByteArrayOutputStream
       val stringBuilderWriter = new StringBuilderWriter
-      val printWriter         = new PrintWriter(stringBuilderWriter)
-
-      (outputStream, stringBuilderWriter, printWriter)
+      (new ByteArrayOutputStream, stringBuilderWriter, new PrintWriter(stringBuilderWriter))
     }
 
     // Not handled right now or because it doesn't make sense

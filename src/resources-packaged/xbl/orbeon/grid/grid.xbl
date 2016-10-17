@@ -158,11 +158,13 @@
 
                             <xsl:if test="not($readonly)">
                                 <xf:var name="repeat-template">
+                                    <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                     <xxf:value value="{(@template, @origin)[1]}" xxbl:scope="outer"/>
                                 </xf:var>
                             </xsl:if>
                             <xf:var name="repeat-index">
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
+                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                 <xxf:value value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
                             <!-- NOTE: We need a better way to get the Form Runner mode. -->
@@ -172,16 +174,19 @@
 
                             <xf:var name="min-avt" xxbl:scope="outer"><xsl:value-of select="($root/@min, $root/@minOccurs, 0)[1]"/></xf:var>
                             <xf:var name="min">
+                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                 <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($min-avt)" xxbl:scope="outer"/>
                             </xf:var>
 
                             <xf:var name="max-avt" xxbl:scope="outer"><xsl:value-of select="($root/@max, $root/@maxOccurs, 'none')[1]"/></xf:var>
                             <xf:var name="max">
+                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                 <xxf:value value="$repeat-context-outer/xxf:evaluate-avt($max-avt)" xxbl:scope="outer"/>
                             </xf:var>
 
                             <xf:var name="freeze-avt" xxbl:scope="outer"><xsl:value-of select="$root/@freeze"/></xf:var>
                             <xf:var name="freeze">
+                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                 <xxf:value value="(xs:integer($repeat-context-outer/xxf:evaluate-avt($freeze-avt)[. castable as xs:integer]), 0)[1]" xxbl:scope="outer"/>
                             </xf:var>
 
@@ -442,6 +447,7 @@
                                                     <!-- Local -->
                                                     <xf:var name="remove-constraint">
                                                         <!-- Evaluate the constraint in the context of the iteration -->
+                                                        <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
                                                         <xxf:value value="{$remove-constraint}" xxbl:scope="outer"/>
                                                     </xf:var>
 

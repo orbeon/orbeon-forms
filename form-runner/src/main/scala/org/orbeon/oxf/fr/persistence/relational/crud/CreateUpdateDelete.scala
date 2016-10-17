@@ -148,7 +148,7 @@ trait CreateUpdateDelete
     val resultSet = {
       val ps = connection.prepareStatement(
         s"""|SELECT created
-            |       ${if (req.forData) ", username , groupname, form_version" else ""}
+            |       ${if (req.forData) ", username , groupname, organization_id, form_version" else ""}
             |FROM   $table t,
             |       (
             |           SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
@@ -174,17 +174,24 @@ trait CreateUpdateDelete
 
     // Create Row object with first row of result
     if (resultSet.next()) {
-      val row = Row(resultSet.getTimestamp("created"),
-                if (req.forData) Option(resultSet.getString("username" )) else None,
-                if (req.forData) Option(resultSet.getString("groupname")) else None,
-                if (req.forData) Option(resultSet.getInt("form_version")) else None)
       // The query could return multiple rows if we have both a draft and non-draft, but the `created`,
       // `username`, `groupname`, and `form_version` must be the same on all rows, so it doesn't matter from
       // which row we read this from.
-      Some(row)
+      Some(Row(
+        created      = resultSet.getTimestamp("created"),
+        username     = if (req.forData) Option(resultSet.getString("username" ))              else None,
+        group        = if (req.forData) Option(resultSet.getString("groupname"))              else None,
+        organization = if (req.forData) Organization.readFromResultSet(connection, resultSet) else None,
+        formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))              else None
+      ))
     } else {
       None
     }
+  }
+
+  private def currentUserOrganization(connection: Connection, req: Request): Option[OrganizationId] = {
+    val organization = Organization.fromJava(httpRequest.getUserOrganization)
+    organization.map(Organization.createIfNecessary(connection, req.provider, _))
   }
 
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
@@ -227,8 +234,7 @@ trait CreateUpdateDelete
 
     // Do insert
     locally {
-
-      val possibleCols = insertCols(req, existingRow, delete, versionToSet)
+      val possibleCols = insertCols(req, existingRow, delete, versionToSet, currentUserOrganization(connection, req))
       val includedCols = possibleCols.filter(_.included)
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
@@ -287,10 +293,11 @@ trait CreateUpdateDelete
               // Check we're allowed to update or delete this resource
               val username      = existing.get.username
               val groupname     = existing.get.group
+              val organization  = existing.get.organization.map(_._2)
               val authorizedOps = PermissionsAuthorization.authorizedOperations(
                 formPermissions,
                 PermissionsAuthorization.currentUserFromSession,
-                CheckWithDataUser(username, groupname, None)
+                CheckWithDataUser(username, groupname, organization)
               )
               val requiredOp    = if (delete) Delete else Update
               Operations.allows(authorizedOps, requiredOp)

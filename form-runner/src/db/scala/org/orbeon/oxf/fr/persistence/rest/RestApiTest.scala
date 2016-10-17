@@ -43,10 +43,12 @@ import scala.xml.Elem
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
-  val AllOperations = SpecificOperations(List(Create, Read, Update, Delete))
-  val CanCreate     = SpecificOperations(List(Create))
-  val CanRead       = SpecificOperations(List(Read))
-  val CanCreateRead = Operations.combine(CanCreate, CanRead)
+  val AllOperations       = SpecificOperations(List(Create, Read, Update, Delete))
+  val CanCreate           = SpecificOperations(List(Create))
+  val CanRead             = SpecificOperations(List(Read))
+  val CanUpdate           = SpecificOperations(List(Update))
+  val CanCreateRead       = Operations.combine(CanCreate, CanRead)
+  val CanCreateReadUpdate = Operations.combine(CanCreateRead, CanUpdate)
   val FormName = "my-form"
 
   val AnyoneCanCreateAndRead = DefinedPermissions(List(Permission(Nil, SpecificOperations(List(Read, Create)))))
@@ -253,45 +255,40 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
     }
   }
 
-  def organizationPermissions(): Unit =
-    Connect.withOrbeonTables("read/write organization") { (connection, provider) ⇒
+  @Test def organizationPermissions(): Unit =
+    Connect.withOrbeonTables("Organization-based permissions") { (connection, provider) ⇒
 
       val formURL   = crudURLPrefix(provider) + "form/form.xhtml"
 
-      // Leaf users
-      val sfUserA   = Some(HttpRequest.Credentials("sfUserA"  , Nil, None, Some(OrganizationTest.SF)))
-      val sfUserB   = Some(HttpRequest.Credentials("sfUserB"  , Nil, None, Some(OrganizationTest.SF)))
-
-      // Managers
-      def createManager(username: String, organization: Organization) = {
-        val role: List[UserRole] = List(ParametrizedRole("manager", organization.levels.last))
-        Some(HttpRequest.Credentials(username, role, None, Some(organization)))
-      }
-      val sfManager = createManager("sfManager", OrganizationTest.SF)
-      val paManager = createManager("paManager", OrganizationTest.PA)
-      val caManager = createManager("caManager", OrganizationTest.CA)
+      // Users
+      val c1User   = Some(HttpRequest.Credentials("c1User"  , Nil, None, Some(Organization(List("a", "b", "c")))))
+      val c2User   = Some(HttpRequest.Credentials("c2User"  , Nil, None, Some(Organization(List("a", "b", "c")))))
+      val cManager = Some(HttpRequest.Credentials("cManager", List(ParametrizedRole("manager", "c")), None, None))
+      val bManager = Some(HttpRequest.Credentials("cManager", List(ParametrizedRole("manager", "b")), None, None))
+      val dManager = Some(HttpRequest.Credentials("cManager", List(ParametrizedRole("manager", "d")), None, None))
 
       val dataURL   = crudURLPrefix(provider) + "data/123/data.xml"
       val dataBody  = HttpRequest.XML(<gaga/>)
 
       // User can read their own data, as well as their managers
       HttpAssert.put(formURL, Unspecified, HttpRequest.XML(buildFormDefinition(provider, DefinedPermissions(List(
-        Permission(Nil         , CanCreate),
-        Permission(List(Owner)          , CanRead),
-        Permission(List(RolesAnyOf(List("manager"))), CanRead)
+        Permission(Nil                              , SpecificOperations(List(Create))),
+        Permission(List(Owner)                      , SpecificOperations(List(Read, Update))),
+        Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(List(Read))),
+        Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update)))
       )))), 201)
 
       // Data initially created by sfUserA
-      HttpAssert.put(dataURL, Specific(1), dataBody, 201, sfUserA)
+      HttpAssert.put(dataURL, Specific(1), dataBody, 201, c1User)
       // Owner can read their own data
-      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateRead, Some(1)), sfUserA)
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), c1User)
       // Other users can't read the data
-      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                             , sfUserB)
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                                   , c2User)
       // Managers of the user up the organization structure can read the data
-      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateRead, Some(1)), sfManager)
-      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateRead, Some(1)), caManager)
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), cManager)
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), bManager)
       // Other managers can't read the data
-      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                             , paManager)
+      HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                                   , dManager)
     }
 
   // Try uploading files of 1 KB, 1 MB

@@ -103,21 +103,19 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         // Check user can read and set Orbeon-Operations header
         formMetadataForDataRequestOpt foreach { formMetadata ⇒
           val dataUser = CheckWithDataUser(
-            username  = Option(resultSet.getString("username")),
-            groupname = Option(resultSet.getString("groupname")),
-            organization = {
-              val id        = resultSet.getInt("organization_id")
-              val isValidId = ! resultSet.wasNull()
-              isValidId.option(Organization.read(connection, OrganizationId(id))).flatten
-            }
+            username     = Option(resultSet.getString("username")),
+            groupname    = Option(resultSet.getString("groupname")),
+            organization = Organization.readFromResultSet(connection, resultSet).map(_._2)
           )
           val authorizedOperations = PermissionsAuthorization.authorizedOperations(
             PermissionsXML.parse(formMetadata.orNull),
             PermissionsAuthorization.currentUserFromSession,
             dataUser
           )
-          if (! Operations.allows(authorizedOperations, Read))
+          if (! Operations.allows(authorizedOperations, Read)) {
+            println("403", authorizedOperations, dataUser)
             throw HttpStatusCodeException(403)
+          }
           httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
         }
 

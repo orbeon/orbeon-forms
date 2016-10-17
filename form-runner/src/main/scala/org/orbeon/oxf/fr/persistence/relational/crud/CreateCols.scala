@@ -27,6 +27,7 @@ trait CreateCols extends RequestResponse with Common {
     created      : Timestamp,
     username     : Option[String],
     group        : Option[String],
+    organization : Option[(Int, Organization)],
     formVersion  : Option[Int]
   )
 
@@ -37,27 +38,35 @@ trait CreateCols extends RequestResponse with Common {
   ) extends ColValue
 
   case class DynamicColValue (
-    placeholder  : String,
-    paramSetter  : ParamSetterFunc
+    placeholder            : String,
+    paramSetter            : ParamSetterFunc
   ) extends ColValue
 
   case class Col(
-    included     : Boolean,
-    name         : String,
-    value        : ColValue
+    included               : Boolean,
+    name                   : String,
+    value                  : ColValue
   )
 
   def insertCols(
-    req          : Request,
-    existingRow  : Option[Row],
-    delete       : Boolean,
-    versionToSet : Int)
-    : List[Col]  = {
+    req                    : Request,
+    existingRow            : Option[Row],
+    delete                 : Boolean,
+    versionToSet           : Int,
+    currentUserOrganization: ⇒ Option[OrganizationId]
+  ): List[Col]  = {
 
-    val xmlCol           = "xml"
-    val xmlVal           = if (req.provider == PostgreSQL) "XMLPARSE( DOCUMENT ? )" else "?"
-    val isFormDefinition = req.forForm && ! req.forAttachment
-    val now              = new Timestamp(System.currentTimeMillis())
+    val xmlCol = "xml"
+    val xmlVal = if (req.provider == PostgreSQL) "XMLPARSE( DOCUMENT ? )" else "?"
+    val isFormDefinition = req.forForm && !req.forAttachment
+    val now = new Timestamp(System.currentTimeMillis())
+    val organizationToSet = req.forData match {
+      case false ⇒ None
+      case true  ⇒ existingRow match {
+        case Some(row) ⇒ row.organization.map(_._1)
+        case None ⇒ currentUserOrganization.map(_.underlying)
+      }
+    }
 
     val (xmlOpt, metadataOpt) =
       if (! delete && ! req.forAttachment) {
@@ -178,6 +187,14 @@ trait CreateCols extends RequestResponse with Common {
         value         = DynamicColValue(
           placeholder = "?",
           paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestGroup.orNull))
+        )
+      ),
+      Col(
+        included      = organizationToSet.isDefined,
+        name          = "organization_id",
+        value         = DynamicColValue(
+          placeholder = "?",
+          paramSetter = param(_.setInt, organizationToSet.get)
         )
       ),
       Col(

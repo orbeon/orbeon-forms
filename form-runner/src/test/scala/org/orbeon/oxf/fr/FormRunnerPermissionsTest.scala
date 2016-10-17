@@ -67,7 +67,7 @@ class FormRunnerPermissionsTest extends FunSpec {
     }
   }
 
-  describe("The `allAuthorizedOperations()` function (based on data)") {
+  describe("The `authorizedOperations()` function") {
 
     // Pretty typical permissions defined in the form
     val formPermissions = DefinedPermissions(List(
@@ -80,7 +80,7 @@ class FormRunnerPermissionsTest extends FunSpec {
     val guestOperations = SpecificOperations(List(Create))
     val fullOperations  = SpecificOperations(List(Create, Read, Update))
 
-    it(";ets anonymous users only create") {
+    it("lets anonymous users only create") {
       val ops = authorizedOperations(
         formPermissions,
         juser,

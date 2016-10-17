@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.crud
 
-import java.sql.Connection
+import java.sql.{Connection, ResultSet}
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.util.CoreUtils._
@@ -132,6 +132,20 @@ object Organization {
           case _   ⇒ Some(Organization(levels))
         }
       }
+    }
+  }
+
+  def readFromResultSet(
+    connection: Connection,
+    resultSet: ResultSet
+  ): Option[(Int, Organization)] = {
+    val id        = resultSet.getInt("organization_id")
+    val isValidId = ! resultSet.wasNull()
+    if (! isValidId) {
+      None
+    } else {
+      val organizationOpt = Organization.read(connection, OrganizationId(id))
+      organizationOpt.map(id → _)
     }
   }
 

@@ -48,7 +48,7 @@ class FormRunnerPermissionsTest extends FunSpec {
       val clerkCanRead = DefinedPermissions(List(
         Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(List(Read))))
       )
-      it("Allows clerk to read") {
+      it("allows clerk to read") {
         val ops = authorizedOperations(
           clerkCanRead,
           juser.copy(roles = List(SimpleRole("clerk" ))),
@@ -56,7 +56,7 @@ class FormRunnerPermissionsTest extends FunSpec {
         )
         assert(ops === SpecificOperations(List(Read)))
       }
-      it("Prevents a user with another role from reading") {
+      it("prevents a user with another role from reading") {
         val ops = authorizedOperations(
           clerkCanRead,
           juser.copy(roles = List(SimpleRole("other" ))),
@@ -80,7 +80,7 @@ class FormRunnerPermissionsTest extends FunSpec {
     val guestOperations = SpecificOperations(List(Create))
     val fullOperations  = SpecificOperations(List(Create, Read, Update))
 
-    it("Lets anonymous users only create") {
+    it(";ets anonymous users only create") {
       val ops = authorizedOperations(
         formPermissions,
         juser,
@@ -93,7 +93,7 @@ class FormRunnerPermissionsTest extends FunSpec {
       assert(ops === guestOperations)
     }
 
-    it("Lets owners access their data") {
+    it("lets owners access their data") {
       val ops = authorizedOperations(
         formPermissions,
         juser,
@@ -115,9 +115,9 @@ class FormRunnerPermissionsTest extends FunSpec {
       )
 
       val checks = List(
-        "Lets direct manager access the data"                → ParametrizedRole("manager", "c") → fullOperations,
-        "Lets manager of manager access the data"            → ParametrizedRole("manager", "b") → fullOperations,
-        "Prevents unrelated manager from accessing the data" → ParametrizedRole("manager", "d") → guestOperations
+        "lets direct manager access the data"                → ParametrizedRole("manager", "c") → fullOperations,
+        "lets manager of manager access the data"            → ParametrizedRole("manager", "b") → fullOperations,
+        "prevents unrelated manager from accessing the data" → ParametrizedRole("manager", "d") → guestOperations
       )
 
       for (((specText, roles), operations) ← checks) {

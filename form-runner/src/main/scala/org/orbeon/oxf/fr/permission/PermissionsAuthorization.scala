@@ -56,7 +56,7 @@ object PermissionsAuthorization {
         val operationsList = permissionsList.map(authorizedOperations(_, currentUser, check))
         Operations.combine(operationsList)
       case UndefinedPermissions ⇒
-        AnyOperation
+        SpecificOperations(Operations.All)
     }
 
   private def authorizedOperations(

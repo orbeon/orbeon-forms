@@ -93,17 +93,6 @@ object RelationalUtils extends Logging {
       .child("forms").child("form").child("permissions")
       .headOption
 
-  // Given a user/group/organization coming from the data, tells us what operations we can do on this data,
-  // assuming that it is for the current request app/form
-  def allAuthorizedOperations(
-    permissionsElOpt : Option[NodeInfo],
-    dataUserGroup    : (Option[String], Option[String], Option[Organization])
-  ): Set[String] =
-    crudOperationsIfNoPermissions(permissionsElOpt, (permissionsEl) ⇒ {
-      val (username, groupname, organization) = dataUserGroup
-      FormRunner.allAuthorizedOperations(permissionsEl, username, groupname, None).toSet
-    })
-
   def authorizedOperationsBasedOnRoles(permissionsElOpt: Option[NodeInfo]): Set[String] =
     crudOperationsIfNoPermissions(permissionsElOpt, (permissionsEl) ⇒ {
       FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet

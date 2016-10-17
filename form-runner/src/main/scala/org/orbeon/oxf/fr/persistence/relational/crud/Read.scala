@@ -16,6 +16,8 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
 import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML, Read}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
@@ -100,20 +102,23 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
         // Check user can read and set Orbeon-Operations header
         formMetadataForDataRequestOpt foreach { formMetadata ⇒
-          val dataUserGroupOrganization = {
-            val username  = resultSet.getString("username")
-            val groupname = resultSet.getString("groupname")
-            val organization = {
+          val dataUser = CheckWithDataUser(
+            username  = Option(resultSet.getString("username")),
+            groupname = Option(resultSet.getString("groupname")),
+            organization = {
               val id        = resultSet.getInt("organization_id")
               val isValidId = ! resultSet.wasNull()
               isValidId.option(Organization.read(connection, OrganizationId(id))).flatten
             }
-            (Option(username), Option(groupname), organization)
-          }
-          val operations = RelationalUtils.allAuthorizedOperations(formMetadata, dataUserGroupOrganization)
-          if (! operations.contains("read"))
-            throw new HttpStatusCodeException(403)
-          httpResponse.setHeader("Orbeon-Operations", operations.mkString(" "))
+          )
+          val authorizedOperations = PermissionsAuthorization.authorizedOperations(
+            PermissionsXML.parse(formMetadata.orNull),
+            PermissionsAuthorization.currentUserFromSession,
+            dataUser
+          )
+          if (! Operations.allows(authorizedOperations, Read))
+            throw HttpStatusCodeException(403)
+          httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
         }
 
         // Set form version header

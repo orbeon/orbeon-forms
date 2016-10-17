@@ -20,6 +20,8 @@ import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
+import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
@@ -258,7 +260,10 @@ trait CreateUpdateDelete
   def change(req: Request, delete: Boolean): Unit = {
 
     // Read before establishing a connection, so we don't use two simultaneous connections
-    val formPermissions = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form)).flatten
+    val formPermissions = {
+      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form)).flatten
+      PermissionsXML.parse(elOpt.orNull)
+    }
 
     RelationalUtils.withConnection { connection ⇒
 
@@ -282,16 +287,23 @@ trait CreateUpdateDelete
               // Check we're allowed to update or delete this resource
               val username      = existing.get.username
               val groupname     = existing.get.group
-
-              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, (username, groupname, None))
-              val requiredOp    = if (delete) "delete" else "update"
-              authorizedOps.contains(requiredOp)
+              val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                formPermissions,
+                PermissionsAuthorization.currentUserFromSession,
+                CheckWithDataUser(username, groupname, None)
+              )
+              val requiredOp    = if (delete) Delete else Update
+              Operations.allows(authorizedOps, requiredOp)
             } else {
               // For deletes, if there is no data to delete, it is a 403 if could not read, update,
               // or delete if it existed (otherwise code later will return a 404)
-              val authorizedOps = RelationalUtils.allAuthorizedOperations(formPermissions, (None, None, None))
-              val requiredOps   = if (delete) Set("read", "update", "delete") else Set("create")
-              authorizedOps.intersect(requiredOps).nonEmpty
+              val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                formPermissions,
+                PermissionsAuthorization.currentUserFromSession,
+                CheckWithoutDataUser(optimistic = false)
+              )
+              val requiredOps   = if (delete) List(Read, Update, Delete) else Set(Create)
+              requiredOps.exists(Operations.allows(authorizedOps, _))
             }
           } else {
             // Operations on deployed forms are always authorized

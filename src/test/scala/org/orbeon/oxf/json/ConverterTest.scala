@@ -22,7 +22,6 @@
  */
 package org.orbeon.oxf.json
 
-import org.junit.Test
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.NumberUtils._
 import org.orbeon.oxf.xml.TransformerUtils._
@@ -30,7 +29,7 @@ import org.orbeon.oxf.xml.{Dom4j, SAXStore, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.XML
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 import spray.json._
 
 import scala.language.postfixOps
@@ -169,34 +168,38 @@ object ConverterTest {
     Dom4j.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
 }
 
-class ConverterTest extends AssertionsForJUnit with XMLSupport {
+class ConverterTest extends FunSpecLike with XMLSupport {
 
   import ConverterTest._
   import org.orbeon.scaxon.XML.{Test ⇒ _, _}
 
-  @Test def testJsonToXml(): Unit = {
-    for ((json, xml) ← ExpectedJsonToXml) {
-      val store = new SAXStore
-      Converter.jsonStringToXmlStream(json, store)
-      val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
+  describe("Converting from JSON to XML") {
+    it ("must match expectations") {
+      for ((json, xml) ← ExpectedJsonToXml) {
+        val store = new SAXStore
+        Converter.jsonStringToXmlStream(json, store)
+        val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
 
-      assertXMLDocumentsIgnoreNamespacesInScope(elemToDom4j(xml), resultXML)
+        assertXMLDocumentsIgnoreNamespacesInScope(elemToDom4j(xml), resultXML)
+      }
     }
   }
 
-  @Test def testXmlToJson(): Unit = {
-    for {
-      strict      ← List(true, false)
-      (json, xml) ← ExpectedJsonToXml
-    } locally {
-      val expectedJson = json.parseJson
-      val actualJson   = Converter.xmlToJson(xml, strict = strict)
+  describe("Converting from XML to JSON") {
+    it ("must match expectations") {
+      for {
+        strict      ← List(true, false)
+        (json, xml) ← ExpectedJsonToXml
+      } locally {
+        val expectedJson = json.parseJson
+        val actualJson   = Converter.xmlToJson(xml, strict = strict)
 
-      assert(expectedJson === actualJson)
+        assert(expectedJson === actualJson)
+      }
     }
   }
 
-  @Test def testEscaping(): Unit = {
+  describe("Escaping of special characters") {
 
     val codePointsToEscape           = (0 to 0x1F) :+ 0x7F toArray
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
@@ -213,22 +216,28 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
     val firstElemName = firstElem attValueOpt "name" getOrElse firstElem.localname
     val firstValue    = firstElem.stringValue
 
-    assert("foo" + translatedString === firstElemName)
-    assert("bar" + translatedString === firstValue)
+    it ("must escape specified character ranges when going from JSON to XML") {
+      assert("foo" + translatedString === firstElemName)
+      assert("bar" + translatedString === firstValue)
+    }
 
     val backToJson = Converter.xmlToJson(xml, strict = true)
 
-    assert(json === backToJson)
+    it ("must roundtrip") {
+      assert(json === backToJson)
+    }
 
     // We'll get `MatchError` during deconstruction if types don't match and the test will fail
     val JsObject(fields) = backToJson
     val (name, JsString(value)) = fields.head
 
-    assert("bar" + stringWithCodePointsToEscape === value)
-    assert("foo" + stringWithCodePointsToEscape === name)
+    it ("must contain correct code points when parsing JSON") {
+      assert("bar" + stringWithCodePointsToEscape === value)
+      assert("foo" + stringWithCodePointsToEscape === name)
+    }
   }
 
-  @Test def testStrictAndLax(): Unit = {
+  describe("The `strict` parameter") {
 
     val xmlInputs = List(
       <json type="array">
@@ -257,16 +266,18 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
       </json>
     )
 
-    for (xml ← xmlInputs) {
-      intercept[IllegalArgumentException] {
-        Converter.xmlToJson(xml, strict = true)
-      }
+    it ("must fail with invalid XML input when set to `true` and pass when set to `false`") {
+      for (xml ← xmlInputs) {
+        intercept[IllegalArgumentException] {
+          Converter.xmlToJson(xml, strict = true)
+        }
 
-      Converter.xmlToJson(xml, strict = false)
+        Converter.xmlToJson(xml, strict = false)
+      }
     }
   }
 
-  @Test def testBlankValues(): Unit = {
+  describe("Support for blank values in XML") {
 
     val xmlInputs = List(
       """ ["red",null,true,{"foo":"bar"}] """ →
@@ -289,19 +300,21 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
         </json>
     )
 
-    for {
-      strict      ← List(true, false)
-      (json, xml) ← xmlInputs
-    } locally {
+    it ("must create JSON with `null`") {
+      for {
+        strict      ← List(true, false)
+        (json, xml) ← xmlInputs
+      } locally {
 
-      val expectedJson = json.parseJson
-      val actualJson   = Converter.xmlToJson(xml, strict = strict)
+        val expectedJson = json.parseJson
+        val actualJson   = Converter.xmlToJson(xml, strict = strict)
 
-      assert(expectedJson === actualJson)
+        assert(expectedJson === actualJson)
+      }
     }
   }
 
-  @Test def testAnyXML(): Unit = {
+  describe("Non-compliant XML input") {
 
     val xmlInputs = List(
       """ "504967 Quattordici lettere inedite di Pietro Mascagni NRMI, iv (1970) 1970 Italian 493-513" """ →
@@ -315,20 +328,23 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
         </book>
     )
 
-    for {
-      strict      ← List(true, false)
-      (json, xml) ← xmlInputs
-    } locally {
+    it ("must succeed and default to a concatenation of string values") {
 
-      def normalize(v: JsValue) = v match {
-        case JsString(s) ⇒ Whitespace.collapseWhitespace(s).toString
-        case other       ⇒ other
+      for {
+        strict      ← List(true, false)
+        (json, xml) ← xmlInputs
+      } locally {
+
+        def normalize(v: JsValue) = v match {
+          case JsString(s) ⇒ Whitespace.collapseWhitespace(s).toString
+          case other       ⇒ other
+        }
+
+        val expectedJson = normalize(json.parseJson)
+        val actualJson   = normalize(Converter.xmlToJson(xml, strict = strict))
+
+        assert(expectedJson === actualJson)
       }
-
-      val expectedJson = normalize(json.parseJson)
-      val actualJson   = normalize(Converter.xmlToJson(xml, strict = strict))
-
-      assert(expectedJson === actualJson)
     }
   }
 }

@@ -46,10 +46,10 @@ object LiferaySupport {
   }
 
   def getHttpServletRequest(req: PortletRequest): HttpServletRequest =
-    getHttpServletRequestMethod.invoke(req).asInstanceOf[HttpServletRequest]
+    getHttpServletRequestMethod.invoke(null, req).asInstanceOf[HttpServletRequest]
 
   def getUser(req: HttpServletRequest): UserFacade =
-    getUserMethod.invoke(req).asInstanceOf[UserFacade]
+    getUserMethod.invoke(null, req).asInstanceOf[UserFacade]
 
   // Facade types as structural types so that we get Java reflective calls with little boilerplate!
   // NOTE: Package private for tests.

@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.portlet
 
-import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
-import collection.JavaConverters._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.NetUtils
+import org.scalatest.FunSpec
 
-class WSRP2UtilsTest extends AssertionsForJUnit {
+import scala.collection.JavaConverters._
 
-  @Test def decodeQueryStringTest(): Unit = {
+class WSRP2UtilsTest extends FunSpec {
+
+  describe("The `decodeQueryStringPortlet()` function") {
 
     val expected = Seq(
       """filename=data.html&orbeon.path=/fr/service/import-export/serve&uuid=""" →
@@ -32,17 +32,20 @@ class WSRP2UtilsTest extends AssertionsForJUnit {
         Map("p1" → Seq("v11", "v12", ""),
           "p2" → Seq("v21", "", "v23"))
     )
-    
+
     def decode(s: String) = NetUtils.decodeQueryStringPortlet(s).asScala.mapValues(_.toList)
-    
-    for ((query, extracted) ← expected) {
-      // Test with both separators
-      assert(extracted === decode(query))
-      assert(extracted === decode(query.replaceAllLiterally("&", "&amp;")))
+
+    it ("must satisfy expectations") {
+      for ((query, extracted) ← expected) {
+        // Test with both separators
+        assert(extracted === decode(query))
+        assert(extracted === decode(query.replaceAllLiterally("&", "&amp;")))
+      }
     }
   }
 
-  @Test def moveResourceId(): Unit = {
+  describe("The `moveMagicResourceId()`") {
+
     val expected = Seq(
       // No magic, no p_p_resource_id
       "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=" →
@@ -61,7 +64,9 @@ class WSRP2UtilsTest extends AssertionsForJUnit {
         "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=other-resource-id&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js"
     )
 
-    for ((expected, initial) ← expected)
-      assert(expected === LiferayURL.moveMagicResourceId(initial))
+    it ("must satisfy expectations") {
+      for ((expected, initial) ← expected)
+        assert(expected === LiferayURL.moveMagicResourceId(initial))
+    }
   }
 }

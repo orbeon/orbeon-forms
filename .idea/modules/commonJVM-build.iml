@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="commonJVM-build" external.linked.project.path="$MODULE_DIR$/../../common/jvm/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="sbt._, Keys._, dsl._, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, $a7c173414073eec71c72.root, $a7c173414073eec71c72.core, $a7c173414073eec71c72.formBuilder, $a7c173414073eec71c72.formRunner, $a7c173414073eec71c72.dom, $a7c173414073eec71c72.xupdate, $a7c173414073eec71c72.formBuilderClient, $a7c173414073eec71c72.formBuilderSharedJS, $a7c173414073eec71c72.formBuilderSharedJVM, $a7c173414073eec71c72.commonJS, $a7c173414073eec71c72.commonJVM, $a7c173414073eec71c72.orbeonEditionFromProperties, $a7c173414073eec71c72.orbeonVersionFromProperties, $a7c173414073eec71c72.fullOptJSToExplodedWar, $a7c173414073eec71c72.fastOptJSToExplodedWar, $a7c173414073eec71c72.copyJarToExplodedWar" sbt.resolvers="https://jcenter.bintray.com/|maven|jcenter, https://repo1.maven.org/maven2/|maven|public, /Users/avernet/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="commonJVM-build" external.linked.project.path="$MODULE_DIR$/../../common/jvm/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="$679f639040e327f7ba28.commonJS, $679f639040e327f7ba28.commonJVM, $679f639040e327f7ba28.copyJarToExplodedWar, $679f639040e327f7ba28.core, $679f639040e327f7ba28.dom, $679f639040e327f7ba28.embedding, $679f639040e327f7ba28.fastOptJSToExplodedWar, $679f639040e327f7ba28.formBuilder, $679f639040e327f7ba28.formBuilderClient, $679f639040e327f7ba28.formBuilderSharedJS, $679f639040e327f7ba28.formBuilderSharedJVM, $679f639040e327f7ba28.formRunner, $679f639040e327f7ba28.formRunnerProxyPortlet, $679f639040e327f7ba28.fullOptJSToExplodedWar, $679f639040e327f7ba28.fullPortlet, $679f639040e327f7ba28.orbeonEditionFromProperties, $679f639040e327f7ba28.orbeonVersionFromProperties, $679f639040e327f7ba28.portletSupport, $679f639040e327f7ba28.root, $679f639040e327f7ba28.xupdate, _root_.com.orrsella.sbtsound.SbtSound._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.sbtbuildinfo.BuildInfoPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.sbtbuildinfo.BuildInfoPlugin, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /Users/ebruchez/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../common/jvm/project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../common/jvm/project/target/idea-test-classes" />
@@ -86,39 +86,7 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/org.scala-sbt/sbt/0.13.9/xsbti/interface-0.13.9.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../../sbt" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/actions/doc/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/apiinfo/basic/src/main/scala" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/apiinfo/show-circular-structure/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/compiler-project/semantic-errors/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/cache-resolver/changes/def" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/cache-resolver/changes/use" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/cached-resolution-classifier/a" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/cached-resolution-classifier/c" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/deliver-artifacts/a" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/deliver-artifacts/b" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/scala-tests-only/changes" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/test-artifact/changes/def" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/dependency-management/test-artifact/changes/use" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/analysis/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/basic/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/no-scala-tool" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/options/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/scala-library/src/main/java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/track-anonymous/changes" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/java/varargs-main" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/project/flatten/src" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/project/src-plugins/plugin" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/source-dependencies/canon/actual" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/source-dependencies/java-generic-workaround" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/source-dependencies/java-mixed" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/source-dependencies/java-static/changes" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/source-dependencies/less-inter-inv-java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/source-dependencies/transitive-inherit-java" />
-          <root url="file://$MODULE_DIR$/../../../sbt/sbt/src/sbt-test/tests/serial" />
-          <root url="file://$MODULE_DIR$/../../../sbt/testing/agent/src/main/java" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

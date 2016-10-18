@@ -18,10 +18,14 @@
       <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../common/jvm/target/scala-2.11/resource_managed/test" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../../common/jvm/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../common/jvm/target/resolution-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/../../common/jvm/target/streams" />
+      <excludeFolder url="file://$MODULE_DIR$/../../common/jvm/target/test-reports" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
+    <orderEntry type="module" module-name="common-sources" exported="" />
     <orderEntry type="module-library">
       <library name="SBT: unmanaged-jars">
         <CLASSES>
@@ -172,6 +176,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="common-sources" exported="" />
   </component>
 </module>

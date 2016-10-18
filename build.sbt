@@ -29,12 +29,7 @@ val orbeonEditionFromProperties   = settingKey[String]("Orbeon Forms edition fro
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
 orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 
-val PathsToExcludeFromCoreJAR = List(
-  "org/orbeon/oxf/servlet/OrbeonXFormsFilter",
-  "org/orbeon/oxf/portlet/OrbeonProxyPortlet",
-  "org/orbeon/oxf/fr/embedding/servlet/ServletFilter",
-  "org/orbeon/oxf/fr/embedding/servlet/API"
-)
+val PathsToExcludeFromCoreJAR = Nil
 
 val TestResourceManagerPaths = List(
   "src/test/resources",    // so that Java processor tests work
@@ -266,8 +261,40 @@ lazy val dom = (project in file("dom"))
     unmanagedBase in Test := baseDirectory.value / ".." / "lib"
   )
 
+lazy val embedding = (project in file("embedding"))
+  .dependsOn(core)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-embedding"
+  )
+  .settings(
+  )
+
+lazy val fullPortlet = (project in file("full-portlet"))
+  .dependsOn(portletSupport)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-proxy-portlet"
+  )
+  .settings(
+  )
+
+lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
+  .dependsOn(portletSupport)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-proxy-portlet"
+  )
+
+lazy val portletSupport = (project in file("portlet-support"))
+  .dependsOn(embedding)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-portlet-support"
+  )
+
 lazy val formRunner = (project in file("form-runner"))
-  .dependsOn(core % "test->test;compile->compile")
+  .dependsOn(portletSupport, core % "test->test;compile->compile")
   .configs(DatabaseTest, DebugTest)
   .settings(commonSettings: _*)
   .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
@@ -344,7 +371,7 @@ lazy val core = (project in file("src"))
   )
 
 lazy val root = (project in file("."))
-  .aggregate(commonJVM, commonJS, dom, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient)
+  .aggregate(commonJVM, commonJS, dom, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient, embedding, portletSupport, formRunnerProxyPortlet, fullPortlet)
   .settings(
 
     scalaVersion                       := ScalaVersion,

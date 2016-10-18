@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
-import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.XQuery.XQueryProcessor;
 import org.orbeon.oxf.processor.converter.JFreeChartConverter;
@@ -100,9 +99,9 @@ public class SchemaRepository {
         SCHEMAS.put(LDAPProcessor.LDAP_FILTER_NAMESPACE_URI, "schemas/ldap-filter.rng");
         SCHEMAS.put(SchedulerProcessor.SCHEDULER_CONFIG_NAMESPACE_URI, "schemas/scheduler-config.rng");
         SCHEMAS.put(ServletIncludeGenerator.SERVLET_INCLUDE_NAMESPACE_URI, "schemas/servlet-include-config.rng");
+
         // Portlet schemas
-        SCHEMAS.put(PortletPreferencesSerializer.PORTLET_PREFERENCES_SERIALIZER_DATA_NAMESPACE_URI,
-                PORTLET_PROCESSORS_SCHEMA_PATH + "portlet-preferences-serializer-data.rng");
+        SCHEMAS.put("http://orbeon.org/oxf/xml/portlet-preferences-serializer-data", PORTLET_PROCESSORS_SCHEMA_PATH + "portlet-preferences-serializer-data.rng");
 
         // XSLT schemas
         SCHEMAS.put(XSLTTransformer.XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/xslt-transformer-config.rng");

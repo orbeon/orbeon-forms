@@ -17,7 +17,7 @@ import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
-import org.orbeon.oxf.fr.embedding._
+import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL

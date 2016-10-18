@@ -2,7 +2,7 @@
 <module external.linked.project.id="formRunner" external.linked.project.path="$MODULE_DIR$/../../form-runner" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/classes" />
-    <output-test url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/test-classes" />
+    <output-test url="file://$MODULE_DIR$/../../form-runner/target/scala-2.11/db-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../form-runner">
       <sourceFolder url="file://$MODULE_DIR$/../../form-runner/src/main/java" isTestSource="false" />
@@ -33,7 +33,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.8:jar" level="project" />
-    <orderEntry type="module" module-name="core" exported="" />
     <orderEntry type="library" scope="TEST" name="SBT: com.novocode:junit-interface:0.11:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: junit:junit:4.11:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.hamcrest:hamcrest-core:1.3:jar" level="project" />
@@ -188,5 +187,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="core" exported="" />
+    <orderEntry type="module" module-name="portletSupport" exported="" />
   </component>
 </module>

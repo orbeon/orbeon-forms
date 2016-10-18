@@ -38,11 +38,15 @@
       <module name="commonSharedJVM" target="1.6" />
       <module name="core" target="1.6" />
       <module name="dom" target="1.6" />
+      <module name="embedding" target="1.6" />
       <module name="formBuilder" target="1.6" />
       <module name="formBuilderClient" target="1.6" />
       <module name="formBuilderSharedJS" target="1.6" />
       <module name="formBuilderSharedJVM" target="1.6" />
       <module name="formRunner" target="1.6" />
+      <module name="formRunnerProxyPortlet" target="1.6" />
+      <module name="fullPortlet" target="1.6" />
+      <module name="portletSupport" target="1.6" />
       <module name="root" target="1.6" />
       <module name="xupdate" target="1.6" />
     </bytecodeTargetLevel>

@@ -11,6 +11,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core-build.iml" filepath="$PROJECT_DIR$/.idea/modules/core-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom.iml" filepath="$PROJECT_DIR$/.idea/modules/dom.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dom-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dom-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding-build.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-builder-shared-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-builder-shared-sources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" />
@@ -22,6 +24,12 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderSharedJVM-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunner.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunner.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunner-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunner-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fullPortlet.iml" filepath="$PROJECT_DIR$/.idea/modules/fullPortlet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fullPortlet-build.iml" filepath="$PROJECT_DIR$/.idea/modules/fullPortlet-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/portletSupport.iml" filepath="$PROJECT_DIR$/.idea/modules/portletSupport.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/portletSupport-build.iml" filepath="$PROJECT_DIR$/.idea/modules/portletSupport-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root.iml" filepath="$PROJECT_DIR$/.idea/modules/root.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root-build.iml" filepath="$PROJECT_DIR$/.idea/modules/root-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xupdate.iml" filepath="$PROJECT_DIR$/.idea/modules/xupdate.iml" />

@@ -18,6 +18,9 @@
       <sourceFolder url="file://$MODULE_DIR$/../../dom/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../dom/target/scala-2.11/resource_managed/test" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../../dom/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../dom/target/resolution-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/../../dom/target/streams" />
+      <excludeFolder url="file://$MODULE_DIR$/../../dom/target/test-reports" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

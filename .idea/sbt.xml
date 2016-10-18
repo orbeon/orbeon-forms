@@ -3,9 +3,45 @@
   <component name="ScalaSbtSettings">
     <option name="linkedExternalProjectsSettings">
       <SbtProjectSettings>
-        <option name="createEmptyContentRootDirectories" value="true" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="jdk" value="1.7" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/common/js" />
+            <option value="$PROJECT_DIR$/common/js/project" />
+            <option value="$PROJECT_DIR$/common/jvm" />
+            <option value="$PROJECT_DIR$/common/jvm/project" />
+            <option value="$PROJECT_DIR$/common/shared" />
+            <option value="$PROJECT_DIR$/dom" />
+            <option value="$PROJECT_DIR$/dom/project" />
+            <option value="$PROJECT_DIR$/embedding" />
+            <option value="$PROJECT_DIR$/embedding/project" />
+            <option value="$PROJECT_DIR$/form-builder" />
+            <option value="$PROJECT_DIR$/form-builder-client" />
+            <option value="$PROJECT_DIR$/form-builder-client/project" />
+            <option value="$PROJECT_DIR$/form-builder-shared" />
+            <option value="$PROJECT_DIR$/form-builder-shared/.js" />
+            <option value="$PROJECT_DIR$/form-builder-shared/.js/project" />
+            <option value="$PROJECT_DIR$/form-builder-shared/.jvm" />
+            <option value="$PROJECT_DIR$/form-builder-shared/.jvm/project" />
+            <option value="$PROJECT_DIR$/form-builder/project" />
+            <option value="$PROJECT_DIR$/form-runner" />
+            <option value="$PROJECT_DIR$/form-runner/project" />
+            <option value="$PROJECT_DIR$/full-portlet" />
+            <option value="$PROJECT_DIR$/full-portlet/project" />
+            <option value="$PROJECT_DIR$/portlet-support" />
+            <option value="$PROJECT_DIR$/portlet-support/project" />
+            <option value="$PROJECT_DIR$/project" />
+            <option value="$PROJECT_DIR$/proxy-portlet" />
+            <option value="$PROJECT_DIR$/proxy-portlet/project" />
+            <option value="$PROJECT_DIR$/src" />
+            <option value="$PROJECT_DIR$/src/project" />
+            <option value="$PROJECT_DIR$/xupdate" />
+            <option value="$PROJECT_DIR$/xupdate/project" />
+          </set>
+        </option>
+        <option name="sbtVersion" value="0.13.9" />
         <option name="useAutoImport" value="true" />
         <option name="useOurOwnAutoImport" value="true" />
       </SbtProjectSettings>

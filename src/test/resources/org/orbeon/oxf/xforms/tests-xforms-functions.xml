@@ -2860,4 +2860,66 @@
         </output>
     </test>
 
+    <test description="#2942: XPath functions to convert between JSON and XML" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="results">
+                            <result/>
+                        </xf:instance>
+
+                        <xf:action
+                            event="xforms-model-construct-done"
+                            xmlns:ct="java:org.orbeon.oxf.json.ConverterTest">
+
+                            <xf:var name="json" value="ct:expectedJsonStrings()"/>
+                            <xf:var name="xml"  value="ct:expectedXmlStrings()"/>
+
+                            <xf:var name="size" value="count($json)"/>
+
+                            <xf:setvalue
+                                ref="instance()"
+                                value="
+                                    $size -
+                                    count(
+                                        (
+                                            for $i in 1 to $size
+                                            return
+                                                let $current-json := $json[$i],
+                                                    $current-xml  := $xml[$i]
+                                                return
+                                                    ct:compareXMLDocumentsIgnoreNamespacesInScope(
+                                                        xxf:json-to-xml($current-json),
+                                                        $current-xml
+                                                    )
+                                        )[. = true()]
+                                    )
+                                "/>
+
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="results" model-id="model">
+                                <result>0</result>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

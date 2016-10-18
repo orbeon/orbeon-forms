@@ -25,7 +25,9 @@ package org.orbeon.oxf.json
 import org.junit.Test
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.NumberUtils._
-import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils._
+import org.orbeon.oxf.xml.{Dom4j, SAXStore, TransformerUtils}
+import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.XML
 import org.scalatest.junit.AssertionsForJUnit
@@ -34,9 +36,9 @@ import spray.json._
 import scala.language.postfixOps
 import scala.xml.Elem
 
-class ConverterTest extends AssertionsForJUnit with XMLSupport {
+object ConverterTest {
 
-  import org.orbeon.scaxon.XML.{Test ⇒ _, _}
+  import XML._
 
   // Examples from the XForms 2.0 spec
   val XFormsJsonToXml = List[(String, Elem)](
@@ -160,6 +162,18 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
 
   val ExpectedJsonToXml = XFormsJsonToXml ++ AdditionalJsonToXml
 
+  /*@XPathFunctions*/ def expectedJsonStrings = ExpectedJsonToXml map (_._1)
+  /*@XPathFunctions*/ def expectedXmlStrings  = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
+
+  /*@XPathFunctions*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo) =
+    Dom4j.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
+}
+
+class ConverterTest extends AssertionsForJUnit with XMLSupport {
+
+  import ConverterTest._
+  import org.orbeon.scaxon.XML.{Test ⇒ _, _}
+
   @Test def testJsonToXml(): Unit = {
     for ((json, xml) ← ExpectedJsonToXml) {
       val store = new SAXStore
@@ -183,8 +197,6 @@ class ConverterTest extends AssertionsForJUnit with XMLSupport {
   }
 
   @Test def testEscaping(): Unit = {
-
-    import XML._
 
     val codePointsToEscape           = (0 to 0x1F) :+ 0x7F toArray
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)

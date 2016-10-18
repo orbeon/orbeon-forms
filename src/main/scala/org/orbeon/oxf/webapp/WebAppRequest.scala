@@ -24,9 +24,9 @@ trait WebAppRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]
 
-  def getUsername  : String = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername).orNull
-  def getUserGroup : String = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup).orNull
-  def getUserOrganization   = null
+  def getUsername        : String        = Headers.firstHeaderIgnoreCase   (headerValuesMap, Headers.OrbeonUsername).orNull
+  def getUserGroup       : String        = Headers.firstHeaderIgnoreCase   (headerValuesMap, Headers.OrbeonGroup).orNull
+  def getUserOrganization: Array[String] = Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonOrganization).getOrElse(Array.empty)
 
   lazy val getUserRoles: Array[UserRole] =
     Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles) match {

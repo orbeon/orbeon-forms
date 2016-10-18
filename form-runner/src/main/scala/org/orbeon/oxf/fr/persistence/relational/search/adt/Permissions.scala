@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.saxon.om.NodeInfo
 
 case class Permissions(
-    formPermissionsElOpt  : Option[NodeInfo],
-    authorizedBasedOnRole : Boolean,
-    authorizedIfUsername  : Option[String],
-    authorizedIfGroup     : Option[String]
+    formPermissionsElOpt          : Option[NodeInfo],
+    authorizedBasedOnRole         : Boolean,
+    authorizedIfOrganizationMatch : Option[Organization],
+    authorizedIfUsername          : Option[String],
+    authorizedIfGroup             : Option[String]
   )

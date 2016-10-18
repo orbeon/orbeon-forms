@@ -16,6 +16,8 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import java.sql.Timestamp
 
 import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.PermissionsCheck
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
@@ -33,13 +35,24 @@ trait SearchLogic extends SearchRequest {
   private def computePermissions(request: Request): Permissions = {
 
     val formPermissionsElOpt            = RelationalUtils.readFormPermissions(request.app, request.form)
-    val permissionsBasedOnRoles         = RelationalUtils.authorizedOperationsBasedOnRoles(formPermissionsElOpt)
-    val authorizedBasedOnRole           = SearchOperations.toSet.intersect(permissionsBasedOnRoles).nonEmpty
-    def hasPermissionCond(cond: String) = formPermissionsElOpt.exists(_.child("permission").child(cond).nonEmpty)
-    val authorizedIfUsername            = hasPermissionCond("owner")       .option(request.username).flatten
-    val authorizedIfGroup               = hasPermissionCond("group-member").option(request.group).flatten
+    val formPermissions                 = PermissionsXML.parse(formPermissionsElOpt.orNull)
+    val user                            = PermissionsAuthorization.currentUserFromSession
 
-    Permissions(formPermissionsElOpt, authorizedBasedOnRole, authorizedIfUsername, authorizedIfGroup)
+    def hasPermissionCond(cond: String): Boolean =
+      formPermissionsElOpt.exists(_.child("permission").child(cond).nonEmpty)
+    def authorizedIf(check: PermissionsCheck): Boolean = {
+      val authorized = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
+      Operations.allowsAny(authorized,Operations.All)
+    }
+
+    Permissions(
+      formPermissionsElOpt,
+      authorizedBasedOnRole         = authorizedIf(PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)),
+      authorizedIfOrganizationMatch = authorizedIf(PermissionsAuthorization.CheckAssumingOrganizationMatch)
+                                        .option(user.organization).flatten,
+      authorizedIfUsername          = hasPermissionCond("owner")       .option(request.username).flatten,
+      authorizedIfGroup             = hasPermissionCond("group-member").option(request.group).flatten
+    )
   }
 
   def doSearch(request: Request): (List[Document], Int) =  {

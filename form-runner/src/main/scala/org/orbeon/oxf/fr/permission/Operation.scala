@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.scalactic.Equality
-import org.scalactic.TripleEquals._
-
 sealed trait                                                        Operations
 case object AnyOperation                                    extends Operations
 case class  SpecificOperations(operations: List[Operation]) extends Operations
@@ -68,4 +65,6 @@ object Operations {
       case SpecificOperations(grantedOperations) ⇒ grantedOperations.contains(requested)
     }
 
+  def allowsAny(granted: Operations, mightHave: List[Operation]): Boolean =   mightHave.exists(  allows(granted, _))
+  def allowsAll(granted: Operations, mustHave : List[Operation]): Boolean = ! mustHave .exists(! allows(granted, _))
 }

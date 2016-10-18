@@ -309,8 +309,8 @@ trait CreateUpdateDelete
                 PermissionsAuthorization.currentUserFromSession,
                 CheckWithoutDataUser(optimistic = false)
               )
-              val requiredOps   = if (delete) List(Read, Update, Delete) else Set(Create)
-              requiredOps.exists(Operations.allows(authorizedOps, _))
+              val requiredOps   = if (delete) List(Read, Update, Delete) else List(Create)
+              Operations.allowsAny(authorizedOps, requiredOps)
             }
           } else {
             // Operations on deployed forms are always authorized

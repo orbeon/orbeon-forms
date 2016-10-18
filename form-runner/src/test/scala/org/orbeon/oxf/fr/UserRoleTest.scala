@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr
 
 import org.scalatest.FunSpec
 
-
 class UserRoleTest extends FunSpec {
 
   val TestRoles = List(

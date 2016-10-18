@@ -29,6 +29,16 @@ class FormRunnerPermissionsTest extends FunSpec {
   val juser    = guest.copy(username = Some("juser"))
   val jmanager = guest.copy(username = Some("jmanager"))
 
+  val clerkPermissions = DefinedPermissions(List(
+    Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(List(Read)))
+  ))
+  val clerkAndManagerPermissions = DefinedPermissions(List(
+    Permission(Nil                              , SpecificOperations(List(Create))),
+    Permission(List(Owner)                      , SpecificOperations(List(Read, Update))),
+    Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(List(Read))),
+    Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update)))
+  ))
+
   describe("The `authorizedOperationsBasedOnRoles()` function") {
 
     it("Returns all operations if the form has no permissions") {
@@ -45,12 +55,9 @@ class FormRunnerPermissionsTest extends FunSpec {
     }
 
     describe("With the 'clerk can read' permission") {
-      val clerkCanRead = DefinedPermissions(List(
-        Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(List(Read))))
-      )
       it("allows clerk to read") {
         val ops = authorizedOperations(
-          clerkCanRead,
+          clerkPermissions,
           juser.copy(roles = List(SimpleRole("clerk" ))),
           CheckWithoutDataUser(optimistic = false)
         )
@@ -58,7 +65,7 @@ class FormRunnerPermissionsTest extends FunSpec {
       }
       it("prevents a user with another role from reading") {
         val ops = authorizedOperations(
-          clerkCanRead,
+          clerkPermissions,
           juser.copy(roles = List(SimpleRole("other" ))),
           CheckWithoutDataUser(optimistic = false)
         )
@@ -69,20 +76,12 @@ class FormRunnerPermissionsTest extends FunSpec {
 
   describe("The `authorizedOperations()` function") {
 
-    // Pretty typical permissions defined in the form
-    val formPermissions = DefinedPermissions(List(
-      Permission(Nil                              , SpecificOperations(List(Create))),
-      Permission(List(Owner)                      , SpecificOperations(List(Read, Update))),
-      Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(List(Read))),
-      Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update)))
-    ))
-
     val guestOperations = SpecificOperations(List(Create))
     val fullOperations  = SpecificOperations(List(Create, Read, Update))
 
     it("lets anonymous users only create") {
       val ops = authorizedOperations(
-        formPermissions,
+        clerkAndManagerPermissions,
         juser,
         CheckWithDataUser(
           username     = None,
@@ -95,7 +94,7 @@ class FormRunnerPermissionsTest extends FunSpec {
 
     it("lets owners access their data") {
       val ops = authorizedOperations(
-        formPermissions,
+        clerkAndManagerPermissions,
         juser,
         CheckWithDataUser(
           username     = Some("juser"),
@@ -108,26 +107,60 @@ class FormRunnerPermissionsTest extends FunSpec {
 
     describe("Organization-based permissions") {
 
-      val dataUser = CheckWithDataUser(
-        username     = Some("juser"),
-        groupname    = None,
-        organization = Some(Organization(List("a", "b", "c")))
-      )
+      describe("With known user") {
 
-      val checks = List(
-        "lets direct manager access the data"                → ParametrizedRole("manager", "c") → fullOperations,
-        "lets manager of manager access the data"            → ParametrizedRole("manager", "b") → fullOperations,
-        "prevents unrelated manager from accessing the data" → ParametrizedRole("manager", "d") → guestOperations
-      )
+        val dataUser = CheckWithDataUser(
+          username     = Some("juser"),
+          groupname    = None,
+          organization = Some(Organization(List("a", "b", "c")))
+        )
 
-      for (((specText, roles), operations) ← checks) {
-        it(specText) {
-          val ops = authorizedOperations(
-            formPermissions,
-            jmanager.copy(roles = List(roles)),
-            dataUser
+        val checks = List(
+          "lets direct manager access the data"                → ParametrizedRole("manager", "c") → fullOperations,
+          "lets manager of manager access the data"            → ParametrizedRole("manager", "b") → fullOperations,
+          "prevents unrelated manager from accessing the data" → ParametrizedRole("manager", "d") → guestOperations
+        )
+
+        for (((specText, roles), operations) ← checks) {
+          it(specText) {
+            val ops = authorizedOperations(
+              clerkAndManagerPermissions,
+              jmanager.copy(roles = List(roles)),
+              dataUser
+            )
+            assert(ops === operations)
+          }
+        }
+      }
+
+      describe("Assuming organization match") {
+
+        it("grants access to a manager, whatever she manages") {
+          assert(
+            authorizedOperations(
+              permissions = clerkAndManagerPermissions,
+              currentUser = jmanager.copy(roles = List(ParametrizedRole("manager", "x"))),
+              CheckAssumingOrganizationMatch
+            ) === fullOperations
           )
-          assert(ops === operations)
+        }
+        it("doesn't grant access to a manager if the permissions don't grant any access to manager") {
+          assert(
+            authorizedOperations(
+              permissions = clerkPermissions,
+              currentUser = jmanager.copy(roles = List(ParametrizedRole("manager", "x"))),
+              CheckAssumingOrganizationMatch
+            ) === Operations.None
+          )
+        }
+        it("doesn't grant access to a user with a parameterized role other than manager") {
+          assert(
+            authorizedOperations(
+              permissions = clerkPermissions,
+              currentUser = jmanager.copy(roles = List(ParametrizedRole("chief", "x"))),
+              CheckAssumingOrganizationMatch
+            ) === Operations.None
+          )
         }
       }
     }

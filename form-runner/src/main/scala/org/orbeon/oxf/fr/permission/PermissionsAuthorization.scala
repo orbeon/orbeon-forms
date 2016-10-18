@@ -41,10 +41,11 @@ object PermissionsAuthorization {
     username     : Option[String],
     groupname    : Option[String],
     organization : Option[Organization]
-  ) extends PermissionsCheck
+  )                                          extends PermissionsCheck
   case class CheckWithoutDataUser(
     optimistic   : Boolean
-  ) extends PermissionsCheck
+  )                                          extends PermissionsCheck
+  case object CheckAssumingOrganizationMatch extends PermissionsCheck
 
   def authorizedOperations(
     permissions : Permissions,
@@ -83,6 +84,7 @@ object PermissionsAuthorization {
               case _ ⇒ false
             }
           case CheckWithoutDataUser(optimistic) ⇒ optimistic
+          case CheckAssumingOrganizationMatch   ⇒ false
         }
       case Group ⇒
         check match {
@@ -92,6 +94,7 @@ object PermissionsAuthorization {
               case _ ⇒ false
             }
           case CheckWithoutDataUser(optimistic) ⇒ optimistic
+          case CheckAssumingOrganizationMatch   ⇒ false
         }
       case RolesAnyOf(permissionRoles) ⇒
         permissionRoles.exists(permissionRoleName ⇒
@@ -105,6 +108,7 @@ object PermissionsAuthorization {
                     dataOrganizationOpt.exists(_.levels.contains(userOrganizationName))
                   case CheckWithoutDataUser(optimistic) ⇒
                     optimistic
+                  case CheckAssumingOrganizationMatch   ⇒ true
                 }
               )
           }

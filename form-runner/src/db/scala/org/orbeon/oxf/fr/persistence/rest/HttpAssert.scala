@@ -15,15 +15,25 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 
-import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.fr.permission.Operations.operationsEquality
+import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.scalactic.Equality
 
 private object HttpAssert extends XMLSupport {
+
+  implicit val operationsEquality = new Equality[Operations] {
+    def areEqual(left: Operations, right: Any): Boolean =
+      (left, right) match {
+        case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) ⇒
+          leftSpecific.to[Set] === rightSpecific.to[Set]
+        case _ ⇒
+          left === right
+      }
+  }
 
   sealed trait Expected
   case   class ExpectedBody(

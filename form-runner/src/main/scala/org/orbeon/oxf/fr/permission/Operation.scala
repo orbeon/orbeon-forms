@@ -28,16 +28,6 @@ case object Delete extends Operation { val name = "delete" }
 
 object Operations {
 
-  implicit val operationsEquality = new Equality[Operations] {
-    def areEqual(left: Operations, right: Any): Boolean =
-      (left, right) match {
-        case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) ⇒
-          leftSpecific.to[Set] === rightSpecific.to[Set]
-        case _ ⇒
-          left === right
-      }
-  }
-
   def All  = List(Create, Read, Update, Delete)
   def None = SpecificOperations(Nil)
 

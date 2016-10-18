@@ -26,7 +26,6 @@ import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xml.XMLUtils
@@ -147,7 +146,7 @@ object APISupport {
     if (isRedirectCode(cx.statusCode)) {
       // https://github.com/orbeon/orbeon-forms/issues/2967
       val location = cx.headers("Location").head
-      Redirect(location, exitPortal = NetUtils.urlHasProtocol(location))
+      Redirect(location, exitPortal = urlHasProtocol(location))
     } else
       cx.content
   }

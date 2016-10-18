@@ -26,6 +26,7 @@ import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.NetUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xml.XMLUtils
@@ -143,10 +144,11 @@ object APISupport {
     Logger.debug("proxying page {}", requestDetails.url)
 
     val cx = connectURL(requestDetails)
-    if (isRedirectCode(cx.statusCode))
-      // TODO: Check `exitPortal` which was `true` before #2513. Do we need a way to discriminate?
-      Redirect(cx.headers("Location").head, exitPortal = false)
-    else
+    if (isRedirectCode(cx.statusCode)) {
+      // https://github.com/orbeon/orbeon-forms/issues/2967
+      val location = cx.headers("Location").head
+      Redirect(location, exitPortal = NetUtils.urlHasProtocol(location))
+    } else
       cx.content
   }
 

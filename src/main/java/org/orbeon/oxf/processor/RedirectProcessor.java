@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -36,7 +37,7 @@ public class RedirectProcessor extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read the data stream entirely
-            final Node node = readCacheInputAsDOM4J(context, INPUT_DATA);
+            final Document node = readCacheInputAsDOM4J(context, INPUT_DATA);
 
             // Is this a server-side redirect?
             final String serverSideString = XPathUtils.selectStringValueNormalize(node, "redirect-url/server-side");
@@ -45,6 +46,9 @@ public class RedirectProcessor extends ProcessorImpl {
             // Is this going to exit the portal, if any?
             final String exitPortalString = XPathUtils.selectStringValueNormalize(node, "redirect-url/exit-portal");
             final boolean isExitPortal = "true".equals(exitPortalString);
+
+            final String rewriteString = XPathUtils.selectStringValueNormalize(node, "redirect-url/rewrite");
+            final boolean isRewrite = ! "false".equals(rewriteString);
 
             // Build parameters
             final String path = XPathUtils.selectStringValueNormalize(node, "normalize-space(redirect-url/path-info)");
@@ -68,7 +72,7 @@ public class RedirectProcessor extends ProcessorImpl {
             final ExternalContext.Response response = externalContext.getResponse();
 
             // Don't rewrite the path if doing a server-side redirect, because the forward expects a URL without the servlet context
-            final String pathMaybeRewritten = isServerSide ? path : response.rewriteRenderURL(path);
+            final String pathMaybeRewritten = (! isRewrite || isServerSide) ? path : response.rewriteRenderURL(path);
             response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(pathMaybeRewritten, parameters), isServerSide, isExitPortal);
         } catch (Exception e) {
             throw new OXFException(e);

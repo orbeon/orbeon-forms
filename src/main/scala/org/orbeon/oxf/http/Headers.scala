@@ -19,33 +19,35 @@ import scala.collection.breakOut
 
 object Headers {
 
-  val OrbeonToken         = "Orbeon-Token"
-  val OrbeonUsername      = "Orbeon-Username"
-  val OrbeonGroup         = "Orbeon-Group"
-  val OrbeonRoles         = "Orbeon-Roles"
+  val OrbeonToken             = "Orbeon-Token"
+  val OrbeonUsername          = "Orbeon-Username"
+  val OrbeonGroup             = "Orbeon-Group"
+  val OrbeonRoles             = "Orbeon-Roles"
+  val OrbeonOrganization      = "Orbeon-Organization"
 
-  val OrbeonRemoteAddress = "Orbeon-Remote-Address"
+  val OrbeonRemoteAddress     = "Orbeon-Remote-Address"
 
-  val ContentType         = "Content-Type"
-  val ContentLength       = "Content-Length"
-  val LastModified        = "Last-Modified"
-  val Authorization       = "Authorization"
-  val Location            = "Location"
-  val OrbeonClient        = "Orbeon-Client"
+  val ContentType             = "Content-Type"
+  val ContentLength           = "Content-Length"
+  val LastModified            = "Last-Modified"
+  val Authorization           = "Authorization"
+  val Location                = "Location"
+  val OrbeonClient            = "Orbeon-Client"
 
-  val OrbeonTokenLower    = OrbeonToken.toLowerCase
-  val OrbeonUsernameLower = OrbeonUsername.toLowerCase
-  val OrbeonGroupLower    = OrbeonGroup.toLowerCase
-  val OrbeonRolesLower    = OrbeonRoles.toLowerCase
+  val OrbeonTokenLower        = OrbeonToken.toLowerCase
+  val OrbeonUsernameLower     = OrbeonUsername.toLowerCase
+  val OrbeonGroupLower        = OrbeonGroup.toLowerCase
+  val OrbeonRolesLower        = OrbeonRoles.toLowerCase
+  val OrbeonOrganizationLower = OrbeonOrganization.toLowerCase
 
-  val ContentTypeLower    = ContentType.toLowerCase
-  val ContentLengthLower  = ContentLength.toLowerCase
-  val LastModifiedLower   = LastModified.toLowerCase
-  val AuthorizationLower  = Authorization.toLowerCase
-  val LocationLower       = Location.toLowerCase
-  val OrbeonClientLower   = OrbeonClient.toLowerCase
+  val ContentTypeLower        = ContentType.toLowerCase
+  val ContentLengthLower      = ContentLength.toLowerCase
+  val LastModifiedLower       = LastModified.toLowerCase
+  val AuthorizationLower      = Authorization.toLowerCase
+  val LocationLower           = Location.toLowerCase
+  val OrbeonClientLower       = OrbeonClient.toLowerCase
 
-  val EmbeddedClientValues = Set("embedded", "portlet")
+  val EmbeddedClientValues    = Set("embedded", "portlet")
 
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //

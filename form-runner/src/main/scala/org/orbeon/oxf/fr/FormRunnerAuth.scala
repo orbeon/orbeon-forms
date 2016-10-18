@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
@@ -31,7 +32,7 @@ object FormRunnerAuth {
 
   import Private._
 
-  type UserGroupRoles = (Option[String], Option[String], Option[Array[String]])
+  type UserGroupRoles = (Option[String], Option[String], Option[Array[String]], Option[Array[String]])
 
   // Get the username, group and roles from the request, based on the Form Runner configuration.
   // The first time this is called, the result is stored into the required session. The subsequent times,
@@ -46,10 +47,10 @@ object FormRunnerAuth {
     getHeader  : String ⇒ Option[Array[String]]
   ): UserGroupRoles =
     Option(session.getAttribute(UserGroupRolesSessionKey).asInstanceOf[UserGroupRoles]) match {
-      case Some(sessionUserGroupRoles) ⇒
-        sessionUserGroupRoles
+      case Some(sessionUserGroupRolesOrganization) ⇒
+        sessionUserGroupRolesOrganization
       case None ⇒
-        val newSessionUserGroupRoles @ (usernameOpt, _, _) = getUserGroupRoles(userRoles, getHeader)
+        val newSessionUserGroupRoles @ (usernameOpt, _, _, _) = getUserGroupRoles(userRoles, getHeader)
 
         // Only store the information into the session if we get a user. This handles the case of the initial
         // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
@@ -65,12 +66,13 @@ object FormRunnerAuth {
     getHeader  : String ⇒ Option[Array[String]]
   ): List[(String, Array[String])] = {
 
-    val (usernameOpt, groupOpt, rolesOpt) = getUserGroupRolesUseSession(userRoles, session, getHeader)
+    val (usernameOpt, groupOpt, rolesOpt, organizationOpt) = getUserGroupRolesUseSession(userRoles, session, getHeader)
 
     def headersAsList =
-      (usernameOpt.toList map (Headers.OrbeonUsernameLower → Array(_))) :::
-      (groupOpt.toList    map (Headers.OrbeonGroupLower    → Array(_))) :::
-      (rolesOpt.toList    map (Headers.OrbeonRolesLower    →))
+      (usernameOpt.toList     map (Headers.OrbeonUsernameLower     → Array(_))) :::
+      (groupOpt.toList        map (Headers.OrbeonGroupLower        → Array(_))) :::
+      (rolesOpt.toList        map (Headers.OrbeonRolesLower        → _       )) :::
+      (organizationOpt.toList map (Headers.OrbeonOrganizationLower → _       ))
 
     usernameOpt match {
       case Some(username) ⇒
@@ -101,6 +103,7 @@ object FormRunnerAuth {
     val HeaderRolesSplitPropertyName        = PropertyPrefix + "header.roles.split"
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
+    val HeaderOrganizationPropertyName      = PropertyPrefix + "header.organization"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
@@ -131,7 +134,8 @@ object FormRunnerAuth {
     def getUserGroupRoles(
       userRoles : UserRoles,
       getHeader : String ⇒ Option[Array[String]]
-    ) = {
+    ): UserGroupRoles = {
+
       val propertySet = properties
       propertySet.getString(MethodPropertyName, "container") match {
 
@@ -142,7 +146,7 @@ object FormRunnerAuth {
 
           rolesStringOpt match {
             case None ⇒
-              (usernameOpt, None, None)
+              (usernameOpt, None, None, None)
             case Some(rolesString) ⇒
 
               // Wrap exceptions as Liferay throws if the role is not available instead of returning false
@@ -165,7 +169,7 @@ object FormRunnerAuth {
                 case array   ⇒ Some(array)
               }
 
-              (usernameOpt, rolesArray.headOption, roles)
+              (usernameOpt, rolesArray.headOption, roles, None)
           }
 
         case "header" ⇒
@@ -197,7 +201,9 @@ object FormRunnerAuth {
           // See also: https://github.com/orbeon/orbeon-forms/issues/1690
           val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
 
-          (username, group, roles)
+          val organization = headerOption(HeaderOrganizationPropertyName)
+
+          (username, group, roles, organization)
 
         case other ⇒
           throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")

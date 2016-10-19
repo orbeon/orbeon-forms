@@ -145,6 +145,7 @@ trait Reindex extends FormDefinition {
            |         d.last_modified_by,
            |         d.username,
            |         d.groupname,
+           |         d.organization_id,
            |         d.app,
            |         d.form,
            |         d.form_version,
@@ -202,12 +203,13 @@ trait Reindex extends FormDefinition {
               |            last_modified_by,
               |            username,
               |            groupname,
+              |            organization_id,
               |            app,
               |            form,
               |            form_version,
               |            document_id,
               |            draft)
-              |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.stripMargin)
           .kestrel(_.setInt      (position.next(), currentData.getInt("id")))
           .kestrel(_.setTimestamp(position.next(), currentData.getTimestamp("created")))
@@ -215,6 +217,7 @@ trait Reindex extends FormDefinition {
           .kestrel(_.setString   (position.next(), currentData.getString("last_modified_by")))
           .kestrel(_.setString   (position.next(), currentData.getString("username")))
           .kestrel(_.setString   (position.next(), currentData.getString("groupname")))
+          .kestrel(_.setInt      (position.next(), currentData.getInt("organization_id")))
           .kestrel(_.setString   (position.next(), app))
           .kestrel(_.setString   (position.next(), form))
           .kestrel(_.setInt      (position.next(), currentData.getInt("form_version")))

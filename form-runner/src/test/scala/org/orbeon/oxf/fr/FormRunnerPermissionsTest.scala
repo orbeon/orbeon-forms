@@ -19,14 +19,16 @@ import org.scalatest.FunSpec
 
 class FormRunnerPermissionsTest extends FunSpec {
 
-  val guest = CurrentUser(
-      username     = Some("juser"),
-      groupname    = None,
+  val guest =
+    Credentials(
+      username     = "juser",
+      group        = None,
       organization = None,
       roles        = Nil
     )
-  val juser    = guest.copy(username = Some("juser"))
-  val jmanager = guest.copy(username = Some("jmanager"))
+
+  val juser    = guest.copy(username = "juser")
+  val jmanager = guest.copy(username = "jmanager")
 
   val clerkPermissions = DefinedPermissions(List(
     Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(List(Read)))
@@ -45,7 +47,7 @@ class FormRunnerPermissionsTest extends FunSpec {
         val user = juser.copy(roles = userRoles)
         val ops  = authorizedOperations(
           UndefinedPermissions,
-          user,
+          Some(user),
           CheckWithoutDataUser(optimistic = false)
         )
         assert(ops === SpecificOperations(Operations.All))
@@ -57,7 +59,7 @@ class FormRunnerPermissionsTest extends FunSpec {
       it("allows clerk to read") {
         val ops = authorizedOperations(
           clerkPermissions,
-          juser.copy(roles = List(SimpleRole("clerk" ))),
+          Some(juser.copy(roles = List(SimpleRole("clerk" )))),
           CheckWithoutDataUser(optimistic = false)
         )
         assert(ops === SpecificOperations(List(Read)))
@@ -65,7 +67,7 @@ class FormRunnerPermissionsTest extends FunSpec {
       it("prevents a user with another role from reading") {
         val ops = authorizedOperations(
           clerkPermissions,
-          juser.copy(roles = List(SimpleRole("other" ))),
+          Some(juser.copy(roles = List(SimpleRole("other" )))),
           CheckWithoutDataUser(optimistic = false)
         )
         assert(ops === Operations.None)
@@ -81,7 +83,7 @@ class FormRunnerPermissionsTest extends FunSpec {
     it("lets anonymous users only create") {
       val ops = authorizedOperations(
         clerkAndManagerPermissions,
-        juser,
+        Some(juser),
         CheckWithDataUser(
           username     = None,
           groupname    = None,
@@ -94,7 +96,7 @@ class FormRunnerPermissionsTest extends FunSpec {
     it("lets owners access their data") {
       val ops = authorizedOperations(
         clerkAndManagerPermissions,
-        juser,
+        Some(juser),
         CheckWithDataUser(
           username     = Some("juser"),
           groupname    = None,
@@ -124,7 +126,7 @@ class FormRunnerPermissionsTest extends FunSpec {
           it(specText) {
             val ops = authorizedOperations(
               clerkAndManagerPermissions,
-              jmanager.copy(roles = List(roles)),
+              Some(jmanager.copy(roles = List(roles))),
               dataUser
             )
             assert(ops === operations)
@@ -138,7 +140,7 @@ class FormRunnerPermissionsTest extends FunSpec {
           assert(
             authorizedOperations(
               permissions = clerkAndManagerPermissions,
-              currentUser = jmanager.copy(roles = List(ParametrizedRole("manager", "x"))),
+              currentUser = Some(jmanager.copy(roles = List(ParametrizedRole("manager", "x")))),
               CheckAssumingOrganizationMatch
             ) === fullOperations
           )
@@ -147,7 +149,7 @@ class FormRunnerPermissionsTest extends FunSpec {
           assert(
             authorizedOperations(
               permissions = clerkPermissions,
-              currentUser = jmanager.copy(roles = List(ParametrizedRole("manager", "x"))),
+              currentUser = Some(jmanager.copy(roles = List(ParametrizedRole("manager", "x")))),
               CheckAssumingOrganizationMatch
             ) === Operations.None
           )
@@ -156,7 +158,7 @@ class FormRunnerPermissionsTest extends FunSpec {
           assert(
             authorizedOperations(
               permissions = clerkPermissions,
-              currentUser = jmanager.copy(roles = List(ParametrizedRole("chief", "x"))),
+              currentUser = Some(jmanager.copy(roles = List(ParametrizedRole("chief", "x")))),
               CheckAssumingOrganizationMatch
             ) === Operations.None
           )

@@ -85,19 +85,19 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
 // xxf:username()  as xs:string? and xxf:get-remote-user() as xs:string?
 class XXFormsUsername extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    Option(NetUtils.getExternalContext.getRequest.getUsername)
+    NetUtils.getExternalContext.getRequest.credentials map (_.username)
 }
 
 // xxf:user-group() as xs:string?
 class XXFormsUserGroup extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    Option(NetUtils.getExternalContext.getRequest.getUserGroup)
+    NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)
 }
 
 // xxf:user-roles() as xs:string*
 class XXFormsUserRoles extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(NetUtils.getExternalContext.getRequest.getUserRoles.map(_.roleName))
+    asIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.roles map (_.roleName)))
 }
 
 // xxf:is-user-in-role(xs:string) as xs:boolean

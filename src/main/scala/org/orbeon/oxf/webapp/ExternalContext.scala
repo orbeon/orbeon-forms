@@ -18,7 +18,9 @@ import java.security.Principal
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.fr.{Organization, UserRole}
+import org.orbeon.oxf.fr.Credentials
+
+import scala.collection.JavaConverters._
 
 /**
   * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
@@ -70,11 +72,11 @@ object ExternalContext {
     def getAuthType: String
     def isSecure: Boolean
 
-    // TODO: Consider using a class such as `HttpRequest.Credentials`
-    def getUsername: String
-    def getUserGroup: String
-    def getUserRoles: Array[UserRole] // TODO: Don't use `Array`
-    def getUserOrganization: Option[Organization]
+    def credentials: Option[Credentials]
+
+    // For Java callers
+    def getUsername: String = credentials map (_.username) orNull
+
     def isUserInRole(role: String): Boolean
     def getUserPrincipal: Principal // TODO: any use of this?
 
@@ -90,6 +92,11 @@ object ExternalContext {
     def getWindowState: String
 
     def getNativeRequest: Any
+
+    // TODO: return immutable.Map[String, List[AnyRef]] → what about AnyRef?
+    def parameters: collection.Map[String, Array[AnyRef]] = getParameterMap.asScala
+    def getFirstParamAsString(name: String)               = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
+    def getFirstHeader(name: String)                      = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
   }
 
   trait Rewriter extends URLRewriter {

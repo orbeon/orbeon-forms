@@ -16,8 +16,16 @@ package org.orbeon.oxf.fr
 import org.parboiled.errors.ParsingException
 import org.parboiled.scala._
 
-// An organization is a list of level, with the root-level first, leaf-level last
-case class Organization(levels: List[String])
+case class Credentials(
+  username     : String,
+  group        : Option[String],
+  roles        : List[UserRole],
+  organization : Option[Organization]
+)
+
+case class Organization(
+  levels       : List[String] // list of levels, with the root-level first, leaf-level last
+)
 
 sealed trait UserRole   { def roleName: String }
 case class   SimpleRole      (roleName: String)                           extends UserRole

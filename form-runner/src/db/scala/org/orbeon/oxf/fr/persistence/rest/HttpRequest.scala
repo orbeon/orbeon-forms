@@ -17,8 +17,8 @@ import java.io.ByteArrayOutputStream
 
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.fr.{Organization, UserRole}
-import org.orbeon.oxf.http.{PUT, _}
+import org.orbeon.oxf.fr.Credentials
+import org.orbeon.oxf.http.{Credentials ⇒ _, _}
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util._
@@ -29,13 +29,6 @@ import scala.util.Try
 private object HttpRequest {
 
   private val PersistenceBase = "/fr/service/persistence/"
-
-  case class Credentials(
-    username     : String,
-    roles        : List[UserRole],
-    group        : Option[String],
-    organization : Option[Organization]
-  )
 
   sealed trait Body
   case class XML   (doc : Document   ) extends Body
@@ -92,10 +85,7 @@ private object HttpRequest {
         method       = method,
         headers      = headers,
         content      = content,
-        username     = credentials.map(_.username),
-        group        = credentials.flatMap(_.group),
-        roles        = credentials.map(_.roles.toList).getOrElse(Nil),
-        organization = credentials.flatMap(_.organization)
+        credentials  = credentials
       )
 
     new ClosableHttpResponse(httpResponse)

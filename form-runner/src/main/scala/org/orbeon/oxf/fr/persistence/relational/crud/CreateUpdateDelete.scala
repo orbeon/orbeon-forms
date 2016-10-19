@@ -190,7 +190,7 @@ trait CreateUpdateDelete
   }
 
   private def currentUserOrganization(connection: Connection, req: Request): Option[OrganizationId] =
-    httpRequest.getUserOrganization.map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
+    httpRequest.credentials.flatMap(_.organization).map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 

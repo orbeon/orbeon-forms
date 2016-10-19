@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
@@ -58,13 +58,7 @@ trait FormRunnerPermissionsOps {
    */
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
-    currentUser         : PermissionsAuthorization.CurrentUser =
-      PermissionsAuthorization.CurrentUser(
-        username     = Option(request.getUsername),
-        groupname    = Option(request.getUserGroup),
-        organization = request.getUserOrganization,
-        roles        = request.getUserRoles.to[List]
-      )
+    currentUser         : Option[Credentials] = NetUtils.getExternalContext.getRequest.credentials
   ): List[String] = {
     val permissions = PermissionsXML.parse(permissionsElOrNull)
     val operations  = PermissionsAuthorization.authorizedOperations(
@@ -83,7 +77,7 @@ trait FormRunnerPermissionsOps {
     // TODO: take additional organization parameter
   ): Seq[String] = {
     val permissions = PermissionsXML.parse(permissionsElement)
-    val user        = PermissionsAuthorization.currentUserFromSession
+    val user        = NetUtils.getExternalContext.getRequest.credentials
     val check       = CheckWithDataUser(Option(dataUsername), Option(dataGroupname), None)
     Operations.serialize(PermissionsAuthorization.authorizedOperations(permissions, user, check))
   }
@@ -95,17 +89,14 @@ trait FormRunnerPermissionsOps {
     dataUsername        : Option[String],
     dataGroupname       : Option[String],
     dataOrganization    : Option[Organization],
-    currentUsername     : Option[String]       = Option(request.getUsername),
-    currentGroupname    : Option[String]       = Option(request.getUserGroup),
-    currentOrganization : Option[Organization] = request.getUserOrganization,
-    currentRoles        : List[UserRole]       = request.getUserRoles.to[List]
+    currentUser         : Option[Credentials] = NetUtils.getExternalContext.getRequest.credentials
   ): List[String] = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
     require(dataUsername  ne null)
     require(dataGroupname ne null)
-    require(!dataUsername .contains(""))
-    require(!dataGroupname.contains(""))
+    require(! dataUsername .contains(""))
+    require(! dataGroupname.contains(""))
 
     def ownerGroupMemberOperations(
       maybeCurrentUsernameOrGroupname : Option[String],
@@ -123,10 +114,9 @@ trait FormRunnerPermissionsOps {
     }
 
     allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions ⇒
-      val rolesOperations       = authorizedOperationsBasedOnRoles(permissionsElOrNull, CurrentUser(
-        currentUsername, currentGroupname, currentOrganization, currentRoles))
-      val ownerOperations       = ownerGroupMemberOperations(currentUsername , dataUsername,  "owner")
-      val groupMemberOperations = ownerGroupMemberOperations(currentGroupname, dataGroupname, "group-member")
+      val rolesOperations       = authorizedOperationsBasedOnRoles(permissionsElOrNull, currentUser)
+      val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.username), dataUsername,  "owner")
+      val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.group),    dataGroupname, "group-member")
       (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }
@@ -155,7 +145,11 @@ trait FormRunnerPermissionsOps {
     // We only need one wrapper; create it when we encounter the first <form>
     var wrapperOpt: Option[DocumentWrapper] = None
 
-    val fbPermissions = FormRunner.formBuilderPermissions(FormRunner.formBuilderPermissionsConfiguration, orbeonRoles)
+    val fbPermissions =
+      FormRunner.formBuilderPermissions(
+        FormRunner.formBuilderPermissionsConfiguration,
+        orbeonRolesFromCurrentRequest
+      )
 
     formsEls.flatMap { formEl ⇒
 
@@ -207,12 +201,10 @@ trait FormRunnerPermissionsOps {
     }
   }
 
-  def request = NetUtils.getExternalContext.getRequest
-
-  def orbeonRoles: Set[String] =
-    NetUtils.getExternalContext.getRequest.getUserRoles.to[Set].map(_.roleName)
+  def orbeonRolesFromCurrentRequest: Set[String] =
+    NetUtils.getExternalContext.getRequest.credentials.to[List].flatMap(_.roles).map(_.roleName).to[Set]
 
   //@XPathFunction
-  def orbeonRolesSequence: SequenceIterator =
-    orbeonRoles.iterator
+  def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =
+    orbeonRolesFromCurrentRequest.iterator
 }

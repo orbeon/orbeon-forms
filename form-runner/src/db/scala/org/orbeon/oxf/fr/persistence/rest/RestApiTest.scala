@@ -20,7 +20,7 @@ import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
-import org.orbeon.oxf.fr.{Organization, ParametrizedRole, SimpleRole}
+import org.orbeon.oxf.fr.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
@@ -195,9 +195,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val formURL = crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>
       val guest   = None
-      val clerk   = Some(HttpRequest.Credentials("tom", List(SimpleRole("clerk"  )), Some("clerk")  , None))
-      val manager = Some(HttpRequest.Credentials("jim", List(SimpleRole("manager")), Some("manager"), None))
-      val admin   = Some(HttpRequest.Credentials("tim", List(SimpleRole("admin"  )), Some("admin")  , None))
+      val clerk   = Some(Credentials("tom", Some("clerk")  , List(SimpleRole("clerk"  )), None))
+      val manager = Some(Credentials("jim", Some("manager"), List(SimpleRole("manager")), None))
+      val admin   = Some(Credentials("tim", Some("admin")  , List(SimpleRole("admin"  )), None))
 
       {
         val DataURL = crudURLPrefix(provider) + "data/123/data.xml"
@@ -260,11 +260,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val formURL   = crudURLPrefix(provider) + "form/form.xhtml"
 
       // Users
-      val c1User   = Some(HttpRequest.Credentials("c1User"  , Nil, None, Some(Organization(List("a", "b", "c")))))
-      val c2User   = Some(HttpRequest.Credentials("c2User"  , Nil, None, Some(Organization(List("a", "b", "c")))))
-      val cManager = Some(HttpRequest.Credentials("cManager", List(ParametrizedRole("manager", "c")), None, None))
-      val bManager = Some(HttpRequest.Credentials("cManager", List(ParametrizedRole("manager", "b")), None, None))
-      val dManager = Some(HttpRequest.Credentials("cManager", List(ParametrizedRole("manager", "d")), None, None))
+      val c1User   = Some(Credentials("c1User"  , None, Nil, Some(Organization(List("a", "b", "c")))))
+      val c2User   = Some(Credentials("c2User"  , None, Nil, Some(Organization(List("a", "b", "c")))))
+      val cManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "c")), None))
+      val bManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "b")), None))
+      val dManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "d")), None))
 
       val dataURL   = crudURLPrefix(provider) + "data/123/data.xml"
       val dataBody  = HttpRequest.XML(<gaga/>)

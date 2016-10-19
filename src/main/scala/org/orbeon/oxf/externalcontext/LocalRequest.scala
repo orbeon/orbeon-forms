@@ -52,10 +52,9 @@ class LocalRequest(
 
     def userGroupRoleHeadersIterator =
       Iterator(
-        Option(incomingRequest.getUsername)                                        .map (Headers.OrbeonUsernameLower     → List(_)),
-        Option(incomingRequest.getUserGroup)                                       .map (Headers.OrbeonGroupLower        → List(_)),
-        Option(incomingRequest.getUserRoles).map(_.to[List].map(UserRole.serialize).pipe(Headers.OrbeonRolesLower        → _)),
-        Option(incomingRequest.getUserOrganization).map(_.to[List])                .map (Headers.OrbeonOrganizationLower → _)
+        incomingRequest.credentials map     (_.username)                            map (Headers.OrbeonUsernameLower → List(_)),
+        incomingRequest.credentials flatMap (_.group)                               map (Headers.OrbeonGroupLower    → List(_)),
+        incomingRequest.credentials map     (_.roles map UserRole.serialize)        map (Headers.OrbeonRolesLower    → _)
       ).flatten
 
     def bodyHeadersIterator =
@@ -214,10 +213,7 @@ class LocalRequest(
   def getRequestedSessionId                   = incomingRequest.getRequestedSessionId
 
   // User information is preserved
-  def getUsername                             = incomingRequest.getUsername
-  def getUserRoles                            = incomingRequest.getUserRoles
-  def getUserGroup                            = incomingRequest.getUserGroup
-  def getUserOrganization                     = incomingRequest.getUserOrganization
+  def credentials                             = incomingRequest.credentials
   def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
 
   def getUserPrincipal                        = incomingRequest.getUserPrincipal

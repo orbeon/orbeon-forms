@@ -19,7 +19,6 @@ import javax.sql.DataSource
 
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}

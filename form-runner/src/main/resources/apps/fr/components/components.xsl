@@ -490,7 +490,7 @@
 
             <!-- Variable exposing all the user roles -->
 
-            <xf:var name="fr-roles" value="frf:orbeonRolesSequence()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
+            <xf:var name="fr-roles" value="frf:xpathOrbeonRolesFromCurrentRequest()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
 
             <!-- Variable exposing the form app/form/mode -->
             <!-- NOTE: This is no longer the preferred way now that we have `fr:` functions. -->

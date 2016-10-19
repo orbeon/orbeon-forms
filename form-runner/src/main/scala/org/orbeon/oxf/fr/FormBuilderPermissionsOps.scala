@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.FormRunner.orbeonRoles
+import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -45,7 +45,7 @@ trait FormBuilderPermissionsOps {
 
   //@XPathFunction
   def formBuilderPermissionsForCurrentUserXPath(configurationOpt: Option[NodeInfo]) =
-    formBuilderPermissionsForCurrentUserAsXML(configurationOpt, orbeonRoles)
+    formBuilderPermissionsForCurrentUserAsXML(configurationOpt, orbeonRolesFromCurrentRequest)
 
   // Result document contains a tree structure of apps and forms if roles are configured
   // NOTE: The result is sorted by app name first, then form name.

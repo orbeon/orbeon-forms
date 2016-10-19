@@ -17,7 +17,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
-import org.orbeon.oxf.fr.{Organization, UserRole}
+import org.orbeon.oxf.fr.Credentials
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
@@ -69,10 +69,7 @@ object TestHttpClient {
     method       : HttpMethod,
     headers      : Map[String, List[String]],
     content      : Option[StreamedContent],
-    username     : Option[String] = None,
-    group        : Option[String] = None,
-    roles        : List[UserRole] = Nil,
-    organization : Option[Organization] = None
+    credentials  : Option[Credentials] = None
   ): (ProcessorService, HttpResponse, List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
@@ -100,7 +97,8 @@ object TestHttpClient {
 
         val (externalContext, response) = {
 
-          val webAppContext = new TestWebAppContext(Logger, ServerState.serverAttributes)
+          val webAppContext         = new TestWebAppContext(Logger, ServerState.serverAttributes)
+          val connectionCredentials = credentials
 
           // Create a request with only the methods used by `LocalRequest.incomingRequest` parameter
           val baseRequest = new RequestAdapter {
@@ -128,10 +126,7 @@ object TestHttpClient {
             override def sessionInvalidate()                     = session foreach (_.invalidate())
             override val getRequestedSessionId                   = null
 
-            override val getUsername                             = username.orNull
-            override val getUserRoles                            = roles.toArray
-            override val getUserGroup                            = group.orNull
-            override val getUserOrganization                     = organization
+            override val credentials                             = connectionCredentials
 
             // The following are never used by our code
             override val isRequestedSessionIdValid               = false   // only delegated

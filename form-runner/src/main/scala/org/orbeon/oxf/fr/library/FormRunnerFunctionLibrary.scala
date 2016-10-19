@@ -80,8 +80,8 @@ private object FormRunnerFunctions {
     "form-name"            → (() ⇒ FormRunner.FormRunnerParams().form),
     "document-id"          → (() ⇒ FormRunner.FormRunnerParams().document.orNull),
     "lang"                 → (() ⇒ FormRunner.currentLang.stringValue),
-    "username"             → (() ⇒ NetUtils.getExternalContext.getRequest.getUsername),
-    "user-group"           → (() ⇒ NetUtils.getExternalContext.getRequest.getUserGroup)
+    "username"             → (() ⇒ NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
+    "user-group"           → (() ⇒ NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull)
   )
 
   val BooleanGettersByName = List(

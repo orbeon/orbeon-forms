@@ -40,8 +40,8 @@ trait SearchRequest {
         val searchElement = searchDocument.rootElement
         val queryEls      = searchElement.child("query").toList
         val draftsElOpt   = searchElement.child("drafts").headOption
-        val username      = Option(httpRequest.getUsername)
-        val group         = Option(httpRequest.getUserGroup)
+        val username      = httpRequest.credentials map     (_.username)
+        val group         = httpRequest.credentials flatMap (_.group)
 
         Request(
           provider       = Provider.providerFromToken(provider),

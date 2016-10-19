@@ -13,27 +13,13 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.fr.{Organization, ParametrizedRole, SimpleRole, UserRole}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.NetUtils
 
 object PermissionsAuthorization {
 
-  case class CurrentUser(
-    username     : Option[String],
-    groupname    : Option[String],
-    organization : Option[Organization],
-    roles        : List[UserRole]
-  )
-
-  def currentUserFromSession: CurrentUser = {
-    val request = NetUtils.getExternalContext.getRequest
-    CurrentUser(
-      username     = Option(request.getUsername),
-      groupname    = Option(request.getUserGroup),
-      organization = request.getUserOrganization,
-      roles        = request.getUserRoles.to[List]
-    )
-  }
+  def currentUserFromSession: Option[Credentials] =
+    NetUtils.getExternalContext.getRequest.credentials
 
   sealed trait PermissionsCheck
   case class CheckWithDataUser(
@@ -48,7 +34,7 @@ object PermissionsAuthorization {
 
   def authorizedOperations(
     permissions : Permissions,
-    currentUser : CurrentUser,
+    currentUser : Option[Credentials],
     check       : PermissionsCheck
   ): Operations =
     permissions match {
@@ -61,7 +47,7 @@ object PermissionsAuthorization {
 
   private def authorizedOperations(
     permission  : Permission,
-    currentUser : CurrentUser,
+    currentUser : Option[Credentials],
     check       : PermissionsCheck
   ): Operations =
     if (permission.conditions.forall(conditionPasses(_, currentUser, check)))
@@ -71,14 +57,14 @@ object PermissionsAuthorization {
 
   private def conditionPasses(
     condition   : Condition,
-    currentUser : CurrentUser,
+    currentUser : Option[Credentials],
     check       : PermissionsCheck
   ): Boolean =
     condition match {
       case Owner ⇒
         check match {
           case CheckWithDataUser(dataUsernameOpt, _, _) ⇒
-            (currentUser.username, dataUsernameOpt) match {
+            (currentUser map (_.username), dataUsernameOpt) match {
               case (Some(currentUsername), Some(dataUsername)) if currentUsername == dataUsername ⇒ true
               case _ ⇒ false
             }
@@ -88,7 +74,7 @@ object PermissionsAuthorization {
       case Group ⇒
         check match {
           case CheckWithDataUser(_, dataGroupnameOpt, _) ⇒
-            (currentUser.groupname, dataGroupnameOpt) match {
+            (currentUser flatMap (_.group), dataGroupnameOpt) match {
               case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt ⇒ true
               case _ ⇒ false
             }
@@ -97,7 +83,7 @@ object PermissionsAuthorization {
         }
       case RolesAnyOf(permissionRoles) ⇒
         permissionRoles.exists(permissionRoleName ⇒
-          currentUser.roles.exists {
+          currentUser.to[List] flatMap (_.roles) exists {
             case SimpleRole(userRoleName) ⇒
               userRoleName == permissionRoleName
             case ParametrizedRole(userRoleName, userOrganizationName) ⇒

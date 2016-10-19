@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.fr.{Organization, UserRole}
+import org.orbeon.oxf.fr.{Credentials, Organization, UserRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.URLRewriterUtils
 
@@ -23,23 +23,29 @@ trait ServletPortletRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]
 
-  def getUsername        : String = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername).orNull
-  def getUserGroup       : String = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup).orNull
+  lazy val credentials: Option[Credentials] =
+    Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername) map { username ⇒
 
-  def getUserOrganization: Option[Organization] =
-    Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonOrganization) filter
-      (_.nonEmpty) map
-      (_.to[List]) map
-      Organization.apply
+      val roles =
+        Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles).to[List] flatMap
+          (_ map UserRole.parse)
 
-  lazy val getUserRoles: Array[UserRole] =
-    Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles) match {
-      case Some(headers) ⇒ headers map UserRole.parse
-      case None          ⇒ Array.empty[UserRole]
+      val organization =
+        Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonOrganization) filter
+          (_.nonEmpty) map
+          (_.to[List]) map
+          Organization.apply
+
+      Credentials(
+        username     = username,
+        roles        = roles,
+        group        = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup),
+        organization = organization
+      )
     }
 
   def isUserInRole(role: String): Boolean =
-    getUserRoles exists (_.roleName == role)
+    credentials exists (_.roles exists (_.roleName == role))
 
   def getClientContextPath(urlString: String): String =
     if (URLRewriterUtils.isPlatformPath(urlString))

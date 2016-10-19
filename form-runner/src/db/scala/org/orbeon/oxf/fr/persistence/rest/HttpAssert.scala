@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 
+import org.orbeon.oxf.fr.Credentials
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.test.XMLSupport
@@ -47,7 +48,7 @@ private object HttpAssert extends XMLSupport {
     url         : String,
     version     : Version,
     expected    : Expected,
-    credentials : Option[HttpRequest.Credentials] = None)(implicit
+    credentials : Option[Credentials] = None)(implicit
     logger      : IndentedLogger
   ): Unit = {
 
@@ -86,7 +87,7 @@ private object HttpAssert extends XMLSupport {
     version      : Version,
     body         : HttpRequest.Body,
     expectedCode : Int,
-    credentials  : Option[HttpRequest.Credentials] = None)(implicit
+    credentials  : Option[Credentials] = None)(implicit
     logger       : IndentedLogger
   ): Unit = {
     val actualCode = HttpRequest.put(url, version, body, credentials)
@@ -97,7 +98,7 @@ private object HttpAssert extends XMLSupport {
     url          : String,
     version      : Version,
     expectedCode : Int,
-    credentials  : Option[HttpRequest.Credentials] = None)(implicit
+    credentials  : Option[Credentials] = None)(implicit
     logger       : IndentedLogger
   ): Unit = {
     val actualCode = HttpRequest.del(url, version, credentials)

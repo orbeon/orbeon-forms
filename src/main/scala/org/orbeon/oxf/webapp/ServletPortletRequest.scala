@@ -15,12 +15,11 @@ package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.fr.UserRole
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.URLRewriterUtils
 
 
 // Implementations shared between ServletExternalContext and Portlet2ExternalContext.
-trait WebAppRequest extends ExternalContext.Request {
+trait ServletPortletRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]
 

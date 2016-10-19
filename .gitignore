@@ -4,6 +4,7 @@ tmp/
 target/
 build-local.properties
 .idea/shelf/
+.idea/modules/
 src/resources-packaged-target/
 src/resources-packaged/xbl/orbeon/code-mirror/CodeMirror-2.34/
 src/resources-local/

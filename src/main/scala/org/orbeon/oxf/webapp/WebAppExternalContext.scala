@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.webapp.ExternalContext.Session
+import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, Session, SessionScope}
 
 // External context which only exposes the web app, without request or response
 // Session is None when called from init()/destroy()/contextInitialized()/contextDestroyed()
@@ -57,8 +57,8 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
       sessionAttributesMap
     }
 
-    def getAttributesMap(scope: Int) = {
-      if (scope != Session.APPLICATION_SCOPE)
+    def getAttributesMap(scope: SessionScope) = {
+      if (scope != ApplicationSessionScope)
         throw new OXFException("Invalid session scope scope: only the application scope is allowed in Servlets")
 
       getAttributesMap

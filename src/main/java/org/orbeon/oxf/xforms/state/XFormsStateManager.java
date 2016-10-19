@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.webapp.ExternalContext;
-import org.orbeon.oxf.webapp.ExternalContext$;
 import org.orbeon.oxf.webapp.SessionExpiredException;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -92,14 +91,14 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     private static void addDocumentToSession(String uuid) {
         final ExternalContext.Session session = NetUtils.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
-        final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext$.MODULE$.APPLICATION_SCOPE());
+        final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$);
         sessionAttributes.put(getUUIDSessionKey(uuid), new SessionDocument(uuid));
     }
 
     private static SessionDocument getSessionDocument(String uuid) {
         final ExternalContext.Session session = NetUtils.getSession(false);
         if (session != null) {
-            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext$.MODULE$.APPLICATION_SCOPE());
+            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$);
             return (SessionDocument) sessionAttributes.get(getUUIDSessionKey(uuid));
         } else {
             return null;
@@ -110,7 +109,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     public static void removeSessionDocument(String uuid) {
         final ExternalContext.Session session = NetUtils.getSession(false);
         if (session != null) {
-            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext$.MODULE$.APPLICATION_SCOPE());
+            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$);
             sessionAttributes.remove(getUUIDSessionKey(uuid));
         }
     }
@@ -130,7 +129,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         final ExternalContext.Session session = NetUtils.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
-        final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext$.MODULE$.APPLICATION_SCOPE());
+        final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$);
         final String listenerSessionKey = getListenerSessionKey(uuid);
         if (sessionAttributes.get(listenerSessionKey) == null) {
 
@@ -180,7 +179,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         // because the session goes away -> all of its attributes go away so we don't have to remove them below.
         final ExternalContext.Session session = NetUtils.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
         if (session != null) {
-            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext$.MODULE$.APPLICATION_SCOPE());
+            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$);
             final String listenerSessionKey = getListenerSessionKey(uuid);
 
             final ExternalContext.SessionListener listener = (ExternalContext.SessionListener) sessionAttributes.get(listenerSessionKey);

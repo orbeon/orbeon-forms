@@ -25,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext.Session
+import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, SessionScope}
 import org.orbeon.oxf.webapp.{ExternalContext, ServletPortletRequest, SessionListeners, WebAppContext}
 
 import scala.collection.JavaConverters._
@@ -389,8 +389,8 @@ class ServletExternalContext(
     lazy val getAttributesMap: ju.Map[String, AnyRef] =
       new InitUtils.SessionMap(httpSession)
 
-    def getAttributesMap(scope: Int): ju.Map[String, AnyRef] = {
-      if (scope != Session.APPLICATION_SCOPE)
+    def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef] = {
+      if (scope != ApplicationSessionScope)
         throw new IllegalArgumentException("Only the application scope is allowed in a servlet environment")
 
       getAttributesMap

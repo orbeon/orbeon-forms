@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.dom.Document;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.servlet.ServletUtilities;
 import org.jfree.data.general.Dataset;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.portlet.PortletSession;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
@@ -122,11 +121,11 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
             file = ServletUtilities.saveChartAsPNG(chart, chartConfig.getxSize(), chartConfig.getySize(), info,
                     new HttpSession() {
                         public Object getAttribute(String s) {
-                            return session.getAttributesMap(PortletSession.APPLICATION_SCOPE).get(s);
+                            return session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$).get(s);
                         }
 
                         public Enumeration getAttributeNames() {
-                            return Collections.enumeration(session.getAttributesMap(PortletSession.APPLICATION_SCOPE).keySet());
+                            return Collections.enumeration(session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$).keySet());
                         }
 
                         public long getCreationTime() {
@@ -180,7 +179,7 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
                         }
 
                         public void removeAttribute(String s) {
-                            session.getAttributesMap(PortletSession.APPLICATION_SCOPE).remove(s);
+                            session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$).remove(s);
                         }
 
                         public void removeValue(String s) {
@@ -188,7 +187,7 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
                         }
 
                         public void setAttribute(String s, Object o) {
-                            session.getAttributesMap(PortletSession.APPLICATION_SCOPE).put(s, o);
+                            session.getAttributesMap(ExternalContext.ApplicationSessionScope$.MODULE$).put(s, o);
                         }
 
                         public void setMaxInactiveInterval(int i) {

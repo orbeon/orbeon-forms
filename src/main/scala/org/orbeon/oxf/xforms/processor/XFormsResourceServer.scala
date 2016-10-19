@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.Session.APPLICATION_SCOPE
+import org.orbeon.oxf.webapp.ExternalContext.ApplicationSessionScope
 import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
 
 import scala.util.Try
@@ -289,7 +289,7 @@ object XFormsResourceServer {
       DynamicResource(digest, serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
 
     // Store mapping into session
-    session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, resource)
+    session.getAttributesMap(ApplicationSessionScope).put(DynamicResourcesSessionKey + digest, resource)
 
     DynamicResourcesPath + digest
   }
@@ -319,7 +319,7 @@ object XFormsResourceServer {
             file.delete()
           }
 
-        session.getAttributesMap(APPLICATION_SCOPE).remove(DynamicResourcesSessionKey + resource.digest)
+        session.getAttributesMap(ApplicationSessionScope).remove(DynamicResourcesSessionKey + resource.digest)
       }
     }
   }
@@ -332,7 +332,7 @@ object XFormsResourceServer {
       val digestFromPath = filename(requestPath)
       val lookupKey      = DynamicResourcesSessionKey + digestFromPath
 
-      Option(session.getAttributesMap(APPLICATION_SCOPE).get(lookupKey).asInstanceOf[DynamicResource])
+      Option(session.getAttributesMap(ApplicationSessionScope).get(lookupKey).asInstanceOf[DynamicResource])
     }
 
   // For unit tests only (called from XSLT)

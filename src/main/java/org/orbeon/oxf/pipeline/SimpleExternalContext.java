@@ -19,7 +19,6 @@ import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.webapp.ExternalContext;
-import org.orbeon.oxf.webapp.ExternalContext$;
 import org.orbeon.oxf.webapp.TestWebAppContext;
 import org.orbeon.oxf.webapp.WebAppContext;
 
@@ -348,8 +347,8 @@ class SimpleExternalContext implements ExternalContext {
             return sessionAttributesMap;
         }
 
-        public Map<String, Object> getAttributesMap(int scope) {
-            if (scope != ExternalContext$.MODULE$.APPLICATION_SCOPE())
+        public Map<String, Object> getAttributesMap(SessionScope scope) {
+            if (! ExternalContext.ApplicationSessionScope$.MODULE$.equals(scope))
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Eclipse");
             return getAttributesMap();
         }

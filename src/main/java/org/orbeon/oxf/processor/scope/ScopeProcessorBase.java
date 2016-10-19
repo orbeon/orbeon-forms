@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.webapp.ExternalContext$;
+import org.orbeon.oxf.webapp.ExternalContext;
 
 public abstract class ScopeProcessorBase extends ProcessorImpl {
 
@@ -46,7 +46,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
                         : "session".equals(contextName) ? SESSION_CONTEXT
                         : "application".equals(contextName) ? APPLICATION_CONTEXT
                         : -1,
-                        "application".equals(sessionScopeValue) ? ExternalContext$.MODULE$.APPLICATION_SCOPE() : "portlet".equals(sessionScopeValue) ? ExternalContext$.MODULE$.PORTLET_SCOPE() : -1,
+                        "application".equals(sessionScopeValue) ? ExternalContext.ApplicationSessionScope$.MODULE$ : "portlet".equals(sessionScopeValue) ? ExternalContext.PortletSessionScope$.MODULE$ : null,
                         rootElement.element("key").getStringValue(),
                         contentType,
                         ProcessorUtils.selectBooleanValue(rootElement, "/*/test-ignore-stored-key-validity", false));
@@ -56,12 +56,12 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
 
     protected static class ContextConfig {
         private final int contextType;
-        private final int sessionScope;
+        private final ExternalContext.SessionScope sessionScope;
         private final String key;
         private final boolean testIgnoreStoredKeyValidity;
         private final String contentType;
 
-        public ContextConfig(int contextType, int sessionScope, String key, String contentType, boolean testIgnoreInternalKeyValidity) {
+        public ContextConfig(int contextType, ExternalContext.SessionScope sessionScope, String key, String contentType, boolean testIgnoreInternalKeyValidity) {
             this.contextType = contextType;
             this.sessionScope = sessionScope;
             this.key = key;
@@ -73,7 +73,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
             return contextType;
         }
 
-        public int getSessionScope() {
+        public ExternalContext.SessionScope getSessionScope() {
             return sessionScope;
         }
 

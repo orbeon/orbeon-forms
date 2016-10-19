@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{JSON, NetUtils}
-import org.orbeon.oxf.webapp.ExternalContext.{Request, Session, SessionListener}
+import org.orbeon.oxf.webapp.ExternalContext.{Request, Session, SessionListener, SessionScope}
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
@@ -30,16 +30,16 @@ private class MinimalSession(session: HttpSession) extends Session {
 
   override def getId = session.getId
 
-  override def getCreationTime: Long = throw new UnsupportedOperationException
-  override def isNew: Boolean = throw new UnsupportedOperationException
-  override def getLastAccessedTime: Long = throw new UnsupportedOperationException
-  override def removeListener(sessionListener: SessionListener): Unit = throw new UnsupportedOperationException
-  override def setMaxInactiveInterval(interval: Int): Unit = throw new UnsupportedOperationException
-  override def getAttributesMap: util.Map[String, AnyRef] = throw new UnsupportedOperationException
-  override def getAttributesMap(scope: Int): util.Map[String, AnyRef] = throw new UnsupportedOperationException
-  override def addListener(sessionListener: SessionListener): Unit = throw new UnsupportedOperationException
-  override def invalidate(): Unit = throw new UnsupportedOperationException
-  override def getMaxInactiveInterval: Int = throw new UnsupportedOperationException
+  override def getCreationTime: Long                                           = throw new UnsupportedOperationException
+  override def isNew: Boolean                                                  = throw new UnsupportedOperationException
+  override def getLastAccessedTime: Long                                       = throw new UnsupportedOperationException
+  override def removeListener(sessionListener: SessionListener): Unit          = throw new UnsupportedOperationException
+  override def setMaxInactiveInterval(interval: Int): Unit                     = throw new UnsupportedOperationException
+  override def getAttributesMap: util.Map[String, AnyRef]                      = throw new UnsupportedOperationException
+  override def getAttributesMap(scope: SessionScope): util.Map[String, AnyRef] = throw new UnsupportedOperationException
+  override def addListener(sessionListener: SessionListener): Unit             = throw new UnsupportedOperationException
+  override def invalidate(): Unit                                              = throw new UnsupportedOperationException
+  override def getMaxInactiveInterval: Int                                     = throw new UnsupportedOperationException
 }
 
 private class MinimalRequest(req: HttpServletRequest) extends RequestAdapter {

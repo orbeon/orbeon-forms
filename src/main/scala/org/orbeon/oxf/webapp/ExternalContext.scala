@@ -33,10 +33,6 @@ object ExternalContext {
   val StandardHeaderCharacterEncoding : String = StandardCharacterEncoding
   val StandardFormCharacterEncoding   : String = StandardCharacterEncoding
 
-  // TODO: Should be ADT.
-  val APPLICATION_SCOPE = 1
-  val PORTLET_SCOPE     = 2
-
   trait Request {
 
     def getContainerType: String
@@ -145,10 +141,9 @@ object ExternalContext {
     def getNativeResponse: AnyRef
   }
 
-  object Session {
-    val APPLICATION_SCOPE: Int = 1
-    val PORTLET_SCOPE: Int = 2
-  }
+  sealed trait SessionScope                   { def value: Int }
+  case object ApplicationSessionScope extends { val value = 1  } with SessionScope
+  case object PortletSessionScope     extends { val value = 2  } with SessionScope
 
   trait SessionListener {
     def sessionDestroyed()
@@ -164,7 +159,7 @@ object ExternalContext {
     def setMaxInactiveInterval(interval: Int)
 
     def getAttributesMap: ju.Map[String, AnyRef]
-    def getAttributesMap(scope: Int): ju.Map[String, AnyRef]
+    def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef]
 
     def addListener(sessionListener: SessionListener)
     def removeListener(sessionListener: SessionListener)

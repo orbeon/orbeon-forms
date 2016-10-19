@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, PortletSessionScope, SessionScope}
 import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._
@@ -152,12 +153,12 @@ object Portlet2ExternalContext {
   )
 
   // Present a view of the HttpSession properties as a Map.
-  class SessionMap(val portletSession: PortletSession, val scope: Int) extends AttributesToMap[AnyRef](
+  class SessionMap(val portletSession: PortletSession, val scope: SessionScope) extends AttributesToMap[AnyRef](
     new AttributesToMap.Attributeable[AnyRef]() {
-      def getAttribute(s: String): AnyRef           = portletSession.getAttribute(s, scope)
-      def getAttributeNames: ju.Enumeration[String] = portletSession.getAttributeNames(scope)
-      def removeAttribute(s: String)                = portletSession.removeAttribute(s, scope)
-      def setAttribute(s: String, o: AnyRef)        = portletSession.setAttribute(s, o, scope)
+      def getAttribute(s: String): AnyRef           = portletSession.getAttribute     (s,    scope.value)
+      def getAttributeNames: ju.Enumeration[String] = portletSession.getAttributeNames(      scope.value)
+      def removeAttribute(s: String)                = portletSession.removeAttribute  (s,    scope.value)
+      def setAttribute(s: String, o: AnyRef)        = portletSession.setAttribute     (s, o, scope.value)
     }
   )
 }
@@ -302,15 +303,15 @@ class Portlet2ExternalContext(
     def isNew                                 = portletSession.isNew
     def setMaxInactiveInterval(interval: Int) = portletSession.setMaxInactiveInterval(interval)
 
-    lazy val applicationAttributesMap = new SessionMap(portletSession, APPLICATION_SCOPE)
-    lazy val portletAttributesMap     = new SessionMap(portletSession, PORTLET_SCOPE)
+    lazy val applicationAttributesMap = new SessionMap(portletSession, ApplicationSessionScope)
+    lazy val portletAttributesMap     = new SessionMap(portletSession, PortletSessionScope)
 
     def getAttributesMap: ju.Map[String, AnyRef] = portletAttributesMap
 
-    def getAttributesMap(scope: Int): ju.Map[String, AnyRef] = scope match {
-      case APPLICATION_SCOPE ⇒ applicationAttributesMap
-      case PORTLET_SCOPE     ⇒ portletAttributesMap
-      case _                 ⇒ throw new IllegalArgumentException
+    def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef] = scope match {
+      case ApplicationSessionScope ⇒ applicationAttributesMap
+      case PortletSessionScope     ⇒ portletAttributesMap
+      case _                       ⇒ throw new IllegalArgumentException
     }
 
     def addListener(sessionListener: ExternalContext.SessionListener): Unit =

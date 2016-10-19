@@ -3,7 +3,7 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.webapp.ExternalContext.{Session, SessionListener}
+import org.orbeon.oxf.webapp.ExternalContext.{Session, SessionListener, SessionScope}
 
 import scala.collection.JavaConverters._
 
@@ -35,7 +35,7 @@ def removeListener(sessionListener: SessionListener): Unit = {
     attributesMap
   }
 
-  def getAttributesMap(scope: Int): ju.Map[String, AnyRef] = {
+  def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef] = {
     checkExpired()
     attributesMap
   }

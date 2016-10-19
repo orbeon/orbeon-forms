@@ -31,6 +31,12 @@ orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getO
 
 val PathsToExcludeFromCoreJAR = Nil
 
+val JarFilesToExcludeFromWar = Set(
+  "orbeon-form-builder-client",
+  "orbeon-form-builder-shared",
+  "orbeon-proxy-portlet"
+)
+
 val TestResourceManagerPaths = List(
   "src/test/resources",    // so that Java processor tests work
   "src/resources",         // ultimately should be moved
@@ -173,8 +179,8 @@ lazy val commonSettings = Seq(
     val MatchRawJarNameRE(sourceJarRawName) = sourceJarFile.name
     val targetJarFile = new File(ExplodedWarLibPath + '/' + sourceJarRawName + ".jar")
 
-    if (! sourceJarFile.name.contains("_sjs") &&
-        sourceJarRawName != "orbeon-form-builder-client" &&
+    if (! sourceJarFile.name.contains("_sjs")        &&
+        ! JarFilesToExcludeFromWar(sourceJarRawName) &&
         (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
       println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
       IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
@@ -199,7 +205,7 @@ lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
   )
 
 lazy val commonJVM = common.jvm
-lazy val commonJS = common.js
+lazy val commonJS  = common.js
 
 lazy val formBuilderShared = (crossProject.crossType(CrossType.Pure) in file("form-builder-shared"))
   .settings(commonSettings: _*)
@@ -274,7 +280,7 @@ lazy val fullPortlet = (project in file("full-portlet"))
   .dependsOn(portletSupport)
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-proxy-portlet"
+    name := "orbeon-full-portlet"
   )
   .settings(
   )
@@ -371,7 +377,21 @@ lazy val core = (project in file("src"))
   )
 
 lazy val root = (project in file("."))
-  .aggregate(commonJVM, commonJS, dom, formBuilderSharedJVM, xupdate, core, formRunner, formBuilder, formBuilderClient, embedding, portletSupport, formRunnerProxyPortlet, fullPortlet)
+  .aggregate(
+    commonJVM,
+    commonJS,
+    dom,
+    formBuilderSharedJVM,
+    xupdate,
+    core,
+    formRunner,
+    formBuilder,
+    formBuilderClient,
+    embedding,
+    portletSupport,
+    formRunnerProxyPortlet,
+    fullPortlet
+  )
   .settings(
 
     scalaVersion                       := ScalaVersion,

@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.fr.{ParametrizedRole, SimpleRole, UserRole}
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
+import org.orbeon.oxf.fr.{Organization, ParametrizedRole, SimpleRole, UserRole}
 import org.orbeon.oxf.util.NetUtils
 
 object PermissionsAuthorization {
@@ -31,7 +30,7 @@ object PermissionsAuthorization {
     CurrentUser(
       username     = Option(request.getUsername),
       groupname    = Option(request.getUserGroup),
-      organization = Organization.fromJava(request.getUserOrganization),
+      organization = request.getUserOrganization,
       roles        = request.getUserRoles.to[List]
     )
   }

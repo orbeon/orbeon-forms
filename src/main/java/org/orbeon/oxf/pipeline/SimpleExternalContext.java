@@ -15,6 +15,7 @@ package org.orbeon.oxf.pipeline;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.fr.Organization;
 import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
@@ -84,7 +85,7 @@ class SimpleExternalContext implements ExternalContext {
 
         public String getUserGroup() { return null; }
 
-        public String[] getUserOrganization() { return null; }
+        public scala.Option<Organization> getUserOrganization() { return null; }
 
         public UserRole[] getUserRoles() { return new UserRole[0]; }
 

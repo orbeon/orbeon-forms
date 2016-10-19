@@ -18,7 +18,7 @@ import java.security.Principal
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.fr.UserRole
+import org.orbeon.oxf.fr.{Organization, UserRole}
 
 /**
   * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
@@ -74,7 +74,7 @@ object ExternalContext {
     def getUsername: String
     def getUserGroup: String
     def getUserRoles: Array[UserRole] // TODO: Don't use `Array`
-    def getUserOrganization: Array[String]
+    def getUserOrganization: Option[Organization]
     def isUserInRole(role: String): Boolean
     def getUserPrincipal: Principal // TODO: any use of this?
 

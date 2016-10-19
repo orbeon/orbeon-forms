@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.scalatest.FunSpec
 
 class FormRunnerPermissionsTest extends FunSpec {

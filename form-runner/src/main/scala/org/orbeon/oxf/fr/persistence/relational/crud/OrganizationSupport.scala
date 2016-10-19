@@ -15,28 +15,18 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.{Connection, ResultSet}
 
+import org.orbeon.oxf.fr.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 
 // Operations on organizations
 // - When creating data, if we have an organization, we want to create it or return it
 // - When reading data, we want to make sure the user
 
-// An organization is a list of level, with the root-level first, leaf-level last
-case class Organization(levels: List[String])
-
 // Type for organization id, which is stored as an int
 case class OrganizationId(underlying: Int) extends AnyVal
-
-object Organization {
-
-  def fromJava(organization: Array[String]): Option[Organization] =
-    organization match {
-      case null | Array() ⇒ None
-      case _              ⇒ Some(Organization(organization.to[List]))
-    }
 
   def createIfNecessary(
     connection   : Connection,
@@ -144,7 +134,7 @@ object Organization {
     if (! isValidId) {
       None
     } else {
-      val organizationOpt = Organization.read(connection, OrganizationId(id))
+      val organizationOpt = OrganizationSupport.read(connection, OrganizationId(id))
       organizationOpt.map(id → _)
     }
   }

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext;
 
+import org.orbeon.oxf.fr.Organization;
 import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.webapp.ExternalContext;
 
@@ -139,7 +140,7 @@ public class RequestAdapter implements ExternalContext.Request {
 
     public String getUserGroup() { return null; }
 
-    public String[] getUserOrganization() { return null; }
+    public scala.Option<Organization> getUserOrganization() { return null; }
 
     public UserRole[] getUserRoles() { return new UserRole[0]; }
 

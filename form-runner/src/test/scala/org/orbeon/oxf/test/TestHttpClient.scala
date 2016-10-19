@@ -17,8 +17,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
-import org.orbeon.oxf.fr.UserRole
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
+import org.orbeon.oxf.fr.{Organization, UserRole}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._
@@ -132,7 +131,7 @@ object TestHttpClient {
             override val getUsername                             = username.orNull
             override val getUserRoles                            = roles.toArray
             override val getUserGroup                            = group.orNull
-            override val getUserOrganization                     = organization.map(_.levels.toArray).orNull
+            override val getUserOrganization                     = organization
 
             // The following are never used by our code
             override val isRequestedSessionIdValid               = false   // only delegated

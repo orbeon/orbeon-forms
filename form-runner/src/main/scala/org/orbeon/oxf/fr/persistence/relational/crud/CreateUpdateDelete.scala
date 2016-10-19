@@ -179,20 +179,18 @@ trait CreateUpdateDelete
       // which row we read this from.
       Some(Row(
         created      = resultSet.getTimestamp("created"),
-        username     = if (req.forData) Option(resultSet.getString("username" ))              else None,
-        group        = if (req.forData) Option(resultSet.getString("groupname"))              else None,
-        organization = if (req.forData) Organization.readFromResultSet(connection, resultSet) else None,
-        formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))              else None
+        username     = if (req.forData) Option(resultSet.getString("username" ))                     else None,
+        group        = if (req.forData) Option(resultSet.getString("groupname"))                     else None,
+        organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet) else None,
+        formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                     else None
       ))
     } else {
       None
     }
   }
 
-  private def currentUserOrganization(connection: Connection, req: Request): Option[OrganizationId] = {
-    val organization = Organization.fromJava(httpRequest.getUserOrganization)
-    organization.map(Organization.createIfNecessary(connection, req.provider, _))
-  }
+  private def currentUserOrganization(connection: Connection, req: Request): Option[OrganizationId] =
+    httpRequest.getUserOrganization.map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 

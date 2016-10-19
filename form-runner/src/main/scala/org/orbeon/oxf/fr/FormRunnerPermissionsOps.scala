@@ -17,7 +17,6 @@ import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser}
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
@@ -63,7 +62,7 @@ trait FormRunnerPermissionsOps {
       PermissionsAuthorization.CurrentUser(
         username     = Option(request.getUsername),
         groupname    = Option(request.getUserGroup),
-        organization = Organization.fromJava(request.getUserOrganization),
+        organization = request.getUserOrganization,
         roles        = request.getUserRoles.to[List]
       )
   ): List[String] = {
@@ -98,7 +97,7 @@ trait FormRunnerPermissionsOps {
     dataOrganization    : Option[Organization],
     currentUsername     : Option[String]       = Option(request.getUsername),
     currentGroupname    : Option[String]       = Option(request.getUserGroup),
-    currentOrganization : Option[Organization] = Organization.fromJava(request.getUserOrganization),
+    currentOrganization : Option[Organization] = request.getUserOrganization,
     currentRoles        : List[UserRole]       = request.getUserRoles.to[List]
   ): List[String] = {
 

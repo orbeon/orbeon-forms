@@ -16,8 +16,9 @@ package org.orbeon.oxf.fr.persistence.rest
 import java.sql.Connection
 
 import org.junit.Test
+import org.orbeon.oxf.fr.Organization
 import org.orbeon.oxf.fr.persistence.db.Connect
-import org.orbeon.oxf.fr.persistence.relational.crud.{Organization, OrganizationId}
+import org.orbeon.oxf.fr.persistence.relational.crud
 import org.orbeon.oxf.fr.persistence.rest.OrganizationTest.{CA, SF}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.IOUtils._
@@ -29,7 +30,6 @@ object OrganizationTest {
   val SF = Organization(List("usa", "ca", "sf"))
   val PA = Organization(List("usa", "ca", "pa"))
 }
-
 
 // Test organization-related code used by the REST API
 class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
@@ -53,8 +53,8 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   @Test def createAndRead(): Unit = {
     Connect.withOrbeonTables("create and read") { (connection, provider) ⇒
       List(CA, SF).foreach { writtenOrganization ⇒
-        val orgId = Organization.createIfNecessary(connection, provider, writtenOrganization)
-        val readOrganization = Organization.read(connection, orgId)
+        val orgId = crud.OrganizationSupport.createIfNecessary(connection, provider, writtenOrganization)
+        val readOrganization = crud.OrganizationSupport.read(connection, orgId)
         assert(readOrganization.get === writtenOrganization)
       }
     }
@@ -62,8 +62,8 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
 
   @Test def readEmptyWhenNotFound(): Unit = {
     Connect.withOrbeonTables("create and read") { (connection, provider) ⇒
-      Organization.createIfNecessary(connection, provider, CA)
-      val read = Organization.read(connection, OrganizationId(42))
+      crud.OrganizationSupport.createIfNecessary(connection, provider, CA)
+      val read = crud.OrganizationSupport.read(connection, crud.OrganizationId(42))
       assert(read.isEmpty)
     }
   }
@@ -72,11 +72,11 @@ class OrganizationTest extends ResourceManagerTestBase with AssertionsForJUnit w
   @Test def orgReuse(): Unit = {
     Connect.withOrbeonTables("create read") { (connection, provider) ⇒
 
-      Organization.createIfNecessary(connection, provider, CA)
+      crud.OrganizationSupport.createIfNecessary(connection, provider, CA)
       assertRecordsCountIs(connection, 2)
 
       // Testing the "if necessary" part
-      Organization.createIfNecessary(connection, provider, CA)
+      crud.OrganizationSupport.createIfNecessary(connection, provider, CA)
       assertRecordsCountIs(connection, 2)
     }
   }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._

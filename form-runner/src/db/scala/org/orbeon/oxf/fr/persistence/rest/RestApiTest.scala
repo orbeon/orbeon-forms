@@ -19,9 +19,8 @@ import org.junit.Test
 import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
-import org.orbeon.oxf.fr.{ParametrizedRole, SimpleRole, UserRole}
+import org.orbeon.oxf.fr.{Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}

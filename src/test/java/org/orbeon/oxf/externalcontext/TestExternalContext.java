@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.fr.Organization;
 import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.fr.UserRole$;
 import org.orbeon.oxf.http.Headers;
@@ -60,13 +61,6 @@ public class TestExternalContext implements ExternalContext  {
 
     public WebAppContext getWebAppContext() {
         return webAppContext;
-    }
-
-    public byte[] getResponseBytes() {
-        if (response.outputStream == null)
-            return null;
-        else
-            return response.outputStream.toByteArray();
     }
 
     private class Request implements ExternalContext.Request {
@@ -305,12 +299,12 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-group");
         }
 
-        public String[] getUserOrganization() {
+        public scala.Option<Organization> getUserOrganization() {
             final String organizationOrNull = XPathUtils.selectStringValueNormalize(requestDocument, "/*/user-organization");
             if (organizationOrNull == null)
                 return null;
             else
-                return organizationOrNull.split("\\s+");
+                return null;// TODO organizationOrNull.split("\\s+");
         }
 
         public UserRole[] getUserRoles() {

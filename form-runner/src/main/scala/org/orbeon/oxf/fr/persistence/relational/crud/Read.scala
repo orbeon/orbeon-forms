@@ -15,9 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
 
-import org.orbeon.oxf.fr.FormRunnerPersistence
-import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML, Read}
+import org.joda.time.DateTime
+import org.orbeon.oxf.fr.{FormRunnerPersistence, permission}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
@@ -105,14 +106,14 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           val dataUser = CheckWithDataUser(
             username     = Option(resultSet.getString("username")),
             groupname    = Option(resultSet.getString("groupname")),
-            organization = Organization.readFromResultSet(connection, resultSet).map(_._2)
+            organization = OrganizationSupport.readFromResultSet(connection, resultSet).map(_._2)
           )
           val authorizedOperations = PermissionsAuthorization.authorizedOperations(
             PermissionsXML.parse(formMetadata.orNull),
             PermissionsAuthorization.currentUserFromSession,
             dataUser
           )
-          if (! Operations.allows(authorizedOperations, Read)) {
+          if (! Operations.allows(authorizedOperations, permission.Read)) {
             println("403", authorizedOperations, dataUser)
             throw HttpStatusCodeException(403)
           }

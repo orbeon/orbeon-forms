@@ -34,8 +34,8 @@ object Organization {
 
   def fromJava(organization: Array[String]): Option[Organization] =
     organization match {
-      case null ⇒ None
-      case _    ⇒ Some(Organization(organization.to[List]))
+      case null | Array() ⇒ None
+      case _              ⇒ Some(Organization(organization.to[List]))
     }
 
   def createIfNecessary(

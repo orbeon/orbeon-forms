@@ -82,9 +82,11 @@ object LiferaySupport {
     "Orbeon-Liferay-User-Roles"       → (u ⇒ u.getRoles.asScala map (_.getName) toList)
   )
 
-  val AllHeaderNames                   = HeaderNamesGetters map (_._1) toSet
-  val AllHeaderNamesLower              = AllHeaderNames map (_.toLowerCase)
-  val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLower zip AllHeaderNames toMap
+  private val AllHeaderNamesList       = HeaderNamesGetters map (_._1)
+  private val AllHeaderNamesLowerList  = AllHeaderNamesList map (_.toLowerCase)
+
+  val AllHeaderNamesLower              = AllHeaderNamesLowerList.toSet
+  val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLowerList zip AllHeaderNamesList toMap
 
   def languageHeader(req: PortletRequest) =
     LanguageUtil.getLanguageId(req).trimAllToOpt map ("Orbeon-Liferay-Language" →)

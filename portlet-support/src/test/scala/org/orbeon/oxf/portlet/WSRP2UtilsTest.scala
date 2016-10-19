@@ -44,7 +44,7 @@ class WSRP2UtilsTest extends FunSpec {
     }
   }
 
-  describe("The `moveMagicResourceId()`") {
+  describe("The `moveMagicResourceId()` function") {
 
     val expected = Seq(
       // No magic, no p_p_resource_id

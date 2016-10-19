@@ -126,7 +126,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         }
 
       case None ⇒
-        response.setStatus(StatusCode.SC_NOT_FOUND)
+        response.setStatus(StatusCode.NotFound)
     }
   }
 
@@ -141,7 +141,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     // Eliminate funny requests
     if (! isCSS && ! isJS && ! filenameFromPath.startsWith("orbeon-")) {
-      response.setStatus(StatusCode.SC_NOT_FOUND)
+      response.setStatus(StatusCode.NotFound)
       return
     }
 
@@ -155,7 +155,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
       } else {
         // Not found, either because the hash is invalid, or because the cache lost the mapping
-        response.setStatus(StatusCode.SC_NOT_FOUND)
+        response.setStatus(StatusCode.NotFound)
         return
       }
     }
@@ -175,7 +175,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     // Check If-Modified-Since and don't return content if condition is met
     if (! response.checkIfModifiedSince(combinedLastModified)) {
-      response.setStatus(StatusCode.SC_NOT_MODIFIED)
+      response.setStatus(StatusCode.NotModified)
       return
     }
 

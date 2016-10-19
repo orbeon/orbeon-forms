@@ -70,8 +70,8 @@ object Portlet2ExternalContext {
 
     def setStatus(status: Int): Unit = {
       // Test error
-      if (status == StatusCode.SC_NOT_FOUND) {
-        throw HttpStatusCodeException(StatusCode.SC_NOT_FOUND)
+      if (status == StatusCode.NotFound) {
+        throw HttpStatusCodeException(StatusCode.NotFound)
       } else if (status >= 400) {
         // Ignore
       }

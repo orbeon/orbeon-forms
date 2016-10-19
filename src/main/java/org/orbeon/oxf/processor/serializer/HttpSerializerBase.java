@@ -41,7 +41,7 @@ import java.util.List;
  */
 public abstract class HttpSerializerBase extends CachedSerializer {
 
-    protected static final int DEFAULT_STATUS_CODE = StatusCode.SC_OK();
+    protected static final int DEFAULT_STATUS_CODE = StatusCode.Ok();
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
     private static final boolean DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE = false;
@@ -103,7 +103,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     if (!isForward) {
                         // Check If-Modified-Since (conditional GET) and don't return content if condition is met
                         if (!response.checkIfModifiedSince(lastModified)) {
-                            response.setStatus(StatusCode.SC_NOT_MODIFIED());
+                            response.setStatus(StatusCode.NotModified());
                             if (logger.isDebugEnabled())
                                 logger.debug("Sending SC_NOT_MODIFIED");
                             return;

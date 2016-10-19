@@ -89,7 +89,7 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
       // Send new headers and HTML prologue
       response.reset()
       response.setContentType("text/html; charset=utf-8")
-      response.setStatus(StatusCode.SC_INTERNAL_SERVER_ERROR)
+      response.setStatus(StatusCode.InternalServerError)
     } else {
       // Try to close table that may still be open
       sb.append("</p></table></table></table></table></table>")

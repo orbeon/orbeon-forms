@@ -177,7 +177,7 @@ public class ImageServer extends ProcessorImpl {
                     // Check if new URL is relative to image directory URL
                     boolean relative = NetUtils.relativeURL(config.imageDirectoryURL, newURL);
                     if (config.useSandbox && !relative) {
-                        imageResponse.setStatus(StatusCode.SC_NOT_FOUND());
+                        imageResponse.setStatus(StatusCode.NotFound());
                         return;
                     }
                     // Try to open the connection
@@ -189,11 +189,11 @@ public class ImageServer extends ProcessorImpl {
                     // Make sure the resource looks like a JPEG file
                     String contentType = URLConnection.guessContentTypeFromStream(urlConnectionInputStream);
                     if (!"image/jpeg".equals(contentType)) {
-                        imageResponse.setStatus(StatusCode.SC_NOT_FOUND());
+                        imageResponse.setStatus(StatusCode.NotFound());
                         return;
                     }
                 } catch (IOException e) {
-                    imageResponse.setStatus(StatusCode.SC_NOT_FOUND());
+                    imageResponse.setStatus(StatusCode.NotFound());
                     return;
                 }
 
@@ -212,7 +212,7 @@ public class ImageServer extends ProcessorImpl {
 
                 // Check If-Modified-Since and don't return content if condition is met
                 if ((imageConfig.transformCount == 0 || !mustProcess) && !imageResponse.checkIfModifiedSince(lastModified, false)) {
-                    imageResponse.setStatus(StatusCode.SC_NOT_MODIFIED());
+                    imageResponse.setStatus(StatusCode.NotModified());
                     return;
                 }
 
@@ -262,7 +262,7 @@ public class ImageServer extends ProcessorImpl {
                             File outputDir = cacheFile.getParentFile();
                             if (!outputDir.exists() && !outputDir.mkdirs()) {
                                 logger.info("Cannot create cache directory: " + outputDir.getCanonicalPath());
-                                imageResponse.setStatus(StatusCode.SC_INTERNAL_SERVER_ERROR());
+                                imageResponse.setStatus(StatusCode.InternalServerError());
                                 return;
                             }
                             os = new FileOutputStream(cacheFile);
@@ -287,7 +287,7 @@ public class ImageServer extends ProcessorImpl {
                         writer.write(img2);
                     } catch (OXFException e) {
                         logger.error(OrbeonFormatter.format(e));
-                        imageResponse.setStatus(StatusCode.SC_INTERNAL_SERVER_ERROR());
+                        imageResponse.setStatus(StatusCode.InternalServerError());
                         return;
                     } finally {
                         if (os != null && closeOutputStream) os.close();
@@ -385,9 +385,9 @@ public class ImageServer extends ProcessorImpl {
                     }
 
                     public void setStatus(int status) {
-                        if (status == StatusCode.SC_NOT_FOUND()) {
+                        if (status == StatusCode.NotFound()) {
                             throw new OXFException("Image not not found.");
-                        } else if (status == StatusCode.SC_INTERNAL_SERVER_ERROR()) {
+                        } else if (status == StatusCode.InternalServerError()) {
                             throw new OXFException("Error while processing image.");
                         }
                     }

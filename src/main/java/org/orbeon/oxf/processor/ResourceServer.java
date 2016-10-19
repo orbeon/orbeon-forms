@@ -103,7 +103,7 @@ public class ResourceServer extends ProcessorImpl {
 
                 // Check If-Modified-Since and don't return content if condition is met
                 if (!response.checkIfModifiedSince(lastModified)) {
-                    response.setStatus(StatusCode.SC_NOT_MODIFIED());
+                    response.setStatus(StatusCode.NotModified());
                     return;
                 }
 
@@ -116,12 +116,12 @@ public class ResourceServer extends ProcessorImpl {
                     response.setContentLength(length);
 
             } catch (IOException e) {
-                response.setStatus(StatusCode.SC_NOT_FOUND());
+                response.setStatus(StatusCode.NotFound());
                 return;
             } catch (ResourceNotFoundException e) {
                 // Note: we should really not get this exception here, but an IOException
                 // However we do actually get it, and so do the same we do for IOException.
-                response.setStatus(StatusCode.SC_NOT_FOUND());
+                response.setStatus(StatusCode.NotFound());
                 return;
             }
             // Copy stream to output

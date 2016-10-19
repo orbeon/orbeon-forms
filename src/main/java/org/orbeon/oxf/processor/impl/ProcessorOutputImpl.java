@@ -19,17 +19,16 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TraceEntry;
-import org.orbeon.oxf.xml.InspectingXMLReceiver;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.InspectingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
@@ -388,21 +387,12 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
     }
 
     public final void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-        TraceEntry traceEntry = null;
         try {
             // Delegate
             getRuntimeFilter().read(pipelineContext, xmlReceiver);
             // NOTE: Not sure why we used to catch and log AbstractMethodError here, but we should not!
         } catch (Exception e) {
             throw OrbeonLocationException.wrapException(e, getLocationData());
-        } finally {
-            if (traceEntry != null)
-                traceEntry.end = System.nanoTime();
-        }
-
-        // Ensure getKey() is called if read() is called()
-        if (traceEntry != null && !traceEntry.outputGetKeyCalled) {
-            getKey(pipelineContext);
         }
     }
 

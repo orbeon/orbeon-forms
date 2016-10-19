@@ -41,5 +41,9 @@
         <xf:name>Orbeon-Roles</xf:name>
         <xf:value value="."/>
     </xf:header>
+    <xf:header ref="xxf:get-request-header('Orbeon-Organization')">
+        <xf:name>Orbeon-Organization</xf:name>
+        <xf:value value="."/>
+    </xf:header>
 
 </root>

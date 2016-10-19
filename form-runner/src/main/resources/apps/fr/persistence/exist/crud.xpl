@@ -37,6 +37,7 @@
                 <include>/request/headers/header[name = 'orbeon-exist-uri']</include>
                 <include>/request/headers/header[name = 'orbeon-username']</include>
                 <include>/request/headers/header[name = 'orbeon-group']</include>
+                <include>/request/headers/header[name = 'orbeon-organization']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -76,6 +77,9 @@
                 <xsl:for-each select="($headers[name = 'orbeon-username']/value)[1]">
                     <username><xsl:value-of select="."/></username>
                     <groupname><xsl:value-of select="($headers[name = 'orbeon-group']/value)[1]"/></groupname>
+                    <xsl:for-each select="$headers[name = 'orbeon-organization']/value">
+                        <organization><xsl:value-of select="."/></organization>
+                    </xsl:for-each>
                 </xsl:for-each>
                 <!-- /collection used for data only -->
                 <xsl:if test="exists($matcher-groups)">
@@ -123,21 +127,22 @@
             <p:processor name="oxf:xforms-submission">
                 <p:input name="request" transform="oxf:xslt" href="#request-description">
                     <request xsl:version="2.0" xsl:exclude-result-prefixes="#all">
-                        <xsl:copy-of select="/*/(exist-base-uri | collection | username | groupname | method)"/>
+                        <xsl:copy-of select="/*/(exist-base-uri | collection | username | groupname | organization | method)"/>
                         <exist:query>
                             <exist:text>
 
-                                declare variable $frPath     := request:get-path-info();
-                                declare variable $collection := request:get-parameter('collection', '');
-                                declare variable $username   := request:get-parameter('username'  , '');
-                                declare variable $groupname  := request:get-parameter('groupname' , '');
-                                declare variable $method     := request:get-parameter('method' , '');
+                                declare variable $frPath       := request:get-path-info();
+                                declare variable $collection   := request:get-parameter('collection'  , '');
+                                declare variable $username     := request:get-parameter('username'    , '');
+                                declare variable $groupname    := request:get-parameter('groupname'   , '');
+                                declare variable $organization := request:get-parameter('organization', ());
+                                declare variable $method       := request:get-parameter('method'      , '');
 
-                                declare variable $path       := concat(
-                                                                    $frPath,
-                                                                    if (ends-with($frPath, '/')) then '' else '/',
-                                                                    $collection
-                                                                );
+                                declare variable $path         := concat(
+                                                                      $frPath,
+                                                                      if (ends-with($frPath, '/')) then '' else '/',
+                                                                      $collection
+                                                                  );
                                 declare function local:createPath($parts, $count) {
                                     concat('/', string-join(subsequence($parts, 1, $count), '/'))
                                 };
@@ -161,8 +166,14 @@
                                         (: Store metadata.xml :)
                                         let $metadata :=
                                                 element metadata {
-                                                    element username  { $username  },
-                                                    element groupname { $groupname }
+                                                    element username     { $username  },
+                                                    element groupname    { $groupname },
+                                                    if (exists($organization)) then
+                                                        element organization {
+                                                            for $level in $organization return
+                                                                element level { $level }
+                                                        }
+                                                    else ()
                                                 }
                                         let $dummy := xmldb:store($path, 'metadata.xml', $metadata)
                                         return ()
@@ -187,6 +198,13 @@
                                                 }&amp;username={  /*/username
                                                 }&amp;groupname={ /*/groupname
                                                 }&amp;method={    /*/method
+                                                }{
+                                                    string-join(
+                                                        for    $organization
+                                                        in     /*/organization
+                                                        return concat('&amp;organization=', $organization),
+                                                        ''
+                                                    )
                                                 }">
                         <xi:include href="exist-submission-common.xml" xpointer="xpath(/root/*)"/>
                     </xf:submission>

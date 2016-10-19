@@ -24,7 +24,6 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-      xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
@@ -45,7 +44,7 @@
     <!-- Public variable pointing to the current language -->
     <xf:var name="fb-lang" value="instance('fb-language-instance')"/>
 
-    <xf:var name="is-pe" value="xpl:isPE()" as="xs:boolean"/>
+    <xf:var name="is-pe" value="xpl:isPE()" as="xs:boolean" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
 
     <!-- Other variables -->
     <!-- TODO: don't duplicate logic with what's in FormBuilderFunctions -->

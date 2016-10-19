@@ -14,13 +14,12 @@
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                xmlns:saxon="http://saxon.sf.net/"
-                xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+                xmlns:saxon="http://saxon.sf.net/">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:template match="xxf:dynamic-state">
         <xsl:copy>
-            <xsl:apply-templates select="xpl:decodeDynamicStateString(normalize-space(.))"/>
+            <xsl:apply-templates select="xpl:decodeDynamicStateString(normalize-space(.))" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
         </xsl:copy>
     </xsl:template>
     <!-- Don't output information about controls which only have visited="true" so we don't have to modify the unit

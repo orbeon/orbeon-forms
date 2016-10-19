@@ -16,11 +16,10 @@
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       version="2.0">
 
-    <xsl:variable name="is-portlet" select="xpl:isPortlet()"/>
+    <xsl:variable name="is-portlet" select="xpl:isPortlet()" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
 
     <xsl:template match="/examples">
         <xh:html>

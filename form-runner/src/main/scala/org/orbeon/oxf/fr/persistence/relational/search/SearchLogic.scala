@@ -16,12 +16,12 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import java.sql.Timestamp
 
 import org.orbeon.oxf.fr.{FormRunner, ParametrizedRole}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.PermissionsCheck
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser, PermissionsCheck}
 import org.orbeon.oxf.fr.permission.{Permissions ⇒ _, _}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
+import org.orbeon.oxf.fr.persistence.relational.crud.{Organization, OrganizationId}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, _}
 import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.util.CoreUtils._
@@ -29,16 +29,17 @@ import org.orbeon.oxf.util.SQLUtils._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.scaxon.XML._
 
+import scala.collection.mutable
+
 trait SearchLogic extends SearchRequest {
 
   private val SearchOperationsLegacy = List("read", "update", "delete")
   private val SearchOperations       = List(Read, Update, Delete)
 
-  private def computePermissions(request: Request): Permissions = {
+  private def computePermissions(request: Request, user: CurrentUser): Permissions = {
 
     val formPermissionsElOpt            = RelationalUtils.readFormPermissions(request.app, request.form)
     val formPermissions                 = PermissionsXML.parse(formPermissionsElOpt.orNull)
-    val user                            = PermissionsAuthorization.currentUserFromSession
 
     def hasPermissionCond(cond: String): Boolean =
       formPermissionsElOpt.exists(_.child("permission").child(cond).nonEmpty)
@@ -49,6 +50,7 @@ trait SearchLogic extends SearchRequest {
 
     Permissions(
       formPermissionsElOpt,
+      formPermissions,
       authorizedBasedOnRole         = {
         val check                = PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
         val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
@@ -71,7 +73,8 @@ trait SearchLogic extends SearchRequest {
 
   def doSearch(request: Request): (List[Document], Int) =  {
 
-    val permissions = computePermissions(request)
+    val user             = PermissionsAuthorization.currentUserFromSession
+    val permissions      = computePermissions(request, user)
     val hasNoPermissions =
       ! permissions.authorizedBasedOnRole &&
       permissions.authorizedIfUsername.isEmpty &&
@@ -134,23 +137,24 @@ trait SearchLogic extends SearchRequest {
           executeQuery(connection, sql, parts)
         }
 
-        val documents =
+        val documentsMetadataValues =
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),
             elem = (
                 DocumentMetaData(
-                  documentId       = documentsResultSet.getString        ("document_id"),
-                  draft            = documentsResultSet.getString        ("draft") == "Y",
-                  created          = documentsResultSet.getTimestamp     ("created"),
-                  lastModifiedTime = documentsResultSet.getTimestamp     ("last_modified_time"),
-                  lastModifiedBy   = documentsResultSet.getString        ("last_modified_by"),
-                  username         = Option(documentsResultSet.getString ("username")),
-                  groupname        = Option(documentsResultSet.getString ("groupname"))
+                  documentId       = documentsResultSet.getString                 ("document_id"),
+                  draft            = documentsResultSet.getString                 ("draft") == "Y",
+                  created          = documentsResultSet.getTimestamp              ("created"),
+                  lastModifiedTime = documentsResultSet.getTimestamp              ("last_modified_time"),
+                  lastModifiedBy   = documentsResultSet.getString                 ("last_modified_by"),
+                  username         = Option(documentsResultSet.getString          ("username")),
+                  groupname        = Option(documentsResultSet.getString          ("groupname")),
+                  organizationId   = RelationalUtils.getIntOpt(documentsResultSet, "organization_id")
                 ),
                 DocumentValue(
-                  control          = documentsResultSet.getString        ("control"),
-                  pos              = documentsResultSet.getInt           ("pos"),
-                  value            = documentsResultSet.getString        ("val")
+                  control          = documentsResultSet.getString                 ("control"),
+                  pos              = documentsResultSet.getInt                    ("pos"),
+                  value            = documentsResultSet.getString                 ("val")
                 )
             )
           )
@@ -162,16 +166,18 @@ trait SearchLogic extends SearchRequest {
             // Sort by last modified in descending order, as the call expects the result to be pre-sorted
             .sortBy(_._1.lastModifiedTime)(Ordering[Timestamp].reverse)
 
-            // Compute possible operations for each document
-            .map{ case (metadata, values) ⇒
-              val operations =
-                permissions.formPermissionsElOpt
-                .map(FormRunner.allAuthorizedOperations(_, metadata.username, metadata.groupname, None))
-                .getOrElse(SearchOperationsLegacy)
-              Document(metadata, operations, values)
-            }
-          (documents, searchCount)
-        }
+
+        // Compute possible operations for each document
+        val organizationsCache = mutable.Map[Int, Organization]()
+        val documents = documentsMetadataValues.map{ case (metadata, values) ⇒
+            def readFromDatabase(id: Int) = Organization.read(connection, OrganizationId(id)).get
+            val organization              = metadata.organizationId.map(id ⇒ organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
+            val check                     = CheckWithDataUser(metadata.username, metadata.groupname, organization)
+            val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, user, check)
+            Document(metadata, Operations.serialize(operations), values)
+          }
+        (documents, searchCount)
+      }
     }
 
 }

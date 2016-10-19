@@ -22,7 +22,8 @@ case class DocumentMetaData(
   lastModifiedTime : Timestamp,
   lastModifiedBy   : String,
   username         : Option[String],
-  groupname        : Option[String]
+  groupname        : Option[String],
+  organizationId   : Option[Int]
 )
 
 case class DocumentValue(

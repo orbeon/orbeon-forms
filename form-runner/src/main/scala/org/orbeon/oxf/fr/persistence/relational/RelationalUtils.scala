@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
-import java.sql.Connection
+import java.sql.{Connection, ResultSet}
 import javax.naming.{Context, InitialContext}
 import javax.sql.DataSource
 
@@ -21,11 +21,12 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.util.CoreUtils._
+
 
 import scala.util.control.NonFatal
 
@@ -62,6 +63,12 @@ object RelationalUtils extends Logging {
     * [3]: http://www.jguru.com/faq/view.jsp?EID=8881
     */
   def sqlString(text: String) = "'" + text.replaceAllLiterally("'", "''") + "'"
+
+  def getIntOpt(resultSet: ResultSet, columnLabel: String): Option[Int] = {
+    val readInt = resultSet.getInt(columnLabel)
+    val valid   = ! resultSet.wasNull()
+    valid.option(readInt)
+  }
 
   private def getDataSourceNameFromHeaders =
     NetUtils.getExternalContext.getRequest.getFirstHeader("orbeon-datasource") getOrElse

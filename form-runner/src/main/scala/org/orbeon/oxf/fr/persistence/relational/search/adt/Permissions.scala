@@ -18,6 +18,7 @@ import org.orbeon.saxon.om.NodeInfo
 
 case class Permissions(
     formPermissionsElOpt          : Option[NodeInfo],
+    formPermissions               : org.orbeon.oxf.fr.permission.Permissions,
     authorizedBasedOnRole         : Boolean,
     authorizedIfOrganizationMatch : List[String],
     authorizedIfUsername          : Option[String],

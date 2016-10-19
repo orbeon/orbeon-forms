@@ -51,6 +51,7 @@ object commonPart  {
             |           c.last_modified_by,
             |           c.username,
             |           c.groupname,
+            |           c.organization_id,
             |           $rowNumCol
             |      FROM orbeon_i_current c
             |           $mySqlRowNumTable

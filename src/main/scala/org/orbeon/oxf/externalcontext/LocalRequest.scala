@@ -52,9 +52,10 @@ class LocalRequest(
 
     def userGroupRoleHeadersIterator =
       Iterator(
-        Option(incomingRequest.getUsername)                                        .map (Headers.OrbeonUsernameLower → List(_)),
-        Option(incomingRequest.getUserGroup)                                       .map (Headers.OrbeonGroupLower    → List(_)),
-        Option(incomingRequest.getUserRoles).map(_.to[List].map(UserRole.serialize).pipe(Headers.OrbeonRolesLower    → _))
+        Option(incomingRequest.getUsername)                                        .map (Headers.OrbeonUsernameLower     → List(_)),
+        Option(incomingRequest.getUserGroup)                                       .map (Headers.OrbeonGroupLower        → List(_)),
+        Option(incomingRequest.getUserRoles).map(_.to[List].map(UserRole.serialize).pipe(Headers.OrbeonRolesLower        → _)),
+        Option(incomingRequest.getUserOrganization).map(_.to[List])                .map (Headers.OrbeonOrganizationLower → _)
       ).flatten
 
     def bodyHeadersIterator =

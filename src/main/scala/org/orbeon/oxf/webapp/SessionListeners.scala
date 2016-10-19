@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.webapp
 
-import java.io.{ObjectInput, ObjectOutput, Externalizable, Serializable}
+import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import org.orbeon.oxf.pipeline.api.ExternalContext.Session.SessionListener
+import org.orbeon.oxf.webapp.ExternalContext.SessionListener
 
 class SessionListeners extends Externalizable {
 

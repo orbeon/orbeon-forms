@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -32,17 +32,21 @@ public class ServletToExternalContextRequestDispatcherWrapper implements Externa
         this.isDefaultContext = isDefaultContext;
     }
 
-    public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
+    public void forward(ExternalContext.Request request, ExternalContext.Response response) {
         try {
             dispatcher.forward(new ExternalContextToHttpServletRequestWrapper(request, true), new ExternalContextToHttpServletResponseWrapper(response));
+        } catch (IOException e) {
+            throw new OXFException(e);
         } catch (ServletException e) {
             throw new OXFException(e);
         }
     }
 
-    public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
+    public void include(ExternalContext.Request request, ExternalContext.Response response) {
         try {
             dispatcher.include(new ExternalContextToHttpServletRequestWrapper(request, false), new ExternalContextToHttpServletResponseWrapper(response));
+        } catch (IOException e) {
+            throw new OXFException(e);
         } catch (ServletException e) {
             throw new OXFException(e);
         }

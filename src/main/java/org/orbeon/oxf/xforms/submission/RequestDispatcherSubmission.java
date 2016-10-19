@@ -13,16 +13,14 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.Callable;
 
@@ -258,14 +256,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             customHeaderNameValues,
             new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
-                  try {
-                      if (p.isReplaceAll)
-                          requestDispatcher.forward(request, response);
-                      else
-                          requestDispatcher.include(request, response);
-                  } catch (IOException e) {
-                      throw new OXFException(e);
-                  }
+                  if (p.isReplaceAll)
+                      requestDispatcher.forward(request, response);
+                  else
+                      requestDispatcher.include(request, response);
                }
             },
             isContextRelative,

@@ -23,6 +23,7 @@ import org.jfree.data.general.Dataset;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -116,7 +117,7 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
 
         String file;
         try {
-            final ExternalContext.Session session =
+            final org.orbeon.oxf.webapp.ExternalContext.Session session =
                     ((ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT)).getSession(true);
             file = ServletUtilities.saveChartAsPNG(chart, chartConfig.getxSize(), chartConfig.getySize(), info,
                     new HttpSession() {

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.BindingContext;

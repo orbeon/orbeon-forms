@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.webapp.ExternalContext.Request
 import collection.JavaConverters._
 
 object ExternalContextOps {

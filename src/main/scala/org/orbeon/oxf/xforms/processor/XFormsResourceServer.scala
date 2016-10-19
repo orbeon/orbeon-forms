@@ -18,14 +18,14 @@ import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.http.GET
-import org.orbeon.oxf.pipeline.api.ExternalContext.Session.APPLICATION_SCOPE
-import org.orbeon.oxf.pipeline.api.ExternalContext._
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.http.{GET, StatusCode}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.ExternalContext
+import org.orbeon.oxf.webapp.ExternalContext.Session.APPLICATION_SCOPE
 import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
 
 import scala.util.Try
@@ -126,7 +126,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         }
 
       case None ⇒
-        response.setStatus(SC_NOT_FOUND)
+        response.setStatus(StatusCode.SC_NOT_FOUND)
     }
   }
 
@@ -141,7 +141,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     // Eliminate funny requests
     if (! isCSS && ! isJS && ! filenameFromPath.startsWith("orbeon-")) {
-      response.setStatus(SC_NOT_FOUND)
+      response.setStatus(StatusCode.SC_NOT_FOUND)
       return
     }
 
@@ -155,7 +155,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
       } else {
         // Not found, either because the hash is invalid, or because the cache lost the mapping
-        response.setStatus(SC_NOT_FOUND)
+        response.setStatus(StatusCode.SC_NOT_FOUND)
         return
       }
     }
@@ -175,7 +175,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     // Check If-Modified-Since and don't return content if condition is met
     if (! response.checkIfModifiedSince(combinedLastModified)) {
-      response.setStatus(SC_NOT_MODIFIED)
+      response.setStatus(StatusCode.SC_NOT_MODIFIED)
       return
     }
 

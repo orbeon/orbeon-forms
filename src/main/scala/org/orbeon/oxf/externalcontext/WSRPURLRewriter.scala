@@ -14,11 +14,12 @@
 package org.orbeon.oxf.externalcontext
 
 import URLRewriter._
-import java.net.{URLDecoder, URL, URLEncoder}
+import java.net.{URL, URLDecoder, URLEncoder}
 import java.util.concurrent.Callable
 import java.{util ⇒ ju}
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.util.{StringConversions, NetUtils, URLRewriterUtils}
+
+import org.orbeon.oxf.util.{NetUtils, StringConversions, URLRewriterUtils}
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DynamicResourcesPath
 
 // This URL rewriter rewrites URLs using the WSRP encoding
@@ -27,7 +28,7 @@ class WSRPURLRewriter(
   request              : ExternalContext.Request,
   wsrpEncodeResources  : Boolean
 ) extends URLRewriter {
-  
+
   import WSRPURLRewriter._
 
   // We don't initialize the matchers right away, because when the rewriter is created, they may not be available.
@@ -230,7 +231,7 @@ object WSRPURLRewriter {
       if (s.startsWith("amp;")) s.substring("amp;".length) else s
 
     val wsrpParameters = NetUtils.decodeQueryStringPortlet(encodedURL)
-    
+
     val urlType = {
       val urlType = getFirstValueFromStringArray(wsrpParameters.get(URLTypeParam))
 
@@ -256,7 +257,7 @@ object WSRPURLRewriter {
       navigationParameters.remove(PathParameterName)
       val resourceQuery = NetUtils.encodeQueryString2(navigationParameters)
       val resourceId = NetUtils.appendQueryString(resourcePath, resourceQuery)
-      
+
       createResourceURL(resourceId)
     } else {
       val portletMode =

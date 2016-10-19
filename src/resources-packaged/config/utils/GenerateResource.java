@@ -1,13 +1,13 @@
 package config.utils;
 
 import org.orbeon.oxf.cache.OutputCacheKey;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 public class GenerateResource extends ProcessorImpl {
 

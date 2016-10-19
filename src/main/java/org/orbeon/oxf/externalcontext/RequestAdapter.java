@@ -14,9 +14,8 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.fr.UserRole;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.security.Principal;
@@ -77,11 +76,11 @@ public class RequestAdapter implements ExternalContext.Request {
         return null;
     }
 
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         return null;
     }
 
-    public Reader getReader() throws IOException {
+    public Reader getReader() {
         return null;
     }
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.generator;
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;

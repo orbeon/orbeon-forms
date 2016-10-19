@@ -21,13 +21,13 @@ import javax.portlet._
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
-import org.orbeon.oxf.http.{Headers, Redirect, StreamedContent, StreamedContentOrRedirect}
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.http._
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.{HttpStatusCodeException, SessionListeners, WebAppContext, WebAppRequest}
+import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._
 
@@ -70,8 +70,8 @@ object Portlet2ExternalContext {
 
     def setStatus(status: Int): Unit = {
       // Test error
-      if (status == ExternalContext.SC_NOT_FOUND) {
-        throw HttpStatusCodeException(ExternalContext.SC_NOT_FOUND)
+      if (status == StatusCode.SC_NOT_FOUND) {
+        throw HttpStatusCodeException(StatusCode.SC_NOT_FOUND)
       } else if (status >= 400) {
         // Ignore
       }
@@ -175,7 +175,7 @@ class Portlet2ExternalContext(
 
   def getWebAppContext: WebAppContext = webAppContext
 
-  private class RequestImpl extends ExternalContext.Request with WebAppRequest {
+  private class RequestImpl extends ExternalContext.Request with ServletPortletRequest {
 
     def getContainerType          : String            = "portlet"
     def getContainerNamespace     : String            = getResponse.getNamespacePrefix
@@ -313,7 +313,7 @@ class Portlet2ExternalContext(
       case _                 ⇒ throw new IllegalArgumentException
     }
 
-    def addListener(sessionListener: ExternalContext.Session.SessionListener): Unit =
+    def addListener(sessionListener: ExternalContext.SessionListener): Unit =
       portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
         case listeners: SessionListeners ⇒ listeners.addListener(sessionListener)
         case _ ⇒
@@ -322,7 +322,7 @@ class Portlet2ExternalContext(
           )
       }
 
-    def removeListener(sessionListener: ExternalContext.Session.SessionListener): Unit =
+    def removeListener(sessionListener: ExternalContext.SessionListener): Unit =
       portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
         case listeners: SessionListeners ⇒ listeners.removeListener(sessionListener)
         case _ ⇒

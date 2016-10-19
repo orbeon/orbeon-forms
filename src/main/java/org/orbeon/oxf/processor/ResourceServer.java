@@ -14,13 +14,14 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Mediatypes;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.IOException;
@@ -102,7 +103,7 @@ public class ResourceServer extends ProcessorImpl {
 
                 // Check If-Modified-Since and don't return content if condition is met
                 if (!response.checkIfModifiedSince(lastModified)) {
-                    response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                    response.setStatus(StatusCode.SC_NOT_MODIFIED());
                     return;
                 }
 
@@ -115,12 +116,12 @@ public class ResourceServer extends ProcessorImpl {
                     response.setContentLength(length);
 
             } catch (IOException e) {
-                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                response.setStatus(StatusCode.SC_NOT_FOUND());
                 return;
             } catch (ResourceNotFoundException e) {
                 // Note: we should really not get this exception here, but an IOException
                 // However we do actually get it, and so do the same we do for IOException.
-                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                response.setStatus(StatusCode.SC_NOT_FOUND());
                 return;
             }
             // Copy stream to output

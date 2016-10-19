@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 
 public class SessionInvalidator extends ProcessorImpl {
 

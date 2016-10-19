@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.util.URLRewriterUtils
 import java.{util ⇒ ju}
+
+import org.orbeon.oxf.util.URLRewriterUtils
+import org.orbeon.oxf.webapp.ExternalContext
+import org.orbeon.oxf.webapp.ExternalContext.Request
 
 // This request copies all values of the given request ahead of time
 class AsyncRequest(req: Request) extends ExternalContext.Request {

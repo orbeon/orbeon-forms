@@ -18,8 +18,7 @@ import javax.servlet.http.HttpSession
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.ExternalContext.Session
+import org.orbeon.oxf.webapp.ExternalContext.Session
 
 // External context which only exposes the web app, without request or response
 // Session is None when called from init()/destroy()/contextInitialized()/contextDestroyed()
@@ -65,10 +64,10 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[Ht
       getAttributesMap
     }
 
-    def addListener(sessionListener: ExternalContext.Session.SessionListener) =
+    def addListener(sessionListener: ExternalContext.SessionListener) =
       throw new UnsupportedOperationException
 
-    def removeListener(sessionListener: ExternalContext.Session.SessionListener) =
+    def removeListener(sessionListener: ExternalContext.SessionListener) =
       throw new UnsupportedOperationException
   }
 }

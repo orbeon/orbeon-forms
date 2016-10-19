@@ -13,20 +13,18 @@
  */
 package org.orbeon.oxf.externalcontext;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Map;
 
 
 public class ResponseAdapter implements ExternalContext.Response {
-    public PrintWriter getWriter() throws IOException {
+    public PrintWriter getWriter() {
         return null;
     }
 
-    public OutputStream getOutputStream() throws IOException {
+    public OutputStream getOutputStream() {
         return null;
     }
 
@@ -52,14 +50,14 @@ public class ResponseAdapter implements ExternalContext.Response {
     public void addHeader(String name, String value) {
     }
 
-    public void sendError(int len) throws IOException {
+    public void sendError(int len) {
     }
 
     public String getCharacterEncoding() {
         return null;
     }
 
-    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
+    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) {
     }
 
     public void setPageCaching(long lastModified) {

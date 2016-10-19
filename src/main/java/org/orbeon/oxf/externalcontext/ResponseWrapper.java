@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.externalcontext;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 
-import java.io.*;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 public class ResponseWrapper implements ExternalContext.Response {
     private ExternalContext.Response _response;
@@ -38,11 +39,11 @@ public class ResponseWrapper implements ExternalContext.Response {
         return _response.getNamespacePrefix();
     }
 
-    public OutputStream getOutputStream() throws IOException {
+    public OutputStream getOutputStream() {
         return _response.getOutputStream();
     }
 
-    public PrintWriter getWriter() throws IOException {
+    public PrintWriter getWriter() {
         return _response.getWriter();
     }
 
@@ -74,11 +75,11 @@ public class ResponseWrapper implements ExternalContext.Response {
         return _response.rewriteResourceURL(urlString, rewriteMode);
     }
 
-    public void sendError(int len) throws IOException {
+    public void sendError(int len) {
         _response.sendError(len);
     }
 
-    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
+    public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) {
         _response.sendRedirect(location, isServerSide, isExitPortal);
     }
 

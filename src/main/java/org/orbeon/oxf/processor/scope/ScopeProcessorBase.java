@@ -15,12 +15,12 @@ package org.orbeon.oxf.processor.scope;
 
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.http.Headers;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.webapp.ExternalContext$;
 
 public abstract class ScopeProcessorBase extends ProcessorImpl {
 
@@ -46,7 +46,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
                         : "session".equals(contextName) ? SESSION_CONTEXT
                         : "application".equals(contextName) ? APPLICATION_CONTEXT
                         : -1,
-                        "application".equals(sessionScopeValue) ? ExternalContext.Session.APPLICATION_SCOPE : "portlet".equals(sessionScopeValue) ? ExternalContext.Session.PORTLET_SCOPE : -1,
+                        "application".equals(sessionScopeValue) ? ExternalContext$.MODULE$.APPLICATION_SCOPE() : "portlet".equals(sessionScopeValue) ? ExternalContext$.MODULE$.PORTLET_SCOPE() : -1,
                         rootElement.element("key").getStringValue(),
                         contentType,
                         ProcessorUtils.selectBooleanValue(rootElement, "/*/test-ignore-stored-key-validity", false));

@@ -16,9 +16,9 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.util.StringBuilderWriter
+import org.orbeon.oxf.webapp.ExternalContext
+import org.orbeon.oxf.webapp.ExternalContext.Response
 
 import scala.collection.mutable
 

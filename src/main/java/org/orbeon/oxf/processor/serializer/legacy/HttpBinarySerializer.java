@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -41,11 +41,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
             response.setContentType(contentType);
 
         // Read input into an OutputStream
-        try {
-            readInput(pipelineContext, input, config, response.getOutputStream());
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
+        readInput(pipelineContext, input, config, response.getOutputStream());
     }
 
     /**

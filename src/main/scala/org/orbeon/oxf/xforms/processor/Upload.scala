@@ -17,12 +17,12 @@ import javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
 
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Multipart, NetUtils}
-import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.webapp.{ExternalContext, HttpStatusCodeException}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.XML

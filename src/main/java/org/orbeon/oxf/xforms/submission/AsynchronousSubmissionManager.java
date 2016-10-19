@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.LocalExternalContext;
 import org.orbeon.oxf.externalcontext.AsyncRequest;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;

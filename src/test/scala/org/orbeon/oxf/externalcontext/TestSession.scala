@@ -3,14 +3,14 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.pipeline.api.ExternalContext.Session
+import org.orbeon.oxf.webapp.ExternalContext.{Session, SessionListener}
 
 import scala.collection.JavaConverters._
 
 class TestSession(sessionId: String) extends Session {
 
   private val creationTime     = System.currentTimeMillis
-  private val sessionListeners = new ju.LinkedHashSet[Session.SessionListener]
+  private val sessionListeners = new ju.LinkedHashSet[SessionListener]
   private val attributesMap    = new ju.LinkedHashMap[String, AnyRef]
   private var expired          = false
 
@@ -20,12 +20,12 @@ class TestSession(sessionId: String) extends Session {
     expired = true
   }
 
-  def addListener(sessionListener: Session.SessionListener): Unit = {
+  def addListener(sessionListener: SessionListener): Unit = {
     checkExpired()
     sessionListeners.add(sessionListener)
   }
 
-def removeListener(sessionListener: Session.SessionListener): Unit = {
+def removeListener(sessionListener: SessionListener): Unit = {
     checkExpired()
     sessionListeners.remove(sessionListener)
   }

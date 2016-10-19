@@ -21,10 +21,9 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.oxf.externalcontext.LocalRequest
 import org.orbeon.oxf.externalcontext.RequestAdapter
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.webapp.WebAppContext
+import org.orbeon.oxf.webapp.{ExternalContext, WebAppContext}
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
 

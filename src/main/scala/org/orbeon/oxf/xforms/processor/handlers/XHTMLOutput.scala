@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers
 
-import org.orbeon.oxf.pipeline.api.ExternalContext
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XHTMLHeadHandler, XXFormsAttributeHandler}
 import org.orbeon.oxf.xforms.processor.handlers.xml._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate

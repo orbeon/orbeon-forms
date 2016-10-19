@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ResponseWrapper;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -27,6 +27,7 @@ import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ import java.util.List;
  */
 public abstract class HttpSerializerBase extends CachedSerializer {
 
-    protected static final int DEFAULT_STATUS_CODE = ExternalContext.SC_OK;
+    protected static final int DEFAULT_STATUS_CODE = StatusCode.SC_OK();
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
     private static final boolean DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE = false;
@@ -102,7 +103,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     if (!isForward) {
                         // Check If-Modified-Since (conditional GET) and don't return content if condition is met
                         if (!response.checkIfModifiedSince(lastModified)) {
-                            response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                            response.setStatus(StatusCode.SC_NOT_MODIFIED());
                             if (logger.isDebugEnabled())
                                 logger.debug("Sending SC_NOT_MODIFIED");
                             return;

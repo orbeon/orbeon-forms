@@ -296,7 +296,7 @@ public class FileSerializer extends ProcessorImpl {
     }
 
 
-    protected void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
+    protected void readInput(PipelineContext context, org.orbeon.oxf.webapp.ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
         FileSerializer.Config config = (FileSerializer.Config) _config;
         Writer writer = getWriter(outputStream, config);
 

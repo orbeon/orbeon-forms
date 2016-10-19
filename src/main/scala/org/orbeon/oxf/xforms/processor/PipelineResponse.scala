@@ -14,11 +14,12 @@
 package org.orbeon.oxf.xforms.processor
 
 import java.io.{OutputStreamWriter, PrintWriter}
+
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.CachedSerializer
-import org.orbeon.oxf.util.{NetUtils, ContentHandlerOutputStream}
-import org.orbeon.oxf.pipeline.api.{ExternalContext}
+import org.orbeon.oxf.util.{ContentHandlerOutputStream, NetUtils}
 import org.orbeon.oxf.externalcontext.ResponseAdapter
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xml.XMLReceiver
 
 object PipelineResponse {

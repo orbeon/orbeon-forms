@@ -23,14 +23,14 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext, ProcessorDefinition}
+import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
-import org.orbeon.oxf.webapp.{HttpStatusCodeException, WebAppContext, WebAppExternalContext}
+import org.orbeon.oxf.webapp.{ExternalContext, HttpStatusCodeException, WebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 

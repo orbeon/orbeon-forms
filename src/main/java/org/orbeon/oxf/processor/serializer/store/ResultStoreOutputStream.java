@@ -14,10 +14,13 @@
 package org.orbeon.oxf.processor.serializer.store;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Result store for binary data (e.g. PDF document)
@@ -55,12 +58,8 @@ public class ResultStoreOutputStream extends ByteArrayOutputStream implements Re
     }
 
     public void replay(PipelineContext context) {
-        try {
-            ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-            replay(externalContext.getResponse().getOutputStream());
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
+        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        replay(externalContext.getResponse().getOutputStream());
     }
 
     public void replay(Writer writer) {

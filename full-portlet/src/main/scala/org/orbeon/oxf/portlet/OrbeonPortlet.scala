@@ -18,10 +18,10 @@ import javax.portlet._
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
-import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+import org.orbeon.oxf.webapp.{ExternalContext, ProcessorService, ServletPortlet, WebAppContext}
 
 import scala.collection.JavaConverters._
 

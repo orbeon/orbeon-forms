@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.orbeon.dom.Element;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;

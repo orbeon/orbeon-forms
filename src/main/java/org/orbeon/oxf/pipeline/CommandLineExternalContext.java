@@ -16,7 +16,10 @@ package org.orbeon.oxf.pipeline;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * Simple ExternalContext for command-line applications.
@@ -46,13 +49,13 @@ public class CommandLineExternalContext extends SimpleExternalContext {
     private class CommandLineResponse extends SimpleExternalContext.Response {
 
         private PrintWriter printWriter;
-        public PrintWriter getWriter() throws IOException {
+        public PrintWriter getWriter() {
             if (printWriter == null)
                 printWriter = new PrintWriter(new OutputStreamWriter(getOutputStream()));
             return printWriter;
         }
 
-        public OutputStream getOutputStream() throws IOException {
+        public OutputStream getOutputStream() {
             return new FilterOutputStream(System.out) {
                 public void close() {
                     // Don't close System.out

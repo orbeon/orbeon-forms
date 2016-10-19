@@ -16,9 +16,10 @@ package org.orbeon.oxf.pipeline;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.fr.UserRole;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.webapp.ExternalContext$;
 import org.orbeon.oxf.webapp.TestWebAppContext;
 import org.orbeon.oxf.webapp.WebAppContext;
 
@@ -171,11 +172,11 @@ class SimpleExternalContext implements ExternalContext {
             return getContextPath();
         }
 
-        public Reader getReader() throws IOException {
+        public Reader getReader() {
             return null;
         }
 
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             return null;
         }
 
@@ -215,11 +216,11 @@ class SimpleExternalContext implements ExternalContext {
         protected int status;
         protected Map<String, String> headers = new HashMap<String, String>();
 
-        public OutputStream getOutputStream() throws IOException {
+        public OutputStream getOutputStream() {
             return outputStream;
         }
 
-        public PrintWriter getWriter() throws IOException {
+        public PrintWriter getWriter() {
             return new PrintWriter(writer);
         }
 
@@ -249,13 +250,13 @@ class SimpleExternalContext implements ExternalContext {
             headers.put(name, value);
         }
 
-        public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
+        public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) {
         }
 
         public void setContentLength(int len) {
         }
 
-        public void sendError(int code) throws IOException {
+        public void sendError(int code) {
         }
 
         public String getCharacterEncoding() {
@@ -348,7 +349,7 @@ class SimpleExternalContext implements ExternalContext {
         }
 
         public Map<String, Object> getAttributesMap(int scope) {
-            if (scope != APPLICATION_SCOPE)
+            if (scope != ExternalContext$.MODULE$.APPLICATION_SCOPE())
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Eclipse");
             return getAttributesMap();
         }

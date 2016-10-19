@@ -21,11 +21,11 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.fr.UserRole;
 import org.orbeon.oxf.fr.UserRole$;
 import org.orbeon.oxf.http.Headers;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.webapp.TestWebAppContext;
 import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -126,7 +126,7 @@ public class TestExternalContext implements ExternalContext  {
             return bodyContentType;
         }
 
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             if (getReaderCalled)
                 throw new IllegalStateException("Cannot call getInputStream() after getReader() has been called.");
             if (bodyInputStream == null)
@@ -206,13 +206,17 @@ public class TestExternalContext implements ExternalContext  {
             }
         }
 
-        public Reader getReader() throws IOException {
+        public Reader getReader() {
             if (getInputStreamCalled)
                 throw new IllegalStateException("Cannot call getReader() after getInputStream() has been called.");
             if (bodyInputStream == null)
                 setupBody();
             if (bodyReader == null)
-                bodyReader = new InputStreamReader(bodyInputStream, bodyEncoding);
+                try {
+                    bodyReader = new InputStreamReader(bodyInputStream, bodyEncoding);
+                } catch (UnsupportedEncodingException e) {
+                    throw new OXFException(e);
+                }
             getReaderCalled = true;
             return bodyReader;
         }
@@ -416,7 +420,7 @@ public class TestExternalContext implements ExternalContext  {
 
         private ByteArrayOutputStream outputStream = null;
 
-        public OutputStream getOutputStream() throws IOException {
+        public OutputStream getOutputStream() {
 
             if (outputStream == null)
                 outputStream = new ByteArrayOutputStream();
@@ -424,7 +428,7 @@ public class TestExternalContext implements ExternalContext  {
             return outputStream;
         }
 
-        public PrintWriter getWriter() throws IOException {
+        public PrintWriter getWriter() {
             return null;
         }
 
@@ -455,10 +459,10 @@ public class TestExternalContext implements ExternalContext  {
             return URLRewriterUtils.rewriteURL(getRequest(), urlString, rewriteMode);
         }
 
-        public void sendError(int len) throws IOException {
+        public void sendError(int len) {
         }
 
-        public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) throws IOException {
+        public void sendRedirect(String location, boolean isServerSide, boolean isExitPortal) {
         }
 
         public void setPageCaching(long lastModified) {

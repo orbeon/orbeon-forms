@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import net.sf.ehcache.{Element ⇒ EhElement }
+import net.sf.ehcache.{Element ⇒ EhElement}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.util.SecureUtils
+import org.orbeon.oxf.webapp.ExternalContext
 
 /**
  * XForms state cache based on Ehcache.

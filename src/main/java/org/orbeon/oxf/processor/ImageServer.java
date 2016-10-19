@@ -24,15 +24,16 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.SoftCacheImpl;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
+import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -176,7 +177,7 @@ public class ImageServer extends ProcessorImpl {
                     // Check if new URL is relative to image directory URL
                     boolean relative = NetUtils.relativeURL(config.imageDirectoryURL, newURL);
                     if (config.useSandbox && !relative) {
-                        imageResponse.setStatus(ExternalContext.SC_NOT_FOUND);
+                        imageResponse.setStatus(StatusCode.SC_NOT_FOUND());
                         return;
                     }
                     // Try to open the connection
@@ -188,11 +189,11 @@ public class ImageServer extends ProcessorImpl {
                     // Make sure the resource looks like a JPEG file
                     String contentType = URLConnection.guessContentTypeFromStream(urlConnectionInputStream);
                     if (!"image/jpeg".equals(contentType)) {
-                        imageResponse.setStatus(ExternalContext.SC_NOT_FOUND);
+                        imageResponse.setStatus(StatusCode.SC_NOT_FOUND());
                         return;
                     }
                 } catch (IOException e) {
-                    imageResponse.setStatus(ExternalContext.SC_NOT_FOUND);
+                    imageResponse.setStatus(StatusCode.SC_NOT_FOUND());
                     return;
                 }
 
@@ -211,7 +212,7 @@ public class ImageServer extends ProcessorImpl {
 
                 // Check If-Modified-Since and don't return content if condition is met
                 if ((imageConfig.transformCount == 0 || !mustProcess) && !imageResponse.checkIfModifiedSince(lastModified, false)) {
-                    imageResponse.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                    imageResponse.setStatus(StatusCode.SC_NOT_MODIFIED());
                     return;
                 }
 
@@ -261,7 +262,7 @@ public class ImageServer extends ProcessorImpl {
                             File outputDir = cacheFile.getParentFile();
                             if (!outputDir.exists() && !outputDir.mkdirs()) {
                                 logger.info("Cannot create cache directory: " + outputDir.getCanonicalPath());
-                                imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
+                                imageResponse.setStatus(StatusCode.SC_INTERNAL_SERVER_ERROR());
                                 return;
                             }
                             os = new FileOutputStream(cacheFile);
@@ -286,7 +287,7 @@ public class ImageServer extends ProcessorImpl {
                         writer.write(img2);
                     } catch (OXFException e) {
                         logger.error(OrbeonFormatter.format(e));
-                        imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
+                        imageResponse.setStatus(StatusCode.SC_INTERNAL_SERVER_ERROR());
                         return;
                     } finally {
                         if (os != null && closeOutputStream) os.close();
@@ -384,9 +385,9 @@ public class ImageServer extends ProcessorImpl {
                     }
 
                     public void setStatus(int status) {
-                        if (status == ExternalContext.SC_NOT_FOUND) {
+                        if (status == StatusCode.SC_NOT_FOUND()) {
                             throw new OXFException("Image not not found.");
-                        } else if (status == ExternalContext.SC_INTERNAL_SERVER_ERROR) {
+                        } else if (status == StatusCode.SC_INTERNAL_SERVER_ERROR()) {
                             throw new OXFException("Error while processing image.");
                         }
                     }

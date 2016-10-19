@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.immutable.Seq
+
 trait Content {
   def inputStream   : InputStream
   def contentType   : Option[String]
@@ -193,6 +194,13 @@ trait HttpResponse {
   def lastModified : Option[Long]
   def content      : StreamedContent
   def disconnect() : Unit
+}
+
+object StatusCode {
+  val SC_OK                    = 200
+  val SC_NOT_FOUND             = 404
+  val SC_NOT_MODIFIED          = 304
+  val SC_INTERNAL_SERVER_ERROR = 500
 }
 
 sealed trait HttpMethod { def name: String }

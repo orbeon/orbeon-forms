@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}

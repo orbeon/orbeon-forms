@@ -19,8 +19,8 @@ import java.{util ⇒ ju}
 import javax.servlet.http.{Cookie, HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 import javax.servlet.{RequestDispatcher, ServletInputStream}
 
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.{DateUtils, NetUtils, StringConversions}
+import org.orbeon.oxf.webapp.ExternalContext
 
 /**
  * Wrap an ExternalContext.Request into an HttpServletRequest.

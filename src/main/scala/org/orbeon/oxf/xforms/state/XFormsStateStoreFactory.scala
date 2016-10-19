@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.oxf.pipeline.api.ExternalContext
+import org.orbeon.oxf.webapp.ExternalContext
 
 
 object XFormsStateStoreFactory {

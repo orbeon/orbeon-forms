@@ -17,10 +17,10 @@ import org.orbeon.oxf.http.Headers._
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
 import org.junit.Test
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.mockito.Mockito
+
 import collection.JavaConverters._
-import org.orbeon.oxf.webapp.WebAppContext
+import org.orbeon.oxf.webapp.{ExternalContext, WebAppContext}
 
 class AuthorizerTest extends AssertionsForJUnit with MockitoSugar {
 

@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import java.{lang ⇒ jl}
 
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.Dom4j._
 import org.orbeon.oxf.xml._
 

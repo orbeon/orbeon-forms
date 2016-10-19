@@ -19,11 +19,11 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.webapp.WebAppListener;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
@@ -655,7 +655,7 @@ public class NetUtils {
         final ExternalContext.Session session = externalContext.getSession(false);
         if (session != null) {
             try {
-                session.addListener(new ExternalContext.Session.SessionListener() {
+                session.addListener(new ExternalContext.SessionListener() {
                     public void sessionDestroyed() {
                         deleteFileItem(fileItem, SESSION_SCOPE, logger);
                     }
@@ -891,7 +891,7 @@ public class NetUtils {
                 final ExternalContext.Session session = getExternalContext().getSession(false);
                 if (session != null) {
                     try {
-                        session.addListener(new ExternalContext.Session.SessionListener() {
+                        session.addListener(new ExternalContext.SessionListener() {
                             public void sessionDestroyed() {
                                 deleteFile(newFile, logger);
                             }

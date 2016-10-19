@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import java.util.{List ⇒ JList}
 
 import org.orbeon.oxf.externalcontext.ExternalContextOps._
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.webapp.ExternalContext.Request
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._

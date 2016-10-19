@@ -19,5 +19,5 @@ import org.apache.log4j.Logger;
  * Main pipeline engine interface.
  */
 public interface PipelineEngine {
-    public void executePipeline(ProcessorDefinition processorDefinition, ExternalContext externalContext, PipelineContext pipelineContext, Logger logger) throws Exception;
+    public void executePipeline(ProcessorDefinition processorDefinition, org.orbeon.oxf.webapp.ExternalContext externalContext, PipelineContext pipelineContext, Logger logger) throws Exception;
 }

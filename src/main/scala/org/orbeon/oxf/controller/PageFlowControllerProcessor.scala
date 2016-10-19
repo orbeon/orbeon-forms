@@ -19,8 +19,7 @@ import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.pipeline.ast._
@@ -30,7 +29,8 @@ import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.{HttpRedirectException, HttpStatusCodeException, ProcessorService}
+import org.orbeon.oxf.webapp.ExternalContext.Request
+import org.orbeon.oxf.webapp.{ExternalContext, HttpRedirectException, HttpStatusCodeException, ProcessorService}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._

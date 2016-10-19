@@ -21,12 +21,12 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
 import org.orbeon.oxf.externalcontext.{ServletToExternalContextRequestDispatcherWrapper, ServletURLRewriter, URLRewriter, WSRPURLRewriter}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.pipeline.api.ExternalContext.Session
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.{SessionListeners, WebAppContext, WebAppRequest}
+import org.orbeon.oxf.webapp.ExternalContext.Session
+import org.orbeon.oxf.webapp.{ExternalContext, ServletPortletRequest, SessionListeners, WebAppContext}
 
 import scala.collection.JavaConverters._
 
@@ -75,7 +75,7 @@ class ServletExternalContext(
 
   import ServletExternalContext._
 
-  private class RequestImpl extends ExternalContext.Request with WebAppRequest {
+  private class RequestImpl extends ExternalContext.Request with ServletPortletRequest {
 
     private var getParameterMapMultipartFormDataCalled = false
     private var getInputStreamCalled                   = false
@@ -396,7 +396,7 @@ class ServletExternalContext(
       getAttributesMap
     }
 
-    def addListener(sessionListener: ExternalContext.Session.SessionListener): Unit = {
+    def addListener(sessionListener: ExternalContext.SessionListener): Unit = {
       val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
       if (listeners eq null)
         throw new IllegalStateException(
@@ -405,7 +405,7 @@ class ServletExternalContext(
       listeners.addListener(sessionListener)
     }
 
-    def removeListener(sessionListener: ExternalContext.Session.SessionListener): Unit = {
+    def removeListener(sessionListener: ExternalContext.SessionListener): Unit = {
       val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
       if (listeners ne null)
         listeners.removeListener(sessionListener)

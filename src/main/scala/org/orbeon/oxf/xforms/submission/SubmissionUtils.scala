@@ -19,8 +19,8 @@ import java.net.URI
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.GET
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}

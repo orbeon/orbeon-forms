@@ -59,6 +59,14 @@
                         <param-value><xsl:value-of select="$build-root"/>/src/resources-packaged</param-value>
                     </context-param>
                     <context-param>
+                        <param-name>oxf.resources.priority.4</param-name>
+                        <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory</param-name>
+                        <param-value><xsl:value-of select="$build-root"/>/form-builder/src/main/resources</param-value>
+                    </context-param>
+                    <context-param>
                         <param-name>oxf.resources.priority.5</param-name>
                         <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
                     </context-param>
@@ -79,7 +87,7 @@
             </context-param>
             <xsl:comment>Classloader resource manager</xsl:comment>
             <context-param>
-                <param-name>oxf.resources.priority.4</param-name>
+                <param-name>oxf.resources.priority.6</param-name>
                 <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
             </context-param>
             <xsl:comment>Set run mode ("dev" or "prod")</xsl:comment>

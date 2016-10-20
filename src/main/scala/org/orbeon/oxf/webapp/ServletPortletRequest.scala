@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.fr.{Credentials, Organization, UserRole}
+import org.orbeon.oxf.fr.{Credentials, Organization, Organizations, UserRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.URLRewriterUtils
 
@@ -23,25 +23,29 @@ trait ServletPortletRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]
 
-  lazy val credentials: Option[Credentials] =
-    Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername) map { username ⇒
+  lazy val credentials: Option[Credentials] = {
 
-      val roles =
-        Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles).to[List] flatMap
-          (_ map UserRole.parse)
+      // These are credentials coming from the JSON-encoded HTTP header
+      def fromCredentialsHeader =
+        Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonCredentials) flatMap
+          (Organizations.parseCredentials(_, decodeForHeader = true))
 
-      val organization =
-        Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonOrganization) filter
-          (_.nonEmpty) map
-          (_.to[List]) map
-          Organization.apply
+      def fromIndividualHeaders =
+        Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername) map { username ⇒
 
-      Credentials(
-        username     = username,
-        roles        = roles,
-        group        = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup),
-        organization = organization
-      )
+          val roles =
+            Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles).to[List] flatMap
+              (_ map UserRole.parse)
+
+          Credentials(
+            username     = username,
+            roles        = roles,
+            group        = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup),
+            organization = None
+          )
+        }
+
+      fromCredentialsHeader orElse fromIndividualHeaders
     }
 
   def isUserInRole(role: String): Boolean =

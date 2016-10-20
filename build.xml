@@ -358,6 +358,7 @@
             -injars      lib/httpcore-4.3.2.jar
             -injars      lib/httpmime-4.3.5.jar
             -injars      lib/jcl-over-slf4j-1.7.7.jar
+            -injars      lib/spray-json_2.11-1.3.2.jar
 
             -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
 

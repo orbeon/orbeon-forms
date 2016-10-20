@@ -61,13 +61,17 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     }
 
     class MyGroup {
-      def getName         = "universe"
-      def getGroupId      = 42L
+      def getGroupId         = 42L
+      def getName            = "universe"
+      def getDescriptiveName = getName
     }
 
     case class MyRole(
       getName             : String
-    )
+    ) {
+      def getType           = LiferaySupport.LiferayRegularRoleType.value
+      override def toString = s"MyRole($getName)"
+    }
 
     class MyUser {
       def getUserId       = 123L
@@ -82,7 +86,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
     val amendedRequest =
       wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(mockRequest, new LiferayUser {
-        override def userHeaders = LiferaySupport.userHeaders(new MyUser)
+        override def userHeaders = LiferaySupport.userHeaders(new MyUser, tests = true)
       }))
 
     val expectedProperties =

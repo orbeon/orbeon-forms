@@ -26,7 +26,8 @@ object FormRunnerAuth {
   val AllHeaderNamesLower = Set(
     Headers.OrbeonUsernameLower,
     Headers.OrbeonGroupLower,
-    Headers.OrbeonRolesLower
+    Headers.OrbeonRolesLower,
+    Headers.OrbeonCredentialsLower
   )
 
   import Private._
@@ -49,7 +50,7 @@ object FormRunnerAuth {
       case Some(sessionUserGroupRolesOrganization) ⇒
         sessionUserGroupRolesOrganization
       case None ⇒
-        val newSessionUserGroupRoles @ (usernameOpt, _, _, _) = getUserGroupRoles(userRoles, getHeader)
+        val newSessionUserGroupRoles @ (usernameOpt, _, _, _) = getUserGroupRolesCredentials(userRoles, getHeader)
 
         // Only store the information into the session if we get a user. This handles the case of the initial
         // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
@@ -71,7 +72,7 @@ object FormRunnerAuth {
       (usernameOpt.toList     map (Headers.OrbeonUsernameLower     → Array(_))) :::
       (groupOpt.toList        map (Headers.OrbeonGroupLower        → Array(_))) :::
       (rolesOpt.toList        map (Headers.OrbeonRolesLower        → _       )) :::
-      (organizationOpt.toList map (Headers.OrbeonOrganizationLower → _       ))
+      (organizationOpt.toList map (Headers.OrbeonCredentialsLower  → _       ))
 
     usernameOpt match {
       case Some(username) ⇒
@@ -102,7 +103,7 @@ object FormRunnerAuth {
     val HeaderRolesSplitPropertyName        = PropertyPrefix + "header.roles.split"
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
-    val HeaderOrganizationPropertyName      = PropertyPrefix + "header.organization"
+    val HeaderCredentialsPropertyName       = PropertyPrefix + "header.credentials"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
@@ -130,7 +131,8 @@ object FormRunnerAuth {
       headerAsJSONStrings.mkString("{", ", ", "}")
     }
 
-    def getUserGroupRoles(
+    // TODO: use Credentials?
+    def getUserGroupRolesCredentials(
       userRoles : UserRoles,
       getHeader : String ⇒ Option[Array[String]]
     ): UserGroupRoles = {
@@ -200,9 +202,9 @@ object FormRunnerAuth {
           // See also: https://github.com/orbeon/orbeon-forms/issues/1690
           val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
 
-          val organization = headerOption(HeaderOrganizationPropertyName)
+          val credentials = headerOption(HeaderCredentialsPropertyName)
 
-          (username, group, roles, organization)
+          (username, group, roles, credentials)
 
         case other ⇒
           throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")

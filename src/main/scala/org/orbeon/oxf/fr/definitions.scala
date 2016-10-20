@@ -41,6 +41,7 @@ object UserRole {
       case SimpleRole(roleName) ⇒
         roleName
       case ParametrizedRole(roleName, organizationName) ⇒
+
         val escapedOrganizationName = organizationName
           .replaceAllLiterally("\\", "\\\\")
           .replaceAllLiterally("\"", "\\\"")

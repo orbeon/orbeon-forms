@@ -24,6 +24,7 @@ object Headers {
   val OrbeonGroup             = "Orbeon-Group"
   val OrbeonRoles             = "Orbeon-Roles"
   val OrbeonOrganization      = "Orbeon-Organization"
+  val OrbeonCredentials       = "Orbeon-Credentials"
 
   val OrbeonRemoteAddress     = "Orbeon-Remote-Address"
 
@@ -39,6 +40,7 @@ object Headers {
   val OrbeonGroupLower        = OrbeonGroup.toLowerCase
   val OrbeonRolesLower        = OrbeonRoles.toLowerCase
   val OrbeonOrganizationLower = OrbeonOrganization.toLowerCase
+  val OrbeonCredentialsLower  = OrbeonCredentials.toLowerCase
 
   val ContentTypeLower        = ContentType.toLowerCase
   val ContentLengthLower      = ContentLength.toLowerCase

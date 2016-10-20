@@ -16,7 +16,7 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
-import org.orbeon.oxf.fr.UserRole
+import org.orbeon.oxf.fr.{Organizations, SimpleRole, UserRole}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
@@ -52,9 +52,10 @@ class LocalRequest(
 
     def userGroupRoleHeadersIterator =
       Iterator(
-        incomingRequest.credentials map     (_.username)                            map (Headers.OrbeonUsernameLower → List(_)),
-        incomingRequest.credentials flatMap (_.group)                               map (Headers.OrbeonGroupLower    → List(_)),
-        incomingRequest.credentials map     (_.roles map UserRole.serialize)        map (Headers.OrbeonRolesLower    → _)
+        incomingRequest.credentials map     (_.username)                                                      map (Headers.OrbeonUsernameLower    → List(_)),
+        incomingRequest.credentials flatMap (_.group)                                                         map (Headers.OrbeonGroupLower       → List(_)),
+        incomingRequest.credentials map     (_.roles collect { case r: SimpleRole ⇒ UserRole.serialize(r) } ) map (Headers.OrbeonRolesLower       → _)
+        // TODO: Set OrbeonCredentialsLower so that it can be forwarded to an external persistence layer.
       ).flatten
 
     def bodyHeadersIterator =

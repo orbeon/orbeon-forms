@@ -22,7 +22,9 @@
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:search="java:org.orbeon.oxf.fr.persistence.relational.search.SearchOps"
+        xmlns:ru="java:org.orbeon.oxf.fr.persistence.relational.RelationalUtils">
 
     <!-- Search instance -->
     <p:param name="instance" type="input"/>
@@ -56,6 +58,11 @@
                 <authorized-based-on-role  ><xsl:value-of select="$operations-from-role = $search-operations"/></authorized-based-on-role>
                 <authorized-if-owner       ><xsl:value-of select="exists($search-permissions[owner])"        /></authorized-if-owner>
                 <authorized-if-group-member><xsl:value-of select="exists($search-permissions[group-member])" /></authorized-if-group-member>
+                <authorized-if-organization-match>
+                    <xsl:for-each select="search:xpathAuthorizedIfOrganizationMatch($permissions)">
+                        <organization><xsl:value-of select="."/></organization>
+                    </xsl:for-each>
+                </authorized-if-organization-match>
             </auth-info>
         </p:input>
         <p:output name="data" id="auth-info"/>
@@ -119,7 +126,7 @@
     </p:processor>
 
     <!-- Prepare query -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#search-input"/>
         <p:input name="query" href="search.xml"/>
         <p:input name="auth-info" href="#auth-info"/>
@@ -167,9 +174,29 @@
                         and
                         (
                             <!-- Using string() is necessary to get around a bug in eXist (at least with 1.4.1) -->
-                            <xsl:if test="$auth-info/authorized-if-owner = 'true'"      >$metadata/username/string() = $username  </xsl:if>
-                            <xsl:if test="$auth-info/authorized-if-owner = 'true' and $auth-info/authorized-if-group-member= 'true'"> or </xsl:if>
-                            <xsl:if test="$auth-info/authorized-if-group-member= 'true'">$metadata/groupname/string() = $groupname</xsl:if>
+                            <xsl:variable name="username-test"
+                                          select="if ($auth-info/authorized-if-owner = 'true')
+                                                  then '$metadata/username/string() = $username'
+                                                  else ()"/>
+                            <xsl:variable name="groupname-test"
+                                          select="if ($auth-info/authorized-if-group-member = 'true')
+                                                  then '$metadata/groupname/string() = $groupname'
+                                                  else ()"/>
+                            <xsl:variable name="organizations" select="$auth-info/authorized-if-organization-match/organization"/>
+                            <xsl:variable name="organization-test"
+                                          select="if (exists($organizations))
+                                                  then concat
+                                                      (
+                                                          '$metadata/organization/level/string() = (',
+                                                          string-join
+                                                              (
+                                                                  $organizations/ru:sql-string(.),
+                                                                  ', '
+                                                              ),
+                                                          ')'
+                                                      )
+                                                  else ()"/>
+                            <xsl:value-of select="string-join(($username-test, $groupname-test, $organization-test), ' or ')"/>
                         )
                     </xsl:if>
                 </xsl:template>
@@ -202,8 +229,8 @@
                 <xsl:variable name="permissions" select="doc('input:form-metadata')/forms/form/permissions"/>
                 <xsl:template match="document">
                     <xsl:copy>
-                        <xsl:attribute name="operations" select="string-join(frf:xpathAllAuthorizedOperations($permissions, string(@username), string(@groupname)), ' ')"/>
-                        <xsl:apply-templates select="(@* except (@username | @groupname)) | node()"/>
+                        <xsl:attribute name="operations" select="string-join(search:authorizedOperations($permissions, metadata), ' ')"/>
+                        <xsl:apply-templates select="(@* | node()) except metadata"/>
                     </xsl:copy>
                 </xsl:template>
             </xsl:stylesheet>

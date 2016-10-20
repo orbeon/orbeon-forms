@@ -74,9 +74,8 @@
                     return
                         <document created="{xmldb:created($collection-name, $resource-name)}"
                                   last-modified="{$last-modified}"
-                                  name="{$resource-id}"
-                                  username="{$metadata/username}"
-                                  groupname="{$metadata/groupname}">
+                                  name="{$resource-id}">
+                            { $metadata }
                             <details>
                                 ]]><details/><![CDATA[
                             </details>

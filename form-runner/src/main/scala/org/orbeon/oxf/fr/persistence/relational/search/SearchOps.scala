@@ -1,0 +1,82 @@
+/**
+ * Copyright (C) 2016 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.fr.persistence.relational.search
+
+import org.orbeon.oxf.fr.ParametrizedRole
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser}
+import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.relational.crud.Organization
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.util.StringUtils._
+
+object SearchOps {
+
+  private val SearchOperations = List(Read, Update, Delete)
+
+  def xpathAuthorizedIfOrganizationMatch(formPermissionsElOrNull: NodeInfo): List[String] =
+    authorizedIfOrganizationMatch(
+      permissions = PermissionsXML.parse(formPermissionsElOrNull),
+      currentUser = PermissionsAuthorization.currentUserFromSession
+    )
+
+  def authorizedIfOrganizationMatch(
+    permissions : Permissions,
+    currentUser : CurrentUser
+  ): List[String] = {
+    val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
+    val userParameterizedRoles = currentUser.roles.collect{ case role@ParametrizedRole(_, _) ⇒ role }
+    val usefulUserParameteriedRoles = userParameterizedRoles.filter(role ⇒ {
+      val userWithJustThisRole = currentUser.copy(roles = List(role))
+      val authorizedOperations = PermissionsAuthorization.authorizedOperations(permissions, userWithJustThisRole, check)
+      Operations.allowsAny(authorizedOperations, SearchOperations)
+    } )
+    usefulUserParameteriedRoles.map(_.organizationName)
+  }
+
+  def authorizedOperations(
+    formPermissionsElOrNull : NodeInfo,
+    metadataOrNullEl        : NodeInfo
+  ): List[String] = {
+
+    val checkWithData = {
+
+      def childValue(name: String): Option[String] =
+        Option(metadataOrNullEl)
+          .flatMap(_.firstChild(name))
+          .map(_.stringValue)
+          .flatMap(_.trimAllToOpt)
+
+      val username     = childValue("username")
+      val groupname    = childValue("groupname")
+      val organization = {
+        val levels = Option(metadataOrNullEl)
+          .flatMap(_.firstChild("organization"))
+          .map(_.child("level").to[List].map(_.stringValue))
+        levels.map(Organization(_))
+      }
+
+      CheckWithDataUser(username, groupname, organization)
+    }
+
+    val operations =
+      PermissionsAuthorization.authorizedOperations(
+        permissions = PermissionsXML.parse(formPermissionsElOrNull),
+        currentUser = PermissionsAuthorization.currentUserFromSession,
+        check       = checkWithData
+      )
+
+    Operations.serialize(operations)
+  }
+}

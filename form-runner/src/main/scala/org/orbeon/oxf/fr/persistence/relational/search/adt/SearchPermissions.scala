@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
 import org.orbeon.saxon.om.NodeInfo
 
-case class Permissions(
+case class SearchPermissions(
     formPermissionsElOpt          : Option[NodeInfo],
     formPermissions               : org.orbeon.oxf.fr.permission.Permissions,
     authorizedBasedOnRole         : Boolean,

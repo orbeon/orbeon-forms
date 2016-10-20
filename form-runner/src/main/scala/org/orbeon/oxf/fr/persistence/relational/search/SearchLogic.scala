@@ -15,9 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import java.sql.Timestamp
 
+import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchPermissions
 import org.orbeon.oxf.fr.{FormRunner, ParametrizedRole}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser, PermissionsCheck}
-import org.orbeon.oxf.fr.permission.{Permissions ⇒ _, _}
+import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
@@ -27,6 +28,7 @@ import org.orbeon.oxf.fr.persistence.relational.search.part._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 import scala.collection.mutable
@@ -36,7 +38,7 @@ trait SearchLogic extends SearchRequest {
   private val SearchOperationsLegacy = List("read", "update", "delete")
   private val SearchOperations       = List(Read, Update, Delete)
 
-  private def computePermissions(request: Request, user: CurrentUser): Permissions = {
+  private def computePermissions(request: Request, user: CurrentUser): SearchPermissions = {
 
     val formPermissionsElOpt            = RelationalUtils.readFormPermissions(request.app, request.form)
     val formPermissions                 = PermissionsXML.parse(formPermissionsElOpt.orNull)
@@ -48,7 +50,7 @@ trait SearchLogic extends SearchRequest {
       Operations.allowsAny(authorized, SearchOperations)
     }
 
-    Permissions(
+    SearchPermissions(
       formPermissionsElOpt,
       formPermissions,
       authorizedBasedOnRole         = {
@@ -56,16 +58,7 @@ trait SearchLogic extends SearchRequest {
         val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
         Operations.allowsAny(authorizedOperations, SearchOperations)
       },
-      authorizedIfOrganizationMatch = {
-        val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
-        val userParameterizedRoles = user.roles.collect{ case role@ParametrizedRole(_, _) ⇒ role }
-        val usefulUserParameteriedRoles = userParameterizedRoles.filter(role ⇒ {
-          val userWithJustThisRole = user.copy(roles = List(role))
-          val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, userWithJustThisRole, check)
-          Operations.allowsAny(authorizedOperations, SearchOperations)
-        } )
-        usefulUserParameteriedRoles.map(_.organizationName)
-      },
+      authorizedIfOrganizationMatch = SearchOps.authorizedIfOrganizationMatch(formPermissions, user),
       authorizedIfUsername          = hasPermissionCond("owner")       .option(request.username).flatten,
       authorizedIfGroup             = hasPermissionCond("group-member").option(request.group).flatten
     )

@@ -71,10 +71,11 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
-    Fun("username"       , classOf[XXFormsUsername],  op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-    Fun("get-remote-user", classOf[XXFormsUsername],  op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-    Fun("user-group"     , classOf[XXFormsUserGroup], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
-    Fun("user-roles"     , classOf[XXFormsUserRoles], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+    Fun("username"          , classOf[XXFormsUsername],          op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("get-remote-user"   , classOf[XXFormsUsername],          op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("user-group"        , classOf[XXFormsUserGroup],         op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("user-roles"        , classOf[XXFormsUserRoles],         op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+    Fun("user-organizations", classOf[XXFormsUserOrganizations], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
 
     Fun("is-user-in-role", classOf[XXFormsIsUserInRole], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)

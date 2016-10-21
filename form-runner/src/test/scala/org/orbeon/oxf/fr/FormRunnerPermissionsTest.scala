@@ -154,7 +154,7 @@ class FormRunnerPermissionsTest extends FunSpec {
             ) === Operations.None
           )
         }
-        it("doesn't grant access to a user with a parameterized role other than manager") {
+        it("doesn't grant access to a user with a parametrized role other than manager") {
           assert(
             authorizedOperations(
               permissions = clerkPermissions,

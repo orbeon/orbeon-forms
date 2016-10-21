@@ -35,9 +35,6 @@
                 <include>/request/method</include>
                 <include>/request/body</include>
                 <include>/request/headers/header[name = 'orbeon-exist-uri']</include>
-                <include>/request/headers/header[name = 'orbeon-username']</include>
-                <include>/request/headers/header[name = 'orbeon-group']</include>
-                <include>/request/headers/header[name = 'orbeon-organization']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -57,7 +54,7 @@
         <p:output name="data" id="delete-matcher-groups"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#request"/>
         <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="delete-matcher-groups" href="#delete-matcher-groups"/>
@@ -74,10 +71,10 @@
 
                 <exist-base-uri><xsl:value-of select="$exist-base-uri"/></exist-base-uri>
 
-                <xsl:for-each select="($headers[name = 'orbeon-username']/value)[1]">
+                <xsl:for-each select="p:username()">
                     <username><xsl:value-of select="."/></username>
-                    <groupname><xsl:value-of select="($headers[name = 'orbeon-group']/value)[1]"/></groupname>
-                    <xsl:for-each select="$headers[name = 'orbeon-organization']/value">
+                    <groupname><xsl:value-of select="p:user-group()"/></groupname>
+                    <xsl:for-each select="p:user-organizations()">
                         <organization><xsl:value-of select="."/></organization>
                     </xsl:for-each>
                 </xsl:for-each>

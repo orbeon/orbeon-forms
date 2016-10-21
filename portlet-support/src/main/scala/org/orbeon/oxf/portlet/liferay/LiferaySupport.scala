@@ -155,7 +155,7 @@ object LiferaySupport {
         group    = org.getGroup
         role     ← List(LiferayOrganizationOwnerRoleName, LiferayOrganizationAdministratorRoleName)
         roleName = role.name
-        hasRole  = hasUserGroupRoleMethod(u.getUserId, group.getGroupId, roleName)
+        if hasUserGroupRoleMethod(u.getUserId, group.getGroupId, roleName)
       } yield
         ParametrizedRole(roleName, org.getName)
 

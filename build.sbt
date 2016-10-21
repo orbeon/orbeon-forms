@@ -11,6 +11,7 @@ val DefaultOrbeonEdition          = "CE"
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
+val LiferayWarLibPath             = "/Users/ebruchez/Google Drive/Work/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
 
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
@@ -18,7 +19,8 @@ val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
 val MatchScalaJSFileNameFormatRE  = """((.+)-(fastopt|opt)).js""".r
 val MatchRawJarNameRE             = """([^_]+)(?:_.*)?\.jar""".r
 
-val copyJarToExplodedWar          = taskKey[Option[File]]("Copy JAR file to local WEB-INF/bin for development.")
+val copyJarToExplodedWar          = taskKey[Option[File]]("Copy JAR file to local WEB-INF/lib for development.")
+val copyJarToLiferayWar           = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
 val fastOptJSToExplodedWar        = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
 val fullOptJSToExplodedWar        = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
 
@@ -35,6 +37,11 @@ val JarFilesToExcludeFromWar = Set(
   "orbeon-form-builder-client",
   "orbeon-form-builder-shared",
   "orbeon-proxy-portlet"
+)
+
+val JarFilesToExcludeFromLiferayWar = Set(
+  "orbeon-form-builder-client",
+  "orbeon-form-builder-shared"
 )
 
 val TestResourceManagerPaths = List(
@@ -96,6 +103,21 @@ val JunitTestOptions = List(
   javaOptions       in Test          ++= TestJavaOptions,
   baseDirectory     in Test          := baseDirectory.value / ".."
 )
+
+def copyJarFile(sourceJarFile: File, destination: String, excludes: Set[String]) = {
+  val MatchRawJarNameRE(sourceJarRawName) = sourceJarFile.name
+  val targetJarFile = new File(destination + '/' + sourceJarRawName + ".jar")
+
+  if (! sourceJarFile.name.contains("_sjs")        &&
+      ! excludes(sourceJarRawName) &&
+      (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
+    println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
+    IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
+    Some(targetJarFile)
+  } else {
+    None
+  }
+}
 
 def deleteAndCreateTempTestDirectory(base: File) = {
 
@@ -173,22 +195,8 @@ lazy val commonSettings = Seq(
 //    "-Ywarn-unused-import"     // 2.11 only
   ),
 
-  copyJarToExplodedWar := {
-
-    val sourceJarFile = (packageBin in Compile).value
-    val MatchRawJarNameRE(sourceJarRawName) = sourceJarFile.name
-    val targetJarFile = new File(ExplodedWarLibPath + '/' + sourceJarRawName + ".jar")
-
-    if (! sourceJarFile.name.contains("_sjs")        &&
-        ! JarFilesToExcludeFromWar(sourceJarRawName) &&
-        (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
-      println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
-      IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
-      Some(targetJarFile)
-    } else {
-      None
-    }
-  }
+  copyJarToExplodedWar := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar),
+  copyJarToLiferayWar  := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar)
 )
 
 lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))

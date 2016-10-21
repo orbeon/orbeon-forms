@@ -15,20 +15,18 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import java.sql.Timestamp
 
-import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchPermissions
-import org.orbeon.oxf.fr.{FormRunner, ParametrizedRole}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser, PermissionsCheck}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, PermissionsCheck}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.crud.{Organization, OrganizationId}
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, _}
+import org.orbeon.oxf.fr.persistence.relational.crud.{OrganizationId, OrganizationSupport}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchPermissions, _}
 import org.orbeon.oxf.fr.persistence.relational.search.part._
+import org.orbeon.oxf.fr.{Credentials, Organization}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 import scala.collection.mutable
@@ -38,7 +36,7 @@ trait SearchLogic extends SearchRequest {
   private val SearchOperationsLegacy = List("read", "update", "delete")
   private val SearchOperations       = List(Read, Update, Delete)
 
-  private def computePermissions(request: Request, user: CurrentUser): SearchPermissions = {
+  private def computePermissions(request: Request, user: Option[Credentials]): SearchPermissions = {
 
     val formPermissionsElOpt            = RelationalUtils.readFormPermissions(request.app, request.form)
     val formPermissions                 = PermissionsXML.parse(formPermissionsElOpt.orNull)
@@ -163,7 +161,7 @@ trait SearchLogic extends SearchRequest {
         // Compute possible operations for each document
         val organizationsCache = mutable.Map[Int, Organization]()
         val documents = documentsMetadataValues.map{ case (metadata, values) ⇒
-            def readFromDatabase(id: Int) = Organization.read(connection, OrganizationId(id)).get
+            def readFromDatabase(id: Int) = OrganizationSupport.read(connection, OrganizationId(id)).get
             val organization              = metadata.organizationId.map(id ⇒ organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.username, metadata.groupname, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, user, check)

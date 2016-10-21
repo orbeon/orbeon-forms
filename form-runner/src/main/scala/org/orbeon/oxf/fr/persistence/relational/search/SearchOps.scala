@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.ParametrizedRole
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CurrentUser}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.persistence.relational.crud.Organization
+import org.orbeon.oxf.fr.{Credentials, Organization, ParametrizedRole}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.util.StringUtils._
 
 object SearchOps {
 
@@ -33,16 +32,16 @@ object SearchOps {
 
   def authorizedIfOrganizationMatch(
     permissions : Permissions,
-    currentUser : CurrentUser
+    currentUser : Option[Credentials]
   ): List[String] = {
     val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
-    val userParameterizedRoles = currentUser.roles.collect{ case role@ParametrizedRole(_, _) ⇒ role }
+    val userParameterizedRoles = currentUser.to[List].flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) ⇒ role }
     val usefulUserParameteriedRoles = userParameterizedRoles.filter(role ⇒ {
-      val userWithJustThisRole = currentUser.copy(roles = List(role))
+      val userWithJustThisRole = currentUser.map(_.copy(roles = List(role)))
       val authorizedOperations = PermissionsAuthorization.authorizedOperations(permissions, userWithJustThisRole, check)
       Operations.allowsAny(authorizedOperations, SearchOperations)
     } )
-    usefulUserParameteriedRoles.map(_.organizationName)
+    usefulUserParameteriedRoles.map(_.organizationName).to[List]
   }
 
   def authorizedOperations(
@@ -64,7 +63,7 @@ object SearchOps {
         val levels = Option(metadataOrNullEl)
           .flatMap(_.firstChild("organization"))
           .map(_.child("level").to[List].map(_.stringValue))
-        levels.map(Organization(_))
+        levels.map(Organization.apply)
       }
 
       CheckWithDataUser(username, groupname, organization)

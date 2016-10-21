@@ -28,6 +28,8 @@ import org.orbeon.oxf.util.IOUtils._
 // Type for organization id, which is stored as an int
 case class OrganizationId(underlying: Int) extends AnyVal
 
+object OrganizationSupport {
+
   def createIfNecessary(
     connection   : Connection,
     provider     : Provider,

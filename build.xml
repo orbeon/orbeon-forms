@@ -344,6 +344,7 @@
             -injars      proxy-portlet/target/scala-2.11/classes
             -injars      portlet-support/target/scala-2.11/classes
             -injars      embedding/target/scala-2.11/classes
+            -injars      form-runner/target/scala-2.11/classes
             -injars      src/target/scala-2.11/classes
             -injars      common/jvm/target/scala-2.11/classes
 

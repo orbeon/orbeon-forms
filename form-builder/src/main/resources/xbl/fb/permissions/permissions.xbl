@@ -94,6 +94,8 @@
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'owner')"/>
                     <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-template')"/>
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'group-members')"/>
+                    <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-with-role-template')"/>
+                    <xf:setvalue ref="$ui/permissions/permission[last()]/role" value="'Organization owner'"/>
 
                     <!-- Populate UI permissions based metadata -->
                     <xf:action if="$has-permissions">
@@ -111,14 +113,23 @@
                         <xf:action iterate="$roles">
                             <!-- Current role -->
                             <xf:var name="role" value="."/>
+                            <xf:var name="ui-role" value="replace($role, '%20', ' ')"/>
                             <!-- Permissions for the current role -->
                             <xf:var name="permissions" value="$metadata/permissions/permission[xxf:split(user-role/@any-of) = $role]"/>
-                            <!-- Insert new permission in UI, and populate it -->
-                            <xf:insert context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
-                            <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
-                            <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xf:insert context="$new-permission" origin="xf:element('role', replace($role, '%20', ' '))"/>
-                            <xf:setvalue ref="$new-permission/operations" value="string-join($permissions/@operations, ' ')"/>
+                            <!-- If necessary, insert new permission in UI, and populate it -->
+                            <xf:var name="operations" value="string-join($permissions/@operations, ' ')"/>
+                            <xf:var name="existing-permission" value="$ui/permissions/permission[role = $ui-role]"/>
+                            <xf:action if="exists($existing-permission)">
+                                <!-- For the case of the organization owner, which might have been added already -->
+                                <xf:setvalue ref="$existing-permission/operations" value="$operations"/>
+                            </xf:action>
+                            <xf:action if="empty($existing-permission)">
+                                <xf:insert context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
+                                <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
+                                <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
+                                <xf:insert context="$new-permission" origin="xf:element('role', $ui-role)"/>
+                                <xf:setvalue ref="$new-permission/operations" value="$operations"/>
+                            </xf:action>
                         </xf:action>
                     </xf:action>
 
@@ -219,7 +230,11 @@
                                         <xf:label value="$resources/dialog-permissions/role"/>
                                     </xf:output>
                                     <xf:group ref=".[exists(role)]">
-                                        <xf:input ref="role" incremental="true" class="fb-role-name"/>
+                                        <xf:var name="is-organization-owner" value="role = 'Organization owner'"/>
+                                        <xf:group ref=".[$is-organization-owner]">
+                                            Organization owner
+                                        </xf:group>
+                                        <xf:input ref="role[not($is-organization-owner)]" incremental="true" class="fb-role-name"/>
                                     </xf:group>
                                 </xh:td>
                                 <!-- Checkboxes for operations -->

@@ -31,9 +31,9 @@ import scala.collection.JavaConverters._
   */
 object ExternalContext {
 
-  val StandardCharacterEncoding       : String = "utf-8"
-  val StandardHeaderCharacterEncoding : String = StandardCharacterEncoding
-  val StandardFormCharacterEncoding   : String = StandardCharacterEncoding
+  val StandardCharacterEncoding       = "utf-8"
+  val StandardHeaderCharacterEncoding = StandardCharacterEncoding
+  val StandardFormCharacterEncoding   = StandardCharacterEncoding
 
   trait Request {
 

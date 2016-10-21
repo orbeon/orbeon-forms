@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletRequest
 
 import org.orbeon.oxf.fr.FormRunnerAuth
 
-import scala.collection.JavaConversions._
-
 class FormRunnerAuthFilter extends Filter {
 
   def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) =
@@ -31,18 +29,16 @@ class FormRunnerAuthFilter extends Filter {
 
 object FormRunnerAuthFilter {
 
-  import java.util.{Enumeration ⇒ JEnumeration}
+  import java.{util ⇒ ju}
+
+  import scala.collection.JavaConverters._
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
-    val authHeaders = FormRunnerAuth.getUserGroupRolesAsHeadersUseSession(
-      userRoles  = servletRequest,
-      session    = servletRequest.getSession(true),
-      getHeader  = name ⇒
-        servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
-          case Array() ⇒ None
-          case array   ⇒ Some(array)
-        }
+    val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
+      userRoles = servletRequest,
+      session   = servletRequest.getSession(true),
+      getHeader = servletRequest.getHeaders(_).asInstanceOf[ju.Enumeration[String]].asScala.to[List]
     ).toMap
 
     trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {

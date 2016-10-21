@@ -170,6 +170,9 @@ object ExternalContext {
 
     def addListener(sessionListener: SessionListener)
     def removeListener(sessionListener: SessionListener)
+
+    def getAttribute(name: String): AnyRef              = getAttributesMap.get(name)
+    def setAttribute(name: String, value: AnyRef): Unit = getAttributesMap.put(name, value)
   }
 
   trait RequestDispatcher {

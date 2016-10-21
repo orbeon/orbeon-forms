@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.webapp.{ServletPortletRequest, SessionFacade, UserRolesFacade}
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
@@ -32,8 +33,6 @@ object FormRunnerAuth {
 
   import Private._
 
-  type UserGroupRoles = (Option[String], Option[String], Option[Array[String]], Option[Array[String]])
-
   // Get the username, group and roles from the request, based on the Form Runner configuration.
   // The first time this is called, the result is stored into the required session. The subsequent times,
   // the value stored in the session is retrieved. This ensures that authentication information remains an
@@ -41,48 +40,50 @@ object FormRunnerAuth {
   //
   // See https://github.com/orbeon/orbeon-forms/issues/2464
   // See also https://github.com/orbeon/orbeon-forms/issues/2632
-  def getUserGroupRolesUseSession(
-    userRoles  : UserRoles,
-    session    : Session,
-    getHeader  : String ⇒ Option[Array[String]]
-  ): UserGroupRoles =
-    Option(session.getAttribute(UserGroupRolesSessionKey).asInstanceOf[UserGroupRoles]) match {
-      case Some(sessionUserGroupRolesOrganization) ⇒
-        sessionUserGroupRolesOrganization
-      case None ⇒
-        val newSessionUserGroupRoles @ (usernameOpt, _, _, _) = getUserGroupRolesCredentials(userRoles, getHeader)
+  def getCredentialsUseSession(
+    userRoles  : UserRolesFacade,
+    session    : SessionFacade,
+    getHeader  : String ⇒ List[String]
+  ): Option[Credentials] =
+    ServletPortletRequest.findCredentialsInSession(session) orElse {
 
-        // Only store the information into the session if we get a user. This handles the case of the initial
-        // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
-        if (usernameOpt.isDefined)
-          session.setAttribute(UserGroupRolesSessionKey, newSessionUserGroupRoles)
+      val newCredentialsOpt = findCredentialsFromHeaders(userRoles, getHeader)
 
-        newSessionUserGroupRoles
+      // Only store the information into the session if we get user credentials. This handles the case of the initial
+      // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
+      newCredentialsOpt foreach
+        (ServletPortletRequest.storeCredentialsInSession(session, _))
+
+      newCredentialsOpt
     }
 
-  def getUserGroupRolesAsHeadersUseSession(
-    userRoles  : UserRoles,
-    session    : Session,
-    getHeader  : String ⇒ Option[Array[String]]
+  def getCredentialsAsHeadersUseSession(
+    userRoles  : UserRolesFacade,
+    session    : SessionFacade,
+    getHeader  : String ⇒ List[String]
   ): List[(String, Array[String])] = {
 
-    val (usernameOpt, groupOpt, rolesOpt, organizationOpt) = getUserGroupRolesUseSession(userRoles, session, getHeader)
+    getCredentialsUseSession(userRoles, session, getHeader) match {
+      case Some(credentials) ⇒
 
-    def headersAsList =
-      (usernameOpt.toList     map (Headers.OrbeonUsernameLower     → Array(_))) :::
-      (groupOpt.toList        map (Headers.OrbeonGroupLower        → Array(_))) :::
-      (rolesOpt.toList        map (Headers.OrbeonRolesLower        → _       )) :::
-      (organizationOpt.toList map (Headers.OrbeonCredentialsLower  → _       ))
+        import org.orbeon.oxf.util.CoreUtils._
 
-    usernameOpt match {
-      case Some(username) ⇒
+        val usernameArray  = Array(credentials.username)
+        val groupNameArray = credentials.group.to[Array]
+        val roleNamesArray = credentials.roles map (_.roleName) toArray
+
+        def headersAsList =
+          (                              Headers.OrbeonUsernameLower → usernameArray)   ::
+          (groupNameArray.nonEmpty list (Headers.OrbeonGroupLower    → groupNameArray)) :::
+          (roleNamesArray.nonEmpty list (Headers.OrbeonRolesLower    → roleNamesArray))
+
         val result = headersAsList
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
         result
+
       case None ⇒
         // Don't set any headers in case there is no username
-        if (groupOpt.isDefined || (rolesOpt exists (_.nonEmpty)))
-          Logger.warn(s"not setting auth headers because username is missing: $headersAsList")
+        Logger.warn(s"not setting auth headers because username is missing")
         Nil
     }
   }
@@ -92,7 +93,6 @@ object FormRunnerAuth {
     val LoggerName = "org.orbeon.auth"
     val Logger     = LoggerFactory.getLogger(LoggerName)
 
-    val UserGroupRolesSessionKey            = "org.orbeon.auth.user-group-roles"
     val PropertyPrefix                      = "oxf.fr.authentication."
 
     val MethodPropertyName                  = PropertyPrefix + "method"
@@ -106,16 +106,6 @@ object FormRunnerAuth {
     val HeaderCredentialsPropertyName       = PropertyPrefix + "header.credentials"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
-
-    type UserRoles = {
-      def getRemoteUser(): String
-      def isUserInRole(role: String): Boolean
-    }
-
-    type Session = {
-      def getAttribute(name: String): AnyRef
-      def setAttribute(name: String, value: AnyRef): Unit
-    }
 
     def properties: PropertySet = Properties.instance.getPropertySet
 
@@ -131,11 +121,10 @@ object FormRunnerAuth {
       headerAsJSONStrings.mkString("{", ", ", "}")
     }
 
-    // TODO: use Credentials?
-    def getUserGroupRolesCredentials(
-      userRoles : UserRoles,
-      getHeader : String ⇒ Option[Array[String]]
-    ): UserGroupRoles = {
+    def findCredentialsFromHeaders(
+      userRoles : UserRolesFacade,
+      getHeader : String ⇒ List[String]
+    ): Option[Credentials] = {
 
       val propertySet = properties
       propertySet.getString(MethodPropertyName, "container") match {
@@ -147,7 +136,7 @@ object FormRunnerAuth {
 
           rolesStringOpt match {
             case None ⇒
-              (usernameOpt, None, None, None)
+              None
             case Some(rolesString) ⇒
 
               // Wrap exceptions as Liferay throws if the role is not available instead of returning false
@@ -163,14 +152,21 @@ object FormRunnerAuth {
                   role ← rolesString split rolesSplit
                   if isUserInRole(role)
                 } yield
-                  role
+                  UserRole.parse(role)
 
               val roles = rolesArray match {
                 case Array() ⇒ None
                 case array   ⇒ Some(array)
               }
 
-              (usernameOpt, rolesArray.headOption, roles, None)
+              usernameOpt map { username ⇒
+                Credentials(
+                  username     = username,
+                  roles        = rolesArray.to[List],
+                  group        = rolesArray.headOption map (_.roleName),
+                  organization = None
+                )
+              }
           }
 
         case "header" ⇒
@@ -178,8 +174,8 @@ object FormRunnerAuth {
           val headerPropertyName =
             propertySet.getString(HeaderRolesPropertyNamePropertyName).trimAllToOpt
 
-          def headerOption(name: String) =
-            Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
+          def headerList(name: String) =
+            Option(propertySet.getString(name)).toList flatMap (p ⇒ getHeader(p.toLowerCase))
 
           val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
           def splitRoles(value: String) = value split rolesSplit
@@ -194,17 +190,29 @@ object FormRunnerAuth {
             case _ ⇒ List(value)
           }
 
-          // Username and group: take the first header
-          val username = headerOption(HeaderUsernamePropertyName) map (_.head)
-          val group    = headerOption(HeaderGroupPropertyName)    map (_.head)
+          // Credentials coming from the JSON-encoded HTTP header
+          def fromCredentialsHeader =
+            headerList(HeaderCredentialsPropertyName).headOption flatMap
+              (Organizations.parseCredentials(_, decodeForHeader = true))
 
-          // Roles: all headers with the given name are used, each header value is split, and result combined
-          // See also: https://github.com/orbeon/orbeon-forms/issues/1690
-          val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap splitRoles flatMap splitWithinRole)
+          // Credentials coming from individual headers (requires at least the username)
+          def fromIndividualHeaders =
+            headerList(HeaderUsernamePropertyName).headOption map { username ⇒
 
-          val credentials = headerOption(HeaderCredentialsPropertyName)
+              // Roles: all headers with the given name are used, each header value is split, and result combined
+              // See also: https://github.com/orbeon/orbeon-forms/issues/1690
+              val roles =
+                headerList(HeaderRolesPropertyName) flatMap splitRoles flatMap splitWithinRole map UserRole.parse
 
-          (username, group, roles, credentials)
+              Credentials(
+                username     = username,
+                roles        = roles,
+                group        = headerList(HeaderGroupPropertyName).headOption,
+                organization = None
+              )
+            }
+
+          fromCredentialsHeader orElse fromIndividualHeaders
 
         case other ⇒
           throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")

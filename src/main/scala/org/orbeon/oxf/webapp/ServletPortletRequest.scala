@@ -13,40 +13,28 @@
   */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.fr.{Credentials, Organization, Organizations, UserRole}
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.fr.Credentials
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
 
+object ServletPortletRequest {
+
+  private val CredentialsSessionKey = "org.orbeon.auth.credentials"
+
+  def findCredentialsInSession(session: SessionFacade): Option[Credentials] =
+     collectByErasedType[Credentials](session.getAttribute(ServletPortletRequest.CredentialsSessionKey))
+
+   def storeCredentialsInSession(session: SessionFacade, credentials: Credentials) =
+    session.setAttribute(ServletPortletRequest.CredentialsSessionKey, credentials)
+}
 
 // Implementations shared between ServletExternalContext and Portlet2ExternalContext.
 trait ServletPortletRequest extends ExternalContext.Request {
 
   protected def headerValuesMap: Map[String, Array[String]]
 
-  lazy val credentials: Option[Credentials] = {
-
-      // These are credentials coming from the JSON-encoded HTTP header
-      def fromCredentialsHeader =
-        Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonCredentials) flatMap
-          (Organizations.parseCredentials(_, decodeForHeader = true))
-
-      def fromIndividualHeaders =
-        Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonUsername) map { username ⇒
-
-          val roles =
-            Headers.nonEmptyHeaderIgnoreCase(headerValuesMap, Headers.OrbeonRoles).to[List] flatMap
-              (_ map UserRole.parse)
-
-          Credentials(
-            username     = username,
-            roles        = roles,
-            group        = Headers.firstHeaderIgnoreCase(headerValuesMap, Headers.OrbeonGroup),
-            organization = None
-          )
-        }
-
-      fromCredentialsHeader orElse fromIndividualHeaders
-    }
+  lazy val credentials: Option[Credentials] =
+    Option(getSession(create = false)) flatMap ServletPortletRequest.findCredentialsInSession
 
   def isUserInRole(role: String): Boolean =
     credentials exists (_.roles exists (_.roleName == role))

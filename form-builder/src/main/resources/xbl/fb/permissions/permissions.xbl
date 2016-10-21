@@ -20,7 +20,8 @@
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:xbl="http://www.w3.org/ns/xbl"
-    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-permissions" element="fb|permissions">
         <xbl:handlers>
@@ -39,6 +40,7 @@
                         <has-permissions/>
                         <readonly-checked>create read update delete</readonly-checked>
                         <permissions/>
+                        <always-show-roles/>
                     </ui>
                 </xf:instance>
                 <!-- Maintain validity flag -->
@@ -87,6 +89,13 @@
                     <xf:var name="has-permissions" value="exists($metadata/permissions)"/>
                     <xf:setvalue ref="$ui/has-permissions" value="if ($has-permissions) then 'true' else ''"/>
 
+                    <!-- Get and store roles we always show first -->
+                    <xf:delete ref="$ui/always-show-roles/role"/>
+                    <xf:action iterate="fbf:alwaysShowRoles()">
+                        <xf:var name="role" value="."/>
+                        <xf:insert context="$ui/always-show-roles" ref="*" origin="xf:element('role', $role)"/>
+                    </xf:action>
+
                     <!-- Clean UI permissions -->
                     <xf:delete ref="$ui/permissions/*"/>
                     <xf:insert context="$ui/permissions" origin="instance('permission-template')"/>
@@ -94,8 +103,11 @@
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'owner')"/>
                     <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-template')"/>
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'group-members')"/>
-                    <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-with-role-template')"/>
-                    <xf:setvalue ref="$ui/permissions/permission[last()]/role" value="'Organization owner'"/>
+                    <xf:action iterate="$ui/always-show-roles/role">
+                        <xf:var name="role" value="."/>
+                        <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-with-role-template')"/>
+                        <xf:setvalue ref="$ui/permissions/permission[last()]/role" value="$role"/>
+                    </xf:action>
 
                     <!-- Populate UI permissions based metadata -->
                     <xf:action if="$has-permissions">
@@ -120,7 +132,7 @@
                             <xf:var name="operations" value="string-join($permissions/@operations, ' ')"/>
                             <xf:var name="existing-permission" value="$ui/permissions/permission[role = $ui-role]"/>
                             <xf:action if="exists($existing-permission)">
-                                <!-- For the case of the organization owner, which might have been added already -->
+                                <!-- For the case of the roles configured to always, which we added already -->
                                 <xf:setvalue ref="$existing-permission/operations" value="$operations"/>
                             </xf:action>
                             <xf:action if="empty($existing-permission)">
@@ -209,7 +221,7 @@
                             repeat="content"
                             bind="permissions-bind"
                             template="instance('permission-with-role-template')"
-                            freeze="3"
+                            freeze="{3 + count($ui/always-show-roles/role)}"
                             class="fb-permissions-grid">
 
                             <xh:tr>
@@ -230,11 +242,9 @@
                                         <xf:label value="$resources/dialog-permissions/role"/>
                                     </xf:output>
                                     <xf:group ref=".[exists(role)]">
-                                        <xf:var name="is-organization-owner" value="role = 'Organization owner'"/>
-                                        <xf:group ref=".[$is-organization-owner]">
-                                            Organization owner
-                                        </xf:group>
-                                        <xf:input ref="role[not($is-organization-owner)]" incremental="true" class="fb-role-name"/>
+                                        <xf:var name="is-always-show-roles" value="role = $ui/always-show-roles/role"/>
+                                        <xf:output ref="role[$is-always-show-roles]"/>
+                                        <xf:input  ref="role[not($is-always-show-roles)]" incremental="true" class="fb-role-name"/>
                                     </xf:group>
                                 </xh:td>
                                 <!-- Checkboxes for operations -->

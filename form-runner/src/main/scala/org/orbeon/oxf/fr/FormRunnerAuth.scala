@@ -65,22 +65,9 @@ object FormRunnerAuth {
 
     getCredentialsUseSession(userRoles, session, getHeader) match {
       case Some(credentials) ⇒
-
-        import org.orbeon.oxf.util.CoreUtils._
-
-        val usernameArray  = Array(credentials.username)
-        val groupNameArray = credentials.group.to[Array]
-        val roleNamesArray = credentials.roles map (_.roleName) toArray
-
-        def headersAsList =
-          (                              Headers.OrbeonUsernameLower → usernameArray)   ::
-          (groupNameArray.nonEmpty list (Headers.OrbeonGroupLower    → groupNameArray)) :::
-          (roleNamesArray.nonEmpty list (Headers.OrbeonRolesLower    → roleNamesArray))
-
-        val result = headersAsList
+        val result = Credentials.toHeaders(credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
         result
-
       case None ⇒
         // Don't set any headers in case there is no username
         Logger.warn(s"not setting auth headers because username is missing")
@@ -149,10 +136,10 @@ object FormRunnerAuth {
 
               val rolesArray =
                 for {
-                  role ← rolesString split rolesSplit
-                  if isUserInRole(role)
+                  roleName ← rolesString split rolesSplit
+                  if isUserInRole(roleName)
                 } yield
-                  UserRole.parse(role)
+                  SimpleRole(roleName)
 
               val roles = rolesArray match {
                 case Array() ⇒ None
@@ -202,7 +189,7 @@ object FormRunnerAuth {
               // Roles: all headers with the given name are used, each header value is split, and result combined
               // See also: https://github.com/orbeon/orbeon-forms/issues/1690
               val roles =
-                headerList(HeaderRolesPropertyName) flatMap splitRoles flatMap splitWithinRole map UserRole.parse
+                headerList(HeaderRolesPropertyName) flatMap splitRoles flatMap splitWithinRole map SimpleRole.apply
 
               Credentials(
                 username     = username,

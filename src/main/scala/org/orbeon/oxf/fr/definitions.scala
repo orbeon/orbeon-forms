@@ -13,8 +13,16 @@
  */
 package org.orbeon.oxf.fr
 
-import org.parboiled.errors.ParsingException
-import org.parboiled.scala._
+import org.orbeon.oxf.http.Headers
+
+
+sealed trait UserRole   { def roleName: String }
+case class   SimpleRole      (roleName: String)                           extends UserRole
+case class   ParametrizedRole(roleName: String, organizationName: String) extends UserRole
+
+case class Organization(
+  levels       : List[String] // levels from root to leaf
+)
 
 case class Credentials(
   username     : String,
@@ -23,60 +31,20 @@ case class Credentials(
   organization : Option[Organization]
 )
 
-case class Organization(
-  levels       : List[String] // list of levels, with the root-level first, leaf-level last
-)
+object Credentials {
 
-sealed trait UserRole   { def roleName: String }
-case class   SimpleRole      (roleName: String)                           extends UserRole
-case class   ParametrizedRole(roleName: String, organizationName: String) extends UserRole
+  def toHeaders(credentials: Credentials): List[(String, Array[String])] = {
 
-object UserRole {
+    import org.orbeon.oxf.util.CoreUtils._
 
-  def parse(userRole: String): UserRole =
-    UserRoleParser.parse(userRole)
+    val usernameArray  = Array(credentials.username)
+    val groupNameArray = credentials.group.to[Array]
+    val roleNamesArray = credentials.roles collect { case r: SimpleRole ⇒ r.roleName } toArray
 
-  def serialize(userRole: UserRole): String =
-    userRole match {
-      case SimpleRole(roleName) ⇒
-        roleName
-      case ParametrizedRole(roleName, organizationName) ⇒
-
-        val escapedOrganizationName = organizationName
-          .replaceAllLiterally("\\", "\\\\")
-          .replaceAllLiterally("\"", "\\\"")
-        s"""$roleName(organization="$escapedOrganizationName")"""
-    }
-
-  private object UserRoleParser extends Parser {
-
-    def parse(role: String): UserRole = {
-      val parsingResult = ReportingParseRunner(Role).run(role)
-      parsingResult.result match {
-        case Some(userRole) ⇒ userRole
-        case None           ⇒ throw new ParsingException(s"Invalid role `$role`")
-      }
-    }
-
-    def Role: Rule1[UserRole] = rule {
-      Name ~ optional("(" ~ Param ~ ")") ~~>
-        ((name, param) ⇒ param match {
-          case None               ⇒ SimpleRole(name)
-          case Some(organization) ⇒ ParametrizedRole(name, organization.mkString)
-        })
-    }
-
-    def Param       : Rule1[List[Char]] = rule { "organization=" ~ ValueString }
-    def ValueString : Rule1[List[Char]] = rule { "\"" ~ Characters ~ "\"" }
-
-    def Name        : Rule1[String] = rule { zeroOrMore(NameChar) ~> identity }
-    def NameChar    : Rule0         = rule { "a" - "z" | "A" - "Z" | "-" | "_" }
-
-    def Characters  : Rule1[List[Char]] = rule { zeroOrMore(Character) }
-
-    def Character   : Rule1[Char] = rule { EscapedChar | NormalChar }
-    def EscapedChar : Rule1[Char] = rule { "\\" ~ anyOf("\"\\")  ~> (_.head) }
-    def NormalChar  : Rule1[Char] = rule { ! anyOf("\"\\") ~ ANY ~> (_.head) }
-
+    (                              Headers.OrbeonUsernameLower → usernameArray)   ::
+    (groupNameArray.nonEmpty list (Headers.OrbeonGroupLower    → groupNameArray)) :::
+    (roleNamesArray.nonEmpty list (Headers.OrbeonRolesLower    → roleNamesArray))
+    // TODO: Set OrbeonCredentialsLower so that it can be forwarded to an external persistence layer.
   }
+
 }

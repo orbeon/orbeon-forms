@@ -16,11 +16,10 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
-import org.orbeon.oxf.fr.{Organizations, SimpleRole, UserRole}
+import org.orbeon.oxf.fr
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
@@ -50,28 +49,28 @@ class LocalRequest(
 
   private val _headersIncludingAuthBodyLowercase = {
 
-    def userGroupRoleHeadersIterator =
-      Iterator(
-        incomingRequest.credentials map     (_.username)                                                      map (Headers.OrbeonUsernameLower    → List(_)),
-        incomingRequest.credentials flatMap (_.group)                                                         map (Headers.OrbeonGroupLower       → List(_)),
-        incomingRequest.credentials map     (_.roles collect { case r: SimpleRole ⇒ UserRole.serialize(r) } ) map (Headers.OrbeonRolesLower       → _)
-        // TODO: Set OrbeonCredentialsLower so that it can be forwarded to an external persistence layer.
-      ).flatten
+    def requestHeadersIt =
+      headersMaybeCapitalized.iterator map { case (k, v) ⇒ k.toLowerCase → v.toArray }
 
-    def bodyHeadersIterator =
+    def credentialsHeadersIt =
+      incomingRequest.credentials match {
+        case Some(credentials) ⇒ fr.Credentials.toHeaders(credentials).iterator
+        case None              ⇒ Iterator.empty
+      }
+
+    def bodyHeadersIt =
       if (Connection.requiresRequestBody(method)) {
-        (_contentLengthOpt.iterator map (value ⇒ Headers.ContentLengthLower → List(value.toString))) ++
-        (_contentTypeOpt.iterator   map (value ⇒ Headers.ContentTypeLower   → List(value)))
+        (_contentLengthOpt.iterator map (value ⇒ Headers.ContentLengthLower → Array(value.toString))) ++
+        (_contentTypeOpt.iterator   map (value ⇒ Headers.ContentTypeLower   → Array(value)))
       } else
         Iterator.empty
 
-    def allHeadersLowercaseIterator =
-      headersMaybeCapitalized.iterator ++
-      userGroupRoleHeadersIterator     ++
-      bodyHeadersIterator              map
-      { case (k, v) ⇒ k.toLowerCase → v.toArray }
+    def allHeadersLowercaseIt =
+      requestHeadersIt     ++
+      credentialsHeadersIt ++
+      bodyHeadersIt
 
-    allHeadersLowercaseIterator.toMap.asJava
+    allHeadersLowercaseIt.toMap.asJava
   }
 
   private val (_pathInfo, _queryString) =

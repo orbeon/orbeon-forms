@@ -22,7 +22,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.portlet.liferay.LiferaySupport.RoleFacade
+import org.orbeon.oxf.portlet.liferay.LiferayAPI.RoleFacade
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar

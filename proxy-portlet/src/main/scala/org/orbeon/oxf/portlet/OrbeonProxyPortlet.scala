@@ -20,7 +20,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http.{ApacheHttpClient, HttpClient, HttpClientSettings, StreamedContent}
-import org.orbeon.oxf.portlet.liferay.LiferaySupport
+import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -73,7 +73,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   // Try to find getHttpServletRequest only the first time this is accessed
   private lazy val getHttpServletRequest =
-    try Some(LiferaySupport.getHttpServletRequest _)
+    try Some(LiferayAPI.getHttpServletRequest _)
     catch { case (_: NoClassDefFoundError) | (_: ClassNotFoundException) ⇒ None }
 
   private def findServletRequest(request: PortletRequest) =

@@ -21,15 +21,14 @@ import spray.json._
 
 object Organizations {
 
-  private object Symbols {
+  object Symbols {
     val Username      = "username"
     val Groups        = "groups"
     val Roles         = "roles"
     val Organizations = "organizations"
     val Organization  = "organization"
     val Name          = "name"
-    val Value         = "value"
-    val Parameters    = "parameters"
+    val Levels        = "levels"
   }
 
   private def maybeEncodeJsStringContent(s: String) = {
@@ -42,22 +41,13 @@ object Organizations {
       s
   }
 
-  private def maybeDecodeJsStringContent(s: String) =
-    URLDecoder.decode(s, ExternalContext.StandardHeaderCharacterEncoding)
-
   def serializeCredentials(
-    username        : String,
-    userRoles       : List[UserRole],
-    groups          : List[String],
-    organizations   : List[Organization],
+    credentials     : Credentials,
     encodeForHeader : Boolean
-  ) = {
+  ): String = {
 
     val encode: String ⇒ String =
       if (encodeForHeader) maybeEncodeJsStringContent else identity
-
-    def serializeOrganization(organization: Organization) =
-      JsArray(organization.levels.iterator map encode map JsString.apply toVector)
 
     def serializeRole(userRole: UserRole) =
       userRole match {
@@ -67,22 +57,20 @@ object Organizations {
           )
         case ParametrizedRole(roleName, organizationName) ⇒
           JsObject(
-            Symbols.Name       → JsString(encode(roleName)),
-            Symbols.Parameters → JsArray(
-              JsObject(
-                Symbols.Name  → JsString(Symbols.Organization),
-                Symbols.Value → JsString(encode(organizationName))
-              )
-            )
+            Symbols.Name         → JsString(encode(roleName)),
+            Symbols.Organization → JsString(encode(organizationName))
           )
       }
 
+    def serializeOrganization(organization: Organization) =
+      JsArray(organization.levels.iterator map encode map JsString.apply toVector)
+
     JsObject(
-      Symbols.Username      → JsString(encode(username)),
-      Symbols.Groups        → JsArray(groups        map encode map JsString.apply toVector),
-      Symbols.Roles         → JsArray(userRoles     map serializeRole             toVector),
-      Symbols.Organizations → JsArray(organizations map serializeOrganization     toVector)
-    )
+      Symbols.Username      → JsString(encode(credentials.username)),
+      Symbols.Groups        → JsArray(credentials.group         map encode map JsString.apply toVector),
+      Symbols.Roles         → JsArray(credentials.roles         map serializeRole             toVector),
+      Symbols.Organizations → JsArray(credentials.organizations map serializeOrganization     toVector)
+    ).compactPrint
   }
 
   def parseCredentials(
@@ -94,81 +82,91 @@ object Organizations {
     } else {
 
       val decode: String ⇒ String =
-        if (decodeForHeader) maybeDecodeJsStringContent else identity
+        if (decodeForHeader) URLDecoder.decode(_, ExternalContext.StandardHeaderCharacterEncoding) else identity
 
-      (credentials.parseJson: @unchecked) match {
-        case JsObject(nameValues) ⇒
+      val parsed = credentials.parseJson
 
-          val usernameOpt = nameValues.get(Symbols.Username) map {
-            case JsString(value) ⇒ decode(value)
-            case _ ⇒ throw new IllegalArgumentException
+      def deserializeRole(value: JsValue): UserRole = value match {
+        case JsObject(roleNameValues) ⇒
+
+          val roleName = roleNameValues.get(Symbols.Name) match {
+            case Some(JsString(value)) ⇒ decode(value)
+            case _                     ⇒ deserializationError("key `name` with string value expected in role")
           }
 
-          val rolesOpt =
-            (nameValues.get(Symbols.Roles): @unchecked) map {
-              case JsArray(roles) ⇒
-                (roles: @unchecked) map {
-                  case JsObject(roleNameValues) ⇒
+          val organizationOpt = roleNameValues.get(Symbols.Organization) match {
+            case Some(JsString(value)) ⇒ Some(decode(value))
+            case None                  ⇒ None
+            case _                     ⇒ deserializationError("key `organization` with string value expected in role")
+          }
 
-                    val roleName = (roleNameValues.get(Symbols.Name): @unchecked) match {
-                      case Some(JsString(value)) ⇒ decode(value)
-                    }
+          organizationOpt match {
+            case Some(organizationName) ⇒ ParametrizedRole(roleName, organizationName)
+            case none                   ⇒ SimpleRole(roleName)
+          }
 
-                    val params = (roleNameValues.get(Symbols.Parameters): @unchecked) map {
-                      case JsArray(parameters) ⇒
-                        (parameters: @unchecked) map {
-                          case JsObject(parameterNameValues) ⇒
-                            val parameterMap =
-                              (parameterNameValues: @unchecked) map {
-                                case (name, JsString(value)) ⇒ name → value
-                              }
+        case _ ⇒ deserializationError("object value expected")
+      }
 
-                            ((parameterMap.get(Symbols.Name), parameterMap.get(Symbols.Value)): @unchecked) match {
-                              case (Some(name), Some(value)) ⇒ name → value
-                            }
-                        }
-                    }
+      def deserializeOrganization(value: JsValue): Organization = value match {
+        case JsArray(values) ⇒
 
-                    (params: @unchecked) match {
-                      case Some(params) if params.toMap.contains(Symbols.Organization)  ⇒
-                        ParametrizedRole(decode(roleName), decode(params.toMap.apply(Symbols.Organization)))
-                      case None ⇒
-                        SimpleRole(decode(roleName))
-                    }
-                }
+          val levels =
+            values map {
+              case JsString(value) ⇒ decode(value)
+              case _               ⇒ deserializationError("string value expected")
             }
 
-          val organizationsOpt =
-            (nameValues.get(Symbols.Organizations): @unchecked) map {
-              case JsArray(hierarchies) ⇒
-                (hierarchies: @unchecked) map {
-                  case JsArray(orgNames) ⇒
+          Organization(levels = levels.to[List])
+        case _ ⇒ deserializationError("array value expected")
+      }
 
-                    val names =
-                      (orgNames: @unchecked) map {
-                        case JsString(orgName) ⇒ decode(orgName)
-                      }
+      parsed match {
+        case JsObject(topLevel) ⇒
 
-                    Organization(names.to[List])
-                }
+          val username =
+            topLevel.get(Symbols.Username) match {
+              case Some(JsString(value)) ⇒ decode(value)
+              case _                     ⇒ deserializationError("key `username` with string value expected")
             }
 
-          val groupsOpt =
-            (nameValues.get(Symbols.Groups): @unchecked) map {
-              case JsArray(groups) ⇒
-                (groups: @unchecked) map {
-                  case JsString(value) ⇒ decode(value)
+          // NOTE: We support an array in the JSON format but not yet in `Credentials`
+          val groupOpt =
+            topLevel.get(Symbols.Groups) match {
+              case Some(JsArray(values)) ⇒
+                values.headOption match {
+                  case Some(JsString(value)) ⇒ Some(decode(value))
+                  case None                  ⇒ None
+                  case _                     ⇒ deserializationError("string value expected")
                 }
+              case None ⇒ None
+              case _    ⇒ deserializationError("key `groups` with array value expected")
             }
 
-          usernameOpt map { username ⇒
+          val roles =
+            topLevel.get(Symbols.Roles) match {
+              case Some(JsArray(values)) ⇒ values map deserializeRole
+              case None                  ⇒ Vector.empty
+              case _                     ⇒ deserializationError("key `roles` with array value expected")
+            }
+
+          val organizations =
+            topLevel.get(Symbols.Organizations) match {
+              case Some(JsArray(values)) ⇒ values map deserializeOrganization
+              case None                  ⇒ Vector.empty
+              case _                     ⇒ deserializationError("array value expected")
+            }
+
+          Some(
             Credentials(
-              username     = username,
-              group        = groupsOpt flatMap (_.headOption),
-              roles        = rolesOpt map (_.to[List]) getOrElse Nil,
-              organization = organizationsOpt flatMap (_.headOption)
+              username      = username,
+              group         = groupOpt,
+              roles         = roles.to[List],
+              organizations = organizations.to[List]
             )
-          }
+          )
+
+        case _ ⇒ deserializationError("Object expected")
       }
     }
 

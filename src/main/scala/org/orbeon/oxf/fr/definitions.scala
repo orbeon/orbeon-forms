@@ -25,11 +25,13 @@ case class Organization(
 )
 
 case class Credentials(
-  username     : String,
-  group        : Option[String],
-  roles        : List[UserRole],
-  organization : Option[Organization]
-)
+  username      : String,
+  group         : Option[String],
+  roles         : List[UserRole],
+  organizations : List[Organization]
+) {
+  def defaultOrganization: Option[Organization] = organizations.headOption
+}
 
 object Credentials {
 

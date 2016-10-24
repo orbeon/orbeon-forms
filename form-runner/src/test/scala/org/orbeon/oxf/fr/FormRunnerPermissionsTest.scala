@@ -21,10 +21,10 @@ class FormRunnerPermissionsTest extends FunSpec {
 
   val guest =
     Credentials(
-      username     = "juser",
-      group        = None,
-      organization = None,
-      roles        = Nil
+      username      = "juser",
+      group         = None,
+      roles         = Nil,
+      organizations = Nil
     )
 
   val juser    = guest.copy(username = "juser")

@@ -54,10 +54,7 @@ object LiferaySupport {
 
   def getCredentialsAsSerializedJson(u: UserFacade): String = {
 
-    val organizations =
-      ancestorOrSelfLiferayOrgsForUser(u) map { orgs ⇒
-        Organization(orgs map (_.getName))
-      }
+    val ancestorOrSelfLiferayOrgs = ancestorOrSelfLiferayOrgsForUser(u)
 
     val simpleRoles =
       for {
@@ -68,7 +65,7 @@ object LiferaySupport {
 
     val parametrizedRoles =
       for {
-        rootOrgs ← ancestorOrSelfLiferayOrgsForUser(u)
+        rootOrgs ← ancestorOrSelfLiferayOrgs
         org      ← rootOrgs
         group    = org.getGroup
         role     ← List(LiferayOrganizationOwnerRoleName, LiferayOrganizationAdministratorRoleName)
@@ -77,16 +74,15 @@ object LiferaySupport {
       } yield
         ParametrizedRole(roleName, org.getName)
 
-    val orbeonCredentialsJson =
-      Organizations.serializeCredentials(
-        username        = u.getScreenName,
-        userRoles       = simpleRoles ++: parametrizedRoles,
-        groups          = Option(u.getGroup) map (_.getDescriptiveName) toList,
-        organizations   = organizations,
-        encodeForHeader = true
-      )
-
-    orbeonCredentialsJson.compactPrint
+    Organizations.serializeCredentials(
+      Credentials(
+        username      = u.getScreenName, // TODO: OR getEmailAddress deoendung in orioerty
+        group         = Option(u.getGroup) map (_.getDescriptiveName),
+        roles         = simpleRoles ++: parametrizedRoles,
+        organizations = ancestorOrSelfLiferayOrgs map(org ⇒ Organization(org map (_.getName)))
+      ),
+      encodeForHeader = true
+    )
   }
 
   private val HeaderNamesGetters = List[(String, UserFacade ⇒ List[String])](

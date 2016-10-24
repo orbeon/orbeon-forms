@@ -148,10 +148,10 @@ object FormRunnerAuth {
 
               usernameOpt map { username ⇒
                 Credentials(
-                  username     = username,
-                  roles        = rolesArray.to[List],
-                  group        = rolesArray.headOption map (_.roleName),
-                  organization = None
+                  username      = username,
+                  roles         = rolesArray.to[List],
+                  group         = rolesArray.headOption map (_.roleName),
+                  organizations = Nil
                 )
               }
           }
@@ -192,10 +192,10 @@ object FormRunnerAuth {
                 headerList(HeaderRolesPropertyName) flatMap splitRoles flatMap splitWithinRole map SimpleRole.apply
 
               Credentials(
-                username     = username,
-                roles        = roles,
-                group        = headerList(HeaderGroupPropertyName).headOption,
-                organization = None
+                username      = username,
+                roles         = roles,
+                group         = headerList(HeaderGroupPropertyName).headOption,
+                organizations = Nil
               )
             }
 

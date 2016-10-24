@@ -189,8 +189,9 @@ trait CreateUpdateDelete
     }
   }
 
+  // NOTE: Gets the first organization if there are multiple organization roots
   private def currentUserOrganization(connection: Connection, req: Request): Option[OrganizationId] =
-    httpRequest.credentials.flatMap(_.organization).map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
+    httpRequest.credentials.flatMap(_.defaultOrganization).map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 

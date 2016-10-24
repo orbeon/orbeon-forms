@@ -170,18 +170,6 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
       }
     }
 
-    lazy val getReader: Reader = {
-
-      if (getInputStreamCalled)
-        throw new IllegalStateException("Cannot call getReader() after getInputStream() has been called.")
-
-      getReaderCalled = true
-
-      bodyDetails map { bodyDetails ⇒
-        new InputStreamReader(bodyDetails.bodyInputStream, bodyDetails.bodyEncoding)
-      } orNull
-    }
-
     def getContextPath: String =
       XPathUtils.selectStringValueNormalize(requestDocument, "/*/context-path")
 

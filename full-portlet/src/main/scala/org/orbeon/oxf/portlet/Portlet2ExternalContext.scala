@@ -202,7 +202,6 @@ class Portlet2ExternalContext(
     def getContentLength          : Int               = clientDataRequestOpt map (_.getContentLength)      getOrElse -1
     def getContentType            : String            = clientDataRequestOpt map (_.getContentType)        orNull
     def getMethod                 : String            = clientDataRequestOpt map (_.getMethod)             getOrElse "GET"
-    def getReader                 : Reader            = clientDataRequestOpt map (_.getReader)             orNull
     def getInputStream            : InputStream       = clientDataRequestOpt map (_.getPortletInputStream) orNull
 
     // Not available or not implemented

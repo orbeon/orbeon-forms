@@ -34,7 +34,6 @@ class AsyncRequest(req: Request) extends ExternalContext.Request {
   def isUserInRole(role: String) = getHeaderValuesMap.get("orbeon-liferay-user-roles") contains role
 
   // TODO
-  val getReader = null
   val getInputStream = null
 
   val getAttributesMap   = new ju.HashMap[String, Object](req.getAttributesMap)

@@ -76,7 +76,6 @@ abstract class SimpleExternalContext extends ExternalContext {
     def getRequestURL                                                                 = ""
     def getServletPath                                                                = ""
     def getClientContextPath(urlString: String)                                       = getContextPath
-    def getReader: Reader                                                             = null
     def getInputStream: InputStream                                                   = null
     def getLocale: ju.Locale                                                          = null
     def getLocales: ju.Enumeration[_]                                                 = null

@@ -37,16 +37,12 @@ object ServletExternalContext {
 
   val Logger = LoggerFactory.createLogger(classOf[ServletExternalContext])
 
-  private val DefaultFormCharsetProperty       = "oxf.servlet.default-form-charset"
   private val HttpPageCacheHeadersDefault      = "Cache-Control: private, max-age=0; Pragma:"
   private val HttpPageCacheHeadersProperty     = "oxf.http.page.cache-headers"
   private val HttpResourceCacheHeadersDefault  = "Cache-Control: public; Pragma:"
   private val HttpResourceCacheHeadersProperty = "oxf.http.resource.cache-headers"
   private val HttpNocacheCacheHeadersDefault   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"
   private val HttpNocacheCacheHeadersProperty  = "oxf.http.nocache.cache-headers"
-
-  lazy val defaultFormCharset =
-    Properties.instance.getPropertySet.getString(DefaultFormCharsetProperty, ExternalContext.StandardFormCharacterEncoding)
 
   private lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
   private lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
@@ -100,7 +96,6 @@ class ServletExternalContext(
     def getLocale                  = nativeRequest.getLocale
     def getLocales                 = nativeRequest.getLocales
     def isRequestedSessionIdValid  = nativeRequest.isRequestedSessionIdValid
-    def getReader                  = nativeRequest.getReader
 
     def getContainerType           = "servlet"
     def getContainerNamespace      = getResponse.getNamespacePrefix
@@ -225,8 +220,8 @@ class ServletExternalContext(
             case Some(requestCharacterEncoding) ⇒
               requestCharacterEncoding
             case None ⇒
-              nativeRequest.setCharacterEncoding(defaultFormCharset)
-              defaultFormCharset
+              nativeRequest.setCharacterEncoding(ExternalContext.StandardFormCharacterEncoding)
+              ExternalContext.StandardFormCharacterEncoding
           }
         )
   }

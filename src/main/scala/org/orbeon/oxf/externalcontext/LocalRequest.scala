@@ -17,11 +17,11 @@ import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.webapp.ExternalContext.Request
 
 import scala.collection.JavaConverters._
@@ -89,7 +89,7 @@ class LocalRequest(
         content collect {
           case StreamedContent(is, Some("application/x-www-form-urlencoded"), _, _) ⇒
             useAndClose(is) { is ⇒
-              decodeSimpleQuery(IOUtils.toString(is, ServletExternalContext.defaultFormCharset))
+              decodeSimpleQuery(IOUtils.toString(is, ExternalContext.StandardFormCharacterEncoding))
             }
         }
       else
@@ -108,7 +108,6 @@ class LocalRequest(
   def getContentLength     = _contentLengthOpt map (_.toInt) getOrElse -1
   def getContentType       = _contentTypeOpt.orNull
   def getInputStream       = content map (_.inputStream) getOrElse EmptyInputStream
-  def getReader            = null;//TODO? // not used by our code
   def getHeaderValuesMap   = _headersIncludingAuthBodyLowercase
 
   // 2013-09-10: We should start with a fresh attributes map:

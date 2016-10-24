@@ -34,7 +34,6 @@ class RequestAdapter extends ExternalContext.Request {
   def getContentLength: Int = 0
   def getContentType: String = null
   def getInputStream: InputStream = null
-  def getReader: Reader = null
   def getProtocol: String = null
   def getRemoteHost: String = null
   def getRemoteAddr: String = null

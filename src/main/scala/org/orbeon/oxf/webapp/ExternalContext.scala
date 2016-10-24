@@ -53,7 +53,6 @@ object ExternalContext {
     def getContentLength: Int
     def getContentType: String
     def getInputStream: InputStream
-    def getReader: Reader // TODO: remove uses of this
 
     def getProtocol: String
     def getRemoteHost: String

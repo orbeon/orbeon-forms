@@ -48,8 +48,6 @@ class ExternalContextToHttpServletRequestWrapper(
   request.getNativeRequest.asInstanceOf[HttpServletRequest]
 ) {
 
-  private var servletInputStream: ServletInputStream = null
-
   /*
    * SUPPORTED: request method
    *
@@ -120,24 +118,22 @@ class ExternalContextToHttpServletRequestWrapper(
   override def getContentType      : String = request.getContentType
 
   @throws[IOException]
-  override def getInputStream: ServletInputStream = {
-    if (servletInputStream eq null) {
-      val is = request.getInputStream
-      servletInputStream = new ServletInputStream() {
-        @throws[IOException]
-        def read = is.read
-      }
+  override lazy val getInputStream: ServletInputStream = {
+    val is = request.getInputStream
+    new ServletInputStream() {
+      @throws[IOException]
+      def read = is.read
     }
-    servletInputStream
   }
 
   @throws[IOException]
-  override def getReader: BufferedReader =
-    // NOTE: Not sure why reader can be null, but a user reported that it can happen so returning null if that's the case
-    request.getReader match {
-      case reader: BufferedReader ⇒ reader
-      case reader: Reader         ⇒ new BufferedReader(reader)
-      case _                      ⇒ null
+  override lazy val getReader: BufferedReader =
+    Option(getInputStream) match {
+      case Some(is) ⇒
+        new BufferedReader(new InputStreamReader(is, Option(getCharacterEncoding) getOrElse ExternalContext.StandardCharacterEncoding))
+      case None ⇒
+        // NOTE: Not sure why reader can be null, but a user reported that it can happen so returning null if that's the case.
+        null
     }
 
   @throws[UnsupportedEncodingException]

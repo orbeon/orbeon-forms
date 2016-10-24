@@ -69,7 +69,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     case class MyRole(
       getName             : String
     ) {
-      def getType           = LiferaySupport.LiferayRegularRoleType.value
+      def getType           = LiferayAPI.LiferayRegularRoleType.value
       override def toString = s"MyRole($getName)"
     }
 

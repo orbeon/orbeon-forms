@@ -20,12 +20,26 @@ import javax.servlet.http.HttpServletRequest
 import scala.collection.JavaConverters._
 import scala.util.{Success, Try}
 
-
 // For https://github.com/orbeon/orbeon-forms/issues/2843
 // We must abstract over code which changed packages between Liferay 6.2 and 7.0. We achieve this using Java reflection.
-object LiferayAPI {
+object LiferayAPI extends LiferayAPI {
+   protected val LiferayPackages = List("com.liferay.portal.kernel", "com.liferay.portal")
+}
 
-  private val LiferayPackages = List("com.liferay.portal.kernel", "com.liferay.portal")
+trait LiferayAPI {
+
+  protected val LiferayPackages: List[String]
+
+  // These are the standard organization roles in Liferay (also in Liferay `RoleConstants.java`)
+  sealed trait LiferayOrganizationRoles                           { def name: String                           }
+  case  object LiferayOrganizationOwnerRoleName           extends { val name = "Organization Owner"            } with LiferayOrganizationRoles
+  case  object LiferayOrganizationAdministratorRoleName   extends { val name = "Organization Administrator"    } with LiferayOrganizationRoles
+  case  object LiferayOrganizationContentReviewerRoleName extends { val name = "Organization Content Reviewer" } with LiferayOrganizationRoles
+
+  sealed trait LiferayRoleType                     { def value: Int }
+  case  object LiferayRegularRoleType      extends { val value = 1  } with LiferayRoleType
+  case  object LiferaySiteRoleType         extends { val value = 2  } with LiferayRoleType
+  case  object LiferayOrganizationRoleType extends { val value = 3  } with LiferayRoleType
 
   private def liferayClass(suffix: String) =
     LiferayPackages.iterator                      map

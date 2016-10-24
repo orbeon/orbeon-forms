@@ -30,17 +30,6 @@ object LiferaySupport {
 
   import LiferayAPI._
 
-  // These are the standard organization roles in Liferay (also in Liferay `RoleConstants.java`)
-  sealed trait LiferayOrganizationRoles                           { def name: String                           }
-  case  object LiferayOrganizationOwnerRoleName           extends { val name = "Organization Owner"            } with LiferayOrganizationRoles
-  case  object LiferayOrganizationAdministratorRoleName   extends { val name = "Organization Administrator"    } with LiferayOrganizationRoles
-  case  object LiferayOrganizationContentReviewerRoleName extends { val name = "Organization Content Reviewer" } with LiferayOrganizationRoles
-
-  sealed trait LiferayRoleType                     { def value: Int }
-  case  object LiferayRegularRoleType      extends { val value = 1  } with LiferayRoleType
-  case  object LiferaySiteRoleType         extends { val value = 2  } with LiferayRoleType
-  case  object LiferayOrganizationRoleType extends { val value = 3  } with LiferayRoleType
-
   private def ancestorOrSelfLiferayOrgsForUser(u: UserFacade): List[List[OrganizationFacade]] =
     getUserOrganizations(u.getUserId) map { org ⇒
 

@@ -100,10 +100,42 @@ class XXFormsUserRoles extends XFormsFunction with RuntimeDependentFunction {
     asIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.roles map (_.roleName)))
 }
 
-// xxf:user-organizations() as xs:string*
+// xxf:user-ancestor-organizations() as xs:string*
 class XXFormsUserOrganizations extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.organization.to[List] flatMap  (_.levels)))
+    asIterator(
+      for {
+        credentials ← NetUtils.getExternalContext.getRequest.credentials.toList
+        org         ← credentials.organizations
+        leafOrg     ← org.levels.lastOption.toList
+      } yield
+        leafOrg
+    )
+}
+
+class XXFormsAncestorOrganizations extends XFormsFunction with RuntimeDependentFunction {
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+
+    val leafOrgParam =
+      stringArgument(0)(xpathContext)
+
+    // There should be only one match if the organizations are well-formed
+    val foundOrgs =
+      for {
+          credentials ← NetUtils.getExternalContext.getRequest.credentials.toList
+          org         ← credentials.organizations
+          if org.levels.lastOption contains leafOrgParam
+        } yield
+          org
+
+    asIterator(
+      foundOrgs.headOption match {
+        case Some(foundOrg) ⇒ foundOrg.levels.init.reverse
+        case None           ⇒ Nil
+
+      }
+    )
+  }
 }
 
 // xxf:is-user-in-role(xs:string) as xs:boolean

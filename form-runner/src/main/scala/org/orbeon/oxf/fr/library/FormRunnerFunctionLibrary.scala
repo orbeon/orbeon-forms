@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels.ErrorLevel
-import org.orbeon.oxf.xforms.function.xxforms.{XXFormsUserOrganizations, XXFormsUserRoles}
+import org.orbeon.oxf.xforms.function.xxforms.{XXFormsAncestorOrganizations, XXFormsUserOrganizations, XXFormsUserRoles}
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
@@ -58,8 +58,12 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     }
 
     // Other functions
-    Fun("user-roles",         classOf[XXFormsUserRoles],         op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
-    Fun("user-organizations", classOf[XXFormsUserOrganizations], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+    Fun("user-roles",                  classOf[XXFormsUserRoles],             op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+    Fun("user-organizations",          classOf[XXFormsUserOrganizations],     op = 0, min = 0, STRING, ALLOWS_ZERO_OR_MORE)
+
+    Fun("user-ancestor-organizations", classOf[XXFormsAncestorOrganizations], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
     Fun("run-process-by-name", classOf[FRRunProcessByName], op = 0, min = 2, Type.ITEM_TYPE, EMPTY,
       Arg(STRING, EXACTLY_ONE),

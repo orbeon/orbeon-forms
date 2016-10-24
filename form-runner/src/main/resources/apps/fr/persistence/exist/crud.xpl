@@ -74,8 +74,12 @@
                 <xsl:for-each select="p:username()">
                     <username><xsl:value-of select="."/></username>
                     <groupname><xsl:value-of select="p:user-group()"/></groupname>
-                    <xsl:for-each select="p:user-organizations()">
-                        <organization><xsl:value-of select="."/></organization>
+                    <!-- NOTE: For now take only the first organization. -->
+                    <xsl:for-each select="p:user-organizations()[1]">
+                        <xsl:variable name="org" select="."/>
+                        <xsl:for-each select="reverse(p:user-ancestor-organizations($org)), $org">
+                            <organization><xsl:value-of select="."/></organization>
+                        </xsl:for-each>
                     </xsl:for-each>
                 </xsl:for-each>
                 <!-- /collection used for data only -->

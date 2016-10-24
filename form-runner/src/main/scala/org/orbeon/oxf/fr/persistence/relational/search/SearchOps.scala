@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.{Credentials, Organization, ParametrizedRole}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -41,7 +41,7 @@ object SearchOps {
       val authorizedOperations = PermissionsAuthorization.authorizedOperations(permissions, userWithJustThisRole, check)
       Operations.allowsAny(authorizedOperations, SearchOperations)
     } )
-    usefulUserParametrizedRoles.map(_.organizationName).to[List]
+    usefulUserParametrizedRoles.map(_.organizationName)
   }
 
   def authorizedOperations(

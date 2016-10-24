@@ -19,7 +19,6 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.Credentials
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{EmailProcessor, ProcessorUtils}

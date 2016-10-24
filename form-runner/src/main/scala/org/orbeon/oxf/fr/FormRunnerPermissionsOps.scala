@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.DocumentFactory
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers

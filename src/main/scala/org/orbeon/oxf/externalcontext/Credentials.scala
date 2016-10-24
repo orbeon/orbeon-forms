@@ -1,25 +1,43 @@
 /**
-  * Copyright (C) 2016 Orbeon, Inc.
-  *
-  * This program is free software; you can redistribute it and/or modify it under the terms of the
-  * GNU Lesser General Public License as published by the Free Software Foundation; either version
-  *  2.1 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  * See the GNU Lesser General Public License for more details.
-  *
-  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  */
-package org.orbeon.oxf.fr
+ * Copyright (C) 2016 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.externalcontext
 
 import java.net.{URLDecoder, URLEncoder}
 
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.webapp.ExternalContext
 import spray.json._
 
-object Organizations {
+sealed trait UserRole   { def roleName: String }
+case class   SimpleRole      (roleName: String)                           extends UserRole
+case class   ParametrizedRole(roleName: String, organizationName: String) extends UserRole
+
+case class Organization(
+  levels       : List[String] // levels from root to leaf
+)
+
+case class Credentials(
+  username      : String,
+  group         : Option[String],
+  roles         : List[UserRole],
+  organizations : List[Organization]
+) {
+  def defaultOrganization: Option[Organization] = organizations.headOption
+}
+
+object Credentials {
 
   object Symbols {
     val Username      = "username"
@@ -31,20 +49,35 @@ object Organizations {
     val Levels        = "levels"
   }
 
-  private def maybeEncodeJsStringContent(s: String) = {
-    val urlEncoded    = URLEncoder.encode(s, ExternalContext.StandardHeaderCharacterEncoding)
-    val spacesEncoded = s.replaceAllLiterally(" ", "%20")
+  def toHeaders(credentials: Credentials): List[(String, Array[String])] = {
 
-    if (urlEncoded.replaceAllLiterally("+", "%20") != spacesEncoded)
-      urlEncoded.replaceAllLiterally("+", " ")
-    else
-      s
+    import org.orbeon.oxf.util.CoreUtils._
+
+    val usernameArray    = Array(credentials.username)
+    val credentialsArray = Array(serializeCredentials(credentials, encodeForHeader = true))
+    val groupNameArray   = credentials.group.toArray
+    val roleNamesArray   = credentials.roles collect { case r: SimpleRole ⇒ r.roleName } toArray
+
+    (                              Headers.OrbeonUsernameLower    → usernameArray)    ::
+    (                              Headers.OrbeonCredentialsLower → credentialsArray) ::
+    (groupNameArray.nonEmpty list (Headers.OrbeonGroupLower       → groupNameArray))  :::
+    (roleNamesArray.nonEmpty list (Headers.OrbeonRolesLower       → roleNamesArray))
   }
 
   def serializeCredentials(
     credentials     : Credentials,
     encodeForHeader : Boolean
   ): String = {
+
+    def maybeEncodeJsStringContent(s: String) = {
+      val urlEncoded    = URLEncoder.encode(s, ExternalContext.StandardHeaderCharacterEncoding)
+      val spacesEncoded = s.replaceAllLiterally(" ", "%20")
+
+      if (urlEncoded.replaceAllLiterally("+", "%20") != spacesEncoded)
+        urlEncoded.replaceAllLiterally("+", " ")
+      else
+        s
+    }
 
     val encode: String ⇒ String =
       if (encodeForHeader) maybeEncodeJsStringContent else identity
@@ -169,5 +202,4 @@ object Organizations {
         case _ ⇒ deserializationError("Object expected")
       }
     }
-
 }

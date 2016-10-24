@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.rest
 import java.sql.Connection
 
 import org.junit.Test
-import org.orbeon.oxf.fr.Organization
+import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.relational.crud
 import org.orbeon.oxf.fr.persistence.rest.OrganizationTest.{CA, SF}

@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import java.sql.Timestamp
 
+import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, PermissionsCheck}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
@@ -23,7 +24,6 @@ import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.crud.{OrganizationId, OrganizationSupport}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchPermissions, _}
 import org.orbeon.oxf.fr.persistence.relational.search.part._
-import org.orbeon.oxf.fr.{Credentials, Organization}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._

@@ -16,6 +16,7 @@ package org.orbeon.oxf.portlet.liferay
 import javax.portlet._
 
 import com.liferay.portal.kernel.language.LanguageUtil
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.StringUtils._
 
@@ -63,7 +64,7 @@ object LiferaySupport {
       } yield
         ParametrizedRole(roleName, org.getName)
 
-    Organizations.serializeCredentials(
+    Credentials.serializeCredentials(
       Credentials(
         username      = u.getScreenName, // TODO: OR getEmailAddress deoendung in orioerty
         group         = Option(u.getGroup) map (_.getDescriptiveName),

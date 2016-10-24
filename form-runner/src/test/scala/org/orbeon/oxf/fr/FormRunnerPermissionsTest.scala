@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
 import org.orbeon.oxf.fr.permission._
 import org.scalatest.FunSpec

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.{Connection, ResultSet}
 
-import org.orbeon.oxf.fr.Organization
+import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._

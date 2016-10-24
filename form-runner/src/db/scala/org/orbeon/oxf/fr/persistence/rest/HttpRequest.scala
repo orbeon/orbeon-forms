@@ -16,8 +16,8 @@ package org.orbeon.oxf.fr.persistence.rest
 import java.io.ByteArrayOutputStream
 
 import org.orbeon.dom.Document
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.fr.Credentials
 import org.orbeon.oxf.http.{Credentials ⇒ _, _}
 import org.orbeon.oxf.test.TestHttpClient
 import org.orbeon.oxf.util.IOUtils._

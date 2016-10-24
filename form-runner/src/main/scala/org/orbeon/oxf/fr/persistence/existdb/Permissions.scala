@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.fr.persistence.existdb
 
+import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.{FormRunner, Organization}
+import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.saxon.om.NodeInfo

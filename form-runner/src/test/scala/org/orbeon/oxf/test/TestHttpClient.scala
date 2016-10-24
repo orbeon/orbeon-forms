@@ -16,8 +16,7 @@ package org.orbeon.oxf.test
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.{LocalExternalContext, _}
-import org.orbeon.oxf.fr.Credentials
+import org.orbeon.oxf.externalcontext.{Credentials, LocalExternalContext, _}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
 import org.orbeon.oxf.pipeline.InitUtils._

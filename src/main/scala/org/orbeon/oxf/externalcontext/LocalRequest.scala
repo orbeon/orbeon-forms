@@ -16,7 +16,6 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
-import org.orbeon.oxf.fr
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
@@ -54,7 +53,7 @@ class LocalRequest(
 
     def credentialsHeadersIt =
       incomingRequest.credentials match {
-        case Some(credentials) ⇒ fr.Credentials.toHeaders(credentials).iterator
+        case Some(credentials) ⇒ Credentials.toHeaders(credentials).iterator
         case None              ⇒ Iterator.empty
       }
 

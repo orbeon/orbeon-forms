@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.crud
 
 import java.sql.{PreparedStatement, Timestamp}
-import org.orbeon.oxf.fr.Organization
+import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.crud.{OrganizationSupport ⇒ _}
 

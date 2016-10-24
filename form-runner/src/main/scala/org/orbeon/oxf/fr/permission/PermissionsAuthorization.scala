@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.fr._
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.util.NetUtils
 
 object PermissionsAuthorization {

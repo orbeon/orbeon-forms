@@ -18,7 +18,7 @@ import java.security.Principal
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.Credentials
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.util.{LoggerFactory, StringBuilderWriter}
 import org.orbeon.oxf.webapp.ExternalContext._
 import org.orbeon.oxf.webapp.{ExternalContext, TestWebAppContext, WebAppContext}

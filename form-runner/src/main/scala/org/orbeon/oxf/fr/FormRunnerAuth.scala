@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.{Credentials, SimpleRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
@@ -180,7 +181,7 @@ object FormRunnerAuth {
           // Credentials coming from the JSON-encoded HTTP header
           def fromCredentialsHeader =
             headerList(HeaderCredentialsPropertyName).headOption flatMap
-              (Organizations.parseCredentials(_, decodeForHeader = true))
+              (Credentials.parseCredentials(_, decodeForHeader = true))
 
           // Credentials coming from individual headers (requires at least the username)
           def fromIndividualHeaders =

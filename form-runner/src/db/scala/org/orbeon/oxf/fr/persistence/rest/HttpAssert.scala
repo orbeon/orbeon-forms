@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.rest
 
 import java.io.ByteArrayInputStream
 
-import org.orbeon.oxf.fr.Credentials
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.test.XMLSupport

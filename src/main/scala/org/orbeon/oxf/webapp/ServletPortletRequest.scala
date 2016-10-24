@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.fr.Credentials
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
 

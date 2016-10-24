@@ -11,9 +11,9 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.fr.Organizations._
+import org.orbeon.oxf.externalcontext.Credentials._
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.scalatest.FunSpec
@@ -217,7 +217,7 @@ class CredentialsTest extends FunSpec with XMLSupport {
 
     for ((description, json, credentials) ← expectedPassing)
       it (s"must support $description") {
-        assert(Some(credentials) === Organizations.parseCredentials(json, decodeForHeader = false))
+        assert(Some(credentials) === parseCredentials(json, decodeForHeader = false))
       }
 
     val expectedFailing = List(
@@ -234,7 +234,7 @@ class CredentialsTest extends FunSpec with XMLSupport {
     for ((description, json) ← expectedFailing)
       it (s"must reject $description") {
         intercept[DeserializationException] {
-          Organizations.parseCredentials(json, decodeForHeader = false)
+          parseCredentials(json, decodeForHeader = false)
         }
       }
   }

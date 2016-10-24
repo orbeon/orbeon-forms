@@ -33,8 +33,8 @@ class CredentialsTest extends FunSpec with XMLSupport {
         ParametrizedRole("Organization Administrator", "Orbeon San Mateo")
       ),
       List(
-        Organization(List("Orbeon San Mateo", "Orbeon California", "Orbeon, Inc.")),
-        Organization(List("Local School District", "California Department of Education"))
+        Organization(List("Orbeon, Inc.", "Orbeon California", "Orbeon San Mateo")),
+        Organization(List("California Department of Education", "Local School District"))
       )
     )
 
@@ -89,13 +89,13 @@ class CredentialsTest extends FunSpec with XMLSupport {
         </roles>
         <organizations type="array">
             <_ type="array">
-                <_>Orbeon San Mateo</_>
-                <_>Orbeon California</_>
                 <_>Orbeon, Inc.</_>
+                <_>Orbeon California</_>
+                <_>Orbeon San Mateo</_>
             </_>
             <_ type="array">
-                <_>Local School District</_>
                 <_>California Department of Education</_>
+                <_>Local School District</_>
             </_>
         </organizations>
     </json>
@@ -131,13 +131,13 @@ class CredentialsTest extends FunSpec with XMLSupport {
             ],
             "organizations": [
               [
-                "Orbeon San Mateo",
+                "Orbeon, Inc.",
                 "Orbeon California",
-                "Orbeon, Inc."
+                "Orbeon San Mateo"
               ],
               [
-                "Local School District",
-                "California Department of Education"
+                "California Department of Education",
+                "Local School District"
               ]
             ]
           }

@@ -50,7 +50,6 @@ class RequestAdapter extends ExternalContext.Request {
   def isSecure: Boolean = false
   def credentials: Option[Credentials] = None
   def isUserInRole(role: String): Boolean = false
-  def getUserPrincipal: Principal = null
   def getLocale: ju.Locale = null
   def getLocales: ju.Enumeration[_] = null
   def getPathTranslated: String = null

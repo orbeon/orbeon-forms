@@ -130,7 +130,6 @@ object TestHttpClient {
             // The following are never used by our code
             override val isRequestedSessionIdValid               = false   // only delegated
             override def isUserInRole(role: String)              = false   // called by `xxf:is-user-in-role()`
-            override val getUserPrincipal                        = null    // some processors read it but result is unused
             override val getAuthType                             = "BASIC" // some processors read it but result is unused
 
             // Session handling

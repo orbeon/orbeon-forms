@@ -77,7 +77,6 @@ object ExternalContext {
     def getUsername: String = credentials map (_.username) orNull
 
     def isUserInRole(role: String): Boolean
-    def getUserPrincipal: Principal // TODO: any use of this?
 
     def getLocale: ju.Locale
     def getLocales: ju.Enumeration[_]

@@ -193,7 +193,6 @@ class Portlet2ExternalContext(
     def getLocale                 : Locale            = portletRequest.getLocale
     def getLocales                : ju.Enumeration[_] = portletRequest.getLocales
     def isRequestedSessionIdValid : Boolean           = portletRequest.isRequestedSessionIdValid
-    def getUserPrincipal          : Principal         = portletRequest.getUserPrincipal
     def getNativeRequest          : AnyRef            = portletRequest
     def getPortletMode            : String            = portletRequest.getPortletMode.toString
     def getWindowState            : String            = portletRequest.getWindowState.toString

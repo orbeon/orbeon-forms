@@ -55,7 +55,6 @@ class AsyncRequest(req: Request) extends ExternalContext.Request {
   val getPathTranslated         = req.getPathTranslated
   val getLocales                = req.getLocales
   val getLocale                 = req.getLocale
-  val getUserPrincipal          = req.getUserPrincipal
 
   val credentials               = req.credentials
   val isSecure                  = req.isSecure

@@ -81,7 +81,6 @@ abstract class SimpleExternalContext extends ExternalContext {
     def getLocale: ju.Locale                                                          = null
     def getLocales: ju.Enumeration[_]                                                 = null
     def isRequestedSessionIdValid                                                     = false
-    def getUserPrincipal: Principal                                                   = null
     def getNativeRequest: Any                                                         = null
     def getPortletMode: String                                                        = null
     def getWindowState: String                                                        = null

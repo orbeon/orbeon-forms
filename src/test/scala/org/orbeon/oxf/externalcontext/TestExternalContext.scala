@@ -301,7 +301,6 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
     def getClientContextPath(urlString: String): String =
       URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
 
-    def getUserPrincipal: Principal = null
     def isRequestedSessionIdValid   = false
 
     def isSecure: Boolean = {

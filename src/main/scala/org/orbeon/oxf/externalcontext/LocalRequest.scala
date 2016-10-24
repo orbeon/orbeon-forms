@@ -215,6 +215,5 @@ class LocalRequest(
   def credentials                             = incomingRequest.credentials
   def isUserInRole(role: String)              = incomingRequest.isUserInRole(role)
 
-  def getUserPrincipal                        = incomingRequest.getUserPrincipal
   def getAuthType                             = incomingRequest.getAuthType
 }

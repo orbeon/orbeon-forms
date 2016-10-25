@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.util.IOUtils._
 
 trait Common extends RequestResponse with FormRunnerPersistence {
 
@@ -39,32 +40,31 @@ trait Common extends RequestResponse with FormRunnerPersistence {
     * Page Flow Controller doesn't know how to return a 510.)
     */
   def formVersion(connection: Connection, app: String, form: String, docId: Option[String]): Option[Int] = {
-    val versionResult = {
-      val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
-      val ps = connection.prepareStatement(
-        s"""|SELECT max(t.form_version)
-            |FROM   $table t,
-            |       (
-            |           SELECT   max(last_modified_time) last_modified_time, app, form, form_version
-            |           FROM     $table
-            |           WHERE    app = ?
-            |                    AND form = ?
-            |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
-            |           GROUP BY app, form, form_version
-            |       ) m
-            |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
-            |       AND t.deleted = 'N'
-            |""".stripMargin
-      )
+    val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
+    val versionSql =
+      s"""|SELECT max(t.form_version)
+          |FROM   $table t,
+          |       (
+          |           SELECT   max(last_modified_time) last_modified_time, app, form, form_version
+          |           FROM     $table
+          |           WHERE    app = ?
+          |                    AND form = ?
+          |                    ${docId.map(_ ⇒ "and document_id = ?").getOrElse("")}
+          |           GROUP BY app, form, form_version
+          |       ) m
+          |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
+          |       AND t.deleted = 'N'
+          |""".stripMargin
+    useAndClose(connection.prepareStatement(versionSql)) { ps ⇒
       ps.setString(1, app)
       ps.setString(2, form)
       docId.foreach(ps.setString(3, _))
-      val rs = ps.executeQuery()
-      rs.next()
-      rs
+      useAndClose(ps.executeQuery()) { rs ⇒
+        rs.next()
+        val version = rs.getInt(1)
+        if (rs.wasNull()) None else Some(version)
+      }
     }
-    val version = versionResult.getInt(1)
-    if (versionResult.wasNull()) None else Some(version)
   }
 
   /**

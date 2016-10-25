@@ -96,39 +96,36 @@ trait SearchLogic extends SearchRequest {
              """.stripMargin
 
           Logger.logDebug("search total query", sql)
-          val rs = executeQuery(connection, sql, commonParts)
-          rs.next()
-          rs.getInt(1)
+          executeQuery(connection, sql, commonParts) { rs ⇒
+            rs.next()
+            rs.getInt(1)
+          }
         }
 
-        val documentsResultSet = {
-
-          // Build SQL and create statement
-          val parts =
-            commonParts :+
-            mySqlOrderForRowNumPart(request)
+        // Build SQL and create statement
+        val parts =
+          commonParts :+
+          mySqlOrderForRowNumPart(request)
+        val sql = {
           val innerSQL = buildQuery(parts)
-
           val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
           // Use LEFT JOIN instead of regular join, in case the form doesn't have any control marked
           // to be indexed, in which case there won't be anything for it in orbeon_i_control_text.
-          val sql =
-            s"""    SELECT c.*, t.control, t.pos, t.val
-               |      FROM (
-               |           $innerSQL
-               |           ) c
-               | LEFT JOIN orbeon_i_control_text t
-               |           ON c.data_id = t.data_id
-               |     WHERE row_number
-               |           BETWEEN ${startOffsetZeroBased + 1}
-               |           AND     ${startOffsetZeroBased + request.pageSize}
-               |""".stripMargin
-
-          Logger.logDebug("search items query", sql)
-          executeQuery(connection, sql, parts)
+          s"""    SELECT c.*, t.control, t.pos, t.val
+             |      FROM (
+             |           $innerSQL
+             |           ) c
+             | LEFT JOIN orbeon_i_control_text t
+             |           ON c.data_id = t.data_id
+             |     WHERE row_number
+             |           BETWEEN ${startOffsetZeroBased + 1}
+             |           AND     ${startOffsetZeroBased + request.pageSize}
+             |""".stripMargin
         }
+        Logger.logDebug("search items query", sql)
 
-        val documentsMetadataValues =
+        val documentsMetadataValues = executeQuery(connection, sql, parts) { documentsResultSet ⇒
+
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),
             elem = (
@@ -156,7 +153,7 @@ trait SearchLogic extends SearchRequest {
 
             // Sort by last modified in descending order, as the call expects the result to be pre-sorted
             .sortBy(_._1.lastModifiedTime)(Ordering[Timestamp].reverse)
-
+        }
 
         // Compute possible operations for each document
         val organizationsCache = mutable.Map[Int, Organization]()

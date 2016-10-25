@@ -35,6 +35,7 @@ import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
+import org.orbeon.oxf.util.IOUtils._
 
 object RequestReader {
 
@@ -145,47 +146,51 @@ trait CreateUpdateDelete
 
     val idCols = idColumns(req)
     val table  = tableName(req)
-    val resultSet = {
-      val ps = connection.prepareStatement(
-        s"""|SELECT created
-            |       ${if (req.forData) ", username , groupname, organization_id, form_version" else ""}
-            |FROM   $table t,
-            |       (
-            |           SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
-            |           FROM     $table
-            |           WHERE    app  = ?
-            |                    and form = ?
-            |                    ${if (! req.forData)     "and form_version = ?" else ""}
-            |                    ${if (req.forData)       "and document_id  = ?" else ""}
-            |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
-            |           GROUP BY ${idCols.mkString(", ")}
-            |       ) m
-            |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
-            |       AND deleted = 'N'
-            |""".stripMargin)
+    val sql =
+      s"""|SELECT created
+          |       ${if (req.forData) ", username , groupname, organization_id, form_version" else ""}
+          |FROM   $table t,
+          |       (
+          |           SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+          |           FROM     $table
+          |           WHERE    app  = ?
+          |                    and form = ?
+          |                    ${if (! req.forData)     "and form_version = ?" else ""}
+          |                    ${if (req.forData)       "and document_id  = ?" else ""}
+          |                    ${if (req.forAttachment) "and file_name    = ?" else ""}
+          |           GROUP BY ${idCols.mkString(", ")}
+          |       ) m
+          |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
+          |       AND deleted = 'N'
+          |""".stripMargin
+
+    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+
       val position = Iterator.from(1)
       ps.setString(position.next(), req.app)
       ps.setString(position.next(), req.form)
       if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(connection, req))
       if (req.forData)       ps.setString(position.next(), req.dataPart.get.documentId)
       if (req.forAttachment) ps.setString(position.next(), req.filename.get)
-      ps.executeQuery()
-    }
 
-    // Create Row object with first row of result
-    if (resultSet.next()) {
-      // The query could return multiple rows if we have both a draft and non-draft, but the `created`,
-      // `username`, `groupname`, and `form_version` must be the same on all rows, so it doesn't matter from
-      // which row we read this from.
-      Some(Row(
-        created      = resultSet.getTimestamp("created"),
-        username     = if (req.forData) Option(resultSet.getString("username" ))                     else None,
-        group        = if (req.forData) Option(resultSet.getString("groupname"))                     else None,
-        organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet) else None,
-        formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                     else None
-      ))
-    } else {
-      None
+      useAndClose(ps.executeQuery()) { resultSet ⇒
+
+        // Create Row object with first row of result
+        if (resultSet.next()) {
+          // The query could return multiple rows if we have both a draft and non-draft, but the `created`,
+          // `username`, `groupname`, and `form_version` must be the same on all rows, so it doesn't matter from
+          // which row we read this from.
+          Some(Row(
+            created      = resultSet.getTimestamp("created"),
+            username     = if (req.forData) Option(resultSet.getString("username" ))                     else None,
+            group        = if (req.forData) Option(resultSet.getString("groupname"))                     else None,
+            organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet) else None,
+            formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                     else None
+          ))
+        } else {
+          None
+        }
+      }
     }
   }
 
@@ -202,17 +207,20 @@ trait CreateUpdateDelete
     if (req.forData && ! req.forAttachment) {
 
       // First delete from orbeon_i_control_text, which requires a join
-      connection.prepareStatement(
+      val deleteFromControlIndexSql =
         s"""|DELETE FROM orbeon_i_control_text
-            |WHERE data_id IN (
-            |    SELECT data_id
-            |    FROM   orbeon_i_current
-            |    WHERE  document_id = ?   AND
-            |           draft       = 'Y'
-            |)
-            |""".stripMargin)
-        .kestrel(_.setString(1, req.dataPart.get.documentId))
-        .kestrel(_.executeUpdate())
+            |      WHERE data_id IN
+            |          (
+            |              SELECT data_id
+            |                FROM orbeon_i_current
+            |               WHERE document_id = ?   AND
+            |                     draft       = 'Y'
+            |          )
+            |""".stripMargin
+      useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps ⇒
+        ps.setString(1, req.dataPart.get.documentId)
+        ps.executeUpdate()
+      }
 
       // Then delete from all the other tables
       val tablesToDeleteDraftsFrom = List(
@@ -220,15 +228,17 @@ trait CreateUpdateDelete
         "orbeon_form_data",
         "orbeon_form_data_attach"
       )
-      tablesToDeleteDraftsFrom.foreach(table ⇒
-        connection.prepareStatement(
+      tablesToDeleteDraftsFrom.foreach { table ⇒
+        val deleteFromTables =
           s"""|DELETE FROM $table
-              |WHERE  document_id = ?   AND
-              |       draft       = 'Y'
-              |""".stripMargin)
-          .kestrel(_.setString(1, req.dataPart.get.documentId))
-          .kestrel(_.executeUpdate())
-      )
+              |      WHERE document_id = ?   AND
+              |            draft       = 'Y'
+              |""".stripMargin
+        useAndClose(connection.prepareStatement(deleteFromTables)) { ps ⇒
+          ps.setString(1, req.dataPart.get.documentId)
+          ps.executeUpdate()
+        }
+      }
     }
 
     // Do insert
@@ -243,20 +253,22 @@ trait CreateUpdateDelete
             case DynamicColValue(placeholder, _) ⇒ placeholder})
           .mkString(", ")
 
-      val ps = connection.prepareStatement(
+      val insertSql =
         s"""|INSERT INTO $table
             |            ( $colNames  )
             |     VALUES ( $colValues )
-            |""".stripMargin)
+            |""".stripMargin
+      useAndClose(connection.prepareStatement(insertSql)) { ps ⇒
 
-      // Set parameters in prepared statement for the dynamic values
-      includedCols
-        .map(_.value)
-        .collect({ case DynamicColValue(_, paramSetter) ⇒ paramSetter })
-        .zipWithIndex
-        .foreach{ case (paramSetter, index) ⇒ paramSetter(ps, index + 1)}
+        // Set parameters in prepared statement for the dynamic values
+        includedCols
+          .map(_.value)
+          .collect({ case DynamicColValue(_, paramSetter) ⇒ paramSetter })
+          .zipWithIndex
+          .foreach{ case (paramSetter, index) ⇒ paramSetter(ps, index + 1)}
 
-      ps.executeUpdate()
+        ps.executeUpdate()
+      }
     }
 
     versionToSet

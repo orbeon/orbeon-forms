@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
+import org.orbeon.oxf.util.IOUtils._
 
 object Statement {
 
@@ -31,15 +32,21 @@ object Statement {
       .map { case StatementPart(partSQL, _) ⇒ partSQL }
       .mkString("\n")
 
-  def executeQuery(connection: Connection, sql: String, parts: List[StatementPart]): ResultSet = {
-    val ps = connection.prepareStatement(sql)
-    val index = Iterator.from(1)
-    parts
-      .map(_.setters)
-      .foreach(setters ⇒
-        setters.foreach(setter ⇒
-          setter(ps, index.next())))
-    ps.executeQuery()
+  def executeQuery[T](
+    connection : Connection,
+    sql        : String,
+    parts      : List[StatementPart])(
+    block      : ResultSet ⇒ T
+  ): T = {
+    useAndClose(connection.prepareStatement(sql)) { ps ⇒
+      val index = Iterator.from(1)
+      parts
+        .map(_.setters)
+        .foreach(setters ⇒
+          setters.foreach(setter ⇒
+            setter(ps, index.next())))
+      useAndClose(ps.executeQuery())(block)
+    }
   }
 
 }

@@ -22,9 +22,11 @@ import org.orbeon.scaxon.XML._
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 
+import org.orbeon.oxf.util.IOUtils._
 
 private object FlatView {
 
@@ -85,8 +87,7 @@ private object FlatView {
             |        AND d.document_id        = m.document_id
             |        AND d.deleted            = 'N'
             |""".stripMargin
-      val ps = connection.prepareStatement(query)
-      ps.executeUpdate()
+      useAndClose(connection.prepareStatement(query))(_.executeUpdate())
     }
   }
 

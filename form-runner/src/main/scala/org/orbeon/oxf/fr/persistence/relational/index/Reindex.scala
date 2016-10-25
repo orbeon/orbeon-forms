@@ -27,6 +27,7 @@ import org.orbeon.scaxon.XML
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
+import org.orbeon.oxf.util.IOUtils._
 
 trait Reindex extends FormDefinition {
 
@@ -80,26 +81,32 @@ trait Reindex extends FormDefinition {
           case Nil ⇒ ""
           case _   ⇒ "WHERE " + whereConditions.mkString(" AND ")
         }
-        connection
-          .prepareStatement("DELETE FROM orbeon_i_control_text" + (
-              whatToReindex match {
-                case AllData ⇒ ""
-                case _ ⇒
-                  s""" WHERE data_id IN (
-                     |   SELECT data_id
-                     |     FROM orbeon_i_current
-                     |   $deleteWhereClause
-                     | )
-                     |""".stripMargin
-              }
-            )
-          )
-          .kestrel(paramSetter)
-          .execute()
-        connection
-          .prepareStatement(s"DELETE FROM orbeon_i_current $deleteWhereClause")
-          .kestrel(paramSetter)
-          .execute()
+        val deleteFromValueIndexSql = "DELETE FROM orbeon_i_control_text " + (
+          whatToReindex match {
+            case AllData ⇒ ""
+            case _ ⇒
+              s"""|WHERE data_id IN (
+                  |   SELECT data_id
+                  |     FROM orbeon_i_current
+                  |   $deleteWhereClause
+                  | )
+                  |""".stripMargin
+          }
+        )
+        val deleteFromCurrentIndex =
+          s"""|DELETE FROM orbeon_i_current
+              |$deleteWhereClause
+              |""".stripMargin
+
+        Iterator(
+          deleteFromValueIndexSql,
+          deleteFromCurrentIndex
+        ).foreach { deleteSql ⇒
+          useAndClose(connection.prepareStatement(deleteSql)) { ps ⇒
+            paramSetter(ps)
+            ps.executeUpdate()
+          }
+        }
       }
 
       val currentFromWhere =
@@ -125,16 +132,18 @@ trait Reindex extends FormDefinition {
             |""".stripMargin
 
       // Count how many documents we'll reindex, and tell progress code
-      connection
-        .prepareStatement(
-          s"""  SELECT count(*)
-             |$currentFromWhere
-           """.stripMargin)
-        .kestrel(paramSetter)
-        .executeQuery()
-        .kestrel(_.next())
-        .pipe(_.getInt(1))
-        .kestrel(Backend.setProviderDocumentTotal)
+      val countSql =
+        s"""|SELECT count(*)
+            |$currentFromWhere
+            |""".stripMargin
+      useAndClose(connection.prepareStatement(countSql)) { ps ⇒
+        paramSetter(ps)
+        useAndClose(ps.executeQuery()) { rs ⇒
+          rs.next()
+          val count = rs.getInt(1)
+          Backend.setProviderDocumentTotal(count)
+        }
+      }
 
       // Get all the row from orbeon_form_data that are "latest" and not deleted
       val xmlCol = Provider.xmlCol(provider, "d")
@@ -155,115 +164,119 @@ trait Reindex extends FormDefinition {
            |$currentFromWhere
            |ORDER BY app, form
            |""".stripMargin
-      val currentData = connection
-        .prepareStatement(currentDataSql)
-        .kestrel(paramSetter)
-        .executeQuery()
 
-      // Info on indexed controls for a given app/form
-      case class FormIndexedControls(
-        app             : String,
-        form            : String,
-        indexedControls : Seq[IndexedControl]
-      )
+      useAndClose(connection.prepareStatement(currentDataSql)) { ps ⇒
+        paramSetter(ps)
+        useAndClose(ps.executeQuery()) { currentData ⇒
 
-      // Go through each data document
-      // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
-      var prevIndexedControls: Option[FormIndexedControls] = None
-      while (currentData.next() && StatusStore.getStatus != Stopping) {
 
-        Backend.setProviderDocumentNext()
-        val app = currentData.getString("app")
-        val form = currentData.getString("form")
+          // Info on indexed controls for a given app/form
+          case class FormIndexedControls(
+            app             : String,
+            form            : String,
+            indexedControls : Seq[IndexedControl]
+          )
 
-        // Get indexed controls for current app/form
-        val indexedControls: Seq[IndexedControl] = prevIndexedControls match {
-          case Some(FormIndexedControls(`app`, `form`, indexedControls)) ⇒
-            // Use indexed controls from previous iteration
-            indexedControls
-          case _ ⇒
-            // Compute indexed controls reading the form definition
-            FormRunner.readPublishedForm(app, form)(RelationalUtils.Logger) match {
-              case None ⇒
-                RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
-                Seq.empty
-              case Some(formDefinition) ⇒
-                findIndexedControls(formDefinition)
+          // Go through each data document
+          // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
+          var prevIndexedControls: Option[FormIndexedControls] = None
+          while (currentData.next() && StatusStore.getStatus != Stopping) {
+
+            Backend.setProviderDocumentNext()
+            val app = currentData.getString("app")
+            val form = currentData.getString("form")
+
+            // Get indexed controls for current app/form
+            val indexedControls: Seq[IndexedControl] = prevIndexedControls match {
+              case Some(FormIndexedControls(`app`, `form`, indexedControls)) ⇒
+                // Use indexed controls from previous iteration
+                indexedControls
+              case _ ⇒
+                // Compute indexed controls reading the form definition
+                FormRunner.readPublishedForm(app, form)(RelationalUtils.Logger) match {
+                  case None ⇒
+                    RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
+                    Seq.empty
+                  case Some(formDefinition) ⇒
+                    findIndexedControls(formDefinition)
+                }
             }
-        }
 
-        // Insert into the "current data" table
-        val position = Iterator.from(1)
-        connection
-          .prepareStatement(
-            """INSERT INTO orbeon_i_current
-              |           (data_id,
-              |            created,
-              |            last_modified_time,
-              |            last_modified_by,
-              |            username,
-              |            groupname,
-              |            organization_id,
-              |            app,
-              |            form,
-              |            form_version,
-              |            document_id,
-              |            draft)
-              |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.stripMargin)
-          .kestrel(_.setInt      (position.next(), currentData.getInt("id")))
-          .kestrel(_.setTimestamp(position.next(), currentData.getTimestamp("created")))
-          .kestrel(_.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time")))
-          .kestrel(_.setString   (position.next(), currentData.getString("last_modified_by")))
-          .kestrel(_.setString   (position.next(), currentData.getString("username")))
-          .kestrel(_.setString   (position.next(), currentData.getString("groupname")))
-          .kestrel(_.setInt      (position.next(), currentData.getInt("organization_id")))
-          .kestrel(_.setString   (position.next(), app))
-          .kestrel(_.setString   (position.next(), form))
-          .kestrel(_.setInt      (position.next(), currentData.getInt("form_version")))
-          .kestrel(_.setString   (position.next(), currentData.getString("document_id")))
-          .kestrel(_.setString   (position.next(), currentData.getString("draft")))
-          .kestrel(_.executeUpdate())
-          .kestrel(_.close())
-
-        // Read data (XML)
-        // - using lazy, as we might not need the data, if there are no controls to index
-        // - return root element, as XPath this is the node XPath expressions are relative to
-        lazy val dataRootElement: NodeInfo = {
-          val document = Provider.readXmlColumn(provider, currentData)
-          document.descendant(*).head
-        }
-
-        // Extract and insert value for each indexed control
-        for (control ← indexedControls) {
-
-          val nodes = XML.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
-          for ((node, pos) ← nodes.zipWithIndex) {
-            val nodeValue = truncateValue(provider, node.getStringValue)
-            // For indexing, we are not interested in empty values
-            if (!nodeValue.isEmpty) {
-              val position = Iterator.from(1)
-              connection
-                .prepareStatement(
-                  """INSERT INTO orbeon_i_control_text
-                    |           (data_id,
-                    |            pos,
-                    |            control,
-                    |            val)
-                    |    VALUES (? , ? , ? , ? )
-                  """.stripMargin)
-                .kestrel(_.setInt   (position.next(), currentData.getInt("id")))
-                .kestrel(_.setInt   (position.next(), pos + 1))
-                .kestrel(_.setString(position.next(), control.xpath))
-                .kestrel(_.setString(position.next(), nodeValue))
-                .kestrel(_.executeUpdate())
-                .kestrel(_.close())
+            // Insert into the "current data" table
+            val position = Iterator.from(1)
+            val insertIntoCurrentSql =
+              """INSERT INTO orbeon_i_current
+                |           (data_id,
+                |            created,
+                |            last_modified_time,
+                |            last_modified_by,
+                |            username,
+                |            groupname,
+                |            organization_id,
+                |            app,
+                |            form,
+                |            form_version,
+                |            document_id,
+                |            draft)
+                |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              """.stripMargin
+            useAndClose(connection.prepareStatement(insertIntoCurrentSql)) { ps ⇒
+              ps.setInt      (position.next(), currentData.getInt("id"))
+              ps.setTimestamp(position.next(), currentData.getTimestamp("created"))
+              ps.setTimestamp(position.next(), currentData.getTimestamp("last_modified_time"))
+              ps.setString   (position.next(), currentData.getString("last_modified_by"))
+              ps.setString   (position.next(), currentData.getString("username"))
+              ps.setString   (position.next(), currentData.getString("groupname"))
+              ps.setInt      (position.next(), currentData.getInt("organization_id"))
+              ps.setString   (position.next(), app)
+              ps.setString   (position.next(), form)
+              ps.setInt      (position.next(), currentData.getInt("form_version"))
+              ps.setString   (position.next(), currentData.getString("document_id"))
+              ps.setString   (position.next(), currentData.getString("draft"))
+              ps.executeUpdate()
+              ps.close()
             }
+
+            // Read data (XML)
+            // - using lazy, as we might not need the data, if there are no controls to index
+            // - return root element, as XPath this is the node XPath expressions are relative to
+            lazy val dataRootElement: NodeInfo = {
+              val document = Provider.readXmlColumn(provider, currentData)
+              document.descendant(*).head
+            }
+
+            // Extract and insert value for each indexed control
+            for (control ← indexedControls) {
+
+              val nodes = XML.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
+              for ((node, pos) ← nodes.zipWithIndex) {
+                val nodeValue = truncateValue(provider, node.getStringValue)
+                // For indexing, we are not interested in empty values
+                if (!nodeValue.isEmpty) {
+                  val position = Iterator.from(1)
+                  val insertIntoControlTextSql =
+                    """INSERT INTO orbeon_i_control_text
+                      |           (data_id,
+                      |            pos,
+                      |            control,
+                      |            val)
+                      |    VALUES (? , ? , ? , ? )
+                    """.stripMargin
+                  useAndClose(connection.prepareStatement(insertIntoControlTextSql)) { ps ⇒
+                    ps.setInt   (position.next(), currentData.getInt("id"))
+                    ps.setInt   (position.next(), pos + 1)
+                    ps.setString(position.next(), control.xpath)
+                    ps.setString(position.next(), nodeValue)
+                    ps.executeUpdate()
+                    ps.close()
+                  }
+                }
+              }
+            }
+            // Pass current indexed controls to the next iteration
+            prevIndexedControls = Some(FormIndexedControls(app, form, indexedControls))
           }
         }
-
-        // Pass current indexed controls to the next iteration
-        prevIndexedControls = Some(FormIndexedControls(app, form, indexedControls))
       }
     }
   }

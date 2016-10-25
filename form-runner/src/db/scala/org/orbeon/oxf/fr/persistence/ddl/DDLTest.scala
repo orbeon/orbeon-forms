@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging}
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
+import org.orbeon.oxf.util.IOUtils._
 
 /**
  * Test the DDL we provide to create and update databases.
@@ -59,21 +60,21 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
           throw new IllegalArgumentException(s"unsupported provider `${provider.name}`")
       }
       Connect.getTableNames(provider, connection).map { tableName ⇒
-        val tableInfoResultSet = {
-          val ps = connection.prepareStatement(query.stripMargin)
+        useAndClose(connection.prepareStatement(query.stripMargin)) { ps ⇒
           ps.setString(1, tableName)
-          ps.executeQuery()
+          useAndClose(ps.executeQuery()) { tableInfoResultSet ⇒
+            def tableInfo(): ColMeta = {
+              val colName = tableInfoResultSet.getString("column_name")
+              val interestingKeys = Set(if (provider == Oracle) "nullable" else "is_nullable", "data_type")
+              val colKeyVals = for (metaKey ← interestingKeys) yield
+                ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
+              ColMeta(colName, colKeyVals)
+            }
+            val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList.sortBy(_.colName)
+            assert(colsMeta.nonEmpty)
+            TableMeta(tableName, colsMeta)
+          }
         }
-        def tableInfo(): ColMeta = {
-          val colName = tableInfoResultSet.getString("column_name")
-          val interestingKeys = Set("is_nullable", "data_type")
-          val colKeyVals = for (metaKey ← interestingKeys) yield
-            ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
-          ColMeta(colName, colKeyVals)
-        }
-        val colsMeta = Iterator.iterateWhile(tableInfoResultSet.next(), tableInfo()).toList.sortBy(_.colName)
-        assert(colsMeta.nonEmpty)
-        TableMeta(tableName, colsMeta)
       }
     }
   }

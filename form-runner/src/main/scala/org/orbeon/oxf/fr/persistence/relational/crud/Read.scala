@@ -26,6 +26,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.util.IOUtils._
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
@@ -48,30 +49,29 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         (req.forForm && req.version == Next)
       if (badVersion) throw HttpStatusCodeException(400)
 
-      val resultSet = {
+      val sql = {
         val table  = tableName(req)
         val idCols = idColumns(req)
         val xmlCol = Provider.xmlCol(req.provider, "t")
-        val sql =
-          s"""|SELECT  t.last_modified_time
-              |        ${if (req.forAttachment) ", t.file_content"                               else s", $xmlCol"}
-              |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id"   else ""}
-              |        , t.form_version, t.deleted
-              |FROM    $table t,
-              |        (
-              |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
-              |              FROM   $table
-              |             WHERE   app  = ?
-              |                     and form = ?
-              |                     ${if (req.forForm)       "and form_version = ?"              else ""}
-              |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
-              |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
-              |            GROUP BY ${idCols.mkString(", ")}
-              |        ) m
-              |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
-              |""".stripMargin
-        val ps = connection.prepareStatement(sql)
-
+        s"""|SELECT  t.last_modified_time
+            |        ${if (req.forAttachment) ", t.file_content"                               else s", $xmlCol"}
+            |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id"   else ""}
+            |        , t.form_version, t.deleted
+            |FROM    $table t,
+            |        (
+            |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+            |              FROM   $table
+            |             WHERE   app  = ?
+            |                     and form = ?
+            |                     ${if (req.forForm)       "and form_version = ?"              else ""}
+            |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
+            |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
+            |            GROUP BY ${idCols.mkString(", ")}
+            |        ) m
+            |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
+            |""".stripMargin
+      }
+      useAndClose(connection.prepareStatement(sql)) { ps ⇒
         val position = Iterator.from(1)
         ps.setString(position.next(), req.app)
         ps.setString(position.next(), req.form)
@@ -81,68 +81,66 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
         }
         if (req.forAttachment) ps.setString(position.next(), req.filename.get)
-        ps.executeQuery()
-      }
+        useAndClose(ps.executeQuery()) { resultSet ⇒
+          if (resultSet.next()) {
 
-      if (resultSet.next()) {
+            // We can't always return a 403 instead of a 410/404, so we decided it's OK to divulge to unauthorized
+            // users that the data exists or existed
+            val deleted = resultSet.getString("deleted") == "Y"
+            if (deleted)
+              throw HttpStatusCodeException(410)
 
-        // We can't always return a 403 instead of a 410/404, so we decided it's OK to divulge to unauthorized
-        // users that the data exists or existed
-        val deleted = resultSet.getString("deleted") == "Y"
-        if (deleted)
-          throw new HttpStatusCodeException(410)
+            // Check version if specified
+            val dbFormVersion = resultSet.getInt("form_version")
+            req.version match {
+              case Specific(reqFormVersion) ⇒
+                if (dbFormVersion != reqFormVersion)
+                  throw HttpStatusCodeException(400)
+              case _ ⇒ // NOP; we're all good
+            }
 
-        // Check version if specified
-        val dbFormVersion = resultSet.getInt("form_version")
-        req.version match {
-          case Specific(reqFormVersion) ⇒
-            if (dbFormVersion != reqFormVersion)
-              throw HttpStatusCodeException(400)
-          case _ ⇒ // NOP; we're all good
-        }
+            // Check user can read and set Orbeon-Operations header
+            formMetadataForDataRequestOpt foreach { formMetadata ⇒
+              val dataUser = CheckWithDataUser(
+                username     = Option(resultSet.getString("username")),
+                groupname    = Option(resultSet.getString("groupname")),
+                organization = OrganizationSupport.readFromResultSet(connection, resultSet).map(_._2)
+              )
+              val authorizedOperations = PermissionsAuthorization.authorizedOperations(
+                PermissionsXML.parse(formMetadata.orNull),
+                PermissionsAuthorization.currentUserFromSession,
+                dataUser
+              )
+              if (! Operations.allows(authorizedOperations, permission.Read))
+                throw HttpStatusCodeException(403)
+              httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
+            }
 
-        // Check user can read and set Orbeon-Operations header
-        formMetadataForDataRequestOpt foreach { formMetadata ⇒
-          val dataUser = CheckWithDataUser(
-            username     = Option(resultSet.getString("username")),
-            groupname    = Option(resultSet.getString("groupname")),
-            organization = OrganizationSupport.readFromResultSet(connection, resultSet).map(_._2)
-          )
-          val authorizedOperations = PermissionsAuthorization.authorizedOperations(
-            PermissionsXML.parse(formMetadata.orNull),
-            PermissionsAuthorization.currentUserFromSession,
-            dataUser
-          )
-          if (! Operations.allows(authorizedOperations, permission.Read)) {
-            println("403", authorizedOperations, dataUser)
-            throw HttpStatusCodeException(403)
+            // Set form version header
+            httpResponse.setHeader(OrbeonFormDefinitionVersion, dbFormVersion.toString)
+
+            // Write content (XML / file)
+            if (req.forAttachment) {
+              val stream = req.provider match {
+                case PostgreSQL ⇒ new ByteArrayInputStream(resultSet.getBytes("file_content"))
+                case _          ⇒ resultSet.getBlob("file_content").getBinaryStream
+              }
+              NetUtils.copyStream(stream, httpResponse.getOutputStream)
+            } else {
+              val stream = req.provider match {
+                case PostgreSQL ⇒ new StringReader(resultSet.getString("xml"))
+                case _          ⇒ resultSet.getClob("xml").getCharacterStream
+              }
+              httpResponse.setHeader(Headers.ContentType, "application/xml")
+              val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
+              NetUtils.copyStream(stream, writer)
+              writer.close()
+            }
+
+          } else {
+            throw HttpStatusCodeException(404)
           }
-          httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
         }
-
-        // Set form version header
-        httpResponse.setHeader(OrbeonFormDefinitionVersion, dbFormVersion.toString)
-
-        // Write content (XML / file)
-        if (req.forAttachment) {
-          val stream = req.provider match {
-            case PostgreSQL ⇒ new ByteArrayInputStream(resultSet.getBytes("file_content"))
-            case _          ⇒ resultSet.getBlob("file_content").getBinaryStream
-          }
-          NetUtils.copyStream(stream, httpResponse.getOutputStream)
-        } else {
-          val stream = req.provider match {
-            case PostgreSQL ⇒ new StringReader(resultSet.getString("xml"))
-            case _          ⇒ resultSet.getClob("xml").getCharacterStream
-          }
-          httpResponse.setHeader(Headers.ContentType, "application/xml")
-          val writer = new OutputStreamWriter(httpResponse.getOutputStream, "UTF-8")
-          NetUtils.copyStream(stream, writer)
-          writer.close()
-        }
-
-      } else {
-        throw new HttpStatusCodeException(404)
       }
     }
   }

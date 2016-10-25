@@ -79,9 +79,14 @@ object Provider {
   }
 
   def seqNextVal(connection: Connection, provider: Provider): Int = {
-    val nextValSql = {
-      useAndClose(connection.prepareStatement("INSERT INTO orbeon_seq VALUES ()"))(_.executeUpdate())
-      "SELECT max(val) FROM orbeon_seq"
+    val nextValSql = provider match {
+      case _ ⇒
+        val insertSql = provider match {
+          case MySQL ⇒ "INSERT INTO orbeon_seq VALUES ()"
+          case _     ⇒ "INSERT INTO orbeon_seq DEFAULT VALUES"
+        }
+        useAndClose(connection.prepareStatement(insertSql))(_.executeUpdate())
+        "SELECT max(val) FROM orbeon_seq"
     }
     useAndClose(connection.prepareStatement(nextValSql)){ statement ⇒
       useAndClose(statement.executeQuery()) { resultSet ⇒

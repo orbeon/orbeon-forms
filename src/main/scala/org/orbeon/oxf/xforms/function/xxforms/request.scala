@@ -23,25 +23,21 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
-// xxf:get-request-method() as xs:string
 class XXFormsGetRequestMethod extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getMethod
 }
 
-// xxf:get-portlet-mode() as xs:string
 class XXFormsGetPortletMode extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getPortletMode
 }
 
-// xxf:get-window-state() as xs:string
 class XXFormsGetWindowState extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getWindowState
 }
 
-// xxf:get-request-parameter($a as xs:string) as xs:string*
 class XXFormsGetRequestParameter extends RequestFunction {
 
   def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
@@ -51,7 +47,6 @@ class XXFormsGetRequestParameter extends RequestFunction {
     Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
 }
 
-// xxf:get-request-header($a as xs:string) as xs:string*
 class XXFormsGetRequestHeader extends RequestFunction {
 
   def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
@@ -82,25 +77,21 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
   }
 }
 
-// xxf:username()  as xs:string? and xxf:get-remote-user() as xs:string?
 class XXFormsUsername extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.credentials map (_.username)
 }
 
-// xxf:user-group() as xs:string?
 class XXFormsUserGroup extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)
 }
 
-// xxf:user-roles() as xs:string*
 class XXFormsUserRoles extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     asIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.roles map (_.roleName)))
 }
 
-// xxf:user-ancestor-organizations() as xs:string*
 class XXFormsUserOrganizations extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     asIterator(
@@ -138,7 +129,6 @@ class XXFormsAncestorOrganizations extends XFormsFunction with RuntimeDependentF
   }
 }
 
-// xxf:is-user-in-role(xs:string) as xs:boolean
 class XXFormsIsUserInRole extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     NetUtils.getExternalContext.getRequest.isUserInRole(stringArgument(0)(xpathContext))

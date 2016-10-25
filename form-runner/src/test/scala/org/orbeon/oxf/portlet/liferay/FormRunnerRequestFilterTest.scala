@@ -82,11 +82,15 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
       def getRoles        = ju.Arrays.asList(MyRole("manager"): RoleFacade, MyRole("employee"): RoleFacade)
     }
 
+    class MyCompany {
+      def getAuthType     = LiferayAPI.LiferayEmailAddressAuthType.name
+    }
+
     import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter._
 
     val amendedRequest =
       wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(mockRequest, new LiferayUser {
-        override def userHeaders = LiferaySupport.userHeaders(new MyUser, tests = true)
+        override def userHeaders = LiferaySupport.userHeaders(new MyUser, new MyCompany, tests = true)
       }))
 
     val expectedProperties =

@@ -41,6 +41,11 @@ trait LiferayAPI {
   case  object LiferaySiteRoleType         extends { val value = 2  } with LiferayRoleType
   case  object LiferayOrganizationRoleType extends { val value = 3  } with LiferayRoleType
 
+  sealed trait LiferayAuthType                     { def name: String          }
+  case  object LiferayEmailAddressAuthType extends { val name = "emailAddress" } with LiferayAuthType
+  case  object LiferayUserIdAuthType       extends { val name = "userId"       } with LiferayAuthType
+  case  object LiferayScreenNameAuthType   extends { val name = "screenName"   } with LiferayAuthType
+
   private def liferayClass(suffix: String) =
     LiferayPackages.iterator                      map
       (_ + '.' + suffix)                          map
@@ -53,6 +58,7 @@ trait LiferayAPI {
   // Static methods. We can't use structural types as the methods are static.
   private lazy val getHttpServletRequestMethod = liferayMethod("util.PortalUtil",                       "getHttpServletRequest", classOf[PortletRequest])
   private lazy val getUserMethod               = liferayMethod("util.PortalUtil",                       "getUser",               classOf[HttpServletRequest])
+  private lazy val getCompanyMethod            = liferayMethod("util.PortalUtil",                       "getCompany",            classOf[HttpServletRequest])
   private lazy val getUserOrganizationsMethod  = liferayMethod("service.OrganizationLocalServiceUtil",  "getUserOrganizations",  classOf[Long])
   private lazy val getUserGroupRolesMethod     = liferayMethod("service.UserGroupRoleLocalServiceUtil", "getUserGroupRoles",     classOf[Long])
   private lazy val hasUserGroupRoleMethod      = liferayMethod("service.UserGroupRoleLocalServiceUtil", "hasUserGroupRole",      classOf[Long], classOf[Long], classOf[String])
@@ -62,6 +68,9 @@ trait LiferayAPI {
 
   def getUser(req: HttpServletRequest): UserFacade =
     getUserMethod.invoke(null, req).asInstanceOf[UserFacade]
+
+  def getCompany(req: HttpServletRequest): CompanyFacade =
+    getCompanyMethod.invoke(null, req).asInstanceOf[CompanyFacade]
 
   // A user can belong to multiple organizations. Each such organization can be part of
   // a hierarchy. Users can be part of more than one organization which is part of the
@@ -115,6 +124,10 @@ trait LiferayAPI {
     def getGroup        : GroupFacade
     def getRole         : RoleFacade
     def getUser         : UserFacade
+  }
+
+  private[liferay] type CompanyFacade = {
+    def getAuthType     : String
   }
 
 }

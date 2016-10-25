@@ -17,7 +17,6 @@ import javax.portlet._
 
 import com.liferay.portal.kernel.language.LanguageUtil
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
-import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
@@ -31,18 +30,18 @@ object LiferaySupport {
 
   import LiferayAPI._
 
-  private def ancestorOrSelfLiferayOrgsForUser(u: UserFacade): List[List[OrganizationFacade]] =
-    getUserOrganizations(u.getUserId) map { org ⇒
+  def getCredentialsAsSerializedJson(u: UserFacade, c: CompanyFacade): String = {
 
-      var orgNamesRootToLeaf: List[OrganizationFacade] = List(org)
+    def ancestorOrSelfLiferayOrgsForUser(u: UserFacade): List[List[OrganizationFacade]] =
+      getUserOrganizations(u.getUserId) map { org ⇒
 
-      for (name ← org.getAncestors.asScala map (_.asInstanceOf[OrganizationFacade]))
-        orgNamesRootToLeaf = name :: orgNamesRootToLeaf
+        var orgNamesRootToLeaf: List[OrganizationFacade] = List(org)
 
-      orgNamesRootToLeaf
-    }
+        for (name ← org.getAncestors.asScala map (_.asInstanceOf[OrganizationFacade]))
+          orgNamesRootToLeaf = name :: orgNamesRootToLeaf
 
-  def getCredentialsAsSerializedJson(u: UserFacade): String = {
+        orgNamesRootToLeaf
+      }
 
     val ancestorOrSelfLiferayOrgs = ancestorOrSelfLiferayOrgsForUser(u)
 
@@ -64,9 +63,15 @@ object LiferaySupport {
       } yield
         ParametrizedRole(roleName, org.getName)
 
+    val username = c.getAuthType match {
+      case LiferayEmailAddressAuthType.name ⇒ u.getEmailAddress
+      case LiferayUserIdAuthType.name       ⇒ u.getUserId.toString
+      case LiferayScreenNameAuthType.name   ⇒ u.getScreenName
+    }
+
     Credentials.serializeCredentials(
       Credentials(
-        username      = u.getScreenName, // TODO: OR getEmailAddress deoendung in orioerty
+        username      = username,
         group         = Option(u.getGroup) map (_.getDescriptiveName),
         roles         = simpleRoles ++: parametrizedRoles,
         organizations = ancestorOrSelfLiferayOrgs map(org ⇒ Organization(org map (_.getName)))
@@ -75,15 +80,15 @@ object LiferaySupport {
     )
   }
 
-  private val HeaderNamesGetters = List[(String, UserFacade ⇒ List[String])](
-    "Orbeon-Liferay-User-Id"          → (u ⇒ Option(u.getUserId)                          map (_.toString)            toList),
-    "Orbeon-Liferay-User-Screen-Name" → (u ⇒ Option(u.getScreenName)                                                  toList),
-    "Orbeon-Liferay-User-Full-Name"   → (u ⇒ Option(u.getFullName)                                                    toList),
-    "Orbeon-Liferay-User-Email"       → (u ⇒ Option(u.getEmailAddress)                                                toList),
-    "Orbeon-Liferay-User-Group-Id"    → (u ⇒ Option(u.getGroup)                           map (_.getGroupId.toString) toList),
-    "Orbeon-Liferay-User-Group-Name"  → (u ⇒ Option(u.getGroup)                           map (_.getDescriptiveName)  toList),
-    "Orbeon-Liferay-User-Roles"       → (u ⇒ u.getRoles.asScala                           map (_.getName)             toList),
-    "Orbeon-Liferay-User-Credentials" → (u ⇒ List(getCredentialsAsSerializedJson(u))                                        )
+  private val HeaderNamesGetters = List[(String, (UserFacade, CompanyFacade) ⇒ List[String])](
+    "Orbeon-Liferay-User-Id"          → ((u, _) ⇒ Option(u.getUserId)                          map (_.toString)            toList),
+    "Orbeon-Liferay-User-Screen-Name" → ((u, _) ⇒ Option(u.getScreenName)                                                  toList),
+    "Orbeon-Liferay-User-Full-Name"   → ((u, _) ⇒ Option(u.getFullName)                                                    toList),
+    "Orbeon-Liferay-User-Email"       → ((u, _) ⇒ Option(u.getEmailAddress)                                                toList),
+    "Orbeon-Liferay-User-Group-Id"    → ((u, _) ⇒ Option(u.getGroup)                           map (_.getGroupId.toString) toList),
+    "Orbeon-Liferay-User-Group-Name"  → ((u, _) ⇒ Option(u.getGroup)                           map (_.getDescriptiveName)  toList),
+    "Orbeon-Liferay-User-Roles"       → ((u, _) ⇒ u.getRoles.asScala                           map (_.getName)             toList),
+    "Orbeon-Liferay-User-Credentials" → ((u, c) ⇒ List(getCredentialsAsSerializedJson(u, c))                                     )
   )
 
   private val AllHeaderNamesList       = HeaderNamesGetters map (_._1)
@@ -95,18 +100,22 @@ object LiferaySupport {
   def languageHeader(req: PortletRequest) =
     LanguageUtil.getLanguageId(req).trimAllToOpt map ("Orbeon-Liferay-Language" →)
 
-  def userHeaders(user: UserFacade, tests: Boolean = false): List[(String, String)] =
+  def userHeaders(user: UserFacade, company: CompanyFacade, tests: Boolean): List[(String, String)] =
     for {
       (name, getter) ← HeaderNamesGetters
       if ! (tests && name == "Orbeon-Liferay-User-Credentials") // we can't yet make this work during tests
-      value          ← getter(user)
+      value          ← getter(user, company)
     } yield
       name → value
 
-  def getLiferayUser(req: PortletRequest): Option[LiferayUser] =
-    Option(getUser(getHttpServletRequest(req))) map { user ⇒
+  def getLiferayUser(req: PortletRequest): Option[LiferayUser] = {
+
+    val httpReq = getHttpServletRequest(req)
+
+    Option(getUser(httpReq)) map { user ⇒
       new LiferayUser {
-        def userHeaders = LiferaySupport.userHeaders(user)
+        def userHeaders = LiferaySupport.userHeaders(user, getCompany(httpReq), tests = false)
       }
     }
+  }
 }

@@ -30,14 +30,14 @@ import scala.collection.mutable
 
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLike with MockitoSugar {
 
-  describe("The `amendRequest()` function") {
+  describe("The servlet filter's `amendRequest()` function") {
 
     // Initial headers
     val initialHeaders = Map(
-      "p1" → Seq("v1a", "v1b"),
+      "p1" → List("v1a", "v1b"),
       // NOTE: Just use these header names because that's what's configured in the properties for the Liferay test
-      "Orbeon-Liferay-User-Email".toLowerCase → Seq("test@orbeon.com"),
-      "Orbeon-Liferay-User-Roles".toLowerCase → Seq("manager,employee")
+      "Orbeon-Liferay-User-Email".toLowerCase → List("test@orbeon.com"),
+      "Orbeon-Liferay-User-Roles".toLowerCase → List("manager,employee")
     )
 
     val sessionAttributes = mutable.Map[String, AnyRef]()
@@ -63,9 +63,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
     val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest)
 
     // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
-    val expectedHeaders = initialHeaders ++ Map(
-      Headers.OrbeonUsernameLower → Seq("test@orbeon.com"),
-      Headers.OrbeonRolesLower    → Seq("manager", "employee")
+    val expectedHeaders = initialHeaders ++ List(
+      Headers.OrbeonCredentialsLower → List("""{"username":"test%40orbeon.com","groups":[],"roles":[{"name":"manager"},{"name":"employee"}],"organizations":[]}"""),
+      Headers.OrbeonUsernameLower    → List("test@orbeon.com"),
+      Headers.OrbeonRolesLower       → List("manager", "employee")
     )
 
     // NOTE: Use asInstanceOf because servlet API doesn't have generics

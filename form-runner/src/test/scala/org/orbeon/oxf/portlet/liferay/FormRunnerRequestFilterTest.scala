@@ -17,26 +17,25 @@ import java.{util ⇒ ju}
 import javax.portlet.filter.PortletRequestWrapper
 import javax.portlet.{PortletRequest, PortletSession}
 
-import org.junit.Test
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.LiferayAPI.RoleFacade
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.test.ResourceManagerSupport
+import org.scalatest.FunSpecLike
 import org.scalatest.mock.MockitoSugar
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
-class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
+class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLike with MockitoSugar {
 
-  @Test def amendPortletRequest(): Unit = {
+  describe("The portlet filter's `amendRequest()` function") {
 
     // Initial properties
-    val initialProperties = Map("p1" → Seq("v1a", "v1b"))
+    val initialProperties = Map("p1" → List("v1a", "v1b"))
 
     // Session
     val sessionAttributes = mutable.Map[String, AnyRef]()
@@ -104,7 +103,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         "orbeon-liferay-user-roles"       → List("manager", "employee"),
         Headers.OrbeonUsernameLower       → List("test@orbeon.com"),
         Headers.OrbeonGroupLower          → List("universe"),
-        Headers.OrbeonRolesLower          → List("manager", "employee")
+        Headers.OrbeonRolesLower          → List("manager", "employee"),
+        Headers.OrbeonCredentialsLower    → List("""{"username":"test%40orbeon.com","groups":["universe"],"roles":[{"name":"manager"},{"name":"employee"}],"organizations":[]}""")
       )
 
     // NOTE: Don't use Array for comparison, because Array's == doesn't work as expected in Scala
@@ -114,6 +114,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map
 
-    assert(toTreeMap(expectedProperties) === toTreeMap(actualProperties))
+    it ("must set authentication headers based on incoming headers") {
+      assert(toTreeMap(expectedProperties) === toTreeMap(actualProperties))
+    }
    }
 }

@@ -26,11 +26,11 @@ object DataSourceSupport {
   // Run the given thunk in the context of the datasources specified by the given descriptors.
   // This sets a JNDI context, binds the datasources, runs the thunk, unbind the datasources, and
   // does some JNDI context cleanup.
-  def withDatasources[T](datasources: immutable.Seq[DatasourceDescriptor])(thunk: ⇒ T): T = {
+  def withDatasources[T](descriptors: immutable.Seq[DatasourceDescriptor])(thunk: ⇒ T): T = {
     val originalProperties = setupInitialContextForJDBC()
-    datasources foreach bindDatasource
+    val basicDataSources = descriptors map bindDatasource
     val result = thunk
-    datasources foreach unbindDatasource
+    descriptors.zip(basicDataSources) foreach (unbindDatasource _).tupled
     clearInitialContextForJDBC(originalProperties)
     result
   }
@@ -72,16 +72,25 @@ object DataSourceSupport {
       case (name, None)        ⇒ System.clearProperty(name)
     }
 
-  private def bindDatasource(ds: DatasourceDescriptor): Unit =
-    (new InitialContext).rebind(
-      NamingPrefix + ds.name,
+  private def bindDatasource(dsd: DatasourceDescriptor): BasicDataSource = {
+
+    val basicDataSource =
       new BasicDataSource                   |!>
-        (_.setDriverClassName(ds.driver  )) |!>
-        (_.setUrl            (ds.url     )) |!>
-        (_.setUsername       (ds.username)) |!>
-        (_.setPassword       (ds.password))
+        (_.setDriverClassName(dsd.driver  )) |!>
+        (_.setUrl            (dsd.url     )) |!>
+        (_.setUsername       (dsd.username)) |!>
+        (_.setPassword       (dsd.password))
+
+    (new InitialContext).rebind(
+      NamingPrefix + dsd.name,
+      basicDataSource
     )
 
-  private  def unbindDatasource(ds: DatasourceDescriptor): Unit =
-    (new InitialContext).unbind(NamingPrefix + ds.name)
+    basicDataSource
+  }
+
+  private  def unbindDatasource(dsd: DatasourceDescriptor, ds: BasicDataSource): Unit = {
+    (new InitialContext).unbind(NamingPrefix + dsd.name)
+    ds.close()
+  }
 }

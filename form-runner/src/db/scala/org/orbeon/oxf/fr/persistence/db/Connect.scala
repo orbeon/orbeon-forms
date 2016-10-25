@@ -40,7 +40,7 @@ private[persistence] object Connect {
             // Create tables
             val sql = provider match {
               case MySQL      ⇒ "mysql-2016_3.sql"
-              case PostgreSQL ⇒ "postgresql-2016_2.sql"
+              case PostgreSQL ⇒ "postgresql-2016_3.sql"
             }
             val createDDL = SQL.read(sql)
             Logging.withDebug("creating tables") { SQL.executeStatements(provider, statement, createDDL) }

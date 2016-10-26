@@ -38,7 +38,7 @@ object BinaryTextSupport {
     * @param contentType  optional content type to set as attribute on the root element
     * @param lastModified optional last modified timestamp
     */
-  def readText(is: InputStream, encoding: String, output: ContentHandler, contentType: String, lastModified: Long, statusCode: Int): Unit = {
+  def readText(is: InputStream, encoding: String, output: ContentHandler, contentType: String, lastModified: jl.Long, statusCode: Int): Unit = {
 
     val encodingOrDefault = Option(encoding) getOrElse Defaults.DefaultEncodingForServletCompatibility
 

@@ -43,7 +43,9 @@ class BinaryTextXMLReceiver(
   ignoreDocumentContentType : Boolean,
   forceEncoding             : Boolean,
   requestedEncoding         : Option[String],
-  ignoreDocumentEncoding    : Boolean
+  ignoreDocumentEncoding    : Boolean,
+  headersToForward          : List[String]
+
 ) extends XMLReceiverAdapter {
 
   require(! forceContentType || isNotBlank(requestedContentType.get))
@@ -68,7 +70,8 @@ class BinaryTextXMLReceiver(
     ignoreDocumentContentType : Boolean,
     forceEncoding             : Boolean,
     requestedEncoding         : String,
-    ignoreDocumentEncoding    : Boolean
+    ignoreDocumentEncoding    : Boolean,
+    headersToForward          : String
   ) =
     this(
       if (response ne null) Left(response) else Right(outputStream),
@@ -78,12 +81,13 @@ class BinaryTextXMLReceiver(
       ignoreDocumentContentType,
       forceEncoding,
       requestedEncoding.trimAllToOpt,
-      ignoreDocumentEncoding
+      ignoreDocumentEncoding,
+      Option(headersToForward) map (_.splitTo[List]()) getOrElse Nil
     )
 
   // Simple constructor to write to a stream and close it
   def this(outputStream: OutputStream) =
-    this(Right(outputStream), true, false, None, false, false, None, false)
+    this(Right(outputStream), true, false, None, false, false, None, false, Nil)
 
   // Record definitions only before root element arrives
   override def startPrefixMapping(prefix: String, uri: String): Unit =
@@ -124,6 +128,13 @@ class BinaryTextXMLReceiver(
 
         attributes.getValue("status-code").trimAllToOpt foreach
           (statusCode ⇒ response.setStatus(statusCode.toInt))
+
+        // Forward headers if any
+        headersToForward foreach { headerName ⇒
+          attributes.getValue(headerName).trimAllToOpt foreach { headerValue ⇒
+            response.setHeader(headerName, headerValue)
+          }
+        }
       }
 
       // Set ContentHandler and headers depending on input type

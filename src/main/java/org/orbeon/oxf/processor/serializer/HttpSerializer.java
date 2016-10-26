@@ -39,7 +39,7 @@ public class HttpSerializer extends HttpSerializerBase {
 
             readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, null, true,
                     httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
-                    httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding));
+                    httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding, httpConfig.headersToForward));
 
         } catch (Exception e) {
             throw new OXFException(e);

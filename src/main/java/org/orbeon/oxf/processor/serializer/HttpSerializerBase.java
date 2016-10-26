@@ -32,9 +32,7 @@ import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Base class for all HTTP serializers.
@@ -146,13 +144,19 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                                 logger.debug("Output not cached");
                             try {
                                 final ExtendedResultStoreOutputStream resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream);
-                                // NOTE: readInput will call response.setContentType(), so we intercept and save the set contentType
-                                // Other headers are set above
+                                // NOTE: readInput will call response.setContentType() and other methods so we intercept and save the
+                                // values.
                                 readInput(pipelineContext, new ResponseWrapper(response) {
                                     @Override
                                     public void setContentType(String contentType) {
                                         resultStoreOutputStream.setContentType(contentType);
                                         super.setContentType(contentType);
+                                    }
+
+                                    @Override
+                                    public void setHeader(String name, String value) {
+                                        resultStoreOutputStream.setHeader(name, value);
+                                        super.setHeader(name, value);
                                     }
 
                                     @Override
@@ -195,6 +199,13 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                             final String contentType = resultStore.getContentType();
                             if (contentType != null)
                                 response.setContentType(contentType);
+                            // Set saved headers
+                            final LinkedHashMap<String, String> headers = resultStore.getHeader();
+                            if (headers != null)
+                                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                                    response.setHeader(entry.getKey(), entry.getValue());
+                                }
+
                             // Set length since we know it
                             response.setContentLength(resultStore.length(pipelineContext));
                         }
@@ -254,6 +265,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                                 String value = header.element("value").getTextTrim();
                                 config.addHeader(name, value);
                             }
+                            config.headersToForward = XPathUtils.selectStringValue(configElement, "/config/forward-headers");
+
                             config.empty = ProcessorUtils.selectBooleanValue(configElement, "/config/empty-content", DEFAULT_EMPTY);
 
                             // Cache control
@@ -292,6 +305,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         public boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         public boolean ignoreDocumentEncoding = DEFAULT_IGNORE_DOCUMENT_ENCODING;
         public List<String> headers;
+        public String headersToForward;
         public boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
         public boolean empty = DEFAULT_EMPTY;
 
@@ -365,6 +379,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
         private String contentType;
         private int status;
+        private LinkedHashMap<String, String> headers;
 
         public ExtendedResultStoreOutputStream(OutputStream out) {
             super(out);
@@ -374,16 +389,23 @@ public abstract class HttpSerializerBase extends CachedSerializer {
             this.contentType = contentType;
         }
 
-        public String getContentType() {
-            return contentType;
-        }
-
         public void setStatus(int status) {
             this.status = status;
         }
 
+        public void setHeader(String name, String value) {
+            if (headers == null)
+                headers = new LinkedHashMap<String, String>();
+
+            headers.put(name, value);
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
         public int getStatus() {
             return status;
         }
+        public LinkedHashMap<String, String> getHeader() { return headers; }
     }
 }

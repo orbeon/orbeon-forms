@@ -14,13 +14,14 @@
 package org.orbeon.oxf.processor.serializer
 
 import java.io.ByteArrayOutputStream
-import org.orbeon.dom.Document
+
 import org.junit.Test
+import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext.ResponseAdapter
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 // As of 2012-07-05, this tests a minimal subset of BinaryTextXMLReceiver only. We should test more combinations of
 // the input parameters.
@@ -59,7 +60,7 @@ class BinaryTextXMLReceiverTest extends DocumentTestBase with AssertionsForJUnit
 
   def responseWithReceiver = {
     val response = new TestResponse
-    (response, new BinaryTextXMLReceiver(Left(response), true, false, None, false, false, None, false))
+    (response, new BinaryTextXMLReceiver(Left(response), true, false, None, false, false, None, false, Nil))
   }
 
   class TestResponse extends ResponseAdapter {

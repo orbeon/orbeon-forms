@@ -19,14 +19,14 @@ import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.SAXUtils;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
+import org.orbeon.oxf.xml.SAXUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.SAXException;
 
@@ -249,7 +249,7 @@ public class FileSerializer extends ProcessorImpl {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
                             readInputAsSAX(context, input, new BinaryTextXMLReceiver(null, resultStoreOutputStream, true,
                                     config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
-                                    config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
+                                    config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding, null));
                             resultStoreOutputStream.close();
                             return resultStoreOutputStream;
                         } catch (IOException e) {
@@ -268,7 +268,7 @@ public class FileSerializer extends ProcessorImpl {
                 // Caching is not enabled
                 readInputAsSAX(context, dataInput, new BinaryTextXMLReceiver(null, fileOutputStream, true,
                         config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
-                        config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
+                        config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding, null));
 
                 fileOutputStream.close();
             }

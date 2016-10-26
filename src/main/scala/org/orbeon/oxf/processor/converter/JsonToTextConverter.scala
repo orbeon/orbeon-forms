@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.converter
 
 import org.orbeon.oxf.json
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorUtils}
+import org.orbeon.oxf.processor.{BinaryTextSupport, ProcessorImpl, ProcessorInputOutputInfo}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.XMLReceiver
 
@@ -38,7 +38,7 @@ class JsonToTextConverter extends ProcessorImpl {
 
         val jsonString = json.Converter.xmlToJsonString(xmlDoc, strict = false)
 
-        ProcessorUtils.readText(
+        BinaryTextSupport.readText(
           jsonString,
           xmlReceiver,
           "application/json",

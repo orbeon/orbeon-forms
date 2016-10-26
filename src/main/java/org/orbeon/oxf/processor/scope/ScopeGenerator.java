@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.processor.scope;
 
-import org.orbeon.dom.Document;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Marshaller;
+import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
+import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
@@ -145,7 +145,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
                 // Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
-                ProcessorUtils.readText((String) value, result, contentType, System.currentTimeMillis());
+                BinaryTextSupport.readText((String) value, result, contentType, System.currentTimeMillis());
             } else {
                 logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + key);
                 SAXUtils.streamNullDocument(result);

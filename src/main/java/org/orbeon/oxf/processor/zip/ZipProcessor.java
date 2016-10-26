@@ -17,11 +17,14 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.BinaryTextSupport;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -128,7 +131,7 @@ public class ZipProcessor extends ProcessorImpl {
                     // Generate an Orbeon binary document with the content of the zip file
                     FileInputStream zipInputStream = new FileInputStream(temporaryZipFile);
                     try {
-                        ProcessorUtils.readBinary(zipInputStream, xmlReceiver, "multipart/x-gzip", null, statusCode, fileName);
+                        BinaryTextSupport.readBinary(zipInputStream, xmlReceiver, "multipart/x-gzip", null, statusCode, fileName, null);
                     } finally {
                         zipInputStream.close();
                     }

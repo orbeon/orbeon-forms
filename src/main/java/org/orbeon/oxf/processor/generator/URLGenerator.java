@@ -40,6 +40,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 import scala.Option;
+import scala.Tuple2;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -871,7 +872,7 @@ public class URLGenerator extends ProcessorImpl {
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
-            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
+            BinaryTextSupport.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
@@ -891,7 +892,7 @@ public class URLGenerator extends ProcessorImpl {
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
-            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
+            BinaryTextSupport.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode(), null, null);
         }
 
         public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
@@ -909,6 +910,7 @@ public class URLGenerator extends ProcessorImpl {
     private static class URLResourceHandler extends ResourceHandlerBase {
         private ConnectionResult connectionResult;
         private InputStream inputStream;
+        private scala.collection.immutable.List<Tuple2<String, String>> headersToPropagate;
 
         public URLResourceHandler(Config config) {
             super(config);
@@ -984,18 +986,9 @@ public class URLGenerator extends ProcessorImpl {
 
                 inputStream = connectionResult.content().inputStream();
 
-                // Save headers as request attributes
-                final List<String> readHeader = config.getReadHeaders();
-                if (readHeader != null && ! readHeader.isEmpty()) {
-                    final Map<String, Object> requestAttributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
-                    for (final String nameMixed : config.getReadHeaders()) {
-                        // We only support headers with one value
-                        final String nameLower = nameMixed.toLowerCase();
-                        final scala.collection.immutable.List<String> list = connectionResult.getHeaderIgnoreCase(nameLower);
-                        if (! list.isEmpty())
-                            requestAttributes.put("oxf.url-generator.header." + nameLower, list.head());
-                    }
-                }
+                headersToPropagate = URLGeneratorBase.collectHeaders(connectionResult, config.getReadHeaders());
+
+                URLGeneratorBase.storeHeadersIntoRequest(connectionResult, headersToPropagate);
             }
         }
 
@@ -1008,7 +1001,7 @@ public class URLGenerator extends ProcessorImpl {
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
-            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
+            BinaryTextSupport.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
@@ -1019,7 +1012,7 @@ public class URLGenerator extends ProcessorImpl {
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
-            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
+            BinaryTextSupport.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode(), null, headersToPropagate);
         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
@@ -1110,7 +1103,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
-            ProcessorUtils.readText(System.in, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
+            BinaryTextSupport.readText(System.in, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
@@ -1127,7 +1120,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
-            ProcessorUtils.readBinary(System.in, output, contentType, lastModified, getConnectionStatusCode());
+            BinaryTextSupport.readBinary(System.in, output, contentType, lastModified, getConnectionStatusCode(), null, null);
         }
 
         public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {

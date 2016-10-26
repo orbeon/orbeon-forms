@@ -19,8 +19,8 @@ import org.apache.tools.ant.types.Commandline;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
@@ -228,12 +228,12 @@ public class ExecuteProcessor extends ProcessorImpl {
     }
 
     private void outputStdout(ContentHandler contentHandler, State state) {
-        ProcessorUtils.readText(state.outputString, contentHandler, "text/plain", null);
+        BinaryTextSupport.readText(state.outputString, contentHandler, "text/plain", null);
         state.outputString = null;
     }
 
     private void outputStderr(ContentHandler contentHandler, State state) {
-        ProcessorUtils.readText(state.errorString, contentHandler, "text/plain", null);
+        BinaryTextSupport.readText(state.errorString, contentHandler, "text/plain", null);
         state.errorString = null;
     }
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.generator
 import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.{DateUtils, CollectionUtils}
+import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUtils}
 import org.orbeon.oxf.xml.Dom4j
 
 import scala.collection.JavaConverters._
@@ -47,4 +47,27 @@ object URLGeneratorBase {
 
     headersOrEmpty ++ newHeaderAsList
   }.asJava
+
+  // Save headers as request attributes
+  def collectHeaders(connectionResult: ConnectionResult, readHeader: ju.List[String]): List[(String, String)] =
+    if ((readHeader ne null) && ! readHeader.isEmpty) {
+      for {
+        nameMaybeMixed ← readHeader.asScala.to[List]
+        list           = connectionResult.getHeaderIgnoreCase(nameMaybeMixed)
+        if list.nonEmpty // only support headers with one value
+        value          = list.head
+        nameLower      = nameMaybeMixed.toLowerCase
+      } yield {
+        nameMaybeMixed → value
+      }
+    } else {
+      Nil
+    }
+
+  def storeHeadersIntoRequest(connectionResult: ConnectionResult, headers: List[(String, String)]): Unit = {
+    val requestAttributes = NetUtils.getExternalContext.getRequest.getAttributesMap
+    headers foreach { case (name, value) ⇒
+      requestAttributes.put("oxf.url-generator.header." + name.toLowerCase, value)
+    }
+  }
 }

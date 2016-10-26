@@ -17,10 +17,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.processor.BinaryTextSupport;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.ContentHandlerWriter;
@@ -81,7 +81,7 @@ public abstract class TextConverterBase extends ConverterBase {
                     xmlReceiver.startDocument();
                     xmlReceiver.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                     xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                    xmlReceiver.startElement("", ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT, ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
+                    xmlReceiver.startElement("", BinaryTextSupport.TextDocumentElementName(), BinaryTextSupport.TextDocumentElementName(), attributes);
 
                     // Create OutputStream that converts to Base64
                     final TransformerXMLReceiver transformer = createTransformer(config);
@@ -163,7 +163,7 @@ public abstract class TextConverterBase extends ConverterBase {
 
     private static void sendEndDocument(ContentHandler contentHandler) {
         try {
-            contentHandler.endElement("", ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT, ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT);
+            contentHandler.endElement("", BinaryTextSupport.TextDocumentElementName(), BinaryTextSupport.TextDocumentElementName());
             contentHandler.endDocument();
         } catch (SAXException e) {
             throw new OXFException(e);

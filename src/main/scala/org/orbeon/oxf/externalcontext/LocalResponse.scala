@@ -16,14 +16,14 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
-import org.orbeon.oxf.util.StringBuilderWriter
-import org.orbeon.oxf.webapp.ExternalContext
+import org.orbeon.oxf.util.{DateUtils, NetUtils, StringBuilderWriter}
+import org.orbeon.oxf.webapp.{CachingResponseSupport, ExternalContext}
 import org.orbeon.oxf.webapp.ExternalContext.Response
 
 import scala.collection.mutable
 
 
-class LocalResponse(rewriter: URLRewriter) extends Response {
+class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponseSupport {
 
   private var _statusCode                         = 200
   private var _serverSideRedirect: Option[String] = None
@@ -71,8 +71,6 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
 
   def addHeader(name: String, value: String): Unit =
     _lowerCaseHeaders += name.toLowerCase  → (_lowerCaseHeaders.getOrElse(name.toLowerCase , Nil) :+ value)
-
-  def checkIfModifiedSince(lastModified: Long) = true
 
   def getCharacterEncoding = null
 
@@ -122,11 +120,11 @@ class LocalResponse(rewriter: URLRewriter) extends Response {
       setHeader(Headers.LocationLower, location)
     }
 
-  def setPageCaching(lastModified: Long) = () // Q: Should set headers?
-  def setResourceCaching(lastModified: Long, expires: Long) = () // Q: Should set headers?
-
-  def setStatus(status: Int): Unit =
+  def setStatus(status: Int): Unit = {
+    if (! NetUtils.isSuccessCode(status))
+        responseCachingDisabled = true
     this._statusCode = status
+  }
 
   def setContentLength(len: Int): Unit =
     setHeader(Headers.ContentLength, len.toString)

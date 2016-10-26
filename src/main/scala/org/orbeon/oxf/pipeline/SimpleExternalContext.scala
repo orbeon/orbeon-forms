@@ -114,7 +114,7 @@ abstract class SimpleExternalContext extends ExternalContext {
 
     def setPageCaching(lastModified: Long)                                            = ()
     def setResourceCaching(lastModified: Long, expires: Long)                         = ()
-    def checkIfModifiedSince(lastModified: Long)                                      = true
+    def checkIfModifiedSince(request: Request, lastModified: Long)                    = true
     def rewriteActionURL(urlString: String)                                           = ""
     def rewriteRenderURL(urlString: String)                                           = ""
     def rewriteActionURL(urlString: String, portletMode: String, windowState: String) = ""

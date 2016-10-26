@@ -308,7 +308,7 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
 
     def addHeader(name: String, value: String)  = ()
 
-    def checkIfModifiedSince(lastModified: Long) = true
+    def checkIfModifiedSince(request: Request, lastModified: Long) = true
     def getCharacterEncoding: String = null
     def getNamespacePrefix: String = null
 

@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, PortletSessionScope, SessionScope}
+import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, PortletSessionScope, Request, SessionScope}
 import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._
@@ -57,17 +57,17 @@ object Portlet2ExternalContext {
     }
 
     // Not handled right now or because it doesn't make sense
-    def setContentLength(len: Int)                            = ()
-    def checkIfModifiedSince(lastModified: Long)              = true
-    def sendError(code: Int)                                  = throw new OXFException(s"Error while processing request: $code")
-    def setPageCaching(lastModified: Long)                    = ()
-    def setResourceCaching(lastModified: Long, expires: Long) = ()
-    def setHeader(name: String, value: String)                = ()
-    def addHeader(name: String, value: String)                = ()
-    def reset()                                               = () // NOTE: We could implement this if needed.
+    def setContentLength(len: Int)                                 = ()
+    def checkIfModifiedSince(request: Request, lastModified: Long) = true
+    def sendError(code: Int)                                       = throw new OXFException(s"Error while processing request: $code")
+    def setPageCaching(lastModified: Long)                         = ()
+    def setResourceCaching(lastModified: Long, expires: Long)      = ()
+    def setHeader(name: String, value: String)                     = ()
+    def addHeader(name: String, value: String)                     = ()
+    def reset()                                                    = () // NOTE: We could implement this if needed.
 
     // We are always buffering
-    def isCommitted                                           = false
+    def isCommitted                                                = false
 
     def setStatus(status: Int): Unit = {
       // Test error

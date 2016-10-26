@@ -66,7 +66,7 @@ public class ResponseAdapter implements ExternalContext.Response {
     public void setResourceCaching(long lastModified, long expires) {
     }
 
-    public boolean checkIfModifiedSince(long lastModified) {
+    public boolean checkIfModifiedSince(ExternalContext.Request request, long lastModified) {
         // Always indicate that the resource has been modified. If needed we could use:
         // return NetUtils.checkIfModifiedSince(request, lastModified);
         return true;

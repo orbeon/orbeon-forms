@@ -138,7 +138,7 @@ object ExternalContext {
       */
     def setResourceCaching(lastModified: Long, expires: Long)
 
-    def checkIfModifiedSince(lastModified: Long): Boolean
+    def checkIfModifiedSince(request: Request, lastModified: Long): Boolean
 
     def setTitle(title: String)
 

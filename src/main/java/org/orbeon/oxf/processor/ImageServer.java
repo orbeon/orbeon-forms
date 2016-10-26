@@ -347,7 +347,7 @@ public class ImageServer extends ProcessorImpl {
             }
 
             public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
-                return response.checkIfModifiedSince(lastModified);
+                return response.checkIfModifiedSince(externalContext.getRequest(), lastModified);
             }
         });
     }

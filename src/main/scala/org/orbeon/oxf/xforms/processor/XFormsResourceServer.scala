@@ -174,7 +174,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
       response.setResourceCaching(combinedLastModified, 0)
 
     // Check If-Modified-Since and don't return content if condition is met
-    if (! response.checkIfModifiedSince(combinedLastModified)) {
+    if (! response.checkIfModifiedSince(externalContext.getRequest, combinedLastModified)) {
       response.setStatus(StatusCode.NotModified)
       return
     }

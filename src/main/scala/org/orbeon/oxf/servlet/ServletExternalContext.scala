@@ -26,7 +26,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, SessionScope}
-import org.orbeon.oxf.webapp.{ExternalContext, ServletPortletRequest, SessionListeners, WebAppContext}
+import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._
 
@@ -44,9 +44,9 @@ object ServletExternalContext {
   private val HttpNocacheCacheHeadersDefault   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"
   private val HttpNocacheCacheHeadersProperty  = "oxf.http.nocache.cache-headers"
 
-  private lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
-  private lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
-  private lazy val nocacheCacheHeaders  = decodeCacheString(HttpNocacheCacheHeadersProperty,  HttpNocacheCacheHeadersDefault)
+  lazy val pageCacheHeaders     = decodeCacheString(HttpPageCacheHeadersProperty,     HttpPageCacheHeadersDefault)
+  lazy val resourceCacheHeaders = decodeCacheString(HttpResourceCacheHeadersProperty, HttpResourceCacheHeadersDefault)
+  lazy val nocacheCacheHeaders  = decodeCacheString(HttpNocacheCacheHeadersProperty,  HttpNocacheCacheHeadersDefault)
 
   private def decodeCacheString(name: String, defaultValue: String): List[(String, String)] =
     for {
@@ -56,10 +56,6 @@ object ServletExternalContext {
       name :: value :: Nil = parts
     } yield
       name.trimAllToEmpty → value.trimAllToEmpty
-
-  private def setResponseHeaders(nativeResponse: HttpServletResponse, headers: List[(String, String)]): Unit =
-    for ((key, value) ← headers)
-      nativeResponse.setHeader(key, value)
 }
 
 class ServletExternalContext(
@@ -226,9 +222,7 @@ class ServletExternalContext(
         )
   }
 
-  private class ResponseImpl(urlRewriter: URLRewriter) extends ExternalContext.Response {
-
-    private var responseCachingDisabled: Boolean = false
+  private class ResponseImpl(urlRewriter: URLRewriter) extends ExternalContext.Response with CachingResponseSupport {
 
     // Delegate to underlying response
     def getOutputStream                        = nativeResponse.getOutputStream
@@ -296,47 +290,6 @@ class ServletExternalContext(
             location
         )
       }
-
-    def setPageCaching(lastModified: Long): Unit =
-      if (responseCachingDisabled) {
-        setResponseHeaders(nativeResponse, nocacheCacheHeaders)
-      } else {
-        // Get current time and adjust lastModified
-        val now = System.currentTimeMillis
-        var _lastModified = lastModified
-        if (_lastModified <= 0)
-          _lastModified = now
-        // Set last-modified
-        nativeResponse.setDateHeader(Headers.LastModified, _lastModified)
-        // Make sure the client does not load from cache without revalidation
-        nativeResponse.setDateHeader("Expires", now)
-        setResponseHeaders(nativeResponse, pageCacheHeaders)
-      }
-
-    def setResourceCaching(lastModified: Long, expires: Long): Unit =
-      if (responseCachingDisabled) {
-        setResponseHeaders(nativeResponse, nocacheCacheHeaders)
-      } else {
-        // Get current time and adjust parameters
-        val now = System.currentTimeMillis
-        var _lastModified = lastModified
-        var _expires = expires
-        if (_lastModified <= 0) {
-          _lastModified = now
-          _expires = now
-        } else if (_expires <= 0) {
-          // Regular expiration strategy. We use the HTTP spec heuristic to calculate the "Expires" header value
-          // (10% of the difference between the current time and the last modified time)
-          _expires = now + (now - _lastModified) / 10
-        }
-        // Set caching headers
-        nativeResponse.setDateHeader(Headers.LastModified, _lastModified)
-        nativeResponse.setDateHeader("Expires", _expires)
-        setResponseHeaders(nativeResponse, resourceCacheHeaders)
-      }
-
-    def checkIfModifiedSince(lastModified: Long): Boolean =
-      responseCachingDisabled || NetUtils.checkIfModifiedSince(getRequest , lastModified, Logger)
 
     def getNamespacePrefix: String =
       urlRewriter.getNamespacePrefix

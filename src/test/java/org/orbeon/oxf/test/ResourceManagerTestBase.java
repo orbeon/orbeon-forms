@@ -96,11 +96,11 @@ public abstract class ResourceManagerTestBase {
             pipelineContext.destroy(true);
     }
 
-    protected PipelineContext createPipelineContextWithExternalContext() {
+    public static PipelineContext createPipelineContextWithExternalContext() {
         return createPipelineContextWithExternalContext("oxf:/org/orbeon/oxf/default-request.xml");
     }
 
-    protected PipelineContext createPipelineContextWithExternalContext(String requestURL) {
+    public static PipelineContext createPipelineContextWithExternalContext(String requestURL) {
         final PipelineContext pipelineContext = new PipelineContext();
         final Document requestDocument = ProcessorUtils.createDocumentFromURL(requestURL, null);
         final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);

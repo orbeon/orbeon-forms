@@ -13,8 +13,6 @@
   */
 package org.orbeon.oxf.test
 
-import java.{util ⇒ ju}
-
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
@@ -30,17 +28,15 @@ import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.XML._
-import org.scalatest.{BeforeAndAfter, FunSpecLike}
+import org.scalatest.{FunSpec, FunSpecLike}
 
 import scala.util.control.NonFatal
 
 abstract class ProcessorTestBase(testsDocUrl: String)
-  extends ResourceManagerTestBase
+  extends FunSpec
      with ResourceManagerSupport
      with FunSpecLike
-     with BeforeAndAfter
      with XMLSupport {
 
   case class TestDescriptor(
@@ -56,20 +52,12 @@ abstract class ProcessorTestBase(testsDocUrl: String)
   case class  FailedTestResult(expected: Document, actual: Document) extends TestResult
   case class  ErrorTestResult(t: Throwable)                          extends TestResult
 
-  // Setup and tear-down for each test
-  locally {
-    var pipelineContext: Option[PipelineContext] = None
-
-    before { pipelineContext = Some(createPipelineContextWithExternalContext) }
-    after  { pipelineContext foreach (_.destroy(true)) }
-  }
-
   // Run tests
   findTestsToRun groupByKeepOrder (_.groupOpt) foreach { case (groupOpt, descriptors) ⇒
     describe(groupOpt getOrElse "[No group description provided]") {
       descriptors foreach { descriptor ⇒
         it (s"must pass ${descriptor.descriptionOpt getOrElse "[No test description provided]"}") {
-          runTest(descriptor) match {
+          runOneTest(descriptor) match {
             case SuccessTestResult ⇒
             case FailedTestResult(expected, actual) ⇒
               assert(Dom4jUtils.domToPrettyString(expected) === Dom4jUtils.domToPrettyString(actual))
@@ -82,13 +70,13 @@ abstract class ProcessorTestBase(testsDocUrl: String)
     }
   }
 
-  private def runTest(d: TestDescriptor): TestResult =
+  private def runOneTest(d: TestDescriptor): TestResult =
     try {
       // Create pipeline context
       val pipelineContext =
         d.requestUrlOpt match {
-          case Some(requestURL) ⇒ createPipelineContextWithExternalContext(requestURL)
-          case None             ⇒ createPipelineContextWithExternalContext
+          case Some(requestURL) ⇒ ResourceManagerTestBase.createPipelineContextWithExternalContext(requestURL)
+          case None             ⇒ ResourceManagerTestBase.createPipelineContextWithExternalContext
         }
 
       d.processor.reset(pipelineContext)

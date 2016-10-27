@@ -13,7 +13,19 @@
   */
 package org.orbeon.oxf.test
 
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.scalatest.{BeforeAndAfter, Suite}
 
-trait ResourceManagerSupport {
+
+trait ResourceManagerSupport extends Suite with BeforeAndAfter {
+
   ResourceManagerTestBase.staticSetup()
+
+  locally {
+    var pipelineContext: Option[PipelineContext] = None
+
+    before { pipelineContext = Some(ResourceManagerTestBase.createPipelineContextWithExternalContext); println("xxx before") }
+    after  { pipelineContext foreach (_.destroy(true)); println("xxx after")  }
+  }
+
 }

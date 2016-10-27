@@ -134,6 +134,9 @@
                                         <xsl:if test="@visible">
                                             <xsl:attribute name="ref" select="concat('.[boolean(', @visible, ')]')"/>
                                         </xsl:if>
+                                        <xsl:if test="not($repeat)">
+                                            <xsl:copy-of select="$tab/(@context | @model)"/>
+                                        </xsl:if>
                                         <xsl:apply-templates select="node() except (fr:label, xf:label)"/>
                                     </xf:group>
                                 </xsl:variable>
@@ -142,9 +145,7 @@
                                     <xsl:when test="$repeat">
                                         <xf:repeat xxbl:scope="outer">
                                             <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
-                                            <xf:group xxbl:scope="inner" appearance="xxf:internal">
-                                                <xsl:copy-of select="$content"/>
-                                            </xf:group>
+                                            <xsl:copy-of select="$content"/>
                                         </xf:repeat>
                                     </xsl:when>
                                     <xsl:otherwise>

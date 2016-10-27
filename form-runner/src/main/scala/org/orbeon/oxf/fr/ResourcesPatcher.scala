@@ -60,16 +60,18 @@ object ResourcesPatcher {
       case _                                    ⇒ path
     }
 
-    val langPathValue =
-      for {
-        name   ← propertyNames
-        tokens = name split """\."""
-        lang   = tokens(5)
-        path   = filterPathForBackwardCompatibility(tokens drop 6) mkString "/"
-        value  = properties.getString(name)
-        if value ne null // got one case where this happened
-      } yield
-        (lang, path, value)
+    val langPathValue = propertyNames.flatMap { propertyName ⇒
+      val tokens               = propertyName split """\."""
+      val lang                 = tokens(5)
+      val pathSeq              = filterPathForBackwardCompatibility(tokens drop 6)
+      val pathString           = pathSeq.mkString("/")
+      // Property name with possible `*` replaced by actual app/form name
+      val expandedPropertyName = (List("oxf.fr.resource", app, form, lang) ++ pathSeq).mkString(".")
+      val value                = properties.getString(expandedPropertyName)
+      val tuple                = (lang, pathString, value)
+      // Had a case where value was null (more details would be useful)
+      Option(value).map(_ ⇒ tuple)
+    }
 
     // Return all languages or the language specified if it exists
     // For now we don't support creating new top-level resource elements for new languages.
@@ -91,7 +93,7 @@ object ResourcesPatcher {
 
     // Update or create elements and set values
     for {
-      (langOrWildcard, path, value) ← langPathValue
+      (langOrWildcard, path, value) ← langPathValue.distinct
       lang                          ← findConcreteLanguages(langOrWildcard)
       rootForLang                   ← resourceElementsForLang(lang)
     } locally {

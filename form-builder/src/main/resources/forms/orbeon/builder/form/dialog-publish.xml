@@ -314,9 +314,12 @@
                 <xf:setvalue
                     ref="instance()/latest-version"
                     value="
-                        max(
-                            instance('fb-publish-form-metadata')/form/form-version[. castable as xs:integer]/xs:integer(.)
-                        )"/>
+                        (
+                            max(
+                                instance('fb-publish-form-metadata')/form/form-version[. castable as xs:integer]/xs:integer(.)
+                            ),
+                            -1
+                        )[1]"/>
             </xf:action>
 
             <xf:action event="xforms-submit-error">

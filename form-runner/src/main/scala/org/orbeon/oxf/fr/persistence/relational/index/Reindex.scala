@@ -227,7 +227,10 @@ trait Reindex extends FormDefinition {
               ps.setString   (position.next(), currentData.getString("last_modified_by"))
               ps.setString   (position.next(), currentData.getString("username"))
               ps.setString   (position.next(), currentData.getString("groupname"))
-              ps.setInt      (position.next(), currentData.getInt("organization_id"))
+              RelationalUtils.getIntOpt(currentData, "organization_id") match {
+                case Some(id) ⇒ ps.setInt(position.next(), id)
+                case None     ⇒ ps.setNull(position.next(), java.sql.Types.INTEGER)
+              }
               ps.setString   (position.next(), app)
               ps.setString   (position.next(), form)
               ps.setInt      (position.next(), currentData.getInt("form_version"))

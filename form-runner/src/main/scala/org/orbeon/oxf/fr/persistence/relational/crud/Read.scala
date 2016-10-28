@@ -59,7 +59,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             |        , t.form_version, t.deleted
             |FROM    $table t,
             |        (
-            |            SELECT   max(last_modified_time) last_modified_time, max(created) created, ${idCols.mkString(", ")}
+            |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
             |              FROM   $table
             |             WHERE   app  = ?
             |                     and form = ?

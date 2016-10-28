@@ -206,8 +206,14 @@
             </xf:bind>
 
             <xf:bind ref="instance('fr-form-instance')">
-                <xf:bind ref="current-remote-server"   type="xs:integer"/>
-                <xf:bind ref="remote-servers/remote-server/username | remote-servers/remote-server/password" required="true()" calculate="normalize-space()" readonly="false()"/>
+                <xf:bind
+                    ref="current-remote-server"
+                    type="xs:integer"/>
+                <xf:bind
+                    ref="remote-servers/remote-server/username | remote-servers/remote-server/password"
+                    required="true()"
+                    xxf:whitespace="trim"
+                    readonly="false()"/>
             </xf:bind>
 
             <xf:submission
@@ -266,7 +272,9 @@
 
             <xf:var name="forms" value="instance('fr-metadata')/form"/>
 
-            <xf:bind ref="instance('fr-metadata')/form/(last-modified-time | remote-last-modified-time)" type="xs:dateTime"/>
+            <xf:bind
+                ref="instance('fr-metadata')/form/(last-modified-time | remote-last-modified-time)"
+                type="xs:dateTime"/>
 
             <xf:instance id="fr-metadata-local"><forms/></xf:instance>
             <xf:instance id="fr-metadata-remote"><forms/></xf:instance>

@@ -51,7 +51,6 @@ private[persistence] object Connect {
     }
   }
 
-
   def withNewDatabase[T](provider: Provider)(block: Connection ⇒ T): T = {
     val buildNumber = System.getenv("TRAVIS_BUILD_NUMBER")
     val schema = s"orbeon_$buildNumber"

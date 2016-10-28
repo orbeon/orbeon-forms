@@ -67,10 +67,9 @@ object ResourcesPatcher {
       val pathString           = pathSeq.mkString("/")
       // Property name with possible `*` replaced by actual app/form name
       val expandedPropertyName = (List("oxf.fr.resource", app, form, lang) ++ pathSeq).mkString(".")
-      val value                = properties.getString(expandedPropertyName)
-      val tuple                = (lang, pathString, value)
       // Had a case where value was null (more details would be useful)
-      Option(value).map(_ ⇒ tuple)
+      val value                = Option(properties.getString(expandedPropertyName))
+      value.map((lang, pathString, _))
     }
 
     // Return all languages or the language specified if it exists

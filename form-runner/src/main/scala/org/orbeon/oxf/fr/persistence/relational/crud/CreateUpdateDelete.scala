@@ -28,6 +28,7 @@ import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{JXQName, _}
@@ -35,7 +36,6 @@ import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
-import org.orbeon.oxf.util.IOUtils._
 
 object RequestReader {
 
@@ -170,8 +170,9 @@ trait CreateUpdateDelete
       ps.setString(position.next(), req.app)
       ps.setString(position.next(), req.form)
       if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(connection, req))
-      if (req.forData)       ps.setString(position.next(), req.dataPart.get.documentId)
-      if (req.forAttachment) ps.setString(position.next(), req.filename.get)
+
+      req.dataPart foreach (dataPart ⇒ ps.setString(position.next(), dataPart.documentId))
+      req.filename foreach (filename ⇒ ps.setString(position.next(), filename))
 
       useAndClose(ps.executeQuery()) { resultSet ⇒
 
@@ -312,28 +313,30 @@ trait CreateUpdateDelete
       def checkAuthorized(existing: Option[Row]): Unit = {
         val authorized =
           if (req.forData) {
-            if (existing.isDefined) {
-              // Check we're allowed to update or delete this resource
-              val username      = existing.get.username
-              val groupname     = existing.get.group
-              val organization  = existing.get.organization.map(_._2)
-              val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                formPermissions,
-                PermissionsAuthorization.currentUserFromSession,
-                CheckWithDataUser(username, groupname, organization)
-              )
-              val requiredOp    = if (delete) Delete else Update
-              Operations.allows(authorizedOps, requiredOp)
-            } else {
-              // For deletes, if there is no data to delete, it is a 403 if could not read, update,
-              // or delete if it existed (otherwise code later will return a 404)
-              val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                formPermissions,
-                PermissionsAuthorization.currentUserFromSession,
-                CheckWithoutDataUser(optimistic = false)
-              )
-              val requiredOps   = if (delete) List(Read, Update, Delete) else List(Create)
-              Operations.allowsAny(authorizedOps, requiredOps)
+            existing match {
+              case Some(existing) ⇒
+
+                // Check we're allowed to update or delete this resource
+                val username      = existing.username
+                val groupname     = existing.group
+                val organization  = existing.organization.map(_._2)
+                val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                  formPermissions,
+                  PermissionsAuthorization.currentUserFromSession,
+                  CheckWithDataUser(username, groupname, organization)
+                )
+                val requiredOp    = if (delete) Delete else Update
+                Operations.allows(authorizedOps, requiredOp)
+              case None ⇒
+                // For deletes, if there is no data to delete, it is a 403 if could not read, update,
+                // or delete if it existed (otherwise code later will return a 404)
+                val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                  formPermissions,
+                  PermissionsAuthorization.currentUserFromSession,
+                  CheckWithoutDataUser(optimistic = false)
+                )
+                val requiredOps   = if (delete) List(Read, Update, Delete) else List(Create)
+                Operations.allowsAny(authorizedOps, requiredOps)
             }
           } else {
             // Operations on deployed forms are always authorized

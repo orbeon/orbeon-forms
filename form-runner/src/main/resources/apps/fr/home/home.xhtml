@@ -214,6 +214,7 @@
                     id="fr-reindex-submission"
                     method="get"
                     resource="/fr/service/persistence/reindex"
+                    serialization="none"
                     replace="none"
                     mode="asynchronous">
                 <xf:setvalue event="xforms-submit" ref="instance('fr-reindex-instance')/status">starting</xf:setvalue>

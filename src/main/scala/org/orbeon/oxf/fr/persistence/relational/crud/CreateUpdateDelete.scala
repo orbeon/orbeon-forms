@@ -190,7 +190,7 @@ trait CreateUpdateDelete
     val table = tableName(req)
     val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
 
-    // If we saved data, delete any draft document and draft attachments
+    // If for data, start by deleting any draft document and draft attachments
     if (req.forData && ! req.forAttachment) {
 
       // First delete from orbeon_i_control_text, which requires a join
@@ -223,9 +223,9 @@ trait CreateUpdateDelete
       )
     }
 
-    // Do insert
-    locally {
-
+    // Do insert, unless we're deleting draft data
+    val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
+    if (! deletingDataDraft) {
       val possibleCols = insertCols(req, existingRow, delete, versionToSet)
       val includedCols = possibleCols.filter(_.included)
       val colNames     = includedCols.map(_.name).mkString(", ")

@@ -204,41 +204,52 @@ trait CreateUpdateDelete
     val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
 
     // If for data, start by deleting any draft document and draft attachments
-    if (req.forData && ! req.forAttachment) {
+    req.dataPart match {
+      case Some(dataPart) if ! req.forAttachment ⇒
 
-      // First delete from orbeon_i_control_text, which requires a join
-      val deleteFromControlIndexSql =
-        s"""|DELETE FROM orbeon_i_control_text
-            |      WHERE data_id IN
-            |          (
-            |              SELECT data_id
-            |                FROM orbeon_i_current
-            |               WHERE document_id = ?   AND
-            |                     draft       = 'Y'
-            |          )
-            |""".stripMargin
-      useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps ⇒
-        ps.setString(1, req.dataPart.get.documentId)
-        ps.executeUpdate()
-      }
-
-      // Then delete from all the other tables
-      val tablesToDeleteDraftsFrom = List(
-        "orbeon_i_current",
-        "orbeon_form_data",
-        "orbeon_form_data_attach"
-      )
-      tablesToDeleteDraftsFrom.foreach { table ⇒
-        val deleteFromTables =
-          s"""|DELETE FROM $table
-              |      WHERE document_id = ?   AND
-              |            draft       = 'Y'
+        // First delete from orbeon_i_control_text, which requires a join
+        val deleteFromControlIndexSql =
+          s"""|DELETE FROM orbeon_i_control_text
+              |      WHERE data_id IN
+              |          (
+              |              SELECT data_id
+              |                FROM orbeon_i_current
+              |               WHERE document_id = ?   AND
+              |                     draft       = 'Y'
+              |          )
               |""".stripMargin
-        useAndClose(connection.prepareStatement(deleteFromTables)) { ps ⇒
-          ps.setString(1, req.dataPart.get.documentId)
+        useAndClose(connection.prepareStatement(deleteFromControlIndexSql)) { ps ⇒
+          ps.setString(1, dataPart.documentId)
           ps.executeUpdate()
         }
-      }
+
+        // Then delete from all the other tables
+
+        // See https://github.com/orbeon/orbeon-forms/issues/2980: when saving the data for a draft, we don't want to
+        // remove draft attachments from `orbeon_form_data_attach`, otherwise the attachments which were just saved are
+        // immediately removed! So we remove draft attachments from `from orbeon_form_data_attach` only when we are
+        // saving data which is not for a draft. Note that there is no garbage collection for attachments.
+
+        val tablesToDeleteDraftsFrom =
+          (! dataPart.isDraft list "orbeon_form_data_attach") :::
+          "orbeon_i_current"                                  ::
+          "orbeon_form_data"                                  ::
+          Nil
+
+        tablesToDeleteDraftsFrom.foreach { table ⇒
+          val deleteFromTables =
+            s"""|DELETE FROM $table
+                |      WHERE document_id = ?   AND
+                |            draft       = 'Y'
+                |""".stripMargin
+          useAndClose(connection.prepareStatement(deleteFromTables)) { ps ⇒
+            ps.setString(1, dataPart.documentId)
+            ps.executeUpdate()
+          }
+        }
+
+      case _ ⇒
+
     }
 
     // Do insert, unless we're deleting draft data

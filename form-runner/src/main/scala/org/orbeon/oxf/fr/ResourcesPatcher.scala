@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{Dom4j, TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.util.StringUtils._
 
 // Processor to replace or add resources based on properties
 //
@@ -61,12 +62,12 @@ object ResourcesPatcher {
     }
 
     val langPathValue = propertyNames.flatMap { propertyName ⇒
-      val tokens               = propertyName split """\."""
-      val lang                 = tokens(5)
-      val pathSeq              = filterPathForBackwardCompatibility(tokens drop 6)
-      val pathString           = pathSeq.mkString("/")
+      val allTokens            = propertyName.splitTo[List](".")
+      val lang                 = allTokens(5)
+      val resourceTokens       = allTokens.drop(6)
+      val pathString           = filterPathForBackwardCompatibility(resourceTokens).mkString("/")
       // Property name with possible `*` replaced by actual app/form name
-      val expandedPropertyName = (List("oxf.fr.resource", app, form, lang) ++ pathSeq).mkString(".")
+      val expandedPropertyName = (List("oxf.fr.resource", app, form, lang) ++ resourceTokens).mkString(".")
       // Had a case where value was null (more details would be useful)
       val value                = Option(properties.getString(expandedPropertyName))
       value.map((lang, pathString, _))

@@ -11,7 +11,7 @@ val DefaultOrbeonEdition          = "CE"
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
-val LiferayWarLibPath             = "/Users/ebruchez/Google Drive/Work/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
+val LiferayWarLibPath             = "/Users/ebruchez/OF/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
 
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
@@ -28,6 +28,7 @@ val orbeonVersionFromProperties   = settingKey[String]("Orbeon Forms version fro
 val orbeonEditionFromProperties   = settingKey[String]("Orbeon Forms edition from system properties.")
 
 // TBH I don't know whether `in ThisBuild` is needed
+// "ThisBuild is a Scope encompassing all projects"
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
 orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 

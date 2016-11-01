@@ -24,8 +24,8 @@ trait ResourceManagerSupport extends Suite with BeforeAndAfter {
   locally {
     var pipelineContext: Option[PipelineContext] = None
 
-    before { pipelineContext = Some(ResourceManagerTestBase.createPipelineContextWithExternalContext); println("xxx before") }
-    after  { pipelineContext foreach (_.destroy(true)); println("xxx after")  }
+    before { pipelineContext = Some(ResourceManagerTestBase.createPipelineContextWithExternalContext) }
+    after  { pipelineContext foreach (_.destroy(true)) }
   }
 
 }

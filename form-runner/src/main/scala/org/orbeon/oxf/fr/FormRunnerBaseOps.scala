@@ -15,11 +15,10 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._

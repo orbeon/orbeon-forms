@@ -30,7 +30,7 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.webapp.SessionExpiredException;
+import org.orbeon.oxf.http.SessionExpiredException;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;

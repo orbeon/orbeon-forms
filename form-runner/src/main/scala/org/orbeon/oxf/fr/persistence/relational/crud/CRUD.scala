@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.crud
 
+import org.orbeon.oxf.http.HttpStatusCodeException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 
 class CRUD

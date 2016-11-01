@@ -18,10 +18,9 @@ import java.lang.{Long ⇒ JLong}
 
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.http.{StreamedContent, Headers ⇒ HttpHeaders}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StreamedContent, Headers ⇒ HttpHeaders}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{XMLParsing, XMLUtils}
 
 import scala.util.Try

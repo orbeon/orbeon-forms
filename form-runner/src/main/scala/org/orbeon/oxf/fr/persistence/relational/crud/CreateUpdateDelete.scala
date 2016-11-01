@@ -25,12 +25,12 @@ import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
+import org.orbeon.oxf.http.HttpStatusCodeException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{NetUtils, StringBuilderWriter, Whitespace, XPath}
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.{JXQName, _}
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo

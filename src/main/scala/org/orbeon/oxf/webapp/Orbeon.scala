@@ -14,6 +14,7 @@
 package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.common.{OXFException, Version}
+import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}

@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, URLRewriterUtils}
 import org.orbeon.oxf.webapp.ExternalContext.Session
-import org.orbeon.oxf.webapp.{ProcessorService, TestWebAppContext}
+import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 import org.orbeon.oxf.xml.XMLConstants._
 

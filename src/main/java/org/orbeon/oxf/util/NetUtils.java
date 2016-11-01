@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.webapp.ExternalContext;
-import org.orbeon.oxf.webapp.WebAppListener;
+import org.orbeon.oxf.externalcontext.WebAppListener;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;

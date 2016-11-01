@@ -11,17 +11,15 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.pipeline
+package org.orbeon.oxf.externalcontext
 
 import java.io._
-import java.security.Principal
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.util.{LoggerFactory, StringBuilderWriter}
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.webapp.ExternalContext._
-import org.orbeon.oxf.webapp.{ExternalContext, TestWebAppContext, WebAppContext}
 
 import scala.collection.mutable
 

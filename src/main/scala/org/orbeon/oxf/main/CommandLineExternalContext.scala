@@ -11,11 +11,11 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.pipeline
+package org.orbeon.oxf.main
 
 import java.io.{FilterOutputStream, OutputStream, OutputStreamWriter, PrintWriter}
 
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.{SimpleExternalContext, URLRewriter}
 import org.orbeon.oxf.util.URLRewriterUtils
 
 /**

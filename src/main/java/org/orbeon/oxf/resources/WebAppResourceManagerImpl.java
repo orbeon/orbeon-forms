@@ -16,7 +16,7 @@ package org.orbeon.oxf.resources;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.webapp.WebAppContext;
+import org.orbeon.oxf.externalcontext.WebAppContext;
 
 import java.io.*;
 import java.net.URL;

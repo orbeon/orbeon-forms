@@ -18,7 +18,7 @@ import java.{util ⇒ ju}
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
 
-import org.orbeon.oxf.externalcontext.{ServletToExternalContextRequestDispatcherWrapper, ServletURLRewriter, URLRewriter, WSRPURLRewriter}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext

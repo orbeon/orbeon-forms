@@ -17,7 +17,7 @@ import java.io._
 import java.security.Principal
 import java.{util ⇒ ju}
 
-import org.orbeon.oxf.externalcontext.{Credentials, URLRewriter}
+import org.orbeon.oxf.externalcontext.{Credentials, URLRewriter, WebAppContext}
 
 import scala.collection.JavaConverters._
 

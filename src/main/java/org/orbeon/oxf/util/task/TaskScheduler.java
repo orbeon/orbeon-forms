@@ -17,8 +17,8 @@ package org.orbeon.oxf.util.task;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.webapp.WebAppContext;
-import org.orbeon.oxf.webapp.WebAppListener;
+import org.orbeon.oxf.externalcontext.WebAppContext;
+import org.orbeon.oxf.externalcontext.WebAppListener;
 
 import java.util.ArrayList;
 import java.util.Date;

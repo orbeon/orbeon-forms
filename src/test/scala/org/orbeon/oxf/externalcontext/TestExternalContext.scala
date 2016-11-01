@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.{EmailProcessor, ProcessorUtils}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ExternalContext._
-import org.orbeon.oxf.webapp.{ExternalContext, TestWebAppContext, WebAppContext}
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.{XMLUtils, XPathUtils}
 

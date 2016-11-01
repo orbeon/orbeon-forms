@@ -17,6 +17,7 @@ import org.apache.log4j.Logger
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.{WebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.util.CollectionUtils._

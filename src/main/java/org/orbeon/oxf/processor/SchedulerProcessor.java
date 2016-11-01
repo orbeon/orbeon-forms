@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
-import org.orbeon.oxf.webapp.WebAppExternalContext;
+import org.orbeon.oxf.externalcontext.WebAppExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 

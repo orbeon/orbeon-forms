@@ -15,6 +15,7 @@ package org.orbeon.oxf.webapp
 
 import javax.servlet.{ServletContextEvent, ServletContextListener, ServletException}
 
+import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.webapp.ServletPortlet._
 

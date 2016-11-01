@@ -22,7 +22,7 @@ import org.orbeon.dom.io.SAXReader;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.CommandLineExternalContext;
+import org.orbeon.oxf.main.CommandLineExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.webapp.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

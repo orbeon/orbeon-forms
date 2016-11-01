@@ -11,13 +11,16 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.webapp
+package org.orbeon.oxf.externalcontext
 
-import javax.servlet.ServletContext
-import javax.portlet.PortletContext
-import java.net.URL
 import java.io.InputStream
-import collection.JavaConverters._
+import java.net.URL
+import javax.portlet.PortletContext
+import javax.servlet.ServletContext
+
+import org.orbeon.oxf.webapp.Orbeon
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 // Abstraction for ServletContext and PortletContext

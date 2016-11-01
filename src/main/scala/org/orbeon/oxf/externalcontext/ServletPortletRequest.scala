@@ -11,11 +11,11 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.webapp
+package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
+import org.orbeon.oxf.webapp._
 
 object ServletPortletRequest {
 

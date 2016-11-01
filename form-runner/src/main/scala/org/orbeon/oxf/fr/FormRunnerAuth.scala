@@ -14,11 +14,11 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{Credentials, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, SimpleRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.{ServletPortletRequest, SessionFacade, UserRolesFacade}
+import org.orbeon.oxf.webapp.{SessionFacade, UserRolesFacade}
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal

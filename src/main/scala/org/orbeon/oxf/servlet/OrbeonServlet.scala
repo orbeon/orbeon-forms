@@ -17,9 +17,10 @@ import javax.servlet.ServletException
 import javax.servlet.http._
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.webapp.ServletPortlet._
-import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
 import scala.collection.JavaConverters._
 

@@ -11,13 +11,14 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.webapp
+package org.orbeon.oxf.externalcontext
 
 import java.util.{Map ⇒ JMap}
 import javax.servlet.http.HttpSession
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.InitUtils
+import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, Session, SessionScope}
 
 // External context which only exposes the web app, without request or response

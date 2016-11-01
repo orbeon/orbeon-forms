@@ -19,7 +19,6 @@ import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.util.{NetUtils, StringConversions, URLRewriterUtils}
-import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DynamicResourcesPath
 
 // This URL rewriter rewrites URLs using the WSRP encoding

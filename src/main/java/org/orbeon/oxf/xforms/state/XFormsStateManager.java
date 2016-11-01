@@ -21,7 +21,7 @@ import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.http.SessionExpiredException;
 import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsConstants;

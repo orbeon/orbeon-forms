@@ -21,7 +21,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Mediatypes;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.IOException;

@@ -17,9 +17,8 @@ import java.io._
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.util.{LoggerFactory, StringBuilderWriter}
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext._
 
 import scala.collection.mutable
 

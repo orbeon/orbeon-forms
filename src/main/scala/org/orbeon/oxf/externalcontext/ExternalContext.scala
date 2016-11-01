@@ -11,13 +11,10 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.webapp
+package org.orbeon.oxf.externalcontext
 
 import java.io._
-import java.security.Principal
 import java.{util ⇒ ju}
-
-import org.orbeon.oxf.externalcontext.{Credentials, URLRewriter, WebAppContext}
 
 import scala.collection.JavaConverters._
 

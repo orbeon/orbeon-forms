@@ -14,18 +14,16 @@
 package org.orbeon.oxf.externalcontext
 
 import java.io._
-import java.security.Principal
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{EmailProcessor, ProcessorUtils}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext._
-import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.{XMLUtils, XPathUtils}
 

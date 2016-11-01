@@ -25,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, SessionScope}
+import ExternalContext.{ApplicationSessionScope, SessionScope}
 import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._

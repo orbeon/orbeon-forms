@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.orbeon.oxf.externalcontext.URLRewriter;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;

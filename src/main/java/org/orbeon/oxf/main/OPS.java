@@ -24,7 +24,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.main.CommandLineExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.Processor;

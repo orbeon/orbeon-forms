@@ -17,9 +17,8 @@ import java.util.{Map ⇒ JMap}
 import javax.servlet.http.HttpSession
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext.{ApplicationSessionScope, Session, SessionScope}
 import org.orbeon.oxf.pipeline.InitUtils
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.{ApplicationSessionScope, Session, SessionScope}
 
 // External context which only exposes the web app, without request or response
 // Session is None when called from init()/destroy()/contextInitialized()/contextDestroyed()

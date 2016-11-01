@@ -21,7 +21,7 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.properties.Properties
@@ -30,7 +30,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 

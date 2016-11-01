@@ -18,7 +18,7 @@ import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.instruct.NumberInstruction
 import org.orbeon.saxon.om.{Item, NodeInfo}

@@ -15,13 +15,12 @@ package org.orbeon.oxf.processor.generator;
 
 import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
 import org.xml.sax.ContentHandler;
 
-import java.security.Principal;
 import java.util.Iterator;
 
 public class RequestSecurityGenerator extends ProcessorImpl {

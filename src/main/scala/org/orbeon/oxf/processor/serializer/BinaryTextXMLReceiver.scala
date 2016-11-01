@@ -18,13 +18,13 @@ import java.io._
 import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
 import org.orbeon.oxf.util.NetUtils.{getContentTypeCharset, getContentTypeMediaType}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Base64XMLReceiver, DateUtils, TextXMLReceiver}
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.Response
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter, XMLUtils}
 import org.orbeon.scaxon.XML

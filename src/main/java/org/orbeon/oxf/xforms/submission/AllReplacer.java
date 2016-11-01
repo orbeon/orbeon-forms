@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.externalcontext.ResponseWrapper;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;

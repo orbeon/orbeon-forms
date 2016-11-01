@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -112,7 +112,7 @@ public class BeanGenerator extends ProcessorImpl {
     }
 
     protected void readBean(PipelineContext context, Config config, Mapping mapping, XMLReceiver xmlReceiver) {
-        org.orbeon.oxf.webapp.ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (externalContext == null)
             throw new OXFException("Missing external context in BeanGenerator");
         try {

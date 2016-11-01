@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 
 public class UserAgent {
 

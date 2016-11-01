@@ -18,8 +18,7 @@ import java.io.{OutputStreamWriter, PrintWriter}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.CachedSerializer
 import org.orbeon.oxf.util.{ContentHandlerOutputStream, NetUtils}
-import org.orbeon.oxf.externalcontext.ResponseAdapter
-import org.orbeon.oxf.webapp.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter}
 import org.orbeon.oxf.xml.XMLReceiver
 
 object PipelineResponse {

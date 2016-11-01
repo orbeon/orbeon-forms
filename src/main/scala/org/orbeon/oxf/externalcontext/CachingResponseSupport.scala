@@ -16,7 +16,7 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
-import org.orbeon.oxf.webapp.ExternalContext.Request
+import ExternalContext.Request
 
 trait CachingResponseSupport {
 

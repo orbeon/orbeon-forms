@@ -16,13 +16,12 @@ package org.orbeon.oxf.externalcontext
 import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.Request
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.serializer.store;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

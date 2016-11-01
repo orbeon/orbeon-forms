@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import java.{lang ⇒ jl}
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._

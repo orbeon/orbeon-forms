@@ -17,7 +17,6 @@ import java.net.{URLDecoder, URLEncoder}
 
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.webapp.ExternalContext
 import spray.json._
 
 sealed trait UserRole   { def roleName: String }

@@ -17,6 +17,8 @@ import java.lang.{Boolean ⇒ JBoolean}
 import java.net.URI
 
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{EmptyInputStream, HttpMethod, HttpStatusCodeException, StreamedContent}
@@ -24,8 +26,6 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext.Request
-import org.orbeon.oxf.webapp.ExternalContext
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal

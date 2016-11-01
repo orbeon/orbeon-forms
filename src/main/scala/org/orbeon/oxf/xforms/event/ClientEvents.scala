@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.event
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.{Document, DocumentFactory, Element}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.webapp.ExternalContext
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument

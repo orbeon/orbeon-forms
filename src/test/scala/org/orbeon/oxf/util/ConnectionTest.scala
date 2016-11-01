@@ -19,10 +19,9 @@ import org.orbeon.oxf.http.{GET, POST, StreamedContent}
 import collection.JavaConverters._
 import org.junit.Test
 import org.mockito.Mockito
-import org.orbeon.oxf.externalcontext.{LocalRequest, RequestAdapter, WebAppContext}
+import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.webapp.ExternalContext
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
 

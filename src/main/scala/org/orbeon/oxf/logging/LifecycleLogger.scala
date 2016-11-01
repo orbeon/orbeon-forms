@@ -21,7 +21,7 @@ import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{JSON, NetUtils}
-import org.orbeon.oxf.webapp.ExternalContext.{Request, Session, SessionListener, SessionScope}
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session, SessionListener, SessionScope}
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal

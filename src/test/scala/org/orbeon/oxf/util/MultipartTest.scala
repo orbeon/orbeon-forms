@@ -18,12 +18,11 @@ import java.io.ByteArrayInputStream
 import org.apache.commons.fileupload.FileItem
 import org.junit.Test
 import org.mockito.Mockito
-import org.orbeon.oxf.externalcontext.TestSession
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.{ExternalContext, TestSession}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.Multipart._
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.Request
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
 

@@ -17,8 +17,6 @@ import java.io.{InputStream, Reader}
 import java.security.Principal
 import java.{util ⇒ ju}
 
-import org.orbeon.oxf.webapp.ExternalContext
-
 class RequestAdapter extends ExternalContext.Request {
   def getContainerType: String = null
   def getContainerNamespace: String = null

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 
 import javax.servlet.ServletException;
 import java.io.IOException;

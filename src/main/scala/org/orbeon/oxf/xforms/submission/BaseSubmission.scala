@@ -17,11 +17,10 @@ import java.io.IOException
 import java.util.concurrent.Callable
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{LocalRequest, LocalResponse, URLRewriter}
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, LocalResponse, URLRewriter}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpMethod, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils}
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.Request
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 

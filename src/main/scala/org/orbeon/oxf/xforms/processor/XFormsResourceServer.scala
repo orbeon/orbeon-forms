@@ -17,15 +17,14 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.ExternalContext.ApplicationSessionScope
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{GET, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.ExternalContext
-import org.orbeon.oxf.webapp.ExternalContext.ApplicationSessionScope
 import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
 
 import scala.util.Try

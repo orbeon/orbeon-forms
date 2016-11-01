@@ -14,7 +14,7 @@
 package org.orbeon.oxf.portlet.processor;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;

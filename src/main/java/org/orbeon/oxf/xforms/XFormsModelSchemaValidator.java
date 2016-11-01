@@ -41,7 +41,7 @@ import org.orbeon.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.processor.validation.SchemaValidationException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;

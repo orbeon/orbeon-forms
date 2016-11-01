@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import org.orbeon.oxf.webapp.ExternalContext.{Request, Response}
-import org.orbeon.oxf.webapp.ExternalContext
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 
 // This context uses the original WebAppContext and session
 class LocalExternalContext(val webAppContext: WebAppContext, request: Request, response: Response) extends ExternalContext {

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.state;
 
 import org.junit.Test;
 import org.orbeon.oxf.externalcontext.TestSession;
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;

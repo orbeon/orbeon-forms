@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext;
 
-import org.orbeon.oxf.webapp.ExternalContext;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;

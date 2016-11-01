@@ -17,6 +17,7 @@ import java.io.{BufferedWriter, OutputStreamWriter, PrintWriter}
 import javax.naming.InitialContext
 
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.InitUtils

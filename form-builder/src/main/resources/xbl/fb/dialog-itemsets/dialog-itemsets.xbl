@@ -117,7 +117,7 @@
                                                          not(($i/items/item/label[@lang = $l] except .) = .)"/>                 <!-- No duplicate label are allowed -->
                     <xf:bind ref="value">
                         <xf:bind ref="." constraint=". != ''"/>                                                                 <!-- Empty values are not allowed -->
-                        <xf:bind ref="." constraint="not(($i/items/item/value except .) = .)"/>                                 <!-- No duplicate value are allowed -->
+                        <xf:bind ref="." constraint="not(($i/items/item/value except .) = .)"/>                                 <!-- No duplicate values are allowed -->
                         <xf:bind ref="." constraint="frf:isSingleSelectionControl($control-type) or not(contains(., ' '))"/>    <!-- No spaces in values are allowed for xf:select -->
                     </xf:bind>
                 </xf:bind>

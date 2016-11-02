@@ -380,12 +380,12 @@
 
                         <xf:var name="tab" value="."/>
 
-                        <xf:var name="searched" context="instance('import-search-response')" value="exists(self::documents)"/>
+                        <xf:var name="searched"  value="exists(instance('import-search-response')/@search-total)"/>
                         <xf:var name="importing" value="xs:boolean($tab/importing)"/>
 
                         <xf:group ref=".[$searched]">
 
-                            <xf:var name="existing" value="xs:integer(instance('import-search-response')/@total)"/>
+                            <xf:var name="existing" value="xs:integer(instance('import-search-response')/@search-total)"/>
 
                             <xf:group ref=".[not($importing or $import-done)]">
                                 <xf:group ref=".[$existing gt 0]">

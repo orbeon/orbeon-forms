@@ -288,7 +288,7 @@ public class XFormsControls implements XFormsObjectResolver {
         }
 
         // This method implements the new refresh event algorithm:
-        // http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-refresh-events
+        // http://wiki.orbeon.com/forms/doc/developer-guide/xforms-refresh-events
 
         // Don't do anything if there are no children controls
         if (getCurrentControlTree().children().isEmpty()) {

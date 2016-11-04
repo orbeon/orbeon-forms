@@ -31,7 +31,7 @@ import java.util.concurrent.*;
  *
  * The CompletionService is stored in the session, indexed by document UUID.
  *
- * See http://wiki.orbeon.com/forms/doc/developer-guide/asynchronous-submissions
+ * See https://doc.orbeon.com/xforms/submission-asynchronous.html
  * See http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/ExecutorCompletionService.html
  */
 public class AsynchronousSubmissionManager {

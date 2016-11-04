@@ -1,7 +1,7 @@
 <!--
     This file is an empty template for your own properties-local.xml file. Please follow the instructions here:
 
-    http://wiki.orbeon.com/forms/doc/developer-guide/configuration-properties
+    https://doc.orbeon.com/configuration/properties/
 -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors">

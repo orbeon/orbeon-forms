@@ -41,7 +41,7 @@
     <!-- NOTE: Actions and services are implemented, for historical reasons, as XForms instances, submissions, and action
          blocks. This means that we must analyze them to try to make sense of them, and this is a bit fragile. In the
          future, actions should be described in a more declarative format. See also:
-         http://wiki.orbeon.com/forms/projects/form-runner-builder/improved-actions-and-services-format
+         https://github.com/orbeon/orbeon-forms/issues/224
      -->
     <xsl:variable name="actions" select="$fr-form-model/xf:action[ends-with(@id, '-binding')]"/>
     <xsl:variable name="service-instances" select="$fr-form-model/xf:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>

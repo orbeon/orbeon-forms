@@ -49,7 +49,7 @@
         </layout>
     </appender>
 
-    <!-- XForms engine activity, see http://wiki.orbeon.com/forms/doc/developer-guide/xforms-logging -->
+    <!-- XForms engine activity, see https://doc.orbeon.com/configuration/advanced/xforms-logging.html -->
     <!--
     <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
         <priority value="debug"/>

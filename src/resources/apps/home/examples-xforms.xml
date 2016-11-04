@@ -25,7 +25,7 @@
     <example title="XForms Bookcast" href="/xforms-bookcast/" img="/home/images/xforms-bookcast-small.jpg" size="4"
              source="http://www.flickr.com/photos/osiatynska/3287986172/">
         The <xh:i>Bookcast</xh:i> app is part of the Orbeon <xh:a
-        href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial">XForms tutorial</xh:a>.
+        href="https://doc.orbeon.com/xforms/tutorial/introduction.html">XForms tutorial</xh:a>.
         It shows simple XRX-style database access, repeats, and more.
     </example>
     <example title="Flickr Resize" href="/xforms-flickr-resize/" img="/home/images/xforms-flickr-resize-small.jpg" size="4"

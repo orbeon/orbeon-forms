@@ -2,43 +2,39 @@ sudo: required
 dist: trusty
 language: java
 jdk:
-  - oraclejdk7
+- oraclejdk7
 node_js:
-  - "node"
+- node
 env:
   global:
   - ANT_OPTS=-Xmx2048m
-  - secure: "lv7PiyaATPsWOTVyrkU3jLCqUDhrmOYJvJvPADfqpwLFhysealM2YsSBS9i9M5hZ5GQZCy8oU9S9e9rzupEuK6Jt+KhJdMNwg7QJM48aot9mjoVsUTl6bLLZuO37ALzc4WHQW04++4vWPzbS/BNQbXwsu6XwHAnCKkU2xnzJgS4="
-  - secure: "bAgBFLf9R51upNAWfHJyBsByveotFRwCUAWFIiVTgCGxAE5mhWFMZl9HsAL0oiacjzmQ03u2toboOdTH/tfm2bohtQZknFleO0rDhLyW3ZmYI65vmFm1uYVrbyzMI0l7t/Ws4gZW9SC5cUl7m2GjTnB/qKg/O6uohPU7uqf8KEU="
-  - secure: "PhGOPRzoUKHmJxytdzA78+veaDi6Xm1JzcTFb1tHIna1DV8gjSR7YHMuuxbJCrhF719ubGJlgE8LndLolkMGVq/3GL8XA6rV5RQeNZ+FnNgcQ+KCo4NYH8Zpyb3zn2Bp0L3Q1XSWjXoTEeVwjwDEVOpdBxLTvD+LorLVuC0cEMc="
-  - secure: "E2ux7UgwF6IuwpKdyg+i3XRzWJ77gAJyxkw1wHogsKhm7GRTYO22CQtMqrENV9jzqOEK8gOM3clFoNGgCFUatxnKru3vy2MXq5mx88EeQ0FoooaRAevtxev4G9wh8jizI9JH+LK4hidek+Wmm1NLChU4VphJ33co5Y7s9vZLKv4="
-  - secure: "K8wZkf213KQepxZzki51gdtCCbBX4FDnhu7tcUYs8lMb8b3iEoVZdSlo1dx0f76FxpVztNeyF5e5QN25e0tLCmFo9rmXCvyt5YAWt6Gu7Z27h2gzi4atpltJkK80NUG56MwAWHL/wdKT1IWFxS8gb6a1B7m4g0n5Wjir7e2tnqw="
-  - secure: "L/Pra2kMGn3AZ1sJb8nvOgxRnpK9/LWY0a4FuYHoQnA6KkjOQfujABHFQRjht8gcc0n0cQttWKsRWT3phTIPGD6YmB25/KT/CI5uKXnbBCMpM1JxhweKRz0P5uOJFO5pVAlkmYq6DwMxP3U/AMs7r4R/9CRyNYEnGEsbr30qphU="
-  - secure: "oddq5H6A4CIOps7nZsDHWVNhjKoAZ7hbdIXHCgh1IS9dV5cb7kZFwnmRNTO1ZaTwrwpwzIZoQqfAfH7jdGVmSFiVlbT3iHjb9nfpTo8CcA5oVnIfGdkx4c55lA04yPP6AY7HGzPDdlH4STWPNz0W6ZPuaPK8cI84V/Z8UXfR0Qg="
-  - secure: "ZS8OKYwuxKDzbXtHAPOCwyqFEWZAH/kqW/eiEhEWYZqrzhBSD6BJgOyisvhDWWof0MQe6ys0OThfFvOnthhK8V+/32NLhBGweH4k29SF6A8VxyYC/bzobGgRMCLCjh7WHWVYAkoSth/3Omi/1DnCd+OauNpY6rbJk43zAWwdYZY="
-  - secure: "UgkdzUPu5ZnGuP1SBScd9CwncD2BylyyxWpI4wPrXofCKiUvh8D9AP4kM83LKQ8yTVzQJhcKzZwZNHY9xwzGhanelYHi7Ju5hnDlhV+w6LfTHaJAyStNChMzzLdAZ0FzCTESX0RobNGwpMRKZRSdCWb5H6BKIfAu8Abf/M/ySac="
-  - secure: "aCCisKF6bb5E9zeM9ALLOmBA5kHiKit4XnUIfb90+kAqONYzJPbGZbuGZGdii8x+4AOsmsdppgXBrku/G2k9AwNITJfBp7Q0yziqgnSg+5we7yvztohuwueQhXqxwchpnp9Y5CqASq/HmgRctyeAbaNBw+VaSDpIhYW/QN6GoBw="
+  - MYSQL_URL="jdbc:mysql://localhost:3306"
+  - POSTGRESQL_URL="jdbc:postgresql://localhost:5432"
+  - secure: duj2NzncZG+oNk8ISitO697mne1EzAajvdRjw39yevKTMdMbf6cbMa+beo/3JW8xMbGxMLovfI4zK0Bykoo98VQVJan87tLGTQVmOKGboi0sYvOeun9jXUoT66tQAEtlL48S5nNoHKyF/dRaGgPRPMkfXiPdElAU9FDklm3rwQs=
+  - secure: gWPaj/3IUfFU/MGqcB6AkD3MsAlLT9uBP5YZhgCZrgHXYIvyhEH9F+it17b5ibWq+i7boSs9G8HcCRwNdaNrlcN1ONDOVRW1f3syK2+HC947/FfzHE6jnamVbEAZMYr77WgR5eeqLQRl94Q2CRa3eW/6QERM99kt5nbRo3oPT/c=
+  - secure: X+82NUnipRkzqBAt4IOgVuW/kDd/m85MEExAxRAxqZ2R6ALCHRMYKpCSv47dW7qnX89EkkN8vEDQ1/5h8bnGY5i1a6b8mMVLS3tkRUtuqW9bL59TzEyVTS6hsWoNNKWL4rzqnDAXTyy4RB881ZGdkTR3nRjrmEZtbfVWLXQCQ+A=
+  - secure: Ufv45EFdy9eKEjZ6Za7DAo7X/cAB16G8a9qNj+qvcCOBiZLTjXO8+1Hqj85R5dopZwYvHt0cVaIiPJ+/7z1DeQ9076g5UTdhnK+agPxMW7WPlf9QqXiIDMZbjBsmPEIjp4jF42QDjoxY/tPTsupW45yXkHCeroUAud2zwvDkb1c=
   matrix:
   - TARGET=test-unit
   - TARGET=orbeon-dist
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
 install:
-  - npm install
+- npm install
 script:
-  - "ant $TARGET"
+- ant $TARGET
 addons:
   artifacts:
     paths:
     - $(ls build/distrib/* | tr "\n" ":")
 cache:
   directories:
-    - $HOME/.ivy2/cache
-    - $HOME/.m2/repository
-    - $HOME/.sbt/boot
-    - $HOME/.sbt/launchers
-    - $HOME/node_modules
+  - "$HOME/.ivy2/cache"
+  - "$HOME/.m2/repository"
+  - "$HOME/.sbt/boot"
+  - "$HOME/.sbt/launchers"
+  - "$HOME/node_modules"
 before_cache:
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
-  - find $HOME/.sbt -name "*.lock" -delete
+# Tricks to avoid unnecessary cache updates
+- find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+- find $HOME/.sbt -name "*.lock" -delete

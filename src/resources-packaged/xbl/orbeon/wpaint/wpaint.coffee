@@ -41,9 +41,9 @@ YAHOO.xbl.fr.WPaint.prototype =
 
     backgroundImageChanged: ->
         if @canvasSupported
-            imageSrc = @imageEl.attr('src')
+            imageSrc     = @imageEl.attr('src')
             imageIsEmpty = ! _.isNull(imageSrc.match(/spacer.gif$/))
-            if (@_imgIsEmpty(@imageEl))
+            if (imageIsEmpty)
                 @wpaintElA.addClass('xforms-hidden')
                 if not _.isNull(@wpaintElC)
                     @wpaintElC.detach()
@@ -56,8 +56,8 @@ YAHOO.xbl.fr.WPaint.prototype =
                 @wpaintElC = $('<div class="fr-wpaint-container-c" tabindex="-1"/>')
                 @wpaintElB.append(@wpaintElC)
                 @wpaintElC.on('focusout', => @blur())
-                @wpaintElC.css('width',  @imageEl.width()  + 'px')
-                @wpaintElC.css('height', @imageEl.height() + 'px')
+                @wpaintElC.css('width',  @imageEl.width() )
+                @wpaintElC.css('height', @imageEl.height())
                 annotation = @annotationEl.attr('src')
                 imgData = @wpaintElC.wPaint
                     drawDown : => @drawDown()
@@ -73,10 +73,6 @@ YAHOO.xbl.fr.WPaint.prototype =
     # When looses focus, send drawing to the server right away (incremental)
     blur: ->
         @_sendAnnotationToServer()
-
-    _imgIsEmpty: (imgEl) ->
-        imgSrc = imgEl.attr('src')
-        ! _.isNull(imgSrc.match(/spacer.gif$/))
 
     # Send the image data from wPaint to the server, which will put it in <annotation>
     _sendAnnotationToServer: ->

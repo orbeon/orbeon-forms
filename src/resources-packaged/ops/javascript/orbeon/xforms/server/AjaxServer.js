@@ -19,11 +19,11 @@
     ORBEON.xforms.server.AjaxServer = {};
 
     var $ = ORBEON.jQuery;
-    var AjaxServer = ORBEON.xforms.server.AjaxServer;
-    var Controls = ORBEON.xforms.Controls;
-    var Properties = ORBEON.util.Properties;
+    var AjaxServer  = ORBEON.xforms.server.AjaxServer;
+    var Controls    = ORBEON.xforms.Controls;
+    var Properties  = ORBEON.util.Properties;
     var StringUtils = ORBEON.util.StringOps;
-    var Globals = ORBEON.xforms.Globals;
+    var Globals     = ORBEON.xforms.Globals;
 
     function childrenWithLocalName(node, name) {
         var result = [];

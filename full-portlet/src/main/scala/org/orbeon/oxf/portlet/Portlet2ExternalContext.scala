@@ -14,7 +14,6 @@
 package org.orbeon.oxf.portlet
 
 import java.io._
-import java.security.Principal
 import java.util.Locale
 import java.{util ⇒ ju}
 import javax.portlet._

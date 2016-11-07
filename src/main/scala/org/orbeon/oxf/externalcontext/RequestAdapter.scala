@@ -14,7 +14,6 @@
 package org.orbeon.oxf.externalcontext
 
 import java.io.{InputStream, Reader}
-import java.security.Principal
 import java.{util ⇒ ju}
 
 class RequestAdapter extends ExternalContext.Request {

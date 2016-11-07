@@ -65,7 +65,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
           useAndClose(ps.executeQuery()) { tableInfoResultSet ⇒
             def tableInfo(): ColMeta = {
               val colName = tableInfoResultSet.getString("column_name")
-              val interestingKeys = Set(if (provider == Oracle) "nullable" else "is_nullable", "data_type")
+              val interestingKeys = Set("is_nullable", "data_type")
               val colKeyVals = for (metaKey ← interestingKeys) yield
                 ColKeyVal(metaKey, tableInfoResultSet.getObject(metaKey))
               ColMeta(colName, colKeyVals)

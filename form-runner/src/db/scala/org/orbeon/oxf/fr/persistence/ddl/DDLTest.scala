@@ -99,6 +99,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
         assertSameTable(provider, "2016_2",  "2016_3")
       case provider @ PostgreSQL ⇒
         assertSameTable(provider, "4_8"   ,  "2016_2")
+        assertSameTable(provider, "2016_2" , "2016_3")
     }
   }
 }

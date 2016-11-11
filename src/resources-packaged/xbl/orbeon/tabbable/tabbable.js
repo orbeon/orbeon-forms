@@ -80,16 +80,12 @@
                     var dndEnd = $(el).prevAll('.xforms-dnd-moves' + RepeatClassesSelector).length;
                     var siblingPos = $(sibling).prevAll('.xforms-dnd-moves' + RepeatClassesSelector).length;
 
-                    // console.log(el);
-                    // console.log(sibling);
-
                     var repeatId = $(el).prevAll('.xforms-repeat-begin-end').attr('id').substring('repeat-begin-'.length);
 
                     var beforeEl = companion.currentDragStartPrev;
                     var dndStart = companion.currentDragStartPosition;
 
                     if (dndStart != dndEnd) {
-                        console.log("moved from " + dndStart + " to " + dndEnd);
 
                         // Restore order once we get an Ajax response back
                         AjaxServer.ajaxResponseReceived.add(function moveBack() {
@@ -158,55 +154,6 @@
             newLi.addClass('active');
             $(newTabPane).addClass('active');
         }
-
-        // _renumberIDsWorker: function (element, repeatDepth, newIndex) {
-        //     // Rename ID on this element
-        //     var repeatSeparatorPosition = element.id.indexOf(XF_REPEAT_SEPARATOR);
-        //     if (repeatSeparatorPosition != -1) {
-        //         var repeatIndexes = element.id.substring(repeatSeparatorPosition + 1).split(XF_REPEAT_INDEX_SEPARATOR);
-        //         repeatIndexes[repeatDepth] = newIndex;
-        //         var newID = element.id.substring(0, repeatSeparatorPosition) + XF_REPEAT_SEPARATOR + repeatIndexes.join(XF_REPEAT_INDEX_SEPARATOR);
-        //         element.id = newID;
-        //
-        //     }
-        //     // Do the same with all the children
-        //     YAHOO.util.Dom.batch(YAHOO.util.Dom.getChildren(element), function (childElement) {
-        //         this._renumberIDsWorker(childElement, repeatDepth, newIndex);
-        //     }, this, true);
-        // },
-        //
-        // /**
-        //  * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
-        //  * @param repeatID      E.g. repeat-begin-todo⊙1 for the repeat on to-dos in the first to-do list.
-        //  */
-        // _renumberIDs: function (repeatID) {
-        //
-        //     // Figure at what depth this repeat is
-        //     var repeatDepth = 0;
-        //     var currentRepeat = repeatID;
-        //     var repeatSeparatorPosition = currentRepeat.indexOf(XF_REPEAT_SEPARATOR);
-        //     if (repeatSeparatorPosition != -1)
-        //         currentRepeat = currentRepeat.substring(0, repeatSeparatorPosition);
-        //     while (true) {
-        //         var parentRepeat = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeat];
-        //         if (! parentRepeat) break;
-        //         repeatDepth++;
-        //         currentRepeat = parentRepeat;
-        //     }
-        //
-        //     // Go through the top elements and change the IDs of all the children
-        //     var currentElement = ORBEON.util.Dom.get("repeat-begin-" + repeatID);
-        //     var newIndex = 0;
-        //     while (true) {
-        //         currentElement = YAHOO.util.Dom.getNextSibling(currentElement);
-        //         if (currentElement == null || $(currentElement).is('.xforms-repeat-begin-end'))
-        //             break;
-        //         if (! $(currentElement).is('.xforms-repeat-delimiter, .xforms-repeat-template')) {
-        //             newIndex++;
-        //             this._renumberIDsWorker(currentElement, repeatDepth, newIndex);
-        //         }
-        //     }
-        // }
     });
 
 })();

@@ -146,7 +146,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     if (getSize > 0) {
       // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
       //tree.dispatchDestructionEventsForRemovedContainer(this, false)
-      tree.deindexSubtree(this, false)
+      tree.deindexSubtree(this, includeCurrent = false)
       clearChildren()
     }
 
@@ -305,7 +305,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             componentControl.destroyNestedContainer()
 
             // Remove dynamic controls
-            tree.deindexSubtree(componentControl, false)
+            tree.deindexSubtree(componentControl, includeCurrent = false)
             componentControl.clearChildren()
 
             // Update the shadow tree

@@ -16,6 +16,8 @@ package org.orbeon
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 package object builder {
-  val $               = g.ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
-  val Events          = g.ORBEON.xforms.Events
+  val ORBEON          = g.ORBEON
+  val $               = ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
+  val Events          = ORBEON.xforms.Events
+  val AjaxServer      = ORBEON.xforms.server.AjaxServer
 }

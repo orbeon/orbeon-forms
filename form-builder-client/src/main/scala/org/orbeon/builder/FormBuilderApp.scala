@@ -22,6 +22,7 @@ object FormBuilderApp extends JSApp {
 
     def initializeOnDomReady(): Unit = {
       StaticUpload
+      DndRepeat
     }
 
     $(initializeOnDomReady _)

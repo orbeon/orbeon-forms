@@ -1,0 +1,38 @@
+<!--
+  Copyright (C) 2016 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+>
+
+    <!-- NOTE: JavaScript code is handled by Scala.js so no other <script> element here. -->
+    <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
+
+    <xbl:binding
+        id="fb-dnd-repeat"
+        element="fb|dnd-repeat"
+        xxbl:mode="javascript-lifecycle">
+
+        <xbl:template>
+            <xf:repeat xbl:attr="model context ref bind" xxbl:scope="outer" xxf:dnd="true">
+                <xbl:content/>
+            </xf:repeat>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

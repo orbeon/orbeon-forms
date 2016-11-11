@@ -88,15 +88,17 @@
                 <!-- Make instance read-only when the form must be read-only -->
                 <xf:bind ref="." readonly="is-readonly = 'true'"/>
 
-                <!-- TODO: would need global instances! -->
+                <!-- Q: Could we have a global instance? Only for the same start/end. -->
                 <xf:instance id="years-itemset">
                     <years start="" end=""/>
                 </xf:instance>
 
+                <!-- Would be good to have a global instance -->
                 <xf:instance id="months-itemset">
                     <months/>
                 </xf:instance>
 
+                <!-- Would be good to have a global instance -->
                 <xf:instance id="days-itemset">
                     <days/>
                 </xf:instance>
@@ -124,15 +126,15 @@
                     <xf:var name="start-year" value="instance('years-itemset')/@start" as="xs:integer"/>
                     <xf:var name="end-year"   value="instance('years-itemset')/@end  " as="xs:integer"/>
 
-                    <xf:action iterate="($start-year to $end-year)">
+                    <xf:action iterate="$start-year to $end-year">
                         <xf:var name="year" value="." as="xs:string"/>
                         <xf:insert context="instance('years-itemset')" origin="xf:element('year', $year)"/>
                     </xf:action>
-                    <xf:action iterate="(1 to 12)">
+                    <xf:action iterate="1 to 12">
                         <xf:var name="month" value="." as="xs:string"/>
                         <xf:insert context="instance('months-itemset')" ref="*" origin="xf:element('month', $month)"/>
                     </xf:action>
-                    <xf:action iterate="(1 to 31)">
+                    <xf:action iterate="1 to 31">
                         <xf:var name="day" value="." as="xs:string"/>
                         <xf:insert context="instance('days-itemset')" ref="*" origin="xf:element('day', $day)"/>
                     </xf:action>

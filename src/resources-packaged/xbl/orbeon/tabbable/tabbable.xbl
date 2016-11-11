@@ -23,19 +23,40 @@
          xmlns:p="http://www.orbeon.com/oxf/pipeline"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <!--<xbl:script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"/>-->
+    <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
     <xbl:script src="/xbl/orbeon/tabbable/tabbable.js"/>
 
     <xbl:binding
-            id="fr-tabbable"
-            element="fr|tabbable"
-            xxbl:mode="binding javascript-lifecycle">
+        id="fr-tabbable"
+        element="fr|tabbable"
+        xxbl:mode="binding javascript-lifecycle">
 
         <xbl:resources>
-            <xbl:style>
-                .orbeon .xbl-fr-tabbable .nav-tabs > li > a { text-decoration: none }
-                .orbeon .xbl-fr-tabbable .nav-tabs { margin-bottom: 0 }
-            </xbl:style>
+             <xbl:style src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>
+             <xbl:style src="/xbl/orbeon/tabbable/tabbable.css"/>
         </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <resources>
+                        <resource xml:lang="en"><add>Add One</add></resource>
+                        <resource xml:lang="fr"><add>Ajouter</add></resource>
+                        <resource xml:lang="es"><add>[Add One]</add></resource>
+                        <resource xml:lang="no"><add>[Add One]</add></resource>
+                        <resource xml:lang="ru"><add>[Add One]</add></resource>
+                        <resource xml:lang="it"><add>[Add One]</add></resource>
+                        <resource xml:lang="de"><add>[Add One]</add></resource>
+                        <resource xml:lang="fi"><add>[Add One]</add></resource>
+                        <resource xml:lang="nl"><add>[Add One]</add></resource>
+                        <resource xml:lang="pt"><add>[Add One]</add></resource>
+                        <resource xml:lang="sv"><add>[Add One]</add></resource>
+                    </resources>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -48,10 +69,10 @@
                         <!-- Tab labels -->
                         <xh:ul class="nav nav-tabs">
                             <xsl:for-each select="fr:tab">
-                                <xsl:variable name="tab"    select="."/>
-                                <xsl:variable name="pos"    select="position()"/>
-                                <xsl:variable name="repeat" select="exists($tab/(@bind | @ref))"/>
-                                <xsl:variable name="label"  select="$tab/(fr:label | xf:label)[1]"/>
+                                <xsl:variable name="tab"               select="."/>
+                                <xsl:variable name="pos"               select="position()"/>
+                                <xsl:variable name="repeat"            select="exists($tab/(@bind | @ref))"/>
+                                <xsl:variable name="label"             select="$tab/(fr:label | xf:label)[1]"/>
 
                                 <xf:group appearance="xxf:internal">
 
@@ -69,7 +90,9 @@
                                                     '{''active''[xxf:repeat-position() = 1]}'
                                                 else
                                                     'active'[$pos = 1],
-                                                '{''xforms-hidden''[not($visible)]}'[$tab/@visible]
+                                                '{''xforms-hidden''[not($visible)]}'[$tab/@visible],
+                                                'xforms-dnd-item',
+                                                'xforms-dnd-moves'[$repeat]
                                             }">
                                             <!-- Transform *:label into xf:output -->
                                             <xh:a data-toggle="tabbable">
@@ -90,18 +113,36 @@
                                                         </xf:output>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
+                                                <xh:i class="icon-align-justify fr-tabbable-grab"/>
                                             </xh:a>
                                         </xh:li>
                                     </xsl:variable>
 
                                     <xsl:choose>
                                         <xsl:when test="$repeat">
-                                            <xf:repeat xxbl:scope="outer">
+                                            <xf:repeat xxbl:scope="outer" xxf:dnd="true">
                                                 <xsl:copy-of select="$tab/(@context | @model | @bind | @ref)"/>
+                                                <xf:action event="xxforms-index-changed" type="javascript">
+                                                    <xf:param
+                                                        name="newIndex"
+                                                        value="event('xxf:new-index') - 1"/>
+                                                    <xf:body>
+                                                        ORBEON.xforms.XBL.instanceForControl(this).selectTab(newIndex);
+                                                    </xf:body>
+                                                </xf:action>
                                                 <xf:group xxbl:scope="inner" appearance="xxf:internal">
                                                     <xsl:copy-of select="$content"/>
                                                 </xf:group>
                                             </xf:repeat>
+                                            <xh:li class="fr-tabbable-add">
+                                                <xf:trigger appearance="xxf:mini" ref="xxf:binding('fr-tabbable')">
+                                                    <xf:label value="xxf:r('add')"/>
+                                                    <xf:dispatch
+                                                        event="DOMActivate"
+                                                        name="fr-tabbable-add"
+                                                        targetid="fr-tabbable"/>
+                                                </xf:trigger>
+                                            </xh:li>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:copy-of select="$content"/>

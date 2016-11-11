@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import java.{util ⇒ ju}
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -31,6 +30,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -125,7 +125,7 @@ class XFormsRepeatControl(
       if (local.index != -1)
         local.index
       else
-        throw new OXFException("Repeat index was not set for repeat id: " + getEffectiveId)
+        throw new OXFException("Repeat index was not set for repeat id: " + effectiveId)
     } else
       0
 
@@ -137,93 +137,73 @@ class XFormsRepeatControl(
       children(getIndex - 1)
 
   def doDnD(dndEvent: XXFormsDndEvent): Unit = {
-    // Only support this on DnD-enabled controls
-    if (! isDnD)
-      throw new ValidationException(
-        "Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId, getLocationData)
+
+    require(isDnD, s"attempt to process `xxforms-dnd` event on non-DnD-enabled control `$effectiveId`")
 
     // Get all repeat iteration details
-    val dndStart = StringUtils.split(dndEvent.getDndStart, '-')
-    val dndEnd = StringUtils.split(dndEvent.getDndEnd, '-')
+    val dndStart = dndEvent.getDndStart.splitTo[List]("-")
+    val dndEnd   = dndEvent.getDndEnd.splitTo[List]("-")
+
+    require(dndStart.size == 1 && dndEnd.size == 1, "DnD over repeat boundaries not supported yet")
 
     // Find source information
-    val (sourceNodeset, requestedSourceIndex) =
-      (bindingContext.nodeset.asScala, dndStart(dndStart.length - 1).toInt)
+    val sourceItems               = bindingContext.nodeset.asScala
+    val sourceItemsSize           = sourceItems.size
+    val requestedSourceIndex      = dndStart.last.toInt
+    val requestedDestinationIndex = dndEnd.last.toInt
 
-    if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size)
-      throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData)
+    require(
+      requestedSourceIndex >= 1 && requestedSourceIndex <= sourceItemsSize,
+      s"Out of range DnD start iteration: $requestedSourceIndex"
+    )
 
-    // Find destination
-    val (destinationNodeset, requestedDestinationIndex) = {
-      val destinationControl =
-        if (dndEnd.length > 1) {
-          // DnD destination is a different repeat control
-          val containingRepeatEffectiveId =
-            getPrefixedId + REPEAT_SEPARATOR + (dndEnd mkString REPEAT_INDEX_SEPARATOR_STRING)
-          containingDocument.getControlByEffectiveId(containingRepeatEffectiveId).asInstanceOf[XFormsRepeatControl]
-        } else
-          // DnD destination is the current repeat control
-          this
+    require(
+      requestedDestinationIndex >= 1 && requestedDestinationIndex <= sourceItemsSize,
+      s"Out of range DnD end iteration: $requestedDestinationIndex"
+    )
 
-      (new ju.ArrayList[Item](destinationControl.bindingContext.nodeset), dndEnd(dndEnd.length - 1).toInt)
-    }
+    val destinationItemsCopy = new ju.ArrayList[Item](sourceItems.asJava)
 
-    // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
+    require(requestedSourceIndex != requestedDestinationIndex, "`dnd-start` must be different from `dnd-end`")
 
-    // Delete node from source
-    // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
     val deletedNodeInfo = {
-      // This deletes exactly one node
       val deletionDescriptors =
         XFormsDeleteAction.doDelete(
           containingDocument = containingDocument,
-          collectionToUpdate = sourceNodeset,
+          collectionToUpdate = sourceItems,
           deleteIndexOpt     = Some(requestedSourceIndex),
-          doDispatch         = false)(
-          indentedLogger     = containingDocument.getControls.getIndentedLogger
+          doDispatch         = false // don't dispatch event because one call to updateRepeatNodeset() is enough
         )
-      deletionDescriptors.head.nodeInfo
+      deletionDescriptors.head.nodeInfo // above deletes exactly one node
     }
 
-    // Adjust destination collection to reflect new state
-    val deletedNodePosition = destinationNodeset.indexOf(deletedNodeInfo)
-    val (actualDestinationIndex, destinationPosition) =
-      if (deletedNodePosition != -1) {
-        // Deleted node was part of the destination nodeset
-        // NOTE: This removes from our copy of the nodeset, not from the control's nodeset, which must not be
-        // touched until control bindings are updated.
-        destinationNodeset.remove(deletedNodePosition)
-        // If the insertion position is after the delete node, must adjust it
-        if (requestedDestinationIndex <= deletedNodePosition + 1)
-          // Insertion point is before or on (degenerate case) deleted node
-          (requestedDestinationIndex, "before")
-        else
-          // Insertion point is after deleted node
-          (requestedDestinationIndex - 1, "after")
-      } else {
-        // Deleted node was not part of the destination nodeset
-        if (requestedDestinationIndex <= destinationNodeset.size)
-          // Position within nodeset
-          (requestedDestinationIndex, "before")
-        else
-          // Position at the end of the nodeset
-          (requestedDestinationIndex - 1, "after")
-      }
+    // This removes from our copy of the nodeset, not from the control's nodeset, which must not be
+    // touched until control bindings are updated.
+    destinationItemsCopy.remove(requestedSourceIndex - 1)
 
-    // Insert nodes into destination
-    val insertContextNodeInfo = deletedNodeInfo.getParent
-    // NOTE: Tell insert to not clone the node, as we know it is ready for insertion
+    // Below we still try to use `before` when we can so that handles better the case of a repeat over
+    // a hierarchy of nodes where children come after containers.
+    val (actualDestinationIndex, destinationBeforeAfter) = {
+      if (requestedDestinationIndex < requestedSourceIndex)
+        (requestedDestinationIndex, "before")                // insertion point is before or on (degenerate case) deleted node
+      else if (requestedDestinationIndex == sourceItemsSize) // must become last element of collection
+        (requestedDestinationIndex - 1, "after")
+      else
+        (requestedDestinationIndex, "before")                // insertion point is after deleted node
+    }
+
+    // 3. Insert node into destination
     XFormsInsertAction.doInsert(
-      containingDocument,
-      containingDocument.getControls.getIndentedLogger,
-      destinationPosition,
-      destinationNodeset,
-      insertContextNodeInfo,
-      Seq(deletedNodeInfo: Item).asJava,
-      actualDestinationIndex,
-      false,
-      true,
-      false
+      /* containingDocument    = */ containingDocument,
+      /* indentedLogger        = */ containingDocument.getControls.getIndentedLogger,
+      /* positionAttribute     = */ destinationBeforeAfter,
+      /* collectionToBeUpdated = */ destinationItemsCopy,
+      /* insertContextNodeInfo = */ null, // `insertContextNodeInfo` doesn't actually matter because `collectionToBeUpdated` is not empty
+      /* originItems           = */ List(deletedNodeInfo: Item).asJava,
+      /* insertionIndex        = */ actualDestinationIndex,
+      /* doClone               = */ false, // do not clone the node as we know the node it is ready for insertion
+      /* doDispatch            = */ true,
+      /* requireDefaultValues  = */ false
     )
 
     // TODO: should dispatch xxforms-move instead of xforms-insert?
@@ -629,8 +609,8 @@ class XFormsRepeatControl(
 
   override def performDefaultAction(event: XFormsEvent) = event match {
     case e: XXFormsSetindexEvent ⇒ setIndex(e.index)
-    case e: XXFormsDndEvent ⇒ doDnD(e)
-    case _ ⇒ super.performDefaultAction(event)
+    case e: XXFormsDndEvent      ⇒ doDnD(e)
+    case _                       ⇒ super.performDefaultAction(event)
   }
 
   override def buildChildren(

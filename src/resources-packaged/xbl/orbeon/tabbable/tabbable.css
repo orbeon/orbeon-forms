@@ -1,0 +1,35 @@
+.xbl-fr-tabbable.fr-tabbable-dnd > .tabs-left > .nav-tabs i.fr-tabbable-grab {
+  display: block;
+  float: right;
+  cursor: move;
+  opacity: 0.25;
+  filter: alpha(opacity=25);
+}
+.xbl-fr-tabbable.fr-tabbable-dnd > .tabs-left > .nav-tabs .active i.fr-tabbable-grab {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+.xbl-fr-tabbable .nav-tabs {
+  margin-bottom: 0;
+}
+.xbl-fr-tabbable .nav-tabs > li > a {
+  text-decoration: none;
+}
+.xbl-fr-tabbable .nav-tabs > li:not(.active) a:hover {
+  cursor: pointer;
+}
+.xbl-fr-tabbable .nav-tabs > li i {
+  display: none;
+}
+.xbl-fr-tabbable .nav-tabs > li .xforms-output {
+  display: inline-block;
+}
+.xbl-fr-tabbable .fr-tabbable-add {
+  padding: 0 5px;
+}
+.xbl-fr-tabbable .fr-tabbable-add button {
+  width: 100%;
+}
+.xbl-fr-tabbable .tab-pane {
+  background-color: white;
+}

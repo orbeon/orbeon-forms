@@ -108,7 +108,7 @@ class PropertySet {
 
     def processNode(propertyNode: PropertyNode, consumed: String, tokens: List[String], currentTokenPosition: Int): Unit = {
 
-      def appendToConsumed(s: String) = if (consumed.length == 0) s else consumed + "." + s
+      def appendToConsumed(s: String) = if (consumed.isEmpty) s else consumed + "." + s
 
       tokens.lift(currentTokenPosition) match {
         case x @ (Some("*") | None) ⇒
@@ -130,8 +130,8 @@ class PropertySet {
           for {
             (newPropertyNodeOpt, index) ← newPropertyNodes.zipWithIndex
             newPropertyNode             ← newPropertyNodeOpt
-            actualToken = if (index == 0) token else "*"
-            newConsumed = appendToConsumed(actualToken)
+            actualToken                 = if (index == 0) token else "*"
+            newConsumed                 = appendToConsumed(actualToken)
           } locally {
             processNode(newPropertyNode, newConsumed, tokens, currentTokenPosition + 1)
           }

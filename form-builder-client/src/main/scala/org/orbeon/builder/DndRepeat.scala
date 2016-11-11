@@ -52,20 +52,16 @@ object DndRepeat {
 
       def init(): Unit = {
 
-        println(s" ${containerElem.className}  for ${containerElem.id} ")
-
         val newDrake =
           Dragula(
             js.Array(),
             new DragulaOptions {
 
-              def isContainer(el: html.Element) =
-                el eq containerElem
+              override def mirrorContainer                                                                            = containerElem
+              override def isContainer(el: html.Element)                                                              = el eq containerElem
+              override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) = $(el).is(DndMovesSelector)
 
-              def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
-                $(el).is(DndMovesSelector)
-
-              def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) = {
+              override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) = {
 
                 val jSibling = $(sibling)
 
@@ -74,16 +70,6 @@ object DndRepeat {
                   jSibling.is(DndItemSelector) &&
                   ! dragState.exists(_.excludedTargets.exists(_ eq sibling))
               }
-
-              def invalid(el: html.Element, handle: html.Element) = false
-
-              val direction                = "vertical"    // Y axis is considered when determining where an element would be dropped
-              val copy                     = false         // elements are moved by default, not copied
-              val copySortSource           = false         // elements in copy-source containers can be reordered
-              val revertOnSpill            = false         // spilling will put the element back where it was dragged from, if this is true
-              val removeOnSpill            = false         // spilling will `.remove` the element, if this is true
-              val mirrorContainer          = containerElem
-              val ignoreInputTextSelection = true          // allows users to select input text
             }
           )
 
@@ -126,8 +112,6 @@ object DndRepeat {
             val dndStart   = dragState.currentDragStartPosition
 
             if (dndStart != dndEnd) {
-
-              println(s"moved from $dndStart to $dndEnd")
 
               lazy val moveBack: js.Function = () ⇒ {
                 $(beforeEl).after(el)

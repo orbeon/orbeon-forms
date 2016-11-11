@@ -13,6 +13,7 @@
   */
 package org.orbeon.builder
 
+import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -25,18 +26,18 @@ object Dragula {
 }
 
 @ScalaJSDefined
-trait DragulaOptions extends js.Object {
-  def isContainer(el: html.Element)                                                                : Boolean
-  def moves  (el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) : Boolean
-  def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) : Boolean
-  def invalid(el: html.Element, handle: html.Element)                                              : Boolean
-  def direction                                                                                    : String
-  def copy                                                                                         : Boolean
-  def copySortSource                                                                               : Boolean
-  def revertOnSpill                                                                                : Boolean
-  def removeOnSpill                                                                                : Boolean
-  def mirrorContainer                                                                              : html.Element
-  def ignoreInputTextSelection                                                                     : Boolean
+abstract class DragulaOptions extends js.Object {
+  def isContainer(el: html.Element)                                                                = false
+  def moves  (el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) = true
+  def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) = true
+  def invalid(el: html.Element, handle: html.Element)                                              = false
+  def direction                                                                                    = "vertical"
+  def copy                                                                                         = false
+  def copySortSource                                                                               = false
+  def revertOnSpill                                                                                = false
+  def removeOnSpill                                                                                = false
+  def mirrorContainer                                                                              = dom.document.body
+  def ignoreInputTextSelection                                                                     = true
 
 }
 

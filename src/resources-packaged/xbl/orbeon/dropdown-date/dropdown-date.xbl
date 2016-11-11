@@ -102,7 +102,8 @@
                 </xf:instance>
 
                 <!-- Initialize itemsets upon initialization -->
-                <xf:action ev:event="xforms-model-construct-done">
+                <!-- Only do this if not initialized yet. See https://github.com/orbeon/orbeon-forms/issues/2993. Remove `if` once #2994 is fixed. -->
+                <xf:action ev:event="xforms-model-construct-done" if="empty(instance('years-itemset')/*)">
 
                     <!-- Figure start-end years -->
                     <xf:action iterate="instance('years-itemset')/@*">

@@ -197,10 +197,11 @@ trait HttpResponse {
 }
 
 object StatusCode {
-  val Ok                  = 200
-  val NotFound            = 404
-  val NotModified         = 304
-  val InternalServerError = 500
+  val Ok                    = 200
+  val NotModified           = 304
+  val NotFound              = 404
+  val RequestEntityTooLarge = 413
+  val InternalServerError   = 500
 }
 
 sealed trait HttpMethod { def name: String }

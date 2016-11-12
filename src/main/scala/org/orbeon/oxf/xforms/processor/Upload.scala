@@ -13,12 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
-
 import org.apache.commons.fileupload.FileItem
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.HttpStatusCodeException
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -32,16 +29,22 @@ class Upload extends ProcessorImpl {
   override def createOutput(name: String) =
     addOutput(name, new ProcessorOutputImpl(Upload.this, name) {
       override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
-        Multipart.parseMultipartRequest(NetUtils.getExternalContext.getRequest, RequestGenerator.getMaxSizeProperty, ExternalContext.StandardHeaderCharacterEncoding) match {
+        Multipart.parseMultipartRequest(
+          request        = NetUtils.getExternalContext.getRequest,
+          maxSize        = RequestGenerator.getMaxSizeProperty,
+          headerEncoding = ExternalContext.StandardHeaderCharacterEncoding
+        ) match {
           case (nameValues, None) ⇒
 
             // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
             // handle more than one here.
             val files = nameValues collect {
-              case (name, fileItem: FileItem) if StringUtils.isNotBlank(fileItem.getName) ⇒
-                val size = fileItem.getSize
-                val sessionURL = NetUtils.renameAndExpireWithSession(RequestGenerator.urlForFileItem(fileItem), XFormsServer.logger).toURI.toString
-                (name, fileItem, sessionURL, size)
+              case (name, fileItem: FileItem) if fileItem.getName.nonBlank ⇒
+
+                val sessionURL =
+                  NetUtils.renameAndExpireWithSession(RequestGenerator.urlForFileItem(fileItem), XFormsServer.logger).toURI.toString
+
+                (name, fileItem, sessionURL, fileItem.getSize)
             }
 
             val serverEvents =
@@ -61,17 +64,19 @@ class Upload extends ProcessorImpl {
             val response =
               <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:action>
-                  <xxf:server-events delay="0">{XFormsUtils.encodeXML(XML.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)}</xxf:server-events>
+                  <xxf:server-events delay="0">{
+                    XFormsUtils.encodeXML(XML.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)
+                  }</xxf:server-events>
                 </xxf:action>
               </xxf:event-response>
 
             XML.elemToSAX(response, xmlReceiver)
 
-          case (nameValues, someThrowable @ Some(t)) ⇒
+          case (nameValues, someThrowable @ Some(_)) ⇒
             // NOTE: There is no point sending a response, see:
             // https://github.com/orbeon/orbeon-forms/issues/985
             Multipart.deleteFileItems(nameValues)
-            throw HttpStatusCodeException(SC_REQUEST_ENTITY_TOO_LARGE, throwable = someThrowable)
+            throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
         }
     })
 }

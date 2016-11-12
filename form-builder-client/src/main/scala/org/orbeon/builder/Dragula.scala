@@ -14,30 +14,31 @@
 package org.orbeon.builder
 
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.annotation.ScalaJSDefined
 
+// Simple facade for Dragula. See https://github.com/bevacqua/dragula.
 object Dragula {
-  def apply(initialContainers: js.Array[html.Element], options: DragulaOptions): Drake =
+  def apply(initialContainers: js.Array[Element], options: DragulaOptions): Drake =
     g.dragula(initialContainers, options).asInstanceOf[Drake]
 }
 
 @ScalaJSDefined
 abstract class DragulaOptions extends js.Object {
-  def isContainer(el: html.Element)                                                                = false
-  def moves  (el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) = true
-  def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) = true
-  def invalid(el: html.Element, handle: html.Element)                                              = false
-  def direction                                                                                    = "vertical"
-  def copy                                                                                         = false
-  def copySortSource                                                                               = false
-  def revertOnSpill                                                                                = false
-  def removeOnSpill                                                                                = false
-  def mirrorContainer                                                                              = dom.document.body
-  def ignoreInputTextSelection                                                                     = true
+  def isContainer(el: Element)                                                 = false
+  def moves  (el: Element, source: Element, handle: Element, sibling: Element) = true
+  def accepts(el: Element, target: Element, source: Element, sibling: Element) = true
+  def invalid(el: Element, handle: Element)                                    = false
+  def direction                                                                = "vertical"
+  def copy                                                                     = false
+  def copySortSource                                                           = false
+  def revertOnSpill                                                            = false
+  def removeOnSpill                                                            = false
+  def mirrorContainer                                                          = dom.document.body
+  def ignoreInputTextSelection                                                 = true
 
 }
 
@@ -49,8 +50,8 @@ trait Drake extends js.Any {
 
 object Drake {
   implicit class DrakeOps(val drake: Drake) extends AnyVal {
-    def onDrag   (callback: (html.Element, html.Element)                             ⇒ Any): Unit = drake.on("drag",    callback)
-    def onDragend(callback: (html.Element)                                           ⇒ Any): Unit = drake.on("dragend", callback)
-    def onDrop   (callback: (html.Element, html.Element, html.Element, html.Element) ⇒ Any): Unit = drake.on("drag",    callback)
+    def onDrag   (callback: (Element, Element)                   ⇒ Any): Unit = drake.on("drag",    callback)
+    def onDragend(callback: (Element)                            ⇒ Any): Unit = drake.on("dragend", callback)
+    def onDrop   (callback: (Element, Element, Element, Element) ⇒ Any): Unit = drake.on("drag",    callback)
   }
 }

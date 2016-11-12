@@ -13,7 +13,7 @@
   */
 package org.orbeon.builder
 
-import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 
@@ -32,19 +32,18 @@ object DndRepeat {
 
   @js.native
   trait XBLCompanion extends js.Object {
-    def container: html.Element = js.native
+    def container: Element = js.native
   }
 
-  // See Dragula doc at https://github.com/bevacqua/dragula
   ORBEON.xforms.XBL.declareCompanion("fb|dnd-repeat",
     new js.Object {
 
       def containerElem = this.asInstanceOf[XBLCompanion].container
 
       case class DragState(
-        currentDragStartPrev     : html.Element,
+        currentDragStartPrev     : Element,
         currentDragStartPosition : Int,
-        excludedTargets          : List[html.Element]
+        excludedTargets          : List[Element]
       )
 
       private var dragState: Option[DragState]     = None
@@ -57,11 +56,11 @@ object DndRepeat {
             js.Array(),
             new DragulaOptions {
 
-              override def mirrorContainer                                                                            = containerElem
-              override def isContainer(el: html.Element)                                                              = el eq containerElem
-              override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) = $(el).is(DndMovesSelector)
+              override def mirrorContainer                                                        = containerElem
+              override def isContainer(el: Element)                                               = el eq containerElem
+              override def moves(el: Element, source: Element, handle: Element, sibling: Element) = $(el).is(DndMovesSelector)
 
-              override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) = {
+              override def accepts(el: Element, target: Element, source: Element, sibling: Element) = {
 
                 val jSibling = $(sibling)
 
@@ -73,12 +72,12 @@ object DndRepeat {
             }
           )
 
-        newDrake.onDrag((el: html.Element, source: html.Element) ⇒ {
+        newDrake.onDrag((el: Element, source: Element) ⇒ {
           val jEl   = $(el)
 
           import org.orbeon.oxf.util.StringUtils._
 
-          def findElemLevel(el: html.Element) =
+          def findElemLevel(el: Element) =
             el.className.splitTo[List]() collectFirst { case FindDndLevelRe(level) ⇒ level.toInt }
 
           val startLevelOpt = findElemLevel(el)
@@ -98,11 +97,11 @@ object DndRepeat {
           )
         })
 
-        newDrake.onDragend((el: html.Element) ⇒ {
+        newDrake.onDragend((el: Element) ⇒ {
           dragState = None
         })
 
-        newDrake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
+        newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
           dragState foreach { dragState ⇒
 
             val dndEnd     = $(el).prevAll(DndItemSelector).length
@@ -119,6 +118,10 @@ object DndRepeat {
               }
 
               // Restore order once we get an Ajax response back
+              // NOTE: You might think that we should wait for the specific response to the Ajax request corresponding to
+              // the event below. However, we should move the element back to its original location before *any*
+              // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
+              // doing this is probably the right thing to do.
               AjaxServer.ajaxResponseReceived.add(moveBack)
 
               // Thinking this should instead block input, but only after a while show a modal screen.

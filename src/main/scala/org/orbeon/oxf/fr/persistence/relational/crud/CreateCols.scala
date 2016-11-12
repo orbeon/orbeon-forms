@@ -69,6 +69,11 @@ trait CreateCols extends RequestResponse with Common {
 
     List(
       Col(
+        included      = false && req.forData && ! req.forAttachment, // Oracle
+        name          = "id",
+        value         = StaticColValue("orbeon_seq.NEXTVAL")
+      ),
+      Col(
         included      = true,
         name          = "created",
         value         = DynamicColValue(

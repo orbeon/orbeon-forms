@@ -154,9 +154,10 @@ object Multipart {
   // responsibility of the caller to discard returned FileItem if the caller doesn't want to process the partial
   // results further.
   private def parseRequest(
-      requestContext: RequestContext,
-      upload: ServletFileUpload,
-      sessionOpt: Option[Session]): (i.Seq[(String, AnyRef)], Option[Throwable]) = {
+    requestContext : RequestContext,
+    upload         : ServletFileUpload,
+    sessionOpt     : Option[Session]
+  ): (i.Seq[(String, AnyRef)], Option[Throwable]) = {
 
     val requestUntrustedSize = requestContext.getContentLength
 

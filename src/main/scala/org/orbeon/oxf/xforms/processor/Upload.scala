@@ -41,10 +41,13 @@ class Upload extends ProcessorImpl {
             val files = nameValues collect {
               case (name, fileItem: FileItem) if fileItem.getName.nonBlank ⇒
 
+                // Get size before renaming below
+                val size = fileItem.getSize
+
                 val sessionURL =
                   NetUtils.renameAndExpireWithSession(RequestGenerator.urlForFileItem(fileItem), XFormsServer.logger).toURI.toString
 
-                (name, fileItem, sessionURL, fileItem.getSize)
+                (name, fileItem, sessionURL, size)
             }
 
             val serverEvents =

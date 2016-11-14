@@ -771,28 +771,28 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         Properties: {
             init: function() {
-                this.sessionHeartbeat = new ORBEON.util.Property("session-heartbeat", true);
-                this.sessionHeartbeatDelay = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
-                this.revisitHandling = new ORBEON.util.Property("revisit-handling", "restore");
-                this.delayBeforeIncrementalRequest = new ORBEON.util.Property("delay-before-incremental-request", 500);
-                this.delayBeforeAjaxTimeout = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
-                this.internalShortDelay = new ORBEON.util.Property("internal-short-delay", 100);
-                this.delayBeforeDisplayLoading = new ORBEON.util.Property("delay-before-display-loading", 500);
-                this.delayBeforeUploadProgressRefresh= new ORBEON.util.Property("delay-before-upload-progress-refresh", 2000);
-                this.helpHandler = new ORBEON.util.Property("help-handler", false);
-                this.helpTooltip = new ORBEON.util.Property("help-tooltip", false);
-                this.formatInputTime = new ORBEON.util.Property("format.input.time", "[h] =[m] =[s] [P]");
-                this.formatInputDate = new ORBEON.util.Property("format.input.date", "[M]/[D]/[Y]");
-                this.datePickerNavigator = new ORBEON.util.Property("datepicker.navigator", true);
-                this.datePickerTwoMonths = new ORBEON.util.Property("datepicker.two-months", false);
-                this.showErrorDialog = new ORBEON.util.Property("show-error-dialog", true);
-                this.loginPageDetectionRegexp = new ORBEON.util.Property("login-page-detection-regexp", "");
-                this.clientEventMode = new ORBEON.util.Property("client.events.mode", "default");
-                this.clientEventsFilter = new ORBEON.util.Property("client.events.filter", "");
-                this.resourcesVersioned = new ORBEON.util.Property("oxf.resources.versioned", false);
-                this.retryDelayIncrement = new ORBEON.util.Property("retry.delay-increment", 5000);
-                this.retryMaxDelay = new ORBEON.util.Property("retry.max-delay", 30000);
-                this.useARIA = new ORBEON.util.Property("use-aria", false);
+                this.sessionHeartbeat                 = new ORBEON.util.Property("session-heartbeat", true);
+                this.sessionHeartbeatDelay            = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
+                this.revisitHandling                  = new ORBEON.util.Property("revisit-handling", "restore");
+                this.delayBeforeIncrementalRequest    = new ORBEON.util.Property("delay-before-incremental-request", 500);
+                this.delayBeforeAjaxTimeout           = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
+                this.internalShortDelay               = new ORBEON.util.Property("internal-short-delay", 100);
+                this.delayBeforeDisplayLoading        = new ORBEON.util.Property("delay-before-display-loading", 500);
+                this.delayBeforeUploadProgressRefresh = new ORBEON.util.Property("delay-before-upload-progress-refresh", 2000);
+                this.helpHandler                      = new ORBEON.util.Property("help-handler", false);
+                this.helpTooltip                      = new ORBEON.util.Property("help-tooltip", false);
+                this.formatInputTime                  = new ORBEON.util.Property("format.input.time", "[h] =[m] =[s] [P]");
+                this.formatInputDate                  = new ORBEON.util.Property("format.input.date", "[M]/[D]/[Y]");
+                this.datePickerNavigator              = new ORBEON.util.Property("datepicker.navigator", true);
+                this.datePickerTwoMonths              = new ORBEON.util.Property("datepicker.two-months", false);
+                this.showErrorDialog                  = new ORBEON.util.Property("show-error-dialog", true);
+                this.loginPageDetectionRegexp         = new ORBEON.util.Property("login-page-detection-regexp", "");
+                this.clientEventMode                  = new ORBEON.util.Property("client.events.mode", "default");
+                this.clientEventsFilter               = new ORBEON.util.Property("client.events.filter", "");
+                this.resourcesVersioned               = new ORBEON.util.Property("oxf.resources.versioned", false);
+                this.retryDelayIncrement              = new ORBEON.util.Property("retry.delay-increment", 5000);
+                this.retryMaxDelay                    = new ORBEON.util.Property("retry.max-delay", 30000);
+                this.useARIA                          = new ORBEON.util.Property("use-aria", false);
             }
         },
 

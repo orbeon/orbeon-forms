@@ -5,6 +5,12 @@ val ScalaJsDomVersion             = "0.9.0"
 val ScalaJsJQueryVersion          = "0.9.0"
 val JUnitInterfaceVersion         = "0.11"
 val UPickleVersion                = "0.4.1"
+val Parboiled1Version             = "1.1.7"
+val SprayJsonVersion              = "1.3.2"
+val JodaTimeVersion               = "2.1"
+val JodaConvertVersion            = "1.2"
+val ServletApiVersion             = "3.0.1"
+val PortletApiVersion             = "2.0"
 
 val DefaultOrbeonFormsVersion     = "2016.2-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
@@ -17,15 +23,17 @@ val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
 
 val MatchScalaJSFileNameFormatRE  = """((.+)-(fastopt|opt)).js""".r
+val MatchJarNameRE                = """(.+)\.jar""".r
 val MatchRawJarNameRE             = """([^_]+)(?:_.*)?\.jar""".r
 
-val copyJarToExplodedWar          = taskKey[Option[File]]("Copy JAR file to local WEB-INF/lib for development.")
-val copyJarToLiferayWar           = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
-val fastOptJSToExplodedWar        = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
-val fullOptJSToExplodedWar        = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
+val copyJarToExplodedWar           = taskKey[Option[File]]("Copy JAR file to local WEB-INF/lib for development.")
+val copyDependenciesToExplodedWar  = taskKey[Unit]("Copy managed library JAR files to WEB-INF/lib.")
+val fastOptJSToExplodedWar         = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
+val fullOptJSToExplodedWar         = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
+val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
 
-val orbeonVersionFromProperties   = settingKey[String]("Orbeon Forms version from system properties.")
-val orbeonEditionFromProperties   = settingKey[String]("Orbeon Forms edition from system properties.")
+val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
+val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 // TBH I don't know whether `in ThisBuild` is needed
 // "ThisBuild is a Scope encompassing all projects"
@@ -93,8 +101,8 @@ val JUnitTestArguments = List(
 ) ++ ResourceManagerProperties
 
 val JunitTestOptions = List(
-  libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % "test",
-  //    libraryDependencies          += "com.lihaoyi" %% "pprint" % "0.4.1" % "test",
+  libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % Test,
+  //    libraryDependencies          += "com.lihaoyi" %% "pprint" % "0.4.1" % Test,
 
   testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, JUnitTestArguments: _*),
   testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
@@ -105,20 +113,38 @@ val JunitTestOptions = List(
   baseDirectory     in Test          := baseDirectory.value / ".."
 )
 
-def copyJarFile(sourceJarFile: File, destination: String, excludes: Set[String]) = {
-  val MatchRawJarNameRE(sourceJarRawName) = sourceJarFile.name
-  val targetJarFile = new File(destination + '/' + sourceJarRawName + ".jar")
+// This is copied from the sbt source but doesn't seem to be exported publicly
+def myFindUnmanagedJars(config: Configuration, base: File, filter: FileFilter, excl: FileFilter): Classpath = {
+  (base * (filter -- excl) +++ (base / config.name).descendantsExcept(filter, excl)).classpath
+}
 
-  if (! sourceJarFile.name.contains("_sjs")        &&
-      ! excludes(sourceJarRawName) &&
-      (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
-    println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
-    IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
-    Some(targetJarFile)
-  } else {
-    None
+def copyJarFile(sourceJarFile: File, destination: String, excludes: String ⇒ Boolean, matchRawJarName: Boolean) = {
+
+  val sourceJarNameOpt = Some(sourceJarFile.name) collect {
+    case MatchRawJarNameRE(name) if matchRawJarName ⇒ name
+    case MatchJarNameRE(name)                       ⇒ name
+  }
+
+  sourceJarNameOpt flatMap { sourceJarName ⇒
+
+    val targetJarFile = new File(destination + '/' + sourceJarName + ".jar")
+
+    if (! sourceJarFile.name.contains("_sjs")        &&
+        ! excludes(sourceJarName)                    &&
+        (! targetJarFile.exists || sourceJarFile.lastModified > targetJarFile.lastModified)) {
+      println(s"Copying JAR ${sourceJarFile.name} to ${targetJarFile.absolutePath}.")
+      IO.copy(List(sourceJarFile → targetJarFile), overwrite = false, preserveLastModified = false)
+      Some(targetJarFile)
+    } else {
+      None
+    }
   }
 }
+
+def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =
+  files map (_.data) foreach { file ⇒
+    copyJarFile(file, ExplodedWarLibPath, _ contains "scalajs-", matchRawJarName = false)
+  }
 
 def deleteAndCreateTempTestDirectory(base: File) = {
 
@@ -170,12 +196,12 @@ lazy val commonSettings = Seq(
 
   jsEnv                         := JSDOMNodeJSEnv().value,
 
-  javacOptions  ++= Seq(
+  javacOptions                  ++= Seq(
     "-encoding", "utf8",
     "-source", "1.6",
     "-target", "1.6"
   ),
-  scalacOptions ++= Seq(
+  scalacOptions                 ++= Seq(
     "-encoding", "utf8",
     "-feature",
     "-language:postfixOps",
@@ -196,8 +222,13 @@ lazy val commonSettings = Seq(
 //    "-Ywarn-unused-import"     // 2.11 only
   ),
 
-  copyJarToExplodedWar := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar),
-  copyJarToLiferayWar  := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar)
+  libraryDependencies           += "org.scalactic" %%% "scalactic" % "3.0.0" % Test,
+  libraryDependencies           += "org.scalatest" %%% "scalatest" % "3.0.0" % Test,
+
+  unmanagedBase                      := baseDirectory.value / "lib",
+
+  copyJarToExplodedWar          := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains _, matchRawJarName = true),
+  copyJarToLiferayWar           := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains _, matchRawJarName = true)
 )
 
 lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
@@ -206,11 +237,16 @@ lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
     name := "orbeon-common"
   )
   .jvmSettings(
-    unmanagedBase := baseDirectory.value / ".." / ".." / "lib"
+    unmanagedBase                      := baseDirectory.value / ".." / ".." / "lib",
+
+    (unmanagedJars in Compile)         := myFindUnmanagedJars(
+      Runtime,
+      unmanagedBase.value,
+      (includeFilter in unmanagedJars).value,
+      (excludeFilter in unmanagedJars).value
+    )
   )
   .jsSettings(
-    libraryDependencies += "org.scalactic" %%% "scalactic" % "3.0.0" % "test",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
   )
 
 lazy val commonJVM = common.jvm
@@ -239,9 +275,6 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
     libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
     libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
 
-    libraryDependencies            += "org.scalactic" %%% "scalactic" % "3.0.0" % "test",
-    libraryDependencies            += "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
-
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
@@ -266,14 +299,13 @@ lazy val xupdate = (project in file("xupdate"))
   .dependsOn(commonJVM)
   .settings(commonSettings: _*)
   .settings(
-    name          := "orbeon-xupdate"
+    name := "orbeon-xupdate"
   )
 
 lazy val dom = (project in file("dom"))
   .settings(commonSettings: _*)
   .settings(
-    name                  := "orbeon-dom",
-    unmanagedBase in Test := baseDirectory.value / ".." / "lib"
+    name := "orbeon-dom"
   )
 
 lazy val embedding = (project in file("embedding"))
@@ -292,6 +324,7 @@ lazy val fullPortlet = (project in file("full-portlet"))
     name := "orbeon-full-portlet"
   )
   .settings(
+    libraryDependencies                += "org.joda"      %  "joda-convert"      % JodaConvertVersion % Provided
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
@@ -332,6 +365,7 @@ lazy val formBuilder = (project in file("form-builder"))
     formRunner % "test->test;compile->compile",
     core       % "test->test;compile->compile"
   )
+  .enablePlugins(SbtCoffeeScript)
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-form-builder"
@@ -346,6 +380,7 @@ lazy val formBuilder = (project in file("form-builder"))
 
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
+  .enablePlugins(SbtCoffeeScript)
   .dependsOn(commonJVM, dom, xupdate)
   .configs(DebugTest)
   .settings(commonSettings: _*)
@@ -364,12 +399,10 @@ lazy val core = (project in file("src"))
     scalaSource       in Compile       := baseDirectory.value / "main" / "scala",
     javaSource        in Compile       := baseDirectory.value / "main" / "java",
     resourceDirectory in Compile       := baseDirectory.value / "main" / "resources",
+    sourceDirectory   in Assets        := baseDirectory.value / "main" / "assets"
 
-    unmanagedBase                      := baseDirectory.value / ".." / "lib",
-
-    // TODO: only src/main/resources/org/orbeon/oxf/xforms/script/coffee-script.js
-    // http://www.scala-sbt.org/0.13/docs/Mapping-Files.html
-    mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
+//    // http://www.scala-sbt.org/0.13/docs/Mapping-Files.html
+//    mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
   )
   .settings(JunitTestOptions: _*)
   .settings(
@@ -383,6 +416,42 @@ lazy val core = (project in file("src"))
     resourceDirectory in DebugTest     := baseDirectory.value / "test" / "resources",
 
     javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+  ).settings(
+    libraryDependencies                += "org.parboiled" %% "parboiled-scala"   % Parboiled1Version,
+    libraryDependencies                += "io.spray"      %% "spray-json"        % SprayJsonVersion,
+    libraryDependencies                += "joda-time"     %  "joda-time"         % JodaTimeVersion,
+    libraryDependencies                += "org.joda"      %  "joda-convert"      % JodaConvertVersion % Provided
+//    libraryDependencies                += "javax.servlet" %  "javax.servlet-api" % ServletApiVersion  % Provided,
+//    libraryDependencies                += "javax.portlet" %  "portlet-api"       % PortletApiVersion  % Provided
+  ).settings(
+
+    unmanagedBase                      := baseDirectory.value / ".." / "lib",
+
+    (unmanagedJars in Runtime)         := myFindUnmanagedJars(
+      Runtime,
+      unmanagedBase.value,
+      (includeFilter in unmanagedJars).value,
+      (excludeFilter in unmanagedJars).value
+    ),
+
+    (unmanagedJars in Compile)         := (unmanagedJars in Runtime).value ++ myFindUnmanagedJars(
+      Compile,
+      unmanagedBase.value,
+      (includeFilter in unmanagedJars).value,
+      (excludeFilter in unmanagedJars).value
+    ) ++ myFindUnmanagedJars(
+      Provided,
+      unmanagedBase.value,
+      (includeFilter in unmanagedJars).value,
+      (excludeFilter in unmanagedJars).value
+    ),
+
+    (unmanagedJars in Test)             := (unmanagedJars in Compile).value ++ myFindUnmanagedJars(
+      Test,
+      unmanagedBase.value,
+      (includeFilter in unmanagedJars).value,
+      (excludeFilter in unmanagedJars).value
+    )
   )
 
 lazy val root = (project in file("."))
@@ -414,7 +483,20 @@ lazy val root = (project in file("."))
     javaSource        in Test          := baseDirectory.value / "root" / "src" / "test" / "java",
     resourceDirectory in Test          := baseDirectory.value / "root" / "src" / "test" / "resources",
 
-    publishArtifact                    := false
+    publishArtifact                    := false,
+
+    copyDependenciesToExplodedWar      := {
+
+      // This seems overly complicated but some libraries under `lib/provided` end up in the classpath
+      // even though we override `unmanagedJars` above. So we filter `lib/provided` for now.
+      def isLibProvided(f: Attributed[File]) =
+        f.data.absolutePath.contains("/lib/provided/")
+
+      // Also we would like to find the dependency for all aggregated projects but we don't know how
+      // to do this so for specify individual projects.
+      copyFilesToExplodedWarLib((dependencyClasspath in Runtime in core).value filterNot isLibProvided)
+      copyFilesToExplodedWarLib((dependencyClasspath in Runtime in formBuilder).value filterNot isLibProvided)
+    }
   )
 
 sound.play(compile in Compile, Sounds.Blow, Sounds.Basso)

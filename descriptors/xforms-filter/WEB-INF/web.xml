@@ -1,0 +1,29 @@
+<web-app
+    version="2.4"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/j2ee">
+
+    <!-- Declare and configure the XForms filter -->
+    <filter>
+        <filter-name>orbeon-xforms-filter</filter-name>
+        <filter-class>org.orbeon.oxf.servlet.OrbeonXFormsFilter</filter-class>
+        <init-param>
+            <param-name>oxf.xforms.renderer.context</param-name>
+            <param-value>/orbeon</param-value>
+        </init-param>
+        <init-param>
+            <param-name>oxf.xforms.renderer.default-encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+
+    <!-- Any JSP resource under /xforms-jsp is processed by the filter -->
+    <filter-mapping>
+        <filter-name>orbeon-xforms-filter</filter-name>
+        <url-pattern>/xforms-jsp/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+</web-app>

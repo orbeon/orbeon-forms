@@ -28,147 +28,60 @@
     <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
     <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
         <classpath>
-            <pathelement location="lib/yui-compressor-ant-task-0.5.jar"/>
-            <pathelement location="lib/jargs-1.0.jar"/>
-            <pathelement location="lib/yuicompressor-2.4.7.jar"/>
+            <pathelement location="lib_ant/yui-compressor-ant-task-0.5.jar"/>
+            <pathelement location="lib_ant/yuicompressor-2.4.7.jar"/>
         </classpath>
     </taskdef>
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
         <classpath>
-            <pathelement location="lib/jarjar-1.3.jar"/>
+            <pathelement location="lib_ant/jarjar-1.3.jar"/>
         </classpath>
     </taskdef>
 
     <!-- ant-contrib, for tasks like <if> -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
-            <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+            <pathelement location="lib_ant/ant-contrib-1.0b3.jar"/>
         </classpath>
     </taskdef>
 
     <taskdef
         resource="proguard/ant/task.properties"
-        classpath="lib/proguard-5.2.1.jar"/>
+        classpath="lib_ant/proguard-5.2.1.jar"/>
 
-    <fileset id="war.libs" dir="lib">
+    <!--
+        These JARs are checked in. They can be rebuilt with the jarjar target
 
-        <include name="orbeon-errorified-20150511.jar"/>
+        - xerces-2.11-orbeon.jar
+        - msv-20081113-orbeon.jar
 
-        <!-- These JARs are checked in. They can be rebuilt with the jarjar target -->
-        <include name="xerces-2.11-orbeon.jar"/>
-        <include name="msv-20081113-orbeon.jar"/>
+        For directory scanner and SSH support:
 
-        <include name="slf4j-api-1.7.7.jar"/>
-        <include name="slf4j-log4j12-1.7.7.jar"/>
-        <include name="jcl-over-slf4j-1.7.7.jar"/>
-        <include name="log4j-1.2.17.jar"/>
-        <include name="jaxen-1_1_beta_9.jar"/>
-        <include name="saxpath-dev_orbeon.jar"/>
+        - ant-1_6_5.jar
 
-        <include name="commons-beanutils-1_5.jar"/>
-        <include name="commons-cli-1_0.jar"/>
-        <include name="commons-codec-1.6.jar"/>
-        <include name="commons-collections-3.2.2.jar"/>
-        <include name="commons-digester-1_5.jar"/>
-        <include name="commons-discovery-0.4.jar"/>
-        <include name="commons-fileupload-1.2.2.jar"/>
-        <include name="commons-io-2.0.1.jar"/>
-        <include name="commons-lang3-3.1.jar"/>
-        <include name="commons-pool-1.6.jar"/>
-        <include name="commons-validator-1.4.0.jar"/>
-        <include name="joda-time-2.1.jar"/> <!--We don't include joda-convert-1.2.jar; it is only a compile-time dependency for Scala -->
-        <include name="httpclient-4.3.5.jar"/>
-        <!--<include name="httpclient-cache-4.1.jar"/>-->
-        <include name="httpcore-4.3.2.jar"/>
-        <include name="httpmime-4.3.5.jar"/>
+        For SSH support (currently in oxf:file processor)
 
-        <include name="apache-mime4j-0.6.jar"/>
-        <include name="jcifs-1.3.14.jar"/>
+        - ant-jsch-1_6_5.jar
+        - jsch-0.1.42.jar
 
-        <include name="axis_1_2_1-axis.jar"/>
-        <include name="axis_1_2_1-jaxrpc.jar"/>
-        <include name="axis_1_2_1-saaj.jar"/>
-        <include name="axis_1_2_1-wsdl4j-1.5.1.jar"/>
+        For the XQuery Processor:
 
-        <include name="jfreechart-1.0.9.jar"/>
-        <include name="jfreechart-dependency-jcommon-1.0.12.jar"/>
-        <include name="activation-1.1.1.jar"/>
-        <include name="jtidy-8.0-20060801.131059-3.jar"/>
-        <include name="tagsoup-1.2.jar"/>
-        <include name="${saxon.jar}"/>
-        <include name="batik-all-1_7.jar"/>
-        <include name="batic-dependency-xmlgraphics-commons-1.4.jar"/>
-        <include name="avalon-framework-4_2_0.jar"/>
-        <include name="fop-1_0.jar"/>
-        <include name="jakarta-poi*"/>
-        <include name="metadata-extractor-2.7.0.SNAPSHOT.jar"/>
-        <include name="metadata-extractor-dependency-xmpcore-5.1.2.jar"/>
-        <include name="castor-0_9_4_3-xml.jar"/>
+        - xqjapi.jar
+        - xqj2-0.0.1.jar
+        - exist-xqj-1.0.1.jar
 
-        <include name="exist-1_4_1_dev_orbeon_20110104.jar"/>
-        <include name="exist-optional-1_4_1_dev_orbeon_20110104.jar"/>
-        <include name="exist-modules-1_4_1_dev_orbeon_20110104.jar"/>
-        <include name="exist-ngram-module-1_4_1_dev_orbeon_20110104.jar"/>
-        <include name="exist-lucene-module-1_4_1_dev_orbeon_20110104.jar"/>
+        oxf:pdf-to-image:
 
-        <include name="exist-dependency-antlr-2.7.7.jar"/>
-        <include name="exist-dependency-jgroups-all-2.2.6.jar"/>
-        <include name="exist-dependency-jta-1.1.jar"/>
-        <include name="exist-dependency-quartz-1.6.6.jar"/>
-        <include name="exist-dependency-stax-api-1.0.1.jar"/>
-        <include name="exist-dependency-ws-commons-util-1.0.2.jar"/>
-        <include name="exist-dependency-xmldb.jar"/>
-        <include name="exist-dependency-xmlrpc-client-3.1.2.jar"/>
-        <include name="exist-dependency-xmlrpc-common-3.1.2.jar"/>
-        <include name="exist-dependency-xmlrpc-server-3.1.2.jar"/>
-        <include name="exist-dependency-lucene-core-2.9.2.jar"/>
-        <include name="exist-dependency-lucene-regex-2.9.2.jar"/>
-        <include name="exist-dependency-resolver-1.2.jar"/>
+        - icepdf-core-5.1.1.jar
+        - jai-imageio-core-1.3.1-SNAPSHOT.jar
+        - jai-core-1.1.3.jar
 
-        <include name="ehcache-core-2.6.3.jar"/>
+        TODO:
 
-        <include name="scala-library-2.11.8.jar"/>
-        <include name="scala-xml_2.11-1.0.4.jar"/>
-        <include name="sbinary_2.11-SNAPSHOT.jar"/>
+        - httpclient-cache-4.1.jar
 
-        <include name="rhino-1.7R2.jar"/>
-
-        <include name="flying-saucer-core-9.0.2-20140523.jar"/>
-        <include name="flying-saucer-pdf-9.0.2-20140523.jar"/>
-        <include name="flying-saucer-dependency-itext-2.1.7.jar"/>
-        <include name="itext-bcmail-jdk14-138.jar"/>
-        <include name="itext-bcprov-jdk14-138.jar"/>
-
-        <!-- oxf:pdf-to-image -->
-        <include name="icepdf-core-5.1.1.jar"/>
-        <include name="jai-imageio-core-1.3.1-SNAPSHOT.jar"/>
-        <include name="jai-core-1.1.3.jar"/>
-
-        <include name="barcode4j-1.0.jar"/>
-        <include name="simplecaptcha-1.2.1.jar"/>
-
-        <include name="jms-api-1_1.jar"/>
-        <include name="mail-1_3_2.jar"/>
-
-        <!-- For directory scanner and SSH support -->
-        <include name="ant-1_6_5.jar"/>
-
-        <!-- For SSH support (currently in oxf:file processor) -->
-        <include name="ant-jsch-1_6_5.jar"/>
-        <include name="jsch-0.1.42.jar"/>
-
-        <!-- For the XQuery Processor -->
-        <include name="xqjapi.jar"/>
-        <include name="xqj2-0.0.1.jar"/>
-        <include name="exist-xqj-1.0.1.jar"/>
-
-        <!-- Parsing and JSON -->
-        <include name="parboiled-core-1.1.7.jar"/>
-        <include name="parboiled-scala_2.11-1.1.7.jar"/>
-        <include name="spray-json_2.11-1.3.2.jar"/>
-
-    </fileset>
+    -->
 
     <target name="init">
         <tstamp>
@@ -182,8 +95,6 @@
 
         <property name="examples-cli-src.dir"           value="src/examples-cli"/>
 
-        <property name="xforms-filter.jar.file"         value="build/lib/orbeon-xforms-filter.jar"/>
-        <property name="cli.jar.file"                   value="build/lib/orbeon-cli.jar"/>
         <property name="resources-private.jar.file"     value="build/lib/orbeon-resources-private.jar"/>
         <property name="resources-public.jar.file"      value="build/lib/orbeon-resources-public.jar"/>
 
@@ -270,7 +181,7 @@
         </exec>
     </target>
 
-    <target name="embedding-jar" depends="classes">
+    <target name="embedding-jar" depends="war-common">
         <local name="temp.jar"/>
         <tempfile property="temp.jar" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
         <proguard>
@@ -281,30 +192,17 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      embedding/target/scala-2.11/classes
-            -injars      src/target/scala-2.11/classes
-            -injars      common/jvm/target/scala-2.11/classes
-
-            -injars      lib/commons-io-2.0.1.jar
-            -injars      lib/commons-lang3-3.1.jar
-            -injars      lib/commons-codec-1.6.jar
-            -injars      lib/scala-library-2.11.8.jar
-            -injars      lib/orbeon-errorified-20150511.jar
-            -injars      lib/httpclient-4.3.5.jar
-            -injars      lib/httpclient-cache-4.3.5.jar
-            -injars      lib/httpcore-4.3.2.jar
-            -injars      lib/httpmime-4.3.5.jar
-            -injars      lib/jcl-over-slf4j-1.7.7.jar
-
-            -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
-            <!-- -outjars     build/lib/check-resources.jar -->
+            -injars      build/orbeon-war/WEB-INF/lib/
+            -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
-            -libraryjars lib/servlet-2_3-4_0_4.jar
-            -libraryjars lib/portlet-api_2.0.jar
-            -libraryjars lib/slf4j-api-1.7.7.jar
-            -libraryjars lib/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/liferay-portal-kernel-7.0.jar
+
+            -libraryjars build/orbeon-war/WEB-INF/lib/slf4j-api-1.7.7.jar
+
+            -libraryjars lib/provided/servlet-2_3-4_0_4.jar
+            -libraryjars lib/provided/portlet-api_2.0.jar
+            -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
@@ -326,6 +224,9 @@
             <rule pattern="org.orbeon.**"                                      result="org.orbeon.private.orbeon.@1"/>
             <rule pattern="org.apache.**"                                      result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"                                           result="org.orbeon.private.scala.@1"/>
+            <rule pattern="jcifs.**"                                           result="org.orbeon.private.jcifs.@1"/>
+            <rule pattern="spray.**"                                           result="org.orbeon.private.spray.@1"/>
+            <!--<rule pattern="org/slf4j.**"                                       result="org.orbeon.private.slf4j.@1"/>-->
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
@@ -341,34 +242,17 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      proxy-portlet/target/scala-2.11/classes
-            -injars      portlet-support/target/scala-2.11/classes
-            -injars      embedding/target/scala-2.11/classes
-            -injars      form-runner/target/scala-2.11/classes
-            -injars      src/target/scala-2.11/classes
-            -injars      common/jvm/target/scala-2.11/classes
-
-            -injars      lib/commons-io-2.0.1.jar
-            -injars      lib/commons-lang3-3.1.jar
-            -injars      lib/commons-codec-1.6.jar
-            -injars      lib/scala-library-2.11.8.jar
-            -injars      lib/scala-xml_2.11-1.0.4.jar
-            -injars      lib/orbeon-errorified-20150511.jar
-            -injars      lib/httpclient-4.3.5.jar
-            -injars      lib/httpclient-cache-4.3.5.jar
-            -injars      lib/httpcore-4.3.2.jar
-            -injars      lib/httpmime-4.3.5.jar
-            -injars      lib/jcl-over-slf4j-1.7.7.jar
-            -injars      lib/spray-json_2.11-1.3.2.jar
-
-            -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
+            -injars      build/orbeon-war/WEB-INF/lib/
+            -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
-            -libraryjars lib/servlet-2_3-4_0_4.jar
-            -libraryjars lib/portlet-api_2.0.jar
-            -libraryjars lib/slf4j-api-1.7.7.jar
-            -libraryjars lib/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/liferay-portal-kernel-7.0.jar
+
+            -libraryjars build/orbeon-war/WEB-INF/lib/slf4j-api-1.7.7.jar
+
+            -libraryjars lib/provided/servlet-2_3-4_0_4.jar
+            -libraryjars lib/provided/portlet-api_2.0.jar
+            -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
@@ -391,11 +275,14 @@
             <rule pattern="org.orbeon.**"                                               result="org.orbeon.private.orbeon.@1"/>
             <rule pattern="org.apache.**"                                               result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"                                                    result="org.orbeon.private.scala.@1"/>
+            <rule pattern="jcifs.**"                                                    result="org.orbeon.private.jcifs.@1"/>
+            <rule pattern="spray.**"                                                    result="org.orbeon.private.spray.@1"/>
+            <!--<rule pattern="org/slf4j.**"                                                result="org.orbeon.private.slf4j.@1"/>-->
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
 
-    <target name="xforms-filter-jar" depends="classes">
+    <target name="xforms-filter-jar" depends="war-common">
 
         <local name="temp.jar"/>
         <tempfile property="temp.jar" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
@@ -407,39 +294,37 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      common/jvm/target/scala-2.11/classes
-            -injars      src/target/scala-2.11/classes
-
-            -injars      lib/commons-io-2.0.1.jar
-            -injars      lib/commons-lang3-3.1.jar
-            -injars      lib/scala-library-2.11.8.jar
-            -injars      lib/orbeon-errorified-20150511.jar
-
-            -outjars     ${temp.jar}(!apps/**,!forms/**,!config/**,!oxf/**,!templates/**,!META-INF/**,!xbl/**,!ops/**,!**.gif,!**.png,!**.jpg,!**.css,!**.html,!*.properties,!*.xml,!*.txt)
+            -injars      build/orbeon-war/WEB-INF/lib/
+            -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
-            -libraryjars lib/servlet-2_3-4_0_4.jar
-            -libraryjars lib/portlet-api_2.0.jar
-            -libraryjars lib/slf4j-api-1.7.7.jar
-            -libraryjars lib/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/liferay-portal-kernel-7.0.jar
+
+            -libraryjars build/orbeon-war/WEB-INF/lib/slf4j-api-1.7.7.jar
+
+            -libraryjars lib/provided/servlet-2_3-4_0_4.jar
+            -libraryjars lib/provided/portlet-api_2.0.jar
+            -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
+            -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
 
             -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter {
                 public static *;
             }
         </proguard>
-        <jarjar jarfile="${xforms-filter.jar.file}">
+        <jarjar jarfile="build/lib/orbeon-xforms-filter.jar">
             <zipfileset src="${temp.jar}"/>
             <rule pattern="org.orbeon.oxf.servlet.OrbeonXFormsFilter*" result="org.orbeon.oxf.servlet.OrbeonXFormsFilter@1"/>
             <rule pattern="org.orbeon.**"                              result="org.orbeon.private.orbeon.@1"/>
             <rule pattern="org.apache.**"                              result="org.orbeon.private.apache.@1"/>
             <rule pattern="scala.**"                                   result="org.orbeon.private.scala.@1"/>
+            <rule pattern="jcifs.**"                                   result="org.orbeon.private.jcifs.@1"/>
+            <rule pattern="spray.**"                                   result="org.orbeon.private.spray.@1"/>
+            <!--<rule pattern="org/slf4j.**"                               result="org.orbeon.private.slf4j.@1"/>-->
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
 
     <!-- JARs -->
-    <target name="jars" depends="classes, orbeon-minify-js, embedding-jar, xforms-filter-jar">
+    <target name="jars" depends="classes, orbeon-minify-js">
 
         <!-- This packages core, dom, xupdate, common, etc. -->
         <exec executable="sbt" failonerror="true">
@@ -449,12 +334,16 @@
             <arg value="package"/>
         </exec>
 
+        <fileset id="war.libs" dir="lib/runtime">
+            <include name="**/*.jar"/>
+        </fileset>
+
         <property name="cli.jar.lib.dir" location="lib"/>
         <pathconvert dirsep="/" pathsep=" " property="cli.jar.mf.cp" refid="war.libs">
           <map from="${cli.jar.lib.dir}" to="lib"/>
         </pathconvert>
 
-        <jar destfile="${cli.jar.file}" compress="false">
+        <jar destfile="build/lib/orbeon-cli.jar" compress="false">
           <manifest>
             <attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>
             <attribute name="Class-Path" value="lib/orbeon-core.jar lib/orbeon-dom.jar lib/orbeon-common.jar lib/orbeon-common-shared.jar lib/orbeon-xforms-filter.jar lib/orbeon-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>
@@ -521,33 +410,30 @@
 
         <echo message="Creating WAR for target ${target}"/>
 
-        <copy todir="build/orbeon-war/WEB-INF/lib">
-            <fileset refid="war.libs"/>
-        </copy>
-        <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
-        <delete file="build/orbeon-war/WEB-INF/lib/${saxon.jar}"/>
-        <jar destfile="build/orbeon-war/WEB-INF/lib/${saxon.jar}">
-            <zipfileset src="lib/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
-        </jar>
-
         <!-- This copies the JAR files to the exploded WAR -->
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
             <arg value="project root"/>
             <arg value="copyJarToExplodedWar"/>
+            <arg value="copyDependenciesToExplodedWar"/>
         </exec>
 
-        <copy file="${xforms-filter.jar.file}"     todir="build/orbeon-war/WEB-INF/lib"/>
-        <copy file="${resources-private.jar.file}" todir="build/orbeon-war/WEB-INF/lib"/>
-        <copy file="${resources-public.jar.file}"  todir="build/orbeon-war/WEB-INF/lib"/>
+        <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
+        <delete file="build/orbeon-war/WEB-INF/lib/${saxon.jar}"/>
+        <jar destfile="build/orbeon-war/WEB-INF/lib/${saxon.jar}">
+            <zipfileset src="lib/runtime/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
+        </jar>
+
+        <copy file="${resources-private.jar.file}"      todir="build/orbeon-war/WEB-INF/lib"/>
+        <copy file="${resources-public.jar.file}"       todir="build/orbeon-war/WEB-INF/lib"/>
 
         <copy todir="build/orbeon-war/WEB-INF">
             <fileset dir="lib">
                 <include name="commons-cli-1_0.jar"/>
             </fileset>
         </copy>
-        <copy file="${cli.jar.file}" todir="build/orbeon-war/WEB-INF"/>
+        <copy file="build/lib/orbeon-cli.jar" todir="build/orbeon-war/WEB-INF"/>
         <copy todir="build/orbeon-war/xforms-jsp">
             <fileset dir="src/examples-jsp">
                 <include name="**"/>
@@ -640,6 +526,19 @@
         </war>
     </target>
 
+    <target name="xforms-filter-war" depends="xforms-filter-jar" description="Create XForms filter WAR">
+    	<mkdir dir="build/distrib"/>
+        <war destfile="build/distrib/orbeon-${release.number}-xforms-filter.war">
+            <webinf dir="descriptors/xforms-filter/WEB-INF"/>
+            <lib dir="build/lib">
+                <include name="orbeon-xforms-filter.jar"/>
+            </lib>
+            <zipfileset dir="descriptors/xforms-filter" prefix="">
+                <include name="*.jsp"/>
+            </zipfileset>
+        </war>
+    </target>
+
     <target name="orbeon-auth-war" depends="jars" description="Creates Orbeon Forms orbeon-auth.war">
         <mkdir dir="build/distrib"/>
         <war destfile="build/distrib/orbeon-auth.war" webxml="descriptors/orbeon-auth-war/web.xml">
@@ -685,35 +584,6 @@
     <target name="orbeon-minify-js" depends="init, classes">
         <!-- Store those under build/orbeon-war/WEB-INF/resources so they can be used in dev mode -->
         <mkdir dir="build/orbeon-war/WEB-INF/resources/ops"/>
-        <mkdir dir="build/js"/>
-
-        <!-- Ant task to compile CoffeeScript -->
-        <!-- Defined here (instead of the beginning of this file) as CoffeeScriptTask needs to be compiled first -->
-        <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask">
-            <classpath>
-
-                <pathelement location="common/jvm/target/scala-2.11/classes"/>
-                <pathelement location="src/target/scala-2.11/classes"/>
-
-                <pathelement location="src/main/resources"/>
-                <pathelement location="lib/rhino-1.7R2.jar"/>
-                <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
-                <pathelement location="lib/log4j-1.2.17.jar"/>
-                <pathelement location="lib/scala-library-2.11.8.jar"/>
-                <pathelement location="lib/orbeon-errorified-20150511.jar"/>
-            </classpath>
-        </taskdef>
-
-        <!-- Compile CoffeeScript -->
-        <coffee-script fromdir="src/resources-packaged" todir="build/js">
-            <include name="**/*.coffee"/>
-        </coffee-script>
-        <coffee-script fromdir="src/resources" todir="build/js">
-            <include name="**/*.coffee"/>
-        </coffee-script>
-        <coffee-script fromdir="form-builder/src/main/resources" todir="build/js">
-            <include name="**/*.coffee"/>
-        </coffee-script>
 
         <!-- Compile Scala.js -->
         <if>
@@ -725,6 +595,8 @@
                     <arg value="-Dorbeon.edition=${edition}"/>
                     <arg value="project formBuilderClient"/>
                     <arg value="fastOptJSToExplodedWar"/>
+                    <arg value="project root"/>
+                    <arg value="coffeescript"/>
                 </exec>
             </then>
             <else>
@@ -733,19 +605,27 @@
                     <arg value="-Dorbeon.edition=${edition}"/>
                     <arg value="project formBuilderClient"/>
                     <arg value="fullOptJSToExplodedWar"/>
+                    <arg value="project root"/>
+                    <arg value="coffeescript"/>
                 </exec>
             </else>
         </if>
 
         <!-- Copy non-minimized CoffeeScript resources -->
         <copy todir="build/orbeon-war/WEB-INF/resources">
-            <fileset dir="build/js">
+            <fileset dir="form-builder/target/web/coffeescript/main">
+                <include name="**/*.js"/>
+            </fileset>
+            <fileset dir="src/target/web/coffeescript/main">
                 <include name="**/*.js"/>
             </fileset>
         </copy>
 
         <!-- Minimize compiled CoffeeScript -->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="build/js" todir="build/orbeon-war/WEB-INF/resources">
+        <yui-compressor warn="false" charset="UTF-8" fromdir="form-builder/target/web/coffeescript/main" todir="build/orbeon-war/WEB-INF/resources">
+            <include name="**/*.js"/>
+        </yui-compressor>
+        <yui-compressor warn="false" charset="UTF-8" fromdir="src/target/web/coffeescript/main" todir="build/orbeon-war/WEB-INF/resources">
             <include name="**/*.js"/>
         </yui-compressor>
 
@@ -821,13 +701,13 @@
         <parallel failonany="true">
 
             <property name="oracle.driver"     value="oracle.jdbc.OracleDriver"/>
-            <property name="oracle.jar"        value="lib/oracle/ojdbc6_g.jar"/>
+            <property name="oracle.jar"        value="lib/test/ojdbc6_g.jar"/>
             <property name="mysql.driver"      value="com.mysql.jdbc.Driver"/>
-            <property name="mysql.jar"         value="lib/mysql-connector-java-5.1.26-bin.jar"/>
+            <property name="mysql.jar"         value="lib/test/mysql-connector-java-5.1.26-bin.jar"/>
             <property name="sqlserver.driver"  value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
-            <property name="sqlserver.jar"     value="lib/sqljdbc4.jar"/>
+            <property name="sqlserver.jar"     value="lib/test/sqljdbc4.jar"/>
             <property name="postgresql.driver" value="org.postgresql.Driver"/>
-            <property name="postgresql.jar"    value="lib/postgresql-9.3-1102.jdbc4.jar"/>
+            <property name="postgresql.jar"    value="lib/test/postgresql-9.3-1102.jdbc4.jar"/>
 
             <!-- Run Tomcat -->
             <sequential>
@@ -985,12 +865,15 @@
 
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, embedding-war, orbeon-auth-war, orbeon-src">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, embedding-war, xforms-filter-war, orbeon-auth-war, orbeon-src">
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="build/distrib/${versioned-name}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="build/distrib" fullpath="${versioned-name}/orbeon.war">
                 <include name="${versioned-name}.war"/>
+            </zipfileset>
+            <zipfileset dir="build/distrib" fullpath="${versioned-name}/orbeon-xforms-filter.war">
+                <include name="orbeon-${release.number}-xforms-filter.war"/>
             </zipfileset>
             <zipfileset dir="build/distrib" fullpath="${versioned-name}/orbeon-auth.war">
                 <include name="orbeon-auth.war"/>

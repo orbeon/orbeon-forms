@@ -33,7 +33,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
 
   private val Control1 = "control-1"
 
-  @Test def initialAlert() =
+  @Test def initialAlert(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       // Read initial alert
@@ -49,7 +49,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assertAlertsXML(Array(expected), alertDetails map (a ⇒ a.toXML(currentLang): NodeInfo) toArray)
     }
 
-  @Test def warningConstraintAutomaticId() =
+  @Test def warningConstraintAutomaticId(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
       val newValidation =
         <validation type="formula" id="" level="warning" default-alert="false">
@@ -72,7 +72,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
     }
 
-  @Test def warningConstraintSpecifyId() =
+  @Test def warningConstraintSpecifyId(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
       val newValidation =
         <validation type="formula" id="length-constraint" level="warning" default-alert="false">
@@ -86,7 +86,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assertAlertsXML(Array(newValidation), readConstraintValidationsAsXML(doc, Control1))
     }
 
-  @Test def multipleValidations() =
+  @Test def multipleValidations(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       val newValidations = Array(
@@ -108,7 +108,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assertAlertsXML(newValidations, readConstraintValidationsAsXML(doc, Control1))
     }
 
-  @Test def removeAlertInMiddle() =
+  @Test def removeAlertInMiddle(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
@@ -207,7 +207,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
     }
 
-  @Test def defaultAlert() =
+  @Test def defaultAlert(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
@@ -225,7 +225,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
     }
 
-  @Test def singleConstraintWithoutCustomAlert() =
+  @Test def singleConstraintWithoutCustomAlert(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       val newValidation =
@@ -249,7 +249,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assert(bind child * isEmpty)
     }
 
-  @Test def singleConstraintWithCustomAlert() =
+  @Test def singleConstraintWithCustomAlert(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       val newValidation =
@@ -277,7 +277,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assert(1 ===(bind child * size))
     }
 
-  @Test def requiredAndDatatypeValidations() =
+  @Test def requiredAndDatatypeValidations(): Unit =
     withActionAndFBDoc(AlertsDoc) { doc ⇒
 
       val bind = findBindByName(doc, Control1).toList
@@ -419,7 +419,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       }
     }
 
-  @Test def schemaType() =
+  @Test def schemaType(): Unit =
     withActionAndFBDoc(SchemaDoc) { doc ⇒
 
       val bind = findBindByName(doc, Control1).toList
@@ -444,12 +444,12 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assert("foo:email" === (bind att "type" stringValue))
     }
 
-  @Test def schemaPrefix() =
+  @Test def schemaPrefix(): Unit =
     withActionAndFBDoc(SchemaDoc) { doc ⇒
       assert(Some("foo") === findSchemaPrefix(doc))
     }
 
-  @Test def schemaTypeNoNamespace() =
+  @Test def schemaTypeNoNamespace(): Unit =
     withActionAndFBDoc(SchemaNoNamespaceDoc) { doc ⇒
 
       val bind = findBindByName(doc, Control1).toList
@@ -474,7 +474,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
       assert("rating" === (bind att "type" stringValue))
     }
 
-  @Test def schemaPrefixNoNamespace() =
+  @Test def schemaPrefixNoNamespace(): Unit =
     withActionAndFBDoc(SchemaNoNamespaceDoc) { doc ⇒
       assert(None === findSchemaPrefix(doc))
     }

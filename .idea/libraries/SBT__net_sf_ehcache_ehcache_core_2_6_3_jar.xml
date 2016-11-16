@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: net.sf.ehcache:ehcache-core:2.6.3:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.6.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sf.ehcache/ehcache-core/srcs/ehcache-core-2.6.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

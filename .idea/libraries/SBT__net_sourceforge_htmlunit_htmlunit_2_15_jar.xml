@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: net.sourceforge.htmlunit:htmlunit:2.15:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sourceforge.htmlunit/htmlunit/jars/htmlunit-2.15.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/net.sourceforge.htmlunit/htmlunit/srcs/htmlunit-2.15-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

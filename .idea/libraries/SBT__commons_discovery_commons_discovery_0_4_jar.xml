@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: commons-discovery:commons-discovery:0.4:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/commons-discovery/commons-discovery/jars/commons-discovery-0.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/commons-discovery/commons-discovery/srcs/commons-discovery-0.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

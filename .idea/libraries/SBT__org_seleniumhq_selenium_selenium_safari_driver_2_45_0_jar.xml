@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: org.seleniumhq.selenium:selenium-safari-driver:2.45.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.seleniumhq.selenium/selenium-safari-driver/jars/selenium-safari-driver-2.45.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.seleniumhq.selenium/selenium-safari-driver/srcs/selenium-safari-driver-2.45.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

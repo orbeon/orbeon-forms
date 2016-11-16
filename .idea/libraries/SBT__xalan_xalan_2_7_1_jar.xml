@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: xalan:xalan:2.7.1:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/xalan/xalan/jars/xalan-2.7.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/xalan/xalan/srcs/xalan-2.7.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

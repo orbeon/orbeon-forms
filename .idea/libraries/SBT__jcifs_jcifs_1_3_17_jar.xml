@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: jcifs:jcifs:1.3.17:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/jcifs/jcifs/jars/jcifs-1.3.17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/jcifs/jcifs/srcs/jcifs-1.3.17-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

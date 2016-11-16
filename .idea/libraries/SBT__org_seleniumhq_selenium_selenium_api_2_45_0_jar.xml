@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: org.seleniumhq.selenium:selenium-api:2.45.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.seleniumhq.selenium/selenium-api/jars/selenium-api-2.45.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.seleniumhq.selenium/selenium-api/srcs/selenium-api-2.45.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: org.apache.httpcomponents:httpclient:4.3.6:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.httpcomponents/httpclient/jars/httpclient-4.3.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.apache.httpcomponents/httpclient/srcs/httpclient-4.3.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

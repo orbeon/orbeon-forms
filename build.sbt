@@ -1,5 +1,8 @@
 import sbt.Keys._
 
+val DefaultOrbeonFormsVersion     = "2016.3-SNAPSHOT"
+val DefaultOrbeonEdition          = "CE"
+
 val ScalaVersion                  = "2.11.8"
 val ScalaJsDomVersion             = "0.9.0"
 val ScalaJsJQueryVersion          = "0.9.0"
@@ -11,9 +14,6 @@ val JodaTimeVersion               = "2.1"
 val JodaConvertVersion            = "1.2"
 val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
-
-val DefaultOrbeonFormsVersion     = "2016.2-SNAPSHOT"
-val DefaultOrbeonEdition          = "CE"
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"

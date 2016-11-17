@@ -29,6 +29,11 @@
         element="fb|dnd-repeat"
         xxbl:mode="javascript-lifecycle">
 
+        <xbl:resources>
+             <!--<xbl:style src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>-->
+             <xbl:style src="/xbl/orbeon/tabbable/dragula/dragula.min.css"/>
+        </xbl:resources>
+
         <xbl:template>
             <xf:repeat xbl:attr="model context ref bind" xxbl:scope="outer" xxf:dnd="true">
                 <xbl:content/>

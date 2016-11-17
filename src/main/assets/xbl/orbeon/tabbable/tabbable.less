@@ -14,8 +14,14 @@
 
 .xbl-fr-tabbable {
 
+    &.fr-tabbable-dnd.xforms-readonly > .tabs-left > .nav-tabs {
+        i.fr-tabbable-grab {
+            display: none;
+        }
+    }
+
     &.fr-tabbable-dnd > .tabs-left {
-        &>.nav-tabs {
+        &> .nav-tabs {
             i.fr-tabbable-grab {
                 display: block;
                 float: right;

@@ -33,7 +33,8 @@
         xxbl:mode="binding javascript-lifecycle">
 
         <xbl:resources>
-             <xbl:style src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>
+             <!--<xbl:style src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css"/>-->
+             <xbl:style src="/xbl/orbeon/tabbable/dragula/dragula.min.css"/>
              <xbl:style src="/xbl/orbeon/tabbable/tabbable.css"/>
         </xbl:resources>
 

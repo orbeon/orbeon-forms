@@ -1,0 +1,50 @@
+@import "../../../../bootstrap-src/less/variables";
+@import "../../../../bootstrap-src/less/mixins";
+
+body.orbeon {
+    background-color: #f3f3f3 !important;
+}
+
+.orbeon {
+    ul.thumbnails {
+        li {
+            margin: 0 0 18px 18px;          // Default is 20px and somehow boxes don't fit on one line
+            background-color: white;
+            font-family: "ff-meta-serif-web-pro",Georgia,Cambria,"Times New Roman",Times,serif;
+            padding: 0;
+            &.span4, &.span8 { height: 412px; }
+            // Avoid tiles wrapping with zooming out, see #1741
+            &.span4, &.span8 { box-sizing: border-box }
+            &.span4 { width: 302px }
+            &.span8 { width: 622px }
+
+            a {
+                text-decoration: none;
+                img {
+                    height: 230px;
+                }
+                h2 {
+                    font-size: 20px;
+                    line-height: 25px;
+                    font-weight: 700;
+                    color: #444;
+                    margin: 0;
+                    padding-top: 24px;
+                }
+            }
+            h2, p {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+            p {
+                padding-top: 6px;
+                font-size: 15px;
+                line-height: 21px;
+                color: #666;
+            }
+            &.span12 {
+                padding: 4px 0 0 0;     // We want 10px at the top and bottom; p already 10px margin at the bottom and 6px padding at the top
+            }
+        }
+    }
+}

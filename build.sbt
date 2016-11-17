@@ -41,8 +41,6 @@ val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition fr
 orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
 orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 
-val PathsToExcludeFromCoreJAR = Nil
-
 val JarFilesToExcludeFromWar = Set(
   "orbeon-form-builder-client",
   "orbeon-form-builder-shared",
@@ -231,6 +229,21 @@ lazy val commonSettings = Seq(
   copyJarToLiferayWar           := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains _, matchRawJarName = true)
 )
 
+lazy val assetsSettings = Seq(
+
+  includeFilter in (Assets, LessKeys.less) := "*.less",
+//  includeFilter in Assets := "*.less" || "*.js",
+
+  // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.
+  // Also, we only want the .css/.js files, not the .css.map or the original .less files.
+  WebKeys.exportedMappings in Assets :=
+    (WebKeys.exportedMappings in Assets).value collect {
+      case (file, path) if path.endsWith(".css") || path.endsWith(".js") ⇒
+        val prefix = s"${org.webjars.WebJarAssetLocator.WEBJARS_PATH_PREFIX}/${moduleName.value}/${version.value}/"
+        file → path.substring(prefix.length)
+    }
+)
+
 lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
@@ -346,20 +359,24 @@ lazy val portletSupport = (project in file("portlet-support"))
 
 lazy val formRunner = (project in file("form-runner"))
   .dependsOn(portletSupport, core % "test->test;compile->compile")
+  .enablePlugins(SbtWeb)
   .configs(DatabaseTest, DebugTest)
   .settings(commonSettings: _*)
   .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
+  .settings(JunitTestOptions: _*)
+  .settings(assetsSettings: _*)
   .settings(
     name := "orbeon-form-runner"
   )
-  .settings(JunitTestOptions: _*)
   .settings(
     scalaSource       in DebugTest     := baseDirectory.value / "src" / "test" / "scala",
     javaSource        in DebugTest     := baseDirectory.value / "src" / "test" / "java",
     resourceDirectory in DebugTest     := baseDirectory.value / "src" / "test" / "resources",
 
     javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+  ).settings(
+    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided
   )
 
 lazy val formBuilder = (project in file("form-builder"))
@@ -369,7 +386,9 @@ lazy val formBuilder = (project in file("form-builder"))
     core       % "test->test;compile->compile"
   )
   .enablePlugins(SbtCoffeeScript)
+  .enablePlugins(SbtWeb)
   .settings(commonSettings: _*)
+  .settings(assetsSettings: _*)
   .settings(
     name := "orbeon-form-builder"
   )
@@ -384,10 +403,12 @@ lazy val formBuilder = (project in file("form-builder"))
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin)
   .enablePlugins(SbtCoffeeScript)
+  .enablePlugins(SbtWeb)
   .dependsOn(commonJVM, dom, xupdate)
   .configs(DebugTest)
   .settings(commonSettings: _*)
   .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
+  .settings(assetsSettings: _*)
   .settings(
     name                               := "orbeon-core",
 
@@ -403,9 +424,6 @@ lazy val core = (project in file("src"))
     javaSource        in Compile       := baseDirectory.value / "main" / "java",
     resourceDirectory in Compile       := baseDirectory.value / "main" / "resources",
     sourceDirectory   in Assets        := baseDirectory.value / "main" / "assets"
-
-//    // http://www.scala-sbt.org/0.13/docs/Mapping-Files.html
-//    mappings          in (Compile, packageBin) ~= { _ filterNot { case (_, path) ⇒ PathsToExcludeFromCoreJAR.exists(path.startsWith) } }
   )
   .settings(JunitTestOptions: _*)
   .settings(

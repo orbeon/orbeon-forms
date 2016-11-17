@@ -1,0 +1,65 @@
+// Copyright (C) 2016 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference)  "../../../form-runner/src/main/assets/apps/fr/style/form-runner-common";
+
+.xbl-fr-tabbable {
+
+    &.fr-tabbable-dnd > .tabs-left {
+        &>.nav-tabs {
+            i.fr-tabbable-grab {
+                display: block;
+                float: right;
+                cursor: move;
+                .opacity(25);
+            }
+
+            .active i.fr-tabbable-grab {
+                .opacity(50);
+            }
+        }
+    }
+
+    .nav-tabs {
+        margin-bottom: 0;
+
+        &>li {
+
+            > a {
+                text-decoration: none;
+            }
+
+            &:not(.active) a:hover {
+                cursor: pointer;
+            }
+
+            i {
+                display: none;
+            }
+
+            .xforms-output {
+                display: inline-block;
+            }
+        }
+    }
+
+    .fr-tabbable-add {
+        padding: 0 5px;
+        button {
+            width: 100%;
+        }
+    }
+
+    .tab-pane {
+        background-color: white;
+    }
+}

@@ -1,0 +1,89 @@
+// Copyright (C) 2014 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference)  "../../../form-runner/src/main/assets/apps/fr/style/form-runner-common";
+
+.orbeon .xbl-fr-error-summary {
+
+    clear: both;
+    width: 100%;
+    padding: 0;
+
+    .fr-error-summary-body {
+        display: block;
+        padding: 0;
+    }
+
+    .fr-error-title {
+        display: block;
+        margin: 0;
+        .box-sizing(border-box);
+        width: 100%;
+        padding: 5px 10px;
+        color: white;
+    }
+
+    .fr-error-group {
+
+        margin: 5px 0;
+
+        &> li {
+            border: 2px solid;
+            padding: 5px;
+            margin-bottom: 5px;
+            list-style-position: inside;
+
+            // Multiple levels can be mixed so make sure the strongest wins
+            &.fr-level-info    { border-color: @info; }
+            &.fr-level-warning { border-color: @warning; }
+            &.fr-level-error   { border-color: @error; }
+        }
+
+        .fr-error-number, .fr-error-link, .fr-error-alert {
+
+            padding: 2px 5px;
+            vertical-align: top;
+        }
+
+        .fr-error-number {
+            text-align: right;
+            .xforms-output-output:after { content: ":" }
+            display: none;
+        }
+
+        .fr-error-link {
+            display: block;
+        }
+
+        .fr-error-alert {
+            display: block;
+
+            .xforms-output-output {
+                display: inline-block;
+                vertical-align: top;
+                ul {
+                    list-style-type: square;
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+
+    // Multiple levels can be mixed so make sure the strongest wins
+    .fr-level-info    .fr-error-title { background-color: @info; }
+    .fr-level-warning .fr-error-title { background-color: @warning; }
+    .fr-level-error   .fr-error-title { background-color: @error; }
+
+    .fr-error-alert-info    { color: @info }
+    .fr-error-alert-warning { color: @warning }
+    .fr-error-alert-error   { color: @error }
+}

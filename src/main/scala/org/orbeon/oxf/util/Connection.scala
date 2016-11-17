@@ -425,15 +425,11 @@ object Connection extends Logging {
 
       // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
       // mediatype attribute"
-      val headersWithContentTypeIfNeeded = {
-
-        val headers = customHeaders.toMap // TODO: .toMap unneeded
-
-        if (requiresRequestBody(method) && firstHeaderIgnoreCase(headers, ContentType).isEmpty)
-          headers + (ContentType → List(mediatype ensuring (_ ne null)))
+      val headersWithContentTypeIfNeeded =
+        if (requiresRequestBody(method) && firstHeaderIgnoreCase(customHeaders, ContentType).isEmpty)
+          customHeaders + (ContentType → List(mediatype ensuring (_ ne null)))
         else
-          headers
-      }
+          customHeaders
 
       // Also make sure that if a header element defines Content-Type, this overrides the mediatype attribute
       def soapMediatypeWithContentType =

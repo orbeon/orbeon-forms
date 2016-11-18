@@ -48,14 +48,14 @@ trait ControlLHHASupport {
   }
 
   def evaluateNonRelevantLHHA(): Unit =
-    for (i ← 0 to lhha.size - 1)
+    for (i ← lhha.indices)
       lhha(i) = null
 
   // Copy LHHA if not null
   def updateLHHACopy(copy: XFormsControl): Unit = {
     copy.lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
     for {
-      i ← 0 to lhha.size - 1
+      i ← lhha.indices
       currentLHHA = lhha(i)
       if currentLHHA ne null
     } yield {

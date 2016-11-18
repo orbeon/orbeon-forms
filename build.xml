@@ -163,17 +163,8 @@
         </jarjar>
     </target>
 
-    <!-- Set classpath to compile and run the application -->
-    <target name="classpath" depends="prepare">
-        <path id="class.path">
-            <fileset dir="lib">
-                <include name="**/*.jar"/>
-            </fileset>
-        </path>
-    </target>
-
     <!-- Compile source -->
-    <target name="classes" depends="classpath" unless="skip.compilation">
+    <target name="classes" unless="skip.compilation">
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
@@ -409,8 +400,6 @@
 
     <target name="war-common" depends="jars">
 
-        <echo message="Creating WAR for target ${target}"/>
-
         <!-- This copies the JAR files to the exploded WAR -->
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
@@ -441,7 +430,14 @@
             </fileset>
         </copy>
 
-        <!-- Copy descriptors -->
+        <copy todir="build/orbeon-war/WEB-INF/resources">
+            <fileset dir="src/resources"/>
+        </copy>
+
+    </target>
+
+    <target name="war-descriptors" depends="prepare">
+
         <copy todir="build/orbeon-war/WEB-INF">
             <fileset dir="descriptors/orbeon-war"/>
         </copy>
@@ -452,15 +448,11 @@
             <param name="edition"    expression="${edition}"/>
         </xslt>
 
-        <copy todir="build/orbeon-war/WEB-INF/resources">
-            <fileset dir="src/resources"/>
-        </copy>
-
     </target>
 
-    <target name="orbeon-dev-war" depends="prepare" description="Create exploded WAR">
+    <target name="orbeon-dev-war" depends="war-common" description="Create exploded WAR">
 
-        <antcall target="war-common">
+        <antcall target="war-descriptors">
             <param name="target" value="dev"/>
         </antcall>
 
@@ -470,9 +462,9 @@
 
     <target name="orbeon-war" depends="orbeon-dev-war" description="Create exploded WAR (legacy name)"/>
 
-    <target name="orbeon-dist-war" depends="prepare, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
+    <target name="orbeon-dist-war" depends="war-common, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
 
-        <antcall target="war-common">
+        <antcall target="war-descriptors">
             <param name="target" value="dist"/>
         </antcall>
 
@@ -942,15 +934,17 @@
 
     <target name="orbeon-dist" depends="orbeon-dist-checksum"/>
 
-    <target name="exist-task" depends="classes">
+    <target name="exist-task" depends="war-common">
         <!-- eXist tasks -->
         <!-- http://exist-db.org/ant-tasks.html -->
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
-                <path refid="class.path"/>
-                <pathelement location="common/jvm/target/scala-2.11/classes"/>
-                <pathelement location="dom/target/scala-2.11/classes"/>
-                <pathelement location="src/target/scala-2.11/classes"/>
+                <fileset dir="lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <fileset dir="build/orbeon-war/WEB-INF/lib">
+                    <include name="*.jar"/>
+                </fileset>
             </classpath>
         </typedef>
     </target>

@@ -19,6 +19,7 @@ import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 
 import scala.collection.immutable
+import scala.util.matching.Regex
 
 sealed trait  Mode              { val name: String }
 case   object New  extends Mode { val name = "new" }
@@ -62,5 +63,6 @@ private case class EmbeddingSettings(
   orbeonPrefix  : String,
   httpClient    : HttpClient
 ) {
-  val OrbeonResourceRegex = s"$orbeonPrefix/([^/]+)(/.+)".r
+  val OrbeonSubmitPath    = s"$orbeonPrefix/xforms-server-submit"
+  val OrbeonResourceRegex = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
 }

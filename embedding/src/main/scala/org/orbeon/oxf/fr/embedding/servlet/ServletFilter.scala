@@ -20,8 +20,8 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
-import org.orbeon.oxf.http.{HttpClient, HttpClientSettings, ApacheHttpClient}
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.http._
+import org.orbeon.oxf.util.{NetUtils, PathUtils}
 
 import scala.collection.JavaConverters._
 
@@ -67,7 +67,7 @@ class ServletEmbeddingContextWithResponse(
       navigationParameters.asScala.getOrElse(WSRPURLRewriter.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
 
     def createActionURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
-      req.getContextPath + orbeonPrefix + '/' + path(navigationParameters)
+      req.getContextPath + orbeonPrefix + '/' + PathUtils.dropStartingSlash(path(navigationParameters))
 
     def createRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
       path(navigationParameters)
@@ -99,7 +99,7 @@ class ServletFilter extends Filter {
   }
 
   def doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain): Unit =
-    settingsOpt foreach { case settings @ EmbeddingSettings(frURL, orbeonPrefix, httpClient) ⇒
+    settingsOpt foreach { settings ⇒
 
       val httpReq = req.asInstanceOf[HttpServletRequest]
       val httpRes = res.asInstanceOf[HttpServletResponse]
@@ -107,10 +107,13 @@ class ServletFilter extends Filter {
       APISupport.scopeSettings(httpReq, settings) {
         NetUtils.getRequestPathInfo(httpReq) match {
           case settings.OrbeonResourceRegex(namespace, resourcePath) ⇒
-            // Request is for an Orbeon resource or Ajax call that we need to proxy
+            // Request is for an Orbeon resource or Ajax call
             APISupport.proxyServletResources(httpReq, httpRes, namespace, resourcePath)
+          case settings.OrbeonSubmitPath ⇒
+            // Request is for an Orbeon submission
+            APISupport.proxySubmission(httpReq, httpRes)
           case _ ⇒
-            // Not an Orbeon resource
+            // Not an Orbeon resource or submission
             chain.doFilter(httpReq, httpRes)
         }
       }

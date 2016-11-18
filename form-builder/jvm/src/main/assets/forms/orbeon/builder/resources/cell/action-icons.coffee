@@ -81,9 +81,16 @@ $ ->
                 hoverDiv = createHoverDiv gridTd
                 hoverDiv.append(triggerGroups)
                 $(triggerGroups).css('display', '')
+
+                # Use first XForms form's namespace
+                # NOTE: Maybe we should identify triggers by class name instead of id. The purpose here
+                # is to map an element to a trigger name like `fb-shrink-trigger`.
+                form = _.head($(document.forms).filter('.xforms-form'))
+                ns   = ORBEON.xforms.Globals.ns[form.id]
+
                 # Show/hide triggers depending on relevance rules
                 for trigger in triggers
-                    rule = relevanceRules[trigger.id]
+                    rule = relevanceRules[trigger.id.substring(ns.length)]
                     triggerRelevant = if rule? then rule gridTd else true
                     trigger.style.display = if triggerRelevant then '' else 'none'
             else

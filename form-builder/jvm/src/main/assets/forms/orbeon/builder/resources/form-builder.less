@@ -21,15 +21,32 @@
 @fbGridIconsGutter: 22px;
 @fbIconsHeight: 16px;
 
-// Overwrite definition in form-runner-orbeon.css if any
-html {
-    overflow-y: scroll;
+// Case of non-embedded Form Builder: size body to take the whole viewport
+body.orbeon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    .box-sizing(border-box);
     background-color: #999;
+    background-color: lime; // xxx tmp
 }
 
-body {
-    padding-top: 0;
-    margin-right: 4px;
+// Case of embedded Form Builder: size with some defaults (expecting that the embedding code will override this)
+div.orbeon.orbeon-portlet-div {
+    position: absolute;
+    left: 1vw;
+    top: 50px;
+    width: 98vw;
+    bottom: 1vh;
+    box-sizing: border-box;
+    background-color: #999;
+    background-color: orangered; // xxx tmp
+
+    .fr-summary-button, .fr-new-button {
+        display: none;
+    }
 }
 
 .orbeon {
@@ -131,7 +148,7 @@ body {
     // ***** Toolbox ***************************************************************************************************
 
     .fb-toolbox {
-        position: fixed;
+        position: absolute;
         left: @fbGutter;
         top: 40px + @fbGutter;
         bottom: @fbBottomHeight + @fbGutter;
@@ -666,7 +683,7 @@ body {
     }
 
     .fb-bottom {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         width: 100%;
         .box-sizing(border-box);
@@ -693,6 +710,7 @@ body {
 
     // Top Form Builder navbar only
     .fb-navbar {
+        position: absolute;
         margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
         .border-radius(0);                                                  // override Bootstrap rounded corners
         .container {

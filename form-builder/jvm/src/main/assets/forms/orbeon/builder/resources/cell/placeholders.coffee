@@ -29,7 +29,7 @@ $ ->
     editables =
         button:
             selector: '.fr-grid-content > .xforms-trigger-appearance-full'
-            editInputSelector: '#fb-edit-label'
+            editInputSelector: '.fb-edit-label'
             placeholderOutputSelector: '.fb-message-enter-label'
             placeholderContainerSelector: 'span.btn'
             initialValueSelector: 'button'
@@ -43,7 +43,7 @@ $ ->
                 f$.remove f$.find 'span.btn', element
         link:
             selector: '.fr-grid-content > .xforms-trigger-appearance-minimal'
-            editInputSelector: '#fb-edit-label'
+            editInputSelector: '.fb-edit-label'
             placeholderOutputSelector: '.fb-message-enter-label'
             placeholderContainerSelector: '.fb-mock-link'
             initialValueSelector: 'a'

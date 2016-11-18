@@ -28,6 +28,7 @@
                             <li><a href="?form=w9">W-9</a></li>
                             <li><a href="?form=controls">Controls</a></li>
                             <li><a href="?form=contact">Contact</a></li>
+                            <li><a href="?form=builder">Form Builder</a></li>
 
                         </ul>
                     </div>

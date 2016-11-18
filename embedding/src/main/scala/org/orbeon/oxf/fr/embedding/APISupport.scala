@@ -98,6 +98,46 @@ object APISupport {
       )
     }
 
+  def proxySubmission(
+    req         : HttpServletRequest,
+    res         : HttpServletResponse
+  ): Unit =
+    withSettings(req, res.getWriter) { settings ⇒
+
+      implicit val ctx = new ServletEmbeddingContextWithResponse(
+        req,
+        Right(res),
+        APISupport.NamespacePrefix + "0",
+        settings.orbeonPrefix,
+        settings.httpClient
+      )
+
+      def contentFromRequest =
+        StreamedContent(
+          inputStream   = req.getInputStream,
+          contentType   = Option(req.getContentType),
+          contentLength = Some(req.getContentLength.toLong) filter (_ >= 0),
+          title         = None
+        )
+
+      val response =
+        APISupport.callService(RequestDetails(
+          content = Some(contentFromRequest),
+          url     = dropTrailingSlash(settings.formRunnerURL) + "/xforms-server-submit",
+          headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true).to[List],
+          params  = Nil
+        ))
+
+      response match {
+        case Redirect(location, true) ⇒
+          res.sendRedirect(location)
+        case Redirect(location, false) ⇒
+          throw new NotImplementedError
+        case content: StreamedContent ⇒
+          useAndClose(content)(APISupport.writeResponseBody)
+      }
+    }
+
   def proxyResource(requestDetails: RequestDetails)(implicit ctx: EmbeddingContextWithResponse): Unit = {
 
     Logger.debug("proxying resource {}", requestDetails.url)

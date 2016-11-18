@@ -30,6 +30,19 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
 
         # Use first XForms form, if none is specified
         args.form = _.head($(document.forms).filter('.xforms-form')) unless args.form?
+
+        # NOTE: Some code duplication here and in `_findControl` should be removed.
+        ns = ORBEON.xforms.Globals.ns[args.form.id]
+
+        # For backward compatibility, handle the case where the id is already prefixed.
+        # This is not great as we don't know for sure whether the control starts with a namespace, e.g. `o0`,
+        # `o1`, etc. It might be safer to disable the short namespaces feature because of this.
+        args.targetId =
+            if (args.targetId.indexOf(ns) == 0)
+                args.targetId
+            else
+                ns + args.targetId
+
         event = new AjaxServer.Event args
         AjaxServer.fireEvents [event], incremental? and incremental
 

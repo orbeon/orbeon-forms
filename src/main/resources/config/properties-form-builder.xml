@@ -14,6 +14,12 @@
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <!-- Duplicate this here so we can exclude `form-runner-responsive.css` -->
+    <property as="xs:string"  name="oxf.fr.css.uri.orbeon.builder">
+        /apps/fr/style/form-runner-common.css
+        /apps/fr/style/form-runner-base.css
+        /apps/fr/style/form-runner-orbeon.css
+    </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/text-controls.xbl

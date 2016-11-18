@@ -84,15 +84,20 @@ object DndRepeat {
 
           val nextAllItems = jEl.nextAll(DndItemSelector)
 
-          val it =
+          val nextDndItemIt =
             for (i ← 0 until nextAllItems.length iterator)
               yield nextAllItems(i)
+
+          val excludedTargets = startLevelOpt match {
+            case Some(startLevel) ⇒ nextDndItemIt.takeWhile(e ⇒ findElemLevel(e).exists(_ > startLevel)).to[List]
+            case None             ⇒ Nil
+          }
 
           dragState = Some(
             DragState(
               currentDragStartPrev     = jEl.prev()(0),
               currentDragStartPosition = jEl.prevAll(DndItemSelector).length,
-              excludedTargets          = startLevelOpt map (startLevel ⇒ it.takeWhile(e ⇒ findElemLevel(e) exists (_ > startLevel)) toList) getOrElse Nil
+              excludedTargets          = excludedTargets
             )
           )
         })

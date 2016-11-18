@@ -465,7 +465,6 @@ lazy val core = (project in file("src"))
     libraryDependencies                += "org.slf4j"                 % "slf4j-api"            % "1.7.7",
     libraryDependencies                += "org.slf4j"                 % "slf4j-log4j12"        % "1.7.7",
     libraryDependencies                += "log4j"                     % "log4j"                % "1.2.17",
-    libraryDependencies                += "org.ccil.cowan.tagsoup"    % "tagsoup"              % "1.2",    // 1.2.1
     libraryDependencies                += "tyrex"                     % "tyrex"                % "1.0",    // 1.0.1
     libraryDependencies                += "com.jcraft"                % "jsch"                 % "0.1.42", // 0.1.54
     libraryDependencies                += "jcifs"                     % "jcifs"                % "1.3.17",

@@ -112,7 +112,8 @@ private object PEVersion {
     }
 
   def majorMinor(versionString: String): Option[(Int, Int)] = {
-    val ints = versionString.split('.') take 2 map (_.toInt)
+    // Allow `-` as separator as well so we can handle things like "2016.3-SNAPSHOT"
+    val ints = versionString.splitTo[Array](sep = ".-") take 2 map (_.toInt)
     if (ints.size == 2) Some(ints(0), ints(1)) else None
   }
 

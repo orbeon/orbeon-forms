@@ -15,6 +15,8 @@ val JodaTimeVersion               = "2.1"
 val JodaConvertVersion            = "1.2"
 val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
+val Slf4jVersion                  = "1.7.21"  // 1.7.21
+val HttpComponentsVersion         = "4.3.5"  // 4.5.2
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
@@ -220,8 +222,10 @@ lazy val commonSettings = Seq(
 //    "-Ywarn-unused-import"     // 2.11 only
   ),
 
-  libraryDependencies           += "org.scalactic" %%% "scalactic" % "3.0.0" % Test,
-  libraryDependencies           += "org.scalatest" %%% "scalatest" % "3.0.0" % Test,
+  libraryDependencies ++= Seq(
+    "org.scalactic" %%% "scalactic" % "3.0.0" % Test,
+    "org.scalatest" %%% "scalatest" % "3.0.0" % Test
+  ),
 
   unmanagedBase                      := baseDirectory.value / "lib",
 
@@ -285,8 +289,10 @@ lazy val formBuilderClient = (project in file("form-builder-client"))
   .settings(
     name                           := "orbeon-form-builder-client",
 
-    libraryDependencies            += "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
-    libraryDependencies            += "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+    libraryDependencies            ++= Seq(
+      "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
+      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
+    ),
 
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
@@ -314,8 +320,10 @@ lazy val xupdate = (project in file("xupdate"))
   .settings(
     name := "orbeon-xupdate",
 
-    libraryDependencies += "commons-io" %  "commons-io" % "2.0.1",
-    libraryDependencies += "log4j"      % "log4j"       % "1.2.17"
+    libraryDependencies ++= Seq(
+      "commons-io" %  "commons-io" % "2.0.1",
+      "log4j"      % "log4j"       % "1.2.17"
+    ) map (_.exclude("commons-logging", "commons-logging"))
   )
 
 lazy val dom = (project in file("dom"))
@@ -340,7 +348,7 @@ lazy val fullPortlet = (project in file("full-portlet"))
     name := "orbeon-full-portlet"
   )
   .settings(
-    libraryDependencies                += "org.joda"      %  "joda-convert"      % JodaConvertVersion % Provided
+    libraryDependencies += "org.joda" %  "joda-convert" % JodaConvertVersion % Provided
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
@@ -438,48 +446,49 @@ lazy val core = (project in file("src"))
 
     javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies                += "org.parboiled"             %% "parboiled-scala"     % Parboiled1Version,
-    libraryDependencies                += "io.spray"                  %% "spray-json"          % SprayJsonVersion,
-    libraryDependencies                += "org.scala-lang.modules"    %% "scala-xml"           % ScalaXmlVersion,
-    libraryDependencies                += "joda-time"                 %  "joda-time"           % JodaTimeVersion,
-    libraryDependencies                += "org.joda"                  %  "joda-convert"        % JodaConvertVersion % Provided,
-    libraryDependencies                += "org.apache.commons"        %  "commons-lang3"       % "3.1",    // 3.5
-    libraryDependencies                += "net.sf.ehcache"            %  "ehcache-core"        % "2.6.3",  // 2.6.11
-    libraryDependencies                += "commons-beanutils"         %  "commons-beanutils"   % "1.5",    // 1.9.3
-    libraryDependencies                += "commons-codec"             %  "commons-codec"       % "1.6",    // 1.10
-    libraryDependencies                += "commons-collections"       %  "commons-collections" % "3.2.2",
-    libraryDependencies                += "commons-digester"          %  "commons-digester"    % "1.5",    // 2.1
-    libraryDependencies                += "commons-cli"               %  "commons-cli"         % "1.0",    // 1.3.1
-    libraryDependencies                += "commons-discovery"         %  "commons-discovery"   % "0.4",    // 0.5
-    libraryDependencies                += "commons-fileupload"        %  "commons-fileupload"  % "1.2.2",  // 1.3.2
-    libraryDependencies                += "commons-io"                %  "commons-io"          % "2.0.1",  // 2.5
-    libraryDependencies                += "commons-pool"              %  "commons-pool"        % "1.6",
-    libraryDependencies                += "commons-validator"         %  "commons-validator"   % "1.4.0",  // 1.5.1
-    libraryDependencies                += "javax.activation"          % "activation"           % "1.1.1",
-    libraryDependencies                += "org.apache.httpcomponents" % "httpclient"           % "4.3.5",  // 4.5.2
-    libraryDependencies                += "org.apache.httpcomponents" % "httpclient-cache"     % "4.3.5",
-    libraryDependencies                += "org.apache.httpcomponents" % "httpmime"             % "4.3.5",
-    libraryDependencies                += "org.apache.httpcomponents" % "fluent-hc"            % "4.3.5",
-    libraryDependencies                += "org.apache.httpcomponents" % "httpcore"             % "4.3.2",
-    libraryDependencies                += "org.slf4j"                 % "jcl-over-slf4j"       % "1.7.7",  // 1.7.21
-    libraryDependencies                += "org.slf4j"                 % "slf4j-api"            % "1.7.7",
-    libraryDependencies                += "org.slf4j"                 % "slf4j-log4j12"        % "1.7.7",
-    libraryDependencies                += "log4j"                     % "log4j"                % "1.2.17",
-    libraryDependencies                += "tyrex"                     % "tyrex"                % "1.0",    // 1.0.1
-    libraryDependencies                += "com.jcraft"                % "jsch"                 % "0.1.42", // 0.1.54
-    libraryDependencies                += "jcifs"                     % "jcifs"                % "1.3.17",
+    libraryDependencies ++= Seq(
+      "org.parboiled"             %% "parboiled-scala"     % Parboiled1Version,
+      "io.spray"                  %% "spray-json"          % SprayJsonVersion,
+      "org.scala-lang.modules"    %% "scala-xml"           % ScalaXmlVersion,
+      "joda-time"                 %  "joda-time"           % JodaTimeVersion,
+      "org.joda"                  %  "joda-convert"        % JodaConvertVersion % Provided,
+      "org.apache.commons"        %  "commons-lang3"       % "3.1",    // 3.5
+      "net.sf.ehcache"            %  "ehcache-core"        % "2.6.3",  // 2.6.11
+      "commons-beanutils"         %  "commons-beanutils"   % "1.5",    // 1.9.3
+      "commons-codec"             %  "commons-codec"       % "1.6",    // 1.10
+      "commons-collections"       %  "commons-collections" % "3.2.2",
+      "commons-digester"          %  "commons-digester"    % "1.5",    // 2.1
+      "commons-cli"               %  "commons-cli"         % "1.0",    // 1.3.1
+      "commons-discovery"         %  "commons-discovery"   % "0.4",    // 0.5
+      "commons-fileupload"        %  "commons-fileupload"  % "1.2.2",  // 1.3.2
+      "commons-io"                %  "commons-io"          % "2.0.1",  // 2.5
+      "commons-pool"              %  "commons-pool"        % "1.6",
+      "commons-validator"         %  "commons-validator"   % "1.4.0",  // 1.5.1
+      "javax.activation"          % "activation"           % "1.1.1",
+      "org.apache.httpcomponents" % "httpclient"           % HttpComponentsVersion,
+      "org.apache.httpcomponents" % "httpclient-cache"     % HttpComponentsVersion,
+      "org.apache.httpcomponents" % "httpmime"             % HttpComponentsVersion,
+      "org.apache.httpcomponents" % "fluent-hc"            % HttpComponentsVersion,
+      "org.apache.httpcomponents" % "httpcore"             % "4.3.2",
+      "org.slf4j"                 % "jcl-over-slf4j"       % Slf4jVersion,
+      "org.slf4j"                 % "slf4j-api"            % Slf4jVersion,
+      "org.slf4j"                 % "slf4j-log4j12"        % Slf4jVersion,
+      "log4j"                     % "log4j"                % "1.2.17",
+      "tyrex"                     % "tyrex"                % "1.0",    // 1.0.1
+      "com.jcraft"                % "jsch"                 % "0.1.42", // 0.1.54
+      "jcifs"                     % "jcifs"                % "1.3.17",
 
-    libraryDependencies                += "bsf"                       % "bsf"                  % "2.4.0"           % Test,
-    libraryDependencies                += "org.apache.commons"        % "commons-exec"         % "1.1"             % Test, // 1.3
-    libraryDependencies                += "com.google.code.gson"      % "gson"                 % "2.3.1"           % Test, // 2.8.0
-    libraryDependencies                += "com.google.guava"          % "guava"                % "13.0.1"          % Test, // 20.0
-    libraryDependencies                += "org.mockito"               % "mockito-all"          % "1.8.5"           % Test, // 1.10.19
-    libraryDependencies                += "mysql"                     % "mysql-connector-java" % "5.1.26"          % Test, // 6.0.5,
-    libraryDependencies                += "org.postgresql"            % "postgresql"           % "9.3-1102-jdbc4"  % Test,
-    libraryDependencies                += "org.seleniumhq.selenium"   % "selenium-java"        % "2.45.0"          % Test  // 3.0.1
-
-//    libraryDependencies                += "javax.servlet" %  "javax.servlet-api" % ServletApiVersion  % Provided,
-//    libraryDependencies                += "javax.portlet" %  "portlet-api"       % PortletApiVersion  % Provided
+      "bsf"                       % "bsf"                  % "2.4.0"           % Test,
+      "org.apache.commons"        % "commons-exec"         % "1.1"             % Test, // 1.3
+      "com.google.code.gson"      % "gson"                 % "2.3.1"           % Test, // 2.8.0
+      "com.google.guava"          % "guava"                % "13.0.1"          % Test, // 20.0
+      "org.mockito"               % "mockito-all"          % "1.8.5"           % Test, // 1.10.19
+      "mysql"                     % "mysql-connector-java" % "5.1.26"          % Test, // 6.0.5,
+      "org.postgresql"            % "postgresql"           % "9.3-1102-jdbc4"  % Test,
+      "org.seleniumhq.selenium"   % "selenium-java"        % "2.45.0"          % Test  // 3.0.1
+//      "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
+//      "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
+    ) map (_.exclude("commons-logging", "commons-logging")) // because we have jcl-over-slf4j
   ).settings(
 
     unmanagedBase                      := baseDirectory.value / ".." / "lib",

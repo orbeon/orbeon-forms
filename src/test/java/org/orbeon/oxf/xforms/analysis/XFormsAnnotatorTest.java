@@ -42,7 +42,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
 
         final Metadata metadata = new Metadata();
         final XFormsAnnotator ch = new XFormsAnnotator(metadata);
-        XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, XMLParsing.ParserConfiguration.PLAIN, false);
+        XMLParsing.urlToSAX("oxf:/org/orbeon/oxf/xforms/forms/annotator-test.xhtml", ch, XMLParsing.ParserConfiguration.PLAIN, false);
 
         // Test that ns information is provided for those elements
         assertNotNull(metadata.getNamespaceMapping("output-in-title").mapping);
@@ -71,7 +71,7 @@ public class XFormsAnnotatorTest extends ResourceManagerTestBase {
     @Test
     public void xxformsAttribute() {
 
-        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", XMLParsing.ParserConfiguration.PLAIN);
+        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/forms/annotator-test.xhtml", XMLParsing.ParserConfiguration.PLAIN);
         final Metadata metadata = new Metadata();
         final Document annotatedDocument =
             new XBLBindings(new IndentedLogger(XFormsServer.logger), null, metadata).annotateShadowTree(document, "");

@@ -41,9 +41,6 @@
             <option value="$PROJECT_DIR$/xupdate/project" />
           </set>
         </option>
-        <option name="sbtVersion" value="0.13.9" />
-        <option name="useAutoImport" value="true" />
-        <option name="useOurOwnAutoImport" value="true" />
       </SbtProjectSettings>
     </option>
   </component>

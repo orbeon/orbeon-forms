@@ -49,7 +49,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xi:include href="xforms-calculator-controls.xml" xxi:omit-xml-base="true"/>
+                    <xi:include href="forms/xforms-calculator-controls.xml" xxi:omit-xml-base="true"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -141,7 +141,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xi:include href="xforms-calculator-controls.xml" xxi:omit-xml-base="true"/>
+                    <xi:include href="forms/xforms-calculator-controls.xml" xxi:omit-xml-base="true"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -1197,7 +1197,7 @@
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/418 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <!-- Put in external file to make sure we control namespaces -->
-        <input name="document" href="418.xhtml"/>
+        <input name="document" href="forms/418.xhtml"/>
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>

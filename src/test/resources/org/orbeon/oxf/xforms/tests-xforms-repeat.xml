@@ -159,7 +159,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
+                    <xi:include href="forms/repeat-model.xml" xxi:omit-xml-base="true"/>
                 </xh:head>
                 <xh:body>
                     <xf:group id="my-dummy-group">
@@ -321,7 +321,7 @@
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
+                    <xi:include href="forms/repeat-model.xml" xxi:omit-xml-base="true"/>
                 </xh:head>
                 <xh:body>
                     <xf:group id="my-dummy-group">
@@ -557,7 +557,7 @@
         </input>
         <input name="models">
             <models>
-                <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
+                <xi:include href="forms/repeat-model.xml" xxi:omit-xml-base="true"/>
             </models>
         </input>
         <input name="instances">

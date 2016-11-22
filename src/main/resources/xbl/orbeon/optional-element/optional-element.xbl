@@ -1,0 +1,44 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding id="fr-optional-element" element="fr|optional-element" xxbl:mode="binding" xxbl:container="span">
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+                <!-- Content such as xf:input -->
+                <xbl:content/>
+
+                <!-- Insert element if missing -->
+                <xf:action ev:event="xforms-enabled" ev:target="#observer">
+                    <xf:var name="ref" xbl:attr="xbl:text=ref"/>
+                    <xf:var name="name" value="tokenize($ref, '/')[last()]"/>
+                    <xf:insert
+                        if="not(exists(xxf:binding('fr-optional-element'))) and $name castable as xs:NCName"
+                        context="xxf:component-context()"
+                        ref="*"
+                        origin="element($name)"/>
+                </xf:action>
+
+            </xf:group>
+
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

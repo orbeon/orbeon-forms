@@ -25,15 +25,6 @@
     <!-- Expose environment variables -->
     <property environment="env"/>
 
-    <!-- Ant task for the YUI Compressor -->
-    <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
-    <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
-        <classpath>
-            <pathelement location="lib_ant/yui-compressor-ant-task-0.5.jar"/>
-            <pathelement location="lib_ant/yuicompressor-2.4.7.jar"/>
-        </classpath>
-    </taskdef>
-
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
         <classpath>
             <pathelement location="lib_ant/jarjar-1.3.jar"/>
@@ -77,11 +68,6 @@
         - icepdf-core-5.1.1.jar
         - jai-imageio-core-1.3.1-SNAPSHOT.jar
         - jai-core-1.1.3.jar
-
-        TODO:
-
-        - httpclient-cache-4.1.jar
-
     -->
 
     <target name="init">
@@ -95,9 +81,6 @@
         <property name="unversioned-proxy-portlet-name" value="orbeon-proxy-portlet"/>
 
         <property name="examples-cli-src.dir"           value="src/examples-cli"/>
-
-        <property name="resources-private.jar.file"     value="build/lib/orbeon-resources-private.jar"/>
-        <property name="resources-public.jar.file"      value="build/lib/orbeon-resources-public.jar"/>
 
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
@@ -163,16 +146,6 @@
         </jarjar>
     </target>
 
-    <!-- Compile source -->
-    <target name="classes" unless="skip.compilation">
-        <exec executable="sbt" failonerror="true">
-            <arg value="-Dorbeon.version=${release.number}"/>
-            <arg value="-Dorbeon.edition=${edition}"/>
-            <arg value="project root"/>
-            <arg value="test:compile"/>
-        </exec>
-    </target>
-
     <target name="embedding-jar" depends="war-common">
         <local name="temp.jar"/>
         <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
@@ -184,12 +157,12 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      build/orbeon-war/WEB-INF/lib/
+            -injars      orbeon-war/target/webapp/WEB-INF/lib/
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars build/orbeon-war/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
             -libraryjars lib/provided/servlet-2_3-4_0_4.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -223,7 +196,7 @@
         <delete file="${temp.jar}"/>
     </target>
 
-    <target name="proxy-portlet-jar" depends="classes">
+    <target name="proxy-portlet-jar" depends="war-common">
         <local name="temp.jar"/>
         <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
         <proguard>
@@ -234,12 +207,12 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      build/orbeon-war/WEB-INF/lib/
+            -injars      orbeon-war/target/webapp/WEB-INF/lib/
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars build/orbeon-war/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
             -libraryjars lib/provided/servlet-2_3-4_0_4.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -286,12 +259,12 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      build/orbeon-war/WEB-INF/lib/
+            -injars      orbeon-war/target/webapp/WEB-INF/lib/
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars build/orbeon-war/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
             -libraryjars lib/provided/servlet-2_3-4_0_4.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -315,10 +288,8 @@
         <delete file="${temp.jar}"/>
     </target>
 
-    <!-- JARs -->
-    <target name="jars" depends="classes, orbeon-minify-js">
+    <target name="war-common" depends="prepare">
 
-        <!-- This packages core, dom, xupdate, common, etc. -->
         <exec executable="sbt" failonerror="true">
             <arg value="-Dorbeon.version=${release.number}"/>
             <arg value="-Dorbeon.edition=${edition}"/>
@@ -326,156 +297,53 @@
             <arg value="package"/>
         </exec>
 
-        <fileset id="war.libs" dir="lib/runtime">
-            <include name="**/*.jar"/>
-        </fileset>
-
-        <property name="cli.jar.lib.dir" location="lib"/>
-        <pathconvert dirsep="/" pathsep=" " property="cli.jar.mf.cp" refid="war.libs">
-          <map from="${cli.jar.lib.dir}" to="lib"/>
-        </pathconvert>
-
-        <jar destfile="build/lib/orbeon-cli.jar" compress="false">
-          <manifest>
-            <attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>
-            <attribute name="Class-Path" value="lib/orbeon-core.jar lib/orbeon-dom.jar lib/orbeon-common.jar lib/orbeon-common-shared.jar lib/orbeon-xforms-filter.jar lib/orbeon-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>
-          </manifest>
-        </jar>
-
-        <!-- Build private resources JAR -->
-        <jar destfile="${resources-private.jar.file}" compress="false">
-            <fileset dir="src/resources-packaged">
-                <include name="xbl/**/*.xbl"/>
-                <include name="xbl/**/*.xsl"/>
-                <include name="xbl/**/*.xml"/>
-                <include name="ops/**"/>
-                <exclude name="ops/unit-tests"/>
-                <exclude name="ops/unit-tests/**"/>
-                <exclude name="ops/**/*.css"/>
-                <exclude name="ops/**/*.js"/>
-                <exclude name="ops/**/*.gif"/>
-                <exclude name="ops/**/*.png"/>
-                <exclude name="ops/**/*.ico"/>
-                <exclude name="ops/**/*.jpg"/>
-                <exclude name="ops/**/*.html"/>
-                <exclude name="ops/**/*.htm"/>
-                <exclude name="ops/**/*.htc"/>
-                <include name="oxf/**"/>
-                <include name="config/**"/>
-                <exclude name="config/theme"/>
-                <exclude name="config/theme/**"/>
-                <!-- We keep these in orbeon.jar -->
-                <exclude name="config/*-processors.xml"/>
-            </fileset>
-        </jar>
-
-        <!-- Build public resources JAR -->
-        <jar destfile="${resources-public.jar.file}" compress="false">
-            <fileset dir="src/resources-packaged">
-                <include name="xbl/**/*.css"/>
-                <include name="xbl/**/*.js"/>
-                <include name="xbl/**/*.gif"/>
-                <include name="xbl/**/*.png"/>
-                <include name="xbl/**/*.jpg"/>
-                <include name="xbl/**/*.html"/>
-                <include name="xbl/**/*.htm"/>
-                <include name="xbl/**/*.xhtml"/>
-                <include name="ops/**/*.css"/>
-                <include name="ops/**/*.js"/>
-                <include name="ops/**/*.gif"/>
-                <include name="ops/**/*.png"/>
-                <include name="ops/**/*.ico"/>
-                <include name="ops/**/*.jpg"/>
-                <include name="ops/**/*.html"/>
-                <include name="ops/**/*.htm"/>
-                <include name="config/theme/**/*.*"/>
-            </fileset>
-            <zipfileset dir="build/orbeon-war/WEB-INF/resources">
-                <include name="**/*.js"/>
-                <exclude name="apps/fr/style/bootstrap-src/**/*.*"/>
-            </zipfileset>
-        </jar>
-
-    </target>
-
-    <target name="war-common" depends="jars">
-
-        <!-- This copies the JAR files to the exploded WAR -->
-        <exec executable="sbt" failonerror="true">
-            <arg value="-Dorbeon.version=${release.number}"/>
-            <arg value="-Dorbeon.edition=${edition}"/>
-            <arg value="project root"/>
-            <arg value="copyJarToExplodedWar"/>
-            <arg value="copyDependenciesToExplodedWar"/>
-        </exec>
-
         <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
-        <delete file="build/orbeon-war/WEB-INF/lib/${saxon.jar}"/>
-        <jar destfile="build/orbeon-war/WEB-INF/lib/${saxon.jar}">
+        <delete file="orbeon-war/target/webapp/WEB-INF/lib/${saxon.jar}"/>
+        <jar destfile="orbeon-war/target/webapp/WEB-INF/lib/${saxon.jar}">
             <zipfileset src="lib/runtime/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
         </jar>
 
-        <copy file="${resources-private.jar.file}"      todir="build/orbeon-war/WEB-INF/lib"/>
-        <copy file="${resources-public.jar.file}"       todir="build/orbeon-war/WEB-INF/lib"/>
+        <!-- TODO: Restore command-line -->
+        <!--<fileset id="war.libs" dir="lib/runtime">-->
+            <!--<include name="**/*.jar"/>-->
+        <!--</fileset>-->
 
-        <copy todir="build/orbeon-war/WEB-INF">
-            <fileset dir="lib">
-                <include name="commons-cli-1_0.jar"/>
-            </fileset>
-        </copy>
-        <copy file="build/lib/orbeon-cli.jar" todir="build/orbeon-war/WEB-INF"/>
-        <copy todir="build/orbeon-war/xforms-jsp">
-            <fileset dir="src/examples-jsp">
-                <include name="**"/>
-            </fileset>
-        </copy>
+        <!--<property name="cli.jar.lib.dir" location="lib"/>-->
+        <!--<pathconvert dirsep="/" pathsep=" " property="cli.jar.mf.cp" refid="war.libs">-->
+          <!--<map from="${cli.jar.lib.dir}" to="lib"/>-->
+        <!--</pathconvert>-->
 
-        <copy todir="build/orbeon-war/WEB-INF/resources">
-            <fileset dir="src/resources"/>
-        </copy>
-
-    </target>
-
-    <target name="war-descriptors" depends="prepare">
-
-        <copy todir="build/orbeon-war/WEB-INF">
-            <fileset dir="descriptors/orbeon-war"/>
-        </copy>
-        <xslt in="build.xml" style="descriptors/orbeon-war-web.xsl" out="build/orbeon-war/WEB-INF/web.xml" force="true">
-            <param name="target"     expression="${target}"/>
-            <param name="build-root" expression="${basedir}"/>
-            <param name="version"    expression="${release.number} ${edition}"/>
-            <param name="edition"    expression="${edition}"/>
-        </xslt>
+        <!--<jar destfile="build/lib/orbeon-cli.jar" compress="false">-->
+          <!--<manifest>-->
+            <!--<attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>-->
+            <!--<attribute name="Class-Path" value="lib/orbeon-core.jar lib/orbeon-dom.jar lib/orbeon-common.jar lib/orbeon-common-shared.jar lib/orbeon-xforms-filter.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>-->
+          <!--</manifest>-->
+        <!--</jar>-->
+        <!--<copy todir="build/orbeon-war/WEB-INF">-->
+            <!--<fileset dir="lib">-->
+                <!--<include name="commons-cli-1_0.jar"/>-->
+            <!--</fileset>-->
+        <!--</copy>-->
+        <!--<copy file="build/lib/orbeon-cli.jar" todir="build/orbeon-war/WEB-INF"/>-->
 
     </target>
 
     <target name="orbeon-dev-war" depends="war-common" description="Create exploded WAR">
-
-        <antcall target="war-descriptors">
-            <param name="target" value="dev"/>
-        </antcall>
-
-        <!-- web.xml creates a resource manager pointing to this directory and it must exist -->
-        <mkdir dir="src/resources-local"/>
+        <copy todir="build/orbeon-war">
+            <fileset dir="orbeon-war/target/webapp">
+                <!-- Filter local eXist that that might (but shouldn't) be in there -->
+                <exclude name="WEB-INF/exist-data/**"/>
+            </fileset>
+        </copy>
     </target>
 
-    <target name="orbeon-war" depends="orbeon-dev-war" description="Create exploded WAR (legacy name)"/>
-
     <target name="orbeon-dist-war" depends="war-common, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
-
-        <antcall target="war-descriptors">
-            <param name="target" value="dist"/>
-        </antcall>
 
         <mkdir dir="build/distrib"/>
 
         <zip zipfile="build/distrib/${versioned-name}.war">
-            <zipfileset dir="build/orbeon-war">
-                <!-- This is already added to orbeon-resources-public.jar -->
-                <exclude name="WEB-INF/resources/ops"/>
-                <exclude name="WEB-INF/resources/ops/**"/>
-                <!-- Filter local eXist that that might be in there -->
+            <zipfileset dir="orbeon-war/target/webapp">
+                <!-- Filter local eXist that that might (but shouldn't) be in there -->
                 <exclude name="WEB-INF/exist-data/**"/>
             </zipfileset>
             <!-- eXist sample database -->
@@ -483,8 +351,6 @@
                 <exclude name="*.log"/>
                 <exclude name="*.lck"/>
             </zipfileset>
-            <!-- README.txt file -->
-            <zipfileset dir="descriptors/orbeon-war/exist-data" prefix="WEB-INF/exist-data"/>
         </zip>
     </target>
 
@@ -532,7 +398,7 @@
         </war>
     </target>
 
-    <target name="orbeon-auth-war" depends="jars" description="Creates Orbeon Forms orbeon-auth.war">
+    <target name="orbeon-auth-war" depends="war-common" description="Creates Orbeon Forms orbeon-auth.war">
         <mkdir dir="build/distrib"/>
         <war destfile="build/distrib/orbeon-auth.war" webxml="descriptors/orbeon-auth-war/web.xml">
             <zipfileset dir="src/target/scala-2.11/classes" prefix="WEB-INF/classes">
@@ -550,14 +416,16 @@
                 <exclude name="**/.git/**"/>
                 <exclude name="build"/>
                 <exclude name="build/**"/>
-                <exclude name="target"/>
-                <exclude name="target/**"/>
+                <exclude name="**/target"/>
+                <exclude name="**/target/**"/>
                 <exclude name="cache"/>
                 <exclude name="cache/**"/>
                 <exclude name="tmp"/>
                 <exclude name="tmp/**"/>
                 <exclude name="tools"/>
                 <exclude name="tools/**"/>
+                <exclude name="resources-local"/>
+                <exclude name="resources-local/**"/>
                 <exclude name="src/resources-local"/>
                 <exclude name="src/resources-local/**"/>
                 <!-- In case there were some temporary files left by the ProGuard tasks here -->
@@ -568,92 +436,11 @@
                 <exclude name="junit*.properties"/>
                 <!-- Don't include a license with the source -->
                 <exclude name="**/license.xml"/>
+                <exclude name="**/orbeon-private.xml"/>
                 <!--  No travis build -->
                 <exclude name=".travis.yml"/>
             </zipfileset>
         </zip>
-    </target>
-
-    <target name="orbeon-minify-js" depends="init, classes">
-        <!-- Store those under build/orbeon-war/WEB-INF/resources so they can be used in dev mode -->
-        <mkdir dir="build/orbeon-war/WEB-INF/resources/ops"/>
-
-        <!-- Compile Scala.js -->
-        <if>
-            <isset property="skip.compilation"/>
-            <then>
-                <!-- This does in fact compile Scala.js files, but does not run the expensive optimizations -->
-                <exec executable="sbt" failonerror="true">
-                    <arg value="-Dorbeon.version=${release.number}"/>
-                    <arg value="-Dorbeon.edition=${edition}"/>
-                    <arg value="project formBuilderClient"/>
-                    <arg value="fastOptJSToExplodedWar"/>
-                    <arg value="project root"/>
-                    <arg value="coffeescript"/>
-                </exec>
-            </then>
-            <else>
-                <exec executable="sbt" failonerror="true">
-                    <arg value="-Dorbeon.version=${release.number}"/>
-                    <arg value="-Dorbeon.edition=${edition}"/>
-                    <arg value="project formBuilderClient"/>
-                    <arg value="fullOptJSToExplodedWar"/>
-                    <arg value="project root"/>
-                    <arg value="coffeescript"/>
-                </exec>
-            </else>
-        </if>
-
-        <!-- Copy non-minimized CoffeeScript resources -->
-        <copy todir="build/orbeon-war/WEB-INF/resources">
-            <fileset dir="form-builder/target/web/coffeescript/main">
-                <include name="**/*.js"/>
-            </fileset>
-            <fileset dir="src/target/web/coffeescript/main">
-                <include name="**/*.js"/>
-            </fileset>
-        </copy>
-
-        <!-- Minimize compiled CoffeeScript -->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="form-builder/target/web/coffeescript/main" todir="build/orbeon-war/WEB-INF/resources">
-            <include name="**/*.js"/>
-        </yui-compressor>
-        <yui-compressor warn="false" charset="UTF-8" fromdir="src/target/web/coffeescript/main" todir="build/orbeon-war/WEB-INF/resources">
-            <include name="**/*.js"/>
-        </yui-compressor>
-
-        <!-- Minimize JavaScript-->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="src/resources-packaged" todir="build/orbeon-war/WEB-INF/resources">
-
-            <!-- Orbeon JavaScript code -->
-            <include name="ops/javascript/xforms.js"/>
-            <include name="ops/javascript/orbeon/**/*.js"/>
-
-            <!-- YUI file we changed -->
-            <include name="ops/yui/button/button.js"/>
-            <include name="ops/yui/container/container.js"/>
-            <include name="ops/yui/connection/connection.js"/>
-            <include name="ops/yui/calendar/calendar.js"/>
-            <include name="ops/yui/treeview/treeview.js"/>
-            <include name="ops/yui/examples/treeview/assets/js/TaskNode.js"/>
-            <include name="ops/yui/examples/treeview/assets/js/CheckOnClickNode.js"/>
-
-            <!-- Other files  -->
-            <include name="ops/nprogress-0.2.0/nprogress.js"/>
-            <include name="ops/javascript/fastclick/fastclick.js"/>
-
-        </yui-compressor>
-
-        <!-- Form Runner JavaScript -->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="form-runner/src/main/resources" todir="build/orbeon-war/WEB-INF/resources">
-            <include name="apps/fr/script/form-runner.js"/>
-        </yui-compressor>
-
-        <!-- Form Builder JavaScript -->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="form-builder/src/main/resources" todir="build/orbeon-war/WEB-INF/resources">
-            <include name="xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
-        </yui-compressor>
-
     </target>
 
     <target name="test-expand-war" depends="orbeon-dist-war">
@@ -688,7 +475,7 @@
     </target>
 
     <!-- TODO -->
-    <target name="test-integration" depends="test-expand-war, classes">
+    <target name="test-integration" depends="test-expand-war">
 
         <property name="tomcat-version" value="6.0.36"/>
         <parallel failonany="true">
@@ -939,11 +726,8 @@
         <!-- http://exist-db.org/ant-tasks.html -->
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
-                <fileset dir="lib">
+                <fileset dir="orbeon-war/target/webapp/WEB-INF/lib">
                     <include name="**/*.jar"/>
-                </fileset>
-                <fileset dir="build/orbeon-war/WEB-INF/lib">
-                    <include name="*.jar"/>
                 </fileset>
             </classpath>
         </typedef>

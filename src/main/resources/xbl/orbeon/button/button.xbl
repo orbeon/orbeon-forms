@@ -1,0 +1,81 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:script type="text/javascript" src="/ops/yui/element/element.min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/button/button.min.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/button/button.js"/>
+
+    <xbl:binding id="fr-button" element="fr|button" xxbl:mode="binding">
+        <xbl:resources>
+            <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
+            <xbl:style>
+                .xbl-fr-button { display: inline }
+                .xbl-fr-button .yui-button {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                <!-- Override Liferay rule that must not apply to us
+                     NOTE: Use a rule that is not too strong so that CSS that actually places a background image on
+                     buttons works. Liferay simply says "button { ... }" -->
+                .xbl-fr-button button:hover { background-image: none }
+            </xbl:style>
+        </xbl:resources>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xf:group appearance="xxf:internal" xsl:version="2.0">
+                <!-- Propagate @class with AVT to span (Q: do we need to?) -->
+                <xf:var name="class-avt" xxbl:scope="outer" xbl:attr="xbl:text=class"/>
+                <xf:var name="class"><xxf:value value="xxf:evaluate-avt($class-avt)" xxbl:scope="outer"/></xf:var>
+                <xh:span class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
+                    <xh:span class="first-child">
+                        <!-- Store @tabindex into hidden span -->
+                        <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
+                        <xsl:if test="/fr:button/@tabindex">
+                            <xh:span class="fr-button-tabindex xforms-hidden">
+                                <xsl:value-of select="/fr:button/@tabindex"/>
+                            </xh:span>
+                        </xsl:if>
+
+                        <!-- Don't run script in static readonly and noscript modes -->
+                        <xf:var name="script" value="not(exf:readonly(xxf:binding('fr-button')) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
+                        <xf:trigger xbl:attr="xxf:modal" xxbl:scope="outer">
+                            <!-- Bind trigger if needed so it can handle read-only -->
+                            <xsl:if test="exists(/fr:button/(@ref, @bind))">
+                                <xsl:attribute name="ref">.</xsl:attribute>
+                            </xsl:if>
+                            <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
+                            <xf:action type="javascript" ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).enabled();</xf:action>
+                            <xf:action type="javascript" ev:event="xforms-readonly" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readonly();</xf:action>
+                            <xf:action type="javascript" ev:event="xforms-readwrite" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readwrite();</xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                </xh:span>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

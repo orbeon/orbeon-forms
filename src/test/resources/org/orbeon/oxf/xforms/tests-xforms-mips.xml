@@ -1083,9 +1083,13 @@
                             <xf:bind ref="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
                         </xf:bind>
 
-                        <xf:submission id="fr-get-document-submission" serialization="none"
-                                           method="get" resource="oxf:/apps/xforms-sandbox/samples/bugs/bug-events-data.xml"
-                                           replace="instance" xxf:instance="fr-form-instance"/>
+                        <xf:submission
+                            id="fr-get-document-submission"
+                            serialization="none"
+                            method="get"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/bug-events-data.xml"
+                            replace="instance"
+                            xxf:instance="fr-form-instance"/>
 
                         <xf:action ev:event="xforms-model-construct-done">
                             <xf:send submission="fr-get-document-submission"/>

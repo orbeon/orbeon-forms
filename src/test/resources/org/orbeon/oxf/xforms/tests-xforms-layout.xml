@@ -1992,50 +1992,50 @@
                 <xh:script src="/ops/jquery/jquery-1.12.0.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/jquery/jquery-browser-mobile.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/autosize/autosize.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/nprogress-0.2.0/nprogress-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/yahoo/yahoo-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/event/event-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/dom/dom-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/connection/connection-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/element/element-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/animation/animation-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/progressbar/progressbar-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/dragdrop/dragdrop-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/container/container-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/examples/container/assets/containerariaplugin-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/calendar/calendar-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/slider/slider-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/underscore/underscore-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/xforms-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/fQuery-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/StringOps-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/ExecutionQueue-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/FiniteStateMachine-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/server/Server-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/server/UploadServer-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/LoadingIndicator-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/Document-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/Form-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/Page-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/Control-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/Upload-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/action/Message-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/controls/Placement-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/controls/Help-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint-min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/controls/Textarea-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/nprogress-0.2.0/nprogress.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/yahoo/yahoo.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/event/event.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/dom/dom.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/connection/connection.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/element/element.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/animation/animation.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/progressbar/progressbar.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/dragdrop/dragdrop.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/container/container.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/examples/container/assets/containerariaplugin.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/calendar/calendar.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/slider/slider.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/underscore/underscore.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/fQuery.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/StringOps.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/ExecutionQueue.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/util/FiniteStateMachine.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/server/Server.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/server/UploadServer.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/LoadingIndicator.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/Document.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/Form.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/Page.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/control/Control.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/control/Upload.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/action/Message.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/controls/Placement.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/controls/Help.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/controls/Textarea.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/button/button-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/button/button.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/button/button.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/number/number.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/currency/currency.js"/>

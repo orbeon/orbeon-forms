@@ -2617,7 +2617,7 @@
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
-        <input name="form" href="po.xhtml"/>
+        <input name="form" href="forms/po.xhtml"/>
         <output name="analysis">
             <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="po" analyzed-binds="true">
@@ -3358,7 +3358,7 @@
 
     <test description="PO example: change to values causing change to MIPs" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
-        <input name="document" href="po.xhtml"/>
+        <input name="document" href="forms/po.xhtml"/>
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>

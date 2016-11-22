@@ -19,7 +19,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
-      xmlns:utils="java:org.orbeon.oxf.util.ScalaUtils"
+      xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
 
       id="fb-action-dialog" level="modal" close="true" draggable="true" model="fb-actions-editor-model">
 

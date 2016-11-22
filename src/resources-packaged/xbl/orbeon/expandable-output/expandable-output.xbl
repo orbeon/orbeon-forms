@@ -44,7 +44,7 @@
                     name="model-tolerance"
                     value="(tolerance, 0)[. castable as xs:integer][1]"/>
                 <xf:var
-                    xmlns:utils="java:org.orbeon.oxf.util.ScalaUtils"
+                    xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
                     name="short-value"
                     value="utils:truncateWithEllipsis(full-value, $model-max-characters, $model-tolerance)"/>
                 <xf:bind

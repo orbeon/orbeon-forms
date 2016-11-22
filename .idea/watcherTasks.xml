@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectTasksOptions">
-    <TaskOptions isEnabled="true">
+    <TaskOptions isEnabled="false">
       <option name="arguments" value="--no-color $FileName$" />
       <option name="checkSyntaxErrors" value="false" />
       <option name="description" value="Compiles .less files into .css files" />
@@ -28,7 +28,7 @@
         <env name="PATH" value="/usr/local/bin" />
       </envs>
     </TaskOptions>
-    <TaskOptions isEnabled="true">
+    <TaskOptions isEnabled="false">
       <option name="arguments" value="--compile --output $ProjectFileDir$/build/orbeon-war/WEB-INF/resources/$FileDirRelativeToSourcepath$ $FilePathRelativeToSourcepath$" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" value="Compiles .coffee files into .js files" />

@@ -227,10 +227,10 @@ lazy val commonSettings = Seq(
     "org.scalatest" %%% "scalatest" % "3.0.0" % Test
   ),
 
-  unmanagedBase                      := baseDirectory.value / "lib",
+  unmanagedBase        := baseDirectory.value / "lib",
 
-  copyJarToExplodedWar          := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains _, matchRawJarName = true),
-  copyJarToLiferayWar           := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains _, matchRawJarName = true)
+  copyJarToExplodedWar := copyJarFile((packageBin in Compile).value, ExplodedWarLibPath, JarFilesToExcludeFromWar.contains _, matchRawJarName = true),
+  copyJarToLiferayWar  := copyJarFile((packageBin in Compile).value, LiferayWarLibPath,  JarFilesToExcludeFromLiferayWar.contains _, matchRawJarName = true)
 )
 
 lazy val assetsSettings = Seq(
@@ -489,7 +489,8 @@ lazy val core = (project in file("src"))
 //      "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
 //      "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
     ) map (_.exclude("commons-logging", "commons-logging")) // because we have jcl-over-slf4j
-  ).settings(
+  )
+  .settings(
 
     unmanagedBase                      := baseDirectory.value / ".." / "lib",
 

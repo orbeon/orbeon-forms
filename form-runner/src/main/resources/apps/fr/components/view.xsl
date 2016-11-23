@@ -85,7 +85,18 @@
 
     <xsl:template match="fr:body">
         <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
-        <xf:group id="fr-form-group" class="fr-body{if ($is-detail) then ' fr-border' else ''}" model="fr-form-model" ref="instance('fr-form-instance')">
+        <xf:group
+            id="fr-form-group"
+            class="{
+                'fr-body',
+                'fr-border'[$is-detail],
+                concat('fr-validation-mode-', $validation-mode)
+            }"
+            model="fr-form-model"
+            ref="instance('fr-form-instance')"
+            xxf:validation-mode="{$validation-mode}"
+        >
+
             <xh:a name="fr-form"/>
             <xsl:choose>
                 <xsl:when test="not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = ('full', '')">
@@ -97,9 +108,11 @@
                     <!-- NOTE: Once we support XBL matching on @appearance, use instead
                          <fr:view appearance="{$view-appearance}">. -->
                     <xsl:element name="fr:{$view-appearance}">
-                        <xsl:attribute name="id"   select="concat('fr-view-', $view-appearance)"/>
-                        <xsl:attribute name="app"  select="$app"/>
-                        <xsl:attribute name="form" select="$form"/>
+                        <xsl:attribute name="id"              select="concat('fr-view-', $view-appearance)"/>
+                        <xsl:attribute name="app"             select="$app"/>
+                        <xsl:attribute name="form"            select="$form"/>
+                        <xsl:attribute name="validation-mode" select="$validation-mode"/>
+
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
                         <!-- Optional inner buttons -->
                         <xsl:if test="exists($inner-buttons)">

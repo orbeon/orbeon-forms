@@ -108,7 +108,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         try {
             output.startDocument();
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -116,7 +116,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         try {
             output.endDocument();
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -163,7 +163,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 }
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -204,7 +204,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
             level--;
 
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -256,7 +256,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.characters(chars, start, length);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -275,7 +275,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.startPrefixMapping(prefix, uri);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -292,7 +292,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.endPrefixMapping(s);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -309,7 +309,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.ignorableWhitespace(ch, start, length);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -326,7 +326,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.processingInstruction(target, data);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -343,7 +343,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.skippedEntity(name);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -382,7 +382,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.startDTD(name, publicId, systemId);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -399,7 +399,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.endDTD();
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -416,7 +416,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.startEntity(name);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -433,7 +433,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.endEntity(name);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -450,7 +450,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.startCDATA();
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -467,7 +467,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.endCDATA();
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -484,7 +484,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 output.comment(ch, start, length);
             }
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -557,13 +557,13 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 handlerClass = (Class<ElementHandler>) Class.forName(handlerClassName);
                 classNameToHandlerClass.put(handlerClassName, handlerClass);
             } catch (ClassNotFoundException e) {
-                throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+                throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
             }
         }
         try {
             return handlerClass.newInstance();
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(locator));
+            throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
     }
 

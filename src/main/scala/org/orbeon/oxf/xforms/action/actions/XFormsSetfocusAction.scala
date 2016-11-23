@@ -44,7 +44,7 @@ class XFormsSetfocusAction extends XFormsAction {
     val excludesQNamesOpt = resolveStringAVT("excludes")(context) map extractQNames getOrElse Set.empty
 
     // Resolve and update control
-    resolveControl("control")(context) foreach
+    resolveControlAvt("control")(context) foreach
       (XFormsSetfocusAction.setfocus(_, includesQNamesOpt, excludesQNamesOpt))
   }
 }

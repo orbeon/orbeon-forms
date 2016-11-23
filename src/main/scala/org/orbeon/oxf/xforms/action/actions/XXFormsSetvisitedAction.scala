@@ -15,21 +15,17 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsContainerControl, XFormsControl}
-//import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 
 class XXFormsSetvisitedAction extends XFormsAction {
 
   override def execute(context: DynamicActionContext): Unit = {
 
-    // "This XForms Action begins by invoking the deferred update behavior."
-    synchronizeAndRefreshIfNeeded(context)
-
-    // Parameters
     val visited = resolveBooleanAVT("visited", default = true)(context)
     val recurse = resolveBooleanAVT("recurse", default = false)(context)
 
-    // Resolve and update control
-    resolveControl("control")(context) foreach (applyToVisitable(_, _.visited = visited, recurse))
+    synchronizeAndRefreshIfNeeded(context)
+
+    resolveControlAvt("control")(context) foreach (applyToVisitable(_, _.visited = visited, recurse))
 
     //resolveControl("control")(context).iterator flatMap (ControlsIterator(_, includeSelf = true)) foreach (_.visited = visited)
   }

@@ -27,7 +27,7 @@ class XFormsToggleAction extends XFormsAction {
     val actionElement      = actionContext.element
 
     // Find case control
-    resolveControl("case")(actionContext) match {
+    resolveControlAvt("case")(actionContext) match {
       case Some(caseControl: XFormsCaseControl) ⇒
         // Perform the actual toggle action
         val deferred = XFormsAPI.inScopeActionInterpreter.isDeferredUpdates(actionElement)

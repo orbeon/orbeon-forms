@@ -46,6 +46,9 @@
                         value="false()"/>
                 </xf:action>
             </xbl:handler>
+            <xbl:handler event="fr-update-validity" phase="target">
+                <xf:dispatch name="DOMActivate" targetid="fr-wizard-update-validity" xxbl:scope="outer"/>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model>
@@ -73,8 +76,28 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <!-- `app` and `form` must be passed as attributes (see view.xsl) -->
-                <xsl:variable name="static-app"  select="/*/@app/string()"/>
-                <xsl:variable name="static-form" select="/*/@form/string()"/>
+                <xsl:variable name="static-app"             select="/*/@app/string()"/>
+                <xsl:variable name="static-form"            select="/*/@form/string()"/>
+                <xsl:variable name="static-validation-mode" select="/*/@validation-mode/string()"/>
+
+                <xsl:variable name="do-next-handler" as="element()">
+                    <xf:action event="DOMActivate">
+                        <xsl:choose>
+                            <xsl:when test="$static-validation-mode = 'explicit'">
+                                <!-- Update validity, refresh, then try again -->
+                                <xxf:update-validity
+                                    control="{{string-join(($prev-nav-case-ids, $current-nav-case-id), ' ')}}"
+                                    recurse="true"/>
+                                <!-- This ensures that when `fr-do-next` runs, UI variables have been updated -->
+                                <xf:refresh/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- Do action immediately -->
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xf:dispatch name="fr-do-next" targetid="{{event('xxf:targetid')}}"/>
+                    </xf:action>
+                </xsl:variable>
 
                 <xsl:variable
                     xmlns:p="http://www.orbeon.com/oxf/pipeline"
@@ -489,8 +512,9 @@
                                                     <xf:label>
                                                         <xh:i class="icon-chevron-right"/>&#x200b;
                                                     </xf:label>
-                                                    <xf:action event="DOMActivate">
-
+                                                    <!-- DOMActivate handler which depends on `$static-validation-mode` -->
+                                                    <xsl:copy-of select="$do-next-handler"/>
+                                                    <xf:action event="fr-do-next">
                                                         <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                                         <xxf:setvisited
                                                             if="$validated-mode"
@@ -498,7 +522,6 @@
                                                             control="{{.}}"
                                                             visited="true"
                                                             recurse="true"/>
-
                                                         <xf:action if="$allow-next">
                                                             <xf:setvalue
                                                                 ref="xxf:instance('local')/current-case-id"
@@ -520,6 +543,10 @@
                                                 </xf:trigger>
                                             </xh:li>
                                         </xh:ul>
+                                        <!-- We put this here so that `$do-next-handler` has the right variables in scope -->
+                                        <xf:group id="fr-wizard-update-validity" appearance="xxf:internal">
+                                            <xsl:copy-of select="$do-next-handler"/>
+                                        </xf:group>
                                     </xh:div>
                                 </xh:div>
                             </xf:group>
@@ -644,8 +671,10 @@
                                                 )"/></xh:span>
                                     </xsl:if>
                                 </xf:label>
-                                <xf:hint  value="$section-label"/>
-                                <xf:action event="DOMActivate" if="not($top-level-section-disabled)">
+                                <xf:hint value="$section-label"/>
+                                <!-- DOMActivate handler which depends on `$static-validation-mode` -->
+                                <xsl:copy-of select="$do-next-handler"/>
+                                <xf:action event="fr-do-next" if="not($top-level-section-disabled)">
 
                                     <!-- Figure out the nav section id based on whether we support subsection navigation AND where in the hierarchy
                                          the clicked TOC section is. -->

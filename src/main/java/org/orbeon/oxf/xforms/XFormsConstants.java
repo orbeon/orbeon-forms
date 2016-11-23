@@ -376,6 +376,7 @@ public class XFormsConstants {
     public static final String XFORMS_STRING_EXPLODED_QNAME = Dom4jUtils.qNameToExplodedQName(XFORMS_STRING_QNAME);
 
     public static final QName XXFORMS_EVENT_MODE_QNAME = QName.get("events-mode", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_VALIDATION_MODE_QNAME = QName.get("validation-mode", XXFORMS_NAMESPACE);
 
     public static final char COMPONENT_SEPARATOR    = '\u2261'; // ≡ IDENTICAL TO
     public static final char REPEAT_SEPARATOR       = '\u2299'; // ⊙ CIRCLED DOT OPERATOR

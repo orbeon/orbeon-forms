@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.{Logging, XPathCache}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
@@ -48,7 +49,7 @@ abstract class XFormsAction extends Logging {
      overriddenContext: Item): Unit = ()
 
   // Resolve a control given the name of an AVT
-  def resolveControl(attName: String, required: Boolean = true)(implicit context: DynamicActionContext): Option[XFormsControl] = {
+  def resolveControlAvt(attName: String, required: Boolean = true)(implicit context: DynamicActionContext): Option[XFormsControl] = {
 
     val interpreter = context.interpreter
     val element = context.element
@@ -56,17 +57,17 @@ abstract class XFormsAction extends Logging {
     resolveStringAVT(attName)(context) match {
       case Some(resolvedAvt) ⇒
 
-        val controlObject = interpreter.resolveObject(element, resolvedAvt)
-
-        Option(controlObject) match {
-          case Some(control: XFormsControl) ⇒ Some(control)
+        resolveControl(resolvedAvt) match {
+          case Some(control) ⇒ Some(control)
           case _ ⇒
             implicit val indentedLogger = interpreter.indentedLogger
             debug(
               "attribute does not refer to an existing control",
-              Seq("attribute"      → attName,
+              Seq(
+                "attribute"      → attName,
                 "value"          → element.attributeValue("control"),
-                "resolved value" → resolvedAvt)
+                "resolved value" → resolvedAvt
+              )
             )
             None
         }
@@ -77,6 +78,14 @@ abstract class XFormsAction extends Logging {
       case None if ! required ⇒
         None
     }
+  }
+
+  def resolveControl(controlId: String)(implicit context: DynamicActionContext): Option[XFormsControl] = {
+
+    val interpreter = context.interpreter
+    val element = context.element
+
+    collectByErasedType[XFormsControl](interpreter.resolveObject(element, controlId))
   }
 
   // Resolve an optional boolean AVT

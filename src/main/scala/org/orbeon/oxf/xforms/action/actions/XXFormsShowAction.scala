@@ -28,10 +28,10 @@ class XXFormsShowAction extends XFormsAction {
 
     synchronizeAndRefreshIfNeeded(actionContext)
 
-    resolveControl("dialog")(actionContext) match {
+    resolveControlAvt("dialog")(actionContext) match {
       case Some(targetDialog: XFormsEventTarget) ⇒
         val constrainToViewport = interpreter.resolveAVT(actionElement, "constrain") != "false"
-        val neighborEffectiveId = resolveControl("neighbor", required = false)(actionContext) map (_.getEffectiveId)
+        val neighborEffectiveId = resolveControlAvt("neighbor", required = false)(actionContext) map (_.getEffectiveId)
         XXFormsShowAction.showDialog(
           targetDialog,
           neighborEffectiveId,

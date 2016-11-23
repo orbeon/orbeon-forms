@@ -48,13 +48,13 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   final def getBoundItem = _boundItem
 
   // Standard MIPs
-  private var _readonly = false
+  private var _readonly = Model.DEFAULT_READONLY
   final def isReadonly = _readonly
 
-  private var _required = false
+  private var _required = Model.DEFAULT_REQUIRED
   final def isRequired = _required
 
-  private var _valid = true
+  private var _valid = Model.DEFAULT_VALID
   def isValid = _valid
 
   // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
@@ -116,20 +116,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         // Control is bound to a node - get model item properties
         this._readonly  = InstanceData.getInheritedReadonly(nodeInfo)
         this._required  = InstanceData.getRequired(nodeInfo)
-        this._valid     = InstanceData.getValid(nodeInfo)
         this._valueType = InstanceData.getType(nodeInfo)
 
-        // Constraints
-
-        // Instance data stores all failed validations
-        // If there is any type, required, or failed constraint, we have at least one failed failedValidation
-        // returned. The only exception is schema type validation, which can cause the node to be invalid, yet
-        // doesn't have an associated validation because it doesn't have a MIP. Conceivably, something could be
-        // associated with a type validation error.
-        val failedValidations = BindNode.failedValidationsForHighestLevelPrioritizeRequired(nodeInfo)
-
-        this._alertLevel        = failedValidations map (_._1) orElse (! _valid option ErrorLevel)
-        this._failedValidations = failedValidations map (_._2) getOrElse Nil
+        // Validation
+        if ((staticControl eq null) || ! staticControl.explicitValidation)
+          readValidation()
 
         // Custom MIPs
         this._customMIPs = Option(InstanceData.collectAllCustomMIPs(nodeInfo)) map (_.toMap) getOrElse Map()
@@ -142,6 +133,25 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         setDefaultMIPs()
     }
   }
+
+  def readValidation(): Unit =
+    this._boundItem match {
+      case nodeInfo: NodeInfo ⇒
+
+        this._valid = InstanceData.getValid(nodeInfo)
+
+        // Instance data stores all failed validations
+        // If there is any type, required, or failed constraint, we have at least one failed failedValidation
+        // returned. The only exception is schema type validation, which can cause the node to be invalid, yet
+        // doesn't have an associated validation because it doesn't have a MIP. Conceivably, something could be
+        // associated with a type validation error.
+        val failedValidations = BindNode.failedValidationsForHighestLevelPrioritizeRequired(nodeInfo)
+
+        this._alertLevel        = failedValidations map (_._1) orElse (! _valid option ErrorLevel)
+        this._failedValidations = failedValidations map (_._2) getOrElse Nil
+
+      case _ ⇒
+    }
 
   private def setAtomicValueMIPs(): Unit = {
     setDefaultMIPs()

@@ -28,7 +28,7 @@ class XXFormsHideAction extends XFormsAction {
 
     synchronizeAndRefreshIfNeeded(actionContext)
 
-    resolveControl("dialog")(actionContext) match {
+    resolveControlAvt("dialog")(actionContext) match {
       case Some(targetDialog: XFormsEventTarget) ⇒
         XXFormsHideAction.hideDialog(targetDialog, XFormsAction.eventProperties(interpreter, actionElement))
       case _ ⇒

@@ -22,9 +22,13 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.scaxon.XML._
+import org.orbeon.xbl.Wizard
 
 import scala.language.postfixOps
 import scala.util.Try
@@ -35,26 +39,27 @@ trait FormRunnerActions {
   def runningProcessId: Option[String]
 
   def AllowedFormRunnerActions = Map[String, Action](
-    "pending-uploads"  → tryPendingUploads,
-    "validate"         → tryValidate,
-    "save"             → trySaveAttachmentsAndData,
-    "success-message"  → trySuccessMessage,
-    "error-message"    → tryErrorMessage,
-    "confirm"          → tryConfirm,
-    "email"            → trySendEmail,
-    "send"             → trySend,
-    "navigate"         → tryNavigate,
-    "review"           → tryNavigateToReview,
-    "edit"             → tryNavigateToEdit,
-    "open-pdf"         → tryOpenPDF,
-    "toggle-noscript"  → tryToggleNoscript,
-    "visit-all"        → tryVisitAll,
-    "unvisit-all"      → tryUnvisitAll,
-    "expand-all"       → tryExpandSections,
-    "collapse-all"     → tryCollapseSections,
-    "result-dialog"    → tryShowResultDialog,
-    "captcha"          → tryCaptcha,
-    "set-data-status"  → trySetDataStatus
+    "pending-uploads"        → tryPendingUploads,
+    "validate"               → tryValidate,
+    "save"                   → trySaveAttachmentsAndData,
+    "success-message"        → trySuccessMessage,
+    "error-message"          → tryErrorMessage,
+    "confirm"                → tryConfirm,
+    "email"                  → trySendEmail,
+    "send"                   → trySend,
+    "navigate"               → tryNavigate,
+    "review"                 → tryNavigateToReview,
+    "edit"                   → tryNavigateToEdit,
+    "open-pdf"               → tryOpenPDF,
+    "toggle-noscript"        → tryToggleNoscript,
+    "visit-all"              → tryVisitAll,
+    "unvisit-all"            → tryUnvisitAll,
+    "expand-all"             → tryExpandSections,
+    "collapse-all"           → tryCollapseSections,
+    "result-dialog"          → tryShowResultDialog,
+    "captcha"                → tryCaptcha,
+    "set-data-status"        → trySetDataStatus,
+    "wizard-update-validity" → tryUpdateCurrentWizardPageValidity
   )
 
   private val SupportedRenderFormatsMediatypes = List("pdf" → "application/pdf", "tiff" → "image/tiff").toMap
@@ -70,10 +75,25 @@ trait FormRunnerActions {
   // Validate form data and fail if invalid
   def tryValidate(params: ActionParams): Try[Any] =
     Try {
-      val level = paramByNameOrDefault(params, "level") map LevelByName getOrElse ErrorLevel
+      val level     = paramByNameOrDefault(params, "level")   map LevelByName getOrElse ErrorLevel
+      val controlId = paramByNameOrDefault(params, "control") getOrElse "fr-form-group"
+
+      // In case of explicit validation mode
+      if (formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
+        inScopeContainingDocument.synchronizeAndRefresh()
+        XFormsAPI.resolveAs[XFormsControl](controlId) foreach { control ⇒
+          XXFormsUpdateValidityAction.updateValidity(control, recurse = true)
+          inScopeContainingDocument.synchronizeAndRefresh()
+        }
+      }
 
       if (countValidationsByLevel(level) > 0)
         throw new OXFException(s"Data has failed validations for level ${level.name}")
+    }
+
+  def tryUpdateCurrentWizardPageValidity(params: ActionParams): Try[Any] =
+    Try {
+      dispatch(name = "fr-update-validity", targetId = "fr-view-wizard")
     }
 
   def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =

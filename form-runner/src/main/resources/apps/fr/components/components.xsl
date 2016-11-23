@@ -112,6 +112,15 @@
             )[1]"/>
 
     <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
+    <xsl:variable
+        name="validation-mode"
+        as="xs:string"
+        select="
+            (
+                p:property(string-join(('oxf.fr.detail.validation-mode', $app, $form), '.'))[. = ('incremental', 'explicit')],
+                'incremental'
+            )[1]"/>
+
 
     <xsl:variable
         name="enable-initial-focus"

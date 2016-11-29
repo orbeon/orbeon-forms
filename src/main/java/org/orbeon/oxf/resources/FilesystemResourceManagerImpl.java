@@ -40,8 +40,10 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
         if (sandbox != null) {
             // A sandbox directory was found
             rootDirectory = new File(sandbox);
-            if (!rootDirectory.isDirectory())
-                throw new OXFException("Root directory " + sandbox + " does not refer to a valid directory");
+
+            if (! rootDirectory.isDirectory())
+                logger.warn("non-existing root directory for resource manager: " + rootDirectory.getAbsolutePath());
+
             hasSandbox = true;
         }
     }

@@ -45,11 +45,10 @@ protected trait JsonToXmlAlgorithm {
   def jsonToXmlImpl(ast: JsValue, rcv: XmlStream): Unit = {
 
     def escapeString(s: String) =
-      s.iterateCodePoints map { cp ⇒
-        if (cp <= 0x1F || cp == 0x7F)
-          cp + 0xE000
-        else
-          cp
+      s.iterateCodePoints map {
+        case cp @ (0x09 | 0x0a | 0x0d)      ⇒ cp
+        case cp if cp <= 0x1F || cp == 0x7F ⇒ cp + 0xE000
+        case cp                             ⇒ cp
       } codePointsToString
 
     def withElement[T](localName: String, atts: Seq[(String, String)] = Nil)(body: ⇒ T): T = {

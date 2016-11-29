@@ -156,6 +156,19 @@ object ConverterTest {
             <_ type="number">6</_>
           </_>
         </___>
+      </json>,
+    """ { "address": "1000 Main Street\nNew York, NY" } """ →
+      <json type="object">
+        <address>1000 Main Street&#x0a;New York, NY</address>
+      </json>,
+    """ { "values": "foo\t42" } """ →
+      <json type="object">
+        <values>foo&#x09;42</values>
+      </json>
+    ,
+    """ { "escapes": "\\\"" } """ →
+      <json type="object">
+        <escapes>\"</escapes>
       </json>
   )
 
@@ -201,7 +214,7 @@ class ConverterTest extends FunSpecLike with XMLSupport {
 
   describe("Escaping of special characters") {
 
-    val codePointsToEscape           = (0 to 0x1F) :+ 0x7F toArray
+    val codePointsToEscape           = ((0 to 0x1F).to[Set] + 0x7F -- List(0x09, 0x0a, 0x0d)).toArray.sorted
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
     val codePointsTranslated         = codePointsToEscape map (_ + 0xE000)
     val unicodeEscapedString         = codePointsToEscape map (c ⇒ s"\\u00${toHexString(Array(c.toByte))}") mkString

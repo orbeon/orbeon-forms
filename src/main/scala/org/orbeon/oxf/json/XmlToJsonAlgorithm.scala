@@ -51,11 +51,9 @@ protected trait XmlToJsonAlgorithm {
   def xmlToJsonImpl(root: XmlElem, strict: Boolean): JsValue = {
 
     def unescapeString(s: String) =
-      s.iterateCodePoints map { cp ⇒
-        if (cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F)
-          cp - 0xE000
-        else
-          cp
+      s.iterateCodePoints map {
+        case cp if cp >= 0xE000 && cp <= 0xE01F || cp == 0xE07F ⇒ cp - 0xE000
+        case cp                                                 ⇒ cp
       } codePointsToString
 
     def typeOpt (elem: XmlElem) = attValueOpt(elem, Symbols.Type)

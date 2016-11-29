@@ -522,7 +522,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         } else {
             // Warn that scripts won't run in noscript mode (duh)
             if (noscript())
-                indentedLogger().logWarning(
+                indentedLogger().logInfo(
                     "noscript",
                     "script won't run in noscript mode",
                     "script id", scriptInvocation.script().prefixedId()

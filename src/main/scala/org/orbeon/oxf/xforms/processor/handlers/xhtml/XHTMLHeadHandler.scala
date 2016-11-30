@@ -175,7 +175,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     helper            : XMLReceiverHelper
   ): Unit = {
 
-    // Function to output either a <script> element
+    // Function to output a <script> element
     def outputJSElement =
       outputElement(
         xhtmlPrefix,

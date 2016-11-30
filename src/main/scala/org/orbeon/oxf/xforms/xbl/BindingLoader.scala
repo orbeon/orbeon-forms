@@ -112,7 +112,7 @@ trait BindingLoader extends Logging {
       libraryProperty.associatedValue(evaluate)
       baselineProperty.associatedValue(evaluate)
 
-      // Right here, `reloadLibraryAndBaseline` has been called exactly once
+      // Right here, `reloadLibraryAndBaseline` has been called exactly once if a property has changed, and none otherwise
     }
 
     // If the index is unmodified, it might contain out-of-date bindings. If it is modified, it is guaranteed by

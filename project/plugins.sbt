@@ -12,6 +12,7 @@ resolvers += Resolver.typesafeRepo("releases")
 resolvers += Resolver.sonatypeRepo("releases")
 
 // For artifacts published locally
+// https://github.com/sbt/sbt-uglify/pull/23
 resolvers += Resolver.file("ivy-local", file("ivy-local"))(Resolver.ivyStylePatterns)
 
 // Needed for sbt-cross

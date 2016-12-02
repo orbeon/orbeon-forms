@@ -6,19 +6,59 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 val DefaultOrbeonFormsVersion     = "2016.3-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
-val ScalaXmlVersion               = "1.0.6"
 val ScalaJsDomVersion             = "0.9.0"
 val ScalaJsJQueryVersion          = "0.9.0"
 val JUnitInterfaceVersion         = "0.11"
-val UPickleVersion                = "0.4.1"
-val Parboiled1Version             = "1.1.7"
-val SprayJsonVersion              = "1.3.2"
-val JodaTimeVersion               = "2.1"
 val JodaConvertVersion            = "1.2"
 val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
-val Slf4jVersion                  = "1.7.21" // 1.7.21
+val Slf4jVersion                  = "1.7.21"
 val HttpComponentsVersion         = "4.3.5"  // 4.5.2
+val Log4jVersion                  = "1.2.17"
+val CommonsIoVersion              = "2.0.1"  // 2.5
+
+val CoreLibraryDependencies = Seq(
+  "org.parboiled"             %% "parboiled-scala"     % "1.1.7",
+  "io.spray"                  %% "spray-json"          % "1.3.2",
+  "org.scala-lang.modules"    %% "scala-xml"           % "1.0.6",
+  "joda-time"                 %  "joda-time"           % "2.1",
+  "org.joda"                  %  "joda-convert"        % JodaConvertVersion % Provided,
+  "org.apache.commons"        %  "commons-lang3"       % "3.1",    // 3.5
+  "net.sf.ehcache"            %  "ehcache-core"        % "2.6.3",  // 2.6.11
+  "commons-beanutils"         %  "commons-beanutils"   % "1.5",    // 1.9.3
+  "commons-codec"             %  "commons-codec"       % "1.6",    // 1.10
+  "commons-collections"       %  "commons-collections" % "3.2.2",
+  "commons-digester"          %  "commons-digester"    % "1.5",    // 2.1
+  "commons-cli"               %  "commons-cli"         % "1.0",    // 1.3.1
+  "commons-discovery"         %  "commons-discovery"   % "0.4",    // 0.5
+  "commons-fileupload"        %  "commons-fileupload"  % "1.2.2",  // 1.3.2
+  "commons-io"                %  "commons-io"          % CommonsIoVersion,
+  "commons-pool"              %  "commons-pool"        % "1.6",
+  "commons-validator"         %  "commons-validator"   % "1.4.0",  // 1.5.1
+  "javax.activation"          % "activation"           % "1.1.1",
+  "org.apache.httpcomponents" % "httpclient"           % HttpComponentsVersion,
+  "org.apache.httpcomponents" % "httpclient-cache"     % HttpComponentsVersion,
+  "org.apache.httpcomponents" % "httpmime"             % HttpComponentsVersion,
+  "org.apache.httpcomponents" % "fluent-hc"            % HttpComponentsVersion,
+  "org.apache.httpcomponents" % "httpcore"             % "4.3.2",
+  "org.slf4j"                 % "jcl-over-slf4j"       % Slf4jVersion,
+  "org.slf4j"                 % "slf4j-api"            % Slf4jVersion,
+  "org.slf4j"                 % "slf4j-log4j12"        % Slf4jVersion,
+  "log4j"                     % "log4j"                % Log4jVersion,
+  "tyrex"                     % "tyrex"                % "1.0",    // 1.0.1
+  "com.jcraft"                % "jsch"                 % "0.1.42", // 0.1.54
+  "jcifs"                     % "jcifs"                % "1.3.17",
+  "bsf"                       % "bsf"                  % "2.4.0"           % Test,
+  "org.apache.commons"        % "commons-exec"         % "1.1"             % Test, // 1.3
+  "com.google.code.gson"      % "gson"                 % "2.3.1"           % Test, // 2.8.0
+  "com.google.guava"          % "guava"                % "13.0.1"          % Test, // 20.0
+  "org.mockito"               % "mockito-all"          % "1.8.5"           % Test, // 1.10.19
+  "mysql"                     % "mysql-connector-java" % "5.1.26"          % Test, // 6.0.5,
+  "org.postgresql"            % "postgresql"           % "9.3-1102-jdbc4"  % Test,
+  "org.seleniumhq.selenium"   % "selenium-java"        % "2.45.0"          % Test  // 3.0.1
+//      "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
+//      "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
+) map (_.exclude("commons-logging", "commons-logging")) // because we have jcl-over-slf4j
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
@@ -35,7 +75,6 @@ val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Lif
 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
-
 
 // "ThisBuild is a Scope encompassing all projects"
 scalaVersion                in ThisBuild := "2.11.8"
@@ -279,7 +318,7 @@ lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
     name := "orbeon-common"
   )
   .jvmSettings(
-    (unmanagedJars in Compile)         := myFindUnmanagedJars(
+    (unmanagedJars in Compile) := myFindUnmanagedJars(
       Runtime,
       unmanagedBase.value,
       (includeFilter in unmanagedJars).value,
@@ -299,8 +338,8 @@ lazy val xupdate = (project in file("xupdate"))
     name := "orbeon-xupdate",
 
     libraryDependencies ++= Seq(
-      "commons-io" %  "commons-io" % "2.0.1",
-      "log4j"      % "log4j"       % "1.2.17"
+      "commons-io" % "commons-io" % CommonsIoVersion,
+      "log4j"      % "log4j"      % Log4jVersion
     ) map (_.exclude("commons-logging", "commons-logging"))
   )
 
@@ -367,9 +406,27 @@ lazy val formBuilder = (crossProject.crossType(CrossType.Full) in file("form-bui
   .settings(
     name := "orbeon-form-builder"
   )
-  .jvmSettings(JunitTestOptions: _*)
-  .jvmSettings(assetsSettings: _*)
-  .jsSettings(
+
+lazy val formBuilderJVM = formBuilder.jvm
+  .enablePlugins(SbtCoffeeScript, SbtWeb)
+  .dependsOn(
+    commonJVM,
+    formRunner % "test->test;compile->compile",
+    core       % "test->test;compile->compile"
+  )
+  .settings(JunitTestOptions: _*)
+  .settings(assetsSettings: _*)
+  .settings(
+    // Settings here as `.jvmSettings` above causes infinite recursion
+    // Package Scala.js output into main Form Builder JAR
+    // This stores the optimized version. For development we need something else.
+    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formBuilderJS).value.data)
+  )
+
+
+lazy val formBuilderJS: Project =formBuilder.js
+  .dependsOn(commonJS)
+  .settings(
 
     libraryDependencies            ++= Seq(
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
@@ -396,30 +453,6 @@ lazy val formBuilder = (crossProject.crossType(CrossType.Full) in file("form-bui
     )
   )
 
-lazy val formBuilderJVM = formBuilder.jvm
-  .enablePlugins(SbtCoffeeScript, SbtWeb)
-  .dependsOn(commonJVM)
-  .dependsOn(
-    formRunner % "test->test;compile->compile",
-    core       % "test->test;compile->compile"
-  )
-  .enablePlugins(SbtCoffeeScript)
-  .enablePlugins(SbtWeb)
-  .settings(commonSettings: _*)
-  .settings(assetsSettings: _*)
-  .settings(
-    name := "orbeon-form-builder"
-  )
-  .settings(JunitTestOptions: _*)
-  .settings(
-    // Settings here as `.jvmSettings` above causes infinite recursion
-    // Package Scala.js output into main Form Builder JAR
-    // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formBuilderJS).value.data)
-  )
-
-lazy val formBuilderJS: Project = formBuilder.js.dependsOn(commonJS)
-
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin, SbtCoffeeScript, SbtWeb)
   .dependsOn(commonJVM, dom, xupdate)
@@ -442,54 +475,14 @@ lazy val core = (project in file("src"))
   )
   .settings(JunitTestOptions: _*)
   .settings(
-    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
-  ).settings(
-    libraryDependencies ++= Seq(
-      "org.parboiled"             %% "parboiled-scala"     % Parboiled1Version,
-      "io.spray"                  %% "spray-json"          % SprayJsonVersion,
-      "org.scala-lang.modules"    %% "scala-xml"           % ScalaXmlVersion,
-      "joda-time"                 %  "joda-time"           % JodaTimeVersion,
-      "org.joda"                  %  "joda-convert"        % JodaConvertVersion % Provided,
-      "org.apache.commons"        %  "commons-lang3"       % "3.1",    // 3.5
-      "net.sf.ehcache"            %  "ehcache-core"        % "2.6.3",  // 2.6.11
-      "commons-beanutils"         %  "commons-beanutils"   % "1.5",    // 1.9.3
-      "commons-codec"             %  "commons-codec"       % "1.6",    // 1.10
-      "commons-collections"       %  "commons-collections" % "3.2.2",
-      "commons-digester"          %  "commons-digester"    % "1.5",    // 2.1
-      "commons-cli"               %  "commons-cli"         % "1.0",    // 1.3.1
-      "commons-discovery"         %  "commons-discovery"   % "0.4",    // 0.5
-      "commons-fileupload"        %  "commons-fileupload"  % "1.2.2",  // 1.3.2
-      "commons-io"                %  "commons-io"          % "2.0.1",  // 2.5
-      "commons-pool"              %  "commons-pool"        % "1.6",
-      "commons-validator"         %  "commons-validator"   % "1.4.0",  // 1.5.1
-      "javax.activation"          % "activation"           % "1.1.1",
-      "org.apache.httpcomponents" % "httpclient"           % HttpComponentsVersion,
-      "org.apache.httpcomponents" % "httpclient-cache"     % HttpComponentsVersion,
-      "org.apache.httpcomponents" % "httpmime"             % HttpComponentsVersion,
-      "org.apache.httpcomponents" % "fluent-hc"            % HttpComponentsVersion,
-      "org.apache.httpcomponents" % "httpcore"             % "4.3.2",
-      "org.slf4j"                 % "jcl-over-slf4j"       % Slf4jVersion,
-      "org.slf4j"                 % "slf4j-api"            % Slf4jVersion,
-      "org.slf4j"                 % "slf4j-log4j12"        % Slf4jVersion,
-      "log4j"                     % "log4j"                % "1.2.17",
-      "tyrex"                     % "tyrex"                % "1.0",    // 1.0.1
-      "com.jcraft"                % "jsch"                 % "0.1.42", // 0.1.54
-      "jcifs"                     % "jcifs"                % "1.3.17",
-
-      "bsf"                       % "bsf"                  % "2.4.0"           % Test,
-      "org.apache.commons"        % "commons-exec"         % "1.1"             % Test, // 1.3
-      "com.google.code.gson"      % "gson"                 % "2.3.1"           % Test, // 2.8.0
-      "com.google.guava"          % "guava"                % "13.0.1"          % Test, // 20.0
-      "org.mockito"               % "mockito-all"          % "1.8.5"           % Test, // 1.10.19
-      "mysql"                     % "mysql-connector-java" % "5.1.26"          % Test, // 6.0.5,
-      "org.postgresql"            % "postgresql"           % "9.3-1102-jdbc4"  % Test,
-      "org.seleniumhq.selenium"   % "selenium-java"        % "2.45.0"          % Test  // 3.0.1
-//      "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
-//      "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
-    ) map (_.exclude("commons-logging", "commons-logging")) // because we have jcl-over-slf4j
+    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
+    libraryDependencies                ++= CoreLibraryDependencies
   )
 
 lazy val orbeonWar = (project in file("orbeon-war"))
+  .settings(
+    name := "orbeon-war"
+  )
   .dependsOn(
     commonJVM,
     dom,

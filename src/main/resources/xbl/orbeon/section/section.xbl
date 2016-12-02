@@ -48,15 +48,40 @@
 
                 <xsl:template match="/*">
 
+                    <!-- Section level, see https://github.com/orbeon/orbeon-forms/issues/3011 -->
+                    <xsl:variable name="default-level" select="1"/>
+                    <xsl:variable name="min-level"     select="1"/>
+                    <xsl:variable name="max-level"     select="6"/>
+
+                    <xsl:variable
+                        name="base-level"
+                        select="
+                            (
+                                @base-level[. castable as xs:integer]/xs:integer(.)[. ge 0],
+                                0
+                            )[1]"/>
+
+                    <xsl:variable
+                        name="level"
+                        select="
+                            min(
+                                (
+                                    (
+                                        @level[. castable as xs:integer]/xs:integer(.)[. ge $min-level],
+                                        $default-level
+                                    )[1] + $base-level,
+                                    $max-level
+                                )
+                            )"/>
+
                     <!-- Section configuration -->
-                    <xsl:variable name="editable"          select="exists(@edit-ref)"/>
-                    <xsl:variable name="ancestor-sections" select="count(ancestor::fr:section)"/><!-- TODO -->
-                    <xsl:variable name="collapsible"       select="not(@collapsible = 'false' or @collapse = 'false')"/>
-                    <xsl:variable name="animate"           select="not(@animate = 'false')"/>
-                    <xsl:variable name="readonly"          select="@readonly = 'true'"/>
-                    <xsl:variable name="is-repeat"         select="frf:isRepeat(.)"/>
-                    <xsl:variable name="appearance"        select="(@appearance, 'full')[1]"/>
-                    <xsl:variable name="right-column"      select="$appearance = 'minimal' and not($readonly)"/>
+                    <xsl:variable name="editable"     select="exists(@edit-ref)"/>
+                    <xsl:variable name="collapsible"  select="not(@collapsible = 'false' or @collapse = 'false')"/>
+                    <xsl:variable name="animate"      select="not(@animate = 'false')"/>
+                    <xsl:variable name="readonly"     select="@readonly = 'true'"/>
+                    <xsl:variable name="is-repeat"    select="frf:isRepeat(.)"/>
+                    <xsl:variable name="appearance"   select="(@appearance, 'full')[1]"/>
+                    <xsl:variable name="right-column" select="$appearance = 'minimal' and not($readonly)"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -85,7 +110,7 @@
                                     value="fr:is-readonly-mode() or not('{@open}' = 'false')"/>
 
                                 <!-- Section title area: open/close button, title, help -->
-                                <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">
+                                <xsl:element name="xh:h{$level}">
                                     <xsl:attribute name="class" select="'fr-section-title'"/>
 
                                     <!-- Open/close button -->

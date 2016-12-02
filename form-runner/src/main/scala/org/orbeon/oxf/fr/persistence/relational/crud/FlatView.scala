@@ -125,7 +125,7 @@ private object FlatView {
         case _ if IsSection(node) ⇒
           val sectionNames = outerSectionNames :+ controlNameFromId(node.id)
           collectFromChildren(sectionNames)
-        case _ if IsSectionTemplateContent(node) ⇒
+        case _ if isSectionTemplateContent(node) ⇒
           xblMappings.get(node.uriQualifiedName) match {
             case None ⇒
               Nil

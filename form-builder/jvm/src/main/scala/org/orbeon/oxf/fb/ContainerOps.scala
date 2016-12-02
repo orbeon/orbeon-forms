@@ -55,7 +55,7 @@ trait ContainerOps extends ControlOps {
   def countSections(inDoc: NodeInfo)         = getAllControlsWithIds(inDoc)          count IsSection
   def countAllGrids(inDoc: NodeInfo)         = findFRBodyElement(inDoc) descendant * count IsGrid
   def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count isRepeat
-  def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count IsSectionTemplateContent
+  def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count isSectionTemplateContent
 
   def countGrids(inDoc: NodeInfo)            = countAllGrids(inDoc) - countRepeats(inDoc)
   def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
@@ -173,7 +173,7 @@ trait ContainerOps extends ControlOps {
   // Currently: must be a section without section template content
   // Later: fr:tab (maybe fr:tabview), wizard
   def canMoveInto(container: NodeInfo) =
-    IsSection(container) && ! (container \ * exists IsSectionTemplateContent)
+    IsSection(container) && ! (container \ * exists isSectionTemplateContent)
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
   def deleteSectionTemplateContentHolders(inDoc: NodeInfo) = {

@@ -45,29 +45,6 @@ body.orbeon { background-color: @frBackground }
 
 .orbeon {
 
-    // ***** Headings (titles and sections) ****************************************************************************
-    h2, h3 {
-        #gradient > .vertical(#fff, #eee);
-        margin: 0;
-    }
-
-    h2, h3, h4, h5, h6 {
-        text-align: left;
-        font-weight: normal;
-        padding: 0;
-        color: @frHeaderColor;
-    }
-
-    h2 {
-        font-size: @frSectionTitleHeight;
-        line-height: @frSectionTitleLineHeight;
-    }
-
-    h3, h4 {
-        font-size: 110%;
-        line-height: 135%;
-    }
-
     // ***** Controls***************************************************************************************************
 
     // Copied over Bootstrap styles as we can't reuse them simply as mixins
@@ -312,11 +289,6 @@ body.orbeon { background-color: @frBackground }
         .fr-body {
             border: none;
             .box-shadow(0 1px 3px rgba(0,0,0,.055));
-        }
-
-        h2 {
-            border-bottom: 1px solid darken(@wellBackground, 7%);
-            color: black;
         }
 
         // Navbar

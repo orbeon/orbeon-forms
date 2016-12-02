@@ -61,14 +61,14 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   // Namespace URL a section template component must match
   private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
-  val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
-    container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
+  def isSectionTemplateContent(container: NodeInfo) =
+    (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
 
   def sectionTemplateBindingName(section: NodeInfo) =
-    section / * filter IsSectionTemplateContent map (_.uriQualifiedName) headOption
+    section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
 
   def findSectionsWithTemplates(view: NodeInfo) =
-    view descendant * filter IsSection filter (_ \ * exists IsSectionTemplateContent)
+    view descendant * filter IsSection filter (_ \ * exists isSectionTemplateContent)
 
   // All xbl:binding elements available for section templates
   def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =

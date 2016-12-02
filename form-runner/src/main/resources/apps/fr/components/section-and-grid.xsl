@@ -19,8 +19,13 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
+    <xsl:variable name="starting-section-level" select="2"/>
+
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <xsl:template match="xh:body//fr:section | xbl:binding/xbl:template//fr:section">
+
+        <xsl:param name="section-level" tunnel="yes" select="1"/>
+
         <xsl:copy>
             <xsl:if test="empty(@collapse) and empty(@collapsible)">
                 <xsl:attribute name="collapsible" select="$is-section-collapsible"/>
@@ -45,7 +50,34 @@
                     $section-insert != 'index'">
                 <xsl:attribute name="insert" select="$section-insert"/>
             </xsl:if>
+
+            <!-- For https://github.com/orbeon/orbeon-forms/issues/3011 -->
+            <xsl:attribute name="level" select="$section-level"/>
+            <xsl:choose>
+                <xsl:when test="empty(ancestor::xbl:*)">
+                    <xsl:attribute name="base-level" select="$starting-section-level - 1"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="xbl:attr" select="'base-level'"/>
+                </xsl:otherwise>
+            </xsl:choose>
+
+
             <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="node()">
+                <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- For https://github.com/orbeon/orbeon-forms/issues/3011 -->
+    <xsl:template
+        match="xh:body//fr:section/*[frf:isSectionTemplateContent(.)] |
+               xbl:binding/xbl:template//fr:section/*[frf:isSectionTemplateContent(.)]">
+        <xsl:param name="section-level" tunnel="yes"/><!-- must be nested within `fr:section` -->
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:attribute name="base-level" select="$section-level - 1 + $starting-section-level - 1"/>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
     </xsl:template>

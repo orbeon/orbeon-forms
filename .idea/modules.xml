@@ -14,8 +14,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding-build.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-builder-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-builder-sources.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilder-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJS.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJS-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJVM.iml" />

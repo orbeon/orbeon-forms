@@ -4,7 +4,6 @@
     <option name="BUILD_JARS_ON_MAKE" value="false" />
   </component>
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="Javac" />
     <excludeFromCompile>
       <directory url="file://$PROJECT_DIR$/tools" includeSubdirectories="true" />
     </excludeFromCompile>
@@ -23,11 +22,6 @@
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-    </annotationProcessing>
     <bytecodeTargetLevel target="1.6">
       <module name="clientServerSharedJS" target="1.6" />
       <module name="clientServerSharedJVM" target="1.6" />
@@ -41,11 +35,14 @@
       <module name="embedding" target="1.6" />
       <module name="formBuilder" target="1.6" />
       <module name="formBuilderClient" target="1.6" />
+      <module name="formBuilderJS" target="1.6" />
+      <module name="formBuilderJVM" target="1.6" />
       <module name="formBuilderSharedJS" target="1.6" />
       <module name="formBuilderSharedJVM" target="1.6" />
       <module name="formRunner" target="1.6" />
       <module name="formRunnerProxyPortlet" target="1.6" />
       <module name="fullPortlet" target="1.6" />
+      <module name="orbeonWar" target="1.6" />
       <module name="portletSupport" target="1.6" />
       <module name="root" target="1.6" />
       <module name="xupdate" target="1.6" />

@@ -17,19 +17,17 @@
             <option value="$PROJECT_DIR$/dom/project" />
             <option value="$PROJECT_DIR$/embedding" />
             <option value="$PROJECT_DIR$/embedding/project" />
-            <option value="$PROJECT_DIR$/form-builder" />
-            <option value="$PROJECT_DIR$/form-builder-client" />
-            <option value="$PROJECT_DIR$/form-builder-client/project" />
-            <option value="$PROJECT_DIR$/form-builder-shared" />
-            <option value="$PROJECT_DIR$/form-builder-shared/.js" />
-            <option value="$PROJECT_DIR$/form-builder-shared/.js/project" />
-            <option value="$PROJECT_DIR$/form-builder-shared/.jvm" />
-            <option value="$PROJECT_DIR$/form-builder-shared/.jvm/project" />
-            <option value="$PROJECT_DIR$/form-builder/project" />
+            <option value="$PROJECT_DIR$/form-builder/js" />
+            <option value="$PROJECT_DIR$/form-builder/js/project" />
+            <option value="$PROJECT_DIR$/form-builder/jvm" />
+            <option value="$PROJECT_DIR$/form-builder/jvm/project" />
+            <option value="$PROJECT_DIR$/form-builder/shared" />
             <option value="$PROJECT_DIR$/form-runner" />
             <option value="$PROJECT_DIR$/form-runner/project" />
             <option value="$PROJECT_DIR$/full-portlet" />
             <option value="$PROJECT_DIR$/full-portlet/project" />
+            <option value="$PROJECT_DIR$/orbeon-war" />
+            <option value="$PROJECT_DIR$/orbeon-war/project" />
             <option value="$PROJECT_DIR$/portlet-support" />
             <option value="$PROJECT_DIR$/portlet-support/project" />
             <option value="$PROJECT_DIR$/project" />
@@ -41,6 +39,7 @@
             <option value="$PROJECT_DIR$/xupdate/project" />
           </set>
         </option>
+        <option name="sbtVersion" value="0.13.13" />
       </SbtProjectSettings>
     </option>
   </component>

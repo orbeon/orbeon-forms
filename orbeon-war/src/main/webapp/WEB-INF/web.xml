@@ -13,17 +13,6 @@
         <param-name>oxf.resources.factory</param-name>
         <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
     </context-param>
-    <!-- Uncomment this for the filesystem resource manager (development mode) -->
-    <!--
-    <context-param>
-        <param-name>oxf.resources.priority.0</param-name>
-        <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
-    </context-param>
-    <context-param>
-        <param-name>oxf.resources.priority.0.oxf.resources.filesystem.sandbox-directory</param-name>
-        <param-value>$ORBEON_HOME/resources-local</param-value>
-    </context-param>-->
-    <!-- End filesystem resource manager (development mode) -->
     <!--Web application resource manager for resources-->
     <context-param>
         <param-name>oxf.resources.priority.2</param-name>

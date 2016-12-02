@@ -49,7 +49,7 @@
                 <xsl:template match="/*">
 
                     <!-- Section level, see https://github.com/orbeon/orbeon-forms/issues/3011 -->
-                    <xsl:variable name="default-level" select="1"/>
+                    <xsl:variable name="default-level" select="2"/>
                     <xsl:variable name="min-level"     select="1"/>
                     <xsl:variable name="max-level"     select="6"/>
 

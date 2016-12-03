@@ -13,9 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom.Document
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.XML
 import org.orbeon.scaxon.XML._
 
@@ -153,7 +157,7 @@ object DataMigration {
 
   def migrateDataFrom(data: DocumentInfo, jsonMigrationMap: String, pruneMetadata: Boolean): DocumentInfo = {
 
-    val mutableData = TransformerUtils.extractAsMutableDocument(data)
+    val mutableData = copyDocumentKeepInstanceData(data)
 
     partitionNodes(mutableData, decodeMigrationsFromJSON(jsonMigrationMap)) foreach {
       case (_, iterations, _, _) ⇒
@@ -181,13 +185,28 @@ object DataMigration {
 
   //@XPathFunction
   def pruneFormRunnerMetadata(data: DocumentInfo): DocumentInfo = {
-    val mutableData = TransformerUtils.extractAsMutableDocument(data)
+    val mutableData = copyDocumentKeepInstanceData(data)
     pruneFormRunnerMetadataFromMutableData(mutableData)
     mutableData
   }
 
+  private def copyDocumentKeepInstanceData(data: DocumentInfo) =
+    new DocumentWrapper(
+      data match {
+        case virtualNode: VirtualNode ⇒
+          virtualNode.getUnderlyingNode match {
+            case doc: Document ⇒ Dom4jUtils.createDocumentCopyElement(doc.getRootElement)
+            case _             ⇒ throw new IllegalStateException
+          }
+        case _ ⇒
+          TransformerUtils.tinyTreeToDom4j(data)
+      },
+      null,
+      XPath.GlobalConfiguration
+    )
+
   // Remove all `fr:*` elements and attributes
-  def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentInfo): Unit = {
+  private def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentInfo): Unit = {
     // Delete elements from concrete `List` to avoid possible laziness
     val frElements = mutableData descendant * filter (_.namespaceURI == XMLNames.FR) toList
 

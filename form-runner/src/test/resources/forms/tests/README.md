@@ -1,0 +1,1 @@
+This directory contains form definitions used by automated tests, in particular from the `runFormRunner()` function.

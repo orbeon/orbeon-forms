@@ -1,0 +1,213 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:external-events="my-run-process">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <control-1.1 fr:foo="42"/>
+                        <grid-1>
+                            <grid-1-iteration>
+                                <control-1.2 fr:foo="43"/>
+                            </grid-1-iteration>
+                        </grid-1>
+                    </section-1>
+                    <section-2>
+                        <control-2.1 fr:foo="44"/>
+                        <grid-2>
+                            <grid-2-iteration>
+                                <control-2.2 fr:foo="45"/>
+                            </grid-2-iteration>
+                        </grid-2>
+                    </section-2>
+                    <fr:metadata/>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-1.1-bind" name="control-1.1" ref="control-1.1"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="grid-1-iteration-bind" ref="grid-1-iteration" name="grid-1-iteration">
+                            <xf:bind id="control-1.2-bind" ref="control-1.2" name="control-1.2"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-2-bind" ref="section-2" name="section-2" relevant="false()">
+                    <xf:bind id="control-2.1-bind" ref="control-2.1" name="control-2.1"
+                             xxf:whitespace="trim"/>
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="grid-2-iteration-bind" ref="grid-2-iteration" name="grid-2-iteration">
+                            <xf:bind id="control-2.2-bind" ref="control-2.2" name="control-2.2" type="xf:date"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>send-action</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                    <migration version="4.8.0">[{ "path": "(section-1)/(grid-1)", "iteration-name": "grid-1-iteration" },{ "path": "(section-2)/(grid-2)", "iteration-name": "grid-2-iteration" }]</migration>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <control-2.2>
+                            <label>Control 2.2</label>
+                            <hint/>
+                        </control-2.2>
+                        <control-1.2>
+                            <label>Control 1.2</label>
+                            <hint/>
+                        </control-1.2>
+                        <control-2.1>
+                            <label>Control 2.1</label>
+                            <hint/>
+                        </control-2.1>
+                        <section-1>
+                            <label>Section 1</label>
+                        </section-1>
+                        <section-2>
+                            <label>Section 2</label>
+                            <help/>
+                        </section-2>
+                        <control-1.1>
+                            <label>Control 1.1</label>
+                            <hint/>
+                        </control-1.1>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <!-- Utility instances for services -->
+            <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
+                <request/>
+            </xf:instance>
+            <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
+                <response/>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-1-template">
+                <grid-1-iteration>
+                    <control-1.2/>
+                </grid-1-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="grid-2-template">
+                <grid-2-iteration>
+                    <control-2.2/>
+                </grid-2-iteration>
+            </xf:instance>
+
+            <!-- Hook for `SendTest` -->
+            <xf:action event="my-run-process">
+                <xf:action type="xpath">
+                    fr:run-process('oxf.fr.detail.process', event('process'))
+                </xf:action>
+            </xf:action>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-control" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-1.1-control" bind="control-1.1-bind">
+                                    <xf:label ref="$form-resources/control-1.1/label"/>
+                                    <xf:hint ref="$form-resources/control-1.1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid-1-control" bind="grid-1-bind" repeat="content" min="1"
+                             template="instance('grid-1-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <xh:tr>
+                            <xh:td>
+                                <fr:tinymce xmlns:f="http://orbeon.org/oxf/xml/formatting"
+                                            xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                            id="control-1.2-control"
+                                            bind="control-1.2-bind">
+                                    <xf:label ref="$form-resources/control-1.2/label"/>
+                                    <xf:hint ref="$form-resources/control-1.2/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </fr:tinymce>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-control" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-2.1-control" bind="control-2.1-bind">
+                                    <xf:label ref="$form-resources/control-2.1/label"/>
+                                    <xf:hint ref="$form-resources/control-2.1/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid-2-control" bind="grid-2-bind" repeat="content" min="1"
+                             template="instance('grid-2-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-2.2-control" bind="control-2.2-bind">
+                                    <xf:label ref="$form-resources/control-2.2/label"/>
+                                    <xf:hint ref="$form-resources/control-2.2/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

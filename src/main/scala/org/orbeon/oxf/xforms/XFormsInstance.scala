@@ -286,37 +286,11 @@ class XFormsInstance(
   }
 
   // Log the current MIP values applied to this instance
-  def debugLogMIPs() = {
-    val result = DocumentFactory.createDocument
-    underlyingDocumentOpt.get.accept(new VisitorSupport {
-      final override def visit(element: Element) = {
-        currentElement = rootElement.addElement("element")
-        currentElement.addAttribute("qname", element.getQualifiedName)
-        currentElement.addAttribute("namespace-uri", element.getNamespaceURI)
-        addMIPInfo(currentElement, element)
-      }
-
-      final override def visit(attribute: Attribute) = {
-        val attributeElement = currentElement.addElement("attribute")
-        attributeElement.addAttribute("qname", attribute.getQualifiedName)
-        attributeElement.addAttribute("namespace-uri", attribute.getNamespaceURI)
-        addMIPInfo(attributeElement, attribute)
-      }
-
-      private def addMIPInfo(parentInfoElement: Element, node: Node) = {
-        parentInfoElement.addAttribute("readonly", InstanceData.getInheritedReadonly(node).toString)
-        parentInfoElement.addAttribute("relevant", InstanceData.getInheritedRelevant(node).toString)
-        parentInfoElement.addAttribute("required", InstanceData.getRequired(node).toString)
-        parentInfoElement.addAttribute("valid", InstanceData.getValid(node).toString)
-        val typeQName = InstanceData.getType(node)
-        parentInfoElement.addAttribute("type", Option(typeQName) map (_.getQualifiedName) getOrElse "")
-      }
-
-      private val rootElement = result.addElement("mips")
-      private var currentElement: Element = null
-    })
-
-    XFormsUtils.logDebugDocument("MIPs: ", result)
+  def debugLogMIPs(): Unit = {
+    XFormsUtils.logDebugDocument(
+      "MIPs: ",
+      XFormsInstance.createDebugMipsDocument(underlyingDocumentOpt.get)
+    )
   }
 
   // Replace the instance with the given document
@@ -601,5 +575,41 @@ object XFormsInstance extends Logging {
         instanceState.valid
       )
     )
+  }
+
+  def createDebugMipsDocument(doc: Document): Document = {
+
+    val result      = DocumentFactory.createDocument
+    val rootElement = result.addElement("mips")
+
+    doc.accept(new VisitorSupport {
+
+      var currentElement: Element = null
+
+      final override def visit(element: Element) = {
+        currentElement = rootElement.addElement("element")
+        currentElement.addAttribute("qname", element.getQualifiedName)
+        currentElement.addAttribute("namespace-uri", element.getNamespaceURI)
+        addMIPInfo(currentElement, element)
+      }
+
+      final override def visit(attribute: Attribute) = {
+        val attributeElement = currentElement.addElement("attribute")
+        attributeElement.addAttribute("qname", attribute.getQualifiedName)
+        attributeElement.addAttribute("namespace-uri", attribute.getNamespaceURI)
+        addMIPInfo(attributeElement, attribute)
+      }
+
+      private def addMIPInfo(parentInfoElement: Element, node: Node) = {
+        parentInfoElement.addAttribute("readonly", InstanceData.getInheritedReadonly(node).toString)
+        parentInfoElement.addAttribute("relevant", InstanceData.getInheritedRelevant(node).toString)
+        parentInfoElement.addAttribute("required", InstanceData.getRequired(node).toString)
+        parentInfoElement.addAttribute("valid", InstanceData.getValid(node).toString)
+        val typeQName = InstanceData.getType(node)
+        parentInfoElement.addAttribute("type", Option(typeQName) map (_.getQualifiedName) getOrElse "")
+      }
+    })
+
+    result
   }
 }

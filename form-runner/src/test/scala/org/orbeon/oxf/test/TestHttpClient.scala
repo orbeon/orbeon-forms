@@ -64,11 +64,11 @@ object TestHttpClient {
   }
 
   def connect(
-    url          : String,
-    method       : HttpMethod,
-    headers      : Map[String, List[String]],
-    content      : Option[StreamedContent],
-    credentials  : Option[Credentials] = None
+    url         : String,
+    method      : HttpMethod,
+    headers     : Map[String, List[String]],
+    content     : Option[StreamedContent],
+    credentials : Option[Credentials] = None
   ): (ProcessorService, HttpResponse, List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")

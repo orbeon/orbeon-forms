@@ -24,7 +24,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.Multipart._
 import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 
 class MultipartTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 

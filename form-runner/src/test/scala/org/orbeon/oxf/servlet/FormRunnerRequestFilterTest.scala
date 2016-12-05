@@ -22,7 +22,7 @@ import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.FunSpecLike
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.TreeMap

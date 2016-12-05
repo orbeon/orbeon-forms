@@ -23,7 +23,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAda
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 
 import collection.mutable
 

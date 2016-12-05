@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 
 import scala.reflect.ClassTag
 

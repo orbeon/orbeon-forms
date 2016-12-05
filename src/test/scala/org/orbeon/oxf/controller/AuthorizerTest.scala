@@ -15,7 +15,7 @@ package org.orbeon.oxf.controller
 
 import org.orbeon.oxf.http.Headers._
 import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext}

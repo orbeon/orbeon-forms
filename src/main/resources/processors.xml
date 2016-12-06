@@ -405,10 +405,6 @@
         <class name="org.orbeon.oxf.processor.converter.SVGConverter"/>
     </processor>
 
-    <processor name="oxf:from-xls-converter">
-        <class name="org.orbeon.oxf.processor.converter.FromXLSConverter"/>
-    </processor>
-
     <processor name="oxf:qname-converter">
         <class name="org.orbeon.oxf.processor.converter.QNameConverter"/>
     </processor>

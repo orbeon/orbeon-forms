@@ -106,7 +106,8 @@ trait FormRunnerMetadata {
         control           ← sortedControls
         staticControl     ← collectByErasedType[StaticLHHASupport](control.staticControl)
         resourcesInstance ← resourcesInstance(control)
-        controlName       ← Option(FormRunner.controlNameFromId(control.getId))
+        if ! staticControl.staticId.startsWith("fb-lhh-editor-for-") // HACK for this in grid.xbl
+        controlName       ← FormRunner.controlNameFromIdOpt(control.getId)
         boundNode         ← control.boundNode
         dataHash          = SubmissionUtils.dataNodeHash(boundNode)
       } yield

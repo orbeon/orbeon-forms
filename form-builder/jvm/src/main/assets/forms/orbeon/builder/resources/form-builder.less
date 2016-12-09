@@ -43,10 +43,10 @@ body {
 
         .fb-main-inner {
             background-color: @wellBackground;
-            .border-radius(6px);
             .box-sizing(border-box);
             margin-bottom: 0;
-            min-height: 100%;                                               // So the main area uses all the available space, not revealing a large porting of the background
+            min-width: 980px;                                               // So we can include the standard 940px form width
+            min-height: 100%;                                               // So the main area uses all the available space, not revealing a large portion of the background
         }
     }
 
@@ -89,7 +89,7 @@ body {
     }
 
     .fr-section-title.hover {                                               // .hover added by CS on mouse over click interceptor
-        #gradient > .vertical(white, #DDD);
+        #gradient > .vertical(@grayLighter, @grayLighter);
     }
 
     .fb-delete-grid-trigger {
@@ -185,7 +185,7 @@ body {
                         i, img { margin-right: 3px } // space between icon and text
 
                         &:hover {
-                            #gradient > .vertical(white, #DDD);                                                             // effect on hover
+                            #gradient > .vertical(@grayLighter, @grayLighter);                                                             // effect on hover
                         }
                     }
                 }
@@ -711,7 +711,6 @@ body {
     // Form navbar only
     .fb-main .navbar {
         margin-top: 0;                                                      // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
-        .navbar-inner { .border-radius(6px 6px 0 0) }                       // Add radius to the top of the navbar, so it doesn't show over the radius of the surrounding .fb-main-inner
         .fb-navbar-trigger { padding-left: 10px }
         .icon-white { .opacity(70) }                                        // Make icons grayer, so they don't stand out too much in the inverted navbar
     }

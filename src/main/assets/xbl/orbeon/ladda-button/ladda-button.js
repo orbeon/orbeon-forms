@@ -21,19 +21,20 @@
     var STATE_CLICKED = 1;
     var STATE_SENT    = 2;
 
-    // Ladda button uses document.createRange, which isn't supported on IE8, so we don't do anything if that
-    // function isn't available.
-    if (_.isFunction(document.createRange)) {
 
-        YAHOO.namespace("xbl.fr");
-        YAHOO.xbl.fr.LaddaButton = function() {};
-        ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.LaddaButton, "xbl-fr-ladda-button");
-        YAHOO.xbl.fr.LaddaButton.prototype = {
+    YAHOO.namespace("xbl.fr");
+    YAHOO.xbl.fr.LaddaButton = function() {};
+    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.LaddaButton, "xbl-fr-ladda-button");
+    YAHOO.xbl.fr.LaddaButton.prototype = {
 
-            button: null,
-            state: STATE_BEGIN,
+        button: null,
+        state: STATE_BEGIN,
 
-            init: function() {
+        init: function() {
+
+            // Ladda button uses document.createRange, which isn't supported on IE8, so we don't do anything if that
+            // function isn't available.
+            if (_.isFunction(document.createRange)) {
 
                 // Init buttons
                 this.button = $(this.container).find('button');
@@ -47,34 +48,34 @@
                 this.button.on('click',             _.bind(this.click    , this));
                 AjaxServer.beforeSendingEvent.add  (_.bind(this.sending  , this));
                 AjaxServer.ajaxResponseReceived.add(_.bind(this.receiving, this));
-            },
-
-            destroy: function () {
-                // TODO: remove event handlers, destroy component
-            },
-
-            click: function() {
-                if (this.state == STATE_BEGIN) {
-                    // Defer changing the button, not to prevent other listeners on the click event from being called
-                    _.defer(_.bind(function() {
-                        this.button.ladda('start');
-                        this.state = STATE_CLICKED;
-                    }, this));
-                }
-            },
-
-            sending: function() {
-                if (this.state == STATE_CLICKED)
-                    this.state = STATE_SENT;
-            },
-
-            receiving: function() {
-                if (this.state == STATE_SENT) {
-                    this.button.ladda('stop');
-                    this.state = STATE_BEGIN;
-                }
             }
-        };
-    }
+        },
+
+        destroy: function () {
+            // TODO: remove event handlers, destroy component
+        },
+
+        click: function() {
+            if (this.state == STATE_BEGIN) {
+                // Defer changing the button, not to prevent other listeners on the click event from being called
+                _.defer(_.bind(function() {
+                    this.button.ladda('start');
+                    this.state = STATE_CLICKED;
+                }, this));
+            }
+        },
+
+        sending: function() {
+            if (this.state == STATE_CLICKED)
+                this.state = STATE_SENT;
+        },
+
+        receiving: function() {
+            if (this.state == STATE_SENT) {
+                this.button.ladda('stop');
+                this.state = STATE_BEGIN;
+            }
+        }
+    };
 
 })();

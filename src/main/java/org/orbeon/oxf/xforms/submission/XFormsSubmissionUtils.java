@@ -323,11 +323,11 @@ public class XFormsSubmissionUtils {
      * Returns whether there is at least one relevant upload control with pending upload bound to any node of the given instance.
      *
      * @param containingDocument    current XFormsContainingDocument
-     * @param currentInstance       instance to check
+     * @param currentInstance       instance to check or null
      * @return                      true iif condition is satisfied
      */
     public static boolean hasBoundRelevantPendingUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
-        if (containingDocument.countPendingUploads() > 0) { // don't bother if there is no pending upload
+        if (currentInstance != null && containingDocument.countPendingUploads() > 0) { // don't bother if there is no pending upload
             for (XFormsControl currentControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
                 final XFormsUploadControl currentUploadControl = (XFormsUploadControl) currentControl;
                 if (currentUploadControl.isRelevant() && containingDocument.isUploadPendingFor(currentUploadControl)) {

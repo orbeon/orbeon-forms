@@ -326,7 +326,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
-                if (p.serialize && p.resolvedXXFormsUploads && XFormsSubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refInstance)) {
+                if (p.serialize && p.resolvedXXFormsUploads && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, scala.Option.apply(p.refInstance))) {
                     throw new XFormsSubmissionException(this, "xf:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.XXFORMS_PENDING_UPLOADS(), null));

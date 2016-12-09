@@ -21,9 +21,10 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsModel
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
@@ -123,4 +124,29 @@ object SubmissionUtils {
     } locally {
       response.addHeader(headerName, headerValue)
     }
+
+  import org.orbeon.oxf.util.CollectionUtils._
+
+  // Whether there is at least one relevant upload control with pending upload bound to any node of the given instance
+  def hasBoundRelevantPendingUploadControls(
+    doc         : XFormsContainingDocument,
+    instanceOpt : Option[XFormsInstance]
+  ): Boolean =
+    instanceOpt match {
+      case Some(instance) if doc.countPendingUploads > 0 ⇒
+
+        val boundRelevantPendingUploadControlsIt =
+          for {
+            uploadControl ← doc.getControls.getCurrentControlTree.getUploadControls.iterator
+            if uploadControl.isRelevant && doc.isUploadPendingFor(uploadControl)
+            node          ← collectByErasedType[NodeInfo](uploadControl.getBoundItem)
+            if instance eq instance.model.getInstanceForNode(node)
+          } yield
+            uploadControl
+
+        boundRelevantPendingUploadControlsIt.nonEmpty
+      case None ⇒
+        false
+    }
+
 }

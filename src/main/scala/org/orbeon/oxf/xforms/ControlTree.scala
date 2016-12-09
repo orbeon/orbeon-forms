@@ -82,7 +82,12 @@ private class ControlIndex {
 
   def effectiveIdsToControls = _effectiveIdsToControls.asScala
 
-  def controlsOfName(name: String) = {
+  def controlsOfName(name: String): Iterable[XFormsControl] = {
+    val result = _controlTypes.get(name)
+    if (result ne null) result.asScala.values else Nil
+  }
+
+  def controlsOfNameAsMap(name: String) = {
     val result = _controlTypes.get(name)
     if (result ne null) result.asScala else collection.Map.empty[String, XFormsControl]
   }
@@ -263,8 +268,9 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def effectiveIdsToControls                 = _controlIndex.effectiveIdsToControls
   def findControlOrNull(effectiveId: String) = effectiveIdsToControls.getOrElse(effectiveId, null)
 
-  def getUploadControlsJava      = _controlIndex.controlsOfName(UPLOAD_NAME).values.asJava
-  def getRepeatControls          = _controlIndex.controlsOfName(REPEAT_NAME).values
-  def getDialogControls          = _controlIndex.controlsOfName(XXFORMS_DIALOG_NAME).values
-  def getSelectFullControlsAsMap = _controlIndex.controlsOfName(XFORMS_SELECT_QNAME.getName)
+  def getUploadControlsJava      = _controlIndex.controlsOfName(UPLOAD_NAME).asJava
+  def getUploadControls          = _controlIndex.controlsOfName(UPLOAD_NAME).asInstanceOf[Iterable[XFormsUploadControl]]
+  def getRepeatControls          = _controlIndex.controlsOfName(REPEAT_NAME).asInstanceOf[Iterable[XFormsRepeatControl]]
+  def getDialogControls          = _controlIndex.controlsOfName(XXFORMS_DIALOG_NAME).asInstanceOf[Iterable[XXFormsDialogControl]]
+  def getSelectFullControlsAsMap = _controlIndex.controlsOfNameAsMap(XFORMS_SELECT_QNAME.getName)
 }

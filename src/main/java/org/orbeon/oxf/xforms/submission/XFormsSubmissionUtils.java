@@ -25,7 +25,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -317,28 +316,5 @@ public class XFormsSubmissionUtils {
                 }
             }
         }
-    }
-
-    /**
-     * Returns whether there is at least one relevant upload control with pending upload bound to any node of the given instance.
-     *
-     * @param containingDocument    current XFormsContainingDocument
-     * @param currentInstance       instance to check or null
-     * @return                      true iif condition is satisfied
-     */
-    public static boolean hasBoundRelevantPendingUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
-        if (currentInstance != null && containingDocument.countPendingUploads() > 0) { // don't bother if there is no pending upload
-            for (XFormsControl currentControl : containingDocument.getControls().getCurrentControlTree().getUploadControlsJava()) {
-                final XFormsUploadControl currentUploadControl = (XFormsUploadControl) currentControl;
-                if (currentUploadControl.isRelevant() && containingDocument.isUploadPendingFor(currentUploadControl)) {
-                    final Item controlBoundItem = currentUploadControl.getBoundItem();
-                    if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.model().getInstanceForNode((NodeInfo) controlBoundItem)) {
-                        // Found one relevant upload control with pending upload bound to the instance we are submitting
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 }

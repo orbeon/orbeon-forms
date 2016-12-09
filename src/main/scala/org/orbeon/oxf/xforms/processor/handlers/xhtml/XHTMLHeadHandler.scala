@@ -290,8 +290,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
     val dialogsToOpen =
       for {
-        control       ← containingDocument.getControls.getCurrentControlTree.getDialogControls
-        dialogControl = control.asInstanceOf[XXFormsDialogControl]
+        dialogControl ← containingDocument.getControls.getCurrentControlTree.getDialogControls
         if dialogControl.isVisible
       } yield
         dialogControl

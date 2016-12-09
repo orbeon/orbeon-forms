@@ -117,14 +117,27 @@
                 </xf:action>
             </xf:var>
 
-            <!-- Update bound node from local date and time -->
+            <!--
+                Update bound node from local date and time
+
+                The logic is as follows:
+                1. If both date and time are valid, combine them with the `dateTime()` constructor.
+                   Compared to `concat(date, 'T', time), this ensure the timezone on the date isn't present in the result,
+                   and properly taken into account.
+                2. If both date and time are empty, result is empty.
+                3. Otherwise try to keep whatever invalid values the user entered, using 'T' as a separator, which means
+                   we need to remove potential 'T's from the date and time.
+            -->
             <xf:action
                     event="xforms-value-changed"
                     observer="date time">
                 <xf:setvalue
                     ref="$binding"
-                    value="if ($local-date/string() = '' and
-                               $local-time/string() = '')
+                    value="if ($local-date castable as xs:date and
+                               $local-time castable as xs:time)
+                           then dateTime(xs:date($local-date), xs:time($local-time))
+                           else if ($local-date/string() = '' and
+                                    $local-time/string() = '')
                            then ''
                            else
                                concat(translate($local-date/string(), 'T', ''),

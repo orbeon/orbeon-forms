@@ -145,7 +145,7 @@ object SubmissionUtils {
             uploadControl
 
         boundRelevantPendingUploadControlsIt.nonEmpty
-      case None ⇒
+      case _ ⇒
         false
     }
 

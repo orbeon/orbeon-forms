@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-	<info organisation="com.typesafe.sbt" module="sbt-uglify" revision="1.0.4-SNAPSHOT" status="integration" publication="20161123145842" e:sbtVersion="0.13" e:scalaVersion="2.10">
+	<info organisation="com.typesafe.sbt" module="sbt-uglify" revision="1.0.4-SNAPSHOT" status="integration" publication="20161209210641" e:sbtVersion="0.13" e:scalaVersion="2.10">
 		<description>
 		sbt-uglify
 		</description>

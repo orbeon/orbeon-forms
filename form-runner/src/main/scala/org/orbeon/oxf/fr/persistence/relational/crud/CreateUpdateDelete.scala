@@ -390,6 +390,10 @@ trait CreateUpdateDelete
       // Update database
       val versionSet = store(connection, req, existing, delete)
 
+      // Commit before reindexing, as reindexing will read back the form definition, which can
+      // cause a deadlock since we're still in the transaction writing the form definition
+      useAndClose(connection.prepareStatement("COMMIT"))(_.execute())
+
       // Update index
       val whatToReindex = req.dataPart match {
           case Some(dataPart) ⇒

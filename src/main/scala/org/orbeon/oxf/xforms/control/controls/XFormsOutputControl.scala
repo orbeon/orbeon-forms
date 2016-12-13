@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.util.ScalaUtils._
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -126,6 +127,7 @@ class XFormsOutputControl(
   private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: Option[String], mediatype: Option[String]): String =
     try {
       // If the value is a file: we make sure it is signed otherwise we return the default value
+
       def verifiedValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
         if ("file".equals(NetUtils.getProtocol(initial)) && ! XFormsUploadControl.verifyMAC(initial))
           default
@@ -143,43 +145,44 @@ class XFormsOutputControl(
           getHeader        = containingDocument.headersGetter
       )
 
-      if (StringUtils.isNotBlank(internalValue)) {
-        getBuiltinTypeName match {
-          case null | "anyURI" ⇒
-            val (maybeResolved, maybeProxied) =
-              if (! urlNorewrite) {
-                // Resolve xml:base and try to obtain a path which is an absolute path without the context
+      internalValue.trimAllToOpt match {
+        case Some(trimmedInternalValue) ⇒
+          getBuiltinTypeName match {
+            case null | "anyURI" ⇒
+              val (maybeResolved, maybeProxied) =
+                if (! urlNorewrite) {
+                  // Resolve xml:base and try to obtain a path which is an absolute path without the context
 
-                // NOTE: We also proxy data: URLs, even though we could send them to the client directly in many
-                // cases. One drawback is that they are are limited to 32 KB with IE8 (although IE8 support will
-                // go away soon hopefully, and IE 8 doesn't support the image annotation component which was the
-                // driver for data: URL support here), and in general make more sense for relatively short
-                // values. So for now we keep the proxying for data: URLs.
+                  // NOTE: We also proxy data: URLs, even though we could send them to the client directly in many
+                  // cases. One drawback is that they are are limited to 32 KB with IE8 (although IE8 support will
+                  // go away soon hopefully, and IE 8 doesn't support the image annotation component which was the
+                  // driver for data: URL support here), and in general make more sense for relatively short
+                  // values. So for now we keep the proxying for data: URLs.
 
-                val rebasedURI      = XFormsUtils.resolveXMLBase(containingDocument, element, internalValue)
-                val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
-                val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
-                val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
+                  val rebasedURI      = XFormsUtils.resolveXMLBase(containingDocument, element, trimmedInternalValue)
+                  val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
+                  val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
+                  val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
 
-                (resolvedURI, doProxyURI(resolvedURI, lastModified))
-              } else {
-                // Otherwise we leave the value as is
-                (internalValue, internalValue)
-              }
+                  (resolvedURI, doProxyURI(resolvedURI, lastModified))
+                } else {
+                  // Otherwise we leave the value as is
+                  (trimmedInternalValue, trimmedInternalValue)
+                }
 
-            verifiedValueOrDefault(
-              maybeResolved,
-              maybeProxied,
+              verifiedValueOrDefault(
+                maybeResolved,
+                maybeProxied,
+                defaultValue
+              )
+            case "base64Binary" ⇒
+              // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
+              doProxyURI(NetUtils.base64BinaryToAnyURI(trimmedInternalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
+            case _ ⇒
               defaultValue
-            )
-          case "base64Binary" ⇒
-            // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
-            doProxyURI(NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
-          case _ ⇒
-            defaultValue
-        }
-      } else {
-        defaultValue
+          }
+        case None ⇒
+          defaultValue
       }
     } catch {
       case NonFatal(t) ⇒

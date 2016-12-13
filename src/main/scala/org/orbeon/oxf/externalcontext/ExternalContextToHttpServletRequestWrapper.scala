@@ -100,10 +100,10 @@ class ExternalContextToHttpServletRequestWrapper(
     if (values eq null) null else values(0)
   }
 
-  override def getParameterMap: ju.Map[_, _] =
-    request.getParameterMap
+  override def getParameterMap: ju.Map[String, Array[String]] =
+    request.getParameterMap.asInstanceOf[ju.Map[String, Array[String]]] // TODO: we actually get an `Array[AnyRef]`
 
-  override def getParameterNames: ju.Enumeration[_] =
+  override def getParameterNames: ju.Enumeration[String] =
     ju.Collections.enumeration(request.getParameterMap.keySet)
 
   // Convert as parameters MAY contain FileItem values
@@ -143,10 +143,10 @@ class ExternalContextToHttpServletRequestWrapper(
 
   /* SUPPORTED: request attributes */
 
-  override def getAttribute(name: String)           : AnyRef            = request.getAttributesMap.get(name)
-  override def getAttributeNames                    : ju.Enumeration[_] = ju.Collections.enumeration(request.getAttributesMap.keySet)
-  override def removeAttribute(name: String)        : Unit              = request.getAttributesMap.remove(name)
-  override def setAttribute(name: String, o: AnyRef): Unit              = request.getAttributesMap.put(name, o)
+  override def getAttribute(name: String)           : AnyRef                 = request.getAttributesMap.get(name)
+  override def getAttributeNames                    : ju.Enumeration[String] = ju.Collections.enumeration(request.getAttributesMap.keySet)
+  override def removeAttribute(name: String)        : Unit                   = request.getAttributesMap.remove(name)
+  override def setAttribute(name: String, o: AnyRef): Unit                   = request.getAttributesMap.put(name, o)
 
   /* SUPPORTED: request headers */
 
@@ -168,13 +168,13 @@ class ExternalContextToHttpServletRequestWrapper(
     if (values eq null) null else values(0)
   }
 
-  override def getHeaderNames: ju.Enumeration[_] =
+  override def getHeaderNames: ju.Enumeration[String] =
     ju.Collections.enumeration(request.getHeaderValuesMap.keySet)
 
-  override def getHeaders(name: String): ju.Enumeration[_] = {
+  override def getHeaders(name: String): ju.Enumeration[String] = {
     val values = request.getHeaderValuesMap.get(name)
     ju.Collections.enumeration(
-      if (values ne null) ju.Arrays.asList(values) else ju.Collections.emptyList[Any]
+      if (values ne null) ju.Arrays.asList(values: _*) else ju.Collections.emptyList[String]
     )
   }
 
@@ -216,9 +216,9 @@ class ExternalContextToHttpServletRequestWrapper(
    * DELEGATED: other client information
    */
 
-  override def getLocale                     : ju.Locale         = super.getLocale
-  override def getLocales                    : ju.Enumeration[_] = super.getLocales
-  override def getCookies                    : Array[Cookie]     = super.getCookies
+  override def getLocale                     : ju.Locale                 = super.getLocale
+  override def getLocales                    : ju.Enumeration[ju.Locale] = super.getLocales
+  override def getCookies                    : Array[Cookie]             = super.getCookies
 
   /*
    * DELEGATED: remote host

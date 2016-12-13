@@ -164,7 +164,7 @@
 
             -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
-            -libraryjars lib/provided/servlet-2_3-4_0_4.jar
+            -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
             -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
             -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
@@ -214,7 +214,7 @@
 
             -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
-            -libraryjars lib/provided/servlet-2_3-4_0_4.jar
+            -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
             -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
             -libraryjars lib/provided/liferay-portal-kernel-7.0.jar
@@ -266,7 +266,7 @@
 
             -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
-            -libraryjars lib/provided/servlet-2_3-4_0_4.jar
+            -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
             -libraryjars lib/provided/liferay-portal-service-6.1.1.jar
             -libraryjars lib/provided/liferay-portal-kernel-7.0.jar

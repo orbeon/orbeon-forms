@@ -56,9 +56,11 @@ val CoreLibraryDependencies = Seq(
   "mysql"                     % "mysql-connector-java" % "5.1.26"          % Test, // 6.0.5,
   "org.postgresql"            % "postgresql"           % "9.3-1102-jdbc4"  % Test,
   "org.seleniumhq.selenium"   % "selenium-java"        % "2.45.0"          % Test  // 3.0.1
-//      "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
-//      "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
-) map (_.exclude("commons-logging", "commons-logging")) // because we have jcl-over-slf4j
+//  "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
+//  "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
+) map
+  (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
+  (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided
 
 val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
 val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"

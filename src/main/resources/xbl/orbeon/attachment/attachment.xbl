@@ -47,12 +47,9 @@
                 <view>
                      <fr:attachment id="" ref="" class="fr-attachment">
                         <xf:label ref=""/>
-                        <xf:hint ref=""/>
-                        <xf:help ref=""/>
+                        <xf:hint  ref=""/>
+                        <xf:help  ref=""/>
                         <xf:alert ref=""/>
-                        <xf:filename ref="@filename"/>
-                        <xf:mediatype ref="@mediatype"/>
-                        <xxf:size ref="@size"/>
                     </fr:attachment>
                 </view>
             </templates>
@@ -78,11 +75,14 @@
         </xbl:implementation>
         <xbl:template>
             <xf:upload ref="xxf:binding('fr-attachment')" xbl:attr="accept" xxf:title="{xxf:label('fr-attachment')}">
-                <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                <xxf:size     ref="@size"      xxbl:scope="outer"/>
             </xf:upload>
             <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[xxf:non-blank()]">
                 <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
-                <xbl:content includes=":root > xf|filename, :root > xf|mediatype"/>
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xf:header ref="fr:form-version()">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>

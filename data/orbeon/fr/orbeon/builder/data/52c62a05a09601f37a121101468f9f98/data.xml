@@ -463,9 +463,6 @@
                                     <xf:hint ref="$form-resources/image/hint"/>
                                     <xf:help ref="$form-resources/image/help"/>
                                     <xf:alert ref="$form-resources/image/alert"/>
-                                    <xf:filename ref="@filename"/>
-                                    <xf:mediatype ref="@mediatype"/>
-                                    <xxf:size ref="@size"/>
                                 </fr:image-attachment>
                             </xh:td>
                         </xh:tr>

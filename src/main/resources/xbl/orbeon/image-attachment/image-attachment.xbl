@@ -52,9 +52,6 @@
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
                         <xf:alert ref=""/>
-                        <xf:filename ref="@filename"/>
-                        <xf:mediatype ref="@mediatype"/>
-                        <xxf:size ref="@size"/>
                     </fr:image-attachment>
                 </view>
             </templates>
@@ -62,9 +59,13 @@
 
         <xbl:template>
             <xf:upload ref="xxf:binding('fr-image-attachment')" accept="image/*">
-                <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                <xxf:size     ref="@size"      xxbl:scope="outer"/>
             </xf:upload>
             <xf:output mediatype="image/*" ref="xxf:binding('fr-image-attachment')[xxf:non-blank()]">
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xf:header ref="fr:form-version()">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>

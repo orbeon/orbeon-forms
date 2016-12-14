@@ -88,12 +88,11 @@ class XFormsOutputControl(
     val updatedValue =
       if (appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
         // Download appearance
-        // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
         proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatype)
       } else if (mediatype exists (_.startsWith("image/"))) {
         // Image mediatype
         // Use dummy image as default value so that client always has something to load
-        proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, mediatype)
+        proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, fileMediatype orElse mediatype)
       } else if (mediatype contains "text/html") {
         // HTML mediatype
         internalValue

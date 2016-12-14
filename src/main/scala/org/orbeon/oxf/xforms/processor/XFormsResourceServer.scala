@@ -75,20 +75,18 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
         // TODO: for Safari, try forcing application/octet-stream
         // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
-        response.setContentType(resource.contentType getOrElse "application/octet-stream")
+        response.setContentType(resource.contentType)
 
         // File name visible by the user
-        val rawFilename = resource.filename getOrElse digestFromPath
+        val rawFilename = resource.filenameOpt getOrElse digestFromPath
 
         def addExtensionIfNeeded(filename: String) =
           findExtension(filename) match {
             case Some(_) ⇒
               filename
             case None    ⇒
-              resource.contentType                 map
-              NetUtils.getContentTypeMediaType     flatMap
-              Mediatypes.findExtensionForMediatype map
-              (filename + "." +)                   getOrElse
+              Mediatypes.findExtensionForMediatype(resource.mediaType) map
+              (filename + "." +)                                       getOrElse
               filename
           }
 
@@ -268,29 +266,13 @@ object XFormsResourceServer {
         logger           = logger
       )
 
-    // Create a digest, so that for a given URI we always get the same key
-    //
-    // 2015-09-02: Also digest header name/values, as they matter for example if a resource includes a
-    // version number in a header. Headers will include headers explicitly set on `xf:output` with `xf:header`,
-    // as well as `Accept`, `User-Agent`, and `Orbeon-Token`.
-    // One question is what to do with `Orbeon-Token`. We could exclude it from the digest just in case, for
-    // security reasons, but 1) `digest()` should be safe and 2) after a restart, if the session is restored,
-    // the token will have changed anyway, so it's better if the digest does not include it as things won't
-    // work anyway. On the other hand, unit tests fail if `Orbeon-Token` keeps changing. Not sure what's the best
-    // here, but for now filtering out. In addition, that's what we used to do before.
-
-    // Just digest a key produced with `toString`, since we know that tuples, `List` and `Map` produce
-    // a reasonable output with `toString`.
-    val key    = (uri, outgoingHeaders filterNot (_._1.equalsIgnoreCase("Orbeon-Token"))).toString
-    val digest = SecureUtils.digestString(key, "hex")
-
     val resource =
-      DynamicResource(digest, serviceURI, filename, contentType, -1, lastModified, outgoingHeaders)
+      DynamicResource(serviceURI, filename, contentType, lastModified, outgoingHeaders)
 
     // Store mapping into session
-    session.getAttributesMap(ApplicationSessionScope).put(DynamicResourcesSessionKey + digest, resource)
+    session.getAttributesMap(ApplicationSessionScope).put(DynamicResourcesSessionKey + resource.digest, resource)
 
-    DynamicResourcesPath + digest
+    DynamicResourcesPath + resource.digest
   }
 
   // For Java callers
@@ -342,12 +324,57 @@ object XFormsResourceServer {
   case class DynamicResource(
     digest       : String,
     uri          : URI,
-    filename     : Option[String],
-    contentType  : Option[String],
+    filenameOpt  : Option[String],
+    contentType  : String,
+    mediaType    : String,
     size         : Long,
     lastModified : Long,
     headers      : Map[String, List[String]]
   )
+
+  object DynamicResource {
+    def apply(
+      uri            : URI,
+      filenameOpt    : Option[String],
+      contentTypeOpt : Option[String],
+      lastModified   : Long,
+      headers        : Map[String, List[String]]
+    ): DynamicResource = {
+
+      // Create a digest, so that for a given URI we always get the same key
+      //
+      // 2015-09-02: Also digest header name/values, as they matter for example if a resource includes a
+      // version number in a header. Headers will include headers explicitly set on `xf:output` with `xf:header`,
+      // as well as `Accept`, `User-Agent`, and `Orbeon-Token`.
+      // One question is what to do with `Orbeon-Token`. We could exclude it from the digest just in case, for
+      // security reasons, but 1) `digest()` should be safe and 2) after a restart, if the session is restored,
+      // the token will have changed anyway, so it's better if the digest does not include it as things won't
+      // work anyway. On the other hand, unit tests fail if `Orbeon-Token` keeps changing. Not sure what's the best
+      // here, but for now filtering out. In addition, that's what we used to do before.
+
+      // Just digest a key produced with `toString`, since we know that tuples, `List` and `Map` produce
+      // a reasonable output with `toString`.
+      val key    = (uri, headers filterNot (_._1.equalsIgnoreCase("Orbeon-Token"))).toString
+      val digest = SecureUtils.digestString(key, "hex")
+
+      val mediatypeOpt        = contentTypeOpt map NetUtils.getContentTypeMediaType
+      val incompleteMediatype = mediatypeOpt exists (_.endsWith("/*"))
+
+      val contentType =
+        contentTypeOpt filterNot (_ ⇒ incompleteMediatype) getOrElse "application/octet-stream"
+
+      DynamicResource(
+        digest       = digest,
+        uri          = uri,
+        filenameOpt  = filenameOpt,
+        contentType  = contentType,
+        mediaType    = NetUtils.getContentTypeMediaType(contentType),
+        size         = -1,
+        lastModified = lastModified,
+        headers      = headers
+      )
+    }
+  }
 
   private def filename(requestPath: String) =
     requestPath.substring(requestPath.lastIndexOf('/') + 1)

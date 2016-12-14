@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.NodeInfo
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.util.control.NonFatal
 
@@ -70,10 +71,10 @@ trait FileMetadata extends XFormsValueControl {
     props.values foreach (_.handleMarkDirty())
 
   // Getters
-  def state                 = props("state")           .value
-  def fileMediatype         = Option(props("mediatype").value)
-  def filename              = Option(props("filename") .value)
-  def fileSize              = Option(props("size")     .value)
+  def state                 = props("state")    .value
+  def fileMediatype         = props("mediatype").value.trimAllToOpt
+  def filename              = props("filename") .value.trimAllToOpt
+  def fileSize              = props("size")     .value.trimAllToOpt
 
   def iterateProperties = props.iterator map {
     case (k, v) ⇒ k → Option(v.value)

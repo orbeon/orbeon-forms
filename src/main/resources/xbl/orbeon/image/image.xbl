@@ -38,12 +38,14 @@
             </icon>
             <templates>
                 <bind type="xf:anyURI"/>
-                <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
+                <!-- NOTE: `mediatype` so we can serve it, and `filename` for information. See:
+                     https://github.com/orbeon/orbeon-forms/issues/3042 -->
+                <instance filename="" mediatype=""/>
                 <view>
                      <fr:image id="" ref="" class="fr-static-attachment">
-                        <xf:label ref=""/>
-                        <xf:help ref=""/>
-                        <xf:alert ref=""/>
+                         <xf:label ref=""/>
+                         <xf:help  ref=""/>
+                         <xf:alert ref=""/>
                     </fr:image>
                 </view>
             </templates>
@@ -51,6 +53,8 @@
 
         <xbl:template>
             <xf:output ref="xxf:binding('fr-image')" mediatype="image/*" xxf:alt="{xxf:label('fr-image')}">
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xf:header ref="fr:form-version()">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>

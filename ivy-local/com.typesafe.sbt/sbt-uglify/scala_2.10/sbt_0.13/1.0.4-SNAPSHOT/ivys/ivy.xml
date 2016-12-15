@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
-	<info organisation="com.typesafe.sbt" module="sbt-uglify" revision="1.0.4-SNAPSHOT" status="integration" publication="20161209210641" e:sbtVersion="0.13" e:scalaVersion="2.10">
+	<info organisation="com.typesafe.sbt" module="sbt-uglify" revision="1.0.4-SNAPSHOT" status="integration" publication="20161214210832" e:sbtVersion="0.13" e:scalaVersion="2.10">
 		<description>
 		sbt-uglify
 		</description>
@@ -31,7 +31,7 @@
 		
 		<dependency org="org.scala-lang" name="scala-library" rev="2.10.4" conf="provided->default(compile)"/>
 		<dependency org="org.scala-sbt" name="sbt" rev="0.13.13" conf="provided->default(compile)"/>
-		<dependency org="org.webjars.npm" name="uglify-js" rev="2.7.3" conf="compile->default(compile)"/>
+		<dependency org="org.webjars.npm" name="uglify-js" rev="2.7.5" conf="compile->default(compile)"/>
 		<dependency org="com.typesafe.sbt" name="sbt-js-engine" rev="1.1.4" conf="compile->default(compile)" e:sbtVersion="0.13" e:scalaVersion="2.10"/>
 		<dependency org="com.typesafe.sbt" name="sbt-web" rev="1.4.0" conf="compile->default(compile)" e:sbtVersion="0.13" e:scalaVersion="2.10"/>
 		

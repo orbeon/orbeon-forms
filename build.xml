@@ -15,7 +15,7 @@
 
     <!-- Properties to update when version number changes -->
 
-    <property name="version.number" value="2016.3-SNAPSHOT"/>
+    <property name="version.number" value="2016.4-SNAPSHOT"/>
     <property name="edition"        value="CE"/>
 
     <property file="build-local.properties"/>

@@ -537,18 +537,19 @@
         <xsl:if test="not($is-form-builder)">
             <fr:row>
                 <fr:error-summary
-                        id="error-summary-control-{$position}"
-                        observer="fr-form-group fr-captcha-group"
-                        model="fr-error-summary-model"
-                        alerts-count-ref="counts/@alert"
-                        errors-count-ref="counts/@error"
-                        warnings-count-ref="counts/@warning"
-                        infos-count-ref="counts/@info"
-                        visible-alerts-count-ref="visible-counts/@alert"
-                        visible-errors-count-ref="visible-counts/@error"
-                        visible-warnings-count-ref="visible-counts/@warning"
-                        visible-infos-count-ref="visible-counts/@info"
-                        valid-ref="valid">
+                    id="error-summary-control-{$position}"
+                    observer="fr-form-group fr-captcha-group"
+                    model="fr-error-summary-model"
+                    alerts-count-ref="counts/@alert"
+                    errors-count-ref="counts/@error"
+                    warnings-count-ref="counts/@warning"
+                    infos-count-ref="counts/@info"
+                    visible-alerts-count-ref="visible-counts/@alert"
+                    visible-errors-count-ref="visible-counts/@error"
+                    visible-warnings-count-ref="visible-counts/@warning"
+                    visible-infos-count-ref="visible-counts/@info"
+                    valid-ref="valid"
+                >
                     <fr:label>
                         <!-- If there are e.g. some errors AND warnings, the formatter will display a generic word such as "message" -->
                         <xf:output

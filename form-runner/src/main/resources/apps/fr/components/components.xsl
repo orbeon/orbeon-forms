@@ -111,7 +111,6 @@
                 'full'
             )[1]"/>
 
-    <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
     <xsl:variable
         name="validation-mode"
         as="xs:string"
@@ -121,11 +120,15 @@
                 'incremental'
             )[1]"/>
 
+    <xsl:variable
+        name="custom-model"
+        as="xs:anyURI?"
+        select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
     <xsl:variable
         name="enable-initial-focus"
-        select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))"/>
 
     <!-- fr:section and fr:grid configuration -->
     <xsl:variable
@@ -135,36 +138,37 @@
 
     <xsl:variable
         name="is-fr-section-animate"
-        select="not($is-noscript) and not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.')) = false())"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="not($is-noscript) and not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-animate-sections"
-        select="$is-ajax-section-animate and $is-fr-section-animate"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="$is-ajax-section-animate and $is-fr-section-animate"/>
 
     <xsl:variable
         name="is-noscript-section-collapse"
-        select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-ajax-section-collapse"
-        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-fr-section-collapsible"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapsible', $app, $form), '.')) = false())"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapsible', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-fr-section-noscript-collapsible"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.noscript.collapsible', $app, $form), '.')) = false())"
-        as="xs:boolean"/>
+        as="xs:boolean"
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.noscript.collapsible', $app, $form), '.')) = false())"/>
 
     <xsl:variable
         name="is-section-collapsible"
+        as="xs:boolean"
         select="
             (
                 not($is-noscript)             and
@@ -174,28 +178,27 @@
                 $is-noscript                  and
                 $is-noscript-section-collapse and
                 $is-fr-section-noscript-collapsible
-            )"
-        as="xs:boolean"/>
+            )"/>
 
     <xsl:variable
         name="section-appearance"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.section.appearance', $app, $form), '.'))[normalize-space()]"
-        as="xs:string?"/>
+        as="xs:string?"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.appearance', $app, $form), '.'))[normalize-space()]"/>
 
     <xsl:variable
         name="grid-appearance"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'))[normalize-space()]"
-        as="xs:string?"/>
+        as="xs:string?"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'))[normalize-space()]"/>
 
     <xsl:variable
         name="section-insert"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.section.insert', $app, $form), '.'))[normalize-space()]"
-        as="xs:string?"/>
+        as="xs:string?"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.insert', $app, $form), '.'))[normalize-space()]"/>
 
     <xsl:variable
         name="grid-insert"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.insert', $app, $form), '.'))[normalize-space()]"
-        as="xs:string?"/>
+        as="xs:string?"
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.insert', $app, $form), '.'))[normalize-space()]"/>
 
     <xsl:template match="/xh:html">
         <!-- Handle document language -->

@@ -24,8 +24,12 @@ import org.orbeon.scaxon.XML._
 object Wizard {
 
   //@XPathFunction
-  def isWizardValidate =
-    formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) contains "true"
+  def wizardMode: String =
+    formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) match {
+      case Some("true" | "lax") ⇒ "lax"
+      case Some("strict")       ⇒ "strict"
+      case _                    ⇒ "false"
+    }
 
   //@XPathFunction
   def isWizardSeparateToc =

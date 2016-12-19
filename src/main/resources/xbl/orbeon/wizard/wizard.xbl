@@ -65,7 +65,7 @@
 
                 <xf:var name="local" value="instance('local')"/>
 
-                <xf:bind ref="validate"     type="xs:boolean" xxf:default="Wizard:isWizardValidate()"/>
+                <xf:bind ref="validate"                       xxf:default="Wizard:wizardMode()"/>
                 <xf:bind ref="separate-toc" type="xs:boolean" xxf:default="Wizard:isWizardSeparateToc()"/>
                 <xf:bind ref="show-toc"     type="xs:boolean" xxf:default="true()"/>
                 <xf:bind ref="show-body"    type="xs:boolean" xxf:default="not(Wizard:isWizardSeparateToc())"/>
@@ -214,12 +214,22 @@
                                                 select="concat('''', frf:controlNameFromId($static-section-id), '''')"
                                                 xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                                         </xsl:if>
+
+                                        <!-- Visit current section when leaving it -->
                                         <xxf:setvisited
                                             event="xforms-deselect"
                                             target="#observer"
                                             control="{{event('xxf:targetid')}}"
                                             visited="true"
                                             recurse="true"/>
+
+                                        <!-- Un-visit all subsequent sections upon error in current section in `strict` mode -->
+                                        <xf:dispatch
+                                            event="xforms-invalid"
+                                            if="xxf:instance('local')/validate/data(.) = 'strict'"
+                                            name="fr-wizard-unvisit-following"
+                                            targetid="fr-wizard-unvisit-following"/>
+
                                         <xf:action event="xforms-select" target="#observer">
                                             <xf:dispatch name="fr-section-scroll" targetid="switch"/>
 
@@ -230,6 +240,7 @@
                                             </xf:dispatch>
 
                                         </xf:action>
+
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
@@ -318,7 +329,7 @@
 
                                 <xf:var
                                     name="validated-mode"
-                                    value="xxf:instance('local')/validate/data(.)"/>
+                                    value="xxf:instance('local')/validate/data(.) != 'false'"/>
 
                                 <xf:var
                                     name="separate-toc-mode"
@@ -414,9 +425,17 @@
                                 <xf:var
                                     name="allow-next-top-level"
                                     value=
-                                        "not($validated-mode)
+                                        "
+                                         (: Free mode :)
+                                         not($validated-mode)
+                                         (: Heuristic, see #2602 :)
                                          or $is-edit-final
-                                         or xxf:visited($next-top-level-case-ids[1])
+                                         (: Allow if next is visited if lax :)
+                                         or (
+                                            xxf:instance('local')/validate/data(.) = 'lax' and
+                                            xxf:visited($next-top-level-case-ids[1])
+                                         )
+                                         (: No errors :)
                                          or not(
                                             exists(
                                                 ErrorSummary:topLevelSectionsWithErrors(
@@ -453,7 +472,7 @@
                                 <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
                                 <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
 
-                                <!-- This ids are used to expose visibility to buttons outside the wizard -->
+                                <!-- This id is used to expose visibility to buttons outside the wizard -->
                                 <xf:group
                                     id="fr-wizard-submit-hide"
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
@@ -543,9 +562,17 @@
                                                 </xf:trigger>
                                             </xh:li>
                                         </xh:ul>
-                                        <!-- We put this here so that `$do-next-handler` has the right variables in scope -->
+                                        <!-- We put these here so that `$do-next-handler` has the right variables in scope -->
                                         <xf:group id="fr-wizard-update-validity" appearance="xxf:internal">
                                             <xsl:copy-of select="$do-next-handler"/>
+                                        </xf:group>
+                                        <xf:group id="fr-wizard-unvisit-following" appearance="xxf:internal">
+                                            <xxf:setvisited
+                                                event="fr-wizard-unvisit-following"
+                                                iterate="$next-nav-case-ids"
+                                                control="{{.}}"
+                                                visited="false"
+                                                recurse="true"/>
                                         </xf:group>
                                     </xh:div>
                                 </xh:div>

@@ -1134,8 +1134,7 @@
 
                                     var templateClone = template.cloneNode(true);
 
-                                    // Handle empty string explicitly as otherwise $.parseHTML("") returns null
-                                    var parsedLabel = itemElement.label == "" ? [] : $.parseHTML(itemElement.label);
+                                    var parsedLabel = $.parseHTML(itemElement.label);
                                     ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-label$", parsedLabel, true);
                                     ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-value$", itemElement.value, false);
                                     var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
@@ -1149,7 +1148,8 @@
                                     }
 
                                     if (itemElement.hint && itemElement.hint != "") {
-                                        ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-hint$", itemElement.hint, false);
+                                        var parsedHint = $.parseHTML(itemElement.hint);
+                                        ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-hint$", parsedHint, true);
                                     } else {
                                         $(templateClone).find('.xforms-hint-region').removeAttr("class");
                                         $(templateClone).find('.xforms-hint').remove();

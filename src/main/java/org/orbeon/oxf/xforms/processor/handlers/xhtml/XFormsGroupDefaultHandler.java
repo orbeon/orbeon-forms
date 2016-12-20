@@ -34,7 +34,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
         super.init(uri, localname, qName, attributes, matched);
 
         // Use explicit container element name if present, otherwise use default
-        final QName explicitQName = ((ContainerControl) containingDocument.getStaticOps().getControlAnalysis(getPrefixedId())).elementQName();
+        final QName explicitQName = (matched instanceof ContainerControl) ? ((ContainerControl) matched).elementQName() : null;
         if (explicitQName != null) {
             elementName = explicitQName.getName();
             elementQName = explicitQName.getQualifiedName();

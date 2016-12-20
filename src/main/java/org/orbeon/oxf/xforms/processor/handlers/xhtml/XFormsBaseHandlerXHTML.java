@@ -379,7 +379,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         Attributes attributes,
         String targetControlEffectiveId,
         String forEffectiveId,
-        LHHAC lhha,
+        XFormsBaseHandler.LHHAC lhha,
         String elementName,
         String labelValue,
         boolean mustOutputHTMLFragment,
@@ -395,7 +395,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         Attributes attributes,
         String targetControlEffectiveId,
         String forEffectiveId,
-        LHHAC lhha,
+        XFormsBaseHandler.LHHAC lhha,
         String elementName,
         boolean addIds
     ) throws SAXException {

@@ -1054,7 +1054,10 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             replaceInDOM: function(element, needle, replacements, isHTML) {
 
                 var createTextNode = _.bind(document.createTextNode, document);
-                var replacementNodes = isHTML ? replacements : [createTextNode(replacements)];
+                var replacementNodes = 
+                    isHTML ?
+                    (replacements == null ? [] : replacements) :
+                    [createTextNode(replacements)];
                 var replaceInText  = ORBEON.util.Utils.replaceInText;
 
                 function worker(node) {

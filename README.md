@@ -23,7 +23,7 @@ What's new
 - [Orbeon Forms 2016.3](http://blog.orbeon.com/2016/12/orbeon-forms-20163.html)
 - [Orbeon Forms 2016.2.2](http://blog.orbeon.com/2016/11/orbeon-forms-201622-pe.html)
 - [Orbeon Forms 2016.2.1](http://blog.orbeon.com/2016/09/orbeon-forms-201621.html)
-- [Orbeon Forms 2016.2](http://blog.orbeon.com/2016/07/orbeon-forms-20162.html)
+- [Orbeon Forms 2016.2](http://blog.orbeon.com/2016/08/orbeon-forms-20162.html)
 - [Orbeon Forms 2016.1.1](http://blog.orbeon.com/2016/10/orbeon-forms-201611-pe.html)
 - [Orbeon Forms 2016.1](http://blog.orbeon.com/2016/04/orbeon-forms-20161.html)
 - [Orbeon Forms 4.10.2](http://blog.orbeon.com/2015/12/orbeon-forms-4102.html)
@@ -170,7 +170,7 @@ In addition, this product includes the following software:
 - [eXist](http://exist-db.org/)
 - [Flying Saucer](http://code.google.com/p/flying-saucer/)
 - [iText](http://itextpdf.com/)
-- [Jaxen](http://jaxen.org/)
+- Jaxen
 - [JCIFS](http://jcifs.samba.org/)
 - [JCommon](http://www.jfree.org/jcommon/)
 - [JFreeChart](http://www.jfree.org/jfreechart/)
@@ -180,7 +180,7 @@ In addition, this product includes the following software:
 - [SAXPath](http://sourceforge.net/projects/saxpath/)
 - [Scala](http://www.scala-lang.org/)
 - [ScalaTest](http://www.scalatest.org/)
-- [TagSoup](http://home.ccil.org/~cowan/XML/tagsoup/)
+- TagSoup
 - [Sun Multi-Schema XML Validator](https://msv.java.net/)
 - [YUI Compressor](https://yui.github.io/yuicompressor/)
 - [YUI Library](http://yuilibrary.com/)

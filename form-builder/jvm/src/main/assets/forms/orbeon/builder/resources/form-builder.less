@@ -29,7 +29,7 @@ body.orbeon {
     width: 100vw;
     height: 100vh;
     .box-sizing(border-box);
-    background-color: #999;
+    background-color: @grayLight;
 }
 
 // Case of embedded Form Builder: size with some defaults (expecting that the embedding code will override this)
@@ -40,8 +40,8 @@ div.orbeon.orbeon-portlet-div {
     width: 98vw;
     bottom: 1vh;
     box-sizing: border-box;
-    background-color: #999;
-    background-color: orangered; // xxx tmp
+    border: 1px solid @grayLight;
+    background-color: @grayLight;
 
     .fr-summary-button, .fr-new-button {
         display: none;
@@ -734,7 +734,7 @@ div.orbeon.orbeon-portlet-div {
 
     // Hide XForms Inspector in Form Builder, since it doesn't show properly in Form Builder
     .xbl-fr-xforms-inspector {
-        //display: none;
+        display: none;
     }
 }
 

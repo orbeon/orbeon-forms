@@ -90,7 +90,7 @@ trait GridOps extends ContainerOps {
   }
 
   // Width of the grid in columns
-  def getGridSize(grid: NodeInfo) = (grid \ "*:tr")(0) \ "*:td" size
+  def getGridSize(grid: NodeInfo) = (grid \ "*:tr").headOption.to[List] \ "*:td" size
 
   def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
     case Some(rowspan) ⇒
@@ -525,7 +525,7 @@ trait GridOps extends ContainerOps {
     deleteContainerById(canDeleteGrid, gridId)
 
   def canDeleteRow(grid: NodeInfo): Boolean = (grid \ "*:tr").length > 1
-  def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").head \ "*:td").length > 1
+  def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").headOption.to[List] \ "*:td").length > 1
 
   private val DeleteTests = List(
     "grid" → canDeleteGrid _,

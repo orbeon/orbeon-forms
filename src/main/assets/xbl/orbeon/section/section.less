@@ -17,14 +17,16 @@
         display: block;
 
         h2, h3, h4, h5, h6 {
-            #gradient > .vertical(@grayLighter, @grayLighter);
-            margin: 0;
-            text-align: left;
-            font-weight: normal;
-            padding: 0;
-            color: @frHeaderColor;
-            font-size: @frSectionTitleHeight;
-            line-height: @frSectionTitleLineHeight;
+            &.fr-section-title {
+                #gradient > .vertical(@grayLighter, @grayLighter);
+                margin: 0;
+                text-align: left;
+                font-weight: normal;
+                padding: 0;
+                color: @frHeaderColor;
+                font-size: @frSectionTitleHeight;
+                line-height: @frSectionTitleLineHeight;
+            }
         }
 
         .fr-section-title {

@@ -40,7 +40,17 @@
             this.serverValueOutputId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-server-value', null, this.container)[0].id;
 
             // Create TinyMCE editor instance
-            var tinyMceConfig = typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ? TINYMCE_CUSTOM_CONFIG : YAHOO.xbl.fr.Tinymce.DefaultConfig;
+            var tinyMceConfig = (function() {
+                // Use global TINYMCE_CUSTOM_CONFIG is setup by users
+                var config =
+                    typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ?
+                    TINYMCE_CUSTOM_CONFIG :
+                    YAHOO.xbl.fr.Tinymce.DefaultConfig;
+                // Our onchange listener, not using onChange as it doesn't work with the fullscreen plugin
+                config.onchange_callback = _.bind(this.clientToServer, this);
+                return config;
+            }).call(this);
+            tinyMceConfig.onchange_callback = _.bind(this.clientToServer, this);
             var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
             var tabindex = $(tinyMceDiv).attr('tabindex');
             this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig);
@@ -57,7 +67,6 @@
                 if (!_.isUndefined(tabindex)) iframe.attr('tabindex', tabindex);
                 this.tinymceInitialized = true;
             }, this));
-            this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
             // Render the component when visible (see https://github.com/orbeon/orbeon-forms/issues/172)
             // - unfortunately, we need to use polling; can't use Ajax response e.g. if in Bootstrap tab, as
@@ -75,7 +84,8 @@
 
         // Send value in MCE to server
         clientToServer: function() {
-            var content = this.myEditor.getContent();
+            var editor = arguments[0];
+            var content = editor.getContent();
             // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
             if (content == '<div>\xa0</div>') content = '';
             ORBEON.xforms.Document.dispatchEvent({

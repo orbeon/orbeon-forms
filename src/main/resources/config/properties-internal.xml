@@ -238,7 +238,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-textarea.*"                 value="textarea"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                   value="select-labels-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                  value="select-label"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state"                       value="select-label"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state.*"                     value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"              value="attachment-metadata"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"        value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="fr-number"/>

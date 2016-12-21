@@ -202,7 +202,7 @@
         refresh summary clear pdf tiff save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
-    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state"                   value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state.*"                 value="select-value"/>
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.dmv-14"                value="wizard"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>

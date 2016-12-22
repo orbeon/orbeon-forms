@@ -101,7 +101,10 @@
 
         sendValueToServer: function() {
             var newValue = this.visibleInputElement.value;
-            Document.setValue(this.xformsInputElement, newValue);
+            var xformsValue = Document.getValue(this.xformsInputElement);
+            // Document.setValue() doesn't automatically avoid sending the value if it hasn't changed
+            if (newValue != xformsValue)
+                Document.setValue(this.xformsInputElement, newValue);
         },
 
         getEditString: function() {

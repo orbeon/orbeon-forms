@@ -117,8 +117,10 @@ private object FormRunnerFunctions {
   )
 
   val DateTimeGettersByName = List(
-    "created-date"         → (() ⇒ FormRunner.documentCreatedDate),
-    "modified-date"        → (() ⇒ FormRunner.documentModifiedDate)
+    "created-dateTime"     → (() ⇒ FormRunner.documentCreatedDate),
+    "modified-dateTime"    → (() ⇒ FormRunner.documentModifiedDate),
+    "created-date"         → (() ⇒ FormRunner.documentCreatedDate), // only keep until 2017.1 or 2017.2 for backward compatibility
+    "modified-date"        → (() ⇒ FormRunner.documentModifiedDate) // only keep until 2017.1 or 2017.2 for backward compatibility
   )
 
   val IndexedStringFunctions = (

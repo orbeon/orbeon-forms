@@ -19,7 +19,6 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary">
 
     <!--
@@ -423,11 +422,20 @@ Inserting error information into error list:
                                 <xf:group ref=".[exists($visible-errors-for-section)]">
                                     <xh:ol class="fr-error-group">
                                         <xf:repeat ref="$visible-errors-for-section" id="er">
-                                            <xh:li class="fr-level-{{@level}}">
+                                            <xh:li class="fr-level-{{@level}} fr-error-{{if (starts-with(@alert, '&lt;ul>')) then 'multiple' else 'single'}}">
                                                 <!-- Clickable / linkable label -->
                                                 <xf:var
-                                                    name="label"
-                                                    value="if (xxf:non-blank(@label)) then @label else '&lt;i class=&quot;icon-arrow-right&quot;/>'"/>
+                                                    name="label-or-placeholder"
+                                                    value="
+                                                        if (xxf:non-blank(@label)) then
+                                                            concat(
+                                                                '&lt;span class=&quot;fr-error-label&quot;>',
+                                                                @label,
+                                                                '&lt;/span>'
+                                                            )
+
+                                                        else
+                                                            '&lt;span/>'"/>
                                                 <xf:var
                                                     name="focusable"
                                                     value="xxf:focusable(@absolute-id)"/>
@@ -436,30 +444,37 @@ Inserting error information into error list:
                                                 <xf:switch class="fr-error-link" caseref="$noscript" xxf:xforms11-switch="true">
                                                     <xf:case value="true()">
                                                         <!-- Use a plain link to the client id -->
-                                                        <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="$label" class="fr-error-label"/></xh:a>
+                                                        <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="$label-or-placeholder" class="fr-error-label"/></xh:a>
                                                     </xf:case>
                                                     <xf:case value="false()">
                                                         <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
                                                             <xf:case value="true()">
-                                                                <xf:trigger appearance="minimal" class="fr-error-label">
-                                                                    <xf:label mediatype="text/html" value="$label"/>
+                                                                <xf:trigger appearance="minimal">
+                                                                    <xf:label>
+                                                                        <xf:output
+                                                                            mediatype="text/html"
+                                                                            value="$label-or-placeholder"/>
+                                                                        <span class="fr-error-alert fr-error-alert-{{@level}}">
+                                                                            <xf:output
+                                                                                mediatype="text/html"
+                                                                                value="@alert"/>
+                                                                        </span>
+                                                                    </xf:label>
                                                                     <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
                                                                 </xf:trigger>
                                                             </xf:case>
                                                             <xf:case value="false()">
                                                                 <xf:output
-                                                                    class="fr-error-label"
                                                                     mediatype="text/html"
-                                                                    value="$label"/>
+                                                                    value="$label-or-placeholder"/>
+                                                                <xf:output
+                                                                    class="fr-error-alert fr-error-alert-{{@level}}"
+                                                                    mediatype="text/html"
+                                                                    value="@alert"/>
                                                             </xf:case>
                                                         </xf:switch>
                                                     </xf:case>
                                                 </xf:switch>
-                                                <xf:output
-                                                    class="fr-error-alert fr-error-alert-{{@level}}"
-                                                    mediatype="text/html"
-                                                    value="@alert"
-                                                    id="ao"/>
                                             </xh:li>
                                         </xf:repeat>
                                     </xh:ol>

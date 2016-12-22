@@ -49,14 +49,11 @@
         }
 
         .fr-error-number, .fr-error-link, .fr-error-alert {
-
             padding: 2px 0;
             vertical-align: top;
         }
 
         .fr-error-number {
-            text-align: right;
-            .xforms-output-output:after { content: ":" }
             display: none;
         }
 
@@ -64,26 +61,42 @@
             display: inline;
         }
 
-        .fr-error-alert {
-            display: block;
+        .fr-error-label, .fr-error-alert {
+            text-decoration: underline;
+        }
 
-            .xforms-output-output {
-                display: inline-block;
-                vertical-align: top;
-                ul {
-                    list-style-type: square;
-                    margin-bottom: 0;
-                }
+        .fr-error-label:not(:empty):after {
+            content: ": "
+        }
+
+        .fr-error-alert {
+            vertical-align: top;
+            ul {
+                list-style-type: square;
+                margin-bottom: 0;
             }
         }
     }
 
     // Multiple levels can be mixed so make sure the strongest wins
-    .fr-level-info    .fr-error-title { background-color: @info; }
-    .fr-level-warning .fr-error-title { background-color: @warning; }
-    .fr-level-error   .fr-error-title { background-color: @error; }
+    .fr-level-info    > .fr-error-title { background-color: @info; }
+    .fr-level-warning > .fr-error-title { background-color: @warning; }
+    .fr-level-error   > .fr-error-title { background-color: @error; }
 
-    .fr-error-alert-info    { color: @info }
-    .fr-error-alert-warning { color: @warning }
-    .fr-error-alert-error   { color: @error }
+    // Make label and alert both the same color
+    .fr-level-info {
+        .fr-error-label, .fr-error-alert {
+            color: @info
+        }
+    }
+    .fr-level-warning {
+        .fr-error-label, .fr-error-alert {
+            color: @warning
+        }
+    }
+    .fr-level-error {
+        .fr-error-label, .fr-error-alert {
+            color: @error
+        }
+    }
 }

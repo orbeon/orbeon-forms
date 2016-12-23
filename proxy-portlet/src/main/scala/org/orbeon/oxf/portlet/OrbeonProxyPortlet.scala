@@ -99,7 +99,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         bufferedRender(
           request,
           response,
-          APISupport.callService(createRequestDetails(settings, request, response.getNamespace))
+          APISupport.callService(createRequestDetails(settings, request, response.getNamespace))._1
         )
       }
     }
@@ -127,7 +127,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         bufferedProcessAction(
           request,
           response,
-          APISupport.callService(createRequestDetails(settings, request, response.getNamespace))
+          APISupport.callService(createRequestDetails(settings, request, response.getNamespace))._1
         )
       }
     }

@@ -53,7 +53,7 @@ object APISupport {
 
     val url  = formRunnerURL(baseURL, path, embeddable = true)
 
-    callService(RequestDetails(None, url, headers, params)) match {
+    callService(RequestDetails(None, url, headers, params))._1 match {
       case content: StreamedContent ⇒
         useAndClose(content)(writeResponseBody)
       case Redirect(_, _) ⇒
@@ -99,8 +99,8 @@ object APISupport {
     }
 
   def proxySubmission(
-    req         : HttpServletRequest,
-    res         : HttpServletResponse
+    req : HttpServletRequest,
+    res : HttpServletResponse
   ): Unit =
     withSettings(req, res.getWriter) { settings ⇒
 
@@ -120,7 +120,7 @@ object APISupport {
           title         = None
         )
 
-      val response =
+      val (contentOrRedirect, httpResponse) =
         APISupport.callService(RequestDetails(
           content = Some(contentFromRequest),
           url     = dropTrailingSlash(settings.formRunnerURL) + "/xforms-server-submit",
@@ -128,12 +128,18 @@ object APISupport {
           params  = Nil
         ))
 
-      response match {
+      contentOrRedirect match {
         case Redirect(location, true) ⇒
           res.sendRedirect(location)
         case Redirect(location, false) ⇒
           throw new NotImplementedError
         case content: StreamedContent ⇒
+
+          ctx.setStatusCode(httpResponse.statusCode)
+          httpResponse.content.contentType foreach (ctx.setHeader(Headers.ContentType, _))
+
+          proxyCapitalizeAndCombineHeaders(httpResponse.headers, request = false) foreach (ctx.setHeader _).tupled
+
           useAndClose(content)(APISupport.writeResponseBody)
       }
     }
@@ -178,17 +184,21 @@ object APISupport {
       originalName → value
 
   // Call the Orbeon service at the other end
-  def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): StreamedContentOrRedirect = {
+  def callService(requestDetails: RequestDetails)(implicit ctx: EmbeddingContext): (StreamedContentOrRedirect, HttpResponse)= {
 
     Logger.debug("proxying page {}", requestDetails.url)
 
     val cx = connectURL(requestDetails)
-    if (isRedirectCode(cx.statusCode)) {
-      // https://github.com/orbeon/orbeon-forms/issues/2967
-      val location = cx.headers("Location").head
-      Redirect(location, exitPortal = urlHasProtocol(location))
-    } else
-      cx.content
+
+    val redirectOrContent =
+      if (isRedirectCode(cx.statusCode)) {
+        // https://github.com/orbeon/orbeon-forms/issues/2967
+        val location = cx.headers("Location").head
+        Redirect(location, exitPortal = urlHasProtocol(location))
+      } else
+        cx.content
+    
+    redirectOrContent → cx
   }
 
   def writeResponseBody(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =

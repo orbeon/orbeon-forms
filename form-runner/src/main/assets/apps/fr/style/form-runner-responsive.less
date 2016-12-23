@@ -22,26 +22,6 @@
             float: none;
         }
 
-        .fr-buttons {
-            .xforms-trigger button {
-                // Each button is on its own line and takes the whole line
-                display: block;
-                width: 100%;
-                margin-left: 0;
-            }
-        }
-
-        .fr-grid:not(.fr-repeat) {
-
-            // Instead of fixed, so each cell doesn't take 1/x of the width of the table
-            table-layout: inherit;
-
-            & > .fr-grid-body > .fr-grid-tr > .fr-grid-td  {
-                // The main thing this CSS does: change table cells into blocks
-                display: block;
-            }
-        }
-
         // Prevent mobile browsers from zooming when an input gets the focus
         &.xforms-mobile {
             select,
@@ -64,4 +44,29 @@
             }
         }
     }
+
+    // For phones, use 1 column
+    @media (max-width: 640px) {
+
+      .fr-grid:not(.fr-repeat) {
+
+          // Instead of fixed, so each cell doesn't take 1/x of the width of the table
+          table-layout: inherit;
+
+          & > .fr-grid-body > .fr-grid-tr > .fr-grid-td  {
+              // The main thing this CSS does: change table cells into blocks
+              display: block;
+          }
+      }
+
+      .fr-buttons {
+          .xforms-trigger button {
+              // Each button is on its own line and takes the whole line
+              display: block;
+              width: 100%;
+              margin-left: 0;
+          }
+      }
+    }
+
 }

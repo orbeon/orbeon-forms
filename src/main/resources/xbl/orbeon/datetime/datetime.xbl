@@ -106,8 +106,8 @@
                 <xf:action event="xforms-value-changed xforms-enabled">
                     <xf:var name="is-valid" value="$value castable as xs:dateTime"/>
                     <xf:action if="$is-valid">
-                        <xf:setvalue ref="$local-date" value="xs:date($binding)"/>
-                        <xf:setvalue ref="$local-time" value="xs:time($binding)"/>
+                        <xf:setvalue ref="$local-date" value="substring(string(xs:date($binding)), 1, 10)"/>
+                        <xf:setvalue ref="$local-time" value="substring(string(xs:time($binding)), 1, 8)"/>
                     </xf:action>
                     <xf:action if="not($is-valid)">
                         <xf:var name="parts" value="tokenize($value, 'T')"/>

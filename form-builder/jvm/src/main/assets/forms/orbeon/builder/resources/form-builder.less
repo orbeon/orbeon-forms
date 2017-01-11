@@ -163,22 +163,15 @@ div.orbeon.orbeon-portlet-div {
 
             .fb-tools {
                 .fr-border();
-                padding: 8px;
+                padding: 2px 8px 8px;               // 2px at top or legend has too much space above
                 margin-bottom: @fbGutter;
                 &:last-child { margin-bottom: 0 }
 
                 legend {
                     font-size: 11px;
-                    margin-top: -8px;
                     margin-bottom: 4px;
                     text-indent: 9px;
                     line-height: 24px;
-                }
-
-                .xforms-label {
-                    display: block;
-                    margin: 1em 0 .5em 0;
-                    font-size: 93%;
                 }
 
                 .fb-tool {

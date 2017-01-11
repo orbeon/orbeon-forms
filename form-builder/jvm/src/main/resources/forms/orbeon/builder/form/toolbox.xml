@@ -77,132 +77,138 @@
 
         <!-- Sections, grids, etc. toolbox -->
         <xh:div class="fb-tools">
-            <xh:legend><xf:output value="$form-resources/form-structure/label"/></xh:legend>
-            <!-- Add new section -->
-            <xh:div class="fb-tool">
-                <xf:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" >
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
-                        <xf:output value="$form-resources/new-section/label"/>
-                    </xf:label>
-                    <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:insertNewSection($model, true())
-                    </xf:action>
-                </xf:trigger>
-            </xh:div>
-            <!-- Add grids -->
-            <xh:div class="fb-tool">
-                <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
-                        <xf:output value="$form-resources/new-grid/label"/>
-                    </xf:label>
-                    <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:insertNewGrid($model)
-                    </xf:action>
-                </xf:trigger>
-            </xh:div>
-            <xh:div class="fb-tool">
-                <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
-                        <xf:output value="$form-resources/new-repeated-grid/label"/>
-                    </xf:label>
-                    <xf:action ev:event="DOMActivate" type="xpath">
-                        toolboxOps:insertNewRepeatedGrid($model)
-                    </xf:action>
-                </xf:trigger>
-            </xh:div>
+            <xf:group>
+                <xf:label class="fb-tools-title" value="$form-resources/form-structure/label"/>
+                <!-- Add new section -->
+                <xh:div class="fb-tool">
+                    <xf:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" >
+                        <xf:label>
+                            <xh:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
+                            <xf:output value="$form-resources/new-section/label"/>
+                        </xf:label>
+                        <xf:action ev:event="DOMActivate" type="xpath">
+                            toolboxOps:insertNewSection($model, true())
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+                <!-- Add grids -->
+                <xh:div class="fb-tool">
+                    <xf:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
+                        <xf:label>
+                            <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                            <xf:output value="$form-resources/new-grid/label"/>
+                        </xf:label>
+                        <xf:action ev:event="DOMActivate" type="xpath">
+                            toolboxOps:insertNewGrid($model)
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+                <xh:div class="fb-tool">
+                    <xf:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
+                        <xf:label>
+                            <xh:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                            <xf:output value="$form-resources/new-repeated-grid/label"/>
+                        </xf:label>
+                        <xf:action ev:event="DOMActivate" type="xpath">
+                            toolboxOps:insertNewRepeatedGrid($model)
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+            </xf:group>
         </xh:div>
         <!-- Controls and components -->
         <xf:repeat ref="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
             <xh:div class="fb-tools">
-                <!-- Display localized name -->
-                <xh:legend><xf:output ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/></xh:legend>
+                <xf:group>
+                    <!-- Display localized name -->
+                    <xf:label ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/>
 
-                <xf:repeat ref="xbl:binding[not(fb:metadata/fb:toolbox[@show = 'false'])]" id="fb-components-template-repeat">
+                    <xf:repeat ref="xbl:binding[not(fb:metadata/fb:toolbox[@show = 'false'])]" id="fb-components-template-repeat">
 
-                    <xf:var name="binding" value="." as="element(xbl:binding)"/>
+                        <xf:var name="binding" value="." as="element(xbl:binding)"/>
 
-                    <!-- Whether the component is a section component or not -->
-                    <xf:var name="is-section-component" value="xxf:has-class('fr-section-component', $binding)" as="xs:boolean"/>
+                        <!-- Whether the component is a section component or not -->
+                        <xf:var name="is-section-component" value="xxf:has-class('fr-section-component', $binding)" as="xs:boolean"/>
 
-                    <xf:var name="metadata" value="$binding/fb:metadata"/>
+                        <xf:var name="metadata" value="$binding/fb:metadata"/>
 
-                    <xh:div class="fb-tool">
-                        <!-- The class is added so unit tests can find the trigger more easily -->
-                        <xf:trigger id="fb-add-component-trigger"
-                                    ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
-                                    class="fb-add-{$binding/@id} {if ($is-section-component) then 'fb-add-template' else 'fb-add-control'}">
-                            <xf:label>
-                                <xh:img src="{($metadata/fb:icon/fb:small-icon[@lang = $lang], $metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
-                                <xf:output value="($metadata/fb:display-name[@lang = $lang], $metadata/fb:display-name[1])[1]"/>
-                            </xf:label>
-                            <xf:action ev:event="DOMActivate">
-                                <xf:action if="$is-section-component" type="xpath">
-                                    toolboxOps:insertNewSectionTemplate($model, $binding)
-                                </xf:action>
-                                <xf:action if="not($is-section-component)">
-                                    <xf:action type="xpath">
-                                        toolboxOps:insertNewControl($model, $binding)
+                        <xh:div class="fb-tool">
+                            <!-- The class is added so unit tests can find the trigger more easily -->
+                            <xf:trigger id="fb-add-component-trigger"
+                                        ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
+                                        class="fb-add-{$binding/@id} {if ($is-section-component) then 'fb-add-template' else 'fb-add-control'}">
+                                <xf:label>
+                                    <xh:img src="{($metadata/fb:icon/fb:small-icon[@lang = $lang], $metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
+                                    <xf:output value="($metadata/fb:display-name[@lang = $lang], $metadata/fb:display-name[1])[1]"/>
+                                </xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:action if="$is-section-component" type="xpath">
+                                        toolboxOps:insertNewSectionTemplate($model, $binding)
                                     </xf:action>
-                                    <xf:var
-                                        name="effective-id"
-                                        value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
-                                    <xf:load
-                                        resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
+                                    <xf:action if="not($is-section-component)">
+                                        <xf:action type="xpath">
+                                            toolboxOps:insertNewControl($model, $binding)
+                                        </xf:action>
+                                        <xf:var
+                                            name="effective-id"
+                                            value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                        <xf:load
+                                            resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
+                                    </xf:action>
                                 </xf:action>
-                            </xf:action>
-                        </xf:trigger>
-                    </xh:div>
-                </xf:repeat>
+                            </xf:trigger>
+                        </xh:div>
+                    </xf:repeat>
+                </xf:group>
             </xh:div>
         </xf:repeat>
 
-        <!-- Actions toolbox -->
+        <!-- Advanced -->
         <xh:div class="fb-tools">
-            <xh:legend class="a-m-t"><xf:output value="$form-resources/advanced/label"/></xh:legend>
-            <xh:div class="fb-tool">
-                <xf:group ref="instance('fb-metadata-instance')/toolbox/schema">
-                    <!-- Upload XML Schema -->
-                    <xf:trigger>
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/images/other/schema-16.png" alt=""/>
-                            <xh:span>
-                                <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
-                            </xh:span>
-                        </xf:label>
-                        <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
-                        <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                    </xf:trigger>
-                </xf:group>
-                <xf:group ref="instance('fb-metadata-instance')/toolbox/pdf">
-                    <!-- Upload PDF Template -->
-                    <xf:trigger>
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/pdf.png" alt=""/>
-                            <xh:span>
-                                <xf:output value="if (bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
-                            </xh:span>
-                        </xf:label>
-                        <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
-                        <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                    </xf:trigger>
-                </xf:group>
-                <xf:group ref="instance('fb-metadata-instance')/toolbox/permissions">
-                    <!-- Permissions -->
-                    <fb:permissions id="fb-permissions-dialog" resources-ref="$form-resources"
-                        metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
-                    <xf:trigger id="fb-permissions-button">
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
-                            <xf:output ref="$form-resources/permissions/label"/>
-                        </xf:label>
-                        <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions-dialog"/>
-                        <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
-                    </xf:trigger>
-                </xf:group>
-            </xh:div>
+            <xf:group>
+                <xf:label value="$form-resources/advanced/label"/>
+                <xh:div class="fb-tool">
+                    <xf:group ref="instance('fb-metadata-instance')/toolbox/schema">
+                        <!-- Upload XML Schema -->
+                        <xf:trigger>
+                            <xf:label>
+                                <xh:img src="/apps/fr/style/images/other/schema-16.png" alt=""/>
+                                <xh:span>
+                                    <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
+                                </xh:span>
+                            </xf:label>
+                            <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
+                            <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                        </xf:trigger>
+                    </xf:group>
+                    <xf:group ref="instance('fb-metadata-instance')/toolbox/pdf">
+                        <!-- Upload PDF Template -->
+                        <xf:trigger>
+                            <xf:label>
+                                <xh:img src="/apps/fr/style/pdf.png" alt=""/>
+                                <xh:span>
+                                    <xf:output value="if (bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
+                                </xh:span>
+                            </xf:label>
+                            <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
+                            <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                        </xf:trigger>
+                    </xf:group>
+                    <xf:group ref="instance('fb-metadata-instance')/toolbox/permissions">
+                        <!-- Permissions -->
+                        <fb:permissions id="fb-permissions-dialog" resources-ref="$form-resources"
+                            metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                        <xf:trigger id="fb-permissions-button">
+                            <xf:label>
+                                <xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
+                                <xf:output ref="$form-resources/permissions/label"/>
+                            </xf:label>
+                            <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions-dialog"/>
+                            <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                        </xf:trigger>
+                    </xf:group>
+                </xh:div>
+            </xf:group>
         </xh:div>
 
         <!-- Services -->

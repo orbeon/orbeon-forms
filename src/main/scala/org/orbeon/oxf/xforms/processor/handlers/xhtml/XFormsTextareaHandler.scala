@@ -27,7 +27,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl
+import org.orbeon.oxf.xforms.control.controls.XFormsInputControl.PlaceHolderInfo
+import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
@@ -36,6 +37,13 @@ import org.xml.sax.Attributes
   * Handle xf:textarea.
   */
 class XFormsTextareaHandler extends XFormsControlLifecyleHandler(false) {
+
+  private var placeHolderInfo: Option[PlaceHolderInfo] = None
+
+  override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
+    super.init(uri, localname, qName, attributes, matched)
+    this.placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
+  }
 
   protected def handleControlStart(
     uri         : String,
@@ -74,6 +82,12 @@ class XFormsTextareaHandler extends XFormsControlLifecyleHandler(false) {
       if (isConcreteControl)
         XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
 
+      // Add attribute even if the control is not concrete
+      placeHolderInfo foreach { placeHolderInfo ⇒
+        if (placeHolderInfo.value ne null) // unclear whether this can ever be null
+          htmlTextareaAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
+      }
+
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, htmlTextareaAttributes)
       if (isConcreteControl) {
         val value = textareaControl.getExternalValue
@@ -100,4 +114,12 @@ class XFormsTextareaHandler extends XFormsControlLifecyleHandler(false) {
       xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName)
     }
   }
+
+  protected override def handleLabel(): Unit =
+    if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
+      super.handleLabel()
+
+  protected override def handleHint(): Unit =
+    if (! (placeHolderInfo exists (! _.isLabelPlaceholder)))
+      super.handleHint()
 }

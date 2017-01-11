@@ -21,31 +21,39 @@ browserSupportsPlaceholder = do ->
     input = document.createElement "input"
     input.placeholder?
 
-# Returns true if this control is a placeholder
+# Returns true if this control has a placeholder
 isPlaceholderControl = (control) ->
-    if YD.hasClass control, "xforms-input"
-        input = (control.getElementsByTagName "input")[0]
-        placeholder = YD.getAttribute input, "placeholder"
+    if $(control).is('.xforms-input, .xforms-textarea')
+        inputOrTextarea = findInputOrTextarea control
+        placeholder = YD.getAttribute inputOrTextarea, "placeholder"
         placeholder != null
-    else false
+    else
+        false
+
+findInputOrTextarea = (control) ->
+    input = (control.getElementsByTagName "input")[0]
+    if input?
+        input
+    else
+        (control.getElementsByTagName "textarea")[0]
 
 # Populate the value with the placeholder (when users aren't editing the field)
 showPlaceholder = (control) ->
-    input = (control.getElementsByTagName "input")[0]
-    if YD.hasClass control, "xforms-placeholder"
+    inputOrTextarea = findInputOrTextarea control
+    if $(control).is('.xforms-placeholder')
         # Already showing the placeholder, update it
-        input.value = $(input).attr('placeholder')
-    else if input.value == ""
+        inputOrTextarea.value = $(inputOrTextarea).attr('placeholder')
+    else if inputOrTextarea.value == ""
         # Field is empty, then we can show the placeholder
         YD.addClass control, "xforms-placeholder"
-        input.value = $(input).attr('placeholder')
+        inputOrTextarea.value = $(inputOrTextarea).attr('placeholder')
 
 # Remove placeholder
 hidePlaceholder = (control) ->
-    input = (control.getElementsByTagName "input")[0]
-    if YD.hasClass control, "xforms-placeholder"
+    inputOrTextarea = findInputOrTextarea control
+    if $(control).is('.xforms-placeholder')
         YD.removeClass control, "xforms-placeholder"
-        input.value = ""
+        inputOrTextarea.value = ""
 
 # On DOM ready, get initial placeholder inputs and populate value with placeholder
 do ->
@@ -89,8 +97,9 @@ do ->
             labelHint = Controls.getControlLHHA event.control, event.type
             if not labelHint?
                 # Update placeholder attribute and show it
-                input = (event.control.getElementsByTagName "input")[0]
-                $(input).attr('placeholder', event.message)
+                inputOrTextarea = findInputOrTextarea event.control
+                if inputOrTextarea?
+                    $(inputOrTextarea).attr('placeholder', event.message)
                 showPlaceholder event.control if not browserSupportsPlaceholder
 
 # When getting the value of a placeholder input, if the placeholder is shown, the current value is empty string
@@ -98,5 +107,5 @@ do ->
     if not browserSupportsPlaceholder
         Controls.getCurrentValueEvent.subscribe (event) ->
             if isPlaceholderControl event.control
-                if YD.hasClass event.control, "xforms-placeholder"
+                if $(event.control).is('.xforms-placeholder')
                     event.result = ""

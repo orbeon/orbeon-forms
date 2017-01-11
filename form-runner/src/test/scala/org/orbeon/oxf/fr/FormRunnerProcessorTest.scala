@@ -16,4 +16,4 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.ProcessorTestBase
 
 class FormRunnerProcessorTest
-  extends ProcessorTestBase("oxf:/org/orbeon/oxf/fr/tests-xbl-components.xml")
+  extends ProcessorTestBase("oxf:/org/orbeon/oxf/fr/tests-form-runner.xml")

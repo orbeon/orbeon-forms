@@ -48,22 +48,37 @@
             /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
 
     <xsl:variable
-        name="itemset-actions-elements"
+        name="action-models"
         select="
             /xh:html/xh:head//
-            xf:model[
-                generate-id() = $action-models-ids
-            ]/
-            xf:action[
-                ends-with(@id, '-binding')
-            ]//
-            xf:action[
-                p:has-class('fr-itemset-action')
-            ]"/>
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]"/>
+
+    <xsl:variable
+        name="action-bindings"
+        select="
+            $action-models/
+                xf:action[
+                    ends-with(@id, '-binding')
+                ]"/>
+
+    <xsl:variable
+        name="itemset-actions-elements"
+        select="
+            $action-bindings//
+                xf:action[
+                    p:has-class('fr-itemset-action')
+                ]"/>
 
     <xsl:variable
         name="models-with-itemset-actions-models-ids"
-        select="distinct-values($itemset-actions-elements/(ancestor::xf:model[1])/generate-id())"/>
+        select="
+            distinct-values(
+                $itemset-actions-elements/
+                    (ancestor::xf:model[1])/
+                    generate-id()
+            )"/>
 
     <xsl:variable
         name="itemset-actions-ids"
@@ -117,7 +132,7 @@
                 ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <!-- Keep parameters but override implementation  -->
+            <!-- Keep parameters but override implementation -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
             <!-- Set value -->
             <xf:setvalue
@@ -139,7 +154,7 @@
                 ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <!-- Keep parameters but override implementation  -->
+            <!-- Keep parameters but override implementation -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]"/>
             <!-- Set value and escape single quotes -->
             <xf:setvalue
@@ -173,7 +188,7 @@
                 ]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <!-- Keep parameters but override implementation  -->
+            <!-- Keep parameters but override implementation -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
             <!-- Set values (we choose to set all targets returned) -->
             <xf:setvalue
@@ -205,7 +220,7 @@
     <xsl:template match="/xh:html/xh:head//xf:action[generate-id() = $itemset-actions-ids]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <!-- Keep parameters but override implementation  -->
+            <!-- Keep parameters but override implementation -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = 'control-name']"/>
 
             <xsl:variable
@@ -270,10 +285,66 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- This does not match the main model handled in components.xsl -->
     <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $models-with-itemset-actions-models-ids]">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xsl:call-template name="common-actions-impl"/>
+            <xsl:call-template name="common-dataset-actions-impl">
+                <xsl:with-param name="model" select="."/>
+            </xsl:call-template>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- Create one dataset instance per unique dataset name appearing in the given model's actions -->
+    <xsl:template name="common-dataset-actions-impl">
+        <xsl:param name="model"/>
+
+        <xsl:variable
+            name="action-bindings"
+            select="
+                $model/
+                    xf:action[
+                        ends-with(@id, '-binding')
+                    ]"/>
+
+        <xsl:variable
+            name="dataset-names"
+            select="
+                distinct-values(
+                    $action-bindings//
+                        xf:action[
+                            p:has-class('fr-save-to-dataset-action')
+                        ]/
+                        xf:var[@name = 'dataset-name']/
+                        string()
+                )"/>
+
+        <xsl:for-each select="$dataset-names">
+            <xf:instance id="fr-dataset-{.}"><dataset/></xf:instance>
+        </xsl:for-each>
+
+    </xsl:template>
+
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/
+                xf:action[
+                    ends-with(@id, '-binding')
+                ]//
+                xf:action[
+                    p:has-class('fr-save-to-dataset-action')
+                ]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xf:var
+                name="response"
+                value="."/>
+            <xf:insert
+                ref="instance('fr-dataset-{xf:var[@name = 'dataset-name']}')"
+                origin="$response"/>
         </xsl:copy>
     </xsl:template>
 

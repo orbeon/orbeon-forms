@@ -268,37 +268,52 @@
                     - actions.xsl
                     - https://github.com/orbeon/orbeon-forms/issues/1019
                 -->
-                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]"
-                              mode="within-model">
+                <xsl:template
+                    match="
+                        xf:model/xf:action[
+                            ends-with(@id, '-binding')
+                        ]//xf:action[
+                            true() = (
+                                for $c in (
+                                    'fr-set-service-value-action',
+                                    'fr-set-database-service-value-action',
+                                    'fr-set-control-value-action',
+                                    'fr-itemset-action',
+                                    'fr-save-to-dataset-action'
+                                )
+                                return
+                                    p:has-class($c)
+                            )
+                        ]"
+                    mode="within-model">
                     <xsl:copy>
-                        <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]" mode="#current"/>
-                    </xsl:copy>
-                </xsl:template>
-
-                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]"
-                              mode="within-model">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]" mode="#current"/>
-                    </xsl:copy>
-                </xsl:template>
-
-                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]"
-                              mode="within-model">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]" mode="#current"/>
-                    </xsl:copy>
-                </xsl:template>
-
-                <xsl:template match="xf:model/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]"
-                              mode="within-model">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@*" mode="#current"/>
-                        <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]" mode="#current"/>
-                        <!-- These two variables may be nested for forms generated with the inline implementation of the action -->
-                        <xsl:apply-templates select=".//(*:variable | *:var)[@name = ('item-label', 'item-value')]" mode="#current"/>
+                        <xsl:apply-templates
+                            select="@*"
+                            mode="#current"/>
+                        <xsl:apply-templates
+                            select="
+                                (*:variable | *:var)[
+                                    @name = (
+                                        'control-name',
+                                        'control-value',
+                                        'path',
+                                        'parameter',
+                                        'response-items',
+                                        'item-label',
+                                        'item-value',
+                                        'dataset-name'
+                                    )
+                                ]"
+                            mode="#current"/>
+                        <xsl:if test="p:has-class('fr-itemset-action')">
+                            <!-- These two variables may be nested for forms generated with the inline implementation of the action -->
+                            <xsl:apply-templates
+                                select="
+                                    .//(*:variable | *:var)[
+                                        @name = ('item-label', 'item-value')
+                                    ]"
+                                mode="#current"/>
+                        </xsl:if>
                     </xsl:copy>
                 </xsl:template>
 

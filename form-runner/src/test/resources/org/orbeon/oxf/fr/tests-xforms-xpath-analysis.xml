@@ -1,0 +1,141 @@
+<!--
+  Copyright (C) 2017 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+
+    description="XForms XPath Analysis"
+    edition="pe">
+
+    <test description="fr:dataset() rewriting" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html>
+                <xh:head>
+                    <xf:model
+                        xxf:xpath-analysis="true"
+                        id="model"
+                        xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+
+                        <xf:instance id="main">
+                            <form>
+                                <value1/>
+                                <value2/>
+                            </form>
+                        </xf:instance>
+
+                        <xf:instance id="fr-dataset-dataset-1">
+                            <dataset/>
+                        </xf:instance>
+
+                        <xf:bind id="dataset-bind"  ref="value1" calculate="fr:dataset('dataset-1')/foo"/>
+                        <xf:bind id="instance-bind" ref="value2" calculate="instance('fr-dataset-dataset-1')/bar"/>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="main" analyzed-binds="true">
+                    <instance scope="" prefixed-id="main" model-prefixed-id="model" binding="false" value="false"/>
+                    <instance scope="" prefixed-id="fr-dataset-dataset-1" model-prefixed-id="model" binding="false" value="false"/>
+                    <binds>
+                        <bind id="dataset-bind" ref="value1">
+                            <binding>
+                                <analysis expression="value1" analyzed="true">
+                                    <returnable>
+                                        <path>instance('main')/value1</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>main</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>main</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </binding>
+                            <mip name="calculate" expression="string((fr:dataset('dataset-1')/foo)[1])">
+                                <analysis expression="string((fr:dataset('dataset-1')/foo)[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('fr-dataset-dataset-1')/foo</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>fr-dataset-dataset-1</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </mip>
+                        </bind>
+                        <bind id="instance-bind" ref="value2">
+                            <binding>
+                                <analysis expression="value2" analyzed="true">
+                                    <returnable>
+                                        <path>instance('main')/value2</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>main</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>main</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </binding>
+                            <mip name="calculate" expression="string((instance('fr-dataset-dataset-1')/bar)[1])">
+                                <analysis expression="string((instance('fr-dataset-dataset-1')/bar)[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('fr-dataset-dataset-1')/bar</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>fr-dataset-dataset-1</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </mip>
+                        </bind>
+                    </binds>
+                    <bind-instances>
+                        <instance>main</instance>
+                    </bind-instances>
+                    <computed-binds-instances>
+                        <instance>main</instance>
+                    </computed-binds-instances>
+                </model>
+            </root>
+
+        </output>
+    </test>
+
+</group>

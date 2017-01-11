@@ -526,6 +526,10 @@
             <xsl:if test="$fr-form-model-id = $models-with-itemset-actions-models-ids">
                 <xsl:call-template name="common-actions-impl"/>
             </xsl:if>
+            <xsl:call-template name="common-dataset-actions-impl">
+                <xsl:with-param name="model" select="."/>
+            </xsl:call-template>
+
         </xsl:copy>
 
         <xsl:if test="not($is-noscript)">

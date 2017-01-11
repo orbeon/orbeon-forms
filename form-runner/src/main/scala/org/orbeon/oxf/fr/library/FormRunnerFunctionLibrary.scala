@@ -17,14 +17,18 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels.ErrorLevel
+import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsAncestorOrganizations, XXFormsUserOrganizations, XXFormsUserRoles}
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.expr._
+import org.orbeon.saxon.functions.SystemFunction
+import org.orbeon.saxon.om.{Item, StructuredQName}
 import org.orbeon.saxon.value.{BooleanValue, DateTimeValue, IntegerValue, StringValue}
 import org.orbeon.scaxon.XML._
 import org.orbeon.xbl.Wizard
@@ -81,6 +85,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("dataset", classOf[FRDataset], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
   }
 }
 
@@ -123,28 +131,28 @@ private object FormRunnerFunctions {
     "modified-date"        → (() ⇒ FormRunner.documentModifiedDate) // only keep until 2017.1 or 2017.2 for backward compatibility
   )
 
-  val IndexedStringFunctions = (
+  private val IndexedStringFunctions = (
     for {
       ((_, fun), index) ← StringGettersByName.zipWithIndex
     } yield
       index → fun
   ).toMap
 
-  val IndexedBooleanFunctions = (
+  private val IndexedBooleanFunctions = (
     for {
       ((_, fun), index) ← BooleanGettersByName.zipWithIndex
     } yield
       index → fun
   ).toMap
 
-  val IndexedIntFunctions = (
+  private val IndexedIntFunctions = (
     for {
       ((_, fun), index) ← IntGettersByName.zipWithIndex
     } yield
       index → fun
   ).toMap
 
-  val IndexedDateTimeFunctions = (
+  private val IndexedDateTimeFunctions = (
     for {
       ((_, fun), index) ← DateTimeGettersByName.zipWithIndex
     } yield
@@ -184,6 +192,39 @@ private object FormRunnerFunctions {
     override def evaluateItem(context: XPathContext): Item = {
       SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context))
       null
+    }
+  }
+
+  class FRDataset extends SystemFunction {
+
+    // Rewrite `fr:dataset($arg1)` into `instance(concat('fr-dataset-', $arg1))`
+    override def simplify(visitor: ExpressionVisitor): Expression = {
+
+      simplifyArguments(visitor)
+
+      val concatFn =
+        SystemFunction.makeSystemFunction(
+          "concat",
+          Array(new StringLiteral("fr-dataset-"), getArguments()(0))
+        )
+
+      // From `Expression.java`: "The rule is that an implementation of simplify(), typeCheck(), or optimize()
+      // that returns a value other than `this` is required to set the location information and parent pointer
+      // in the new child expression."
+      concatFn.setContainer(getContainer)
+      ExpressionTool.copyLocationInfo(this, concatFn)
+
+      val instanceFn = new Instance
+      instanceFn.setDetails(XFormsFunctionLibrary.getEntry(XFORMS_NAMESPACE_URI, "instance", 1).get)
+      instanceFn.setFunctionName(new StructuredQName("", XFORMS_NAMESPACE_URI, "instance"))
+      instanceFn.setArguments(Array(concatFn))
+
+      instanceFn.setContainer(getContainer)
+      ExpressionTool.copyLocationInfo(this, instanceFn)
+
+      instanceFn.simplify(visitor)
+
+      instanceFn
     }
   }
 }

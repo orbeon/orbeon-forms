@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.saxon.expr._
@@ -26,15 +27,13 @@ import org.orbeon.saxon.om._
 class Instance extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
-
-    implicit val ctx = xpathContext
-
     // "If the argument is omitted or is equal to the empty string, then the root element node (also called the
     // document element node) is returned for the default instance in the model that contains the current context
     // node."
+    findInstance(stringArgumentOpt(0)(xpathContext) flatMap trimAllToOpt)(xpathContext)
+  }
 
-    val instanceId = stringArgumentOpt(0) flatMap trimAllToOpt
-
+  private def findInstance(instanceId: Option[String])(implicit xpathContext: XPathContext): SequenceIterator = {
     // Get model and instance with given id for that model only
 
     // "If a match is located, and the matching instance data is associated with the same XForms Model as the
@@ -65,7 +64,7 @@ class Instance extends XFormsFunction {
           }
 
           def findDynamic = dynamicInstance map (instance ⇒ SingletonIterator.makeIterator(instance.rootElement))
-          def findStatic  = staticInstance map (_ ⇒ EmptyIterator.getInstance)
+          def findStatic  = staticInstance.isDefined option EmptyIterator.getInstance
 
           findDynamic orElse findStatic
         case _ ⇒ None

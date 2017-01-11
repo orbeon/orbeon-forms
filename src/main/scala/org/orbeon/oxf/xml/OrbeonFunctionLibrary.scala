@@ -51,7 +51,7 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
   protected case class Arg(itemType: ItemType, arity: Int, resultIfEmpty: Value = null)
 
   protected object Fun {
-    
+
     def apply(name: String, implementationClass: Class[_], op: Int, min: Int, itemType: ItemType, arity: Int, args: Arg*): Unit = {
       val uri = Namespace.currentURI getOrElse NamespaceConstant.FN
       apply(uri, name, implementationClass, op, min, args.length, itemType, arity,  args: _*)
@@ -95,7 +95,7 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
   private case class FunctionName(uri: String, name: String)
   private val functions = collection.mutable.Map[FunctionName, Entry]()
 
-  private def getEntry(uri: String, name: String, arity: Int) =
+  def getEntry(uri: String, name: String, arity: Int) =
     functions.get(FunctionName(uri, name)) filter
       (e ⇒ arity == -1 || arity >= e.minArguments && arity <= e.maxArguments)
 

@@ -862,16 +862,16 @@
                 <hint>XPath expressions to build a new itemset</hint>
             </itemset>
             <items>
-                <label>Items</label>
-                <hint>XPath expression returning one node for each item</hint>
+                <label>Items XPath expression</label>
+                <hint>Return one node for each item</hint>
             </items>
             <item-label>
-                <label>Label</label>
-                <hint>XPath expression relative to an item node</hint>
+                <label>Label XPath expression</label>
+                <hint>Relative to item node</hint>
             </item-label>
             <item-value>
-                <label>Value</label>
-                <hint>XPath expression relative to an item node</hint>
+                <label>Value XPath expression</label>
+                <hint>Relative to item node</hint>
             </item-value>
             <save>
                 <label>Save</label>
@@ -879,6 +879,16 @@
             <test>
                 <label>Test</label>
             </test>
+
+            <general-settings>General Settings</general-settings>
+            <service-request-actions>Service Request Actions</service-request-actions>
+            <service-response-actions>Service Response Actions</service-response-actions>
+
+            <set-control-value>Set Control Value</set-control-value>
+            <set-control-itemset>Set Control Itemset</set-control-itemset>
+            <save-to-dataset>Save to Dataset</save-to-dataset>
+            <dataset-name>Dataset Name</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Form Preview</label>
@@ -1801,16 +1811,16 @@
                 <hint>Expressions XPath pour liste de choix</hint>
             </itemset>
             <items>
-                <label>Noeuds</label>
-                <hint>Expression XPath retournant un noeud pour chaque choix</hint>
+                <label>Expression XPath pour les choix</label>
+                <hint>Retourne un nœud pour chaque choix</hint>
             </items>
             <item-label>
-                <label>Libellé</label>
-                <hint>Expression XPath relative à un noeud</hint>
+                <label>Expression XPath du libellé</label>
+                <hint>Relative au nœud du choix</hint>
             </item-label>
             <item-value>
-                <label>Valeur</label>
-                <hint>Expression XPath relative à un noeud</hint>
+                <label>Expression XPath de la valeur</label>
+                <hint>Relative au nœud du choix</hint>
             </item-value>
             <save>
                 <label>Sauvegarder</label>
@@ -1818,6 +1828,16 @@
             <test>
                 <label>Tester</label>
             </test>
+
+            <general-settings>Paramètres généraux</general-settings>
+            <service-request-actions>Actions de la requête</service-request-actions>
+            <service-response-actions>Actions de la réponse</service-response-actions>
+
+            <set-control-value>Mettre la valeur du contrôle</set-control-value>
+            <set-control-itemset>Mettre la liste de choix du contrôle</set-control-itemset>
+            <save-to-dataset>Sauvegarder dans un dataset</save-to-dataset>
+            <dataset-name>Nom du dataset</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Prévisualisation du formulaire</label>
@@ -2758,6 +2778,16 @@
             <test>
                 <label>Test</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Skjemaforhåndsvisning</label>
@@ -3697,6 +3727,16 @@
             <test>
                 <label>Тестировать</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Предварительный просмотр формы</label>
@@ -4629,6 +4669,16 @@
             <test>
                 <label>Prova</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Anteprima del modulo</label>
@@ -5562,6 +5612,16 @@
             <test>
                 <label>Testen</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Formularvorschau</label>
@@ -6497,6 +6557,16 @@
             <test>
                 <label>Testaa</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Lomakkeen esikatselu</label>
@@ -7430,6 +7500,16 @@
             <test>
                 <label>Testear</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Vista Previa del Formulario</label>
@@ -8369,6 +8449,16 @@
             <test>
                 <label>Testar</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Previsualização do formulário</label>
@@ -9309,6 +9399,16 @@
             <test>
                 <label>Testa</label>
             </test>
+
+            <general-settings todo="true">[General Settings]</general-settings>
+            <service-request-actions todo="true">[Service Request Actions]</service-request-actions>
+            <service-response-actions todo="true">[Service Response Actions]</service-response-actions>
+
+            <set-control-value todo="true">[Set Control Value]</set-control-value>
+            <set-control-itemset todo="true">[Set Control Itemset]</set-control-itemset>
+            <save-to-dataset todo="true">[Save to Dataset]</save-to-dataset>
+            <dataset-name todo="true">[Dataset Name]</dataset-name>
+
         </dialog-actions>
         <dialog-test>
             <label>Förhandsvisa formulär</label>

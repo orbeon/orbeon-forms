@@ -321,17 +321,86 @@ div.orbeon.orbeon-portlet-div {
     }
 
     // Bindings editor dialog
-    #fb-action-dialog {
+    .fb-action-dialog {
         width: 800px;
         max-width: none;
-        .xforms-select1 { width: auto }
-        .fr-grid.fr-repeat {
-            .fb-parameters {
-                .xforms-label { display: block }
-                .xforms-hint { display: block }
-                .xforms-disabled { display: none }
+
+        .tab-pane {
+            .dialog-scrollable(600px);
+            padding: 5px;
+        }
+
+        .xbl-fb-dnd-repeat {
+            display: table;
+            width: 100%;
+
+            .fb-action-iteration {
+                display: table-row;
+
+                // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
+                &.gu-mirror {
+                    .fb-action-buttons {
+                        display: none;
+                    }
+                }
+
+                .fb-action-options, .fb-action-buttons {
+                    display: table-cell;
+                    padding-bottom: 5px;
+                }
+
+                .fb-action-options > * {
+                    .flex();
+                }
+
+                .fb-action-select1, .fb-action-col {
+                    .flex-flow(column);
+                    display: inline-block;
+                    vertical-align: top;
+                    margin-right: 4px;
+                    flex-grow: 1;
+                    -webkit-flex-grow: 1;
+
+                    input, textarea {
+                        width: 100%;
+                    }
+                }
+
+                .xforms-case-selected {
+                    width: auto;
+                }
+
+                .fb-action-col-3 {
+                    width: 245px;
+                }
+
+                .fb-action-buttons {
+                    text-align: right;
+                    white-space: nowrap;
+                }
+
+                .fb-action-grab {
+                    display: none;
+                }
+
+                &.xforms-dnd-moves .fb-action-grab {
+                    display: inline-block;
+                    cursor: move;
+                    .opacity(50);
+                }
             }
-            th { white-space: nowrap }
+        }
+
+        .fb-action-xpath {
+
+            &> textarea {
+                //width: 100%;
+            }
+        }
+
+        .xforms-trigger-appearance-minimal.xforms-readonly i {
+            .opacity(40);
+            cursor: pointer;
         }
     }
 

@@ -54,7 +54,9 @@
             // Switch the input type after cleaning up the value for edition
             $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
 
-                this.visibleInputElement.value = this.getEditString();
+                // Don't set value if not needed, so not to unnecessarily disturb the cursor position
+                if (this.visibleInputElement.value != this.getEditString())
+                    this.visibleInputElement.value = this.getEditString();
 
                 // See https://github.com/orbeon/orbeon-forms/issues/2545
                 function hasNativeDecimalSeparator(separator) {

@@ -359,11 +359,19 @@
                     <xf:bind ref="@fb:event" required="true()"/>
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
-                    <xf:bind ref="@ev:observer"
-                                 required="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 relevant="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 calculate="if (xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
-                                 readonly="false()"/>
+                    <xf:bind
+                        ref="@ev:observer"
+                        required="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                        relevant="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                        calculate="
+                            if (xxf:split(../@fb:event) = 'xforms-ready') then
+                                'fr-form-model'                (: constant :)
+                            else if (. = 'fr-form-model') then
+                                ''                             (: must not be `fr-form-model` so reset to blank :)
+                            else
+                                .                              (: keep :)
+                        "
+                        readonly="false()"/>
                 </xf:bind>
                 <!-- xforms-submit -->
                 <xf:bind ref="xf:action[@fb:event = 'xforms-submit']">

@@ -73,7 +73,7 @@
             }, this));
 
             // Restore input type, send the value to the server, and updates value after server response
-            $(this.visibleInputElement).on('blur', _.bind(function(e) {
+            $(this.visibleInputElement).on('focusout', _.bind(function(e) {
 
                 // With Firefox, changing the type synchronously interferes with the focus
                 window.setTimeout(_.bind(function() {

@@ -284,7 +284,7 @@
                 <item id="2">Tooltip</item>
             </appearances>
             <placeholders>
-                <label>Use Placeholder for Text Fields</label>
+                <label>Use Placeholder for Text Fields and Text Areas</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -1232,7 +1232,7 @@
                 <item id="2">Infobulle</item>
             </appearances>
             <placeholders>
-                <label>Placer en ligne dans les champs de texte</label>
+                <label>Placer en ligne dans les champs et zones de texte</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -2182,7 +2182,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -3132,7 +3132,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -4082,7 +4082,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -5024,7 +5024,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -5969,7 +5969,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -6912,7 +6912,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -7855,7 +7855,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>
@@ -8804,7 +8804,7 @@
                 <item todo="true" id="2">[Tooltip]</item>
             </appearances>
             <placeholders>
-                <label todo="true">[Use Placeholder for Text Fields]</label>
+                <label todo="true">[Use Placeholder for Text Fields and Text Areas]</label>
             </placeholders>
         </dialog-form-settings>
         <dialog-control-details>

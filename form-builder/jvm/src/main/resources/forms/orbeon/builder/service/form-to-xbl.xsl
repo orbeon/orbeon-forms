@@ -281,12 +281,6 @@
 
                     <!-- Services and actions -->
                     <xsl:if test="exists(($relevant-services, $relevant-actions))">
-                        <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
-                            <request/>
-                        </xf:instance>
-                        <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
-                            <response/>
-                        </xf:instance>
                         <xsl:apply-templates select="$relevant-services, $relevant-actions" mode="filter-actions">
                             <xsl:with-param name="model-id" tunnel="yes" select="$model-id"/>
                         </xsl:apply-templates>

@@ -523,8 +523,11 @@
             <xsl:copy-of select="doc('universal-submission.xml')/*/node()"/>
 
             <!-- Common actions implementation -->
+            <xsl:if test="$fr-form-model-id = $models-with-actions-model-ids">
+                <xsl:call-template name="action-common-impl"/>
+            </xsl:if>
             <xsl:if test="$fr-form-model-id = $models-with-itemset-actions-models-ids">
-                <xsl:call-template name="common-actions-impl"/>
+                <xsl:call-template name="itemset-action-common-impl"/>
             </xsl:if>
             <xsl:call-template name="common-dataset-actions-impl">
                 <xsl:with-param name="model" select="."/>

@@ -48,20 +48,24 @@
             /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
 
     <xsl:variable
-        name="action-models"
+        name="action-bindings"
         select="
             /xh:html/xh:head//
                 xf:model[
                     generate-id() = $action-models-ids
-                ]"/>
-
-    <xsl:variable
-        name="action-bindings"
-        select="
-            $action-models/
+                ]/
                 xf:action[
                     ends-with(@id, '-binding')
                 ]"/>
+
+    <xsl:variable
+        name="models-with-actions-model-ids"
+        select="
+            distinct-values(
+                $action-bindings/
+                (ancestor::xf:model[1])/
+                generate-id()
+            )"/>
 
     <xsl:variable
         name="itemset-actions-elements"
@@ -94,7 +98,9 @@
     <xsl:template match="
             /xh:html/xh:head//
                 xf:model[
-                    generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')
+                    generate-id() = $action-models-ids
+                ]/xf:action[
+                    ends-with(@id, '-binding')
                 ]/
                 xf:action[
                     p:split((@event, @ev:event)[1]) = ('xforms-value-changed', 'xforms-enabled', 'DOMActivate', 'xforms-ready', 'xforms-model-construct-done')
@@ -285,11 +291,15 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Match models with at least one action -->
     <!-- This does not match the main model handled in components.xsl -->
-    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $models-with-itemset-actions-models-ids]">
+    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $models-with-actions-model-ids]">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
-            <xsl:call-template name="common-actions-impl"/>
+            <xsl:call-template name="action-common-impl"/>
+            <xsl:if test="generate-id() = $models-with-itemset-actions-models-ids">
+                <xsl:call-template name="itemset-action-common-impl"/>
+            </xsl:if>
             <xsl:call-template name="common-dataset-actions-impl">
                 <xsl:with-param name="model" select="."/>
             </xsl:call-template>
@@ -349,7 +359,7 @@
     </xsl:template>
 
     <!-- Common implementation -->
-    <xsl:template name="common-actions-impl">
+    <xsl:template name="itemset-action-common-impl">
         <xf:action event="fr-call-itemset-action">
 
             <xf:var name="control-name"       value="event('control-name')"/>
@@ -464,6 +474,11 @@
                 </xf:action>
             </xf:action>
         </xf:action>
+    </xsl:template>
+
+    <xsl:template name="action-common-impl">
+        <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all"><request/></xf:instance>
+        <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all"><response/></xf:instance>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -48,7 +48,7 @@ object FormRunnerAuth {
   ): Option[Credentials] =
     ServletPortletRequest.findCredentialsInSession(session) orElse {
 
-      val newCredentialsOpt = findCredentialsFromHeaders(userRoles, getHeader)
+      val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
 
       // Only store the information into the session if we get user credentials. This handles the case of the initial
       // login. See: https://github.com/orbeon/orbeon-forms/issues/2732
@@ -71,7 +71,7 @@ object FormRunnerAuth {
         result
       case None ⇒
         // Don't set any headers in case there is no username
-        Logger.warn(s"not setting auth headers because username is missing")
+        Logger.warn(s"not setting credentials headers because credentials are not found")
         Nil
     }
   }
@@ -109,7 +109,7 @@ object FormRunnerAuth {
       headerAsJSONStrings.mkString("{", ", ", "}")
     }
 
-    def findCredentialsFromHeaders(
+    def findCredentialsFromContainerOrHeaders(
       userRoles : UserRolesFacade,
       getHeader : String ⇒ List[String]
     ): Option[Credentials] = {

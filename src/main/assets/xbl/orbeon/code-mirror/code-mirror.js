@@ -31,7 +31,7 @@
             var inner = $(this.container).find('.xbl-fr-code-mirror-editor-inner')[0];
 
             this.hasFocus = false;
-            this.userChangedSinceLastBlur= false;
+            this.userChangedSinceLastBlur = false;
 
             this.editor = CodeMirror(
                 inner,

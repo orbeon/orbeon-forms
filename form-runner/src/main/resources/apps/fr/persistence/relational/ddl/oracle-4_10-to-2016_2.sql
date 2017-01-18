@@ -43,3 +43,5 @@ CREATE TABLE orbeon_i_control_text (
     val                 CLOB            NOT NULL,
     FOREIGN KEY         (data_id)       REFERENCES orbeon_form_data(id)
 );
+
+CREATE UNIQUE INDEX orbeon_i_current_i1           ON orbeon_i_current (data_id);

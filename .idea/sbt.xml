@@ -23,6 +23,11 @@
             <option value="$PROJECT_DIR$/form-builder/jvm/project" />
             <option value="$PROJECT_DIR$/form-builder/shared" />
             <option value="$PROJECT_DIR$/form-runner" />
+            <option value="$PROJECT_DIR$/form-runner-components/js" />
+            <option value="$PROJECT_DIR$/form-runner-components/js/project" />
+            <option value="$PROJECT_DIR$/form-runner-components/jvm" />
+            <option value="$PROJECT_DIR$/form-runner-components/jvm/project" />
+            <option value="$PROJECT_DIR$/form-runner-components/shared" />
             <option value="$PROJECT_DIR$/form-runner/project" />
             <option value="$PROJECT_DIR$/full-portlet" />
             <option value="$PROJECT_DIR$/full-portlet/project" />

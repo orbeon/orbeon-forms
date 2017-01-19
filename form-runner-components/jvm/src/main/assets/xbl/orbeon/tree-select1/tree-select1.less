@@ -1,0 +1,177 @@
+@fancy-level-indent: 16px;
+@fancy-line-height: 16px; // height of a nodes selection bar including borders
+@fancy-node-v-spacing: 1px; // gap between two node borders
+
+@fancy-icon-width: 14px;
+@fancy-icon-height: 14px;
+
+@fancy-icon-spacing: 3px; // margin between icon/icon or icon/title
+@fancy-icon-ofs-top: 0px; // extra vertical offset for expander, checkbox and icon
+@fancy-title-ofs-top: 0px; // extra vertical offset for title
+@fancy-node-border-width: 1px;
+@fancy-node-border-radius: 0px;
+
+.xbl-fr-tree-select1 {
+
+    .rounded-corners(@radius) {
+        -webkit-border-radius: @radius;
+        -moz-border-radius: @radius;
+        -ms-border-radius: @radius;
+        -o-border-radius: @radius;
+        border-radius: @radius;
+    }
+
+    .ui-helper-hidden {
+        display: none;
+    }
+
+    .xbl-fr-tree-select1-container {
+        display: block;
+    }
+
+    &.xforms-readonly > .xbl-fr-tree-select1-container {
+        opacity: 0.6;
+    }
+
+    .fancytree-container {
+
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+
+        white-space: nowrap;
+        padding: 3px;
+        margin: 0;
+        min-height: 0;
+        position: relative;
+
+        ul {
+            padding: 0 0 0 @fancy-level-indent;
+            margin: 0;
+        }
+
+        ul > li:before {
+            content: none;
+        }
+
+        li {
+            list-style-image: none;
+            list-style-position: outside;
+            list-style-type: none;
+            -moz-background-clip: border;
+            -moz-background-inline-policy: continuous;
+            -moz-background-origin: padding;
+            background-attachment: scroll;
+            background-color: transparent;
+            background-position: 14px 14px;
+            background-repeat: repeat-y;
+            background-image: none;
+
+            margin: 0;
+        }
+
+        li.fancytree-lastsib {
+            background-image: none;
+        }
+    }
+
+    .ui-fancytree-disabled ul.fancytree-container {
+        opacity: 0.5;
+        background-color: silver;
+    }
+
+    ul.fancytree-connectors.fancytree-container {
+        li {
+            background-position: 0 0;
+        }
+    }
+
+    ul.fancytree-container li.fancytree-lastsib,
+    ul.fancytree-no-connector > li {
+        background-image: none;
+    }
+
+    .fancytree-empty,
+    .fancytree-expander,
+    .fancytree-icon,
+    .fancytree-checkbox,
+    .fancytree-radio {
+        width: @fancy-icon-width;
+        height: @fancy-icon-height;
+        display: inline-block;
+        vertical-align: top;
+        background-repeat: no-repeat;
+        background-position: 14px 14px;
+    }
+    .fancytree-icon,
+    .fancytree-checkbox,
+    .fancytree-expander,
+    .fancytree-radio,
+
+    span.fancytree-node {
+        /* See #117 */
+        display: inherit; // #117, resolves to 'display: list-item;' for standard trees
+        width: 100%;
+        margin-top: @fancy-node-v-spacing;
+        min-height: @fancy-line-height;
+    }
+    span.fancytree-title {
+        cursor: pointer;
+        display: inline-block; // Better alignment, when title contains <br>
+        vertical-align: top;
+        min-height: @fancy-line-height;
+        padding: 0 3px 0 3px; // Otherwise italic font will be outside right bounds
+        margin: @fancy-title-ofs-top 0 0 @fancy-icon-spacing;
+        border: @fancy-node-border-width solid transparent; // avoid jumping, when a border is added on hover
+        .rounded-corners(@fancy-node-border-radius);
+    }
+
+    .fancytree-icon, .fancytree-expander {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-top: 1px;
+        line-height: 14px;
+        vertical-align: text-top;
+        background-image: url("../../../../apps/fr/style/bootstrap/img/glyphicons-halflings.png");
+        background-repeat: no-repeat;
+        background-position: 14px 14px;
+    }
+
+    .fancytree-folder {
+        &> .fancytree-expander {
+            cursor: pointer;
+            background-position: -456px -72px;
+        }
+
+        &> .fancytree-icon {
+            width: 16px;
+            background-position: -384px -120px;
+        }
+
+        &.fancytree-expanded {
+            &> .fancytree-expander {
+                background-position: -313px -119px;
+            }
+
+            &> .fancytree-icon {
+                background-position: -408px -120px;
+            }
+        }
+    }
+
+    .fancytree-node:not(.fancytree-folder) > .fancytree-icon {
+        width: 16px;
+        background-position: -24px  -24px;
+    }
+
+    //.fancytree-node.fancytree-focused {
+    //    border-color: rgba(82, 168, 236, 0.8);
+    //    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    //    outline: 0;
+    //}
+
+    .fancytree-node.fancytree-active > .fancytree-title {
+        background-color: rgba(82, 168, 236, 0.8);
+    }
+}

@@ -13,19 +13,8 @@
  */
 package org.orbeon
 
-import org.scalajs.dom.html.Element
-
-import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 package object fr {
-  val ORBEON          = g.ORBEON
-  val $               = ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
-  val Events          = ORBEON.xforms.Events
-  val AjaxServer      = ORBEON.xforms.server.AjaxServer
-
-  @js.native
-  trait XBLCompanion extends js.Object {
-    def container: Element = js.native
-  }
+  val $ = g.ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.fr
 
-import org.orbeon.xbl.DndRepeat
+import org.orbeon.xbl.{DndRepeat, TreeSelect1}
 
 import scala.scalajs.js.JSApp
 
@@ -24,6 +24,7 @@ object FormRunnerApp extends JSApp {
 
     def initializeOnDomReady(): Unit = {
       DndRepeat
+      TreeSelect1
     }
 
     $(initializeOnDomReady _)

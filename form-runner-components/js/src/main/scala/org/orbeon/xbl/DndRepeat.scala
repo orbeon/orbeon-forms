@@ -14,6 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.fr._
+import org.orbeon.xforms
+import org.orbeon.xforms.{AjaxServer, XBL, XBLCompanion}
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
@@ -31,10 +33,8 @@ object DndRepeat {
 
   val FindDndLevelRe           = """^xforms-dnd-level-(\d+)$""".r
 
-  ORBEON.xforms.XBL.declareCompanion("fr|dnd-repeat",
-    new js.Object {
-
-      def containerElem = this.asInstanceOf[XBLCompanion].container
+  XBL.declareCompanion("fr|dnd-repeat",
+    new XBLCompanion {
 
       case class DragState(
         currentDragStartPrev     : Element,
@@ -45,7 +45,7 @@ object DndRepeat {
       private var dragState: Option[DragState]     = None
       private var drake    : Option[Drake] = None
 
-      def init(): Unit = {
+      override def init(): Unit = {
 
         val newDrake =
           Dragula(
@@ -110,7 +110,8 @@ object DndRepeat {
 
               lazy val moveBack: js.Function = () ⇒ {
                 $(beforeEl).after(el)
-                AjaxServer.ajaxResponseReceived.remove(moveBack)
+                // TODO: Fix this if we switch to `jquery-facade`
+                AjaxServer.ajaxResponseReceived.asInstanceOf[js.Dynamic].remove(moveBack)
               }
 
               // Restore order once we get an Ajax response back
@@ -123,7 +124,7 @@ object DndRepeat {
               // Thinking this should instead block input, but only after a while show a modal screen.
               // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(container).id)
 
-              ORBEON.xforms.Document.dispatchEvent(
+              xforms.Document.dispatchEvent(
                 new js.Object {
                   val targetId  = repeatId
                   val eventName = "xxforms-dnd"
@@ -140,7 +141,7 @@ object DndRepeat {
         drake = Some(newDrake)
       }
 
-      def destroy(): Unit = {
+      override def destroy(): Unit = {
         drake foreach (_.destroy())
         drake = None
       }

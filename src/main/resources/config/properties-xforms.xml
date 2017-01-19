@@ -193,6 +193,7 @@
         fr:boolean-input
         fr:yesno-input
         fr:open-select1
+        fr:tree-select1
     </property>
 
     <!-- Automatically search for XBL components in fr:* namespace -->

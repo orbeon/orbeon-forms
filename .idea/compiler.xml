@@ -40,6 +40,8 @@
       <module name="formBuilderSharedJS" target="1.6" />
       <module name="formBuilderSharedJVM" target="1.6" />
       <module name="formRunner" target="1.6" />
+      <module name="formRunnerComponentsJS" target="1.6" />
+      <module name="formRunnerComponentsJVM" target="1.6" />
       <module name="formRunnerProxyPortlet" target="1.6" />
       <module name="fullPortlet" target="1.6" />
       <module name="orbeonWar" target="1.6" />

@@ -103,7 +103,7 @@ object ExternalContext {
   }
 
   trait Response extends Rewriter {
-    def getWriter: PrintWriter // TODO: remove uses of this
+    def getWriter: PrintWriter // TODO: remove uses of this, see https://github.com/orbeon/orbeon-forms/issues/2962
     def getOutputStream: OutputStream
 
     def isCommitted: Boolean

@@ -188,7 +188,7 @@ object OrbeonXFormsFilter {
 }
 
 private class FilterRequestWrapper(httpServletRequest: HttpServletRequest)
-    extends BaseServletRequestWrapper(httpServletRequest)
+    extends HttpServletRequestWrapper(httpServletRequest)
     with RequestRemoveHeaders {
 
   private var _requestBodyRead = false

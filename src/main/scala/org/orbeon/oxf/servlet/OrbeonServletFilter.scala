@@ -42,7 +42,7 @@ class OrbeonServletFilter extends Filter with ServletPortlet {
     withRootException("initialization", new ServletException(_)) {
 
       _initParameters =
-        config.getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
+        config.getInitParameterNames.asScala map
           (n ⇒ n → config.getInitParameter(n)) toMap
 
       init(WebAppContext(config.getServletContext), None)

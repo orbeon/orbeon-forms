@@ -65,8 +65,6 @@ class ServletExternalContext(
   val nativeResponse  : HttpServletResponse
 ) extends ExternalContext {
 
-  import ServletExternalContext._
-
   private class RequestImpl extends ExternalContext.Request with ServletPortletRequest {
 
     private var getParameterMapMultipartFormDataCalled = false
@@ -134,7 +132,7 @@ class ServletExternalContext(
 
     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
     protected[ServletExternalContext] lazy val headerValuesMap: Map[String, Array[String]] = (
-      for (name ← nativeRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala)
+      for (name ← nativeRequest.getHeaderNames.asScala)
         yield name.toLowerCase → StringConversions.stringEnumerationToArray(nativeRequest.getHeaders(name))
     ).toMap
 
@@ -161,7 +159,7 @@ class ServletExternalContext(
 
         // Just use native request parameters
         val paramsIt =
-          for (name ← nativeRequest.getParameterNames.asInstanceOf[ju.Enumeration[String]].asScala)
+          for (name ← nativeRequest.getParameterNames.asScala)
             yield name → nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]]
 
         paramsIt.toMap.asJava

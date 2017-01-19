@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.Writer
-import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.apache.commons.io.IOUtils
@@ -169,8 +168,8 @@ object APISupport {
 
   def requestHeaders(req: HttpServletRequest) =
     for {
-      name   ← req.getHeaderNames.asInstanceOf[ju.Enumeration[String]].asScala
-      values = req.getHeaders(name).asInstanceOf[ju.Enumeration[String]].asScala.toList
+      name   ← req.getHeaderNames.asScala
+      values = req.getHeaders(name).asScala.toList
     } yield
       name → values
 
@@ -197,7 +196,7 @@ object APISupport {
         Redirect(location, exitPortal = urlHasProtocol(location))
       } else
         cx.content
-    
+
     redirectOrContent → cx
   }
 

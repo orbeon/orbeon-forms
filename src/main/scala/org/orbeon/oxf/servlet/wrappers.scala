@@ -14,14 +14,14 @@
 package org.orbeon.oxf.servlet
 
 import java.io._
-import java.util.{Enumeration ⇒ JEnumeration, Map ⇒ JMap}
+import java.{util ⇒ ju}
 import javax.servlet.ServletInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 
 import scala.collection.JavaConverters._
 
@@ -29,12 +29,12 @@ import scala.collection.JavaConverters._
 class ForwardServletRequestWrapper(
   request   : HttpServletRequest,
   pathQuery : String
-) extends BaseServletRequestWrapper(request)
+) extends HttpServletRequestWrapper(request)
   with RequestPathQuery
   with RequestRemoveHeaders
   with RequestEmptyBody {
 
-  import BaseServletRequestWrapper._
+  import ServletRequestWrapper._
 
   // "Constructors" for traits
   def overriddenPathQuery = pathQuery
@@ -43,16 +43,7 @@ class ForwardServletRequestWrapper(
   override def getMethod = "GET"
 }
 
-// See also: LocalRequest, which does much of this based on ExternalContext
-abstract class BaseServletRequestWrapper(val request: HttpServletRequest)
-  extends HttpServletRequestWrapper(request) {
-
-  // Clean-up API by adding type parameters
-  override def getHeaders(name: String) = super.getHeaders(name).asInstanceOf[JEnumeration[String]]
-  override def getHeaderNames           = super.getHeaderNames.asInstanceOf[JEnumeration[String]]
-}
-
-trait RequestPathQuery extends BaseServletRequestWrapper {
+trait RequestPathQuery extends HttpServletRequestWrapper {
 
   def overriddenPathQuery: String // will be called only once
 
@@ -71,7 +62,7 @@ trait RequestPathQuery extends BaseServletRequestWrapper {
   override def getQueryString = queryString getOrElse ""
 }
 
-trait RequestPrependHeaders extends BaseServletRequestWrapper {
+trait RequestPrependHeaders extends HttpServletRequestWrapper {
 
   def headersToPrepend: Map[String, Array[String]]
 
@@ -95,7 +86,7 @@ trait RequestPrependHeaders extends BaseServletRequestWrapper {
     headersToPrepend.get(name) filter (_.nonEmpty) map (_(0))
 }
 
-trait RequestRemoveHeaders extends BaseServletRequestWrapper {
+trait RequestRemoveHeaders extends HttpServletRequestWrapper {
 
   def headersToRemove: String ⇒ Boolean
 
@@ -107,9 +98,9 @@ trait RequestRemoveHeaders extends BaseServletRequestWrapper {
   override def getIntHeader(name: String)  = if (headersToRemove(name)) -1   else super.getIntHeader(name)
 }
 
-trait RequestEmptyBody extends BaseServletRequestWrapper {
+trait RequestEmptyBody extends HttpServletRequestWrapper {
 
-  import BaseServletRequestWrapper._
+  import ServletRequestWrapper._
 
   private lazy val inputStream  = newEmptyServletInputStream
   private lazy val reader       = newEmptyReader
@@ -123,11 +114,11 @@ trait RequestEmptyBody extends BaseServletRequestWrapper {
   // TODO: filter headers content-type and content-length
 }
 
-object BaseServletRequestWrapper {
+private object ServletRequestWrapper {
 
   var HeadersToFilter= Set(Headers.ContentLengthLower, Headers.ContentTypeLower) // TODO: filtering as in Headers?
 
-  def appendExtraQueryParameters(pathQuery: String, extraQueryParameters: JMap[String, Array[String]]) = {
+  def appendExtraQueryParameters(pathQuery: String, extraQueryParameters: ju.Map[String, Array[String]]) = {
 
     def extraQueryParametersIterator =
       for {

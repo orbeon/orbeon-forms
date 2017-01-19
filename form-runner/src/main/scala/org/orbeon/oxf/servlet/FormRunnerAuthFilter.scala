@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import javax.servlet._
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 
 import org.orbeon.oxf.fr.FormRunnerAuth
 
@@ -29,8 +29,6 @@ class FormRunnerAuthFilter extends Filter {
 
 object FormRunnerAuthFilter {
 
-  import java.{util ⇒ ju}
-
   import scala.collection.JavaConverters._
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
@@ -38,7 +36,7 @@ object FormRunnerAuthFilter {
     val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
       userRoles = servletRequest,
       session   = servletRequest.getSession(true),
-      getHeader = servletRequest.getHeaders(_).asInstanceOf[ju.Enumeration[String]].asScala.to[List]
+      getHeader = servletRequest.getHeaders(_).asScala.to[List]
     ).toMap
 
     trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
@@ -46,6 +44,6 @@ object FormRunnerAuthFilter {
       val headersToPrepend = authHeaders
     }
 
-    new BaseServletRequestWrapper(servletRequest) with CustomHeaders
+    new HttpServletRequestWrapper(servletRequest) with CustomHeaders
   }
 }

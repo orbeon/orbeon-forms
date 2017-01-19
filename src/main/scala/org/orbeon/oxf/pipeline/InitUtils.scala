@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.pipeline
 
-import java.util.{Enumeration ⇒ JEnumeration}
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpSession}
 
@@ -46,7 +45,7 @@ object InitUtils {
   private val DefaultProcessors            = "oxf:/processors.xml"
 
   // Run with a pipeline context and destroy the pipeline when done
-  def withPipelineContext[T](body: PipelineContext ⇒ T) = {
+  def withPipelineContext[T](body: PipelineContext ⇒ T): T = {
     var success = false
     val pipelineContext = new PipelineContext
     try {
@@ -218,18 +217,18 @@ object InitUtils {
     servletContext        : ServletContext,
     uriNamePropertyPrefix : String,
     inputPropertyPrefix   : String
-  ) =
+  ): Option[ProcessorDefinition] =
     getDefinitionFromMap(
       new ServletContextInitMap(servletContext),
       uriNamePropertyPrefix,
       inputPropertyPrefix
     )
 
-  def getDefinitionFromProperties(uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
+  def getDefinitionFromProperties(uriNamePropertyPrefix: String, inputPropertyPrefix: String): Option[ProcessorDefinition] =
     getDefinitionFromMap(PropertiesMap, uriNamePropertyPrefix, inputPropertyPrefix)
 
   // Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used
-  def getDefinitionFromMap(map: Map[String, String], uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
+  def getDefinitionFromMap(map: Map[String, String], uriNamePropertyPrefix: String, inputPropertyPrefix: String): Option[ProcessorDefinition] =
     map.get(uriNamePropertyPrefix + "name") map { processorName ⇒
       val processorDefinition = new ProcessorDefinition(Dom4jUtils.explodedQNameToQName(processorName))
 
@@ -252,7 +251,7 @@ object InitUtils {
   // Read-only view of the ServletContext initialization parameters as a Map
   private class ServletContextInitMap(servletContext: ServletContext) extends Map[String, String] {
     def get(key: String) = Option(servletContext.getInitParameter(key))
-    def iterator         = servletContext.getInitParameterNames.asInstanceOf[JEnumeration[String]].asScala.toIterator map (key ⇒ key → this(key))
+    def iterator         = servletContext.getInitParameterNames.asScala map (key ⇒ key → this(key))
 
     def -(key: String)                    = Map() ++ this - key
     def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
@@ -261,7 +260,7 @@ object InitUtils {
   // View of the HttpSession properties as a Map
   class SessionMap(session: HttpSession) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
     def getAttribute(s: String)                  = session.getAttribute(s)
-    def getAttributeNames                        = session.getAttributeNames.asInstanceOf[JEnumeration[String]]
+    def getAttributeNames                        = session.getAttributeNames
     def removeAttribute(s: String): Unit         = session.removeAttribute(s)
     def setAttribute(s: String, o: AnyRef): Unit = session.setAttribute(s, o)
   })
@@ -269,7 +268,7 @@ object InitUtils {
   // View of the HttpServletRequest properties as a Map
   class RequestMap(request: HttpServletRequest) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
     def getAttribute(s: String)                  = request.getAttribute(s)
-    def getAttributeNames                        = request.getAttributeNames.asInstanceOf[JEnumeration[String]]
+    def getAttributeNames                        = request.getAttributeNames
     def removeAttribute(s: String): Unit         = request.removeAttribute(s)
     def setAttribute(s: String, o: AnyRef): Unit = request.setAttribute(s, o)
   })

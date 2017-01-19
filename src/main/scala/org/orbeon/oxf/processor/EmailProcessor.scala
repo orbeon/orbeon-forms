@@ -215,7 +215,7 @@ class EmailProcessor extends ProcessorImpl {
       throw new OXFException("Main text or body element not found")
 
     // Send message
-    useAndClose(session.getTransport("smtp")) { transport ⇒
+    useAndClose(session.getTransport("smtp")) { _ ⇒
       Transport.send(message)
     }
   }
@@ -245,7 +245,7 @@ class EmailProcessor extends ProcessorImpl {
         // Multipart content is requested
         val mimeMultipart = new MimeMultipart(multipart)
         while (parts.hasNext) {
-          val partElement = parts.next.asInstanceOf[Element]
+          val partElement = parts.next()
           val mimeBodyPart = new MimeBodyPart
           handleBody(pipelineContext, dataInputSystemId, mimeBodyPart, partElement)
           mimeMultipart.addBodyPart(mimeBodyPart)

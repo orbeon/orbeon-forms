@@ -50,7 +50,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
 
   // Immutable map of servlet parameters
   lazy val initParameters =
-    getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
+    getInitParameterNames.asScala map
       (n ⇒ n → getInitParameter(n)) toMap
 
   // Servlet init

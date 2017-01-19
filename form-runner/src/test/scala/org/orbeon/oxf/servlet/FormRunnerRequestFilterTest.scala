@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.{util ⇒ ju}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 
 import org.mockito.invocation.InvocationOnMock
@@ -70,8 +69,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with FunSpecLik
     )
 
     // NOTE: Use asInstanceOf because servlet API doesn't have generics
-    val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[ju.Enumeration[String]] map
-      (n ⇒ n → amendedRequest.getHeaders(n).asInstanceOf[ju.Enumeration[String]].toList) toMap
+    val actualHeaders = amendedRequest.getHeaderNames map
+      (n ⇒ n → amendedRequest.getHeaders(n).toList) toMap
 
     // Compare using TreeMap to get a reliable order
     def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

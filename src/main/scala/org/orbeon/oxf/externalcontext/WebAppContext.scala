@@ -133,10 +133,10 @@ class ServletWebAppContext(val servletContext: ServletContext) extends WebAppCon
   def getNativeContext = servletContext
 
   protected def getInitParameter(s: String) = servletContext.getInitParameter(s)
-  protected def getInitParameterNames = servletContext.getInitParameterNames.asScala.asInstanceOf[Iterator[String]].toList
+  protected def getInitParameterNames = servletContext.getInitParameterNames.asScala.toList
 
   protected def getAttribute(k: String) = servletContext.getAttribute(k)
-  protected def getAttributeNames = servletContext.getAttributeNames.asScala.asInstanceOf[Iterator[String]].toList
+  protected def getAttributeNames = servletContext.getAttributeNames.asScala.toList
   protected def setAttribute(k: String, v: AnyRef) = servletContext.setAttribute(k, v)
   protected def removeAttribute(k: String) = servletContext.removeAttribute(k)
 }

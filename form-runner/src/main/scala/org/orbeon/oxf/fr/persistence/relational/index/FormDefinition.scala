@@ -38,7 +38,7 @@ trait FormDefinition {
     }
 
     val migrationPaths =
-      FormRunner.metadataInstanceRoot(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
+      FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
       DataMigration.decodeMigrationsFromJSON map { case (path, iterationName) ⇒
         path.splitTo[List]("/")
       }

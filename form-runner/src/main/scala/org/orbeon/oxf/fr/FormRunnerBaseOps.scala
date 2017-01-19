@@ -131,9 +131,10 @@ trait FormRunnerBaseOps {
     findModelElement(inDoc) \ "*:instance" filter (_.id endsWith TemplateSuffix)
 
   // Get the root element of instances
-  def formInstanceRoot(inDoc: NodeInfo)      = inlineInstanceRootElement(inDoc, "fr-form-instance").get
-  def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata")
-  def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
+  def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, "fr-form-instance").get
+  def resourcesInstanceRoot(inDoc: NodeInfo)   = inlineInstanceRootElement(inDoc, "fr-form-resources").get
+
+  def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-metadata")
 
   private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
 

@@ -78,7 +78,7 @@
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
                     <xf:property name="form-instance"     value="fbf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRoot($form)"/>
+                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
                 <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
@@ -109,7 +109,7 @@
                 <xf:dispatch name="fb-apply" targetid="fb-custom-form-settings">
                     <xf:property name="form"              value="$form"/>
                     <xf:property name="form-instance"     value="fbf:formInstanceRoot($form)"/>
-                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRoot($form)"/>
+                    <xf:property name="metadata-instance" value="fbf:metadataInstanceRootOpt($form)"/>
                 </xf:dispatch>
 
                 <!-- Dispatch event with result -->

@@ -134,6 +134,7 @@ trait FormRunnerBaseOps {
   def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, "fr-form-instance").get
   def resourcesInstanceRoot(inDoc: NodeInfo)   = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
+  //@XPathFunction
   def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-metadata")
 
   private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")

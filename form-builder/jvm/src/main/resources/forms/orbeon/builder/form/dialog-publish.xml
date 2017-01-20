@@ -169,7 +169,7 @@
 
                             <xf:var
                                 name="metadata"
-                                value="frf:metadataInstanceRoot($doc)"/>
+                                value="frf:metadataInstanceRootOpt($doc)"/>
 
                             <xf:delete
                                 ref="$metadata/version-comment"/>
@@ -360,7 +360,7 @@
 
                 <xf:setvalue
                     ref="instance()/existing-comment"
-                    value="frf:metadataInstanceRoot(event('response-body'))/version-comment/string()"/>
+                    value="frf:metadataInstanceRootOpt(event('response-body'))/version-comment/string()"/>
             </xf:action>
 
             <xf:action event="xforms-submit-error" if="event('response-status-code') = (404, 410)">

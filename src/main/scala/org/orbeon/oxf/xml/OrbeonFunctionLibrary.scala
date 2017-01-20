@@ -72,15 +72,15 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
 
       // Create function entry
       val e = new Entry
-      e.name = functionName.toString
+      e.name                = functionName.toString
       e.implementationClass = implementationClass
-      e.opcode = op
-      e.minArguments = min
-      e.maxArguments = max
-      e.itemType = itemType
-      e.cardinality = arity
-      e.argumentTypes = new Array[SequenceType](max)
-      e.resultIfEmpty = new Array[Value](max)
+      e.opcode              = op
+      e.minArguments        = min
+      e.maxArguments        = max
+      e.itemType            = itemType
+      e.cardinality         = arity
+      e.argumentTypes       = new Array[SequenceType](max)
+      e.resultIfEmpty       = new Array[Value](max)
 
       // Add arguments
       args.zipWithIndex foreach { case (a, i) ⇒

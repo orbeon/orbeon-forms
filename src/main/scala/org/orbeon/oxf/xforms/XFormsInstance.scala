@@ -181,7 +181,7 @@ class XFormsInstance(
       case _ ⇒
     }
 
-  def performTargetAction(event: XFormsEvent) =
+  def performTargetAction(event: XFormsEvent): Unit =
     event match {
       case insertEvent: XFormsInsertEvent ⇒
         // New nodes were just inserted

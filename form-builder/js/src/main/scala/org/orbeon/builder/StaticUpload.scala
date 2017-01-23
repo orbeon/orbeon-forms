@@ -13,6 +13,8 @@
  */
 package org.orbeon.builder
 
+import org.orbeon.fr._
+
 object StaticUpload {
 
   private val SpacerImagePath = "/ops/images/xforms/spacer.gif"

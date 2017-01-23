@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Orbeon, Inc.
+ * Copyright (C) 2017 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,13 +11,18 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon
+package org.orbeon.fr
 
-import scala.scalajs.js.Dynamic.{global ⇒ g}
+import scala.scalajs.js.JSApp
 
-package object builder {
-  val ORBEON          = g.ORBEON
-  val $               = ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
-  val Events          = ORBEON.xforms.Events
-  val AjaxServer      = ORBEON.xforms.server.AjaxServer
+// Scala.js starting point for Form Runner
+object FormRunnerApp extends JSApp {
+
+  override def main(): Unit = {
+
+    def initializeOnDomReady(): Unit = {
+    }
+
+    $(initializeOnDomReady _)
+  }
 }

@@ -67,6 +67,7 @@ val LiferayWarLibPath             = "/Users/ebruchez/OF/liferay-portal-6.2-ce-ga
 
 val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
+val FormRunnerResourcesPathInWar  = "apps/fr/resources"
 
 val copyJarToExplodedWar           = taskKey[Option[File]]("Copy JAR file to local WEB-INF/lib for development.")
 val copyDependenciesToExplodedWar  = taskKey[Unit]("Copy managed library JAR files to WEB-INF/lib.")
@@ -91,7 +92,7 @@ def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =
     copyJarFile(file, ExplodedWarLibPath, _ contains "scalajs-", matchRawJarName = false)
   }
 
-def scalaJsFiles(sourceFile: File): Seq[(File, String)] = {
+def scalaJsFiles(sourceFile: File, pathPrefix: String): Seq[(File, String)] = {
 
   val (prefix, optType) =
     sourceFile.name match { case MatchScalaJSFileNameFormatRE(_, prefix, optType) ⇒ prefix → optType }
@@ -100,7 +101,7 @@ def scalaJsFiles(sourceFile: File): Seq[(File, String)] = {
   val jsdepsName    = s"$prefix-jsdeps${if (optType == "opt") ".min" else ""}.js"
   val sourceMapName = s"${sourceFile.name}.map"
 
-  val targetPath = FormBuilderResourcesPathInWar + '/' + "scalajs"
+  val targetPath = pathPrefix + '/' + "scalajs"
 
   List(
     sourceFile                                 → s"$prefix.js",
@@ -110,14 +111,14 @@ def scalaJsFiles(sourceFile: File): Seq[(File, String)] = {
   ) map { case (f, p) ⇒ f → (targetPath + '/' + p) }
 }
 
-def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File): Unit = {
+def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File, pathPrefix: String): Unit = {
 
   val targetDir =
     rootDirectory / ExplodedWarResourcesPath
 
   IO.createDirectory(targetDir)
 
-  for ((sourceFile, newPath) ← scalaJsFiles(sourceFile)) {
+  for ((sourceFile, newPath) ← scalaJsFiles(sourceFile, pathPrefix)) {
     val targetFile = targetDir / newPath
     println(s"Copying Scala.js file ${sourceFile.name} to ${targetFile.absolutePath}.")
     IO.copyFile(
@@ -383,6 +384,51 @@ lazy val portletSupport = (project in file("portlet-support"))
     name := "orbeon-portlet-support"
   )
 
+lazy val formRunnerComponents = (crossProject.crossType(CrossType.Full) in file("form-runner-components"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-form-runner-components"
+  )
+
+lazy val formRunnerComponentsJVM = formRunnerComponents.jvm
+  .enablePlugins(SbtWeb)
+  .settings(assetsSettings: _*)
+  .settings(commonSettings: _*)
+  .settings(
+    // Settings here as `.jvmSettings` above causes infinite recursion
+    // Package Scala.js output into `orbeon-form-runner-components.jar`
+    // This stores the optimized version. For development we need something else.
+    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formRunnerComponentsJS).value.data, FormRunnerResourcesPathInWar)
+  )
+
+lazy val formRunnerComponentsJS = formRunnerComponents.js
+  .dependsOn(commonJS)
+  .settings(
+
+    libraryDependencies            ++= Seq(
+      "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
+      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
+    ),
+
+    skip in packageJSDependencies  := false,
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+
+    persistLauncher     in Compile := true,
+    persistLauncher     in Test    := true,
+
+    fastOptJSToExplodedWar := copyScalaJSToExplodedWar(
+      (fastOptJS in Compile).value.data,
+      baseDirectory.value.getParentFile,
+      FormRunnerResourcesPathInWar
+    ),
+
+    fullOptJSToExplodedWar := copyScalaJSToExplodedWar(
+      (fullOptJS in Compile).value.data,
+      baseDirectory.value.getParentFile,
+      FormRunnerResourcesPathInWar
+    )
+  )
+
 lazy val formRunner = (project in file("form-runner"))
   .dependsOn(portletSupport, core % "test->test;compile->compile")
   .enablePlugins(SbtWeb)
@@ -419,14 +465,14 @@ lazy val formBuilderJVM = formBuilder.jvm
   .settings(assetsSettings: _*)
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
-    // Package Scala.js output into main Form Builder JAR
+    // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formBuilderJS).value.data)
+    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formBuilderJS).value.data, FormBuilderResourcesPathInWar)
   )
 
 
-lazy val formBuilderJS: Project =formBuilder.js
-  .dependsOn(commonJS)
+lazy val formBuilderJS: Project = formBuilder.js
+  .dependsOn(commonJS, formRunnerComponentsJS)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -445,12 +491,14 @@ lazy val formBuilderJS: Project =formBuilder.js
 
     fastOptJSToExplodedWar := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
-      baseDirectory.value.getParentFile
+      baseDirectory.value.getParentFile,
+      FormBuilderResourcesPathInWar
     ),
 
     fullOptJSToExplodedWar := copyScalaJSToExplodedWar(
       (fullOptJS in Compile).value.data,
-      baseDirectory.value.getParentFile
+      baseDirectory.value.getParentFile,
+      FormBuilderResourcesPathInWar
     )
   )
 
@@ -491,6 +539,7 @@ lazy val orbeonWar = (project in file("orbeon-war"))
     core,
     formRunner,
     formBuilderJVM,
+    formRunnerComponentsJVM,
     embedding,              // probably unneeded in WAR
     portletSupport,
     formRunnerProxyPortlet, // unneeded in WAR, but `proxy-portlet-jar` task for now uses JAR in WAR
@@ -507,6 +556,8 @@ lazy val root = (project in file("."))
     xupdate,
     core,
     formRunner,
+    formRunnerComponentsJVM,
+    formRunnerComponentsJS,
     formBuilderJVM,
     formBuilderJS,
     embedding,

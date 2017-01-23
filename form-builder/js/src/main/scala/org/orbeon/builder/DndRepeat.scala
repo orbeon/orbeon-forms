@@ -13,6 +13,7 @@
   */
 package org.orbeon.builder
 
+import org.orbeon.fr._
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
@@ -29,11 +30,6 @@ object DndRepeat {
   val DndLevelPrefix           = "xforms-dnd-level-"
 
   val FindDndLevelRe           = """^xforms-dnd-level-(\d+)$""".r
-
-  @js.native
-  trait XBLCompanion extends js.Object {
-    def container: Element = js.native
-  }
 
   ORBEON.xforms.XBL.declareCompanion("fb|dnd-repeat",
     new js.Object {

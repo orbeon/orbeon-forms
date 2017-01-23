@@ -14,11 +14,28 @@
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Duplicate this here so we can exclude `form-runner-responsive.css` -->
     <property as="xs:string"  name="oxf.fr.css.uri.orbeon.builder">
         /apps/fr/style/form-runner-common.css
         /apps/fr/style/form-runner-base.css
         /apps/fr/style/form-runner-orbeon.css
+        /forms/orbeon/builder/resources/form-builder.css
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.js.uri.orbeon.builder">
+        /forms/orbeon/builder/resources/cell/events.min.js
+        /forms/orbeon/builder/resources/cell/action-icons.min.js
+        /forms/orbeon/builder/resources/cell/placeholders.min.js
+
+        /forms/orbeon/builder/resources/cell/control-resources-editor/actions.min.js
+        /forms/orbeon/builder/resources/cell/control-resources-editor/events.min.js
+        /forms/orbeon/builder/resources/cell/control-resources-editor/placeholders.min.js
+
+        /forms/orbeon/builder/resources/section-grid-repeat/position.min.js
+        /forms/orbeon/builder/resources/section-grid-repeat/section-editor.min.js
+        /forms/orbeon/builder/resources/section-grid-repeat/grid-repeat-editor.min.js
+
+        /forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
+        /forms/orbeon/builder/resources/scalajs/orbeon-form-builder-launcher.js
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">

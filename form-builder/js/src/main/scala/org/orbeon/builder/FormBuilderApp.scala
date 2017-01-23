@@ -23,11 +23,8 @@ object FormBuilderApp extends JSApp {
   override def main(): Unit = {
 
     def initializeOnDomReady(): Unit = {
-
       FormRunnerApp.main()
-
       StaticUpload
-      DndRepeat
     }
 
     $(initializeOnDomReady _)

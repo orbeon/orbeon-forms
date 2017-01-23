@@ -13,6 +13,8 @@
  */
 package org.orbeon.fr
 
+import org.orbeon.xbl.DndRepeat
+
 import scala.scalajs.js.JSApp
 
 // Scala.js starting point for Form Runner
@@ -21,6 +23,7 @@ object FormRunnerApp extends JSApp {
   override def main(): Unit = {
 
     def initializeOnDomReady(): Unit = {
+      DndRepeat
     }
 
     $(initializeOnDomReady _)

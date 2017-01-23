@@ -16,7 +16,6 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 >
@@ -25,8 +24,8 @@
     <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
 
     <xbl:binding
-        id="fb-dnd-repeat"
-        element="fb|dnd-repeat"
+        id="fr-dnd-repeat"
+        element="fr|dnd-repeat"
         xxbl:mode="javascript-lifecycle">
 
         <xbl:resources>

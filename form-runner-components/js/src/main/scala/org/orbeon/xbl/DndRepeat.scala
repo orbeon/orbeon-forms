@@ -11,14 +11,14 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.builder
+package org.orbeon.xbl
 
 import org.orbeon.fr._
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 
-// Companion for `fb:dnd-repeat`
+// Companion for `fr:dnd-repeat`
 object DndRepeat {
 
   val RepeatDelimiterSelector  = ".xforms-repeat-delimiter"
@@ -31,7 +31,7 @@ object DndRepeat {
 
   val FindDndLevelRe           = """^xforms-dnd-level-(\d+)$""".r
 
-  ORBEON.xforms.XBL.declareCompanion("fb|dnd-repeat",
+  ORBEON.xforms.XBL.declareCompanion("fr|dnd-repeat",
     new js.Object {
 
       def containerElem = this.asInstanceOf[XBLCompanion].container

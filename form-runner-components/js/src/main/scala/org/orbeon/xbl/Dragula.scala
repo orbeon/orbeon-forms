@@ -11,7 +11,7 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.builder
+package org.orbeon.xbl
 
 import org.scalajs.dom
 import org.scalajs.dom.html.Element

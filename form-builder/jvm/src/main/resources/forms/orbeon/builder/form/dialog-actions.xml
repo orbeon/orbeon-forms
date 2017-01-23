@@ -207,7 +207,7 @@
                 value="$instance/fb:action/xf:action[@fb:event = 'xforms-submit-done']"/>
 
             <xf:group ref="$response-actions-container">
-                <fb:dnd-repeat
+                <fr:dnd-repeat
                     ref="
                         let $actions :=
                             xf:action[
@@ -341,7 +341,7 @@
                         </xh:div>
 
                     </xh:div>
-                </fb:dnd-repeat>
+                </fr:dnd-repeat>
             </xf:group>
 
         </fr:tab>

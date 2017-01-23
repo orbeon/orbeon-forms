@@ -61,18 +61,18 @@ val CoreLibraryDependencies = Seq(
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
   (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided
 
-val ExplodedWarWebInf             = "build/orbeon-war/WEB-INF"
-val ExplodedWarLibPath            = ExplodedWarWebInf + "/lib"
+val ExplodedWarLibPath            = "build/orbeon-war/WEB-INF/lib"
 val LiferayWarLibPath             = "/Users/ebruchez/OF/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
 
-val ExplodedWarResourcesPath      = ExplodedWarWebInf + "/resources"
+val LocalResourcesPath            = "resources-local"
+
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
 val FormRunnerResourcesPathInWar  = "apps/fr/resources"
 
 val copyJarToExplodedWar           = taskKey[Option[File]]("Copy JAR file to local WEB-INF/lib for development.")
 val copyDependenciesToExplodedWar  = taskKey[Unit]("Copy managed library JAR files to WEB-INF/lib.")
-val fastOptJSToExplodedWar         = taskKey[Unit]("Copy fast-optimized JavaScript files to the exploded WAR.")
-val fullOptJSToExplodedWar         = taskKey[Unit]("Copy full-optimized JavaScript files to the exploded WAR.")
+val fastOptJSToLocalResources      = taskKey[Unit]("Copy fast-optimized JavaScript files to local resources.")
+val fullOptJSToLocalResources      = taskKey[Unit]("Copy full-optimized JavaScript files to local resources.")
 val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
@@ -114,7 +114,7 @@ def scalaJsFiles(sourceFile: File, pathPrefix: String): Seq[(File, String)] = {
 def copyScalaJSToExplodedWar(sourceFile: File, rootDirectory: File, pathPrefix: String): Unit = {
 
   val targetDir =
-    rootDirectory / ExplodedWarResourcesPath
+    rootDirectory / LocalResourcesPath
 
   IO.createDirectory(targetDir)
 
@@ -416,15 +416,15 @@ lazy val formRunnerComponentsJS = formRunnerComponents.js
     persistLauncher     in Compile := true,
     persistLauncher     in Test    := true,
 
-    fastOptJSToExplodedWar := copyScalaJSToExplodedWar(
+    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
-      baseDirectory.value.getParentFile,
+      (baseDirectory in ThisBuild).value,
       FormRunnerResourcesPathInWar
     ),
 
-    fullOptJSToExplodedWar := copyScalaJSToExplodedWar(
+    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fullOptJS in Compile).value.data,
-      baseDirectory.value.getParentFile,
+      (baseDirectory in ThisBuild).value,
       FormRunnerResourcesPathInWar
     )
   )
@@ -489,15 +489,15 @@ lazy val formBuilderJS: Project = formBuilder.js
     testOptions         in Test    += Tests.Setup(() ⇒ println("Setup")),
     testOptions         in Test    += Tests.Cleanup(() ⇒ println("Cleanup")),
 
-    fastOptJSToExplodedWar := copyScalaJSToExplodedWar(
+    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
-      baseDirectory.value.getParentFile,
+      (baseDirectory in ThisBuild).value,
       FormBuilderResourcesPathInWar
     ),
 
-    fullOptJSToExplodedWar := copyScalaJSToExplodedWar(
+    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fullOptJS in Compile).value.data,
-      baseDirectory.value.getParentFile,
+      (baseDirectory in ThisBuild).value,
       FormBuilderResourcesPathInWar
     )
   )

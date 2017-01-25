@@ -39,7 +39,6 @@ abstract class DragulaOptions extends js.Object {
   def removeOnSpill                                                            = false
   def mirrorContainer                                                          = dom.document.body
   def ignoreInputTextSelection                                                 = true
-
 }
 
 @js.native

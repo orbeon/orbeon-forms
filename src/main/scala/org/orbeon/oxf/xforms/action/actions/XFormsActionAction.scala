@@ -16,6 +16,9 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action._
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
+import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEventTarget}
 import org.orbeon.oxf.xml.Dom4j
 
 /**
@@ -29,14 +32,27 @@ class XFormsActionAction extends XFormsAction {
     val actionElement     = actionContext.element
     val bindingContext    = actionContext.bindingContext
 
+    def observerAncestorsOrSelfIterator(observer: XFormsEventTarget) =
+      Iterator.iterate(observer)(_.parentEventObserver) takeWhile (_ ne null)
+
+    def hasClientRepresentation(observer: XFormsEventTarget) =
+      observer match {
+        case c: XFormsVariableControl ⇒ false
+        case c: XFormsControl if c.appearances(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) ⇒ false
+        case c ⇒ true
+      }
+
+    def firstClientRepresentation(observer: XFormsEventTarget) =
+      observerAncestorsOrSelfIterator(observer) find hasClientRepresentation
+
     actionContext.partAnalysis.scriptsByPrefixedId.get(actionInterpreter.getActionPrefixedId(actionElement)) match {
       case Some(script @ StaticScript(_, JavaScriptScriptType, paramExpressions, _)) ⇒
         // Evaluate script parameters if any and schedule the script to run
         actionInterpreter.containingDocument.addScriptToRun(
           ScriptInvocation(
             script              = script,
-            targetEffectiveId   = actionContext.interpreter.event.targetObject.getEffectiveId,
-            observerEffectiveId = actionContext.interpreter.eventObserver.getEffectiveId,
+            targetEffectiveId   = firstClientRepresentation(actionContext.interpreter.event.targetObject) map (_.getEffectiveId) getOrElse "",
+            observerEffectiveId = firstClientRepresentation(actionContext.interpreter.eventObserver)      map (_.getEffectiveId) getOrElse "",
             paramValues         = paramExpressions map { expr ⇒
               // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(

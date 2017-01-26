@@ -39,13 +39,20 @@ trait FancytreeJsonNode extends js.Object {
   val extraClasses : js.UndefOr[String]                      = js.native
 }
 
+@js.native
+trait FancytreeEventData extends js.Object {
+  val tree: Fancytree                = js.native
+  val node: FancytreeJsonNode        = js.native
+  val targetType: js.UndefOr[String] = js.native
+}
+
 object FancytreeJsonNode {
   def apply(
     label           : String,
     value           : String,
-    childrenOrUndef : js.UndefOr[js.Array[FancytreeJsonNode]] = js.undefined,
-    openOrUndef     : js.UndefOr[Boolean]                     = js.undefined,
-    classesOrUndef  : js.UndefOr[String]                      = js.undefined
+    open            : Boolean,
+    classesOrUndef  : js.UndefOr[String]                      = js.undefined,
+    childrenOrUndef : js.UndefOr[js.Array[FancytreeJsonNode]] = js.undefined
   ): FancytreeJsonNode = {
 
     val result = (new js.Object).asInstanceOf[js.Dynamic]
@@ -61,10 +68,8 @@ object FancytreeJsonNode {
       result.children = children
     }
 
-    openOrUndef foreach { open ⇒
-      if (open)
-        result.expanded = true
-    }
+    if (open)
+      result.expanded = true
 
     classesOrUndef foreach { classes ⇒
       result.extraClasses = classes

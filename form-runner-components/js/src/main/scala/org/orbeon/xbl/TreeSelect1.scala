@@ -15,27 +15,24 @@ package org.orbeon.xbl
 
 import org.orbeon.fr._
 import org.orbeon.xforms
-import org.orbeon.xforms._
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 
 object TreeSelect1 {
 
-  case class TreeConfiguration(tree: Fancytree, handlers: List[js.Function])
-
   xforms.XBL.declareCompanion(
     "fr|tree-select1",
-    new XBLCompanion {
+    new xforms.XBLCompanion {
 
       def findTreeContainer         = $(containerElem).find(".xbl-fr-tree-select1-container")
       def removeListeners()         = findTreeContainer.off()
       def logDebug(message: String) = () // println(s"TreeSelect: $message")
 
-      var isReadonly        : Boolean                   = false
-      var hasJavaScriptTree : Boolean                   = true
-      var currentValue      : String                    = ""
-      var treeConfiguration : Option[TreeConfiguration] = None
+      var isReadonly        : Boolean           = false
+      var hasJavaScriptTree : Boolean           = true
+      var currentValue      : String            = ""
+      var treeConfiguration : Option[Fancytree] = None
 
       override def init(): Unit = {
         logDebug("init")
@@ -63,7 +60,7 @@ object TreeSelect1 {
 
           this.currentValue = newValue ensuring (_ ne null)
 
-          val activatedNodeOpt = this.treeConfiguration flatMap (c ⇒ Option(c.tree.activateKey(newValue)))
+          val activatedNodeOpt = this.treeConfiguration flatMap (tree ⇒ Option(tree.activateKey(newValue)))
 
           if (activatedNodeOpt.isEmpty)
             logDebug(s"no matching node for `$newValue`")
@@ -80,36 +77,44 @@ object TreeSelect1 {
 
           logDebug(s"itemset = `$itemset`")
 
-          def convertItems(items: js.Array[Item]): js.Array[FancytreeJsonNode] =
-            for (item ← items)
-              yield FancytreeJsonNode(
+          def itemOpen(item: xforms.Item) =
+            item.attributes flatMap (_.`xxforms-open`) exists (_ == "true")
+
+          def itemChildrenOpen(nodesOrUndef: js.UndefOr[js.Array[FancytreeJsonNode]]) =
+            nodesOrUndef exists (_ exists (_.expanded exists identity))
+
+          def convertItems(items: js.Array[xforms.Item]): js.Array[FancytreeJsonNode] =
+            for {
+              item            ← items
+              childrenOrUndef = item.children map convertItems
+            } yield
+              FancytreeJsonNode(
                 item.label,
                 item.value,
-                item.children map convertItems,
-                item.attributes flatMap (_.`xxforms-open`) map (_ == "true"),
-                item.attributes flatMap (_.`class`)
+                itemOpen(item) || itemChildrenOpen(childrenOrUndef),
+                item.attributes flatMap (_.`class`),
+                childrenOrUndef
               )
 
           val jTreeContainer        = findTreeContainer
           val jTreeContainerDynamic = jTreeContainer.asInstanceOf[js.Dynamic]
 
-          val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[Item]])
+          val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[xforms.Item]])
 
           this.treeConfiguration match {
-            case Some(TreeConfiguration(tree, _)) ⇒
+            case Some(tree) ⇒
               tree.reload(items)
             case None ⇒
               jTreeContainerDynamic.fancytree(new js.Object { val source = items })
               jTreeContainerDynamic.fancytree("option", "toggleEffect", false)
 
-              val onClick: js.Function = (event: JQueryEventObject, data: js.Dynamic) ⇒ {
-                // Always allow click on expanders but don't allow selection when readonly
-                data.targetType.asInstanceOf[String] == "expander" || ! this.isReadonly
-              }
+              // Always allow click on expanders but don't allow selection when readonly
+              val onClick: js.Function = (event: JQueryEventObject, data: FancytreeEventData) ⇒
+                (data.targetType exists (_ == "expander")) || ! this.isReadonly
 
-              val onActivate: js.Function = (event: JQueryEventObject, data: js.Dynamic) ⇒
+              val onActivate: js.Function = (event: JQueryEventObject, data: FancytreeEventData) ⇒
                 if (! this.isReadonly) {
-                  val newValue = data.node.key.asInstanceOf[String] ensuring (_ ne null)
+                  val newValue = data.node.key ensuring (_ ne null)
 
                   if (this.currentValue != newValue) {
                     this.currentValue = newValue
@@ -121,18 +126,10 @@ object TreeSelect1 {
                   }
                 }
 
-              val onDeactivate: js.Function = (event: JQueryEventObject, data: js.Dynamic) ⇒ ()
+              jTreeContainer.on("fancytreeclick",    onClick)
+              jTreeContainer.on("fancytreeactivate", onActivate)
 
-              jTreeContainer.on("fancytreeclick",      onClick)
-              jTreeContainer.on("fancytreeactivate",   onActivate)
-              jTreeContainer.on("fancytreedeactivate", onDeactivate)
-
-              this.treeConfiguration = Some(
-                TreeConfiguration(
-                  jTreeContainerDynamic.fancytree("getTree").asInstanceOf[Fancytree],
-                  List(onActivate, onDeactivate)
-                )
-              )
+              this.treeConfiguration = Some(jTreeContainerDynamic.fancytree("getTree").asInstanceOf[Fancytree])
           }
 
           // Make sure to update the value into the tree

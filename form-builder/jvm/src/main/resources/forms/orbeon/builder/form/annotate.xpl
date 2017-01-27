@@ -310,7 +310,9 @@
                         <xsl:apply-templates
                             select="@*"
                             mode="#current"/>
-                        <xsl:apply-templates
+
+                        <xsl:variable
+                            name="vars1"
                             select="
                                 (*:variable | *:var)[
                                     @name = (
@@ -323,17 +325,26 @@
                                         'item-value',
                                         'dataset-name'
                                     )
-                                ]"
+                                ]"/>
+
+                        <!-- These two variables may be nested for forms generated with an older inline implementation of the action -->
+                        <xsl:variable
+                            name="vars2"
+                            select="
+                                if (p:has-class('fr-itemset-action')) then
+                                    *//(*:variable | *:var)[
+                                        @name = (
+                                            'item-label',
+                                            'item-value'
+                                        )
+                                    ]
+                                else
+                                    ()"/>
+
+                        <xsl:apply-templates
+                            select="$vars1 | $vars2"
                             mode="#current"/>
-                        <xsl:if test="p:has-class('fr-itemset-action')">
-                            <!-- These two variables may be nested for forms generated with the inline implementation of the action -->
-                            <xsl:apply-templates
-                                select="
-                                    .//(*:variable | *:var)[
-                                        @name = ('item-label', 'item-value')
-                                    ]"
-                                mode="#current"/>
-                        </xsl:if>
+
                     </xsl:copy>
                 </xsl:template>
 

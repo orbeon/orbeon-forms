@@ -414,7 +414,7 @@ lazy val formRunnerComponentsJS = formRunnerComponents.js
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
     persistLauncher     in Compile := true,
-    persistLauncher     in Test    := true,
+    persistLauncher     in Test    := false,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,

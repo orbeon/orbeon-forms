@@ -19,9 +19,9 @@ import scala.scalajs.js
 
 @js.native
 trait Fancytree extends js.Object {
-  val activeNode: FancytreeNode = js.native
-  def activateKey(key: String): FancytreeNode = js.native
-  def reload(source: js.Object): JQueryPromise = js.native
+  val activeNode                : FancytreeNode = js.native
+  def activateKey(key: String)  : FancytreeNode = js.native
+  def reload(source: js.Object) : JQueryPromise = js.native
 }
 
 @js.native
@@ -41,9 +41,9 @@ trait FancytreeJsonNode extends js.Object {
 
 @js.native
 trait FancytreeEventData extends js.Object {
-  val tree: Fancytree                = js.native
-  val node: FancytreeJsonNode        = js.native
-  val targetType: js.UndefOr[String] = js.native
+  val tree       : Fancytree          = js.native
+  val node       : FancytreeJsonNode  = js.native
+  val targetType : js.UndefOr[String] = js.native
 }
 
 object FancytreeJsonNode {

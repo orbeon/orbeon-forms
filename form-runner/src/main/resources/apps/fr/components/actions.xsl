@@ -42,18 +42,33 @@
 
     <!-- Gather top-level model as well as models within section templates -->
     <xsl:variable
+        name="xbl-models"
+        select="/xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model"/>
+
+    <xsl:variable
+        name="action-models"
+        select="$fr-form-model, $xbl-models"/>
+
+    <xsl:variable
         name="action-models-ids"
+        select="$fr-form-model-id, $xbl-models/generate-id()"/>
+
+    <xsl:variable
+        name="service-instance-ids"
         select="
-            $fr-form-model-id,
-            /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
+            $action-models/
+                xf:instance[
+                    @id = (
+                        'fr-service-request-instance',
+                        'fr-service-response-instance'
+                    )
+                ]/
+                generate-id()"/>
 
     <xsl:variable
         name="action-bindings"
         select="
-            /xh:html/xh:head//
-                xf:model[
-                    generate-id() = $action-models-ids
-                ]/
+            $action-models/
                 xf:action[
                     ends-with(@id, '-binding')
                 ]"/>
@@ -63,8 +78,8 @@
         select="
             distinct-values(
                 $action-bindings/
-                (ancestor::xf:model[1])/
-                generate-id()
+                    (ancestor::xf:model[1])/
+                    generate-id()
             )"/>
 
     <xsl:variable
@@ -476,6 +491,17 @@
         </xf:action>
     </xsl:template>
 
+    <!-- Remove existing service instances if any -->
+    <xsl:template match="
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $action-models-ids
+                ]/
+                xf:instance[
+                    generate-id() = $service-instance-ids
+                ]"/>
+
+    <!-- Insert service instances -->
     <xsl:template name="action-common-impl">
         <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all"><request/></xf:instance>
         <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all"><response/></xf:instance>

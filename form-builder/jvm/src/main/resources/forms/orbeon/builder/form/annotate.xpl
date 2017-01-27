@@ -39,12 +39,24 @@
                 <xsl:variable name="xbl-ids"                      select="/*/xh:head/xbl:xbl/generate-id()"/>
                 <xsl:variable name="bindings"                     select="doc('input:bindings')/*/xbl:xbl/xbl:binding"/>
 
-
+                <!-- Identify the range of nodes which contain the service instances.
+                     NOTE: We also try to prune text nodes between the two service instances and one text node after,
+                     but that doesn't seem to work -->
                 <xsl:variable name="service-instances"            select="$model/xf:instance[@id = ('fr-service-request-instance', 'fr-service-response-instance')]"/>
                 <xsl:variable name="service-instance-comment"     select="$service-instances/preceding-sibling::comment()[normalize-space() = 'Utility instances for services']"/>
+                <xsl:variable name="service-instance-after"       select="$service-instances/following-sibling::node()[1]/self::text()"/>
+                <xsl:variable name="service-nodes"                select="$service-instance-comment | $service-instances | $service-instance-after"/>
 
-                <xsl:variable name="service-nodes"                select="$service-instance-comment | $service-instances"/>
-                <xsl:variable name="service-nodes-all"            select="$service-nodes[1]/following-sibling::node() intersect $service-nodes[last()]/preceding-sibling::node()"/>
+                <xsl:variable
+                    name="service-nodes-all"
+                    select="
+                        $service-nodes[1],
+                        (
+                            $service-nodes[1]/following-sibling::node() intersect
+                            $service-nodes[last()]/preceding-sibling::node()
+                        ),
+                        $service-nodes[last()]"/>
+
                 <xsl:variable name="service-nodes-all-ids"        select="$service-nodes-all/generate-id()"/>
 
                 <!-- Only look at templates which are actually for repeats, in case form author manually added

@@ -63,7 +63,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     val configRoot = configDocument.getRootElement
     val templateRoot = configRoot.element("template")
 
-    val instanceDocument = readInputAsDOM4J(pipelineContext, input)
+    val instanceDocument = readInputAsOrbeonDom(pipelineContext, input)
     val instanceDocumentInfo = new DocumentWrapper(instanceDocument, null, XPath.GlobalConfiguration)
 
     // Create PDF reader

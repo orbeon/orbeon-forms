@@ -53,7 +53,7 @@ public class ServletIncludeGenerator extends ProcessorImpl {
                 // Read config
                 final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                     public Config read(PipelineContext context, ProcessorInput input) {
-                        Document configNode = readInputAsDOM4J(context, input);
+                        Document configNode = readInputAsOrbeonDom(context, input);
                         String servletName = XPathUtils.selectStringValueNormalize(configNode, "/config/servlet-name");
                         String path = XPathUtils.selectStringValueNormalize(configNode, "/config/path");
                         String contextPath = XPathUtils.selectStringValueNormalize(configNode, "/config/context-uripath");

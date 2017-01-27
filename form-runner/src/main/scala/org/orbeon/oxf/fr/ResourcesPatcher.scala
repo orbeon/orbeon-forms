@@ -35,8 +35,8 @@ class ResourcesPatcher extends SimpleProcessor  {
   def generateData(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
     // Read inputs
-    val resourcesDocument = readInputAsDOM4J(pipelineContext, "data")
-    val instanceElement   = new DocumentWrapper(readInputAsDOM4J(pipelineContext, "instance"), null, XPath.GlobalConfiguration) \ *
+    val resourcesDocument = readInputAsOrbeonDom(pipelineContext, "data")
+    val instanceElement   = new DocumentWrapper(readInputAsOrbeonDom(pipelineContext, "instance"), null, XPath.GlobalConfiguration) \ *
 
     val app  = instanceElement \ "app"  stringValue
     val form = instanceElement \ "form" stringValue

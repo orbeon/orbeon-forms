@@ -92,7 +92,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                 final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                     public Config read(PipelineContext context, ProcessorInput input) {
 
-                        final Document configNode = readInputAsDOM4J(context, input);
+                        final Document configNode = readInputAsOrbeonDom(context, input);
                         final Config config = new Config();
 
                         final String baseDirectoryURLString = StringUtils.trimAllToEmpty(XPathUtils.selectStringValueNormalize(configNode, "/config/base-directory"));

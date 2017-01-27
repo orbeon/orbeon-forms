@@ -43,7 +43,7 @@ public class SessionGenerator extends ProcessorImpl {
                     String key = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
                         new CacheableInputReader<String>() {
                             public String read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
-                                Document dom = readInputAsDOM4J(context, input);
+                                Document dom = readInputAsOrbeonDom(context, input);
                                 try {
                                     String key = XPathUtils.selectStringValueNormalize(dom, "/key");
                                     if (key == null)

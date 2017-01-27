@@ -46,7 +46,7 @@ public class DebugProcessor extends ProcessorImpl {
                         final String debugMessage;
                         final LocationData debugLocationData;
                         {
-                            final Element configElement = readInputAsDOM4J(pipelineContext, INPUT_CONFIG).getRootElement();
+                            final Element configElement = readInputAsOrbeonDom(pipelineContext, INPUT_CONFIG).getRootElement();
                             debugMessage = configElement.element("message").getText();
                             if (configElement.element("system-id") != null) {
                                 debugLocationData = new LocationData(configElement.element("system-id").getText(),

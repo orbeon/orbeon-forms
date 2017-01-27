@@ -127,7 +127,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                             logger.debug("Reading Schema: " + schemaId);
                                             time = System.currentTimeMillis();
                                         }
-                                        final Document schemaDoc = readInputAsDOM4J(context, input);
+                                        final Document schemaDoc = readInputAsOrbeonDom(context, input);
                                         final LocationData locator = (LocationData) schemaDoc.getRootElement().getData();
                                         final String schemaSystemId = (locator != null && locator.file() != null) ? locator.file() : null;
                                         // Be sure to set our own XML parser factory

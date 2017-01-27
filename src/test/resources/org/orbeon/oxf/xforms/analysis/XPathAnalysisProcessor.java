@@ -31,7 +31,7 @@ public class XPathAnalysisProcessor extends SimpleProcessor {
     public void generateAnalysis(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
         // Read form document
-        final Document formDocument = readInputAsDOM4J(pipelineContext, "form");
+        final Document formDocument = readInputAsOrbeonDom(pipelineContext, "form");
 
         // Create static state for form
         final XFormsStaticState staticState = XFormsStaticStateImpl.createFromDocument(formDocument)._2();

@@ -42,7 +42,7 @@ public class SleepProcessor extends ProcessorImpl {
                 try {
                     final SAXStore inputStore = new SAXStore();
                     readInputAsSAX(context, INPUT_DATA, inputStore);
-                    final Document delayDocument = readInputAsDOM4J(context, INPUT_CONFIG);
+                    final Document delayDocument = readInputAsOrbeonDom(context, INPUT_CONFIG);
                     final String delayString = delayDocument.getStringValue();
                     Thread.sleep(Long.parseLong(delayString));
                     inputStore.replay(xmlReceiver);

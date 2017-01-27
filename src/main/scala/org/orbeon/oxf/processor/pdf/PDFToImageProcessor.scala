@@ -70,7 +70,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
           readCacheInputAsObject(pc, getInputByName(INPUT_CONFIG), new CacheableInputReader[Config] {
             override def read(pipelineContext: PipelineContext, input: ProcessorInput): Config = {
 
-              val configElem = readInputAsDOM4J(pipelineContext, input).getRootElement
+              val configElem = readInputAsOrbeonDom(pipelineContext, input).getRootElement
 
               def elemValue(elem: DOM4JElement) =
                 Option(elem) map (_.getStringValue) flatMap trimAllToOpt

@@ -54,7 +54,7 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 
         // Read inputs
         final Document configDocument = readCacheInputAsDOM4J(context, "barcode");
-		final Document instanceDocument = readInputAsDOM4J(context, "data");
+		final Document instanceDocument = readInputAsOrbeonDom(context, "data");
 
         // Wraps documents for XPath API
         final DocumentInfo configDocumentInfo = new DocumentWrapper(configDocument, null, XPath.GlobalConfiguration());

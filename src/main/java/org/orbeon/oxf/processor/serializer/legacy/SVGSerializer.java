@@ -42,7 +42,7 @@ public class SVGSerializer extends HttpBinarySerializer {
             imageTranscoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, new Float(0.8));
             //t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Integer(100));
             //trans.addTranscodingHint(JPEGTranscoder.KEY_AOI, aoi);
-            //Document document = readInputAsDOM4J(context, input);
+            //Document document = readInputAsOrbeonDom(context, input);
             //String documentString = XMLUtils.domToString(document);
             //TranscoderInput ti = new TranscoderInput(new StringReader(documentString));
             //TranscoderInput tixxx1 = new TranscoderInput(document);

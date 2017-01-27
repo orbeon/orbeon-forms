@@ -36,7 +36,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
     protected ContextConfig readConfig(PipelineContext context) {
         return readCacheInputAsObject(context, getInputByName(ProcessorImpl.INPUT_CONFIG), new CacheableInputReader<ContextConfig>() {
             public ContextConfig read(PipelineContext context, ProcessorInput input) {
-                final Element rootElement = readInputAsDOM4J(context, input).getRootElement();
+                final Element rootElement = readInputAsOrbeonDom(context, input).getRootElement();
                 final String contextName = rootElement.element("scope").getStringValue();
                 final Element sessionScopeElement = rootElement.element("session-scope");
                 final Element contentTypeElement = rootElement.element(Headers.ContentTypeLower());

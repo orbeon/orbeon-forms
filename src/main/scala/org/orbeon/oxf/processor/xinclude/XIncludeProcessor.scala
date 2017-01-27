@@ -50,7 +50,7 @@ class XIncludeProcessor extends ProcessorImpl {
           if (getConnectedInputs.get(AttributesInput) ne null) {
             readCacheInputAsObject(pipelineContext, getInputByName(AttributesInput), new CacheableInputReader[Map[String, Boolean]] {
               def read(pipelineContext: PipelineContext, input: ProcessorInput) = {
-                val preferencesDocument = readInputAsDOM4J(pipelineContext, input)
+                val preferencesDocument = readInputAsOrbeonDom(pipelineContext, input)
                 val propertyStore = new PropertyStore(preferencesDocument)
                 val propertySet = propertyStore.getGlobalPropertySet
 

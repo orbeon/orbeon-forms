@@ -72,7 +72,7 @@ public class PipelineReader extends ProcessorImpl {
     }
 
     public void start(PipelineContext context) {
-        final Document pipelineDocument = readInputAsDOM4J(context, "pipeline");
+        final Document pipelineDocument = readInputAsOrbeonDom(context, "pipeline");
         pipeline = readPipeline(pipelineDocument, getInputValidity(context, getInputByName("pipeline")));
     }
 

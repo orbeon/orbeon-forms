@@ -115,7 +115,7 @@ public class ExecuteProcessor extends ProcessorImpl {
             // Read config
             final Config config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                 public Config read(PipelineContext context, ProcessorInput input) {
-                    return new Config(readInputAsDOM4J(context, input));
+                    return new Config(readInputAsOrbeonDom(context, input));
                 }
             });
 

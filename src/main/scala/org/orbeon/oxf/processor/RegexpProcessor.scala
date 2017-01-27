@@ -33,8 +33,8 @@ class RegexpProcessor extends ProcessorImpl {
     addOutput(name, new CacheableTransformerOutputImpl(self, name) {
       def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
         // Read inputs
-        val data   = readInputAsDOM4J(pipelineContext, INPUT_DATA)
-        val config = readInputAsDOM4J(pipelineContext, INPUT_CONFIG)
+        val data   = readInputAsOrbeonDom(pipelineContext, INPUT_DATA)
+        val config = readInputAsOrbeonDom(pipelineContext, INPUT_CONFIG)
 
         val text   = data.getRootElement.getStringValue
         val regexp = config.getRootElement.getStringValue

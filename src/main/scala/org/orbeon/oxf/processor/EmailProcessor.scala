@@ -60,7 +60,7 @@ class EmailProcessor extends ProcessorImpl {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    val dataDocument   = readInputAsDOM4J(pipelineContext, ProcessorImpl.INPUT_DATA)
+    val dataDocument   = readInputAsOrbeonDom(pipelineContext, ProcessorImpl.INPUT_DATA)
     val messageElement = dataDocument.getRootElement
 
     // Get system id (will likely be null if document is generated dynamically)

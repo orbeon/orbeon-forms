@@ -103,7 +103,7 @@ public class Datasource {
     public static Datasource getDatasource(PipelineContext pipelineContext, final ProcessorImpl processorImpl, final ProcessorInput datasourceInput) {
         return processorImpl.readCacheInputAsObject(pipelineContext, datasourceInput, new CacheableInputReader<Datasource>() {
             public Datasource read(PipelineContext context, ProcessorInput input) {
-                return new Datasource(processorImpl, processorImpl.readInputAsDOM4J(context, datasourceInput));
+                return new Datasource(processorImpl, processorImpl.readInputAsOrbeonDom(context, datasourceInput));
             }
         });
     }

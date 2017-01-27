@@ -231,7 +231,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         return readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
                 new CacheableInputReader<Config>() {
                     public Config read(PipelineContext context, ProcessorInput input) {
-                        Element configElement = readInputAsDOM4J(context, input).getRootElement();
+                        Element configElement = readInputAsOrbeonDom(context, input).getRootElement();
                         try {
                             String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
                             Integer statusCode = XPathUtils.selectIntegerValue(configElement, "/config/status-code");

@@ -362,7 +362,7 @@ public class URLGenerator extends ProcessorImpl {
                 final ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
                     readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<ConfigURIReferences>() {
                         public ConfigURIReferences read(PipelineContext context, ProcessorInput input) {
-                            final Element configElement = readInputAsDOM4J(context, input).getRootElement();
+                            final Element configElement = readInputAsOrbeonDom(context, input).getRootElement();
 
                             // Processor location data
                             final LocationData locationData = URLGenerator.this.getLocationData();

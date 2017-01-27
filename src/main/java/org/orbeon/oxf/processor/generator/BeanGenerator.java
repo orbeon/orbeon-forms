@@ -61,7 +61,7 @@ public class BeanGenerator extends ProcessorImpl {
         return readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
             new CacheableInputReader<Config>() {
                 public Config read(PipelineContext context, ProcessorInput input) {
-                    Document dom = readInputAsDOM4J(context, input);
+                    Document dom = readInputAsOrbeonDom(context, input);
                     try {
                         Config config2 = new Config();
                         for (Iterator i = XPathUtils.selectNodeIterator(dom, "/config/attribute"); i.hasNext();) {
@@ -98,7 +98,7 @@ public class BeanGenerator extends ProcessorImpl {
 //                            readInputAsSAX(context, input, identity);
 //                            logger.warn(result.toString());
 
-                        Document dom = readInputAsDOM4J(context, input);
+                        Document dom = readInputAsOrbeonDom(context, input);
 
                         Mapping mapping = new Mapping();
                         mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToString(dom))));

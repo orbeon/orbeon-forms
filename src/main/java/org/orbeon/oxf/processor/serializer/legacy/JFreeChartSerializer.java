@@ -84,7 +84,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                         return createChartConfig(context, input);
                     }
                 });
-            Document data = readInputAsDOM4J(pipelineContext, (input != null) ? input : getInputByName(INPUT_DATA));
+            Document data = readInputAsOrbeonDom(pipelineContext, (input != null) ? input : getInputByName(INPUT_DATA));
 
             Dataset ds;
             if (chartConfig.getType() == ChartConfig.PIE_TYPE ||
@@ -216,7 +216,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
     }
     protected ChartConfig createChartConfig(org.orbeon.oxf.pipeline.api.PipelineContext context, org.orbeon.oxf.processor.ProcessorInput input) {
         ChartConfig chart = new ChartConfig();
-        Document doc = readInputAsDOM4J(context, input);
+        Document doc = readInputAsOrbeonDom(context, input);
         DefaultDrawingSupplier defaults = new DefaultDrawingSupplier();
 
         String type = XPathUtils.selectStringValueNormalize(doc, "/chart/type");

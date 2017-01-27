@@ -51,7 +51,7 @@ public class QNameConverter extends ProcessorImpl {
                     public Config read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                         Config result = new Config();
 
-                        Element configElement = readInputAsDOM4J(context, input).getRootElement();
+                        Element configElement = readInputAsOrbeonDom(context, input).getRootElement();
 
                         {
                             Element matchURIElement = configElement.element("match").element("uri");

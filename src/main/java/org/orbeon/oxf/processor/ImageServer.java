@@ -104,7 +104,7 @@ public class ImageServer extends ProcessorImpl {
             final Config config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                 public Config read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
-                    final Document configDocument = readInputAsDOM4J(pipelineContext, processorInput);
+                    final Document configDocument = readInputAsOrbeonDom(pipelineContext, processorInput);
                     final Config result = new Config();
 
                     String imageDirectoryString = XPathUtils.selectStringValueNormalize(configDocument, "/config/image-directory");

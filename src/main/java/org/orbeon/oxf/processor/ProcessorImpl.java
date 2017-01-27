@@ -274,10 +274,15 @@ public abstract class ProcessorImpl implements Processor {
         return (Document) domResult.getNode();
     }
 
-    public org.orbeon.dom.Document readInputAsDOM4J(PipelineContext context, ProcessorInput input) {
+    public org.orbeon.dom.Document readInputAsOrbeonDom(PipelineContext context, ProcessorInput input) {
         LocationSAXContentHandler ch = new LocationSAXContentHandler();
         readInputAsSAX(context, input, ch);
         return ch.getDocument();
+    }
+
+    // TODO: https://github.com/orbeon/orbeon-forms/issues/3088
+    public org.orbeon.dom.Document readInputAsDOM4J(PipelineContext context, ProcessorInput input) {
+        return readInputAsOrbeonDom(context, input);
     }
 
     public DocumentInfo readInputAsTinyTree(PipelineContext context, ProcessorInput input, Configuration configuration) {
@@ -290,8 +295,8 @@ public abstract class ProcessorImpl implements Processor {
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 
-    public org.orbeon.dom.Document readInputAsDOM4J(PipelineContext context, String inputName) {
-        return readInputAsDOM4J(context, getInputByName(inputName));
+    public org.orbeon.dom.Document readInputAsOrbeonDom(PipelineContext context, String inputName) {
+        return readInputAsOrbeonDom(context, getInputByName(inputName));
     }
 
 
@@ -306,7 +311,7 @@ public abstract class ProcessorImpl implements Processor {
     public org.orbeon.dom.Document readCacheInputAsDOM4J(PipelineContext context, String inputName) {
         return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<org.orbeon.dom.Document>() {
             public org.orbeon.dom.Document read(PipelineContext context, ProcessorInput input) {
-                return readInputAsDOM4J(context, input);
+                return readInputAsOrbeonDom(context, input);
             }
         });
     }

@@ -46,7 +46,7 @@ public class PortletPreferencesSerializer extends ProcessorImpl {
         final PortletRequest portletRequest = (PortletRequest) externalContext.getRequest().getNativeRequest();
         final PortletPreferences preferences = portletRequest.getPreferences();
 
-        final Document document = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+        final Document document = readInputAsOrbeonDom(pipelineContext, INPUT_DATA);
 
         boolean modified = false;
         for (Iterator i = document.getRootElement().elements().iterator(); i.hasNext();) {

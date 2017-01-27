@@ -60,7 +60,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     final Signature dsa = Signature.getInstance("SHA1withDSA");
                     dsa.initVerify(pubKey);
 
-                    final Document data = readInputAsDOM4J(context, INPUT_DATA);
+                    final Document data = readInputAsOrbeonDom(context, INPUT_DATA);
                     final Element dataElement = data.getRootElement().elements("data").get(0);
                     final Node sigDataNode =  dataElement.elements().get(0);
                     final String sig = StringUtils.trimAllToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));

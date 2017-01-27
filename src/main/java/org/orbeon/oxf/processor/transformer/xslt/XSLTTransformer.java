@@ -135,7 +135,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // Read input as an attribute Map and cache it
                         attributesFromProperties = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {
                             public Map<String, Boolean> read(PipelineContext context, ProcessorInput input) {
-                                final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                final Document preferencesDocument = readInputAsOrbeonDom(context, input);
                                 final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
                                 final PropertySet propertySet = propertyStore.getGlobalPropertySet();
                                 return propertySet.getBooleanProperties();

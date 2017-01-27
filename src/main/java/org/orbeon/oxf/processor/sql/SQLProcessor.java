@@ -114,7 +114,7 @@ public class SQLProcessor extends ProcessorImpl {
             Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                 public Config read(PipelineContext context, ProcessorInput input) {
                     // Read the config input document
-                    Node config = readInputAsDOM4J(context, input);
+                    Node config = readInputAsOrbeonDom(context, input);
                     Document configDocument = config.getDocument();
 
                     // Extract XPath expressions and also check whether any XPath expression is used at all
@@ -226,7 +226,7 @@ public class SQLProcessor extends ProcessorImpl {
                 }
                 // If we can't stream, read everything in
                 if (!useXPathContentHandler)
-                    data = readInputAsDOM4J(context, INPUT_DATA);
+                    data = readInputAsOrbeonDom(context, INPUT_DATA);
             }
 
             // Try to read datasource input if any

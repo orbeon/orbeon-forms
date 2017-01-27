@@ -50,7 +50,7 @@ public class TestScriptProcessor extends ProcessorImpl {
     @Override
     public void start(PipelineContext pipelineContext) {
         // Read configuration script
-        Document config = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+        Document config = readInputAsOrbeonDom(pipelineContext, INPUT_CONFIG);
 
         // Create execution context
         ExecutionContext executionContext = new ExecutionContext();
@@ -165,7 +165,7 @@ public class TestScriptProcessor extends ProcessorImpl {
                     throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but was expected to be different.");
             } else if (condition.equals("output-equals")) {
 
-                final Document actualDocument = executionContext.outputProcessor.readInputAsDOM4J(pipelineContext, outputName);
+                final Document actualDocument = executionContext.outputProcessor.readInputAsOrbeonDom(pipelineContext, outputName);
                 final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
                 if (!Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
@@ -272,8 +272,8 @@ public class TestScriptProcessor extends ProcessorImpl {
         }
 
         @Override
-        public Document readInputAsDOM4J(PipelineContext context, String inputName) {
-            return super.readInputAsDOM4J(context, inputName);
+        public Document readInputAsOrbeonDom(PipelineContext context, String inputName) {
+            return super.readInputAsOrbeonDom(context, inputName);
         }
     }
 }

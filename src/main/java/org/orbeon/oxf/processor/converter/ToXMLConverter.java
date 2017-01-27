@@ -46,7 +46,7 @@ public class ToXMLConverter extends ProcessorImpl {
                 final XMLParsing.ParserConfiguration config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<XMLParsing.ParserConfiguration>() {
                     public XMLParsing.ParserConfiguration read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
 
-                        final Element configElement = readInputAsDOM4J(context, input).getRootElement();
+                        final Element configElement = readInputAsOrbeonDom(context, input).getRootElement();
 
                         return new XMLParsing.ParserConfiguration(
                                 ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING),

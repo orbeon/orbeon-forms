@@ -98,7 +98,7 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
 
     protected ChartInfo createChart(org.orbeon.oxf.pipeline.api.PipelineContext context, JFreeChartSerializer.ChartConfig chartConfig) {
 
-        Document data = readInputAsDOM4J(context, getInputByName(INPUT_DATA));
+        Document data = readInputAsOrbeonDom(context, getInputByName(INPUT_DATA));
 
         Dataset ds;
         if (chartConfig.getType() == JFreeChartSerializer.ChartConfig.PIE_TYPE ||

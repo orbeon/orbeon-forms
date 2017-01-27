@@ -66,7 +66,7 @@ public class LDAPProcessor extends ProcessorImpl {
                     Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                         public Config read(PipelineContext context, ProcessorInput input) {
                             Config config = new Config();
-                            Document doc = readInputAsDOM4J(context, input);
+                            Document doc = readInputAsOrbeonDom(context, input);
 
                             // Try local configuration first
                             String host = XPathUtils.selectStringValueNormalize(doc, "/config/host");
@@ -111,7 +111,7 @@ public class LDAPProcessor extends ProcessorImpl {
                     Command command = readCacheInputAsObject(context, getInputByName(INPUT_FILTER), new CacheableInputReader<Command>() {
                         public Command read(PipelineContext context, ProcessorInput input) {
                             Command command;
-                            Document filterDoc = readInputAsDOM4J(context, input);
+                            Document filterDoc = readInputAsOrbeonDom(context, input);
                             String filterNodeName = filterDoc.getRootElement().getName();
 
                             if ("update".equals(filterNodeName)) {

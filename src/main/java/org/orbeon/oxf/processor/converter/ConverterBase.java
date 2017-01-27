@@ -55,7 +55,7 @@ public abstract class ConverterBase extends ProcessorImpl {
         return readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG),
             new CacheableInputReader<Config>() {
                 public Config read(PipelineContext pipelineContext, ProcessorInput input) {
-                    final Element configElement = readInputAsDOM4J(pipelineContext, input).getRootElement();
+                    final Element configElement = readInputAsOrbeonDom(pipelineContext, input).getRootElement();
                     try {
                         final Config config = new Config();
 

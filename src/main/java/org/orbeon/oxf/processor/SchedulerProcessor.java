@@ -50,7 +50,7 @@ public class SchedulerProcessor extends ProcessorImpl {
             List configs = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<List>() {
                 public List read(PipelineContext context, ProcessorInput input) {
                     List configs = new ArrayList();
-                    Document document = readInputAsDOM4J(context, input);
+                    Document document = readInputAsOrbeonDom(context, input);
 
                     for (Iterator i = XPathUtils.selectNodeIterator(document, "/config/start-task"); i.hasNext();) {
                         Element startTaskElement = (Element) i.next();

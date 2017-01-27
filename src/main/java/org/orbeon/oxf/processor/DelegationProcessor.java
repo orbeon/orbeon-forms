@@ -62,7 +62,7 @@ public class DelegationProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorOutputImpl(DelegationProcessor.this, name) {
             public void readImpl(final PipelineContext context, final XMLReceiver xmlReceiver) {
-                final List<ServiceDefinition> services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
+                final List<ServiceDefinition> services = readServices(readInputAsOrbeonDom(context, INPUT_INTERFACE));
 
                 readInputAsSAX(context, INPUT_CALL, new ForwardingXMLReceiver(xmlReceiver) {
 

@@ -57,7 +57,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val pageFlow = readCacheInputAsObject(pc, getInputByName(ControllerInput), new CacheableInputReader[PageFlow] {
       def read(context: PipelineContext, input: ProcessorInput) =
         compile(
-          configRoot         = readInputAsDOM4J(pc, ControllerInput).getRootElement,
+          configRoot         = readInputAsOrbeonDom(pc, ControllerInput).getRootElement,
           controllerValidity = ProcessorImpl.getInputValidity(pc, getInputByName(ControllerInput))
         )
     })

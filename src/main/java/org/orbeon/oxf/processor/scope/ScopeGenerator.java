@@ -215,7 +215,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
             new CacheableInputReader<Mapping>() {
                 public Mapping read(PipelineContext context, ProcessorInput input) {
                     try {
-                        Document mappingDocument = readInputAsDOM4J(context, input);
+                        Document mappingDocument = readInputAsOrbeonDom(context, input);
                         Mapping mapping = new Mapping();
                         mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToString(mappingDocument))));
                         return mapping;

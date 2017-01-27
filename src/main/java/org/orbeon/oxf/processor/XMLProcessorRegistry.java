@@ -40,7 +40,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
 
     public void start(final PipelineContext ctxt) {
         try {
-            final Node cfg = readInputAsDOM4J(ctxt, INPUT_CONFIG);
+            final Node cfg = readInputAsOrbeonDom(ctxt, INPUT_CONFIG);
 
             for (Iterator i = XPathUtils.selectNodeIterator(cfg, "/processors//processor"); i.hasNext();) { // support multiple nesting levels
                 Element processorElement = (Element) i.next();

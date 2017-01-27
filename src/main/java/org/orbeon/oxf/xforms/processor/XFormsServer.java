@@ -120,7 +120,7 @@ public class XFormsServer extends ProcessorImpl {
     private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
         // Use request input provided by client
-        final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+        final Document requestDocument = readInputAsOrbeonDom(pipelineContext, INPUT_REQUEST);
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Request request = externalContext.getRequest();
@@ -128,7 +128,7 @@ public class XFormsServer extends ProcessorImpl {
         // It's not possible to handle a form update without an existing session. We depend on this to check the UUID,
         // to get the lock, and (except for client state) to retrieve form state.
         //
-        // NOTE: We should test this at the beginning of this method, but calling readInputAsDOM4J() in unit tests
+        // NOTE: We should test this at the beginning of this method, but calling readInputAsOrbeonDom() in unit tests
         // can cause the side effect to create the session, so doing so without changing some tests doesn't work.
         ClientEvents.assertSessionExists();
 

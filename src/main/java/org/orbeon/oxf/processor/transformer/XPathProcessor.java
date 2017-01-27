@@ -60,7 +60,7 @@ public class XPathProcessor extends ProcessorImpl {
 
                Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
                     public Config read(PipelineContext context, final ProcessorInput input) {
-                        final Document config = readInputAsDOM4J(context, INPUT_CONFIG);
+                        final Document config = readInputAsOrbeonDom(context, INPUT_CONFIG);
 
                         // Get declared namespaces
                         final Map<String, String> namespaces = new HashMap<String, String>();

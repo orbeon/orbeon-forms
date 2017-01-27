@@ -68,7 +68,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
         final ProcessorOutput output = new ProcessorOutputImpl(SaxonXQueryProcessor.this, name) {
             public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
-                    final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+                    final Document dataDocument = readInputAsOrbeonDom(pipelineContext, INPUT_DATA);
 
                     // Create XQuery configuration (depends on attributes input)
                     final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, XMLParsing.ParserConfiguration.PLAIN);
@@ -90,7 +90,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                 // Read input as an attribute Map and cache it
                                 attributesFromProperties = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {
                                     public Map<String, Boolean> read(PipelineContext context, ProcessorInput input) {
-                                        final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                        final Document preferencesDocument = readInputAsOrbeonDom(context, input);
                                         final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
                                         final PropertySet propertySet = propertyStore.getGlobalPropertySet();
                                         return propertySet.getBooleanProperties();

@@ -160,7 +160,7 @@ public class JavaProcessor extends ProcessorImpl {
             ProcessorInput input = getInputByName(INPUT_CONFIG);
             final Config config = readCacheInputAsObject(context, input, new CacheableInputReader<Config>() {
                 public Config read(PipelineContext context, ProcessorInput input) {
-                    Document configDocument = readInputAsDOM4J(context, INPUT_CONFIG);
+                    Document configDocument = readInputAsOrbeonDom(context, INPUT_CONFIG);
                     Element configElement = configDocument.getRootElement();
                     Config config = new Config();
                     config.clazz = configElement.attributeValue("class");

@@ -30,6 +30,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 trait FormRunnerPersistence {
 
@@ -220,7 +221,12 @@ trait FormRunnerPersistence {
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String) =
     collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true)._1.asJava
 
-  def collectAttachments(data: DocumentInfo, fromBasePath: String, toBasePath: String, forceAttachments: Boolean) = (
+  def collectAttachments(
+    data             : DocumentInfo,
+    fromBasePath     : String,
+    toBasePath       : String,
+    forceAttachments : Boolean
+  ): (Seq[NodeInfo], Seq[String], Seq[String]) = (
     for {
       holder        ← data \\ Node
       if isAttribute(holder) || isElement(holder) && ! hasChildElement(holder)
@@ -258,14 +264,13 @@ trait FormRunnerPersistence {
     username          : Option[String] = None,
     password          : Option[String] = None,
     formVersion       : Option[String] = None
-  ) = {
+  ): (Seq[String], Seq[String], Int) = {
 
     // Find all instance nodes containing file URLs we need to upload
     val (uploadHolders, beforeURLs, afterURLs) =
       collectAttachments(data, fromBasePath, toBasePath, forceAttachments)
 
-    // Save all attachments
-    def saveAttachments(): Unit =
+    def saveAllAttachments(): Unit =
       uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
         sendThrowOnError("fr-create-update-attachment-submission", Map(
           "holder"       → Some(holder),
@@ -276,14 +281,17 @@ trait FormRunnerPersistence {
         )
       }
 
-    // Update the paths on success
-    def updatePaths() =
+    def updateAttachmentPaths() =
       uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
         setvalue(holder, resource)
       }
 
-    // Save XML document
-    def saveData() =
+    def rollbackAttachmentPaths() =
+      uploadHolders zip beforeURLs foreach { case (holder, resource) ⇒
+        setvalue(holder, resource)
+      }
+
+    def saveXmlData() =
       sendThrowOnError("fr-create-update-submission", Map(
         "holder"       → Some(data.rootElement),
         "resource"     → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
@@ -292,19 +300,37 @@ trait FormRunnerPersistence {
         "form-version" → formVersion)
       )
 
-    // Do things in order, so we don't update path or save the data if any the upload fails
-    saveAttachments()
-    updatePaths()
+    // First process attachments
+    saveAllAttachments()
 
-    // Save and try to retrieve returned version
     val versionOpt =
-      for {
-        done     ← saveData()
-        headers  ← done.headers
-        versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion ⇒ values }
-        version  ← versions.headOption
-      } yield
-        version
+      try {
+
+        // Before saving data, update attachment paths
+        updateAttachmentPaths()
+
+        // Save and try to retrieve returned version
+        for {
+          done     ← saveXmlData()
+          headers  ← done.headers
+          versions ← headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion ⇒ values }
+          version  ← versions.headOption
+        } yield
+          version
+
+      } catch {
+        case NonFatal(e) ⇒
+          // In our persistence implementation, we do not remove attachments if saving the data fails.
+          // However, some custom persistence implementations do. So we don't think we can assume that
+          // attachments have been saved. So we rollback attachment paths in the data in this case.
+          // This will cause attachments to be saved again even if they actually have already been saved.
+          // It is not ideal, but will not lead to data loss. See also:
+          //
+          // - https://github.com/orbeon/orbeon-forms/issues/606
+          // - https://github.com/orbeon/orbeon-forms/issues/3084
+          rollbackAttachmentPaths()
+          throw e
+      }
 
     (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
   }

@@ -2,6 +2,7 @@
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <xh:head>
         <xh:title/>
@@ -147,6 +148,16 @@
                     </resource>
                 </resources>
             </xf:instance>
+
+            <!-- Utility instances for services -->
+            <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
+                <request/>
+            </xf:instance>
+
+            <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
+                <response/>
+            </xf:instance>
+
             <xf:instance xxf:readonly="true" id="grid-3-template">
                 <grid-3>
                     <control-5/>
@@ -183,6 +194,59 @@
             </xf:instance>
             <xf:action event="xforms-ready"/>
             <xf:action ev:event="xforms-model-construct-done" xmlns:ev="http://www.w3.org/2001/xml-events"/>
+
+            <xf:instance id="echo-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body>&lt;request/&gt;</body>
+            </xf:instance>
+            <xf:submission id="echo-submission" class="fr-service"
+                           ref="instance('fr-service-request-instance')"
+                           resource="/fr/service/custom/orbeon/echo"
+                           method="post"
+                           serialization="application/xml"
+                           mediatype="application/xml"
+                           replace="instance"
+                           instance="fr-service-response-instance"/>
+            <xf:action id="fill-dropdown-binding">
+                <!-- React to event... on control... -->
+                <xf:action event="xforms-ready" ev:observer="fr-form-model" if="true()">
+                    <!-- Service to call -->
+                    <xf:send submission="echo-submission"/>
+                </xf:action>
+                <!-- Request actions -->
+                <xf:action event="xforms-submit" ev:observer="echo-submission">
+                    <!-- Get reference to initial request -->
+                    <xf:var name="request-instance-name" value="'echo-instance'" as="xs:string"/>
+                    <!-- Copy over to read-write request instance -->
+                    <xf:insert ref="instance('fr-service-request-instance')"
+                               origin="saxon:parse(instance($request-instance-name))"/>
+                    <!-- Set values if needed -->
+                    <xf:action context="instance('fr-service-request-instance')">
+                        <!-- Setvalue actions will be here -->
+                    </xf:action>
+                </xf:action>
+                <!-- Response actions -->
+                <xf:action event="xforms-submit-done" ev:observer="echo-submission"
+                           context="instance('fr-service-response-instance')">
+                    <xf:action class="fr-itemset-action">
+                        <xf:var name="control-name" value="'dropdown'"/>
+                        <xf:var name="response-items" value="/*/item"/>
+                        <xf:var name="foo" value="foo"/>
+                        <xf:var name="bar" value="bar"/>
+                        <xf:action>
+                            <xf:var name="item-label" value="label"/>
+                            <xf:var name="item-value" value="value"/>
+                        </xf:action>
+                    </xf:action>
+                    <xf:action class="fr-set-control-value-action">
+                        <xf:var name="control-name" value="'dropdown'"/>
+                        <xf:var name="control-value" value="/*/value"/>
+                    </xf:action>
+                    <xf:action class="fr-save-to-dataset-action">
+                        <xf:var name="dataset-name">my-itemset</xf:var>
+                    </xf:action>
+                    <!-- Response actions will be here -->
+                </xf:action>
+            </xf:action>
         </xf:model>
     </xh:head>
     <xh:body>

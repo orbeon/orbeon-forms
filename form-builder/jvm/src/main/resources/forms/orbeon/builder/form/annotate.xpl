@@ -57,7 +57,7 @@
                     name="service-instance-comment"
                     select="
                         $service-instances/
-                            preceding-sibling::node()[1]/self::comment()[
+                            preceding-sibling::comment()[
                                 normalize-space() = 'Utility instances for services'
                             ]"/>
 

@@ -20,8 +20,9 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 >
 
-    <!-- NOTE: JavaScript code is handled by Scala.js so no other <script> element here. -->
     <xbl:script src="/xbl/orbeon/tabbable/dragula/dragula.min.js"/>
+    <xbl:script src="/apps/fr/resources/scalajs/orbeon-form-runner-components.js"/>
+    <xbl:script src="/apps/fr/resources/scalajs/orbeon-form-runner-components-launcher.js"/>
 
     <xbl:binding
         id="fr-dnd-repeat"

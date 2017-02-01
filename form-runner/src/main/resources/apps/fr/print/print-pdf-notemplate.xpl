@@ -75,6 +75,9 @@
                 <!-- While we are at it filter out scripts as they won't be used -->
                 <xsl:template match="*:script | *:noscript" mode="#all"/>
 
+                <!-- https://github.com/orbeon/orbeon-forms/issues/3096 -->
+                <xsl:template match="*:label/*:br[empty(following-sibling::*) and p:is-blank(following-sibling::text())]" mode="#all"/>
+
                 <!--
                     Hyperlinks, see:
 

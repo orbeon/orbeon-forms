@@ -131,9 +131,7 @@ object Portlet2ExternalContext {
         // `ProcessorService` to try to write out an error message. So we should not have to deal with character
         // encoding here.
         val characterEncoding =
-          _responseContentType flatMap
-            (ct ⇒ Option(NetUtils.getContentTypeCharset(ct))) getOrElse
-            ExternalContext.StandardCharacterEncoding
+          _responseContentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
 
         streams._2.toString.getBytes(characterEncoding)
       } else {

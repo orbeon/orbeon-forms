@@ -15,7 +15,7 @@ package org.orbeon.oxf.resources.handler
 
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.net.URLCodec
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.ContentTypes
 
 // Decode as per https://tools.ietf.org/html/rfc2397
 object DataURLDecoder {
@@ -31,7 +31,7 @@ object DataURLDecoder {
     val beforeData = url.substring("data:".length, comma)
     val data       = url.substring(comma + 1).getBytes(DefaultCharset)
 
-    val mediatype = Option(NetUtils.getContentTypeMediaType(beforeData)) getOrElse DefaultMediatype
+    val mediatype = ContentTypes.getContentTypeMediaType(beforeData) getOrElse DefaultMediatype
     val params    = parseContentTypeParameters(beforeData)
 
     val isBase64 = params.contains("base64")

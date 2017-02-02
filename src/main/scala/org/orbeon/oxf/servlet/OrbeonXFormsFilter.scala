@@ -20,9 +20,9 @@ import javax.servlet.http._
 
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 
 private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {
   // NOTE: Never match anything if there is no context path
@@ -242,8 +242,8 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   private var _servletOutputStream: ServletOutputStream     = null
   private var _stringWriter: StringWriter                   = null
   private var _printWriter: PrintWriter                     = null
-  private var _encoding: String                             = null
-  private var _mediatype: String                            = null
+  private var _encoding: Option[String]                     = None
+  private var _mediatype: Option[String]                    = None
 
   override def setStatus(code: Int)                         = _statusCode = Some(code)
   override def setStatus(code: Int, message: String)        = setStatus(code)
@@ -264,7 +264,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   override def flushBuffer()                                = () // NOP
   override def isCommitted                                  = false
   override def reset()                                      = resetBuffer()
-  override def getCharacterEncoding                         = Option(_encoding) getOrElse defaultEncoding
+  override def getCharacterEncoding                         = _encoding getOrElse defaultEncoding
 
   override def getOutputStream = {
     if (_byteArrayOutputStream eq null) {
@@ -285,8 +285,8 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
   }
 
   override def setContentType(contentType: String): Unit = {
-    this._encoding  = NetUtils.getContentTypeCharset(contentType)
-    this._mediatype = NetUtils.getContentTypeMediaType(contentType)
+    this._encoding  = ContentTypes.getContentTypeCharset(contentType)
+    this._mediatype = ContentTypes.getContentTypeMediaType(contentType)
   }
 
   override def resetBuffer(): Unit = {
@@ -300,7 +300,7 @@ private class FilterResponseWrapper(response: HttpServletResponse, defaultEncodi
     }
   }
 
-  def mediaType = Option(_mediatype)
+  def mediaType = _mediatype
 
   def content =
     if (_stringWriter ne null) {

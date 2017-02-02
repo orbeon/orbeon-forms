@@ -20,6 +20,7 @@ object ContentTypes {
   val XmlContentType  = "application/xml"
   val JsonContentType = "application/json"
   val HtmlContentType = "text/html"
+  val SoapContentType = "application/soap+xml"
 
   private val XmlTextContentType    = "text/xml"
   private val XmlContentTypeSuffix  = "+xml"
@@ -45,4 +46,47 @@ object ContentTypes {
 
   def isTextOrJSONContentType(contentType: String): Boolean =
     isTextContentType(contentType) || isJSONContentType(contentType)
+
+  def getContentTypeCharset(contentType: String): Option[String] =
+      getContentTypeParameters(contentType).get("charset")
+
+  def getContentTypeParameters(contentTypeOrNull: String): Map[String, String] = {
+
+    if (contentTypeOrNull eq null)
+      return Map.empty
+
+    val parametersIt = contentTypeOrNull.splitTo[Iterator](";").drop(1)
+
+    if (! parametersIt.hasNext)
+      return Map.empty // no parameters part
+
+    val result =
+      for {
+        nameValue ← parametersIt
+        equalIndex = nameValue.indexOf('=')
+        if equalIndex >= 0
+        name  = nameValue.substring(0, equalIndex).trimAllToEmpty
+        value = nameValue.substring(equalIndex + 1).trimAllToEmpty
+        if name.nonEmpty
+      } yield
+        name → value
+
+    result.toMap
+  }
+
+  def getContentTypeMediaType(contentTypeOrNull: String): Option[String] = {
+
+    if (contentTypeOrNull eq null)
+      return None
+
+    val semicolonIndex = contentTypeOrNull.indexOf(";")
+    if (semicolonIndex < 0)
+      return contentTypeOrNull.trimAllToOpt
+
+    contentTypeOrNull.substring(0, semicolonIndex).trimAllToOpt filterNot (_.equalsIgnoreCase("content/unknown"))
+  }
+
+  // For Java callers
+  def getContentTypeCharsetOrNull(contentType: String)        : String = getContentTypeCharset(contentType).orNull
+  def getContentTypeMediaTypeOrNull(contentTypeOrNull: String): String = getContentTypeMediaType(contentTypeOrNull).orNull
 }

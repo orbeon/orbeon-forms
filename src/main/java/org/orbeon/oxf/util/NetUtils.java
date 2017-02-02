@@ -19,12 +19,12 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.WebAppListener;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.externalcontext.WebAppListener;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -49,8 +49,6 @@ public class NetUtils {
     public static final int REQUEST_SCOPE = 0;
     public static final int SESSION_SCOPE = 1;
     public static final int APPLICATION_SCOPE = 2;
-
-    public static final String APPLICATION_SOAP_XML = "application/soap+xml";
 
     static {
         final String token = "[^=&]";
@@ -236,10 +234,6 @@ public class NetUtils {
         return writer.toString();
     }
 
-    public static String getContentTypeCharset(String contentType) {
-        return getContentTypeParameters(contentType).get("charset");
-    }
-
     public static Map<String, String> getContentTypeParameters(String contentType) {
         if (contentType == null)
             return Collections.emptyMap();
@@ -273,22 +267,6 @@ public class NetUtils {
             parameters.put(name, value);
         }
         return parameters;
-    }
-
-    public static String getContentTypeMediaType(String contentType) {
-        contentType = StringUtils.trimAllToNull(contentType);
-        if (contentType == null)
-            return null;
-
-        final int semicolonIndex = contentType.indexOf(";");
-        if (semicolonIndex == -1)
-            return contentType;
-
-        final String mediatype = StringUtils.trimAllToNull(contentType.substring(0, semicolonIndex));
-        if (mediatype == null || mediatype.equalsIgnoreCase("content/unknown"))
-            return null;
-        else
-            return mediatype;
     }
 
     /**

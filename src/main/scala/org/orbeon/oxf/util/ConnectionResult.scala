@@ -42,10 +42,10 @@ case class ConnectionResult(
   def close() = content.close()
 
   val mediatype =
-    content.contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeMediaType(ct)))
+    content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeMediaType(ct))
 
   val charset =
-    content.contentType flatMap (ct ⇒ Option(NetUtils.getContentTypeCharset(ct)))
+    content.contentType flatMap (ct ⇒ ContentTypes.getContentTypeCharset(ct))
 
   def mediatypeOrDefault(default: String) =
     mediatype getOrElse default

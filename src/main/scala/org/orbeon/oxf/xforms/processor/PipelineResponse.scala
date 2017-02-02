@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.processor
 
 import java.io.{OutputStreamWriter, PrintWriter}
 
+import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.CachedSerializer
-import org.orbeon.oxf.util.{ContentHandlerOutputStream, NetUtils}
-import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter}
+import org.orbeon.oxf.util.{ContentHandlerOutputStream, ContentTypes}
 import org.orbeon.oxf.xml.XMLReceiver
 
 object PipelineResponse {
@@ -61,7 +61,7 @@ object PipelineResponse {
         override def setHeader(name: String, value: String): Unit = {
           // Handle Content-Type
           if (name equalsIgnoreCase Headers.ContentType) {
-            charset = Option(NetUtils.getContentTypeCharset(value))
+            charset = ContentTypes.getContentTypeCharset(value)
             contentHandlerOutputStream.setContentType(value)
           }
           // Don't allow other headers

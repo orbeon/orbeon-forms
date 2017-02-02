@@ -713,7 +713,7 @@ object Connection extends Logging {
 
     require(encoding ne null)
 
-    import org.orbeon.oxf.util.NetUtils.{APPLICATION_SOAP_XML, getContentTypeMediaType, getContentTypeParameters}
+    import org.orbeon.oxf.util.ContentTypes._
 
     val contentTypeMediaType = getContentTypeMediaType(mediatypeMaybeWithCharset)
 
@@ -722,25 +722,24 @@ object Connection extends Logging {
     // appended to the application/soap+xml MIME type." and "the charset MIME parameter is appended . The charset
     // parameter value from the mediatype attribute is used if it is specified. Otherwise, the value of the encoding
     // attribute (or its default) is used."
-    def charsetSuffix(parameters: collection.Map[String, String]) =
-      "; charset=" + parameters.getOrElse("charset", encoding)
+    def charsetSuffix(charset: Option[String]) =
+      "; charset=" + charset.getOrElse(encoding)
 
     val newHeaders =
       method match {
-        case GET if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
+        case GET if contentTypeMediaType contains SoapContentType ⇒
           // Set an Accept header
 
-          val parameters = getContentTypeParameters(mediatypeMaybeWithCharset).asScala
-          val acceptHeader = APPLICATION_SOAP_XML + charsetSuffix(parameters)
+          val acceptHeader = SoapContentType + charsetSuffix(getContentTypeCharset(mediatypeMaybeWithCharset))
 
           // Accept header with optional charset
           List("accept" → List(acceptHeader))
 
-        case POST if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
+        case POST if contentTypeMediaType contains SoapContentType ⇒
           // Set Content-Type and optionally SOAPAction headers
 
-          val parameters            = getContentTypeParameters(mediatypeMaybeWithCharset).asScala
-          val overriddenContentType = "text/xml" + charsetSuffix(parameters)
+          val parameters            = getContentTypeParameters(mediatypeMaybeWithCharset)
+          val overriddenContentType = "text/xml" + charsetSuffix(parameters.get("charset"))
           val actionParameter       = parameters.get("action")
 
           // Content-Type with optional charset and SOAPAction header if any

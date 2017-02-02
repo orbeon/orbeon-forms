@@ -13,14 +13,18 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.generator.TidyConfig;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.ContentTypes;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.*;
-import java.io.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Locale;
 
 public class ServletResponseWrapper extends HttpServletResponseWrapper {
@@ -47,8 +51,8 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper {
     }
 
     public void setContentType(String contentType) {
-        streamInterceptor.setEncoding(NetUtils.getContentTypeCharset(contentType));
-        streamInterceptor.setContentType(NetUtils.getContentTypeMediaType(contentType));
+        streamInterceptor.setEncoding(ContentTypes.getContentTypeCharsetOrNull(contentType));
+        streamInterceptor.setContentType(ContentTypes.getContentTypeMediaTypeOrNull(contentType));
     }
 
     public void addCookie(Cookie cookie) {

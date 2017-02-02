@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.serializer;
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -24,10 +25,10 @@ import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
+import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.IOException;
@@ -338,7 +339,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         if (config.forceContentType)
             return config.contentType;
 
-        String documentContentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
+        String documentContentType = ContentTypes.getContentTypeMediaTypeOrNull(contentTypeAttribute);
         if (!config.ignoreDocumentContentType && documentContentType != null)
             return documentContentType;
 
@@ -361,7 +362,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         if (config.forceEncoding)
             return config.encoding;
 
-        String documentEncoding = NetUtils.getContentTypeCharset(contentTypeAttribute);
+        String documentEncoding = ContentTypes.getContentTypeCharsetOrNull(contentTypeAttribute);
         if (!config.ignoreDocumentEncoding && documentEncoding != null)
             return documentEncoding;
 

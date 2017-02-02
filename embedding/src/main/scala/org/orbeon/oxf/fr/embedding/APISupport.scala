@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
@@ -202,10 +203,10 @@ object APISupport {
   }
 
   def writeResponseBody(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
-    content.contentType map getContentTypeMediaType match {
+    content.contentType flatMap ContentTypes.getContentTypeMediaType match {
       case Some(mediatype) if ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype) ⇒
         // Text/JSON/XML content type: rewrite response content
-        val encoding        = content.contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
+        val encoding        = content.contentType flatMap ContentTypes.getContentTypeCharset getOrElse ExternalContext.StandardCharacterEncoding
         val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
         val encodeForXML    = ContentTypes.isXMLMediatype(mediatype)
 

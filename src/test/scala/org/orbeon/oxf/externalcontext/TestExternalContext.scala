@@ -99,8 +99,8 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
       val bodyNode = XPathUtils.selectSingleNode(requestDocument, "/*/body").asInstanceOf[Element]
       bodyNode ne null option {
         val contentTypeAttribute = bodyNode.attributeValue(Headers.ContentTypeLower)
-        val contentType          = NetUtils.getContentTypeMediaType(contentTypeAttribute)
-        val charset              = NetUtils.getContentTypeCharset(contentTypeAttribute)
+        val contentType          = ContentTypes.getContentTypeMediaType(contentTypeAttribute) getOrElse (throw new IllegalArgumentException)
+        val charset              = ContentTypes.getContentTypeCharset(contentTypeAttribute)   getOrElse (throw new IllegalArgumentException)
         val hrefAttribute        = bodyNode.attributeValue("href")
 
         // TODO: Support same scenarios as Email processor

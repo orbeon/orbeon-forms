@@ -806,7 +806,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
             isHandlingClientGetAll = containingDocument.isOptimizeGetAllSubmission() && actualHttpMethod.equals("GET")
                     && isReplaceAll
-                    && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
+                    && (resolvedMediatype == null || !resolvedMediatype.startsWith(ContentTypes.SoapContentType())) // can't let SOAP requests be handled by the browser
                     && avtXXFormsUsername == null // can't optimize if there are authentication credentials
                     && avtXXFormsTarget == null   // can't optimize if there is a target
                     && getSubmissionElement().elements(XFormsConstants.XFORMS_HEADER_QNAME).size() == 0; // can't optimize if there are headers specified

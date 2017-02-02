@@ -22,7 +22,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
-import org.orbeon.oxf.util.NetUtils.{getContentTypeCharset, getContentTypeMediaType}
+import org.orbeon.oxf.util.ContentTypes.{getContentTypeCharset, getContentTypeMediaType}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Base64XMLReceiver, ContentTypes, DateUtils, TextXMLReceiver}
 import org.orbeon.oxf.xml.XMLConstants._
@@ -207,22 +207,22 @@ class BinaryTextXMLReceiver(
     }
 
   // Content type determination algorithm
-  private def getContentType(contentTypeAttribute: Option[String], defaultContentType: String) =
+  private def getContentType(contentTypeAttribute: Option[String], defaultContentType: String): String =
     if (forceContentType)
       requestedContentType.get
     else if (ignoreDocumentContentType)
       requestedContentType getOrElse defaultContentType
     else
-      contentTypeAttribute map getContentTypeMediaType getOrElse defaultContentType
+      contentTypeAttribute flatMap getContentTypeMediaType getOrElse defaultContentType
 
   // Encoding determination algorithm
-  private def getEncoding(contentTypeAttribute: Option[String], defaultEncoding: String) =
+  private def getEncoding(contentTypeAttribute: Option[String], defaultEncoding: String): String =
     if (forceEncoding)
       requestedEncoding.get
     else if (ignoreDocumentEncoding)
       requestedEncoding getOrElse defaultEncoding
     else
-      contentTypeAttribute flatMap (c ⇒ Option(getContentTypeCharset(c))) getOrElse defaultEncoding
+      contentTypeAttribute flatMap getContentTypeCharset getOrElse defaultEncoding
 }
 
 object BinaryTextXMLReceiver {

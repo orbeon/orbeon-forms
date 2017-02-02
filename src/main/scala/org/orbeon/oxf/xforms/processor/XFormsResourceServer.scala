@@ -357,7 +357,7 @@ object XFormsResourceServer {
       val key    = (uri, headers filterNot (_._1.equalsIgnoreCase("Orbeon-Token"))).toString
       val digest = SecureUtils.digestString(key, "hex")
 
-      val mediatypeOpt        = contentTypeOpt map NetUtils.getContentTypeMediaType
+      val mediatypeOpt        = contentTypeOpt flatMap ContentTypes.getContentTypeMediaType
       val incompleteMediatype = mediatypeOpt exists (_.endsWith("/*"))
 
       val contentType =
@@ -368,7 +368,7 @@ object XFormsResourceServer {
         uri          = uri,
         filenameOpt  = filenameOpt,
         contentType  = contentType,
-        mediaType    = NetUtils.getContentTypeMediaType(contentType),
+        mediaType    = ContentTypes.getContentTypeMediaType(contentType) getOrElse (throw new IllegalStateException),
         size         = -1,
         lastModified = lastModified,
         headers      = headers

@@ -235,7 +235,7 @@ class EmailProcessor extends ProcessorImpl {
         else
           None
       } else {
-        Option(NetUtils.getContentTypeMediaType(bodyElement.attributeValue(Headers.ContentTypeLower))) filter
+        ContentTypes.getContentTypeMediaType(bodyElement.attributeValue(Headers.ContentTypeLower)) filter
         (_.startsWith("multipart/")) map
         (_.substring("multipart/".length))
       }
@@ -262,10 +262,10 @@ class EmailProcessor extends ProcessorImpl {
   private def handlePart(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, partOrBodyElement: Element): Unit = {
     val name = partOrBodyElement.attributeValue("name")
     val contentTypeAttribute = partOrBodyElement.attributeValue(Headers.ContentTypeLower)
-    val contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute)
-    val charset = Option(NetUtils.getContentTypeCharset(contentTypeAttribute)) getOrElse DEFAULT_CHARACTER_ENCODING
+    val mediatype = ContentTypes.getContentTypeMediaType(contentTypeAttribute) getOrElse (throw new IllegalArgumentException)
+    val charset   = ContentTypes.getContentTypeCharset(contentTypeAttribute) getOrElse DEFAULT_CHARACTER_ENCODING
 
-    val contentTypeWithCharset = contentType + "; charset=" + charset
+    val contentTypeWithCharset = mediatype + "; charset=" + charset
 
     // Either a String or a FileItem
     val content =
@@ -274,13 +274,13 @@ class EmailProcessor extends ProcessorImpl {
           // Content of the part is not inline
 
           // Generate a FileItem from the source
-          val source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType)
+          val source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, mediatype)
           Left(handleStreamedPartContent(pipelineContext, source))
         case None ⇒
           // Content of the part is inline
 
           // In the cases of text/html and XML, there must be exactly one root element
-          val needsRootElement = contentType == "text/html"// || ProcessorUtils.isXMLContentType(contentType);
+          val needsRootElement = mediatype == ContentTypes.HtmlContentType// || ProcessorUtils.isXMLContentType(contentType);
           if (needsRootElement && partOrBodyElement.elements.size != 1)
             throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html", partOrBodyElement.getData.asInstanceOf[LocationData])
 
@@ -288,21 +288,21 @@ class EmailProcessor extends ProcessorImpl {
           val rootElement = if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement
           val partDocument = DocumentFactory.createDocument
           partDocument.setRootElement(rootElement.clone().asInstanceOf[Element])
-          Right(handleInlinePartContent(partDocument, contentType))
+          Right(handleInlinePartContent(partDocument, mediatype))
       }
 
-    if (! ContentTypes.isTextOrJSONContentType(contentType)) {
+    if (! ContentTypes.isTextOrJSONContentType(mediatype)) {
       // This is binary content (including application/xml)
       content match {
         case Left(fileItem) ⇒
           parentPart.setDataHandler(new DataHandler(new ReadonlyDataSource {
-            def getContentType = contentType
+            def getContentType = mediatype
             def getInputStream = fileItem.getInputStream
             def getName = name
           }))
         case Right(inline) ⇒
           val data = NetUtils.base64StringToByteArray(inline)
-          parentPart.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)))
+          parentPart.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, mediatype, data)))
       }
     } else {
       // This is text content (including text/xml)

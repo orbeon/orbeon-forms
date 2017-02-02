@@ -44,11 +44,21 @@
 
     <xsl:variable name="fr-form-metadata" select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
 
-    <xsl:variable name="is-detail" select="not($mode = ('summary', 'home', ''))" as="xs:boolean"/>
-    <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
+    <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', ''))"          as="xs:boolean"/>
+    <xsl:variable name="is-summary"          select="$mode = 'summary'"                             as="xs:boolean"/>
+    <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"         as="xs:boolean"/>
     <xsl:variable name="is-noscript-support" select="$fr-form-model/@xxf:noscript-support = 'true'" as="xs:boolean"/>
-    <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'
-                                                and $is-noscript-support" as="xs:boolean"/>
+
+    <xsl:variable
+        name="is-noscript"
+        as="xs:boolean"
+        select="
+            doc('input:request')/request/parameters/parameter[
+                name = 'fr-noscript'
+            ]/value = 'true'
+                and
+            $is-noscript-support"/>
+
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
     <!-- Properties -->
@@ -67,16 +77,44 @@
     <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>
     <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))"                        as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
-    <xsl:variable name="css-uri"              select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))))"         as="xs:string*"/>
-    <xsl:variable name="custom-css-uri"       select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))))"  as="xs:string*"/>
-    <xsl:variable name="js-uri"               select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.uri', $app, $form), '.'))))"          as="xs:string*"/>
-    <xsl:variable name="custom-js-uri"        select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))"   as="xs:string*"/>
+
     <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
     <xsl:variable name="captcha-type"         select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"                            as="xs:string"/>
     <xsl:variable name="has-captcha"          select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"                                                  as="xs:boolean"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
+
+    <xsl:function name="fr:get-uris-from-properties" as="xs:string*">
+        <xsl:param name="name" as="xs:string"/>
+
+        <xsl:sequence
+            select="
+                p:split(
+                    normalize-space(
+                        p:property(string-join(('oxf.fr', $name, 'uri', $app, $form), '.'))
+                    )
+                )"/>
+
+        <xsl:if test="$is-detail or $is-summary">
+            <xsl:sequence
+                select="
+                    p:split(
+                        normalize-space(
+                            p:property(string-join(('oxf.fr', if ($is-detail) then 'detail' else 'summary', $name, 'uri', $app, $form), '.'))
+                        )
+                    )"/>
+        </xsl:if>
+    </xsl:function>
+
+    <xsl:variable
+        name="css-uri"
+        as="xs:string*"
+        select="fr:get-uris-from-properties('css'), fr:get-uris-from-properties('css.custom')"/>
+    <xsl:variable
+        name="js-uri"
+        as="xs:string*"
+        select="fr:get-uris-from-properties('js'), fr:get-uris-from-properties('js.custom')"/>
 
     <xsl:variable
         name="label-appearance"
@@ -259,7 +297,7 @@
             </xh:title>
 
             <!-- Form Runner CSS (standard and custom) -->
-            <xsl:for-each select="$css-uri, $custom-css-uri">
+            <xsl:for-each select="$css-uri">
                 <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
             </xsl:for-each>
 
@@ -275,7 +313,7 @@
 
             <!-- Form Runner JavaScript (standard and custom) -->
             <xsl:if test="not($is-noscript)">
-                <xsl:for-each select="$js-uri, $custom-js-uri">
+                <xsl:for-each select="$js-uri">
                     <xh:script type="text/javascript" src="{.}"/>
                 </xsl:for-each>
             </xsl:if>

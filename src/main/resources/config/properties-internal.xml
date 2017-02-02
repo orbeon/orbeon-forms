@@ -152,10 +152,13 @@
         /apps/fr/style/form-runner-common.css
         /apps/fr/style/form-runner-base.css
         /apps/fr/style/form-runner-orbeon.css
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.css.uri.*.*">
         /apps/fr/style/form-runner-responsive.css
     </property>
 
-    <property as="xs:string"  name="oxf.fr.js.uri.*.*">
+    <property as="xs:string"  name="oxf.fr.detail.js.uri.*.*">
         /ops/javascript/fastclick/fastclick.min.js
         /apps/fr/script/form-runner.min.js
         /apps/fr/resources/scalajs/orbeon-form-runner-components.js

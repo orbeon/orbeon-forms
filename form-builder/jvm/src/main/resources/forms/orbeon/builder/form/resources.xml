@@ -852,26 +852,22 @@
                 <label>Source XPath expression</label>
             </source-xpath>
             <response-itemset>
-                <label>Set Response Selection Control Items</label>
+                <label>Set Response Selection Control Choices</label>
             </response-itemset>
             <destination-selection-control>
                 <label>Destination Selection Control</label>
             </destination-selection-control>
-            <itemset>
-                <label>Itemset</label>
-                <hint>XPath expressions to build a new itemset</hint>
-            </itemset>
             <items>
-                <label>Items XPath expression</label>
-                <hint>Return one node for each item</hint>
+                <label>Choices XPath expression</label>
+                <hint>Return one node for each choice</hint>
             </items>
             <item-label>
                 <label>Label XPath expression</label>
-                <hint>Relative to item node</hint>
+                <hint>Relative to choice tem node</hint>
             </item-label>
             <item-value>
                 <label>Value XPath expression</label>
-                <hint>Relative to item node</hint>
+                <hint>Relative to choice node</hint>
             </item-value>
             <save>
                 <label>Save</label>
@@ -885,7 +881,7 @@
             <service-response-actions>Service Response Actions</service-response-actions>
 
             <set-control-value>Set Control Value</set-control-value>
-            <set-control-itemset>Set Control Itemset</set-control-itemset>
+            <set-control-itemset>Set Control Choices</set-control-itemset>
             <save-to-dataset>Save to Dataset</save-to-dataset>
             <dataset-name>Dataset Name</dataset-name>
 
@@ -1806,10 +1802,6 @@
             <destination-selection-control>
                 <label>Contrôle de sélection de destination</label>
             </destination-selection-control>
-            <itemset>
-                <label>Choix</label>
-                <hint>Expressions XPath pour liste de choix</hint>
-            </itemset>
             <items>
                 <label>Expression XPath pour les choix</label>
                 <hint>Retourne un nœud pour chaque choix</hint>
@@ -2751,26 +2743,22 @@
                 <label>XPath-uttrykk for kilden</label>
             </source-xpath>
             <response-itemset>
-                <label>Set Response Selection Control Items</label>
+                <label todo="true">[Set Response Selection Control Items]</label>
             </response-itemset>
             <destination-selection-control>
-                <label>Destination Selection Control</label>
+                <label todo="true">[Destination Selection Control]</label>
             </destination-selection-control>
-            <itemset>
-                <label>Itemset</label>
-                <hint>XPath expressions to build a new itemset</hint>
-            </itemset>
             <items>
                 <label>Items</label>
-                <hint>XPath expression returning one node for each item</hint>
+                <hint todo="true">[XPath expression returning one node for each item]</hint>
             </items>
             <item-label>
                 <label>Label</label>
-                <hint>XPath expression relative to an item node</hint>
+                <hint todo="true">[XPath expression relative to an item node]</hint>
             </item-label>
             <item-value>
                 <label>Verdi</label>
-                <hint>XPath expression relative to an item node</hint>
+                <hint todo="true">[XPath expression relative to an item node]</hint>
             </item-value>
             <save>
                 <label>Lagre</label>
@@ -3705,10 +3693,6 @@
             <destination-selection-control>
                 <label>Целевой элемент выбора</label>
             </destination-selection-control>
-            <itemset>
-                <label>Набор элементов</label>
-                <hint>Выражение XPath для создания нового набора элементов</hint>
-            </itemset>
             <items>
                 <label>Элементы</label>
                 <hint>Выражение XPath, возвращает один узел для каждого элемента.</hint>
@@ -4647,10 +4631,6 @@
             <destination-selection-control>
                 <label>Controllo selezione destinazione</label>
             </destination-selection-control>
-            <itemset>
-                <label>Scelta</label>
-                <hint>Espressione XPath per creare una nuova scelta</hint>
-            </itemset>
             <items>
                 <label>Elementi</label>
                 <hint>Espressione XPath che ritorna un nodo per ogni elemento</hint>
@@ -5590,10 +5570,6 @@
             <destination-selection-control>
                 <label>Auswahlsteuerelement (Ziel)</label>
             </destination-selection-control>
-            <itemset>
-                <label>Auswahl</label>
-                <hint>XPath-Ausdruck um eine neue Auswahl zu erstellen</hint>
-            </itemset>
             <items>
                 <label>Elemente</label>
                 <hint>XPath-Ausdruck, der eine Knoten für des Element zurückgibt</hint>
@@ -6535,10 +6511,6 @@
             <destination-selection-control>
                 <label>Kohdevalinnan kontrolli</label>
             </destination-selection-control>
-            <itemset>
-                <label>Osaset</label>
-                <hint>XPath-lausekkeet, uusien osasten rakentamiseen</hint>
-            </itemset>
             <items>
                 <label>Osaset</label>
                 <hint>XPath-lauseke palauttaa yhden solmun jokaiselle osaselle</hint>
@@ -7478,10 +7450,6 @@
             <destination-selection-control>
                 <label>Control de Selección de Destino</label>
             </destination-selection-control>
-            <itemset>
-                <label>Conjuto de items</label>
-                <hint>Expresiones XPath para construir el conjunto de items</hint>
-            </itemset>
             <items>
                 <label>Items</label>
                 <hint>Expresión XPath que retorna un nodo por cada item</hint>
@@ -8427,10 +8395,6 @@
             <destination-selection-control>
                 <label>Controlo de selecção de resposta</label>
             </destination-selection-control>
-            <itemset>
-                <label>Itemset</label>
-                <hint>Expressões XPath para construir um novo itemset</hint>
-            </itemset>
             <items>
                 <label>Items</label>
                 <hint>Expressão XPath que retorna um nodo para cada item</hint>
@@ -9377,10 +9341,6 @@
             <destination-selection-control>
                 <label>Kontroll för val av destination</label>
             </destination-selection-control>
-            <itemset>
-                <label>Itemset</label>
-                <hint>XPath-uttryck för att bygga ett nytt itemset</hint>
-            </itemset>
             <items>
                 <label>Items</label>
                 <hint>XPath-uttryck som returnerar en nod per item</hint>

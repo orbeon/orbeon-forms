@@ -117,10 +117,14 @@ object FormRunnerAuth {
       val propertySet = properties
       propertySet.getString(MethodPropertyName, "container") match {
 
-        case "container" ⇒
+        case authMethod @ "container" ⇒
+
+          Logger.debug(s"using `$authMethod` method")
 
           val usernameOpt    = Option(userRoles.getRemoteUser)
           val rolesStringOpt = Option(propertySet.getString(ContainerRolesPropertyName))
+
+          Logger.debug(s"usernameOpt: `$usernameOpt`, roles: `$rolesStringOpt`")
 
           rolesStringOpt match {
             case None ⇒
@@ -157,7 +161,9 @@ object FormRunnerAuth {
               }
           }
 
-        case "header" ⇒
+        case authMethod @ "header" ⇒
+
+          Logger.debug(s"using `$authMethod` method")
 
           val headerPropertyName =
             propertySet.getString(HeaderRolesPropertyNamePropertyName).trimAllToOpt
@@ -167,6 +173,8 @@ object FormRunnerAuth {
 
           val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
           def splitRoles(value: String) = value split rolesSplit
+
+          Logger.debug(s"using properties: $HeaderRolesPropertyNamePropertyName=`$headerPropertyName`, $HeaderRolesSplitPropertyName=`$rolesSplit`")
 
           // If configured, a header can have the form `name=value` where `name` is specified in a property
           def splitWithinRole(value: String) = headerPropertyName match {
@@ -178,10 +186,13 @@ object FormRunnerAuth {
             case _ ⇒ List(value)
           }
 
+          import org.orbeon.oxf.util.CoreUtils._
+
           // Credentials coming from the JSON-encoded HTTP header
           def fromCredentialsHeader =
             headerList(HeaderCredentialsPropertyName).headOption flatMap
-              (Credentials.parseCredentials(_, decodeForHeader = true))
+            (Credentials.parseCredentials(_, decodeForHeader = true)) kestrel
+            (_ ⇒ Logger.debug(s"found from credential headers"))
 
           // Credentials coming from individual headers (requires at least the username)
           def fromIndividualHeaders =
@@ -198,7 +209,8 @@ object FormRunnerAuth {
                 group         = headerList(HeaderGroupPropertyName).headOption,
                 organizations = Nil
               )
-            }
+            } kestrel
+            (_ ⇒ Logger.debug(s"found from individual headers"))
 
           fromCredentialsHeader orElse fromIndividualHeaders
 

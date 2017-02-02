@@ -126,39 +126,30 @@ object FormRunnerAuth {
 
           Logger.debug(s"usernameOpt: `$usernameOpt`, roles: `$rolesStringOpt`")
 
-          rolesStringOpt match {
-            case None ⇒
-              None
-            case Some(rolesString) ⇒
+          usernameOpt map { username ⇒
 
               // Wrap exceptions as Liferay throws if the role is not available instead of returning false
               def isUserInRole(role: String) =
                 try userRoles.isUserInRole(role)
                 catch { case NonFatal(_) ⇒ false}
 
-              val rolesSplit =
+              val rolesSplitRegex =
                 propertySet.getString(ContainerRolesSplitPropertyName, """,|\s+""")
 
-              val rolesArray =
+              val rolesList =
                 for {
-                  roleName ← rolesString split rolesSplit
+                  rolesString ← rolesStringOpt.toList
+                  roleName    ← rolesString split rolesSplitRegex
                   if isUserInRole(roleName)
                 } yield
                   SimpleRole(roleName)
 
-              val roles = rolesArray match {
-                case Array() ⇒ None
-                case array   ⇒ Some(array)
-              }
-
-              usernameOpt map { username ⇒
-                Credentials(
-                  username      = username,
-                  roles         = rolesArray.to[List],
-                  group         = rolesArray.headOption map (_.roleName),
-                  organizations = Nil
-                )
-              }
+              Credentials(
+                username      = username,
+                roles         = rolesList,
+                group         = rolesList.headOption map (_.roleName),
+                organizations = Nil
+              )
           }
 
         case authMethod @ "header" ⇒

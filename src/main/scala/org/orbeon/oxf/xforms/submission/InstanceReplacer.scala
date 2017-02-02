@@ -18,13 +18,13 @@ import java.util.Collections
 import org.orbeon.dom.{Document, Node}
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.util.{ConnectionResult, IndentedLogger, XPath}
+import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceDataOps}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
-import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
 import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}
 
 /**
@@ -54,8 +54,8 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   ): Unit = {
     // Deserialize here so it can run in parallel
     val mediatype = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE)
-    val isJSON = XMLUtils.isJSONContentType(mediatype)
-    if (XMLUtils.isXMLMediatype(mediatype) || isJSON) {
+    val isJSON = ContentTypes.isJSONContentType(mediatype)
+    if (ContentTypes.isXMLMediatype(mediatype) || isJSON) {
       implicit val detailsLogger = getDetailsLogger(p, p2)
       _resultingDocumentOpt = Some(
         deserializeInstance(

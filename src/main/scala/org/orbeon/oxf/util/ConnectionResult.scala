@@ -20,8 +20,7 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.http.{HttpStatusCodeException, StreamedContent, Headers ⇒ HttpHeaders}
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xml.{XMLParsing, XMLUtils}
+import org.orbeon.oxf.xml.XMLParsing
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -60,7 +59,7 @@ case class ConnectionResult(
   }
 
   def readTextResponseBody = mediatype collect {
-    case mediatype if XMLUtils.isXMLMediatype(mediatype) ⇒
+    case mediatype if ContentTypes.isXMLMediatype(mediatype) ⇒
       // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
       //
       // http://tools.ietf.org/html/rfc7303:
@@ -87,7 +86,7 @@ case class ConnectionResult(
       useAndClose(XMLParsing.getReaderFromXMLInputStream(content.inputStream)) { reader ⇒
         NetUtils.readStreamAsString(reader)
       }
-    case mediatype if XMLUtils.isTextOrJSONContentType(mediatype) ⇒
+    case mediatype if ContentTypes.isTextOrJSONContentType(mediatype) ⇒
       readStreamAsText(content.inputStream, charset)
   }
 

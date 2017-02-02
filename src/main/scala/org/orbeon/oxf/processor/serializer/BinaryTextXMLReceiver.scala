@@ -24,9 +24,9 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
 import org.orbeon.oxf.util.NetUtils.{getContentTypeCharset, getContentTypeMediaType}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Base64XMLReceiver, DateUtils, TextXMLReceiver}
+import org.orbeon.oxf.util.{Base64XMLReceiver, ContentTypes, DateUtils, TextXMLReceiver}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter}
 import org.orbeon.scaxon.XML
 import org.xml.sax.Attributes
 
@@ -158,7 +158,7 @@ class BinaryTextXMLReceiver(
             // Output encoding only for text content types, defaulting to utf-8
             // NOTE: The "binary" mode doesn't mean the content is binary, it could be text as well. So we
             // output a charset when possible.
-            if (XMLUtils.isTextOrJSONContentType(contentType))
+            if (ContentTypes.isTextOrJSONContentType(contentType))
               response.setContentType(contentType + "; charset=" + encoding)
             else
               response.setContentType(contentType)

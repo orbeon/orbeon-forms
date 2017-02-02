@@ -22,9 +22,9 @@ import org.orbeon.dom.io.DocumentSource
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.util.{Connection, XPath}
+import org.orbeon.oxf.util.{Connection, ContentTypes, XPath}
 import org.orbeon.oxf.xforms.{InstanceData, XFormsUtils}
-import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants, XMLUtils}
+import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 
 case class SerializationParameters(
   messageBody            : Array[Byte],
@@ -219,7 +219,7 @@ object SerializationParameters {
                 "serializing instance"
               )
           }
-        case serialization if XMLUtils.isTextOrJSONContentType(serialization) ⇒
+        case serialization if ContentTypes.isTextOrJSONContentType(serialization) ⇒
           // Text serialization
           try {
             val identity = TransformerUtils.getIdentityTransformer

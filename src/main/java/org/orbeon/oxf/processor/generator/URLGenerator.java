@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.http.HttpStatusCodeException;
 import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.json.Symbols;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -28,13 +29,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.resources.handler.SystemHandler;
-import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.http.HttpStatusCodeException;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
@@ -526,11 +522,11 @@ public class URLGenerator extends ProcessorImpl {
                                     // Mode is inferred from content-type
                                     if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType))
                                         mode = "html";
-                                    else if (XMLUtils.isXMLMediatype(contentType))
+                                    else if (ContentTypes.isXMLMediatype(contentType))
                                         mode = "xml";
-                                    else if (XMLUtils.isJSONContentType(contentType))
+                                    else if (ContentTypes.isJSONContentType(contentType))
                                         mode = "json";
-                                    else if (XMLUtils.isTextContentType(contentType))
+                                    else if (ContentTypes.isTextContentType(contentType))
                                         mode = "text";
                                     else
                                         mode = "binary";

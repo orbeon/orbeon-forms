@@ -4,11 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class XMLUtils {
 
-    public static final String XML_CONTENT_TYPE1 = "text/xml";
-    public static final String XML_CONTENT_TYPE2 = "application/xml";
-    public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
-    public static final String TEXT_CONTENT_TYPE_PREFIX = "text/";
-
     public static String unescapeXMLMinimal(String str) {
         str = StringUtils.replace(str, "&amp;", "&");
         str = StringUtils.replace(str, "&lt;", "<");
@@ -128,48 +123,5 @@ public class XMLUtils {
         str = escapeXMLMinimal(str);
         str = StringUtils.replace(str, "\"", "&quot;");
         return str;
-    }
-
-    /**
-     * Return whether the given mediatype is considered as XML.
-     *
-     * TODO: This does test on the mediatype only, but we need one to check the content type as well for the case
-     * "text/html; charset=foobar"
-     *
-     * @param mediatype mediatype or null
-     * @return          true if not null and XML mediatype, false otherwise
-     */
-    public static boolean isXMLMediatype(String mediatype) {
-        return mediatype != null && (mediatype.equals(XML_CONTENT_TYPE1)
-                || mediatype.equals(XML_CONTENT_TYPE2)
-                || mediatype.endsWith(XML_CONTENT_TYPE3_SUFFIX));
-    }
-
-    /**
-     * Return whether the given content type is considered as text.
-     *
-     * @param contentType   content type or null
-     * @return              true if not null and a text content type, false otherwise.
-     */
-    public static boolean isTextContentType(String contentType) {
-        return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
-    }
-
-    public static boolean isJSONContentType(String contentType) {
-        return contentType != null && contentType.startsWith( "application/json");
-    }
-
-    /**
-     * Return whether the given content type is considered as text or JSON.
-     *
-     * NOTE: There was debate about whether JSON is text or not and whether it should have a text/* mediatype:
-     *
-     * http://www.alvestrand.no/pipermail/ietf-types/2006-February/001655.html
-     *
-     * @param contentType   content type or null
-     * @return              true if not null and a text or JSON content type, false otherwise
-     */
-    public static boolean isTextOrJSONContentType(String contentType) {
-        return contentType != null && (isTextContentType(contentType) || isJSONContentType(contentType));
     }
 }

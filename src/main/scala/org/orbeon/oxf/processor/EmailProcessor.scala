@@ -291,7 +291,7 @@ class EmailProcessor extends ProcessorImpl {
           Right(handleInlinePartContent(partDocument, contentType))
       }
 
-    if (! XMLUtils.isTextOrJSONContentType(contentType)) {
+    if (! ContentTypes.isTextOrJSONContentType(contentType)) {
       // This is binary content (including application/xml)
       content match {
         case Left(fileItem) ⇒

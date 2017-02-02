@@ -19,8 +19,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -30,8 +30,8 @@ import java.util.Iterator;
 
 public class ProcessorUtils {
 
-    public static final String HTML_CONTENT_TYPE = "text/html";
-    public static final String DEFAULT_CONTENT_TYPE = XMLUtils.XML_CONTENT_TYPE2;
+    public static final String HTML_CONTENT_TYPE = ContentTypes.HtmlContentType();
+    public static final String DEFAULT_CONTENT_TYPE = ContentTypes.XmlContentType();
     //public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
     public static LocationData getElementLocationData(Element element) {

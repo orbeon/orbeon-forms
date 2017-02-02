@@ -23,6 +23,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.NetUtils._
@@ -202,11 +203,11 @@ object APISupport {
 
   def writeResponseBody(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
     content.contentType map getContentTypeMediaType match {
-      case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
+      case Some(mediatype) if ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype) ⇒
         // Text/JSON/XML content type: rewrite response content
         val encoding        = content.contentType flatMap (t ⇒ Option(getContentTypeCharset(t))) getOrElse "utf-8"
         val contentAsString = useAndClose(content.inputStream)(IOUtils.toString(_, encoding))
-        val encodeForXML    = XMLUtils.isXMLMediatype(mediatype)
+        val encodeForXML    = ContentTypes.isXMLMediatype(mediatype)
 
         def decodeURL(encoded: String) = {
           val decodedURL = ctx.decodeURL(encoded)

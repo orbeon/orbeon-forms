@@ -20,17 +20,18 @@ import org.orbeon.dom.Element;
 import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
-import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.SessionExpiredException;
+import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
+import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.http.SessionExpiredException;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -45,7 +46,6 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
@@ -53,7 +53,10 @@ import scala.Tuple3;
 import scala.util.control.NonFatal;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
@@ -138,7 +141,7 @@ public class XFormsServer extends ProcessorImpl {
         final boolean isAjaxRequest =
             request.getMethod() != null &&
             request.getMethod().equals("POST") &&
-            XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(request.getContentType()));
+            ContentTypes.isXMLMediatype(NetUtils.getContentTypeMediaType(request.getContentType()));
 
         final boolean isIgnoreSequenceNumber = !isAjaxRequest;
 

@@ -80,7 +80,7 @@ trait FormRunnerPersistence {
 
   def findProvider(app: String, form: String, formOrData: String) = {
     val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData :: Nil mkString "."
-    Option(properties.getString(providerProperty))
+    properties.getNonBlankString(providerProperty)
   }
 
   def providerPropertyAsURL(provider: String, property: String) =

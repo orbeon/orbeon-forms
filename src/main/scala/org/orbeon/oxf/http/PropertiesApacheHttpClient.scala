@@ -30,20 +30,20 @@ object PropertiesConnectionSettings {
       soTimeout            = props.getInteger(SOTimeoutProperty, SOTimeoutPropertyDefault).toInt,
       chunkRequests        = props.getBoolean(ChunkRequestsProperty, ChunkRequestsDefault),
 
-      proxyHost            = Option(props.getString(ProxyHostProperty)),
+      proxyHost            = props.getNonBlankString(ProxyHostProperty),
       proxyPort            = Option(props.getInteger(ProxyPortProperty)) map (_.toInt),
-      proxyExclude         = Option(props.getString(ProxyExcludeProperty)),
+      proxyExclude         = props.getNonBlankString(ProxyExcludeProperty),
 
       sslHostnameVerifier  = props.getString(SSLHostnameVerifierProperty, SSLHostnameVerifierDefault),
       sslKeystoreURI       = Option(props.getStringOrURIAsString(SSLKeystoreURIProperty, allowEmpty = false)),
-      sslKeystorePassword  = Option(props.getString(SSLKeystorePasswordProperty)),
-      sslKeystoreType      = Option(props.getString(SSLKeystoreTypeProperty)),
+      sslKeystorePassword  = props.getNonBlankString(SSLKeystorePasswordProperty),
+      sslKeystoreType      = props.getNonBlankString(SSLKeystoreTypeProperty),
 
       proxySSL             = props.getBoolean(ProxySSLProperty, ProxySSLPropertyDefault),
-      proxyUsername        = Option(props.getString(ProxyUsernameProperty)),
-      proxyPassword        = Option(props.getString(ProxyPasswordProperty)),
-      proxyNTLMHost        = Option(props.getString(ProxyNTLMHostProperty)),
-      proxyNTLMDomain      = Option(props.getString(ProxyNTLMDomainProperty))
+      proxyUsername        = props.getNonBlankString(ProxyUsernameProperty),
+      proxyPassword        = props.getNonBlankString(ProxyPasswordProperty),
+      proxyNTLMHost        = props.getNonBlankString(ProxyNTLMHostProperty),
+      proxyNTLMDomain      = props.getNonBlankString(ProxyNTLMDomainProperty)
     )
   }
 }

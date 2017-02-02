@@ -220,14 +220,17 @@ class PropertySet {
   def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =
     Option(getStringOrURIAsString(name, allowEmpty)) getOrElse default
 
+  def getNonBlankString(name: String): Option[String] =
+    getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToOpt
+
   def getString(name: String): String =
     getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToNull
 
+  def getString(name: String, default: String): String =
+    getNonBlankString(name) getOrElse default
+
   def getNmtokens(name: String): ju.Set[String] =
     getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
-
-  def getString(name: String, default: String): String =
-    Option(getString(name)) getOrElse default
 
   def getInteger(name: String): jl.Integer =
     getPropertyValue(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]

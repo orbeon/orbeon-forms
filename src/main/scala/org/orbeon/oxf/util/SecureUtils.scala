@@ -34,8 +34,8 @@ object SecureUtils {
 
   private def getPassword: String = {
     val propertySet = Properties.instance.getPropertySet
-    Option(propertySet.getString(XFormsPasswordProperty)) orElse
-      Option(propertySet.getString(PasswordProperty)) getOrElse
+    propertySet.getNonBlankString(XFormsPasswordProperty) orElse
+      propertySet.getNonBlankString(PasswordProperty) getOrElse
       (throw new OXFException(PasswordProperty + "property is not set"))
   }
 
@@ -46,7 +46,7 @@ object SecureUtils {
     Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA1")
 
   private def getPreferredProvider: Option[String] =
-    Option(Properties.instance.getPropertySet.getString(PreferredProviderProperty))
+    Properties.instance.getPropertySet.getNonBlankString(PreferredProviderProperty)
 
   private val HexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 

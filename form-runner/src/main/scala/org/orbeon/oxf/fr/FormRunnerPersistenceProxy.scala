@@ -254,7 +254,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix, matchWildcards = false)
       .filter (propName ⇒ propName.endsWith(".*") ||
                           propName.endsWith(s".${usableFor.token}"))
-      .map(propertySet.getString)
+      .flatMap(propertySet.getNonBlankString)
       .distinct
       .filter(FormRunner.isActiveProvider)
   }

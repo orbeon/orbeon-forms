@@ -71,7 +71,7 @@ class EmailProcessor extends ProcessorImpl {
     // Set SMTP host
     val properties = new JProperties
     val host =
-      propertySet.getString(TestSMTPHost).trimAllToOpt  orElse
+      propertySet.getNonBlankString(TestSMTPHost) orElse
       valueFromElementOrProperty(messageElement, SMTPHost) getOrElse
       (throw new OXFException("Could not find SMTP host in configuration or in properties"))
 
@@ -89,7 +89,7 @@ class EmailProcessor extends ProcessorImpl {
 
             (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
           case None ⇒
-            (propertySet.getString(Username).trimAllToOpt, propertySet.getString(Password).trimAllToOpt)
+            (propertySet.getNonBlankString(Username), propertySet.getNonBlankString(Password))
         }
       }
 
@@ -177,7 +177,7 @@ class EmailProcessor extends ProcessorImpl {
     message.addFrom(createAddresses(messageElement.element("from")))
 
     // Set To
-    propertySet.getString(TestTo).trimAllToOpt match {
+    propertySet.getNonBlankString(TestTo) match {
       case Some(testTo) ⇒
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))
       case None ⇒
@@ -369,8 +369,7 @@ object EmailProcessor {
 
   // First try to get the value from a child element, then from the properties
   def valueFromElementOrProperty(e: Element, name: String)(implicit propertySet: PropertySet) =
-    optionalValueTrim(e.element(name)) orElse
-    propertySet.getString(name).trimAllToOpt
+    optionalValueTrim(e.element(name)) orElse propertySet.getNonBlankString(name)
 
   // Read a text or binary document and return it as a FileItem
   def handleStreamedPartContent(pipelineContext: PipelineContext, source: SAXSource): FileItem = {

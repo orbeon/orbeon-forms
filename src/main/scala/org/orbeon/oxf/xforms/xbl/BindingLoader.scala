@@ -302,7 +302,7 @@ trait BindingLoader extends Logging {
     def evaluate(property: Property) = (
       for {
         propertyName ← mappingProperties
-        uri          = propertySet.getString(propertyName)
+        uri          = propertySet.getNonBlankString(propertyName) getOrElse ""
         prefix       = propertyName.substring(XBLMappingPropertyPrefix.length)
       } yield
         uri → prefix

@@ -69,7 +69,7 @@ object ResourcesPatcher {
       // Property name with possible `*` replaced by actual app/form name
       val expandedPropertyName = (List("oxf.fr.resource", app, form, lang) ++ resourceTokens).mkString(".")
       // Had a case where value was null (more details would be useful)
-      val value                = Option(properties.getString(expandedPropertyName))
+      val value                = properties.getNonBlankString(expandedPropertyName)
       value.map((lang, pathString, _))
     }
 

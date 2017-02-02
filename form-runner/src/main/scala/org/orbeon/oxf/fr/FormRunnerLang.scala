@@ -96,7 +96,7 @@ trait FormRunnerLang {
   // Public for unit tests
   def getDefaultLang(appForm: Option[AppForm]): String = {
     val suffix = appForm.toList flatMap (_.toList)
-    Option(properties.getString("oxf.fr.default-language" :: suffix mkString ".")) map  cleanLanguage getOrElse "en"
+    properties.getNonBlankString("oxf.fr.default-language" :: suffix mkString ".") map  cleanLanguage getOrElse "en"
   }
 
   // Return a predicate telling whether a language is allowed based on properties. If app/form are specified, then the
@@ -104,7 +104,7 @@ trait FormRunnerLang {
   // Public for unit tests
   def isAllowedLang(appForm: Option[AppForm]): String ⇒ Boolean = {
     val suffix = appForm.toList flatMap (_.toList)
-    val set    = stringOptionToSet(Option(properties.getString("oxf.fr.available-languages" :: suffix mkString "."))) map cleanLanguage
+    val set    = stringOptionToSet(properties.getNonBlankString("oxf.fr.available-languages" :: suffix mkString ".")) map cleanLanguage
     // If none specified via property or property contains a wildcard, all languages are considered available
     if (set.isEmpty || set("*")) _ ⇒ true else set
   }

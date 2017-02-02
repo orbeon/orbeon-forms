@@ -122,7 +122,7 @@ object FormRunnerAuth {
           Logger.debug(s"using `$authMethod` method")
 
           val usernameOpt    = Option(userRoles.getRemoteUser)
-          val rolesStringOpt = Option(propertySet.getString(ContainerRolesPropertyName))
+          val rolesStringOpt = propertySet.getNonBlankString(ContainerRolesPropertyName)
 
           Logger.debug(s"usernameOpt: `$usernameOpt`, roles: `$rolesStringOpt`")
 
@@ -157,10 +157,10 @@ object FormRunnerAuth {
           Logger.debug(s"using `$authMethod` method")
 
           val headerPropertyName =
-            propertySet.getString(HeaderRolesPropertyNamePropertyName).trimAllToOpt
+            propertySet.getNonBlankString(HeaderRolesPropertyNamePropertyName)
 
           def headerList(name: String) =
-            Option(propertySet.getString(name)).toList flatMap (p ⇒ getHeader(p.toLowerCase))
+            propertySet.getNonBlankString(name).toList flatMap (p ⇒ getHeader(p.toLowerCase))
 
           val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
           def splitRoles(value: String) = value split rolesSplit

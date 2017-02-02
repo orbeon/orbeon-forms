@@ -203,7 +203,7 @@ object InitUtils {
     // Register processors from processors.xml and from custom properties
     val propertySet = Properties.instance.getPropertySet
 
-    def fromProperty(s: String) = Option(propertySet.getString(s))
+    def fromProperty(s: String) = propertySet.getNonBlankString(s)
 
     val processors =
       fromProperty(ProcessorsProperty)           orElse

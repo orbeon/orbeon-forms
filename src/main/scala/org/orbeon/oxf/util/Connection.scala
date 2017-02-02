@@ -460,8 +460,8 @@ object Connection extends Logging {
   private def getPropertyHandleCustom(propertyName: String) = {
     val propertySet = Properties.instance.getPropertySet
 
-    Option(propertySet.getString(propertyName)).to[List] ++
-      Option(propertySet.getString(propertyName + ".private")).to[List] mkString " "
+    propertySet.getNonBlankString(propertyName).to[List] ++
+      propertySet.getNonBlankString(propertyName + ".private").to[List] mkString " "
   }
 
   private def valueAs[T[_]](value: String)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] =

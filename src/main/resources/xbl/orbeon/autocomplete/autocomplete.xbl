@@ -217,25 +217,23 @@
                                 <xxf:value value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                             </xf:var>
                         </xsl:if>
-                        <!-- Define variables $has-labelref (xs:boolean) and $external-label (node()) -->
-                        <xf:var name="labelref" xbl:attr="xbl:text=labelref"/>
-                        <xf:var name="has-labelref" value="$dynamic-itemset and $labelref != ''"/>
-                        <!-- HACK: It is unfortunate that we have to duplicate in XSLT the logic already implement in XForms for $dynamic-itemset  -->
-                        <xsl:if test="exists(@resource) or @dynamic-itemset = 'true'">
-                            <xf:var name="external-label"><xxf:value xbl:attr="value=labelref" xxbl:scope="outer"/></xf:var>
-                        </xsl:if>
+                        <!-- Point to external node contain label, if it exists -->
+                        <xf:var name="external-label"><xxf:value xbl:attr="value=labelref" xxbl:scope="outer"/></xf:var>
 
                         <!-- - - - - - - - - - - - - - - - - - - FUNCTIONS - - - - - - - - - - - - - - - - - - -->
 
                         <!-- Look for value based on label and update external value (e.g. on tab out) -->
                         <xf:action ev:event="update-external-value">
-                            <xf:var name="value" value="xf:element('value')"/>
-                            <xf:dispatch name="get-value-from-itemset" targetid="component-inner-group"><xf:property name="fr-value" value="$value"/></xf:dispatch>
-                            <xf:setvalue ref="$binding" value="$value"/>
-                            <!-- If no value is found, clear the search field -->
-                            <xf:setvalue if="$value = ''"   ref="$local/textfield-value"/>
-                            <xf:setvalue if="$has-labelref" ref="$external-label" value="$local/textfield-value"/>
-                            <xf:action type="javascript" id="out-arp" if="event('ajax-response-processed') and $script">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xf:action>
+                            <!-- Don't check against the itemset if the label hasn't changed, as we might not have an itemset -->
+                            <xf:action if="empty($external-label) or $external-label != $local/textfield-value">
+                                <xf:var name="value" value="xf:element('value')"/>
+                                <xf:dispatch name="get-value-from-itemset" targetid="component-inner-group"><xf:property name="fr-value" value="$value"/></xf:dispatch>
+                                <xf:setvalue ref="$binding" value="$value"/>
+                                <!-- If no value is found, clear the search field -->
+                                <xf:setvalue if="$value = ''"             ref="$local/textfield-value"/>
+                                <xf:setvalue if="exists($external-label)" ref="$external-label" value="$local/textfield-value"/>
+                                <xf:action type="javascript" id="out-arp" if="event('ajax-response-processed') and $script">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xf:action>
+                            </xf:action>
                         </xf:action>
                         <xf:action ev:event="get-label-from-itemset">
                             <xf:var name="label" value="event('fr-label')"/>
@@ -258,16 +256,18 @@
                         <!-- Init event -->
                         <xf:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="#observer">
                             <xf:action type="javascript" id="init" if="$script">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xf:action>
-                            <!-- On xforms-enabled, if $has-labelref, copy the $external-label to the search field -->
-                            <xf:setvalue if="$has-labelref" ref="$local/textfield-value" value="$external-label"/>
+                            <!-- On xforms-enabled, copy the $external-label to the search field -->
+                            <xf:setvalue if="exists($external-label)" ref="$local/textfield-value" value="$external-label"/>
                         </xf:action>
                         <!-- For resource mode: when the component is initialized or when resources changes, update our internal itemset -->
                         <xsl:if test="exists(@resource)">
-                            <xf:action ev:event="xforms-value-changed xforms-enabled" ev:observer="resource-variable">
-                                <!-- Update itemset based on resource -->
-                                <xf:send submission="get-itemset">
-                                    <xf:property name="resource" value="$resource"/>
-                                </xf:send>
+                            <xf:action ev:event="xforms-value-changed" ev:observer="resource-variable">
+                                <xf:action if="$external-label != $local/textfield-value">
+                                    <!-- Update itemset based on resource -->
+                                    <xf:send submission="get-itemset">
+                                        <xf:property name="resource" value="$resource"/>
+                                    </xf:send>
+                                </xf:action>
                             </xf:action>
                         </xsl:if>
                         <!-- Forward focus event and keep track of whether we have the focus -->
@@ -281,6 +281,9 @@
                         </xf:action>
                         <!-- As the user types, dispatch event to notify the external world about the value entered by the user so far -->
                         <xf:action ev:event="xforms-value-changed" ev:observer="search" if="$dynamic-itemset">
+                            <xf:dispatch targetid="component-inner-group" name="update-external-world"/>
+                        </xf:action>
+                        <xf:action ev:event="update-external-world" ev:observer="component-inner-group">
                             <xf:dispatch targetid="fr-autocomplete" name="fr-search-changed">
                                 <xf:property name="fr-search-value" value="$local/textfield-value"/>
                             </xf:dispatch>
@@ -289,8 +292,16 @@
                             <!-- Clicking on the button is a way to open the suggestion list without having to type something -->
                             <xf:action ev:event="DOMActivate" ev:observer="show-suggestions-button">
                                 <xf:setfocus control="search"/>
-                                <xf:dispatch targetid="resource-variable" name="xforms-value-changed"/>           <!-- For the resource mode, listening on resource AVT changing -->
-                                <xf:dispatch targetid="search" name="xforms-value-changed"/>                      <!-- For the dynamic mode, listening on the search field content changing -->
+                                <!-- For the resource mode, listening on resource AVT changing -->
+                                <xf:action if="$mode = 'resource'">
+                                    <xf:send submission="get-itemset">
+                                        <xf:property name="resource" value="$resource"/>
+                                    </xf:send>
+                                </xf:action>
+                                <!-- For the dynamic mode, listening on the search field content changing -->
+                                <xf:action if="$mode = 'dynamic'">
+                                    <xf:dispatch targetid="component-inner-group" name="update-external-world"/>
+                                </xf:action>
                                 <xf:action type="javascript" id="sr" if="$script">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xf:action>
                             </xf:action>
                         </xsl:if>
@@ -301,7 +312,9 @@
                             <xf:setvalue ref="$local/textfield-value" value="$select1-current-label"/>
                         </xf:action>
                         <!-- For the dynamic and resource mode, just reset the search field if the external value becomes empty -->
-                        <xf:setvalue ev:event="xforms-value-changed" ev:observer="external-value" if="$dynamic-itemset and $binding = ''" ref="$local/textfield-value"/>
+                        <xf:action ev:event="xforms-value-changed" ev:observer="external-value">
+                            <xf:setvalue if="$dynamic-itemset and $binding = ''" ref="$local/textfield-value"/>
+                        </xf:action>
                         <!-- Keep track of readonly -->
                         <xf:setvalue ev:observer="external-value" ev:event="xforms-readonly" ref="$local/readonly">true</xf:setvalue>
                         <xf:setvalue ev:observer="external-value" ev:event="xforms-readwrite" ref="$local/readonly">false</xf:setvalue>

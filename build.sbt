@@ -18,6 +18,7 @@ val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.0.1"  // 2.5
 
 val CoreLibraryDependencies = Seq(
+  "com.beachape"              %% "enumeratum"          % "1.5.6",
   "org.parboiled"             %% "parboiled-scala"     % "1.1.7",
   "io.spray"                  %% "spray-json"          % "1.3.2",
   "org.scala-lang.modules"    %% "scala-xml"           % "1.0.6",

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: com.beachape:enumeratum-macros_2.11:1.5.6:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.beachape/enumeratum-macros_2.11/jars/enumeratum-macros_2.11-1.5.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.beachape/enumeratum-macros_2.11/srcs/enumeratum-macros_2.11-1.5.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

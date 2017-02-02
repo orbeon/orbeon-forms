@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.fr
 
+import enumeratum._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials, ServletPortletRequest, SimpleRole}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.properties.{Properties, PropertySet}
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.webapp.{SessionFacade, UserRolesFacade}
 import org.slf4j.LoggerFactory
 
@@ -31,6 +31,16 @@ object FormRunnerAuth {
     Headers.OrbeonRolesLower,
     Headers.OrbeonCredentialsLower
   )
+
+  sealed abstract class AuthMethod(override val entryName: String) extends EnumEntry
+
+  object AuthMethod extends Enum[AuthMethod] {
+
+     val values = findValues
+
+     case object Container extends AuthMethod("container")
+     case object Header    extends AuthMethod("header")
+  }
 
   import Private._
 
@@ -95,8 +105,6 @@ object FormRunnerAuth {
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
-    def properties: PropertySet = Properties.instance.getPropertySet
-
     def headersAsJSONString(headers: List[(String, Array[String])]) = {
 
       val headerAsJSONStrings =
@@ -114,10 +122,13 @@ object FormRunnerAuth {
       getHeader : String ⇒ List[String]
     ): Option[Credentials] = {
 
-      val propertySet = properties
-      propertySet.getString(MethodPropertyName, "container") match {
+      val propertySet = Properties.instance.getPropertySet
 
-        case authMethod @ "container" ⇒
+      val requestedAuthMethod = propertySet.getString(MethodPropertyName, "container")
+
+      AuthMethod.withNameOption(requestedAuthMethod) match {
+
+        case Some(authMethod @ AuthMethod.Container) ⇒
 
           Logger.debug(s"using `$authMethod` method")
 
@@ -152,7 +163,7 @@ object FormRunnerAuth {
               )
           }
 
-        case authMethod @ "header" ⇒
+        case Some(authMethod @ AuthMethod.Header) ⇒
 
           Logger.debug(s"using `$authMethod` method")
 
@@ -205,8 +216,8 @@ object FormRunnerAuth {
 
           fromCredentialsHeader orElse fromIndividualHeaders
 
-        case other ⇒
-          throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$other`")
+        case None ⇒
+          throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$requestedAuthMethod`")
       }
     }
   }

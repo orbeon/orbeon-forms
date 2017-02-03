@@ -102,7 +102,7 @@
 
                 <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
                      want them to win -->
-                <xf:setfocus ev:event="xforms-enabled" control="dialog"/>
+                <xf:setfocus control="dialog"/>
 
                 <xf:setvalue
                     ref="instance('modified')"

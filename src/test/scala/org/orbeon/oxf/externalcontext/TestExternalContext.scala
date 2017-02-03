@@ -100,7 +100,7 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
       bodyNode ne null option {
         val contentTypeAttribute = bodyNode.attributeValue(Headers.ContentTypeLower)
         val contentType          = ContentTypes.getContentTypeMediaType(contentTypeAttribute) getOrElse (throw new IllegalArgumentException)
-        val charset              = ContentTypes.getContentTypeCharset(contentTypeAttribute)   getOrElse (throw new IllegalArgumentException)
+        val charset              = ContentTypes.getContentTypeCharset(contentTypeAttribute).orNull
         val hrefAttribute        = bodyNode.attributeValue("href")
 
         // TODO: Support same scenarios as Email processor

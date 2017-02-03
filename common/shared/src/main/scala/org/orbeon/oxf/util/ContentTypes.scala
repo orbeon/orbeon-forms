@@ -46,7 +46,6 @@ object ContentTypes {
 
   def isJSONMediatype(mediatype: String): Boolean =
     mediatype.trimAllToOpt exists { trimmed ⇒
-      println(s"trimmed `$trimmed`")
       trimmed == JsonContentType || trimmed.endsWith(JsonContentTypeSuffix)
     }
 

@@ -18,7 +18,7 @@ import org.scalatest.FunSpec
 
 class ContentTypesTest extends FunSpec {
 
-  describe("the isXMLContentType method") {
+  describe("The isXMLContentType method") {
     it("must handle spaces and parameters") {
       assert(true  === isXMLContentType(" text/xml ; charset=utf8"))
     }
@@ -28,7 +28,7 @@ class ContentTypesTest extends FunSpec {
     }
   }
 
-  describe("the isJSONContentType method") {
+  describe("The isJSONContentType method") {
     it("must handle spaces and parameters") {
       assert(true  === isJSONContentType(" application/json ; charset=utf8"))
     }
@@ -38,7 +38,7 @@ class ContentTypesTest extends FunSpec {
     }
   }
 
-  describe("the getContentTypeParameters method") {
+  describe("The getContentTypeParameters method") {
     it("must parse parameters and ignore spaces") {
       assert(Map("charset" → "utf8", "foo" → "bar")  === getContentTypeParameters(" text/html ; charset=utf8; foo =  bar "))
     }
@@ -52,7 +52,7 @@ class ContentTypesTest extends FunSpec {
     }
   }
 
-  describe("the isTextContentType method") {
+  describe("The isTextContentType method") {
     it("must handle spaces") {
       assert(true  === isTextContentType(" text/plain ; charset=utf8"))
     }

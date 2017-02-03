@@ -23,21 +23,21 @@ import scala.collection.mutable
 
 class SharedUtilsTest extends FunSpec {
 
-  describe("the `dropTrailingSlash()` function") {
+  describe("The `dropTrailingSlash()` function") {
     assert("/a" === dropTrailingSlash("/a/"))
     assert("/a" === dropTrailingSlash("/a"))
     assert(""   === dropTrailingSlash("/"))
     assert("/"  === dropTrailingSlash("//"))
   }
 
-  describe("the `dropStartingSlash()` function") {
+  describe("The `dropStartingSlash()` function") {
     assert("a/" === dropStartingSlash("/a/"))
     assert("a/" === dropStartingSlash("a/"))
     assert(""   === dropStartingSlash("/"))
     assert("/"  === dropStartingSlash("//"))
   }
 
-  describe("the `appendStartingSlash()` function") {
+  describe("The `appendStartingSlash()` function") {
     it("must not append if already present") {
       assert("/a/" === appendStartingSlash("/a/"))
     }

@@ -43,7 +43,7 @@
             );
 
             this.handlers = {
-                'change': _.bind(this.codeMirrorChange, this),
+                'change': _.bind(this.codeMirrorChange, this), // TODO: .bind() is deprecated
                 'focus' : _.bind(this.codeMirrorFocus, this),
                 'blur'  : _.bind(this.codeMirrorBlur, this)
             };

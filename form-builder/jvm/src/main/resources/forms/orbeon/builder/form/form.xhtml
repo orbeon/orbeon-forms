@@ -387,15 +387,15 @@
                                     <fr:positive-choice><fr:label value="$fr-resources/buttons/yes" mediatype="text/html"/></fr:positive-choice>
                                 </fr:alert-dialog>
 
-                                <xf:action event="fb-delete-http-service" observer="dialog-http-services">
-                                    <xxf:show dialog="fb-confirmation-dialog">
-                                        <xf:property
-                                            name="fr:message"
-                                            value="concat($form-resources/messages/delete-service, ' ''', event('service-name'), '''?')"/>
-                                        <xf:property
-                                            name="fr:confirmation-target"
-                                            value="'dialog-http-services'"/>
-                                    </xxf:show>
+                                <xf:action event="fb-request-delete-http-service" observer="dialog-http-services">
+                                    <xf:dispatch name="fr-show" targetid="dialog-confirmation">
+                                        <xf:property name="message" value="concat($form-resources/messages/delete-service, ' ''', event('service-name'), '''?')"/>
+                                        <xf:property name="positive-targetid" value="xxf:absolute-id('dialog-http-services')"/>
+                                    </xf:dispatch>
+                                </xf:action>
+
+                                <xf:action event="fr-positive" observer="dialog-http-services">
+                                    <xf:dispatch name="fb-confirm-delete-http-service" targetid="dialog-http-services"/>
                                 </xf:action>
 
                             </xf:group>

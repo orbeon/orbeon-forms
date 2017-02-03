@@ -266,15 +266,14 @@
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
 
-            <!-- Delete service -->
+            <!-- Delete service with confirmation -->
             <xbl:handler event="DOMActivate" observer="fb-service-delete-trigger">
-                <xf:dispatch name="fb-delete-http-service" target="fb-dialog-http-services">
+                <xf:dispatch name="fb-request-delete-http-service" target="fb-dialog-http-services">
                     <xf:property name="service-name" value="$i/name"/>
                 </xf:dispatch>
             </xbl:handler>
 
-            <xbl:handler event="fb-confirmation-yes" phase="target">
-                <!-- Delete stuff and close dialog -->
+            <xbl:handler event="fb-confirm-delete-http-service" phase="target">
                 <xf:delete ref="$model/(fb:submission[@id = $i/submission-id], fb:instance[@id = $i/instance-id])"/>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>

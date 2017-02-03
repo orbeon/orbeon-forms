@@ -373,6 +373,7 @@
                                 <fb:dialog-help                id="dialog-help"              form-ref="$form" resources-ref="$form-resources"/>
                                 <fb:dialog-itemsets            id="dialog-itemsets"                           resources-ref="$form-resources"/>
                                 <fb:dialog-edit-source         id="dialog-edit-source"       ref="$form"      resources-ref="$form-resources"/>
+                                <fb:dialog-http-services       id="dialog-http-services"     ref="$form"      resources-ref="$form-resources"/>
 
                                 <xf:action event="fr-save" observer="dialog-edit-source">
                                     <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
@@ -385,6 +386,17 @@
                                     <fr:negative-choice><fr:label value="$fr-resources/buttons/no"  mediatype="text/html"/></fr:negative-choice>
                                     <fr:positive-choice><fr:label value="$fr-resources/buttons/yes" mediatype="text/html"/></fr:positive-choice>
                                 </fr:alert-dialog>
+
+                                <xf:action event="fb-delete-http-service" observer="dialog-http-services">
+                                    <xxf:show dialog="fb-confirmation-dialog">
+                                        <xf:property
+                                            name="fr:message"
+                                            value="concat($form-resources/messages/delete-service, ' ''', event('service-name'), '''?')"/>
+                                        <xf:property
+                                            name="fr:confirmation-target"
+                                            value="'dialog-http-services'"/>
+                                    </xxf:show>
+                                </xf:action>
 
                             </xf:group>
 
@@ -689,7 +701,6 @@
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-pdf.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-publish.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-schema.xml" xxi:omit-xml-base="true"/>
-            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-services.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-actions.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-database-service.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-confirmation.xml" xxi:omit-xml-base="true"/>

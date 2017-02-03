@@ -222,9 +222,10 @@
                         <xf:var name="submission-name" value="substring-before(@id, '-submission')"/>
                         <xf:trigger>
                             <xf:label value="$submission-name"/>
-                            <xxf:show ev:event="DOMActivate" dialog="fb-service-dialog">
+
+                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-http-services">
                                 <xf:property name="submission-name" value="$submission-name"/>
-                            </xxf:show>
+                            </xf:dispatch>
                         </xf:trigger>
                     </xh:div>
                 </xf:repeat>
@@ -234,7 +235,9 @@
                             <xh:i class="icon-plus-sign"/>
                             <xf:output value="$form-resources/add/label"/>
                         </xf:label>
-                        <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-service-dialog"/>
+                        <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="dialog-http-services">
+                            <xf:property name="submission-name" value="()"/>
+                        </xf:dispatch>
                         <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xf:trigger>
                 </xh:div>

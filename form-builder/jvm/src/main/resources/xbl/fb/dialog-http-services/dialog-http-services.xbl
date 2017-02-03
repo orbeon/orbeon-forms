@@ -1,0 +1,738 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+
+    <xbl:binding id="fb-dialog-http-services" element="fb|dialog-http-services" xxbl:mode="binding">
+        <xbl:handlers>
+
+            <!-- Read data upon dialog open -->
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+
+                <xf:var name="submission-name" value="event('submission-name')"/>
+                <xf:var name="form"            value="xxf:binding('fb-dialog-http-services')"/>
+                <xf:var name="model"           value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
+
+                <!-- Clear instance entirely -->
+                <xf:setvalue iterate="$i//*[not(*)]" ref="."/>
+
+                <xf:setvalue ref="$request/is-soap"       value="false()"/>
+                <xf:setvalue ref="$request/is-auth"       value="false()"/>
+                <xf:setvalue ref="$request/method"        value="instance('fb-submission-template')/@method"/>
+                <xf:setvalue ref="$request/serialization" value="instance('fb-submission-template')/@serialization"/>
+                <xf:delete   ref="$request/params/param"/>
+                <xf:delete   ref="$response/headers/header"/>
+
+                <!-- Copy parameters if any -->
+                <xf:action if="exists($submission-name)">
+
+                    <xf:setvalue ref="$i/name"         value="$submission-name"/>
+                    <xf:setvalue ref="$i/initial-name" value="$submission-name"/>
+
+                    <xf:var
+                        name="submission"
+                        value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
+
+                    <xf:var
+                        name="instance-body-string"
+                        value="$model/fb:instance[@id = concat($submission-name, '-instance')]/*"/>
+
+                    <xf:var
+                        name="local-has-body"
+                        value="not($submission/@method = ('get', 'delete'))"/>
+
+                    <!--<xf:message value="saxon:serialize($submission, 'xml')"/>-->
+                    <!--<xf:message value="exists(xxf:instance('fb-form-instance'))"/>-->
+
+                    <xf:setvalue ref="$request/method"        value="$submission/@method"/>
+                    <xf:setvalue ref="$request/serialization" value="$submission/@serialization"/>
+                    <xf:setvalue ref="$request/resource"      value="$submission/@resource"/>
+
+                    <xf:action if="not($local-has-body)">
+                        <xf:var
+                            name="body"
+                            value="saxon:parse($instance-body-string)"/>
+                        <xf:insert
+                            context="$request/params"
+                            origin="
+                                for $e in $body/*//*[not(*)]
+                                    return xf:element(
+                                        'param',
+                                        (
+                                            xf:attribute('name',  name($e)),
+                                            xf:attribute('value', string($e))
+                                        )
+                                    )"/>
+
+                    </xf:action>
+                    <xf:action if="$local-has-body">
+                        <xf:setvalue
+                            ref="$request/body"
+                            value="$instance-body-string"/>
+                    </xf:action>
+
+                    <!-- Extract SOAP action if there is one -->
+                    <xf:var
+                        name="is-soap"
+                        as="xs:boolean"
+                        value="contains($submission/@mediatype, 'application/soap+xml')"/>
+
+                    <xf:var
+                        name="soap-action"
+                        as="xs:string"
+                        value="
+                            for $a in (
+                                for $t in tokenize($submission/@mediatype, ';')
+                                    return xxf:trim($t)
+                            ) return
+                                if (starts-with($a, 'action=')) then
+                                    $a
+                                else
+                                    ()"
+                    />
+
+                    <xf:setvalue ref="$request/is-soap" value="$is-soap"/>
+                    <xf:setvalue
+                        if="$is-soap"
+                        ref="$request/soap-action"
+                        value="xxf:trim(tokenize($soap-action, '=')[2])"/>
+
+                    <xf:setvalue ref="$request/is-auth"  value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
+                    <xf:setvalue ref="$request/username" value="$submission/@xxf:username"/>
+                    <xf:setvalue ref="$request/password" value="$submission/@xxf:password"/>
+
+                </xf:action>
+
+                <xxf:show dialog="dialog"/>
+
+                <xf:setvalue
+                    ref="instance('modified')"
+                    value="false()"/>
+            </xbl:handler>
+
+            <!-- Test and valid -->
+            <xbl:handler event="DOMActivate" if="valid($i)" observer="fb-service-test-trigger">
+                <!-- Clear response -->
+                <xf:setvalue iterate="$response/*[not(*)]" ref="."/>
+                <xf:delete ref="$response/headers/header"/>
+
+                <!-- Send submission -->
+                <xf:send submission="fb-test-service-submission"/>
+            </xbl:handler>
+
+            <!-- Test and invalid -->
+            <xbl:handler event="DOMActivate" if="not(valid($i))" observer="fb-service-test-trigger">
+                <xxf:setvisited control="dialog" recurse="true"/>
+            </xbl:handler>
+
+            <!-- Common response actions -->
+            <xbl:handler
+                event="xforms-submit-done xforms-submit-error"
+                observer="fb-test-service-submission">
+                <xf:action context="$response">
+
+                    <xf:setvalue ref="resource-uri" value="event('resource-uri')"/>
+                    <xf:setvalue ref="status-code"  value="event('response-status-code')"/>
+
+                    <xf:delete ref="headers/header"/>
+
+                    <xf:insert
+                        context="headers"
+                        origin="event('response-headers')"/>
+
+                    <!-- Handle response body -->
+                    <xf:var name="error-body" value="event('response-body')"/>
+                    <xf:setvalue
+                        if="$error-body"
+                        ref="body"
+                        value="
+                            if ($error-body castable as xs:string) then
+                                $error-body
+                            else
+                                saxon:serialize($error-body, xxf:instance('fr-xsl-output-instance'))
+                    "/>
+                </xf:action>
+            </xbl:handler>
+
+            <!-- Error actions -->
+            <xbl:handler
+                event="xforms-submit-error"
+                observer="fb-test-service-submission">
+                <xf:action context="$response">
+                    <xf:setvalue ref="error-type" value="event('error-type')"/>
+                </xf:action>
+            </xbl:handler>
+
+            <!-- Save and valid -->
+            <xbl:handler event="DOMActivate" if="valid($i)" observer="fb-service-save">
+
+                <xf:action if="instance('modified') = true()">
+                    <!-- Actual id of the submission and instance -->
+                    <xf:var name="submission-id" value="$i/submission-id"/>
+                    <xf:var name="instance-id"   value="$i/instance-id"/>
+
+                    <!-- Insert new submission if needed -->
+                    <xf:action if="not(exists($model/fb:submission[@id = $submission-id]))">
+                        <xf:insert context="$model" ref="xf:* | fb:instance | fb:submission" origin="instance('fb-submission-template')"/>
+                        <xf:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
+                    </xf:action>
+
+                    <!-- Set submission properties -->
+                    <xf:var name="submission" value="$model/fb:submission[@id = $submission-id]"/>
+                    <xf:action context="$submission">
+                        <xf:setvalue ref="@method" value="$request/method"/>
+                        <xf:setvalue ref="@serialization" value="$request/serialization"/>
+                        <xf:setvalue ref="@resource" value="$request/resource"/>
+                        <xf:setvalue ref="@mediatype" value="$request/mediatype"/>
+
+                        <xf:var name="is-auth" value="string($request/is-auth) = 'true'"/>
+                        <xf:action if="$is-auth">
+                            <xf:insert
+                                context="."
+                                origin="(
+                                    xf:attribute('xxf:username', $request/username),
+                                    xf:attribute('xxf:password', $request/password)
+                                )"/>
+                        </xf:action>
+                        <xf:action if="not($is-auth)">
+                            <xf:delete context="." ref="@xxf:username"/>
+                            <xf:delete context="." ref="@xxf:password"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <!-- Insert new instance just before submission if needed -->
+                    <xf:action if="not(exists($model/fb:instance[@id = $instance-id]))">
+                        <xf:insert ref="$submission" position="before" origin="instance('fb-instance-template')"/>
+                        <!-- Don't reuse $submission because it might be out of date due to the insertion before! -->
+                        <xf:setvalue ref="$model/fb:submission[@id = $submission-id]/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
+                    </xf:action>
+
+                    <!-- Set instance document -->
+                    <xf:action context="$model/fb:instance[@id = $instance-id]">
+                        <xf:action if="not($has-body)">
+                            <xf:var
+                                name="body"
+                                value="
+                                    xf:element(
+                                        'params',
+                                        for $p in $request/params/param
+                                            return xf:element(
+                                                $p/@name,
+                                                string($p/@value)
+                                            )
+                                    )"/>
+
+                            <xf:setvalue
+                                ref="*"
+                                value="saxon:serialize($body, xxf:instance('fr-xsl-output-instance'))"/>
+
+                        </xf:action>
+                        <xf:action if="$has-body">
+                            <xf:setvalue ref="*" value="$request/body"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
+
+                <!-- Hide dialog -->
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <!-- Save and invalid -->
+            <xbl:handler event="DOMActivate" if="not(valid($i))" observer="fb-service-save">
+                <xxf:setvisited control="dialog" recurse="true"/>
+            </xbl:handler>
+
+            <!-- Cancel -->
+            <xbl:handler event="DOMActivate" observer="fb-service-cancel">
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <!-- Delete service -->
+            <xbl:handler event="DOMActivate" observer="fb-service-delete-trigger">
+                <xf:dispatch name="fb-delete-http-service" target="fb-dialog-http-services">
+                    <xf:property name="service-name" value="$i/name"/>
+                </xf:dispatch>
+            </xbl:handler>
+
+            <xbl:handler event="fb-confirmation-yes" phase="target">
+                <!-- Delete stuff and close dialog -->
+                <xf:delete ref="$model/(fb:submission[@id = $i/submission-id], fb:instance[@id = $i/instance-id])"/>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+        </xbl:handlers>
+        <xbl:implementation>
+
+            <xf:model id="model">
+
+                <xf:var name="form"            value="xxf:binding('fb-dialog-http-services')"/>
+                <xf:var name="model"           value="$form/xh:head/xf:model[@id = 'fr-form-model']"/>
+
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                    <submission>
+                        <name/>
+                        <initial-name/>
+                        <submission-id/>
+                        <instance-id/>
+                        <request>
+                            <method/>
+                            <serialization/>
+                            <resource/>
+                            <!--<replace/>-->
+                            <is-soap>false</is-soap>
+                            <soap-action/>
+                            <is-auth>false</is-auth>
+                            <username/>
+                            <password/>
+                            <mediatype/>
+                            <body/>
+                            <params/>
+                        </request>
+                        <response>
+                            <error-type/>
+                            <body/>
+                            <resource-uri/>
+                            <status-code/>
+                            <reason-phrase/>
+                            <headers/>
+                            <body/>
+                        </response>
+                        <delete-trigger/>
+                        <save-test-trigger/>
+                    </submission>
+                </xf:instance>
+
+                <xf:var name="i" value="instance()"/>
+
+                <xf:var name="request"  value="$i/request"/>
+                <xf:var name="response" value="$i/response"/>
+                <xf:var name="has-body" value="not($request/method = ('get', 'delete'))"/>
+
+                <xf:instance id="modified">
+                    <modified/>
+                </xf:instance>
+
+                <xf:setvalue
+                    event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed"
+                    observer="i"
+                    ref="instance('modified')"
+                    value="true()"/>
+
+                <xf:bind ref="$i">
+
+                    <xf:bind
+                        ref="name"
+                        type="xs:NCName"
+                        required="true()"
+                        xxf:whitespace="trim"
+                        constraint="
+                            (
+                                . != '' and
+                                . = ../initial-name
+                            ) or not(
+                                ../submission-id  = $model/fb:submission/@id or
+                                ../instance-id    = $model/fb:instance/@id
+                            )"
+                        readonly="xxf:non-blank(../initial-name)"/>
+
+                    <xf:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
+                    <xf:bind ref="instance-id"   calculate="concat(../name, '-instance')"/>
+
+                    <xf:bind ref="request">
+                        <xf:bind ref="resource" required="true()"/>
+                        <xf:bind ref="is-soap | is-auth" type="xs:boolean"/>
+
+                        <xf:bind
+                            ref="soap-action"
+                            xxf:whitespace="trim"
+                            readonly="../is-soap = false()"/>
+
+                        <xf:bind
+                            ref="username | password"
+                            xxf:whitespace="trim"
+                            readonly="../is-auth = false()"
+                            required="../is-auth = true()"/>
+
+                        <xf:bind
+                            ref="serialization"
+                            calculate="if ($has-body) then . else if (exists($param-names)) then 'application/x-www-form-urlencoded' else 'none'"
+                            readonly="not($has-body)"/>
+
+                        <!-- Compute mediatype based on SOAP or serialization -->
+                        <xf:bind
+                            ref="mediatype"
+                            calculate="
+                                if (string(../is-soap) = 'true') then
+                                    string-join(
+                                        (
+                                            'application/soap+xml',
+                                            if (xxf:non-blank(../soap-action)) then
+                                                concat('action=', xxf:trim(../soap-action))
+                                            else
+                                                ()
+                                        ),
+                                        '; '
+                                    )
+                                else
+                                    ../serialization"
+                        />
+                        <xf:bind
+                            ref="body"
+                            type="xxf:xml"
+                            required="$has-body"
+                        />
+                        <xf:bind
+                            name="param-names"
+                            ref="params/param/@name"
+                            type="xs:NCName"
+                            required="true()"/>
+                    </xf:bind>
+
+                    <xf:bind ref="response">
+                        <xf:bind ref="error-type" readonly="true()"/>
+                        <xf:bind ref="body"       readonly="true()"/>
+                    </xf:bind>
+
+                    <xf:bind ref="delete-trigger"    relevant="xxf:non-blank(../initial-name)"/>
+                </xf:bind>
+
+                <!-- Template for inserting a submission -->
+                <xf:instance
+                    id="fb-submission-template"
+                    xxf:readonly="true"
+                    xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+                    <fb:submission
+                        id=""
+                        class="fr-service"
+                        ref="instance('fr-service-request-instance')"
+                        resource=""
+                        method="get"
+                        serialization="application/xml"
+                        mediatype="application/xml"
+                        replace="instance"
+                        instance="fr-service-response-instance"/>
+                </xf:instance>
+
+                <!-- Template for inserting an instance -->
+                <xf:instance
+                    id="fb-instance-template"
+                    xxf:readonly="true"
+                    xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+                    <fb:instance
+                        id=""
+                        class="fr-service"
+                        xxf:exclude-result-prefixes="#all">
+                        <body/>
+                    </fb:instance>
+                </xf:instance>
+
+                <!-- Template for inserting a URL parameter -->
+                <xf:instance
+                    id="fb-param-template"
+                    xxf:readonly="true"
+                    xxf:exclude-result-prefixes="#all">
+                    <param name="" value=""/>
+                </xf:instance>
+
+                <!-- Submission to test a service -->
+                <xf:submission id="fb-test-service-submission"
+                    ref="
+                        if ($has-body) then
+                            saxon:parse($request/body)/*
+                        else
+                            xf:element(
+                                'params',
+                                for $p in $request/params/param
+                                    return xf:element(
+                                        $p/@name,
+                                        string($p/@value)
+                                    )
+                            )"
+                    method="{$request/method}"
+                    serialization="{if ($has-body) then $request/serialization else 'application/x-www-form-urlencoded'}"
+                    resource="{xxf:evaluate-avt($request/resource)}"
+                    mediatype="{$request/mediatype}"
+                    replace="text"
+                    target="$response/body"
+                    xxf:username="{$request/username}"
+                    xxf:password="{$request/password}"/>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group id="group-around-dialog" appearance="xxf:internal">
+
+                <!-- Bindings specified on control -->
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+
+                <!-- Actual dialog -->
+                <xxf:dialog
+                    id="dialog"
+                    level="modal"
+                    close="true"
+                    draggable="true">
+
+                    <xf:label ref="$resources/dialog-http-services/label"/>
+
+                    <fr:tabbable>
+                        <fr:tab>
+                            <fr:label value="xxf:r('dialog-http-services.tab-definition.label', '|fr-form-resources|')"/>
+
+                            <fr:grid>
+                                <xh:tr>
+                                    <xh:td colspan="2">
+                                        <xf:input ref="name" id="fb-service-name-input" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/service-name/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/service-name/hint"/>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td colspan="2">
+                                        <xf:input ref="$request/resource" id="fb-service-resource" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/resource/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/resource/hint"/>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select1 ref="$request/method" id="fb-service-method">
+                                            <xf:label ref="$resources/dialog-http-services/method/label"/>
+                                            <xf:item>
+                                                <xf:label>GET</xf:label>
+                                                <xf:value>get</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>POST</xf:label>
+                                                <xf:value>post</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>PUT</xf:label>
+                                                <xf:value>put</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>DELETE</xf:label>
+                                                <xf:value>delete</xf:value>
+                                            </xf:item>
+
+                                            <!-- Switch serialization when needed -->
+                                            <xf:action event="xforms-select">
+                                                <xf:setvalue
+                                                    if="not(event('xxf:item-value') = ('get', 'delete')) and . = ('get', 'delete')"
+                                                    ref="../serialization"
+                                                    value="'application/xml'"/>
+                                            </xf:action>
+
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select1 ref="$request/serialization">
+                                            <xf:label ref="$resources/dialog-http-services/serialization/label"/>
+                                            <xf:itemset ref=".[not($has-body)]">
+                                                <xf:label>None</xf:label>
+                                                <xf:value>none</xf:value>
+                                            </xf:itemset>
+                                            <xf:item>
+                                                <xf:label>XML</xf:label>
+                                                <xf:value>application/xml</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>HTML Form</xf:label>
+                                                <xf:value>application/x-www-form-urlencoded</xf:value>
+                                            </xf:item>
+                                            <!--<xf:item>-->
+                                                <!--<xf:label>JSON</xf:label>-->
+                                                <!--<xf:value>application/json</xf:value>-->
+                                            <!--</xf:item>-->
+                                        </xf:select1>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td colspan="2">
+
+                                        <xf:group ref="$request/body[not($has-body)]" appearance="xxf:fieldset">
+                                            <xf:label value="xxf:r('dialog-http-services.url-parameters.label', '|fr-form-resources|')"/>
+                                            <fr:grid
+                                                ref="$request/params"
+                                                repeat="content"
+                                                template="instance('fb-param-template')">
+                                                <xh:tr>
+                                                    <xh:td>
+                                                        <xf:input ref="@name">
+                                                            <xf:label value="xxf:r('dialog-http-services.parameter-name.label', '|fr-form-resources|')"/>
+                                                        </xf:input>
+                                                    </xh:td>
+                                                    <xh:td>
+                                                        <xf:input ref="@value">
+                                                            <xf:label value="xxf:r('dialog-http-services.parameter-default-value.label', '|fr-form-resources|')"/>
+                                                        </xf:input>
+                                                    </xh:td>
+                                                </xh:tr>
+                                            </fr:grid>
+                                        </xf:group>
+
+                                        <xf:textarea ref="$request/body[$has-body]" id="fb-service-body" incremental="true" class="fb-service-request-body">
+                                            <xf:label ref="$resources/dialog-http-services/request-body/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/request-body/hint"/>
+                                        </xf:textarea>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
+                        <fr:tab>
+                            <fr:label value="xxf:r('dialog-http-services.tab-advanced.label', '|fr-form-resources|')"/>
+
+                            <fr:grid>
+                                <xh:tr>
+                                    <xh:td>
+                                        <fr:checkbox-input ref="$request/is-soap">
+                                            <xf:label ref="$resources/dialog-http-services/soap-submission/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/soap-submission/hint"/>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="$request/soap-action" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/soap-action/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/soap-action/hint"/>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <fr:checkbox-input ref="$request/is-auth">
+                                            <xf:label ref="$resources/dialog-http-services/http-authentication/label"/>
+                                            <xf:hint ref="$resources/dialog-http-services/http-authentication/hint"/>
+                                        </fr:checkbox-input>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="$request/username" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/username/label"/>
+                                        </xf:input>
+                                        <xf:secret ref="$request/password" incremental="true">
+                                            <xf:label ref="$resources/dialog-http-services/password/label"/>
+                                        </xf:secret>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:tab>
+                        <fr:tab visible="xxf:non-blank($response)">
+                            <fr:label
+                                value="xxf:r('dialog-http-services.tab-test.label', '|fr-form-resources|')"
+                                class="label label-{if ($response/error-type = '') then 'success' else 'important'}"/>
+
+                            <xh:div>
+
+                                <fr:grid>
+                                    <xh:tr>
+                                        <xh:td colspan="2">
+                                            <xf:output ref="$resources/dialog-http-services/error-type/item[value = $response/error-type]/label">
+                                                <xf:label ref="$resources/dialog-http-services/error-type/label"/>
+                                            </xf:output>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output ref="$response/resource-uri[xxf:non-blank()]">
+                                                <xf:label ref="$resources/dialog-http-services/resource-uri/label"/>
+                                            </xf:output>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output ref="$response/status-code[xxf:non-blank()]">
+                                                <xf:label ref="$resources/dialog-http-services/status-code/label"/>
+                                            </xf:output>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
+
+                                <xf:group ref=".[empty($response/headers/header)]">
+                                    <xf:output
+                                        class="fb-submission-response-noheaders"
+                                        value="xxf:r('dialog-http-services.no-headers', '|fr-form-resources|')"/>
+                                </xf:group>
+                                <xf:group ref=".[exists($response/headers/header)]">
+                                    <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
+                                         decide to remove support for legacy mode. -->
+                                    <fr:grid
+                                        ref="$response/headers/header"
+                                        readonly="true"
+                                        repeat="true"
+                                        class="fb-submission-response-headers">
+                                        <xh:tr>
+                                            <xh:td class="fb-nowrap">
+                                                <xf:output value="name">
+                                                    <xf:label ref="$resources/dialog-http-services/header-name/label"/>
+                                                </xf:output>
+                                            </xh:td>
+                                            <xh:td>
+                                                <xf:output value="string-join(value, ', ')">
+                                                    <xf:label ref="$resources/dialog-http-services/header-value/label"/>
+                                                </xf:output>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </fr:grid>
+                                </xf:group>
+
+                                <fr:grid>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:textarea ref="$response/body[xxf:non-blank()]" class="fb-submission-response-body">
+                                                <xf:label ref="$resources/dialog-http-services/response-body/label"/>
+                                            </xf:textarea>
+                                        </xh:td>
+                                    </xh:tr>
+                                </fr:grid>
+
+                            </xh:div>
+                        </fr:tab>
+                    </fr:tabbable>
+
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group>
+                            <xh:div class="pull-left">
+                                <!-- Delete button -->
+                                <xf:trigger ref="$i/delete-trigger" appearance="xxf:danger" id="fb-service-delete-trigger">
+                                    <xf:label value="$resources/remove/label"/>
+                                </xf:trigger>
+                            </xh:div>
+                            <!-- Test button -->
+                            <xf:trigger ref="$i/save-test-trigger" id="fb-service-test-trigger">
+                                <xf:label value="$resources/dialog-http-services/test/label"/>
+                            </xf:trigger>
+                            <!-- Save button -->
+                            <xf:trigger ref="$i/save-test-trigger" id="fb-service-save" appearance="xxf:primary">
+                                <xf:label value="$resources/dialog-http-services/save/label"/>
+                            </xf:trigger>
+                            <xf:output value="$resources/or/label"/>
+                            <xf:trigger appearance="minimal" id="fb-service-cancel">
+                                <xf:label value="$resources/cancel/label"/>
+                            </xf:trigger>
+                        </xf:group>
+
+                        <!--<fr:xforms-inspector/>-->
+                    </xh:div>
+                </xxf:dialog>
+
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

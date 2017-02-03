@@ -35,6 +35,11 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/portletSupport-build.iml" filepath="$PROJECT_DIR$/.idea/modules/portletSupport-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root.iml" filepath="$PROJECT_DIR$/.idea/modules/root.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root-build.iml" filepath="$PROJECT_DIR$/.idea/modules/root-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xforms-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/xforms-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xformsJS.iml" filepath="$PROJECT_DIR$/.idea/modules/xformsJS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xformsJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/xformsJS-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xformsJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/xformsJVM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xformsJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/xformsJVM-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xupdate.iml" filepath="$PROJECT_DIR$/.idea/modules/xupdate.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xupdate-build.iml" filepath="$PROJECT_DIR$/.idea/modules/xupdate-build.iml" />
     </modules>

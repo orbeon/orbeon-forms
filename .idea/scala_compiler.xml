@@ -40,7 +40,7 @@
         <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.9.jar" />
       </plugins>
     </profile>
-    <profile name="SBT 4" modules="formBuilderClient,formBuilderSharedJS,commonJS,formBuilderJS,formRunnerComponentsJS">
+    <profile name="SBT 4" modules="formBuilderClient,formBuilderSharedJS,commonJS,formBuilderJS,formRunnerComponentsJS,xformsJS">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />
@@ -67,7 +67,7 @@
         <parameter value="utf8" />
       </parameters>
     </profile>
-    <profile name="SBT 6" modules="formRunnerComponentsJVM">
+    <profile name="SBT 6" modules="formRunnerComponentsJVM,xformsJVM">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />

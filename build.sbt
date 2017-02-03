@@ -403,7 +403,7 @@ lazy val formRunnerComponentsJVM = formRunnerComponents.jvm
   )
 
 lazy val formRunnerComponentsJS = formRunnerComponents.js
-  .dependsOn(commonJS)
+  .dependsOn(commonJS, xformsJS)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -473,7 +473,7 @@ lazy val formBuilderJVM = formBuilder.jvm
 
 
 lazy val formBuilderJS: Project = formBuilder.js
-  .dependsOn(commonJS, formRunnerComponentsJS)
+  .dependsOn(commonJS, xformsJS, formRunnerComponentsJS)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -501,6 +501,33 @@ lazy val formBuilderJS: Project = formBuilder.js
       (baseDirectory in ThisBuild).value,
       FormBuilderResourcesPathInWar
     )
+  )
+
+lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms"
+  )
+
+lazy val xformsJVM = xforms.jvm
+  .enablePlugins(SbtWeb)
+  .settings(assetsSettings: _*)
+  .settings(commonSettings: _*)
+
+lazy val xformsJS = xforms.js
+  .dependsOn(commonJS)
+  .settings(
+
+    libraryDependencies            ++= Seq(
+      "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
+      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
+    ),
+
+    skip in packageJSDependencies  := false,
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+
+    persistLauncher     in Compile := true,
+    persistLauncher     in Test    := false
   )
 
 lazy val core = (project in file("src"))
@@ -538,6 +565,7 @@ lazy val orbeonWar = (project in file("orbeon-war"))
     dom,
     xupdate,
     core,
+    xformsJVM,
     formRunner,
     formBuilderJVM,
     formRunnerComponentsJVM,
@@ -556,6 +584,8 @@ lazy val root = (project in file("."))
     dom,
     xupdate,
     core,
+    xformsJVM,
+    xformsJS,
     formRunner,
     formRunnerComponentsJVM,
     formRunnerComponentsJS,

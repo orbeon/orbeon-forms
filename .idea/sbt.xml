@@ -40,6 +40,11 @@
             <option value="$PROJECT_DIR$/proxy-portlet/project" />
             <option value="$PROJECT_DIR$/src" />
             <option value="$PROJECT_DIR$/src/project" />
+            <option value="$PROJECT_DIR$/xforms/js" />
+            <option value="$PROJECT_DIR$/xforms/js/project" />
+            <option value="$PROJECT_DIR$/xforms/jvm" />
+            <option value="$PROJECT_DIR$/xforms/jvm/project" />
+            <option value="$PROJECT_DIR$/xforms/shared" />
             <option value="$PROJECT_DIR$/xupdate" />
             <option value="$PROJECT_DIR$/xupdate/project" />
           </set>

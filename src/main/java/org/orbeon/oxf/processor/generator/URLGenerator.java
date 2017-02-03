@@ -522,7 +522,7 @@ public class URLGenerator extends ProcessorImpl {
                                     // Mode is inferred from content-type
                                     if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType))
                                         mode = "html";
-                                    else if (ContentTypes.isXMLMediatype(contentType))
+                                    else if (ContentTypes.isXMLContentType(contentType))
                                         mode = "xml";
                                     else if (ContentTypes.isJSONContentType(contentType))
                                         mode = "json";

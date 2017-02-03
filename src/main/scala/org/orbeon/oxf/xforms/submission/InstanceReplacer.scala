@@ -53,9 +53,9 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     p2               : XFormsModelSubmission#SecondPassParameters
   ): Unit = {
     // Deserialize here so it can run in parallel
-    val mediatype = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE)
-    val isJSON = ContentTypes.isJSONContentType(mediatype)
-    if (ContentTypes.isXMLMediatype(mediatype) || isJSON) {
+    val contentType = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE)
+    val isJSON = ContentTypes.isJSONContentType(contentType)
+    if (ContentTypes.isXMLContentType(contentType) || isJSON) {
       implicit val detailsLogger = getDetailsLogger(p, p2)
       _resultingDocumentOpt = Some(
         deserializeInstance(
@@ -69,7 +69,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       // Other media type is not allowed
       throw new XFormsSubmissionException(
         submission,
-        s"""Body received with non-XML media type for `replace="instance"`: $mediatype""",
+        s"""Body received with non-XML media type for `replace="instance"`: $contentType""",
         "processing instance replacement",
         new XFormsSubmitErrorEvent(
           submission,

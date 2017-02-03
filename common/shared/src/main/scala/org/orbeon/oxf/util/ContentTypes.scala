@@ -17,38 +17,59 @@ import org.orbeon.oxf.util.StringUtils._
 
 object ContentTypes {
 
-  val XmlContentType  = "application/xml"
-  val JsonContentType = "application/json"
-  val HtmlContentType = "text/html"
-  val SoapContentType = "application/soap+xml"
+  val XmlContentType     = "application/xml"
+  val JsonContentType    = "application/json"
+  val HtmlContentType    = "text/html"
+  val SoapContentType    = "application/soap+xml"
+  val UnknownContentType = "content/unknown"
+
+  val CharsetParameter   = "charset"
+  val ActionParameter    = "action"
 
   private val XmlTextContentType    = "text/xml"
-  private val XmlContentTypeSuffix  = "+xml"
   private val TextContentTypePrefix = "text/"
+  private val XmlContentTypeSuffix  = "+xml"
+  private val JsonContentTypeSuffix = "+json"
 
-  // Whether the given mediatype is considered as XML.
-  // TODO: Handle `text/html; charset=foobar`.
   def isXMLMediatype(mediatype: String): Boolean =
     mediatype.trimAllToOpt exists { trimmed ⇒
       trimmed == XmlTextContentType || trimmed == XmlContentType || trimmed.endsWith(XmlContentTypeSuffix)
     }
 
-  // Return whether the given content type is considered as text.
-  def isTextContentType(contentType: String): Boolean =
-    contentType.trimAllToOpt exists { trimmed ⇒
+  def isXMLContentType(contentTypeOrNull: String): Boolean =
+    getContentTypeMediaType(contentTypeOrNull) exists isXMLMediatype
+
+  def isTextContentType(contentTypeOrNull: String): Boolean =
+    contentTypeOrNull.trimAllToOpt exists { trimmed ⇒
       trimmed.startsWith(TextContentTypePrefix)
     }
 
-  def isJSONContentType(contentType: String): Boolean =
-    contentType.trimAllToOpt exists { trimmed ⇒
-      contentType.startsWith(JsonContentType)
+  def isJSONMediatype(mediatype: String): Boolean =
+    mediatype.trimAllToOpt exists { trimmed ⇒
+      println(s"trimmed `$trimmed`")
+      trimmed == JsonContentType || trimmed.endsWith(JsonContentTypeSuffix)
     }
 
-  def isTextOrJSONContentType(contentType: String): Boolean =
-    isTextContentType(contentType) || isJSONContentType(contentType)
+  def isJSONContentType(contentTypeOrNull: String): Boolean =
+    getContentTypeMediaType(contentTypeOrNull) exists isJSONMediatype
 
-  def getContentTypeCharset(contentType: String): Option[String] =
-      getContentTypeParameters(contentType).get("charset")
+  def isTextOrJSONContentType(contentTypeOrNull: String): Boolean =
+    isTextContentType(contentTypeOrNull) || isJSONContentType(contentTypeOrNull)
+
+  def getContentTypeMediaType(contentTypeOrNull: String): Option[String] = {
+
+    if (contentTypeOrNull eq null)
+      return None
+
+    val semicolonIndex = contentTypeOrNull.indexOf(";")
+    if (semicolonIndex < 0)
+      return contentTypeOrNull.trimAllToOpt
+
+    contentTypeOrNull.substring(0, semicolonIndex).trimAllToOpt filterNot (_.equalsIgnoreCase(UnknownContentType))
+  }
+
+  def getContentTypeCharset(contentTypeOrNull: String): Option[String] =
+      getContentTypeParameters(contentTypeOrNull).get(CharsetParameter)
 
   def getContentTypeParameters(contentTypeOrNull: String): Map[String, String] = {
 
@@ -74,19 +95,7 @@ object ContentTypes {
     result.toMap
   }
 
-  def getContentTypeMediaType(contentTypeOrNull: String): Option[String] = {
-
-    if (contentTypeOrNull eq null)
-      return None
-
-    val semicolonIndex = contentTypeOrNull.indexOf(";")
-    if (semicolonIndex < 0)
-      return contentTypeOrNull.trimAllToOpt
-
-    contentTypeOrNull.substring(0, semicolonIndex).trimAllToOpt filterNot (_.equalsIgnoreCase("content/unknown"))
-  }
-
   // For Java callers
-  def getContentTypeCharsetOrNull(contentType: String)        : String = getContentTypeCharset(contentType).orNull
+  def getContentTypeCharsetOrNull(contentTypeOrNull: String)  : String = getContentTypeCharset(contentTypeOrNull).orNull
   def getContentTypeMediaTypeOrNull(contentTypeOrNull: String): String = getContentTypeMediaType(contentTypeOrNull).orNull
 }

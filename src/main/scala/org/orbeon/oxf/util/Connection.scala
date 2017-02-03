@@ -739,8 +739,8 @@ object Connection extends Logging {
           // Set Content-Type and optionally SOAPAction headers
 
           val parameters            = getContentTypeParameters(mediatypeMaybeWithCharset)
-          val overriddenContentType = "text/xml" + charsetSuffix(parameters.get("charset"))
-          val actionParameter       = parameters.get("action")
+          val overriddenContentType = "text/xml" + charsetSuffix(parameters.get(ContentTypes.CharsetParameter))
+          val actionParameter       = parameters.get(ContentTypes.ActionParameter)
 
           // Content-Type with optional charset and SOAPAction header if any
           List(ContentTypeLower → List(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → List(a)))

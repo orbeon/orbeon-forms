@@ -115,7 +115,7 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
 
           val saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType)
           val fileItem  = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource)
-          if (! (ContentTypes.isTextOrJSONContentType(contentType) || ContentTypes.isXMLMediatype(contentType))) {
+          if (! (ContentTypes.isTextOrJSONContentType(contentType) || ContentTypes.isXMLContentType(contentType))) {
             // This is binary content
             if (fileItem ne null) {
               BodyDetails(

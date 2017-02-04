@@ -3761,7 +3761,7 @@
             <delete-column>Вы уверены, что хотите удалить текущий столбец?</delete-column>
             <delete-row>Вы уверены, что хотите удалить текущую строку?</delete-row>
             <expand-cell>Вы уверены, что хотите расширить текущую ячейку? Один элемент будет удален.</expand-cell>
-            <delete-resources>Вы уверены, что хотите удалить все ресуры для языка?</delete-resources>
+            <delete-resources>Вы уверены, что хотите удалить все ресуры для языка</delete-resources>
             <delete-service>Вы уверены, что хотите удалить сервис?</delete-service>
             <delete-action>Вы уверены, что хотите удалить действие?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
@@ -4699,7 +4699,7 @@
             <delete-column>Sei sicuro di voler cancellare la colonna attuale?</delete-column>
             <delete-row>Sei sicuro di voler cancellare la riga attuale?</delete-row>
             <expand-cell>Sei sicuro di voler espandere la cella attuale? Un controllo sarà cancellato.</expand-cell>
-            <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua?</delete-resources>
+            <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua</delete-resources>
             <delete-service>Sei sicuro di voler cancellare questo servizio?</delete-service>
             <delete-action>Sei sicuro di voler cancellare questa azione?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
@@ -6579,7 +6579,7 @@
             <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
             <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
             <expand-cell>Haluatko varmasti laajentaa nykyisen solun? Yksi kontrolli deletoidaan.</expand-cell>
-            <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit?</delete-resources>
+            <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
             <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
             <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
@@ -7518,7 +7518,7 @@
             <delete-column>Está seguro de eliminar la Columna actual?</delete-column>
             <delete-row>Está seguro de eliminar la Fila actual?</delete-row>
             <expand-cell>Está seguro de eliminar de expandir la celda actual? . Un control será eliminado.</expand-cell>
-            <delete-resources>Está seguro de eliminar todos los recursos para los idiomas?</delete-resources>
+            <delete-resources>Está seguro de eliminar todos los recursos para los idiomas</delete-resources>
             <delete-service>Está seguro de eliminar el Servicio?</delete-service>
             <delete-action>Está seguro de eliminar la Acción?</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} serán eliminados.</controls-will-be-deleted>

@@ -18,8 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.orbeon.dom.Document;
-import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.XMLProcessorRegistry;
@@ -102,10 +102,17 @@ public abstract class ResourceManagerTestBase {
 
     public static PipelineContext createPipelineContextWithExternalContext(String requestURL) {
         final PipelineContext pipelineContext = new PipelineContext();
+        setExternalContext(pipelineContext, requestURL);
+        return pipelineContext;
+    }
+
+    public static void setExternalContext(PipelineContext pipelineContext) {
+        setExternalContext(pipelineContext, "oxf:/org/orbeon/oxf/default-request.xml");
+    }
+
+    public static void setExternalContext(PipelineContext pipelineContext, String requestURL) {
         final Document requestDocument = ProcessorUtils.createDocumentFromURL(requestURL, null);
         final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
         pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
-
-        return pipelineContext;
     }
 }

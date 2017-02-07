@@ -14,6 +14,9 @@
 package org.orbeon.oxf.test
 
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.webapp.ProcessorService
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI.withContainingDocument
 import org.scalatest.{BeforeAndAfter, Suite}
 
 
@@ -27,5 +30,4 @@ trait ResourceManagerSupport extends Suite with BeforeAndAfter {
     before { pipelineContext = Some(ResourceManagerTestBase.createPipelineContextWithExternalContext) }
     after  { pipelineContext foreach (_.destroy(true)) }
   }
-
 }

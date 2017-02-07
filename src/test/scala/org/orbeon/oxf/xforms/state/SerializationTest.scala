@@ -13,18 +13,19 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.dom.Document
-import org.orbeon.oxf.test.DocumentTestBase
-import XFormsOperations._
-import XFormsProtocols._
-import org.orbeon.oxf.xml._
-import org.xml.sax.Attributes
-import collection.JavaConverters._
 import org.junit.{Assume, Test}
+import org.orbeon.dom.Document
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl
+import org.orbeon.oxf.xforms.state.XFormsOperations._
+import org.orbeon.oxf.xforms.state.XFormsProtocols._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml._
+import org.scalatest.junit.AssertionsForJUnit
+import org.xml.sax.Attributes
+
+import scala.collection.JavaConverters._
 
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -226,93 +227,5 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
     assert(part.getControlAnalysis("input") ne null)
     assert(part.getControlAnalysis("trigger") ne null)
-  }
-
-  @Test def issue2197RestoreIdsOfBoundControls(): Unit = {
-
-    val doc = this setupDocument
-      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-           xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-        <xh:head>
-          <xf:model>
-            <xf:instance id="instance">
-              <value/>
-            </xf:instance>
-          </xf:model>
-        </xh:head>
-        <xh:body>
-          <fr:number id="my-number" ref="instance()">
-            <xf:label>Number</xf:label>
-          </fr:number>
-        </xh:body>
-      </xh:html>
-
-    assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-
-    val serializedState = XFormsState(
-      staticStateDigest = Option(doc.getStaticState.digest),
-      staticState       = doc.getStaticState.encodedState,
-      dynamicState      = DynamicState(doc)
-    )
-
-    val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
-
-    assert(restoredDoc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-  }
-
-  @Test def issue2197RestoreInlineXBL(): Unit = {
-
-    val doc = this setupDocument
-      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-           xmlns:xbl="http://www.w3.org/ns/xbl">
-        <xh:head>
-          <xf:model>
-            <xf:instance id="instance">
-              <value/>
-            </xf:instance>
-          </xf:model>
-          <xbl:xbl>
-            <xbl:binding id="fr-foo" element="fr|foo">
-              <xbl:template>
-                <xbl:content/>
-              </xbl:template>
-            </xbl:binding>
-          </xbl:xbl>
-          <xbl:xbl>
-            <xbl:binding id="fr-bar" element="fr|bar">
-              <xbl:template>
-                <xbl:content/>
-              </xbl:template>
-            </xbl:binding>
-          </xbl:xbl>
-        </xh:head>
-        <xh:body>
-          <fr:bar id="my-bar">
-            <fr:foo id="my-foo">
-              <fr:number id="my-number" ref="instance()">
-                <xf:label>Number</xf:label>
-              </fr:number>
-            </fr:foo>
-          </fr:bar>
-        </xh:body>
-      </xh:html>
-
-    assert(doc.resolveObjectByIdInScope("#document", "my-number", None).isDefined)
-
-    val serializedState = XFormsState(
-      staticStateDigest = Option(doc.getStaticState.digest),
-      staticState       = doc.getStaticState.encodedState,
-      dynamicState      = DynamicState(doc)
-    )
-
-    val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
-
-    for (id ← List("my-foo", "my-bar", "my-number"))
-      assert(restoredDoc.resolveObjectByIdInScope("#document", id, None).isDefined)
   }
 }

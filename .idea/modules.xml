@@ -14,17 +14,15 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/embedding-build.iml" filepath="$PROJECT_DIR$/.idea/modules/embedding-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-builder-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-builder-sources.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-runner-components-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-runner-components-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/form-runner-sources.iml" filepath="$PROJECT_DIR$/.idea/modules/form-runner-sources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJS.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJS-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJVM.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formBuilderJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formBuilderJVM-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunner.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunner.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunner-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunner-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerComponentsJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerComponentsJS.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerComponentsJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerComponentsJS-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerComponentsJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerComponentsJVM.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerComponentsJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerComponentsJVM-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerJS.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerJS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerJS-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerJVM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerJVM-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/fullPortlet.iml" filepath="$PROJECT_DIR$/.idea/modules/fullPortlet.iml" />

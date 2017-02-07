@@ -1,0 +1,173 @@
+// Copyright (C) 2013 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+@import (reference)  "../../../apps/fr/style/form-runner-orbeon";
+
+@frWizardWidth: 940px;
+@frWizardTocWidth: 199px;
+@frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
+
+// Make li the same height as section title
+@wizardLineHeight: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
+
+.orbeon .xbl-fr-wizard {
+
+    width: @frWizardWidth; // Avoid having TOC wrap below the body, see #1741
+
+    // Use table layout and use `rtl` trick to reverse columns since flex layout is not supported in all browsers yet
+    display: table;
+    table-layout: fixed;
+    direction: rtl;
+
+    .fr-wizard-body, .fr-wizard-toc {
+        display: table-cell;
+    }
+
+    .fr-wizard-other {
+        display: table-row;
+    }
+
+    .fr-wizard-body, .fr-wizard-toc, .fr-wizard-other {
+        direction: ltr; // to restore the direction since parent has `rtl`
+    }
+
+    .fr-wizard-toc, .fr-wizard-body {
+        vertical-align: top;
+    }
+
+    .fr-wizard-toc {
+        width: @frWizardTocWidth;
+        margin-bottom: 0;
+        border-bottom: 1px solid darken(@wellBackground, 7%);
+
+        .nav {
+
+            ul, li {
+                clear: both;
+            }
+
+            .label {
+                display: inline-block;
+                float: right;
+                width: 70px;
+                text-align: center;
+                margin: 8px @wizardLineHeight 8px 0;
+            }
+
+            a {
+                text-decoration: none;
+                .text-overflow();
+            }
+
+            .invalid > span > a {
+                color: @error;
+            }
+
+            .active.invalid > span > a {
+                color: @white;
+                background-color: @error;
+            }
+
+            .invalid.active > span > a {
+                color: @white;
+            }
+
+            .incomplete > span > a {
+                //color: @white;
+                //background-color: green;
+            }
+
+            li {
+                line-height: @wizardLineHeight;
+            }
+
+            .nav-list {
+                list-style-type: none;
+                padding-right: 0;
+            }
+        }
+    }
+
+    .fr-toc-edit {
+        display: none;
+    }
+
+    .fr-wizard-separate-toc {
+        .fr-toc-edit {
+            display: inline-block;
+            float: right;
+            text-decoration: underline;
+        }
+    }
+
+    .fr-wizard-body {
+        border-left: 1px solid darken(@wellBackground, 7%);
+        border-bottom: 1px solid darken(@wellBackground, 7%);
+
+        background-color: white;
+    }
+
+    .fr-wizard-navigation {
+        .pagination {
+            margin: 10px 0;
+            .fr-page-number {
+                width: 60px;
+            }
+        }
+    }
+
+    .fr-buttons {
+        display: table-cell;
+        padding-top: 10px;
+        padding-bottom: 10-5px; // adjust for the 5px bottom margin of buttons (see below)
+        padding-right: 10-1px;  // align with bottom buttons
+        padding-left: 10-1px;   // same as right
+        text-align: right;
+    }
+
+    @media (max-width: 980px) {
+        // Use flex layout to get the TOC to show before the body
+        // NOTE: Media queries not supported with IE 8 anyway. Only problematic browser might be IE 9, which supports
+        // neither flex nor media queries. We really want to support responsive on mobile/tablets/computers with
+        // more modern browsers through.
+        .flex();
+        .flex-direction(column);
+
+        direction: ltr; // restore just in case
+        width: 100%;
+
+        .fr-wizard-body, .fr-wizard-toc, .fr-wizard-other {
+            display: block;
+            position: static;
+            width: 100%;
+        }
+
+        .fr-wizard-toc {
+            .order(1);
+            border: none;
+        }
+
+        .fr-wizard-body {
+            .order(2);
+            border: none;
+        }
+
+        .fr-wizard-other {
+            .order(3);
+        }
+
+        .fr-buttons {
+            display: block;
+        }
+    }
+}

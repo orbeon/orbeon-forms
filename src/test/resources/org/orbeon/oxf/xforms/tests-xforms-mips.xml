@@ -2270,64 +2270,6 @@
         </output>
     </test>
 
-    <test description="#1471: Missing warning annotation with fr:number" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xh:html>
-                <xh:head>
-                    <xf:model id="model">
-                        <xf:instance id="instance">
-                            <form>
-                                <text/>
-                                <number/>
-                            </form>
-                        </xf:instance>
-                        <xf:bind ref="text" id="text-bind">
-                            <xf:constraint id="length-constraint"    level="error"   value="string-length() gt 1"/>
-                            <xf:constraint id="uppercase-constraint" level="error"   value="true()"/>
-                        </xf:bind>
-                        <xf:bind ref="number" id="number-bind">
-                            <xf:constraint id="true-warning-constraint" level="warning" value="false()"/>
-                        </xf:bind>
-
-                        <xf:send event="xforms-ready" submission="submission"/>
-
-                        <xf:submission
-                            id="submission"
-                            method="post"
-                            resource="echo:"
-                            ref="instance()"
-                            xxf:annotate="error warning info"
-                            replace="all"
-                            validate="false"/>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:input id="my-input1" ref="text">
-                        <xf:alert id="alert-1">All levels</xf:alert>
-                        <xf:alert id="alert-2" level="error">Error level</xf:alert>
-                        <xf:alert id="alert-3" level="warning">Warning level</xf:alert>
-                        <xf:alert id="alert-4" level="error warning">Error and warning level</xf:alert>
-                        <xf:alert id="alert-5" validation="length-constraint">Length constraint</xf:alert>
-                        <xf:alert id="alert-6" validation="uppercase-constraint">Uppercase constraint</xf:alert>
-                        <xf:alert id="alert-7" validation="length-constraint uppercase-constraint">Both constraints</xf:alert>
-                    </xf:input>
-                    <fr:number id="my-number" ref="number">
-                        <xf:alert id="alert-15">All levels</xf:alert>
-                        <xf:alert id="alert-16" level="warning">Warning level</xf:alert>
-                        <xf:alert id="alert-17" validation="true-warning-constraint">True warning constraint</xf:alert>
-                    </fr:number>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <form>
-                <text xxf:error="&lt;ul&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;"/>
-                <number xxf:warning="True warning constraint"/>
-            </form>
-        </output>
-    </test>
-
     <test description="#1472: Failed constraints from multiple binds incorrectly combined" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

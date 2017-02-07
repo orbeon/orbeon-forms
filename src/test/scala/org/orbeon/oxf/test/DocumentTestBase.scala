@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.test
 
-import org.orbeon.dom
 import org.junit.After
+import org.orbeon.dom
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
 
+  // FIXME: change to avoid global document
   private var _document: XFormsContainingDocument = _
   def document = _document
 
@@ -31,28 +33,47 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     ResourceManagerTestBase.staticSetup()
 
     val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
-    _document = new XFormsContainingDocument(staticState, null, null, true)
+    val doc = new XFormsContainingDocument(staticState, null, null, true)
 
-    _document.setTemplateIfNeeded(AnnotatedTemplate(template))
-    _document.afterInitialResponse()
-    _document.beforeExternalEvents(null)
+    doc.setTemplateIfNeeded(AnnotatedTemplate(template))
+    doc.afterInitialResponse()
+    doc.beforeExternalEvents(null)
 
-    _document
+    _document = doc
+
+    doc
   }
 
   def setupDocument(doc: XFormsContainingDocument): Unit = {
-    _document = doc
 
-    _document.afterInitialResponse()
-    _document.beforeExternalEvents(null)
+    doc.afterInitialResponse()
+    doc.beforeExternalEvents(null)
+
+    _document = doc
   }
 
   @After def disposeDocument(): Unit = {
     if (_document ne null) {
-      _document.afterExternalEvents()
-      _document.afterUpdateResponse()
-
+      val doc = _document
       _document = null
+      disposeDocument(doc)
+    }
+  }
+
+  def disposeDocument(doc: XFormsContainingDocument): Unit = {
+    doc.afterExternalEvents()
+    doc.afterUpdateResponse()
+  }
+
+  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument ⇒ T): T = {
+    InitUtils.withPipelineContext { pipelineContext ⇒
+      ResourceManagerTestBase.setExternalContext(pipelineContext)
+      val doc = setupDocument(xhtml)
+      try {
+        thunk(doc)
+      } finally {
+        disposeDocument(doc)
+      }
     }
   }
 }

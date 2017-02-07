@@ -146,58 +146,65 @@ val TestResourceManagerPaths = List(
   "orbeon-war/src/main/webapp/WEB-INF/resources"
 )
 
-val ResourceManagerProperties: List[String] = {
+def resourceManagerProperties(buildBaseDirectory: File): List[String] = {
 
   val pkg = "org.orbeon.oxf.resources"
 
   val props =
-    for ((dir, i) ← TestResourceManagerPaths.zipWithIndex)
+    for {
+      (dir, i)    ← TestResourceManagerPaths.zipWithIndex
+      absoluteDir = buildBaseDirectory / dir
+    }
       yield
-        s"-Doxf.resources.priority.${i + 1}=$pkg.FilesystemResourceManagerFactory"           ::
-        s"-Doxf.resources.priority.${i + 1}.oxf.resources.filesystem.sandbox-directory=$dir" ::
+        s"-Doxf.resources.priority.${i + 1}=$pkg.FilesystemResourceManagerFactory"                   ::
+        s"-Doxf.resources.priority.${i + 1}.oxf.resources.filesystem.sandbox-directory=$absoluteDir" ::
         Nil
 
-  s"-Doxf.resources.factory=$pkg.PriorityResourceManagerFactory"                             ::
-    props.flatten                                                                            :::
-    s"-Doxf.resources.priority.${props.size + 1}=$pkg.ClassLoaderResourceManagerFactory"     ::
+  s"-Doxf.resources.factory=$pkg.PriorityResourceManagerFactory"                                     ::
+    props.flatten                                                                                    :::
+    s"-Doxf.resources.priority.${props.size + 1}=$pkg.ClassLoaderResourceManagerFactory"             ::
     Nil
 }
 
-val TestJavaOptions = List(
-  "-ea",
-  "-server",
-  "-Djava.awt.headless=true",
-  "-Xms256m",
-  "-Xmx2G",
-  // Unneeded with Java 8
-  "-XX:MaxPermSize=512m",
-  // Some code uses the default time zone, which might different on different system, so we need to set it explicitly
-  "-Duser.timezone=America/Los_Angeles",
-  "-Doxf.resources.common.min-reload-interval=50",
-//  "-Djava.io.tmpdir=build/temp/test",
-  // Getting a JDK error, per http://stackoverflow.com/a/13575810/5295
-  "-Djava.util.Arrays.useLegacyMergeSort=true"
-) ++ ResourceManagerProperties
+def testJavaOptions(buildBaseDirectory: File) =
+  List(
+    "-ea",
+    "-server",
+    "-Djava.awt.headless=true",
+    "-Xms256m",
+    "-Xmx2G",
+    // Unneeded with Java 8
+    "-XX:MaxPermSize=512m",
+    // Some code uses the default time zone, which might different on different system, so we need to set it explicitly
+    "-Duser.timezone=America/Los_Angeles",
+    "-Doxf.resources.common.min-reload-interval=50",
+  //  "-Djava.io.tmpdir=build/temp/test",
+    // Getting a JDK error, per http://stackoverflow.com/a/13575810/5295
+    "-Djava.util.Arrays.useLegacyMergeSort=true"
+  ) ++
+    resourceManagerProperties(buildBaseDirectory)
 
-val JUnitTestArguments = List(
-  //"-q",
-  "-v",
-  "-s",
-  "-a"
-  //"--run-listener=org.orbeon.junit.OrbeonJUnitRunListener",
-) ++ ResourceManagerProperties
+def jUnitTestArguments(buildBaseDirectory: File) =
+  List(
+    //"-q",
+    "-v",
+    "-s",
+    "-a"
+  ) ++
+    resourceManagerProperties(buildBaseDirectory)
 
-val JunitTestOptions = List(
-  libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % Test,
+def jUnitTestOptions =
+  List(
+    libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % Test,
 
-  testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, JUnitTestArguments: _*),
-  testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
-  testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
-  parallelExecution in Test          := false,
-  fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
-  javaOptions       in Test          ++= TestJavaOptions,
-  baseDirectory     in Test          := Path.absolute(baseDirectory.value / "..")
-)
+    testOptions       in Test          += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((baseDirectory in ThisBuild).value): _*),
+    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test")),
+    testOptions       in Test          += Tests.Filter(s ⇒ s.endsWith("Test") && ! s.contains("CombinedClientTest")),
+    parallelExecution in Test          := false,
+    fork              in Test          := true, // "By default, tests executed in a forked JVM are executed sequentially"
+    javaOptions       in Test          ++= testJavaOptions((baseDirectory in ThisBuild).value),
+    baseDirectory     in Test          := Path.absolute(baseDirectory.value / "..")
+  )
 
 lazy val DatabaseTest = config("db")         extend Test
 lazy val DebugTest    = config("debug-test") extend Test
@@ -385,24 +392,44 @@ lazy val portletSupport = (project in file("portlet-support"))
     name := "orbeon-portlet-support"
   )
 
-lazy val formRunnerComponents = (crossProject.crossType(CrossType.Full) in file("form-runner-components"))
+lazy val formRunner = (crossProject.crossType(CrossType.Full) in file("form-runner"))
   .settings(commonSettings: _*)
   .settings(
-    name := "orbeon-form-runner-components"
+    name := "orbeon-form-runner"
   )
 
-lazy val formRunnerComponentsJVM = formRunnerComponents.jvm
+lazy val formRunnerJVM = formRunner.jvm
+  .dependsOn(
+    core % "test->test;compile->compile",
+    portletSupport
+  )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
+  .configs(DatabaseTest, DebugTest)
   .settings(commonSettings: _*)
+  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
+  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
+  .settings(jUnitTestOptions: _*)
+  .settings(
+    sourceDirectory   in DebugTest     := (sourceDirectory in Test).value,
+    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
+  ).settings(
+    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided,
+
+    libraryDependencies                ++= Seq(
+      "io.circe" %% "circe-core",
+      "io.circe" %% "circe-generic",
+      "io.circe" %% "circe-parser"
+    ).map(_ % CirceVersion)
+  )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-runner-components.jar`
     // This stores the optimized version. For development we need something else.
-    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formRunnerComponentsJS).value.data, FormRunnerResourcesPathInWar)
+    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formRunnerJS).value.data, FormRunnerResourcesPathInWar)
   )
 
-lazy val formRunnerComponentsJS = formRunnerComponents.js
+lazy val formRunnerJS = formRunner.js
   .dependsOn(commonJS, xformsJS)
   .settings(
 
@@ -430,25 +457,6 @@ lazy val formRunnerComponentsJS = formRunnerComponents.js
     )
   )
 
-lazy val formRunner = (project in file("form-runner"))
-  .dependsOn(portletSupport, core % "test->test;compile->compile")
-  .enablePlugins(SbtWeb)
-  .settings(assetsSettings: _*)
-  .configs(DatabaseTest, DebugTest)
-  .settings(commonSettings: _*)
-  .settings(inConfig(DatabaseTest)(Defaults.testSettings): _*)
-  .settings(inConfig(DebugTest)(Defaults.testSettings): _*)
-  .settings(JunitTestOptions: _*)
-  .settings(
-    name := "orbeon-form-runner"
-  )
-  .settings(
-    sourceDirectory   in DebugTest     := (sourceDirectory in Test).value,
-    javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
-  ).settings(
-    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided
-  )
-
 lazy val formBuilder = (crossProject.crossType(CrossType.Full) in file("form-builder"))
   .settings(commonSettings: _*)
   .settings(
@@ -459,10 +467,10 @@ lazy val formBuilderJVM = formBuilder.jvm
   .enablePlugins(SbtCoffeeScript, SbtWeb)
   .dependsOn(
     commonJVM,
-    formRunner % "test->test;compile->compile",
-    core       % "test->test;compile->compile"
+    formRunnerJVM % "test->test;compile->compile",
+    core          % "test->test;compile->compile"
   )
-  .settings(JunitTestOptions: _*)
+  .settings(jUnitTestOptions: _*)
   .settings(assetsSettings: _*)
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
@@ -473,7 +481,7 @@ lazy val formBuilderJVM = formBuilder.jvm
 
 
 lazy val formBuilderJS: Project = formBuilder.js
-  .dependsOn(commonJS, xformsJS, formRunnerComponentsJS)
+  .dependsOn(commonJS, xformsJS, formRunnerJS)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -550,7 +558,7 @@ lazy val core = (project in file("src"))
 
     sourceDirectory in ThisProject     := baseDirectory.value // until we have a more standard layout
   )
-  .settings(JunitTestOptions: _*)
+  .settings(jUnitTestOptions: _*)
   .settings(
     javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
     libraryDependencies                ++= CoreLibraryDependencies
@@ -566,9 +574,8 @@ lazy val orbeonWar = (project in file("orbeon-war"))
     xupdate,
     core,
     xformsJVM,
-    formRunner,
+    formRunnerJVM,
     formBuilderJVM,
-    formRunnerComponentsJVM,
     embedding,              // probably unneeded in WAR
     portletSupport,
     formRunnerProxyPortlet, // unneeded in WAR, but `proxy-portlet-jar` task for now uses JAR in WAR
@@ -586,9 +593,8 @@ lazy val root = (project in file("."))
     core,
     xformsJVM,
     xformsJS,
-    formRunner,
-    formRunnerComponentsJVM,
-    formRunnerComponentsJS,
+    formRunnerJVM,
+    formRunnerJS,
     formBuilderJVM,
     formBuilderJS,
     embedding,

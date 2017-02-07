@@ -1,0 +1,71 @@
+// Copyright (C) 2015 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-character-counter {
+
+        display: inline-block;
+        width: 100%;
+
+        &> .fr-charcounter-wrapper {
+
+            // Use table layout as Flexbox doesn't work with IE < 11
+            display: table;
+
+            &> * {
+                display: table-cell;
+                vertical-align: top;
+            }
+
+            &> .fr-charcounter-count {
+
+                display: inline-block;
+                text-align: right;
+                margin-left: 4px;
+                margin-bottom: 3px;
+
+                .xforms-output {
+                    display: inline-block;
+                    min-width: 28px; // try to fit 3 digits without widening
+                    box-sizing: border-box;
+                }
+
+                .fr-charcounter-over .xforms-output-output:before {
+                    content: "-"
+                }
+            }
+
+            &> .xforms-input, &> .xforms-textarea, &> .xbl-fr-tinymce {
+                width: 100%;
+            }
+        }
+    }
+
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .xbl-fr-character-counter > .fr-charcounter-wrapper {
+
+            display: inline;
+
+            &> * {
+                display: inline;
+            }
+
+            &> .fr-charcounter-count {
+                display: none;
+            }
+
+        }
+    }
+}

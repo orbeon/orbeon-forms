@@ -1,0 +1,175 @@
+// Copyright (C) 2010 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+    .xbl-fr-section {
+        display: block;
+
+        h2, h3, h4, h5, h6 {
+            &.fr-section-title {
+                #gradient > .vertical(@grayLighter, @grayLighter);
+                margin: 0;
+                text-align: left;
+                font-weight: normal;
+                padding: 0;
+                color: @frHeaderColor;
+                font-size: @frSectionTitleHeight;
+                line-height: @frSectionTitleLineHeight;
+            }
+        }
+
+        .fr-section-title {
+            .xforms-help {
+                float: left;                       // Help on the same line as section title in display: block
+                margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
+                margin-right: 5px;                 // Space between help icon and section title
+
+                .help-icon("../../../../resources/apps/fr/style/");
+            }
+        }
+
+        .fr-section-open-close img { margin-right: 0 }
+        .fr-section-open-close {
+            // Padding is designed to make the <a> box around the section open/close images a square
+            padding: 0 7px 0 7px;
+        }
+
+        .fr-section-content {
+            display: block;
+            padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding; // To be aligned with the start of the text of the titles
+            padding-right: @frSectionTitleLeftPadding - @frGridCellPadding; // To have the same margin on both side, especially visible with tables
+            padding-top: 10px;                                              // At the top/bottom of a section, less space
+            padding-bottom: 10px;
+        }
+
+        &.xforms-section-appearance-minimal {
+            .fr-repeat-iteration {
+                display: table-row;
+                &> .fr-repeat-content {
+                    padding-left: 0;
+                    display: table-cell;
+                }
+                &> .fr-section-right-column {
+                    display: table-cell;
+                    vertical-align: bottom;
+                    padding-bottom: 10px;
+                }
+            }
+        }
+
+        background-color: white;
+
+        .fr-section-title {
+
+            .fr-section-label {
+                display: inline-table;          // We don't want the label to expands all the way to the right
+                padding-left: 10px;
+                font-size: @frSectionTitleHeight;
+                vertical-align: top;            // Avoid space at the bottom (http://stackoverflow.com/q/36146704/5295)
+
+                // <a> is collapsible section, <output> for non-collapsible
+                a, .xforms-output-output {
+                    display: table-cell;        // So it extends all the way to the right
+                    min-height: @frSectionTitleLineHeight;
+                }
+                a {
+                    text-decoration: none;
+                    color: @frHeaderColor;      // Don't use the default styling for anchors
+                }
+
+                // Override default label styles
+                label {
+                    font-size: @frSectionTitleHeight;
+                    line-height: @frSectionTitleLineHeight;
+                    margin-bottom: 0;
+                }
+
+                &.fr-section-open, &.fr-section-closed {
+                    padding-left: @frSectionTitleLeftPadding;
+                    background-repeat: no-repeat;
+                    background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
+                                                                                                             // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
+                                                                                                             // to be aligned on the first line, not the middle of the section area
+                    cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
+                    border-collapse: separate;  // For Liferay, see https://github.com/orbeon/orbeon-forms/issues/2716
+                }
+                &.fr-section-open {
+                    background-image: url(arrow-down.png);
+                }
+                &.fr-section-closed {
+                    background-image: url(arrow-right.png);
+                }
+            }
+        }
+
+        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+            .fr-section-title img { display: none }
+        }
+    }
+
+    .xforms-noscript {
+        .xbl-fr-section {
+            .fr-section-title .fr-section-label {
+
+                button.btn-link {
+                    color: @frHeaderColor;
+                    font-size: inherit;
+                }
+
+                .xforms-help {
+                    display: inline;
+                }
+
+                .xforms-help-anchor {
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+@media print {
+    .orbeon {
+
+        h2, h3, h4, h5, h6 {
+            border-bottom: 1px solid darken(@wellBackground, 7%);
+            color: black;
+        }
+
+        .xbl-fr-section {
+            .fr-section-title {
+                background: none;
+                .fr-section-label {
+                    &.fr-section-open, &.fr-section-closed {
+                        padding-left: 0;        // remove padding as we don't have section arrows
+                        background-image: none; // remove section arrows
+                    }
+                }
+            }
+
+            .fr-section-content {
+                padding-left: 0;
+                padding-right: 0;
+
+                page-break-before: avoid;
+            }
+        }
+
+        #xforms-form { // make contained rules strong
+            .fr-section-title .xforms-help {
+                display: none;
+            }
+        }
+    }
+}

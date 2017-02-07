@@ -26,7 +26,7 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <group description="XBL Components">
+    <group description="Form Runner Components">
 
         <test description="fr:inplace-input's hint evaluates in outer context" name="oxf:pipeline">
             <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>

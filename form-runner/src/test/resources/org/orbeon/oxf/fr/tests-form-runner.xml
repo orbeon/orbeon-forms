@@ -12,6 +12,5 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <tests xmlns:xi="http://www.w3.org/2001/XInclude">
-    <xi:include href="tests-xbl-components.xml"/>
     <xi:include href="tests-xforms-xpath-analysis.xml"/>
 </tests>

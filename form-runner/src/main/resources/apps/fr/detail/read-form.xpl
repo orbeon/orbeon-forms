@@ -91,7 +91,7 @@
         <p:output name="data" id="document"/>
     </p:processor>
 
-    <!-- Her we read the document to be sure the URL generator runs before the XSLT stylesheet below,
+    <!-- Here we read the document to be sure the URL generator runs before the XSLT stylesheet below,
          which read a request attribute set by the URL generator -->
     <p:processor name="oxf:null-serializer">
         <p:input name="data" href="#document"/>

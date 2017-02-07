@@ -159,6 +159,11 @@
             )[1]"/>
 
     <xsl:variable
+        name="is-full-update"
+        as="xs:boolean"
+        select="p:property(string-join(('oxf.fr.detail.view.full-update', $app, $form), '.'))"/>
+
+    <xsl:variable
         name="custom-model"
         as="xs:anyURI?"
         select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>

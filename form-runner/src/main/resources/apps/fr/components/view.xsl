@@ -96,6 +96,9 @@
             ref="instance('fr-form-instance')"
             xxf:validation-mode="{$validation-mode}"
         >
+            <xsl:if test="$is-full-update">
+                <xsl:attribute name="xxf:update">full</xsl:attribute>
+            </xsl:if>
 
             <xh:a name="fr-form"/>
             <xsl:choose>

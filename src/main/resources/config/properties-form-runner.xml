@@ -153,6 +153,7 @@
     <property as="xs:string"  name="oxf.fr.detail.tiff.scale.*.*"                               value="3.0"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.view.full-update.*.*"                         value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                              value="false"/>

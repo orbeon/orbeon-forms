@@ -420,47 +420,5 @@ body.orbeon {
                 font-size: .5px;
             }
         }
-
-        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-
-            .xforms-field {
-                // Flying Saucer: missing box-sizing support :(
-                min-height: @controlsHeight - 2 * 2px !important; // not sure why it doesn't kick in otherwise
-                line-height: @controlsHeight - 2 * 2px;
-            }
-
-            // Values below are empirical
-            .span12 {
-                width: 98%;
-            }
-            .fr-grid-1 {
-                .xforms-field {
-                    width: 98.5%;
-                }
-            }
-
-            .fr-grid-2 {
-                .xforms-field {
-                    width: 97%;
-                }
-            }
-
-            .fr-grid-3 {
-                .xforms-field {
-                    width: 95.5%;
-                }
-            }
-
-            .fr-grid-4 {
-                .xforms-field {
-                    width: 94%;
-                }
-            }
-
-            // Bootstrap adds `content: " (" attr(href) ")"` and `content: " (" attr(title) ")"`
-            a[href]:after, abbr[title]:after {
-                content: "";
-            }
-        }
     }
 }

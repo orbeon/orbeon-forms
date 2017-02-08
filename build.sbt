@@ -414,13 +414,7 @@ lazy val formRunnerJVM = formRunner.jvm
     sourceDirectory   in DebugTest     := (sourceDirectory in Test).value,
     javaOptions       in DebugTest     += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided,
-
-    libraryDependencies                ++= Seq(
-      "io.circe" %% "circe-core",
-      "io.circe" %% "circe-generic",
-      "io.circe" %% "circe-parser"
-    ).map(_ % CirceVersion)
+    libraryDependencies                += "org.joda"               %  "joda-convert"      % JodaConvertVersion % Provided
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion

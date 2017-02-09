@@ -148,7 +148,17 @@
         }
 
         .xbl-fr-section {
+
+            page-break-before: auto;
+            page-break-inside: auto;
+            page-break-after: auto;
+
             .fr-section-title {
+
+                page-break-before: auto;
+                page-break-inside: avoid;
+                page-break-after: avoid; // keep title with what follows
+
                 background: none;
                 .fr-section-label {
                     &.fr-section-open, &.fr-section-closed {
@@ -159,10 +169,25 @@
             }
 
             .fr-section-content {
+
+                page-break-before: auto; // curiously `avoid` breaks things
+                page-break-inside: auto;
+                page-break-after: auto;
+
                 padding-left: 0;
                 padding-right: 0;
 
-                page-break-before: avoid;
+                .xbl-fr-grid {
+                    page-break-before: auto;
+                    page-break-inside: auto;
+                    page-break-after:  auto;
+
+                    .fr-grid-tr {
+                        page-break-before: auto;
+                        page-break-inside: avoid; // no break within a `<tr>`
+                        page-break-after:  auto;
+                      }
+                  }
             }
         }
 

@@ -182,7 +182,34 @@
                     </xsl:element>
                 </xsl:template>
 
-                <xsl:template match="*[p:has-class('xforms-disabled')]" mode="#all"/>
+                <xsl:template
+                    match="
+                        *[
+                            p:has-class('xforms-disabled')                   or
+                            p:has-class('xforms-case-deselected')            or
+                            p:has-class('xforms-case-deselected-subsequent') or
+                            p:has-class('xforms-case-begin-end')             or
+                            p:has-class('xforms-hidden')                     or
+                            p:has-class('fr-dialog')                         or
+                            p:has-class('xforms-error-dialogs')              or
+                            p:has-class('xforms-help-panel')                 or
+                            p:has-class('popover-container-right')           or
+                            p:has-class('popover-container-left')            or
+                            p:has-class('xforms-template')]"
+                    mode="#all"/>
+
+                <!-- We could remove the nested `div` but it doesn't seem to make a difference for page breaks -->
+                <!--<xsl:template match="*[p:has-class('xbl-fr-section')]/*:div[1][p:has-class('xforms-group')]" mode="#all">-->
+                    <!--<xsl:apply-templates select="node()" mode="#current"/>-->
+                <!--</xsl:template>-->
+
+                <!-- We could remove grouping switches but it doesn't seem to make a difference for page breaks -->
+                <!--<xsl:template match="*[p:has-class('xforms-switch')]" mode="#all">-->
+                    <!--<xsl:apply-templates select="node()" mode="#current"/>-->
+                <!--</xsl:template>-->
+
+                <!-- Enabling this breaks the `page-break` CSS rules -->
+                <!--<xsl:template match="*:span[p:has-class('xforms-case-selected') and empty(node())]" mode="#all"/>-->
 
                 <!-- Remove all prefixes because Flying Saucer doesn't like them -->
                 <xsl:template match="*" mode="#all">

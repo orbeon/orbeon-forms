@@ -59,7 +59,17 @@
                         </xsl:if>
 
                         <!-- Don't run script in static readonly and noscript modes -->
-                        <xf:var name="script" value="not(exf:readonly(xxf:binding('fr-button')) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
+                        <xf:var
+                            name="script"
+                            value="
+                                not(
+                                    (
+                                        xxf:is-control-readonly('fr-button') and
+                                        property('xxf:readonly-appearance') = 'static'
+                                    ) or
+                                        property('xxf:noscript')
+                                )"/>
+
                         <xf:trigger xbl:attr="xxf:modal" xxbl:scope="outer">
                             <!-- Bind trigger if needed so it can handle read-only -->
                             <xsl:if test="exists(/fr:button/(@ref, @bind))">

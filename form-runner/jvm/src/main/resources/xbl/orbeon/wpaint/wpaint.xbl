@@ -123,8 +123,8 @@
             <xf:group appearance="xxf:internal">
 
                 <!-- Allow access to annotation and image from JavaScript -->
-                <xf:output class="fr-wpaint-image"      ref="image[not(exf:readonly(xxf:binding('fr-wpaint')))]" mediatype="image/*"/>
-                <xf:output class="fr-wpaint-annotation" ref="annotation" alt="{xxf:r('annotated-image')}"        mediatype="image/*"/>
+                <xf:output class="fr-wpaint-image"      ref="image[not(xxf:is-control-readonly('fr-wpaint'))]" mediatype="image/*"/>
+                <xf:output class="fr-wpaint-annotation" ref="annotation" alt="{xxf:r('annotated-image')}"      mediatype="image/*"/>
 
                 <!-- Message in case the canvas is not supported
                      - completely static, so it is shown even without JavaScript

@@ -70,14 +70,14 @@
                         <resource xml:lang="pt"><date>Data</date>      <time>Hora</time></resource>
                     </resources>
                 </xf:instance>
-                <xf:instance id="datetime-instance">
+                <xf:instance id="i">
                     <datetime>
                         <date/>
                         <time/>
                         <is-readonly/>
                     </datetime>
                 </xf:instance>
-                <xf:bind ref="instance('datetime-instance')">
+                <xf:bind ref="instance('i')">
                     <xf:bind ref="date" type="xf:date" readonly="../is-readonly = 'true'"/>
                     <xf:bind ref="time" type="xf:time" readonly="../is-readonly = 'true'"/>
                 </xf:bind>
@@ -89,16 +89,16 @@
             <!-- Propagate readonly -->
             <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
                 <xf:setvalue
-                    ref="instance('datetime-instance')/is-readonly"
-                    value="xxf:readonly(xxf:binding('fr-datetime'))"/>
+                    ref="instance('i')/is-readonly"
+                    value="xxf:is-control-readonly('fr-datetime')"/>
             </xbl:handler>
         </xbl:handlers>
 
         <xbl:template>
 
             <xf:var name="binding"    value="xxf:binding('fr-datetime')"/>
-            <xf:var name="local-date" value="instance('datetime-instance')/date"/>
-            <xf:var name="local-time" value="instance('datetime-instance')/time"/>
+            <xf:var name="local-date" value="instance('i')/date"/>
+            <xf:var name="local-time" value="instance('i')/time"/>
             <xf:var name="view"       value="xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
 
             <!-- Update local date and time from bound node -->

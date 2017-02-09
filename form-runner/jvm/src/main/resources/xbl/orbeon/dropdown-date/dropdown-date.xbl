@@ -69,10 +69,18 @@
                     .xbl-fr-dropdown-date .fr-component-group span.xforms-select1-appearance-minimal select { width: auto }
             </xbl:style>
         </xbl:resources>
+        <xbl:handlers>
+            <!-- Propagate readonly -->
+            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+                <xf:setvalue
+                    ref="instance('i')/is-readonly"
+                    value="xxf:is-control-readonly('fr-dropdown-date-binding')"/>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
             <xf:model id="date-model">
-                <xf:instance id="date-instance">
+                <xf:instance id="i">
                     <date>
                         <!-- Individual components of the date -->
                         <year/>
@@ -146,34 +154,28 @@
             <xf:var name="binding"
                     value="xxf:binding('fr-dropdown-date-binding')"/>
             <xf:var name="view"
-                value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+                value="is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="value" as="xs:string" value="$binding/string()">
                 <xf:action ev:event="xforms-value-changed xforms-enabled">
                     <!-- Only set local values if the bound node is an xs:date -->
                     <xf:action if="$value castable as xs:date">
-                        <xf:setvalue ref="instance('date-instance')/year" value="year-from-date($binding)"/>
-                        <xf:setvalue ref="instance('date-instance')/month" value="month-from-date($binding)"/>
-                        <xf:setvalue ref="instance('date-instance')/day" value="day-from-date($binding)"/>
+                        <xf:setvalue ref="instance('i')/year" value="year-from-date($binding)"/>
+                        <xf:setvalue ref="instance('i')/month" value="month-from-date($binding)"/>
+                        <xf:setvalue ref="instance('i')/day" value="day-from-date($binding)"/>
                     </xf:action>
                     <xf:action if="not($value castable as xs:date) and xxf:is-blank($value)">
-                        <xf:setvalue ref="instance('date-instance')/year"/>
-                        <xf:setvalue ref="instance('date-instance')/month"/>
-                        <xf:setvalue ref="instance('date-instance')/day"/>
+                        <xf:setvalue ref="instance('i')/year"/>
+                        <xf:setvalue ref="instance('i')/month"/>
+                        <xf:setvalue ref="instance('i')/day"/>
                     </xf:action>
                     <xf:action if="not($value castable as xs:date) and count(tokenize($value, '-')) ge 3">
                         <xf:action iterate="tokenize($value, '-')">
                             <xf:var name="position" value="position()" as="xs:integer"/>
-                            <xf:setvalue ref="instance('date-instance')/*[$position]"
+                            <xf:setvalue ref="instance('i')/*[$position]"
                                              value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>
                         </xf:action>
                     </xf:action>
                 </xf:action>
-            </xf:var>
-
-            <!-- Propagate readonly -->
-            <xf:var name="readonly" as="xs:boolean" value="exf:readonly($binding)">
-                <xf:setvalue ev:event="xforms-enabled xforms-value-changed"
-                             ref="instance('date-instance')/is-readonly" value="exf:readonly($binding)"/>
             </xf:var>
 
             <xf:group class="fr-component-group">

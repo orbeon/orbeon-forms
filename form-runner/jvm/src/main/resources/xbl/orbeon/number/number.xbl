@@ -102,7 +102,7 @@
 
                         <xf:var
                             name="view"
-                            value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+                            value="xxf:is-control-readonly('fr-number') and property('xxf:readonly-appearance') = 'static'"/>
 
                         <xf:var
                             name="property-fraction-digits-opt"

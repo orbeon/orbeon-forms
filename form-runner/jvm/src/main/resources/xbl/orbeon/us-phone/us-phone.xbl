@@ -59,7 +59,7 @@
             <xf:var name="binding"
                     value="xxf:binding('fr-phone-binding')"/>
             <xf:var name="view"
-                    value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
+                    value="xxf:is-control-readonly('fr-phone-binding') and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="formatted"
                     ref="$binding"
                     value="for $v in string(.)

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.BooleanValue
@@ -21,6 +22,30 @@ class XXFormsIsControlRelevant extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     relevantControl(0)(xpathContext).nonEmpty
+
+  // TODO: PathMap
+}
+
+class XXFormsIsControlReadonly extends XFormsFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ c.isReadonly } contains true
+
+  // TODO: PathMap
+}
+
+class XXFormsIsControlRequired extends XFormsFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ c.isRequired } contains true
+
+  // TODO: PathMap
+}
+
+class XXFormsIsControlValid extends XFormsFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
+    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ c.isValid } contains true
 
   // TODO: PathMap
 }

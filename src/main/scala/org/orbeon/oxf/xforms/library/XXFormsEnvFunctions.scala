@@ -103,6 +103,18 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
+    Fun("is-control-readonly", classOf[XXFormsIsControlReadonly], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("is-control-required", classOf[XXFormsIsControlRequired], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("is-control-valid", classOf[XXFormsIsControlValid], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
     Fun("value", classOf[XXFormsValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
       Arg(STRING, EXACTLY_ONE)
     )

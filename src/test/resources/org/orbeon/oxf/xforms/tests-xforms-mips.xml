@@ -2432,4 +2432,74 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="#3113: PDF: fr:fields-date not readonly when service is called upon xforms-enabled" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="my-model">
+
+                        <xf:instance id="value-instance">
+                            <value/>
+                        </xf:instance>
+
+                        <xf:bind ref="instance('value-instance')" readonly="true()"/>
+
+                        <xf:instance id="result-instance">
+                            <value/>
+                        </xf:instance>
+
+                        <xf:instance id="rows-instance">
+                            <rows>
+                                <row/>
+                            </rows>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <xf:group id="my-group-1">
+                        <!-- This used to cause a `rebuild` but not a `recalculate`... -->
+                        <xf:insert
+                            event="xforms-enabled"
+                            context="instance('rows-instance')"
+                            ref="*"/>
+                        <!-- ...which caused this handler to get an incorrect value for `readonly`. -->
+                        <xf:setvalue
+                            event="xforms-enabled"
+                            ref="instance('result-instance')"
+                            value="xxf:readonly(instance('value-instance'))"
+                        />
+                    </xf:group>
+
+                    <!-- The repeat is needed so that there is a `rebuild` -->
+                    <xf:repeat id="my-repeat" ref="row"/>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="result-instance" model-id="my-model">
+                                <value>true</value>
+                            </instance>
+                            <instance id="rows-instance" model-id="my-model">
+                                <rows>
+                                    <row/>
+                                    <row/>
+                                </rows>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

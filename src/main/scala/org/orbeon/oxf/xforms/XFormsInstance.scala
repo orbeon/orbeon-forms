@@ -226,12 +226,13 @@ class XFormsInstance(
     if (repeatControls.nonEmpty) {
       val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
 
-      // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
+      // Copy into `List` as `repeatControls` may change within `updateSequenceForInsertDelete()`
       val repeatControlsList = repeatControls.to[List]
 
       // Only update controls within same scope as modified instance
-      // NOTE: This can clearly break with e.g. `xxf:instance()`
-      // NOTE: The control may be non-relevant.
+      //
+      // - This can clearly break with e.g. `xxf:instance()`
+      // - The control may be non-relevant.
       val candidateRepeatsIt =
         for {
           repeatControl ← repeatControlsList.iterator

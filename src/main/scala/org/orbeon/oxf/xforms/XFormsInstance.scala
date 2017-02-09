@@ -226,29 +226,31 @@ class XFormsInstance(
     if (repeatControls.nonEmpty) {
       val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
 
-      // Only update controls within same scope as modified instance
-      // NOTE: This can clearly break with e.g. xxf:instance()
-      // NOTE: The control may be non-relevant.
       // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
-      val candidateRepeats =
+      val repeatControlsList = repeatControls.to[List]
+
+      // Only update controls within same scope as modified instance
+      // NOTE: This can clearly break with e.g. `xxf:instance()`
+      // NOTE: The control may be non-relevant.
+      val candidateRepeatsIt =
         for {
-          repeatControl ← repeatControls.to[List]
+          repeatControl ← repeatControlsList.iterator
           // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
           newRepeatControl ← Option(containingDocument.getControlByEffectiveId(repeatControl.getEffectiveId).asInstanceOf[XFormsRepeatControl])
           if newRepeatControl.getResolutionScope == instanceScope
       } yield
           newRepeatControl
 
-      if (candidateRepeats.nonEmpty) {
-        // See https://github.com/orbeon/orbeon-forms/issues/2473
-        // If a control is bound using a `bind` and the binds haven't been rebuilt, bind resolution can fail.
-        // See also https://github.com/orbeon/orbeon-forms/issues/2474
-        // See also https://github.com/orbeon/orbeon-forms/issues/3113
+      // If a control is bound using a `bind` and the binds haven't been rebuilt, bind resolution can fail
+      if (candidateRepeatsIt.nonEmpty) {
+        // - https://github.com/orbeon/orbeon-forms/issues/2473
+        // - https://github.com/orbeon/orbeon-forms/issues/2474
+        // - https://github.com/orbeon/orbeon-forms/issues/3113
         model.doRebuild()
         model.doRecalculateRevalidate()
       }
 
-      candidateRepeats foreach
+      candidateRepeatsIt foreach
         (_.updateSequenceForInsertDelete(insertedNodes))
     }
   }

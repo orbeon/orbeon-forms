@@ -23,29 +23,27 @@ class XXFormsIsControlRelevant extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
     relevantControl(0)(xpathContext).nonEmpty
 
-  // TODO: PathMap
+  // NOTE: We depend on MIPs so we cannot compute PathMap dependencies at this point.
 }
 
-class XXFormsIsControlReadonly extends XFormsFunction {
+trait SingleNodeControlMipFunction extends XFormsFunction {
+
+  protected def getMip(c: XFormsSingleNodeControl): Boolean
 
   override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ c.isReadonly } contains true
+    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ getMip(c) } contains true
 
-  // TODO: PathMap
+  // NOTE: We depend on MIPs so we cannot compute PathMap dependencies at this point.
 }
 
-class XXFormsIsControlRequired extends XFormsFunction {
-
-  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ c.isRequired } contains true
-
-  // TODO: PathMap
+class XXFormsIsControlReadonly extends SingleNodeControlMipFunction {
+  protected def getMip(c: XFormsSingleNodeControl) = c.isReadonly
 }
 
-class XXFormsIsControlValid extends XFormsFunction {
+class XXFormsIsControlRequired extends SingleNodeControlMipFunction {
+  protected def getMip(c: XFormsSingleNodeControl) = c.isRequired
+}
 
-  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl ⇒ c.isValid } contains true
-
-  // TODO: PathMap
+class XXFormsIsControlValid extends SingleNodeControlMipFunction {
+  protected def getMip(c: XFormsSingleNodeControl) = c.isValid
 }

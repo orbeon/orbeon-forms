@@ -63,7 +63,8 @@ public class XML1252Emitter extends XMLEmitter {
             final char c = chars.charAt(i);
             if (c==0) {
                 // used to switch escaping on and off
-                disabled = !disabled;
+                // See https://github.com/orbeon/orbeon-forms/issues/3115
+//                disabled = !disabled;
             } else if (disabled) {
                 if (c > 127) {
                     if (UTF16.isHighSurrogate(c)) {

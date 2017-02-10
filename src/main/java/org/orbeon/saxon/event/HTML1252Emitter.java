@@ -96,7 +96,8 @@ public class HTML1252Emitter extends HTMLEmitter {
 
             if (c==0) {
                 // used to switch escaping on and off
-                disabled = !disabled;
+                // See https://github.com/orbeon/orbeon-forms/issues/3115
+//                disabled = !disabled;
             } else if (disabled) {
                 writer.write(c);
             } else if (c<=127) {

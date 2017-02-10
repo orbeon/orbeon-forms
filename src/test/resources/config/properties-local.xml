@@ -17,9 +17,21 @@
 
     <property as="xs:string"  processor-name="oxf:page-flow" name="service-public-methods"  value="GET HEAD POST PUT DELETE"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="page-public-methods"     value="GET HEAD POST PUT DELETE"/>
-    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"
-                               value="document model submission submission-details submission-body submission-details
-                                      control event action analysis submission-details server server-body html
-                                      analysis-xbl-tree resources"/>
+
+    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug">
+        document
+        model
+        submission
+        submission-details
+        control
+        event
+        action
+        analysis
+        server
+        server-body
+        html
+        analysis
+        resources
+    </property>
 
 </properties>

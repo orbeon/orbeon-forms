@@ -81,4 +81,5 @@ object AjaxServer extends js.Object {
 object Document extends js.Object {
   def dispatchEvent(event: js.Object): Unit = js.native
   def setValue(controlIdOrElem: String | Element, newValue: String, form: js.UndefOr[Element] = js.undefined): Unit = js.native
+  def getValue(controlIdOrElem: String | Element, form: js.UndefOr[Element] = js.undefined): js.UndefOr[String] = js.native
 }

@@ -25,6 +25,7 @@ object FormBuilderApp extends JSApp {
     def initializeOnDomReady(): Unit = {
       FormRunnerApp.main()
       StaticUpload
+      DialogItemset
     }
 
     $(initializeOnDomReady _)

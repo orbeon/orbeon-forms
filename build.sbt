@@ -418,7 +418,7 @@ lazy val formRunnerJVM = formRunner.jvm
   )
   .settings(
     // Settings here as `.jvmSettings` above causes infinite recursion
-    // Package Scala.js output into `orbeon-form-runner-components.jar`
+    // Package Scala.js output into `orbeon-form-runner.jar`
     // This stores the optimized version. For development we need something else.
     (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in formRunnerJS).value.data, FormRunnerResourcesPathInWar)
   )

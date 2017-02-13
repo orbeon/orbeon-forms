@@ -435,8 +435,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             final LHHAValue itemLabel = item.label();
             final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
 
-            // TODO: In static readonly mode, shouldn't use <label>, unless maybe alongside an <output> element.
-            final String labelName = "label";
+            final String labelName = ! isStaticReadonly ? "label" : "span";
 
             if (! isBooleanInput) {
                 reusableAttributes.clear();
@@ -618,14 +617,16 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             // NOP: in noscript mode for full items, this is handled by fieldset/legend
         } else if (isFull) {
             // For radio and checkboxes, produce span with an id
-            handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.LABEL),
-                                     getEffectiveId(),
-                                     null,
-                                     LHHAC.LABEL,
-                                     "span",                   // Make element name a span, as a label would need a `for`
-                                     currentControlOrNull(),
-                                     isTemplate(),
-                                     true);                    // Pretend we're "external", so the element gets an id
+            handleLabelHintHelpAlert(
+                getStaticLHHA(getPrefixedId(), LHHAC.LABEL),
+                getEffectiveId(),
+                null,
+                LHHAC.LABEL,
+                "span",                   // Make element name a span, as a label would need a `for`
+                currentControlOrNull(),
+                isTemplate(),
+                true                      // Pretend we're "external", so the element gets an id
+            );
         } else {
             super.handleLabel();
         }

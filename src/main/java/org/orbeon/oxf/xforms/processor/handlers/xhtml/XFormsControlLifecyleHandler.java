@@ -237,57 +237,58 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
     }
 
     protected void handleLabel() throws SAXException {
-        // May be overridden by subclasses
         handleLabelHintHelpAlert(
             getStaticLHHA(getPrefixedId(), LHHAC.LABEL),
             getEffectiveId(),
             getForEffectiveId(getEffectiveId()),
             LHHAC.LABEL,
-            null,
+            isStaticReadonly(currentControlOrNull()) ? "span" : null,
             currentControlOrNull(),
             isTemplate(),
-            false);
+            false
+        );
     }
 
     protected void handleAlert() throws SAXException {
-        // May be overridden by subclasses
-        handleLabelHintHelpAlert(
-            getStaticLHHA(getPrefixedId(), LHHAC.ALERT),
-            getEffectiveId(),
-            getForEffectiveId(getEffectiveId()),
-            LHHAC.ALERT,
-            null,
-            currentControlOrNull(),
-            isTemplate(),
-            false);
+        if (! isStaticReadonly(currentControlOrNull()))
+            handleLabelHintHelpAlert(
+                getStaticLHHA(getPrefixedId(), LHHAC.ALERT),
+                getEffectiveId(),
+                getForEffectiveId(getEffectiveId()),
+                LHHAC.ALERT,
+                null,
+                currentControlOrNull(),
+                isTemplate(),
+                false
+            );
     }
 
     protected void handleHint() throws SAXException {
-        // May be overridden by subclasses
-        handleLabelHintHelpAlert(
-            getStaticLHHA(getPrefixedId(), LHHAC.HINT),
-            getEffectiveId(),
-            getForEffectiveId(getEffectiveId()),
-            LHHAC.HINT,
-            null,
-            currentControlOrNull(),
-            isTemplate(),
-            false
-        );
+        if (! isStaticReadonly(currentControlOrNull()))
+            handleLabelHintHelpAlert(
+                getStaticLHHA(getPrefixedId(), LHHAC.HINT),
+                getEffectiveId(),
+                getForEffectiveId(getEffectiveId()),
+                LHHAC.HINT,
+                null,
+                currentControlOrNull(),
+                isTemplate(),
+                false
+            );
     }
 
     protected void handleHelp() throws SAXException {
-        // May be overridden by subclasses
-        handleLabelHintHelpAlert(
-            getStaticLHHA(getPrefixedId(), LHHAC.HELP),
-            getEffectiveId(),
-            getForEffectiveId(getEffectiveId()),
-            LHHAC.HELP,
-            null,
-            currentControlOrNull(),
-            isTemplate(),
-            false
-        );
+        if (! isStaticReadonly(currentControlOrNull()))
+            handleLabelHintHelpAlert(
+                getStaticLHHA(getPrefixedId(), LHHAC.HELP),
+                getEffectiveId(),
+                getForEffectiveId(getEffectiveId()),
+                LHHAC.HELP,
+                null,
+                currentControlOrNull(),
+                isTemplate(),
+                false
+            );
     }
 
     // Must be overridden by subclasses

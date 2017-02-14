@@ -133,8 +133,8 @@
                     observer="date time">
                 <xf:setvalue
                     ref="$binding"
-                    value="if ($local-date castable as xs:date and
-                               $local-time castable as xs:time)
+                    value="if ($local-date/string() castable as xs:date and
+                               $local-time/string() castable as xs:time)
                            then dateTime(xs:date($local-date), xs:time($local-time))
                            else if ($local-date/string() = '' and
                                     $local-time/string() = '')

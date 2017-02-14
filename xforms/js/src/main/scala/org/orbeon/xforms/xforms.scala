@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.scalajs.dom.html.Element
+import org.scalajs.dom.raw.HTMLElement
 import org.scalajs.jquery.JQueryCallback
 
 import scala.scalajs.js
@@ -61,7 +62,14 @@ object XBL extends js.Object {
 
 @js.native
 trait YUICustomEvent extends js.Object {
-  def subscribe(fn: js.Function): Unit = js.native
+  def subscribe(fn: js.Function)   : Unit = js.native
+  def unsubscribe(fn: js.Function) : Unit = js.native
+}
+
+@JSName("YAHOO.util.Event")
+@js.native
+object Event extends js.Object {
+  def preventDefault(event: js.Object): Unit = js.native
 }
 
 @JSName("ORBEON.xforms.Events")
@@ -82,4 +90,75 @@ object Document extends js.Object {
   def dispatchEvent(event: js.Object): Unit = js.native
   def setValue(controlIdOrElem: String | Element, newValue: String, form: js.UndefOr[Element] = js.undefined): Unit = js.native
   def getValue(controlIdOrElem: String | Element, form: js.UndefOr[Element] = js.undefined): js.UndefOr[String] = js.native
+}
+
+@JSName("ORBEON.util.ExecutionQueue")
+@js.native
+class ExecutionQueue extends js.Object {
+  def add(event: js.Object, waitMs: Int, waitType: Int): Unit = js.native
+}
+
+@JSName("ORBEON.util.ExecutionQueue")
+@js.native
+object ExecutionQueue extends js.Object {
+  val MIN_WAIT: Int = js.native
+  val MAX_WAIT: Int = js.native
+}
+
+@JSName("ORBEON.xforms.server.UploadServer")
+@js.native
+object UploadServer extends js.Object {
+  val uploadEventQueue: ExecutionQueue = js.native
+  def cancel(doAbort: Boolean, event: String): Unit = js.native
+}
+
+@JSName("ORBEON.util.Property")
+@js.native
+class Property[T] extends js.Object {
+  def get(): T = js.native
+}
+
+@JSName("ORBEON.util.Properties")
+@js.native
+object Properties extends js.Object {
+  val delayBeforeIncrementalRequest    : Property[Int] = js.native
+  val delayBeforeUploadProgressRefresh : Property[Int] = js.native
+}
+
+@JSName("ORBEON.util.Utils")
+@js.native
+object Utils extends js.Object {
+  def appendToEffectiveId(effectiveId: String, ending: String): String = js.native
+}
+
+@JSName("ORBEON.xforms.Page")
+@js.native
+object Page extends js.Object {
+  def registerControlConstructor(controlConstructor: js.Function0[Control], predicate: js.Function1[HTMLElement, Boolean]): Unit = js.native
+}
+
+@JSName("ORBEON.xforms.control.Control")
+@js.native
+class Control extends js.Object {
+
+  val container: HTMLElement = js.native
+
+  def init(container: Element) : Unit    = js.native
+  def getForm()                : Element = js.native
+  def change()                 : Unit    = js.native
+
+  // Provide a new itemset for a control, if the control supports this.
+  def setItemset(itemset: js.Any): Unit = js.native
+
+  // Set the current value of the control in the UI, without sending an update to the server about the new value
+  def setValue(value: String): Unit = js.native
+
+  // Return the current value of the control
+  def getValue(): String = js.native
+
+  // Return elements with the given class name that are inside this control
+  def getElementsByClassName(className: String): js.Array[Element] = js.native
+
+  // Returns the first element with the given class name that are inside this control
+  def getElementByClassName(className: String): js.UndefOr[Element] = js.native
 }

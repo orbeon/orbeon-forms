@@ -390,7 +390,7 @@
             xxf:xpath-analysis="true"
             xxf:label.appearance="{$label-appearance}"
             xxf:hint.appearance="{$hint-appearance}"
-            xxf:assets.baseline.excludes=""
+            xxf:assets.baseline.excludes="/ops/javascript/scalajs/orbeon-xforms.js /ops/javascript/scalajs/orbeon-xforms-launcher.js"
         >
 
             <!-- Don't enable client events filtering for FB -->

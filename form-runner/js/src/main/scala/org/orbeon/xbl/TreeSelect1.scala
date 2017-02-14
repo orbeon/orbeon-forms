@@ -13,8 +13,8 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.fr._
 import org.orbeon.xforms
+import org.orbeon.xforms.$
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js

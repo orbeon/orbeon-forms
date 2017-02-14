@@ -53,7 +53,7 @@
     Page.getControl = function(container) {
         var control = this.idToControl[container.id];
         if (control == null || control.container != container) {
-            control = new (ORBEON.xforms.Page.getControlConstructor(container));
+            control = ORBEON.xforms.Page.getControlConstructor(container)(); // used to be "new"
             this.idToControl[container.id] = control;
             control.init(container);
         }

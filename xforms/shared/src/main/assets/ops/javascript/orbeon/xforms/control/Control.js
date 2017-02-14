@@ -18,9 +18,15 @@
      *
      * @constructor
      */
+
+    window.ORBEON = window.ORBEON || {};
+    window.ORBEON.xforms = window.ORBEON.xforms || {};
+    window.ORBEON.xforms.control = window.ORBEON.xforms.control || {};
+
     ORBEON.xforms.control.Control = function() {};
     var Control = ORBEON.xforms.control.Control;
-    var YD = YAHOO.util.Dom;
+
+    var $ = ORBEON.jQuery;
 
     /** @type {HTMLElement} */
     Control.prototype.container = null;
@@ -55,7 +61,7 @@
      * @return  {Array.<Element>}   Elements with the given class name
      */
     Control.prototype.getElementsByClassName = function(className) {
-        return YD.getElementsByClassName(className, null, this.container);
+        return $(this.container).find("." + className).toArray();
     };
 
     /**

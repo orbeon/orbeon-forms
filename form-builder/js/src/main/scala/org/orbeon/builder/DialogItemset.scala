@@ -13,7 +13,6 @@
   */
 package org.orbeon.builder
 
-import org.orbeon.fr._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms._
 import org.scalajs.jquery.JQueryEventObject

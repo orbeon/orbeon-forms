@@ -12,9 +12,3 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon
-
-import scala.scalajs.js.Dynamic.{global ⇒ g}
-
-package object fr {
-  val $ = g.ORBEON.jQuery.asInstanceOf[org.scalajs.jquery.JQueryStatic]
-}

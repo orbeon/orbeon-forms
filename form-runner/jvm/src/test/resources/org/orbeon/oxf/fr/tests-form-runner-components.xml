@@ -153,13 +153,14 @@
                     <xh:script src="/ops/javascript/orbeon/xforms/control/Control.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>
-                    <xh:script src="/ops/javascript/orbeon/xforms/control/Upload.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/action/Message.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/controls/Placement.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/controls/Help.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint.min.js" class="xforms-baseline"/>
                     <xh:script src="/ops/javascript/orbeon/xforms/controls/Textarea.min.js" class="xforms-baseline"/>
+                    <xh:script src="/ops/javascript/scalajs/orbeon-xforms.js" class="xforms-baseline"/>
+                    <xh:script src="/ops/javascript/scalajs/orbeon-xforms-launcher.js" class="xforms-baseline"/>
                     <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
                     <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
                     <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>

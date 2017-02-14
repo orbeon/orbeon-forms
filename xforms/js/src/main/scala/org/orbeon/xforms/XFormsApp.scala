@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Orbeon, Inc.
+ * Copyright (C) 2017 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,22 +11,17 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.builder
-
-import org.orbeon.fr._
-import org.orbeon.xforms.$
+package org.orbeon.xforms
 
 import scala.scalajs.js.JSApp
 
-// Scala.js starting point for Form Builder
-object FormBuilderApp extends JSApp {
+// Scala.js starting point for XForms
+object XFormsApp extends JSApp {
 
   override def main(): Unit = {
 
     def initializeOnDomReady(): Unit = {
-      FormRunnerApp.main()
-      StaticUpload
-      DialogItemset
+      Upload
     }
 
     $(initializeOnDomReady _)

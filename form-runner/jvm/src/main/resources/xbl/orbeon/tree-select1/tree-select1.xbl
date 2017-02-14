@@ -24,8 +24,7 @@
     <xbl:script src="/xbl/orbeon/tree-select1/fancytree/jquery-ui.min.js"/>
     <xbl:script src="/xbl/orbeon/tree-select1/fancytree/jquery.fancytree-all.min.js"/>
 
-    <xbl:script src="/apps/fr/resources/scalajs/orbeon-form-runner.js"/>
-    <xbl:script src="/apps/fr/resources/scalajs/orbeon-form-runner-launcher.js"/>
+    <!-- NOTE: When using this component outside of Form Runner, the supporting JavaScript must be explicitly included. -->
 
     <xbl:binding
         id="fr-tree-select1"

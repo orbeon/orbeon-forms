@@ -69,6 +69,7 @@ val LocalResourcesPath            = "resources-local"
 
 val FormBuilderResourcesPathInWar = "forms/orbeon/builder/resources"
 val FormRunnerResourcesPathInWar  = "apps/fr/resources"
+val XFormsResourcesPathInWar      = "ops/javascript"
 
 val copyJarToExplodedWar           = taskKey[Option[File]]("Copy JAR file to local WEB-INF/lib for development.")
 val copyDependenciesToExplodedWar  = taskKey[Unit]("Copy managed library JAR files to WEB-INF/lib.")
@@ -87,6 +88,10 @@ orbeonVersionFromProperties in ThisBuild := sys.props.get("orbeon.version") getO
 orbeonEditionFromProperties in ThisBuild := sys.props.get("orbeon.edition") getOrElse DefaultOrbeonEdition
 
 historyPath                 in ThisBuild := Some((target in LocalRootProject).value / ".history")
+
+// Give a .js or .jvm project's base directory, return the shared assets directory
+def sharedAssetsDir(baseDirectory: File) =
+  baseDirectory.getParentFile / "shared" / "src" / "main" / "assets"
 
 def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =
   files map (_.data) foreach { file ⇒
@@ -424,7 +429,10 @@ lazy val formRunnerJVM = formRunner.jvm
   )
 
 lazy val formRunnerJS = formRunner.js
-  .dependsOn(commonJS, xformsJS)
+  .dependsOn(
+    commonJS,
+    xformsJS % "test->test;compile->compile"
+  )
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -434,6 +442,12 @@ lazy val formRunnerJS = formRunner.js
 
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js",
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js",
+
+    // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
+    unmanagedResourceDirectories in Test += sharedAssetsDir((baseDirectory in xformsJS).value),
 
     persistLauncher     in Compile := true,
     persistLauncher     in Test    := false,
@@ -475,7 +489,11 @@ lazy val formBuilderJVM = formBuilder.jvm
 
 
 lazy val formBuilderJS: Project = formBuilder.js
-  .dependsOn(commonJS, xformsJS, formRunnerJS)
+  .dependsOn(
+    commonJS,
+    xformsJS  % "test->test;compile->compile",
+    formRunnerJS
+  )
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -511,13 +529,23 @@ lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
     name := "orbeon-xforms"
   )
 
+
 lazy val xformsJVM = xforms.jvm
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
   .settings(commonSettings: _*)
+  .settings(
 
-lazy val xformsJS = xforms.js
-  .dependsOn(commonJS)
+    // Because `Assets` doesn't check the `shared` directory
+    unmanagedResourceDirectories in Assets += sharedAssetsDir(baseDirectory.value),
+
+    // Package Scala.js output into `orbeon-xforms.jar`
+    // This stores the optimized version. For development we need something else.
+    (mappings in packageBin in Compile) ++= scalaJsFiles((fullOptJS in Compile in xformsJS).value.data, XFormsResourcesPathInWar)
+  )
+
+lazy val xformsJS: Project = xforms.js
+  .dependsOn(commonJS % "test->test;compile->compile")
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -528,8 +556,28 @@ lazy val xformsJS = xforms.js
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
+    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
+    unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),
+
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js",
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js",
+
     persistLauncher     in Compile := true,
-    persistLauncher     in Test    := false
+    persistLauncher     in Test    := true,
+
+//    jsEnv                         := NodeJSEnv().value,
+
+    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
+      (fastOptJS in Compile).value.data,
+      (baseDirectory in ThisBuild).value,
+      XFormsResourcesPathInWar
+    ),
+
+    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
+      (fullOptJS in Compile).value.data,
+      (baseDirectory in ThisBuild).value,
+      XFormsResourcesPathInWar
+    )
   )
 
 lazy val core = (project in file("src"))

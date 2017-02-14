@@ -13,8 +13,7 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.fr._
-import org.orbeon.xforms.Events
+import org.orbeon.xforms.{$, Events}
 
 object StaticUpload {
 

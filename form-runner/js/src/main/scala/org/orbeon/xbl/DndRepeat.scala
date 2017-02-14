@@ -13,9 +13,8 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.fr._
 import org.orbeon.xforms
-import org.orbeon.xforms.{AjaxServer, XBL, XBLCompanion}
+import org.orbeon.xforms.{$, AjaxServer, XBL, XBLCompanion}
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js

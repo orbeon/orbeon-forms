@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.dom.{Document ⇒ JDocument}
 import org.junit.Test
+import org.orbeon.dom.{Document ⇒ JDocument}
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xforms.submission.{RelevanceHandling, XFormsModelSubmissionBase}
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
@@ -89,7 +89,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
       }
 
       def copyAndAnnotate(tokens: String) =
-        XFormsModelSubmissionBase.prepareXML(document, instance("fr-form-instance").get.root, prune = false, tokens)
+        XFormsModelSubmissionBase.prepareXML(document, instance("fr-form-instance").get.root, RelevanceHandling.Keep, tokens)
 
       // Cause warnings and info
       setControlValue(NumberControlId, "1001")

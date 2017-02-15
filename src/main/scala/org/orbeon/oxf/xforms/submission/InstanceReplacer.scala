@@ -146,7 +146,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
     // Set new instance document to replace the one submitted
 
-    val replaceInstanceNoTargetref = submission.findReplaceInstanceNoTargetref(p.refInstance)
+    val replaceInstanceNoTargetref = submission.findReplaceInstanceNoTargetref(p.refInstanceOpt)
     if (replaceInstanceNoTargetref eq null) {
 
       // Replacement instance or node was specified but not found

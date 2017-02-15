@@ -228,7 +228,7 @@ public class CacheableSubmission extends BaseSubmission {
     private XFormsInstance checkInstanceToUpdate(IndentedLogger indentedLogger, XFormsModelSubmission.SubmissionParameters p) {
         XFormsInstance updatedInstance;
         final NodeInfo destinationNodeInfo = submission().evaluateTargetRef(p.xpathContext,
-                submission().findReplaceInstanceNoTargetref(p.refInstance), p.submissionElementContextItem);
+                submission().findReplaceInstanceNoTargetref(p.refInstanceOpt), p.submissionElementContextItem);
 
         if (destinationNodeInfo == null) {
             // Throw target-error

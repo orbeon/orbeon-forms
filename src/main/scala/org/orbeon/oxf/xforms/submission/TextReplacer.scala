@@ -106,7 +106,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         }
       } else {
         // Use default destination
-        submission.findReplaceInstanceNoTargetref(p.refInstance).rootElement
+        submission.findReplaceInstanceNoTargetref(p.refInstanceOpt).rootElement
       }
 
     def handleSetValueSuccess(oldValue: String) =

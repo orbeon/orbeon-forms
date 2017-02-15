@@ -80,54 +80,6 @@ public class XFormsSubmissionUtils {
     }
 
     /**
-     * Check whether an XML sub-tree satisfies validity and required MIPs.
-     *
-     * @param indentedLogger        logger
-     * @param startNode             node to check
-     * @param recurse               whether to recurse into attributes and descendant nodes
-     * @return                      true iif the sub-tree passes the checks
-     */
-    public static boolean isSatisfiesValid(final IndentedLogger indentedLogger, final Node startNode, boolean recurse) {
-
-        if (recurse) {
-            // Recurse into attributes and descendant nodes
-            final boolean[] instanceSatisfiesValidRequired = new boolean[]{true};
-            startNode.accept(new VisitorSupport() {
-
-                public final void visit(Element element) {
-                    final boolean valid = checkInstanceData(element);
-
-                    instanceSatisfiesValidRequired[0] &= valid;
-
-                    if (!valid && indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug("", "found invalid element",
-                            "element name", Dom4jUtils.elementToDebugString(element));
-                    }
-                }
-
-                public final void visit(Attribute attribute) {
-                    final boolean valid = checkInstanceData(attribute);
-
-                    instanceSatisfiesValidRequired[0] &= valid;
-
-                    if (!valid && indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug("", "found invalid attribute",
-                            "attribute name", Dom4jUtils.attributeToDebugString(attribute), "parent element", Dom4jUtils.elementToDebugString(attribute.getParent()));
-                    }
-                }
-
-                private boolean checkInstanceData(Node node) {
-                    return InstanceData.getValid(node);
-                }
-            });
-            return instanceSatisfiesValidRequired[0];
-        } else {
-            // Just check the current node
-            return InstanceData.getValid(startNode);
-        }
-    }
-
-    /**
      * Create an application/x-www-form-urlencoded string, encoded in UTF-8, based on the elements and text content
      * present in an XML document.
      *

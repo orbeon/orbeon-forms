@@ -326,7 +326,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
-                if (p.serialize && p.resolvedXXFormsUploads && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, scala.Option.apply(p.refInstance))) {
+                if (p.serialize && p.resolvedXXFormsUploads && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refInstanceOpt)) {
                     throw new XFormsSubmissionException(this, "xf:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.XXFORMS_PENDING_UPLOADS(), null));
@@ -334,30 +334,26 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 /* ***** Update data model ****************************************************************************** */
 
-                // "The data model is updated"
-                final XFormsModel modelForInstance;
-                if (p.refInstance != null) {
-                    modelForInstance = p.refInstance.model();
-                    if (modelForInstance != null) {
-                        // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
-                        // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
-                        // This can be different than the model containing the submission if using e.g. xxf:instance().
+                final RelevanceHandling relevanceHandling = RelevanceHandling.withNameAdjustForTrueAndFalse(p.resolvedRelevant);
 
-                        // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
-                        // the instance is not serialized and if no instance data is otherwise used for the submission,
-                        // this seems however unneeded so we optimize out.
-                        if (p.resolvedValidate || p.resolvedRelevant || p.resolvedXXFormsCalculate) {
-                            // Rebuild impacts validation, relevance and calculated values (set by recalculate)
-                            modelForInstance.doRebuild();
-                        }
-                        if (p.resolvedRelevant || p.resolvedXXFormsCalculate) {
-                            // Recalculate impacts relevance and calculated values
-                            modelForInstance.doRecalculateRevalidate();
-                        }
+                // "The data model is updated"
+                if (p.refInstanceOpt.isDefined()) {
+                    final XFormsModel modelForInstance = p.refInstanceOpt.get().model();
+                    // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
+                    // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
+                    // This can be different than the model containing the submission if using e.g. xxf:instance().
+
+                    // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
+                    // the instance is not serialized and if no instance data is otherwise used for the submission,
+                    // this seems however unneeded so we optimize out.
+                    if (p.resolvedValidate || ! relevanceHandling.equals(RelevanceHandling.Keep$.MODULE$)  || p.resolvedXXFormsCalculate) {
+                        // Rebuild impacts validation, relevance and calculated values (set by recalculate)
+                        modelForInstance.doRebuild();
                     }
-                } else {
-                    // Case where no instance was found
-                    modelForInstance = null;
+                    if (! relevanceHandling.equals(RelevanceHandling.Keep$.MODULE$) || p.resolvedXXFormsCalculate) {
+                        // Recalculate impacts relevance and calculated values
+                        modelForInstance.doRecalculateRevalidate();
+                    }
                 }
 
                 /* ***** Handle deferred submission ********************************************************************* */
@@ -368,7 +364,13 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                     // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
                     if (p.serialize) {
-                        createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant, p.resolvedXXFormsAnnotate);
+                        createDocumentToSubmit(
+                            p.refNodeInfo,
+                            p.refInstanceOpt,
+                            p.resolvedValidate,
+                            relevanceHandling,
+                            p.resolvedXXFormsAnnotate, indentedLogger
+                        );
                     }
 
                     // Resolve the target AVT because XFormsServer requires it for deferred submission
@@ -396,13 +398,20 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 if (p.serialize) {
 
                     // Check if a submission requires file upload information
-                    if (requestedSerialization.startsWith("multipart/")) {
+                    if (requestedSerialization.startsWith("multipart/") && p.refInstanceOpt.isDefined()) {
                         // Annotate before re-rooting/pruning
-                        XFormsSubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refInstance);
+                        XFormsSubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refInstanceOpt.get());
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant, p.resolvedXXFormsAnnotate);
+                    documentToSubmit = createDocumentToSubmit(
+                        p.refNodeInfo,
+                        p.refInstanceOpt,
+                        p.resolvedValidate,
+                        relevanceHandling,
+                        p.resolvedXXFormsAnnotate,
+                        indentedLogger
+                    );
 
                 } else {
                     // Don't recreate document
@@ -694,7 +703,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
         // Current node for xf:submission and instance containing the node to submit
         NodeInfo refNodeInfo;
-        XFormsInstance refInstance;
+        scala.Option<XFormsInstance> refInstanceOpt;
         Item submissionElementContextItem;
 
         final String resolvedMethod;
@@ -704,7 +713,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         final boolean serialize;
 
         final boolean resolvedValidate;
-        final boolean resolvedRelevant;
+        final String resolvedRelevant;
         final boolean resolvedXXFormsCalculate;
         final boolean resolvedXXFormsUploads;
         final String resolvedXXFormsAnnotate;
@@ -740,7 +749,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
             refNodeInfo = (NodeInfo) bindingContext.getSingleItem();
             submissionElementContextItem = bindingContext.contextItem();
             // NOTE: Current instance may be null if the document submitted is not part of an instance
-            refInstance = bindingContext.instanceOrNull();
+            refInstanceOpt = bindingContext.instance();
             xpathContext = new XPathCache.XPathContext(namespaceMapping, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
         }
 
@@ -792,7 +801,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtRelevant);
                 // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
-                resolvedRelevant = serialize && !"false".equals(resolvedRelevantString);
+                resolvedRelevant = resolvedRelevantString;
 
                 final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtXXFormsCalculate);
                 resolvedXXFormsCalculate = serialize && !"false".equals(resolvedCalculateString);
@@ -966,16 +975,16 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         }
     }
 
-    public XFormsInstance findReplaceInstanceNoTargetref(XFormsInstance refInstance) {
+    public XFormsInstance findReplaceInstanceNoTargetref(scala.Option<XFormsInstance> refInstance) {
         final XFormsInstance replaceInstance;
         if (xxfReplaceInstanceId != null)
             replaceInstance = container.findInstanceOrNull(xxfReplaceInstanceId);
         else if (replaceInstanceId != null)
             replaceInstance = model.getInstance(replaceInstanceId);
-        else if (refInstance == null)
+        else if (refInstance.isEmpty())
             replaceInstance = model.getDefaultInstance();
         else
-            replaceInstance = refInstance;
+            replaceInstance = refInstance.get();
         return replaceInstance;
     }
 
@@ -1012,45 +1021,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     public void performTargetAction(XFormsEvent event) {
         // NOP
-    }
-
-    private Document createDocumentToSubmit(IndentedLogger indentedLogger, NodeInfo currentNodeInfo,
-                                            XFormsInstance currentInstance, XFormsModel modelForInstance,
-                                            boolean resolvedValidate, boolean resolvedRelevant, String resolvedAnnotate) {
-        final Document documentToSubmit;
-
-        // Revalidate instance
-        // NOTE: We need to do this before pruning so that bind/@type works correctly. XForms 1.1 seems to say that this
-        // must be done after pruning, but then it is not clear how XML Schema validation would work then.
-        // Also, if validate="false" or if serialization="none", then we do not revalidate. Now whether this optimization
-        // is acceptable depends on whether validate="false" only means "don't check the instance's validity" or also
-        // don't even recalculate. If the latter, then this also means that type annotations won't be updated, which
-        // can impact serializations that use type information, for example multipart. But in that case, here we decide
-        // the optimization is worth it anyway.
-        if (resolvedValidate && modelForInstance != null)
-            modelForInstance.doRecalculateRevalidate();
-
-        // Get selected nodes (re-root and prune)
-        documentToSubmit = prepareXML(containingDocument, currentNodeInfo, resolvedRelevant, resolvedAnnotate);
-
-        // Check that there are no validation errors
-        // NOTE: If the instance is read-only, it can't have MIPs at the moment, and can't fail validation/requiredness, so we don't go through the process at all.
-        final boolean instanceSatisfiesValidRequired
-                = (currentInstance != null && currentInstance.readonly())
-                || !resolvedValidate
-                || XFormsSubmissionUtils.isSatisfiesValid(indentedLogger, documentToSubmit, true);
-        if (!instanceSatisfiesValidRequired) {
-            if (indentedLogger.isDebugEnabled()) {
-                final String documentString = TransformerUtils.tinyTreeToString(currentNodeInfo);
-                indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted",
-                        "document", documentString);
-            }
-            throw new XFormsSubmissionException(this, "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
-                    "checking instance validity",
-                    new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.VALIDATION_ERROR(), null));
-        }
-
-        return documentToSubmit;
     }
 
     public IndentedLogger getIndentedLogger() {

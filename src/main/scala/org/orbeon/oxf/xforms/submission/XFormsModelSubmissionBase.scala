@@ -17,6 +17,7 @@ import enumeratum._
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -31,6 +32,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 sealed abstract class RelevanceHandling extends EnumEntry
@@ -116,6 +118,7 @@ abstract class XFormsModelSubmissionBase
         containingDocument,
         currentNodeInfo,
         relevanceHandling,
+        Dom4jUtils.getNamespaceContext(getSubmissionElement).asScala.toMap,
         annotateWith
       )
 
@@ -125,7 +128,7 @@ abstract class XFormsModelSubmissionBase
     val instanceSatisfiesValidRequired =
       currentInstance.exists(_.readonly) ||
       ! validate                         ||
-      isSatisfiesValidity(documentToSubmit, relevanceHandling, recurse = true)
+      isSatisfiesValidity(documentToSubmit, relevanceHandling)
 
     if (! instanceSatisfiesValidRequired) {
       if (indentedLogger.isDebugEnabled) {
@@ -148,6 +151,7 @@ abstract class XFormsModelSubmissionBase
 object XFormsModelSubmissionBase {
 
   import Private._
+  import RelevanceHandling._
   import XFormsSubmissionUtils._
 
   // Prepare XML for submission
@@ -160,6 +164,7 @@ object XFormsModelSubmissionBase {
     xfcd              : XFormsContainingDocument,
     ref               : NodeInfo,
     relevanceHandling : RelevanceHandling,
+    namespaceContext  : Map[String, String],
     annotateWith      : String
   ): Document =
     ref match {
@@ -175,20 +180,46 @@ object XFormsModelSubmissionBase {
             case _          ⇒ throw new IllegalStateException
           }
 
-        val annotationTokens = stringToSet(annotateWith)
+        val attributeNamesForTokens =
+          stringToSet(annotateWith).iterator map { token ⇒
+            decodeSimpleQuery(token).headOption match {
+              case Some((name, value)) ⇒
+                name → {
+                  value.trimAllToOpt map
+                    (Dom4jUtils.extractTextValueQName(namespaceContext.asJava, _, true)) getOrElse
+                    QName.get(name, XXFORMS_NAMESPACE_SHORT)
+                }
+              case None ⇒
+                throw new IllegalArgumentException(s"invalid format for `xxf:annotate` value: `$annotateWith`")
+            }
+          } toMap
 
         // Annotate ids before pruning so that it is easier for other code (Form Runner) to infer the same ids
-        if (annotationTokens("id"))
-          annotateWithHashes(copy)
+        attributeNamesForTokens.get("id") foreach
+          (annotateWithHashes(copy, _))
 
-        // "Any node which is considered not relevant as defined in 6.1.4 is removed."
         relevanceHandling match {
-          case RelevanceHandling.Keep  ⇒ // NOP
-          case RelevanceHandling.Prune ⇒ pruneNonRelevantNodes(copy)
-          case RelevanceHandling.Blank ⇒ blankNonRelevantNodes(copy)
+          case RelevanceHandling.Keep  ⇒
+            attributeNamesForTokens.get("relevant") foreach
+              (annotateNonRelevantElements(copy, _))
+          case RelevanceHandling.Prune ⇒
+            pruneNonRelevantNodes(copy)
+          case RelevanceHandling.Blank ⇒
+            blankNonRelevantNodes(copy)
+            attributeNamesForTokens.get("relevant") foreach
+              (annotateNonRelevantElements(copy, _))
         }
 
-        annotateWithAlerts(xfcd, copy, annotationTokens collect LevelByName)
+        annotateWithAlerts(
+          xfcd             = xfcd,
+          doc              = copy,
+          levelsToAnnotate =
+            attributeNamesForTokens.keySet collect
+              LevelByName                  map { level ⇒
+                level → attributeNamesForTokens(level.name)
+            } toMap
+        )
+
         copy
 
       // Submitting read-only instance backed by TinyTree (no MIPs to check)
@@ -202,16 +233,32 @@ object XFormsModelSubmissionBase {
   def pruneNonRelevantNodes(doc: Document): Unit =
     Iterator.iterateWhileDefined(findFirstNonRelevantElementOrAttribute(doc)) foreach (_.detach())
 
-  def blankNonRelevantNodes(doc: Document): Unit =
-    Iterator.iterateWhileDefined(findFirstNonRelevantSimpleElementOrAttribute(doc)) foreach (_.setText(""))
+  def blankNonRelevantNodes(doc: Document): Unit = {
 
-  def annotateWithHashes(doc: Document): Unit = {
+    def processElement(e: Element): Unit = {
+
+      e.attributes.asScala foreach { a ⇒
+        if (! InstanceData.getInheritedRelevant(a))
+          a.setValue("")
+      }
+
+      if (e.containsElement)
+        e.elements.asScala foreach processElement
+      else if (! InstanceData.getInheritedRelevant(e))
+        e.setText("")
+    }
+
+    processElement(doc.getRootElement)
+
+  }
+
+  def annotateWithHashes(doc: Document, attQName: QName): Unit = {
     val wrapper = new DocumentWrapper(doc, null, XPath.GlobalConfiguration)
     var annotated = false
-    doc.accept(new VisitorSupport() {
+    doc.accept(new VisitorSupport {
       override def visit(element: Element): Unit = {
         val hash = SubmissionUtils.dataNodeHash(wrapper.wrap(element))
-        element.addAttribute(QName.get("id", XXFORMS_NAMESPACE_SHORT), hash)
+        element.addAttribute(attQName, hash)
         annotated = true
       }
     })
@@ -224,17 +271,17 @@ object XFormsModelSubmissionBase {
   def annotateWithAlerts(
     xfcd             : XFormsContainingDocument,
     doc              : Document,
-    levelsToAnnotate : Set[ValidationLevel]
+    levelsToAnnotate : Map[ValidationLevel, QName]
   ): Unit =
     if (levelsToAnnotate.nonEmpty) {
 
       val elementsToAnnotate = mutable.Map[ValidationLevel, mutable.Map[Set[String], Element]]()
 
       // Iterate data to gather elements with failed constraints
-      doc.accept(new VisitorSupport() {
+      doc.accept(new VisitorSupport {
         override def visit(element: Element): Unit = {
           val failedValidations = BindNode.failedValidationsForAllLevelsPrioritizeRequired(element)
-          for (level ← levelsToAnnotate) {
+          for (level ← levelsToAnnotate.keys) {
             // NOTE: Annotate all levels specified. If we decide to store only one level of validation
             // in bind nodes, then we would have to change this to take the highest level only and ignore
             // the other levels.
@@ -269,7 +316,7 @@ object XFormsModelSubmissionBase {
             failedValidationsIds = control.failedValidations.map(_.id).toSet
             elementsMap          ← elementsToAnnotate.get(level)
             element              ← elementsMap.get(failedValidationsIds)
-            qName                = QName.get(level.name, XXFORMS_NAMESPACE_SHORT)
+            qName                ← levelsToAnnotate.get(level)
           } locally {
             // There can be an existing attribute if more than one control bind to the same element
             Option(element.attribute(qName)) match {
@@ -293,30 +340,39 @@ object XFormsModelSubmissionBase {
 
   def isSatisfiesValidity(
     startNode        : Node,
-    relevantHandling : RelevanceHandling,
-    recurse          : Boolean)(implicit
+    relevantHandling : RelevanceHandling)(implicit
     indentedLogger   : IndentedLogger
-  ): Boolean = {
-
-    import RelevanceHandling._
-
-    val checkInstanceData: Node ⇒ Boolean =
+  ): Boolean =
+    findFirstElementOrAttributeWith(
+      startNode,
       relevantHandling match {
         case Keep | Prune ⇒ node ⇒ ! InstanceData.getValid(node)
         case Blank        ⇒ node ⇒ ! InstanceData.getValid(node) && InstanceData.getInheritedRelevant(node)
       }
+    ) match {
+      case Some(e: Element) ⇒
+        logInvalidNode(e)
+        false
+      case Some(a: Attribute) ⇒
+        logInvalidNode(a)
+        false
+      case Some(_) ⇒
+        throw new IllegalArgumentException
+      case None ⇒
+        true
+    }
 
-    if (recurse) {
-      findFirstElementOrAttributeWith(startNode, checkInstanceData) match {
-        case Some(e: Element) ⇒
-          indentedLogger.logDebug(
-            "",
-            "found invalid node",
-            "element name",
-            Dom4jUtils.elementToDebugString(e)
-          )
-          false
-        case Some(a: Attribute) ⇒
+  def logInvalidNode(node: Node)(implicit indentedLogger: IndentedLogger): Unit =
+    if (indentedLogger.isDebugEnabled)
+      node match {
+        case e: Element ⇒
+            indentedLogger.logDebug(
+              "",
+              "found invalid node",
+              "element name",
+              Dom4jUtils.elementToDebugString(e)
+            )
+        case a: Attribute ⇒
           indentedLogger.logDebug(
             "",
             "found invalid attribute",
@@ -325,16 +381,9 @@ object XFormsModelSubmissionBase {
             "parent element",
             Dom4jUtils.elementToDebugString(a.getParent)
           )
-          false
-        case Some(_) ⇒
+        case _ ⇒
           throw new IllegalArgumentException
-        case None ⇒
-          true
       }
-    } else {
-      checkInstanceData(startNode)
-    }
-  }
 
   def defaultSerialization(xformsMethod: String): Option[String] =
     xformsMethod.trimAllToOpt collect {
@@ -353,19 +402,26 @@ object XFormsModelSubmissionBase {
 
   private object Private {
 
-    val breaks = new scala.util.control.Breaks
-    import breaks._
+    def annotateNonRelevantElements(doc: Document, attQname: QName): Unit = {
+
+      def processElem(e: Element): Unit =
+        if (! InstanceData.getInheritedRelevant(e))
+          e.addAttribute(attQname, "false")
+        else {
+          e.removeAttribute(attQname)
+          e.elements.asScala foreach processElem
+        }
+
+      processElem(doc.getRootElement)
+    }
 
     def findFirstNonRelevantElementOrAttribute(startNode: Node): Option[Node] =
       findFirstElementOrAttributeWith(startNode, node ⇒ ! InstanceData.getInheritedRelevant(node))
 
-    def findFirstNonRelevantSimpleElementOrAttribute(startNode: Node): Option[Node] =
-      findFirstElementOrAttributeWith(startNode, {
-        case e: Element ⇒ ! e.containsElement && ! InstanceData.getInheritedRelevant(e)
-        case n          ⇒ ! InstanceData.getInheritedRelevant(n)
-      })
-
     def findFirstElementOrAttributeWith(startNode: Node, check: Node ⇒ Boolean): Option[Node] = {
+
+      val breaks = new scala.util.control.Breaks
+      import breaks._
 
       var foundNode: Node = null
 

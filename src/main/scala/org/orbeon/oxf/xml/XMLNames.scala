@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.dom.{Namespace, QName}
+import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_SHORT
 
 object XMLNames {
 

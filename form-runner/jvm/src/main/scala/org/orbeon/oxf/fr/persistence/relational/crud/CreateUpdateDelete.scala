@@ -106,7 +106,7 @@ object RequestReader {
           new WhitespaceXMLReceiver(
             new ElementFilterXMLReceiver(
               newIdentityReceiver(metadataWriter),
-              (level, uri, localname) ⇒ level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
+              (level, uri, localname, _) ⇒ level != 1 || level == 1 && uri == "" && MetadataElementsToKeep(localname)
             ),
             Whitespace.Normalize,
             (_, _, _, _) ⇒ Whitespace.Normalize

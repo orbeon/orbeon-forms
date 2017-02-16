@@ -168,8 +168,9 @@ case class BindingContext(
 
   // NOTE: This is as of 2009-09-17 used only to determine the submission instance based on a submission node.
   def instance: Option[XFormsInstance] =
-    Option(getSingleItem) collect
-      { case node: NodeInfo ⇒ model.containingDocument.getInstanceForNode(node) }
+    Option(getSingleItem) collect { case node: NodeInfo ⇒
+      model.containingDocument.instanceForNodeOpt(node)
+    } flatten
 
   // We don't have a bound element, but the parent is bound to xf:repeat
   def isRepeatIterationBindingContext =

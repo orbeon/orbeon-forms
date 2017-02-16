@@ -14,9 +14,11 @@
 package org.orbeon.oxf.fr
 
 
+import java.io.{InputStream, OutputStream}
 import java.net.URI
 import javax.xml.transform.stream.StreamResult
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
@@ -34,7 +36,9 @@ import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xforms.submission.RelevanceHandling
+import org.orbeon.oxf.xforms.submission.RelevanceHandling._
+import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
@@ -62,6 +66,8 @@ private object FormRunnerPersistenceProxy {
 class FormRunnerPersistenceProxy extends ProcessorImpl {
 
   import FormRunnerPersistenceProxy._
+
+  private val FRRelevantQName = QName.get("relevant", XMLNames.FRNamespace)
 
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
@@ -109,6 +115,12 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         throw HttpStatusCodeException(400)
     }
 
+  def handleRelevantOpt(request: Request, formOrData: String): Option[RelevanceHandling] =
+    if (formOrData == "data" && HttpMethod.getOrElseThrow(request.getMethod) == GET)
+      request.getFirstParamAsString("relevant") flatMap RelevanceHandling.withNameLowercaseOnlyOption
+    else
+      None
+
   // Proxy the request depending on app/form name and whether we are accessing form or data
   private def proxyRequest(
     request    : Request,
@@ -123,7 +135,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     checkDataFormatVersions(request, app, form, formOrData)
 
     // Get persistence implementation target URL and configuration headers
-    val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
+    val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
+
     assert(
       persistenceBaseURL ne null,
       s"no base URL specified for requested persistence provider `${findProvider(app, form, formOrData).get}` (check properties)"
@@ -134,14 +147,45 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       NetUtils.encodeQueryString(request.getParameterMap)
     )
 
-    proxyRequest(request, serviceURI, headers, response)
+    val transform =
+      handleRelevantOpt(request, formOrData) match {
+        case Some(r @ Keep)  ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
+        case Some(Prune)     ⇒ Some(parsePruneAndSerializeXmlData _)
+        case Some(r @ Blank) ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
+        case None            ⇒ None
+      }
+
+    proxyRequest(request, serviceURI, headers, response, transform)
+  }
+
+  private def parsePruneAndSerializeXmlData(is: InputStream, os: OutputStream) = {
+
+    val receiver = TransformerUtils.getIdentityTransformerHandler
+    receiver.setResult(new StreamResult(os))
+
+    useAndClose(is) { is ⇒
+      useAndClose(os) { _ ⇒
+        XMLParsing.inputStreamToSAX(
+          is,
+          null,
+          new ElementFilterXMLReceiver(
+            xmlReceiver = receiver,
+            filter      = (_, _, _, atts) ⇒
+              atts.getValue(FRRelevantQName.getNamespaceURI, FRRelevantQName.getName) != "false"
+          ),
+          XMLParsing.ParserConfiguration.PLAIN,
+          true
+        )
+      }
+    }
   }
 
   private def proxyRequest(
     request    : Request,
     serviceURI : String,
     headers    : Map[String, String],
-    response   : Response
+    response   : Response,
+    transform  : Option[(InputStream, OutputStream) ⇒ Unit]
   ): Unit =
     useAndClose(proxyEstablishConnection(request, serviceURI, headers)) { cxr ⇒
       // Proxy status code
@@ -149,7 +193,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       // Proxy incoming headers
       cxr.content.contentType foreach (response.setHeader(Headers.ContentType, _))
       proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
-      copyStream(cxr.content.inputStream, response.getOutputStream)
+
+      (transform getOrElse (copyStream(_: InputStream, _: OutputStream)))(
+        cxr.content.inputStream,
+        response.getOutputStream
+      )
     }
 
   private def proxyEstablishConnection(
@@ -157,7 +205,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     uri     : String,
     headers : Map[String, String]
   ): ConnectionResult = {
-    // Create the absolute outgoing URL
+
     val outgoingURL =
       new URI(URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
 
@@ -281,7 +329,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       dataProvidersWithIndexSupport, p ⇒ {
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(p)
         val serviceURI = baseURI + "/reindex"
-        proxyRequest(request, serviceURI, headers, response)
+        proxyRequest(request, serviceURI, headers, response, None)
       }
     )
   }

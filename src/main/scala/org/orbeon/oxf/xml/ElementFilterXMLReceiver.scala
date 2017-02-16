@@ -18,7 +18,7 @@ import org.xml.sax.SAXException
 
 class ElementFilterXMLReceiver(
   xmlReceiver : XMLReceiver,
-  filter      : (Int, String, String) ⇒ Boolean
+  filter      : (Int, String, String, Attributes) ⇒ Boolean
 ) extends SimpleForwardingXMLReceiver(xmlReceiver) {
 
   private var level: Int = 0
@@ -26,7 +26,7 @@ class ElementFilterXMLReceiver(
 
   override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
     if (filterLevel == -1) {
-      if (! filter(level, uri, localname))
+      if (! filter(level, uri, localname, attributes))
         filterLevel = level
       else
         super.startElement(uri, localname, qName, attributes)

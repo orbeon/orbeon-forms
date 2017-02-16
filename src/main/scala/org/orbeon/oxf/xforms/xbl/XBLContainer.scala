@@ -451,6 +451,12 @@ trait ContainerResolver {
     else
       null
 
+  def instanceForNodeOpt(nodeInfo: NodeInfo): Option[XFormsInstance] =
+    if (isRelevant)
+      allModels map (_.getInstanceForNode(nodeInfo)) find (_ ne null)
+    else
+      None
+
   // Locally find the instance with the specified id, searching in any relevant model
   def findInstance(instanceStaticId: String): Option[XFormsInstance] =
     if (isRelevant && models.nonEmpty)

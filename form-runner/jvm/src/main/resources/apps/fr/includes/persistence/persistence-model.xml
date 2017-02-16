@@ -435,6 +435,9 @@
                     ]
                     return
                         xf:attribute(lower-case($header/name/string()), $header/value/string())"/>
+            <!-- Remove `relevant` attributes (#3065) -->
+            <xf:delete
+                ref="xxf:instance('fr-form-instance')//(@xxf:relevant, @fr:relevant)"/>
         </xf:action>
     </xf:submission>
 

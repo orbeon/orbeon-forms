@@ -1840,5 +1840,265 @@ az4K</document>
         </output>
     </test>
 
+    <test description="#1179 and #3065: Clear/annotate non-relevant data" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <form>
+                                <section-1>
+                                    <control-1 xxf:relevant="foo">value1</control-1>
+                                    <grid-3>
+                                        <grid-3-iteration>
+                                            <control-5>value5</control-5>
+                                            <control-16 filename="control-16.pdf" mediatype="application/pdf" size="1">value16</control-16>
+                                        </grid-3-iteration>
+                                    </grid-3>
+                                    <grid-6>
+                                        <grid-6-iteration>
+                                            <control-8>value8</control-8>
+                                            <control-17 filename="control-17.png" mediatype="image/png" size="2">value17</control-17>
+                                        </grid-6-iteration>
+                                    </grid-6>
+                                </section-1>
+                                <section-9>
+                                    <section-9-iteration>
+                                        <control-10 xxf:relevant="false">value10</control-10>
+                                    </section-9-iteration>
+                                </section-9>
+                                <section-11>
+                                    <grid-12>
+                                        <grid-12-iteration>
+                                            extra.1
+                                            <control-13>value13.1</control-13>
+                                            <control-23 filename="control-23.pdf" mediatype="application/pdf" size="1"/>
+                                        </grid-12-iteration>
+                                        extra.2
+                                        <grid-12-iteration>
+                                            extra.3
+                                            <control-13>value13.2</control-13>
+                                            <control-23 filename="image-23.png" mediatype="image/png" size="2"/>
+                                        </grid-12-iteration>
+                                    </grid-12>
+                                    <grid-14/>
+                                </section-11>
+                                <section-18>
+                                    <grid-19>
+                                        <grid-19-iteration foo="foo.1">grid19.1</grid-19-iteration>
+                                        <grid-19-iteration foo="foo.2">grid19.2</grid-19-iteration>
+                                    </grid-19>
+                                    <grid-22>
+                                        <grid-22-iteration foo="foo.1">grid22.1</grid-22-iteration>
+                                        <grid-22-iteration foo="foo.2">grid22.2</grid-22-iteration>
+                                    </grid-22>
+                                </section-18>
+                            </form>
+                        </xf:instance>
+
+                        <xf:bind ref="//section-11 | //control-5 | //grid-19//@foo" relevant="false"/>
+
+                        <xf:instance id="blank-result-instance"><dummy/></xf:instance>
+                        <xf:instance id="annotate-result-instance"><dummy/></xf:instance>
+                        <xf:instance id="blank-annotate-result-instance"><dummy/></xf:instance>
+
+                        <xf:submission
+                            ref="instance('instance')"
+                            id="send-blank-submission"
+                            method="post"
+                            action="echo:"
+                            replace="instance"
+                            instance="blank-result-instance"
+                            relevant="blank"
+                            />
+
+                        <xf:submission
+                            ref="instance('instance')"
+                            id="send-annotate-submission"
+                            method="post"
+                            action="echo:"
+                            replace="instance"
+                            instance="annotate-result-instance"
+                            relevant="keep"
+                            xxf:annotate="relevant"
+                            />
+
+                        <xf:submission
+                            ref="instance('instance')"
+                            id="send-blank-annotate-submission"
+                            method="post"
+                            action="echo:"
+                            replace="instance"
+                            instance="blank-annotate-result-instance"
+                            relevant="blank"
+                            xxf:annotate="relevant"
+                            />
+
+                        <xf:send event="xforms-model-construct-done" submission="send-blank-submission"/>
+                        <xf:send event="xforms-model-construct-done" submission="send-annotate-submission"/>
+                        <xf:send event="xforms-model-construct-done" submission="send-blank-annotate-submission"/>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="blank-result-instance" model-id="model">
+                                <form>
+                                    <section-1>
+                                        <control-1 xxf:relevant="foo">value1</control-1>
+                                        <grid-3>
+                                            <grid-3-iteration>
+                                                <control-5/>
+                                                <control-16 filename="control-16.pdf" mediatype="application/pdf" size="1">value16</control-16>
+                                            </grid-3-iteration>
+                                        </grid-3>
+                                        <grid-6>
+                                            <grid-6-iteration>
+                                                <control-8>value8</control-8>
+                                                <control-17 filename="control-17.png" mediatype="image/png" size="2">value17</control-17>
+                                            </grid-6-iteration>
+                                        </grid-6>
+                                    </section-1>
+                                    <section-9>
+                                        <section-9-iteration>
+                                            <control-10 xxf:relevant="false">value10</control-10>
+                                        </section-9-iteration>
+                                    </section-9>
+                                    <section-11>
+                                        <grid-12>
+                                            <grid-12-iteration>extra.1
+                                                <control-13/>
+                                                <control-23 filename="" mediatype="" size=""/>
+                                            </grid-12-iteration>
+                                            extra.2
+                                            <grid-12-iteration>extra.3
+                                                <control-13/>
+                                                <control-23 filename="" mediatype="" size=""/>
+                                            </grid-12-iteration>
+                                        </grid-12>
+                                        <grid-14/>
+                                    </section-11>
+                                    <section-18>
+                                        <grid-19>
+                                            <grid-19-iteration foo="">grid19.1</grid-19-iteration>
+                                            <grid-19-iteration foo="">grid19.2</grid-19-iteration>
+                                        </grid-19>
+                                        <grid-22>
+                                            <grid-22-iteration foo="foo.1">grid22.1</grid-22-iteration>
+                                            <grid-22-iteration foo="foo.2">grid22.2</grid-22-iteration>
+                                        </grid-22>
+                                    </section-18>
+                                </form>
+                            </instance>
+                            <instance id="annotate-result-instance" model-id="model">
+                                <form>
+                                    <section-1>
+                                        <control-1>value1</control-1>
+                                        <grid-3>
+                                            <grid-3-iteration>
+                                                <control-5 xxf:relevant="false">value5</control-5>
+                                                <control-16 filename="control-16.pdf" mediatype="application/pdf" size="1">value16</control-16>
+                                            </grid-3-iteration>
+                                        </grid-3>
+                                        <grid-6>
+                                            <grid-6-iteration>
+                                                <control-8>value8</control-8>
+                                                <control-17 filename="control-17.png" mediatype="image/png" size="2">value17</control-17>
+                                            </grid-6-iteration>
+                                        </grid-6>
+                                    </section-1>
+                                    <section-9>
+                                        <section-9-iteration>
+                                            <control-10>value10</control-10>
+                                        </section-9-iteration>
+                                    </section-9>
+                                   <section-11 xxf:relevant="false">
+                                       <grid-12>
+                                           <grid-12-iteration>extra.1
+                                               <control-13>value13.1</control-13>
+                                               <control-23 filename="control-23.pdf" mediatype="application/pdf" size="1"/>
+                                           </grid-12-iteration>extra.2
+                                           <grid-12-iteration>extra.3
+                                               <control-13>value13.2</control-13>
+                                               <control-23 filename="image-23.png" mediatype="image/png" size="2"/>
+                                           </grid-12-iteration>
+                                       </grid-12>
+                                       <grid-14/>
+                                   </section-11>
+                                    <section-18>
+                                        <grid-19>
+                                            <grid-19-iteration foo="foo.1">grid19.1</grid-19-iteration>
+                                            <grid-19-iteration foo="foo.2">grid19.2</grid-19-iteration>
+                                        </grid-19>
+                                        <grid-22>
+                                            <grid-22-iteration foo="foo.1">grid22.1</grid-22-iteration>
+                                            <grid-22-iteration foo="foo.2">grid22.2</grid-22-iteration>
+                                        </grid-22>
+                                    </section-18>
+                                </form>
+                            </instance>
+                            <instance id="blank-annotate-result-instance" model-id="model">
+                                <form>
+                                    <section-1>
+                                        <control-1>value1</control-1>
+                                        <grid-3>
+                                            <grid-3-iteration>
+                                                <control-5 xxf:relevant="false"/>
+                                                <control-16 filename="control-16.pdf" mediatype="application/pdf" size="1">value16</control-16>
+                                            </grid-3-iteration>
+                                        </grid-3>
+                                        <grid-6>
+                                            <grid-6-iteration>
+                                                <control-8>value8</control-8>
+                                                <control-17 filename="control-17.png" mediatype="image/png" size="2">value17</control-17>
+                                            </grid-6-iteration>
+                                        </grid-6>
+                                    </section-1>
+                                    <section-9>
+                                        <section-9-iteration>
+                                            <control-10>value10</control-10>
+                                        </section-9-iteration>
+                                    </section-9>
+                                    <section-11 xxf:relevant="false">
+                                        <grid-12>
+                                            <grid-12-iteration>extra.1
+                                                <control-13/>
+                                                <control-23 filename="" mediatype="" size=""/>
+                                            </grid-12-iteration>
+                                            extra.2
+                                            <grid-12-iteration>extra.3
+                                                <control-13/>
+                                                <control-23 filename="" mediatype="" size=""/>
+                                            </grid-12-iteration>
+                                        </grid-12>
+                                        <grid-14/>
+                                    </section-11>
+                                    <section-18>
+                                        <grid-19>
+                                            <grid-19-iteration foo="">grid19.1</grid-19-iteration>
+                                            <grid-19-iteration foo="">grid19.2</grid-19-iteration>
+                                        </grid-19>
+                                        <grid-22>
+                                            <grid-22-iteration foo="foo.1">grid22.1</grid-22-iteration>
+                                            <grid-22-iteration foo="foo.2">grid22.2</grid-22-iteration>
+                                        </grid-22>
+                                    </section-18>
+                                </form>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 
 </group>

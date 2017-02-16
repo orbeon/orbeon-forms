@@ -27,7 +27,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.scaxon.XML._
 
 import scala.language.postfixOps
@@ -231,7 +232,7 @@ trait FormRunnerActions {
   // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
     "method"              → "post",
-    "prune"               → "true",
+    "relevant"            → RelevanceHandling.Prune.entryName.toLowerCase,
     "annotate"            → "",
     "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
     "content"             → "xml",
@@ -243,7 +244,8 @@ trait FormRunnerActions {
     "uri",
     "serialization",
     "content-type",
-    PruneMetadataName
+    PruneMetadataName,
+    "prune" // for backward compatibility
   ) ++ DefaultSendParameters.keys
 
   def trySend(params: ActionParams): Try[Any] =
@@ -324,10 +326,17 @@ trait FormRunnerActions {
           evaluatedPropertiesAsMap.get(PruneMetadataName).flatten orElse
             (evaluatedPropertiesAsMap.get(DataFormatVersionName).flatten map findDefaultPruneMetadata)
 
+        // Allow `prune` to override `relevant` for backward compatibility
+        val effectiveRelevant =
+          evaluatedPropertiesAsMap.get("prune").flatten orElse
+            evaluatedPropertiesAsMap.get("relevant").flatten
+
         evaluatedPropertiesAsMap +
-          ("serialization"   → effectiveSerialization) +
-          ("mediatype"       → effectiveContentType  ) + // `<xf:submission>` uses `mediatype`
-          (PruneMetadataName → effectivePruneMetadata)
+          ("serialization"  → effectiveSerialization)  +
+          ("mediatype"      → effectiveContentType  )  + // `<xf:submission>` uses `mediatype`
+          (PruneMetadataName → effectivePruneMetadata) +
+          ("prune-metadata" → effectivePruneMetadata)  +
+          ("relevant"       → effectiveRelevant)
       }
 
       // Create PDF and/or TIFF if needed
@@ -403,7 +412,7 @@ trait FormRunnerActions {
       Map[Option[String], String](
         Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false)),
         Some("method")              → "post",
-        Some("prune")               → "false",
+        Some("relevant")            → "keep",
         Some("replace")             → replace,
         Some("content")             → "xml",
         Some(DataFormatVersionName) → "edge",

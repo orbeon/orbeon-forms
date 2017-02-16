@@ -94,7 +94,8 @@
     <xf:submission
         id="fr-create-update-submission"
         validate="false"
-        relevant="false"
+        relevant="keep"
+        xxf:annotate="relevant=fr:relevant"
         method="put"
         ref="event('holder')"
         resource="{event('resource')}"

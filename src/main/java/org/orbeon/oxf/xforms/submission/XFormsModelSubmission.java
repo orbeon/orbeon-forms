@@ -369,7 +369,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                             p.refInstanceOpt,
                             p.resolvedValidate,
                             relevanceHandling,
-                            p.resolvedXXFormsAnnotate, indentedLogger
+                            p.resolvedXXFormsAnnotate,
+                            indentedLogger
                         );
                     }
 

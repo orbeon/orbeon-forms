@@ -71,7 +71,7 @@
         </xf:action>
 
         <xf:submission id="save-locally-submission" method="post" ref="xxf:instance('fr-form-instance')" replace="instance" instance="fr-uuid"
-                resource="/fr/service/save-locally/save-generate?app={$parameters/app}&amp;form={$parameters/form}" validate="false" relevant="false">
+                resource="/fr/service/save-locally/save-generate?app={$parameters/app}&amp;form={$parameters/form}" validate="false" relevant="keep">
             <xf:action ev:event="xforms-submit-done">
                 <xxf:show dialog="fr-download-save-dialog"/>
             </xf:action>

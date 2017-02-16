@@ -38,7 +38,7 @@ class ExtractorTest extends DocumentTestBase with AssertionsForJUnit {
     val ElementsToExclude = Set("properties", "last-id", "template")
     val extractorOutput = new ElementFilterXMLReceiver(
       extractorCollector,
-      (level, uri, localname) ⇒ ! ElementsToExclude(localname)
+      (level, uri, localname, _) ⇒ ! ElementsToExclude(localname)
     )
 
     XMLParsing.urlToSAX(

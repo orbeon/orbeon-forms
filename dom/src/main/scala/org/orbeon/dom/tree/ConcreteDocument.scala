@@ -107,13 +107,10 @@ class ConcreteDocument extends AbstractBranch with Document {
 
   def accept(visitor: Visitor): Unit = {
     visitor.visit(this)
-    val ct = content
-    if (ct ne null) {
-      val iter = ct.iterator()
-      while (iter.hasNext) {
-        val node = iter.next()
-        node.accept(visitor)
-      }
+    val iter = content.iterator()
+    while (iter.hasNext) {
+      val node = iter.next()
+      node.accept(visitor)
     }
   }
 

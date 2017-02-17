@@ -406,28 +406,20 @@ class ConcreteElement(var qname: QName)
 
   def addAttribute(name: String, value: String): Element = {
     val att = attribute(name)
-    if (value ne null) {
-      if (att eq null) {
-        add(DocumentFactory.createAttribute(this, name, value))
-      } else {
-        att.setValue(value)
-      }
-    } else if (att ne null) {
-      remove(att)
+    if (att eq null) {
+      add(DocumentFactory.createAttribute(this, name, value))
+    } else {
+      att.setValue(value)
     }
     this
   }
 
   def addAttribute(qName: QName, value: String): Element = {
     val att = attribute(qName)
-    if (value ne null) {
-      if (att eq null) {
-        add(DocumentFactory.createAttribute(this, qName, value))
-      } else {
-        att.setValue(value)
-      }
-    } else if (att ne null) {
-      remove(att)
+    if (att eq null) {
+      add(DocumentFactory.createAttribute(this, qName, value))
+    } else {
+      att.setValue(value)
     }
     this
   }

@@ -89,11 +89,21 @@ case class DynamicState(
     rootElement.addAttribute("sequence", sequence.toString)
 
     // Add request information
-    rootElement.addAttribute("deployment-type", deploymentType.orNull)
-    rootElement.addAttribute("request-context-path", requestContextPath.orNull)
-    rootElement.addAttribute("request-path", requestPath.orNull)
-    rootElement.addAttribute("container-type", containerType.orNull)
-    rootElement.addAttribute("container-namespace", containerNamespace.orNull)
+    deploymentType foreach { value ⇒
+      rootElement.addAttribute("deployment-type", value)
+    }
+    requestContextPath foreach { value ⇒
+      rootElement.addAttribute("request-context-path", value)
+    }
+    requestPath foreach { value ⇒
+      rootElement.addAttribute("request-path", value)
+    }
+    containerType foreach { value ⇒
+      rootElement.addAttribute("container-type", value)
+    }
+    deploymentType foreach { value ⇒
+      rootElement.addAttribute("container-namespace", value)
+    }
 
     // Add upload information
     if (decodePendingUploads.nonEmpty)

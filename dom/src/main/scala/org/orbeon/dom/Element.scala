@@ -34,9 +34,7 @@ trait Element extends Branch {
 
   /**
    * Adds the attribute value of the given local name. If an attribute already
-   * exists for the given name it will be replaced. Attributes with null
-   * values are silently ignored. If the value of the attribute is null then
-   * this method call will remove any attributes with the given name.
+   * exists for the given name it will be replaced.
    */
   def addAttribute(name: String, value: String): Element
 

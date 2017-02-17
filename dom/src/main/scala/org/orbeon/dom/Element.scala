@@ -43,11 +43,9 @@ trait Element extends Branch {
   /**
    * Adds the attribute value of the given fully qualified name. If an
    * attribute already exists for the given name it will be replaced.
-   * Attributes with null values are silently ignored. If the value of the
-   * attribute is null then this method call will remove any attributes with
-   * the given name.
    */
   def addAttribute(qName: QName, value: String): Element
+  def removeAttribute(qName: QName): Element
 
   def addComment(comment: String): Element
   def addNamespace(prefix: String, uri: String): Element

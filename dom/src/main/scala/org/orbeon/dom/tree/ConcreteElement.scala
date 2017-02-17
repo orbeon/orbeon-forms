@@ -432,6 +432,13 @@ class ConcreteElement(var qname: QName)
     this
   }
 
+  def removeAttribute(qName: QName): Element = {
+    val att = attribute(qName)
+    if (att ne null)
+      remove(att)
+    this
+  }
+
   def addComment(comment: String): Element = {
     val node = DocumentFactory.createComment(comment)
     addNewNode(node)

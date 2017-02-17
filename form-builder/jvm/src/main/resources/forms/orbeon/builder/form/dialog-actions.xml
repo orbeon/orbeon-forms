@@ -114,7 +114,20 @@
                             <xf:label ref="$form-resources/dialog-actions/event-control/label"/>
                             <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
                                 <!-- Try to build a reasonably user-friendly label -->
-                                <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
+                                <xf:label
+                                    value="
+                                        utils:truncateWithEllipsis(
+                                            for $id in substring-before(@id, '-control')
+                                            return
+                                                concat(
+                                                    $current-resources/*[name() = $id]/label,
+                                                    ' (',
+                                                    $id,
+                                                    ')'
+                                                ),
+                                            60,
+                                            6
+                                        )"/>
                                 <xf:value value="@id"/>
                             </xf:itemset>
                         </fr:dropdown-select1>
@@ -127,7 +140,17 @@
                             <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                             <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
                             <!-- Show submissions that are NOT yet used by an action. See https://github.com/orbeon/orbeon-forms/issues/397 -->
-                            <xf:itemset ref="$model/fb:submission[ends-with(@id, '-submission') and not(@id = ../fb:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xf:action[1]/xf:send/@submission)]">
+                            <xf:itemset
+                                ref="
+                                    $model/fb:submission[
+                                        ends-with(@id, '-submission') and
+                                        not(
+                                            @id = ../fb:action[
+                                                ends-with(@id, '-binding') and
+                                                @id != concat($instance/initial-name, '-binding')
+                                            ]/xf:action[1]/xf:send/@submission
+                                        )
+                                    ]">
                                 <xf:label value="substring-before(@id, '-submission')"/>
                                 <xf:value value="@id"/>
                             </xf:itemset>
@@ -147,15 +170,32 @@
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
                     <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
                          decide to remove support for legacy mode. -->
-                    <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
+                    <fr:grid
+                        repeat="true"
+                        ref="xf:action[@class = 'fr-set-service-value-action']"
+                        id="fb-actions-setvalue-repeat"
+                        origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
                         <xh:tr>
                             <xh:td>
                                 <fr:dropdown-select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/source-control/label"/>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
-                                        <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                        <xf:label
+                                            value="
+                                                utils:truncateWithEllipsis(
+                                                    for $id in substring-before(@id, '-control')
+                                                    return
+                                                        concat(
+                                                            $current-resources/*[name() = $id]/label,
+                                                            ' (',
+                                                            $id,
+                                                            ')'
+                                                        ),
+                                                    60,
+                                                    6
+                                                )"/>
+                                    <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>
                             </xh:td>
@@ -172,14 +212,31 @@
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
                     <!-- NOTE: Keep legacy repeat="true" so we keep testing the legacy repeat mode. Remove once we
                          decide to remove support for legacy mode. -->
-                    <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
+                    <fr:grid
+                        repeat="true"
+                        ref="xf:action[@class = 'fr-set-database-service-value-action']"
+                        id="fb-actions-database-setvalue-repeat"
+                        origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
                         <xh:tr>
                             <xh:td>
                                 <fr:dropdown-select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/source-control/label"/>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                         <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label value="utils:truncateWithEllipsis(for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')'), 60, 6)"/>
+                                        <xf:label
+                                            value="
+                                                utils:truncateWithEllipsis(
+                                                    for $id in substring-before(@id, '-control')
+                                                    return
+                                                        concat(
+                                                            $current-resources/*[name() = $id]/label,
+                                                            ' (',
+                                                            $id,
+                                                            ')'
+                                                        ),
+                                                    60,
+                                                    6
+                                                )"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
                                 </fr:dropdown-select1>

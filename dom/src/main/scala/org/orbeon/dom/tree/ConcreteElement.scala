@@ -781,8 +781,7 @@ class ConcreteElement(var qname: QName)
 
   protected def addNode(index: Int, node: Node): Unit = {
     if (node.getParent ne null) {
-      val message = "The Node already has an existing parent of \"" + node.getParent.getQualifiedName +
-        "\""
+      val message = "The Node already has an existing parent of \"" + node.getParent.getQualifiedName + "\""
       throw new IllegalAddException(this, node, message)
     }
     addNewNode(index, node)

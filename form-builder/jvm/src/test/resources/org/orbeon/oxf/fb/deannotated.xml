@@ -205,7 +205,7 @@
             <xf:submission id="echo-submission" class="fr-service" ref="instance('fr-service-request-instance')" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml" replace="instance" instance="fr-service-response-instance"/>
             <xf:action id="fill-dropdown-binding">
                 <!-- React to event... on control... -->
-                <xf:action event="xforms-ready" ev:observer="fr-form-model" if="true()">
+                <xf:action event="fr-run-form-load-action-after-controls" ev:observer="fr-form-model" if="true()">
                     <!-- Service to call -->
                     <xf:send submission="echo-submission"/>
                 </xf:action>

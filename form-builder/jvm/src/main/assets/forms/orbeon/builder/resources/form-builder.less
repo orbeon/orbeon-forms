@@ -325,6 +325,20 @@ div.orbeon.orbeon-portlet-div {
         width: 800px;
         max-width: none;
 
+        .fb-action-phrase {
+            display: flex;
+            justify-content: flex-start;
+            align-items: baseline;
+        }
+
+        .fb-action-observer, .fb-action-event, .fb-action-control {
+            display: inline-block;
+            margin-right: 5px;
+            select {
+                width: 100% ;
+            }
+        }
+
         .tab-pane {
             .dialog-scrollable(600px);
             padding: 5px;

@@ -97,40 +97,83 @@
                     </xh:td>
                 </xh:tr>
                 <xh:tr>
-                    <xh:td>
-                        <!-- React to -->
-                        <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/@fb:event" id="fb-action-react-to">
-                            <xf:label ref="$form-resources/dialog-actions/event-type/label"/>
-                            <xf:hint ref="$form-resources/dialog-actions/event-type/hint"/>
-                            <xf:itemset ref="$form-resources/dialog-actions/event-type/item">
-                                <xf:label ref="label"/>
-                                <xf:value ref="value"/>
-                            </xf:itemset>
-                        </fr:dropdown-select1>
-                    </xh:td>
-                    <xh:td>
-                        <!-- Control -->
-                        <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/@ev:observer">
-                            <xf:label ref="$form-resources/dialog-actions/event-control/label"/>
-                            <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
-                                <!-- Try to build a reasonably user-friendly label -->
-                                <xf:label
-                                    value="
-                                        utils:truncateWithEllipsis(
-                                            for $id in substring-before(@id, '-control')
-                                            return
-                                                concat(
-                                                    $current-resources/*[name() = $id]/label,
-                                                    ' (',
-                                                    $id,
-                                                    ')'
-                                                ),
-                                            60,
-                                            6
-                                        )"/>
-                                <xf:value value="@id"/>
-                            </xf:itemset>
-                        </fr:dropdown-select1>
+                    <xh:td colspan="2">
+
+                        <xf:var name="observer" value="$instance/fb:action/xf:action[1]/@ev:observer"/>
+                        <xf:var name="event"    value="$instance/fb:action/xf:action[1]/@fb:event"/>
+
+                        <xf:group ref="$observer">
+                            <xf:label value="$form-resources/dialog-actions/observer-type/label"/>
+
+                            <xh:div class="fb-action-phrase">
+                                <xf:select1 ref="$observer" id="fb-action-react-to" appearance="minimal" class="fb-action-observer">
+                                    <xf:itemset ref="$form-resources/dialog-actions/observer-type/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value
+                                            ref="
+                                                if (@id = 0) then
+                                                    if ($observer = 'fr-form-model') then '' else string($observer)
+                                                else if (@id = 1) then
+                                                    'fr-form-model'
+                                                else
+                                                    error()"/>
+                                    </xf:itemset>
+                                    <xf:alert/>
+
+                                    <xf:setvalue event="xforms-select" ref="$event"/>
+
+                                    <!--<xf:action event="xforms-select" if="event('xxf:item-value') = 'fr-form-model'">-->
+                                        <!--<xf:setvalue event="xforms-select" ref="$event"/>-->
+                                    <!--</xf:action>-->
+
+                                </xf:select1>
+
+                                <fr:dropdown-select1 ref="$observer[. != 'fr-form-model']" class="fb-action-control">
+                                    <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xf:label
+                                            value="
+                                                utils:truncateWithEllipsis(
+                                                    for $id in substring-before(@id, '-control')
+                                                    return
+                                                        concat(
+                                                            $current-resources/*[name() = $id]/label,
+                                                            ' (',
+                                                            $id,
+                                                            ')'
+                                                        ),
+                                                    60,
+                                                    6
+                                                )"/>
+                                        <xf:value value="@id"/>
+                                    </xf:itemset>
+                                    <xf:alert/>
+                                </fr:dropdown-select1>
+
+                                <xf:select1 ref="$event" appearance="dropdown" class="fb-action-event">
+                                    <xf:itemset ref="$form-resources/dialog-actions/event-type/item[@id = (if ($observer = 'fr-form-model') then (3 to 5) else (0 to 2))]">
+                                        <xf:label ref="label"/>
+                                        <xf:value
+                                            ref="
+                                                if (@id = 0) then
+                                                    'xforms-value-changed'
+                                                else if (@id = 1) then
+                                                    'xforms-value-changed xforms-enabled'
+                                                else if (@id = 2) then
+                                                    'DOMActivate'
+                                                else if (@id = 3) then
+                                                    'fr-run-form-load-action-after-controls'
+                                                else if (@id = 4) then
+                                                    'fr-run-form-load-action-before-data'
+                                                else if (@id = 5) then
+                                                    'fr-run-form-load-action-after-data'
+                                                else
+                                                    error()"/>
+                                    </xf:itemset>
+                                    <xf:alert/>
+                                </xf:select1>
+                            </xh:div>
+                        </xf:group>
                     </xh:td>
                 </xh:tr>
                 <xh:tr>
@@ -503,6 +546,14 @@
         <xf:setvalue event="xxforms-invalid" observer="fb-actions-editor-instance" ref="@valid">false</xf:setvalue>
         <xf:setvalue event="xxforms-valid"   observer="fb-actions-editor-instance" ref="@valid">true</xf:setvalue>
 
+        <xf:var
+            name="form-load-actions"
+            value="
+                'fr-run-form-load-action-before-data',
+                'fr-run-form-load-action-after-data',
+                'fr-run-form-load-action-after-controls'
+            "/>
+
         <xf:bind ref="instance('fb-actions-editor-instance')">
             <xf:bind
                 ref="name"
@@ -520,23 +571,9 @@
                 <xf:bind ref="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
                 <xf:bind ref="xf:action[1]">
-                    <!-- Event triggering the action -->
-                    <xf:bind ref="@fb:event" required="true()"/>
+                    <xf:bind ref="@fb:event"    required="true()"/>
+                    <xf:bind ref="@ev:observer" required="true()"/>
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>
-                    <!-- The observer for the event triggering the action is either a control, or the model -->
-                    <xf:bind
-                        ref="@ev:observer"
-                        required="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                        relevant="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                        calculate="
-                            if (xxf:split(../@fb:event) = 'xforms-ready') then
-                                'fr-form-model'                (: constant :)
-                            else if (. = 'fr-form-model') then
-                                ''                             (: must not be `fr-form-model` so reset to blank :)
-                            else
-                                .                              (: keep :)
-                        "
-                        readonly="false()"/>
                 </xf:bind>
                 <!-- xforms-submit -->
                 <xf:bind ref="xf:action[@fb:event = 'xforms-submit']">
@@ -592,26 +629,14 @@
         <!-- Template for a given binding -->
         <xf:instance id="fb-binding-template" xxf:readonly="true" xxf:exclude-result-prefixes="xh exf xsi xi xxi fr fb saxon xbl exforms">
             <fb:action id="">
-                <!-- React to event... on control... -->
                 <xf:action fb:event="" ev:observer="" if="true()">
-                    <!-- Service to call -->
                     <xf:send submission="SET ME"/>
                 </xf:action>
-                <!-- Request actions -->
                 <xf:action fb:event="xforms-submit" ev:observer="SET ME">
-                    <!-- Get reference to initial request -->
-                    <xf:var name="request-instance-name" value="SET ME" as="xs:string"/>
-                    <!-- Copy over to read-write request instance -->
-                    <xf:insert ref="instance('fr-service-request-instance')" origin="saxon:parse(instance($request-instance-name))"/>
-                    <!-- Set values if needed -->
-                    <xf:action context="instance('fr-service-request-instance')">
-                        <!-- Setvalue actions will be here -->
-                    </xf:action>
+                    <xf:var name="request-instance-name" value="SET ME"/>
+                    <xf:action/>
                 </xf:action>
-                <!-- Response actions -->
-                <xf:action fb:event="xforms-submit-done" ev:observer="SET ME" context="instance('fr-service-response-instance')">
-                    <!-- Response actions will be here -->
-                </xf:action>
+                <xf:action fb:event="xforms-submit-done" ev:observer="SET ME"/>
             </fb:action>
         </xf:instance>
 

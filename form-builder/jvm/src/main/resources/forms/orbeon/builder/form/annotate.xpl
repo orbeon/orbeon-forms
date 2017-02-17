@@ -313,7 +313,7 @@
                 <!-- ======== Upgrading form ========-->
 
                 <!--
-                    Remove actions implementations as they are unneeded. See also:
+                    Remove actions implementations as they are unneeded (and can be out of date). See also:
 
                     - actions.xsl
                     - https://github.com/orbeon/orbeon-forms/issues/1019
@@ -376,6 +376,17 @@
                             mode="#current"/>
 
                     </xsl:copy>
+                </xsl:template>
+
+                <!-- Upgrade "form load" actions from `xforms-ready` to `fr-run-form-load-action-after-controls` -->
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/3126 -->
+                <xsl:template
+                    match="
+                        xf:model/xf:action[
+                            ends-with(@id, '-binding')
+                        ]//xf:action/@*:event[. = 'xforms-ready']"
+                    mode="within-model">
+                    <xsl:attribute name="fb:{local-name()}" select="'fr-run-form-load-action-after-controls'"/>
                 </xsl:template>
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->

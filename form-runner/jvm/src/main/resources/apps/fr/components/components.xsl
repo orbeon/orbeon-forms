@@ -508,6 +508,13 @@
             </xf:action>
         </xf:model>
 
+        <!-- Common actions implementation -->
+        <xsl:if test="$fr-form-model-id = $models-with-actions-model-ids">
+            <xf:model id="fr-actions-model">
+                <xsl:call-template name="action-common-impl"/>
+            </xf:model>
+        </xsl:if>
+
         <!-- Copy and annotate existing main model -->
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
@@ -566,15 +573,10 @@
             <xsl:copy-of select="doc('universal-submission.xml')/*/node()"/>
 
             <!-- Common actions implementation -->
-            <xsl:if test="$fr-form-model-id = $models-with-actions-model-ids">
-                <xsl:call-template name="action-common-impl"/>
-            </xsl:if>
             <xsl:if test="$fr-form-model-id = $models-with-itemset-actions-models-ids">
-                <xsl:call-template name="itemset-action-common-impl"/>
+                <xsl:copy-of select="fr:itemset-action-common-impl()"/>
             </xsl:if>
-            <xsl:call-template name="common-dataset-actions-impl">
-                <xsl:with-param name="model" select="."/>
-            </xsl:call-template>
+            <xsl:copy-of select="fr:common-dataset-actions-impl(.)"/>
 
         </xsl:copy>
 

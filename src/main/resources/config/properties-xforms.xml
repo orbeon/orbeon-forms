@@ -75,10 +75,10 @@
         if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01]', xxf:lang(), (), ()) else .
     </property>
     <property as="xs:string"  name="oxf.xforms.format.output.decimal">
-        if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else .
+        if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else .
     </property>
     <property as="xs:string"  name="oxf.xforms.format.output.integer">
-        if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else .
+        if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else .
     </property>
     <property as="xs:string"  name="oxf.xforms.format.output.float">
         if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .

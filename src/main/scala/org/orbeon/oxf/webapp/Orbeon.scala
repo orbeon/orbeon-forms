@@ -31,7 +31,8 @@ object Orbeon {
   private val logger             = LoggerFactory.createLogger(Orbeon.getClass)
 
   val OrbeonFormsAscii =
-    """   ____       __                        ______
+    """
+      |   ____       __                        ______
       |  / __ \_____/ /_  ___  ____  ____     / ____/___  _________ ___  _____
       | / / / / ___/ __ \/ _ \/ __ \/ __ \   / /_  / __ \/ ___/ __ `__ \/ ___/
       |/ /_/ / /  / /_/ /  __/ /_/ / / / /  / __/ / /_/ / /  / / / / / (__  )

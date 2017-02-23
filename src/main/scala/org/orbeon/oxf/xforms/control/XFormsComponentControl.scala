@@ -89,8 +89,8 @@ class XFormsComponentControl(
 
   override type Control <: ComponentControl
 
-  private var _nestedContainer: Option[XBLContainer] = None
-  def nestedContainer = _nestedContainer.get
+  private var _nestedContainerOpt: Option[XBLContainer] = None
+  def nestedContainer = _nestedContainerOpt.get
 
   // If the component handles LHHA itself, they are considered under of the nested container
   override def lhhaContainer = nestedContainer
@@ -106,20 +106,20 @@ class XFormsComponentControl(
 
   private def createNestedContainer(): Unit = {
 
-    assert(_nestedContainer.isEmpty)
+    assert(_nestedContainerOpt.isEmpty)
 
     val newContainer = container.createChildContainer(this)
     // There may or may not be nested models
     newContainer.addAllModels()
 
-    _nestedContainer = Some(newContainer)
+    _nestedContainerOpt = Some(newContainer)
   }
 
   // Destroy container and models if any
   def destroyNestedContainer(): Unit = {
     destroyMirrorListenerIfNeeded()
     nestedContainer.destroy()
-    _nestedContainer = None
+    _nestedContainerOpt = None
   }
 
   // For xxf:dynamic updates of top-level XBL shadow trees
@@ -214,10 +214,10 @@ class XFormsComponentControl(
 
   private def initializeModels(): Unit = {
 
-    // xforms-model-construct, without RRR
+    // `xforms-model-construct` without RRR
     for (model ← nestedContainer.models) {
       Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
-      // NOTE: xforms-model-construct already does a `markStructuralChange()` but without `AllDefaultsStrategy`
+      // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `AllDefaultsStrategy`
       model.markStructuralChange(None, AllDefaultsStrategy)
     }
 
@@ -229,7 +229,7 @@ class XFormsComponentControl(
       model.doRecalculateRevalidate()
     }
 
-    // xforms-model-construct-done
+    // `xforms-model-construct-done`
     for (model ← nestedContainer.models)
       Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
   }
@@ -295,19 +295,27 @@ class XFormsComponentControl(
     // We could have considered using another event, as the name `xforms-ready` does not fully reflect the
     // meaning associated with the top-level. On the other hand, this makes it easier to translate a top-level
     // model into a nested model.
-    _enabledListener = _ ⇒
+    _enabledListener = _ ⇒ {
+
+      // Remove during first run
+      removeEnabledListener()
+
       for {
-        container ← _nestedContainer.iterator
-        model     ← nestedContainer.models
+        container ← _nestedContainerOpt.iterator
+        model     ← container.models
       } locally {
         Dispatch.dispatchEvent(new XFormsReadyEvent(model))
       }
+    }
 
     addListener(XFormsEvents.XFORMS_ENABLED, _enabledListener)
   }
 
   private def removeEnabledListener(): Unit =
-    _enabledListener = null
+    if (_enabledListener ne null) {
+      removeListener(XFormsEvents.XFORMS_ENABLED, _enabledListener)
+      _enabledListener = null
+    }
 
   override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
     super.onBindingUpdate(oldBinding, newBinding)

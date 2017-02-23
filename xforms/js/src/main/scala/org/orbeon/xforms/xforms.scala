@@ -70,7 +70,7 @@ object Events extends js.Object {
   def ajaxResponseProcessedEvent: YUICustomEvent = js.native
 }
 
-@JSName("ORBEON.xforms.AjaxServer")
+@JSName("ORBEON.xforms.server.AjaxServer")
 @js.native
 object AjaxServer extends js.Object {
   def ajaxResponseReceived: JQueryCallback = js.native

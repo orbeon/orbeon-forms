@@ -54,7 +54,7 @@ class XXFormsHasClass extends XFormsFunction with ClassSupport {
 
 class XXFormsClasses extends XFormsFunction with ClassSupport {
   override def iterate(xpathContext: XPathContext) =
-    asIterator(classes(0)(xpathContext).toList)
+    asIterator(classes(0)(xpathContext).to[List])
 }
 
 protected trait ClassSupport extends XFormsFunction with DependsOnContextItemIfSingleArgumentMissing {

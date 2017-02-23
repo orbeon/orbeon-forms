@@ -483,9 +483,9 @@
     <!-- Model for the bindings editor -->
     <xf:model id="fb-actions-editor-model">
 
-        <xf:var name="fb-lang" value="xxf:instance('fb-language-instance')"/>
-        <xf:var name="model" value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
-        <xf:var name="resources" value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
+        <xf:var name="fb-lang"           value="xxf:instance('fb-language-instance')"/>
+        <xf:var name="model"             value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
+        <xf:var name="resources"         value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
         <xf:var name="current-resources" value="$resources/resource[@xml:lang = $fb-lang]"/>
 
         <xf:instance id="fb-actions-editor-instance">

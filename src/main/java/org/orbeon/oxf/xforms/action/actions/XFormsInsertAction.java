@@ -229,7 +229,7 @@ public class XFormsInsertAction extends XFormsAction {
         // instance, ideally.
         // NOTE: We do this test here so that we don't unnecessarily annotate nodes.
         final boolean applyDefaults =
-            requireDefaultValues                                             &&
+            requireDefaultValues                                               &&
             modifiedInstanceOrNull != null                                     &&
             modifiedInstanceOrNull.model().staticModel().hasDefaultValueBind() &&
             containingDocument.getXPathDependencies().hasAnyCalculationBind(

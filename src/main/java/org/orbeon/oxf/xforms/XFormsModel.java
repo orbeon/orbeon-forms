@@ -471,8 +471,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     private void doModelConstruct(boolean rrr) {
         final Element modelElement = staticModel.element();
 
-        // 1. All XML Schema loaded (throws xforms-link-exception)
-
+        // 1. The XML Schemas, if any, are loaded
         try {
             schemaValidator();
         } catch (Exception e) {
@@ -480,13 +479,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(XFormsModel.this, schemaAttribute, e));
         }
 
-        // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
-        //    Instance may not be specified.
-
+        // 2. For each instance element, an XPath data model is constructed
         {
-            // Build initial instance documents
-
-            // Iterate through all instances
             int instancePosition = 0;
             for (final Instance instance : staticModel.instancesMap().values()) {
                 // Skip processing in case somebody has already set this particular instance
@@ -496,19 +490,14 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                     loadInitialInstance(instance);
                 }
             }
+
+            deferredActionContext().jMarkStructuralChange();
         }
 
-        // 3. P3P (N/A)
+        // Custom event after instances are ready
+        Dispatch.dispatchEvent(new XXFormsInstancesReadyEvent(XFormsModel.this));
 
-        // 4. Instance data is constructed. Evaluate binds:
-        //    a. Evaluate nodeset
-        //    b. Apply model item properties on nodes
-        //    c. Throws xforms-binding-exception if the node has already model item property with same name
-        // TODO: a, b, c
-
-        // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-        deferredActionContext().jMarkStructuralChange();
-
+        // 3. A rebuild, recalculate, and revalidate are then performed in sequence for this mode
         if (rrr) {
             doRebuild();
             doRecalculateRevalidate();

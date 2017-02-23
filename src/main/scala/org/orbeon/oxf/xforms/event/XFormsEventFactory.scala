@@ -52,6 +52,7 @@ object XFormsEventFactory {
     XXFORMS_UPLOAD_ERROR        → (new XXFormsUploadErrorEvent(_, _)),
     XFORMS_MODEL_CONSTRUCT_DONE → (new XFormsModelConstructDoneEvent(_, _)),
     XFORMS_MODEL_CONSTRUCT      → (new XFormsModelConstructEvent(_, _)),
+    XXFORMS_INSTANCES_READY     → (new XXFormsInstancesReadyEvent(_, _)),
     XFORMS_MODEL_DESTRUCT       → (new XFormsModelDestructEvent(_, _)),
     XFORMS_READY                → (new XFormsReadyEvent(_, _)),
     XFORMS_REBUILD              → (new XFormsRebuildEvent(_, _)),

@@ -188,6 +188,11 @@ class XFormsModelConstructEvent(target: XFormsEventTarget, properties: PropertyG
   def rrr = propertyOrDefault[Boolean]("rrr", default = true)
 }
 
+class XXFormsInstancesReadyEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(XXFORMS_INSTANCES_READY, target, properties, bubbles = true, cancelable = false) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XFormsModelDestructEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFORMS_MODEL_DESTRUCT, target, properties, bubbles = false, cancelable = false) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)

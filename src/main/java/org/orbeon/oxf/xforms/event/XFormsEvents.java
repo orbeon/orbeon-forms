@@ -68,6 +68,7 @@ public class XFormsEvents {
 
     // Standard XForms events
     public static final String XFORMS_MODEL_CONSTRUCT = "xforms-model-construct";
+    public static final String XXFORMS_INSTANCES_READY = "xxforms-instances-ready";
     public static final String XFORMS_MODEL_CONSTRUCT_DONE = "xforms-model-construct-done";
     public static final String XFORMS_READY = "xforms-ready";
     public static final String XFORMS_MODEL_DESTRUCT = "xforms-model-destruct";

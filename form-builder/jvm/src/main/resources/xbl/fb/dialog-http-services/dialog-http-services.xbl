@@ -422,13 +422,10 @@
                     <fb:submission
                         id=""
                         class="fr-service"
-                        ref="instance('fr-service-request-instance')"
                         resource=""
                         method="get"
                         serialization="application/xml"
-                        mediatype="application/xml"
-                        replace="instance"
-                        instance="fr-service-response-instance"/>
+                        mediatype="application/xml"/>
                 </xf:instance>
 
                 <!-- Template for inserting an instance -->

@@ -302,7 +302,7 @@
         select="
             $action-models/
                 xf:instance[
-                    p:has-class('fr-service')
+                    p:has-class('fr-service') or p:has-class('fr-database-service')
                 ]"/>
 
     <xsl:variable
@@ -314,7 +314,7 @@
         select="
             $action-models/
                 xf:submission[
-                    p:has-class('fr-service')
+                    p:has-class('fr-service') or p:has-class('fr-database-service')
                 ]/generate-id()"/>
 
     <xsl:variable
@@ -373,8 +373,9 @@
                     generate-id() = $service-submissions-ids
                 ]">
         <xsl:copy>
-            <xsl:copy-of select="@* except (@ref | @instance)"/>
+            <xsl:copy-of select="@* except (@ref | @instance | @replace)"/>
             <xsl:attribute name="ref"         >xxf:instance('fr-service-request-instance')</xsl:attribute>
+            <xsl:attribute name="replace"     >instance</xsl:attribute>
             <xsl:attribute name="xxf:instance">fr-service-response-instance</xsl:attribute>
         </xsl:copy>
     </xsl:template>

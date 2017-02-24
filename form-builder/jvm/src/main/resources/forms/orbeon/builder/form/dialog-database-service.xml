@@ -11,18 +11,23 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:saxon="http://saxon.sf.net/"
+<xxf:dialog
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-database-service-dialog" level="modal" close="true" draggable="true" model="fb-database-service-model">
+    id="fb-database-service-dialog"
+    level="modal"
+    close="true"
+    draggable="true"
+    model="fb-database-service-model">
 
     <xf:label model="fr-form-model" ref="$form-resources/dialog-database-services/label"/>
     <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
@@ -251,15 +256,27 @@
         </xf:bind>
 
         <!-- Template for the submission -->
-        <xf:instance id="fb-database-submission-template" xxf:readonly="true" xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
-            <fb:submission id="" class="fr-database-service" ref="instance('fr-service-request-instance')"
-                   resource="/fr/service/custom/orbeon/database" method="post"
-                   serialization="application/xml" replace="instance" instance="fr-service-response-instance"/>
+        <xf:instance
+            id="fb-database-submission-template"
+            xxf:readonly="true"
+            xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+            <fb:submission
+                id=""
+                class="fr-database-service"
+                resource="/fr/service/custom/orbeon/database"
+                method="post"
+                serialization="application/xml"/>
         </xf:instance>
 
         <!-- Template for inserting an instance -->
-        <xf:instance id="fb-database-instance-template" xxf:readonly="true" xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
-            <fb:instance id="" class="fr-database-service" xxf:exclude-result-prefixes="#all">
+        <xf:instance
+            id="fb-database-instance-template"
+            xxf:readonly="true"
+            xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+            <fb:instance
+                id=""
+                class="fr-database-service"
+                xxf:exclude-result-prefixes="#all">
                 <body/>
             </fb:instance>
         </xf:instance>
@@ -274,11 +291,13 @@ WHERE first_name = &lt;sql:param type="xs:string" select=""/></sql:query>
         </xf:instance>
 
         <!-- Submission to test a service -->
-        <xf:submission id="fb-test-database-service-submission"
-                ref="saxon:parse(instance('fb-database-service-instance')/sql)/*"
-                method="post"
-                resource="/fr/service/custom/orbeon/database"
-                replace="text" target="instance('fb-database-service-instance')/response"/>
+        <xf:submission
+            id="fb-test-database-service-submission"
+            ref="saxon:parse(instance('fb-database-service-instance')/sql)/*"
+            method="post"
+            resource="/fr/service/custom/orbeon/database"
+            replace="text"
+            target="instance('fb-database-service-instance')/response"/>
 
     </xf:model>
 

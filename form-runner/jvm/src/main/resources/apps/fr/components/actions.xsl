@@ -539,7 +539,7 @@
                                             <!-- Re-evaluate `$response-items` at each iteration because that can depend on `$fr-lang` -->
                                             <xf:var
                                                 name="response-items"
-                                                context="instance('fr-service-response-instance')"
+                                                context="xxf:instance('fr-service-response-instance')"
                                                 value="{$resource-items-value}"/>
 
                                             <xf:insert

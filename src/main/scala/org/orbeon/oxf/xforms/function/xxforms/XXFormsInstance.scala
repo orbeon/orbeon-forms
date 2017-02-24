@@ -75,7 +75,7 @@ object XXFormsInstance {
     def findDynamic = {
       val containers = Iterator.iterate(startContainer)(_.getParentXBLContainer) takeWhile (_ ne null)
       val instances  = containers flatMap (_.findInstance(instanceId))
-      if (instances.hasNext) Some(instances.next().rootElement) else None
+      instances.nextOption() map (_.rootElement)
     }
 
     def findStatic = {

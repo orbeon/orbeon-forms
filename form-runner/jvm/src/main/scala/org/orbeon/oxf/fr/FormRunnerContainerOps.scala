@@ -16,9 +16,14 @@ package org.orbeon.oxf.fr
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.NodeInfo
 import XMLNames._
+import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
+
+  private val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
 
   def isFBBody(node: NodeInfo) = (node self XFGroupTest) && node.attClasses("fb-body")
 
@@ -155,4 +160,21 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       iterationBind ← bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)
+
+  def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
+
+    def matchesComponentURI(uri: String) =
+      ComponentNS.findFirstIn(uri).isDefined
+
+    // Find the concrete section template component (component:foo)
+    // A bit tricky because there might not be an id on the component element:
+    // <component:eid xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
+    val sectionTemplateElementOpt =
+      frSectionComponent.staticControl.descendants find
+      (c ⇒ matchesComponentURI(c.element.getNamespaceURI))
+
+    sectionTemplateElementOpt flatMap
+      (e ⇒ frSectionComponent.resolve(e.staticId)) flatMap
+      collectByErasedType[XFormsComponentControl]
+  }
 }

@@ -1,16 +1,4 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:sql="http://orbeon.org/oxf/xml/sql"
-         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:saxon="http://saxon.sf.net/" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <xh:head>
         <xh:title>Support for datasets in Form Builder and Form Runner</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
@@ -23,8 +11,23 @@
                         <activity/>
                         <weather-from-dataset/>
                         <activity-from-dataset/>
-
                     </main-section>
+                    <initial-values-section>
+                        <initial-value-from-dataset/>
+                        <static-initial-value-not-overwritten-by-dataset>static initial value</static-initial-value-not-overwritten-by-dataset>
+                        <value-from-after-data-service/>
+                    </initial-values-section>
+                    <main-section-section-template><weather/><activity/><weather-from-dataset/><activity-from-dataset/>
+
+
+
+
+                    </main-section-section-template>
+                    <initial-values-section-section-template><initial-value-from-dataset/><static-initial-value-not-overwritten-by-dataset>static initial value</static-initial-value-not-overwritten-by-dataset><value-from-after-data-service/>
+
+
+
+                    </initial-values-section-section-template>
                 </form>
             </xf:instance>
 
@@ -33,14 +36,16 @@
                 <xf:bind id="main-section-bind" name="main-section" ref="main-section">
                     <xf:bind id="weather-bind" ref="weather" name="weather"/>
                     <xf:bind id="activity-bind" ref="activity" name="activity"/>
-                    <xf:bind id="weather-from-dataset-bind" ref="weather-from-dataset"
-                             name="weather-from-dataset"
-                             calculate="fr:dataset('weather-dataset')"/>
-                    <xf:bind id="activity-from-dataset-bind" ref="activity-from-dataset"
-                             name="activity-from-dataset"
-                             calculate="fr:dataset('activity-dataset')"/>
-
+                    <xf:bind id="weather-from-dataset-bind" ref="weather-from-dataset" name="weather-from-dataset" calculate="fr:dataset('weather-dataset')"/>
+                    <xf:bind id="activity-from-dataset-bind" ref="activity-from-dataset" name="activity-from-dataset" calculate="fr:dataset('activity-dataset')"/>
                 </xf:bind>
+                <xf:bind id="initial-values-section-bind" ref="initial-values-section" name="initial-values-section">
+                    <xf:bind id="initial-value-from-dataset-bind" ref="initial-value-from-dataset" name="initial-value-from-dataset" xxf:whitespace="trim" xxf:default="fr:dataset('initial-values-dataset')"/>
+                    <xf:bind id="static-initial-value-not-overwritten-by-dataset-bind" ref="static-initial-value-not-overwritten-by-dataset" name="static-initial-value-not-overwritten-by-dataset" xxf:whitespace="trim" xxf:default="fr:dataset('after-initial-values-dataset')"/>
+                    <xf:bind id="value-from-after-data-service-bind" ref="value-from-after-data-service" name="value-from-after-data-service" xxf:whitespace="trim" calculate="fr:dataset('after-initial-values-dataset')"/>
+                </xf:bind>
+                <xf:bind id="main-section-section-template-bind" ref="main-section-section-template" name="main-section-section-template"/>
+                <xf:bind id="initial-values-section-section-template-bind" ref="initial-values-section-section-template" name="initial-values-section-section-template"/>
             </xf:bind>
 
             <!-- Metadata -->
@@ -49,7 +54,7 @@
                     <application-name>tests</application-name>
                     <form-name>datasets</form-name>
                     <title xml:lang="en">Support for datasets in Form Builder and Form Runner</title>
-                    <description xml:lang="en"/>
+                    <description xml:lang="en"/><version-comment/>
                 </metadata>
             </xf:instance>
 
@@ -65,6 +70,18 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
+                        <initial-value-from-dataset>
+                            <label>Initial value from dataset</label>
+                            <hint/>
+                        </initial-value-from-dataset>
+                        <static-initial-value-not-overwritten-by-dataset>
+                            <label>Static initial value not overwritten by dataset</label>
+                            <hint/>
+                        </static-initial-value-not-overwritten-by-dataset>
+                        <value-from-after-data-service>
+                            <label>Value from "after data" service</label>
+                            <hint/>
+                        </value-from-after-data-service>
                         <weather>
                             <label>Weather</label>
                             <hint/>
@@ -81,65 +98,127 @@
                             <label>Activity from dataset</label>
                             <hint/>
                         </activity-from-dataset>
+                        <initial-values-section>
+                            <label>Initial values</label>
+                            <help/>
+                        </initial-values-section>
                         <main-section>
-                            <label>Main Section</label>
+                            <label>Basic Datasets</label>
                         </main-section>
-
+                        <main-section-section-template>
+                            <label>Basic Datasets (from section template)</label>
+                            <help/>
+                        </main-section-section-template>
+                        <initial-values-section-section-template>
+                            <label>Initial values (from section template)</label>
+                            <help/>
+                        </initial-values-section-section-template>
                     </resource>
                 </resources>
             </xf:instance>
-            <xf:instance id="weather-service-instance" class="fr-service"
-                         xxf:exclude-result-prefixes="#all">
-                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                      xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-                      xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">&lt;weather&gt;sunny&lt;/weather&gt;</body>
+            <xf:instance id="weather-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">&lt;weather&gt;sunny&lt;/weather&gt;</body>
             </xf:instance>
-            <xf:submission id="weather-service-submission" class="fr-service"
-                           ref="instance('fr-service-request-instance')"
-                           resource="/fr/service/custom/orbeon/echo"
-                           method="post"
-                           serialization="application/xml"
-                           mediatype="application/xml"
-                           replace="instance"
-                           instance="fr-service-response-instance"/>
-            <xf:instance id="activity-service-instance" class="fr-service"
-                         xxf:exclude-result-prefixes="#all">
-                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
-                      xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-                      xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">&lt;activity&gt;hiking&lt;/activity&gt;</body>
+            <xf:submission id="weather-service-submission" class="fr-service" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml"/>
+            <xf:instance id="activity-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">&lt;activity&gt;hiking&lt;/activity&gt;</body>
             </xf:instance>
-            <xf:submission id="activity-service-submission" class="fr-service"
-                           ref="instance('fr-service-request-instance')"
-                           resource="/fr/service/custom/orbeon/echo"
-                           method="post"
-                           serialization="application/xml"
-                           mediatype="application/xml"
-                           replace="instance"
-                           instance="fr-service-response-instance"/>
+            <xf:submission id="activity-service-submission" class="fr-service" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml"/>
             <xf:action id="form-load-binding">
                 <!-- React to event... on control... -->
-                <xf:action event="xforms-ready" ev:observer="fr-form-model" if="true()">
-                    <!-- Service to call -->
+                <xf:action event="fr-run-form-load-action-after-controls" ev:observer="fr-form-model" if="true()">
                     <xf:send submission="weather-service-submission"/>
                 </xf:action>
-                <!-- Request actions -->
                 <xf:action event="xforms-submit" ev:observer="weather-service-submission">
-                    <!-- Get reference to initial request -->
                     <xf:var name="request-instance-name" value="'weather-service-instance'" as="xs:string"/>
-                    <!-- Copy over to read-write request instance -->
-                    <xf:insert ref="instance('fr-service-request-instance')"
-                               origin="saxon:parse(instance($request-instance-name))"/>
-                    <!--<xf:insert ref="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
-                    <!-- Set values if needed -->
-                    <xf:action context="instance('fr-service-request-instance')">
-                        <!-- Setvalue actions will be here -->
-                    </xf:action>
+                    <xf:action/>
                 </xf:action>
-                <!-- Response actions -->
-                <xf:action event="xforms-submit-done" ev:observer="weather-service-submission"
-                           context="instance('fr-service-response-instance')">
+                <xf:action event="xforms-submit-done" ev:observer="weather-service-submission">
+                    <xf:action class="fr-set-control-value-action"><xf:var name="control-name" value="'weather'"/><xf:var name="control-value" value="/weather"/></xf:action>
+                    <xf:action class="fr-save-to-dataset-action"><xf:var name="dataset-name">weather-dataset</xf:var></xf:action>
+                </xf:action>
+            </xf:action>
+            <xf:action id="value-change-binding">
+                <!-- React to event... on control... -->
+                <xf:action event="xforms-value-changed" ev:observer="weather-control" if="true()">
+                    <xf:send submission="activity-service-submission"/>
+                </xf:action>
+                <xf:action event="xforms-submit" ev:observer="activity-service-submission">
+                    <xf:var name="request-instance-name" value="'activity-service-instance'"/>
+                    <xf:action/>
+                </xf:action>
+                <xf:action event="xforms-submit-done" ev:observer="activity-service-submission">
+                    <xf:action class="fr-set-control-value-action"><xf:var name="control-name" value="'activity'"/><xf:var name="control-value" value="/activity"/></xf:action>
+                    <xf:action class="fr-save-to-dataset-action"><xf:var name="dataset-name">activity-dataset</xf:var></xf:action>
+                </xf:action>
+            </xf:action>
+            <xf:instance id="initial-values-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">&lt;response&gt;42&lt;/response&gt;</body>
+            </xf:instance>
+            <xf:submission id="initial-values-service-submission" class="fr-service" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml"/>
+            <xf:action id="initial-values-binding">
+                <xf:action event="fr-run-form-load-action-before-data" ev:observer="fr-form-model" if="true()">
+                    <xf:send submission="initial-values-service-submission"/>
+                </xf:action>
+                <xf:action event="xforms-submit" ev:observer="initial-values-service-submission">
+                    <xf:var name="request-instance-name" value="'initial-values-service-instance'"/>
+                    <xf:action/>
+                </xf:action>
+                <xf:action event="xforms-submit-done" ev:observer="initial-values-service-submission">
+                    <xf:action class="fr-save-to-dataset-action"><xf:var name="dataset-name">initial-values-dataset</xf:var></xf:action>
+                </xf:action>
+            </xf:action>
+            <xf:instance id="after-initial-values-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">&lt;response&gt;43&lt;/response&gt;</body>
+            </xf:instance>
+            <xf:submission id="after-initial-values-service-submission" class="fr-service" ref="instance('fr-service-request-instance')" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml" replace="instance" instance="fr-service-response-instance"/>
+            <xf:action id="after-initial-values-binding">
+                <xf:action event="fr-run-form-load-action-after-data" ev:observer="fr-form-model" if="true()">
+                    <xf:send submission="after-initial-values-service-submission"/>
+                </xf:action>
+                <xf:action event="xforms-submit" ev:observer="after-initial-values-service-submission">
+                    <xf:var name="request-instance-name" value="'after-initial-values-service-instance'"/>
+                    <xf:action/>
+                </xf:action>
+                <xf:action event="xforms-submit-done" ev:observer="after-initial-values-service-submission">
+                    <xf:action class="fr-save-to-dataset-action"><xf:var name="dataset-name">after-initial-values-dataset</xf:var></xf:action>
+                </xf:action>
+            </xf:action>
+        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/tests/library" xmlns:p="http://www.orbeon.com/oxf/pipeline"><xbl:binding id="tests-main-section-component" element="component|main-section" class="fr-section-component"><xbl:implementation><xf:model id="main-section-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><main-section>
+                        <weather/>
+                        <activity/>
+                        <weather-from-dataset/>
+                        <activity-from-dataset/>
+                    </main-section></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="weather-bind" ref="weather" name="weather"/><xf:bind id="activity-bind" ref="activity" name="activity"/><xf:bind id="weather-from-dataset-bind" ref="weather-from-dataset" name="weather-from-dataset" calculate="fr:dataset('weather-dataset')"/><xf:bind id="activity-from-dataset-bind" ref="activity-from-dataset" name="activity-from-dataset" calculate="fr:dataset('activity-dataset')"/></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><main-section>
+                            <label>Main Section</label>
+                        </main-section><weather>
+                            <label>Weather</label>
+                            <hint/>
+                        </weather><activity>
+                            <label>Activity</label>
+                            <hint/>
+                        </activity><weather-from-dataset>
+                            <label>Weather from dataset</label>
+                            <hint/>
+                        </weather-from-dataset><activity-from-dataset>
+                            <label>Activity from dataset</label>
+                            <hint/>
+                        </activity-from-dataset></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:action if="empty(instance()/*)"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
+
+                            <xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action></xf:action><xf:instance id="weather-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:secure="java:org.orbeon.oxf.util.SecureUtils">&lt;weather&gt;sunny&lt;/weather&gt;</body>
+            </xf:instance><xf:submission id="weather-service-submission" class="fr-service" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml"/><xf:instance id="activity-service-instance" class="fr-service" xxf:exclude-result-prefixes="#all">
+                <body xmlns:secure="java:org.orbeon.oxf.util.SecureUtils">&lt;activity&gt;hiking&lt;/activity&gt;</body>
+            </xf:instance><xf:submission id="activity-service-submission" class="fr-service" resource="/fr/service/custom/orbeon/echo" method="post" serialization="application/xml" mediatype="application/xml"/><xf:action id="form-load-binding">
+                <!-- React to event... on control... -->
+                <xf:action event="fr-run-form-load-action-after-controls" ev:observer="main-section-model" if="true()">
+                    <xf:send submission="weather-service-submission"/>
+                </xf:action>
+                <xf:action event="xforms-submit" ev:observer="weather-service-submission">
+                    <xf:var name="request-instance-name" value="'weather-service-instance'" as="xs:string"/>
+                    <xf:action/>
+                </xf:action>
+                <xf:action event="xforms-submit-done" ev:observer="weather-service-submission">
                     <xf:action class="fr-set-control-value-action">
                         <xf:var name="control-name" value="'weather'"/>
                         <xf:var name="control-value" value="/weather"/>
@@ -147,31 +226,17 @@
                     <xf:action class="fr-save-to-dataset-action">
                         <xf:var name="dataset-name">weather-dataset</xf:var>
                     </xf:action>
-                    <!-- Response actions will be here -->
                 </xf:action>
-            </xf:action>
-            <xf:action id="value-change-binding">
+            </xf:action><xf:action id="value-change-binding">
                 <!-- React to event... on control... -->
                 <xf:action event="xforms-value-changed" ev:observer="weather-control" if="true()">
-                    <!-- Service to call -->
                     <xf:send submission="activity-service-submission"/>
                 </xf:action>
-                <!-- Request actions -->
                 <xf:action event="xforms-submit" ev:observer="activity-service-submission">
-                    <!-- Get reference to initial request -->
-                    <xf:var name="request-instance-name" value="'activity-service-instance'" as="xs:string"/>
-                    <!-- Copy over to read-write request instance -->
-                    <xf:insert ref="instance('fr-service-request-instance')"
-                               origin="saxon:parse(instance($request-instance-name))"/>
-                    <!--<xf:insert ref="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
-                    <!-- Set values if needed -->
-                    <xf:action context="instance('fr-service-request-instance')">
-                        <!-- Setvalue actions will be here -->
-                    </xf:action>
+                    <xf:var name="request-instance-name" value="'activity-service-instance'"/>
+                    <xf:action/>
                 </xf:action>
-                <!-- Response actions -->
-                <xf:action event="xforms-submit-done" ev:observer="activity-service-submission"
-                           context="instance('fr-service-response-instance')">
+                <xf:action event="xforms-submit-done" ev:observer="activity-service-submission">
                     <xf:action class="fr-set-control-value-action">
                         <xf:var name="control-name" value="'activity'"/>
                         <xf:var name="control-value" value="/activity"/>
@@ -179,36 +244,21 @@
                     <xf:action class="fr-save-to-dataset-action">
                         <xf:var name="dataset-name">activity-dataset</xf:var>
                     </xf:action>
-                    <!-- Response actions will be here -->
                 </xf:action>
-            </xf:action>
-        </xf:model>
-    </xh:head>
-    <xh:body>
-        <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                <fr:section id="main-section-control" bind="main-section-bind">
-                    <xf:label ref="$form-resources/main-section/label"/>
-                    <fr:grid>
+            </xf:action></xf:model></xbl:implementation><xbl:template><xf:var name="context" id="context" value="xxf:binding-context('tests-main-section-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:group appearance="xxf:internal"><xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/main-section/label"/><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors">
                         <xh:tr>
                             <xh:td>
                                 <xf:output id="weather-control" bind="weather-bind">
                                     <xf:label ref="$form-resources/weather/label"/>
                                     <xf:hint ref="$form-resources/weather/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                                 </xf:output>
-
                             </xh:td>
                             <xh:td>
                                 <xf:output id="activity-control" bind="activity-bind">
                                     <xf:label ref="$form-resources/activity/label"/>
                                     <xf:hint ref="$form-resources/activity/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                                 </xf:output>
                             </xh:td>
                         </xh:tr>
@@ -218,8 +268,6 @@
                                     <xf:label ref="$form-resources/weather-from-dataset/label"/>
                                     <xf:hint ref="$form-resources/weather-from-dataset/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                                 </xf:output>
                             </xh:td>
                             <xh:td>
@@ -227,12 +275,134 @@
                                     <xf:label ref="$form-resources/activity-from-dataset/label"/>
                                     <xf:hint ref="$form-resources/activity-from-dataset/hint"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid></xf:group></xbl:template></xbl:binding><xbl:binding id="tests-initial-values-section-component" element="component|initial-values-section" class="fr-section-component"><xbl:implementation><xf:model id="initial-values-section-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty/></xf:instance><xf:instance id="fr-form-template"><initial-values-section>
+                        <initial-value-from-dataset/>
+                        <static-initial-value-not-overwritten-by-dataset>static initial value</static-initial-value-not-overwritten-by-dataset>
+                        <value-from-after-data-service/>
+                    </initial-values-section></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind id="initial-value-from-dataset-bind" ref="initial-value-from-dataset" name="initial-value-from-dataset" xxf:whitespace="trim" xxf:default="if ($fr-mode = ('new', 'test')) then (fr:dataset('initial-values-dataset')) else ."/><xf:bind id="static-initial-value-not-overwritten-by-dataset-bind" ref="static-initial-value-not-overwritten-by-dataset" name="static-initial-value-not-overwritten-by-dataset" xxf:whitespace="trim" xxf:default="if ($fr-mode = ('new', 'test')) then (fr:dataset('after-initial-values-dataset')) else ."/><xf:bind id="value-from-after-data-service-bind" ref="value-from-after-data-service" name="value-from-after-data-service" xxf:whitespace="trim" calculate="fr:dataset('after-initial-values-dataset')"/></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><initial-values-section>
+                            <label>Initial values</label>
+                            <help/>
+                        </initial-values-section><initial-value-from-dataset>
+                            <label>Initial value from dataset</label>
+                            <hint/>
+                        </initial-value-from-dataset><static-initial-value-not-overwritten-by-dataset>
+                            <label>Static initial value not overwritten by dataset</label>
+                            <hint/>
+                        </static-initial-value-not-overwritten-by-dataset><value-from-after-data-service>
+                            <label>Value from "after data" service</label>
+                            <hint/>
+                        </value-from-after-data-service></resource></resources></xf:instance><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/><xf:var name="fr-mode" value="$fr-params/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:action if="empty(instance()/*)"><xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
 
-
+                            <xf:rebuild/><xf:recalculate xxf:defauls="true"/></xf:action></xf:action></xf:model></xbl:implementation><xbl:template><xf:var name="context" id="context" value="xxf:binding-context('tests-initial-values-section-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:group appearance="xxf:internal"><xf:label xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/initial-values-section/label"/><fr:grid xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="initial-value-from-dataset-control" bind="initial-value-from-dataset-bind">
+                                    <xf:label ref="$form-resources/initial-value-from-dataset/label"/>
+                                    <xf:hint ref="$form-resources/initial-value-from-dataset/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input id="static-initial-value-not-overwritten-by-dataset-control" bind="static-initial-value-not-overwritten-by-dataset-bind">
+                                    <xf:label ref="$form-resources/static-initial-value-not-overwritten-by-dataset/label"/>
+                                    <xf:hint ref="$form-resources/static-initial-value-not-overwritten-by-dataset/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td/>
+                            <xh:td>
+                                <xf:input id="value-from-after-data-service-control" bind="value-from-after-data-service-bind">
+                                    <xf:label ref="$form-resources/value-from-after-data-service/label"/>
+                                    <xf:hint ref="$form-resources/value-from-after-data-service/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="main-section-control" bind="main-section-bind">
+                    <xf:label ref="$form-resources/main-section/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:output id="weather-control" bind="weather-bind">
+                                    <xf:label ref="$form-resources/weather/label"/>
+                                    <xf:hint ref="$form-resources/weather/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:output>
+                            </xh:td>
+                            <xh:td>
+                                <xf:output id="activity-control" bind="activity-bind">
+                                    <xf:label ref="$form-resources/activity/label"/>
+                                    <xf:hint ref="$form-resources/activity/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:output id="weather-from-dataset-control" bind="weather-from-dataset-bind">
+                                    <xf:label ref="$form-resources/weather-from-dataset/label"/>
+                                    <xf:hint ref="$form-resources/weather-from-dataset/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:output>
+                            </xh:td>
+                            <xh:td>
+                                <xf:output id="activity-from-dataset-control" bind="activity-from-dataset-bind">
+                                    <xf:label ref="$form-resources/activity-from-dataset/label"/>
+                                    <xf:hint ref="$form-resources/activity-from-dataset/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:output>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>
+                </fr:section>
+                <fr:section id="initial-values-section-control" bind="initial-values-section-bind">
+                    <xf:label ref="$form-resources/initial-values-section/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="initial-value-from-dataset-control" bind="initial-value-from-dataset-bind">
+                                    <xf:label ref="$form-resources/initial-value-from-dataset/label"/>
+                                    <xf:hint ref="$form-resources/initial-value-from-dataset/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input id="static-initial-value-not-overwritten-by-dataset-control" bind="static-initial-value-not-overwritten-by-dataset-bind">
+                                    <xf:label ref="$form-resources/static-initial-value-not-overwritten-by-dataset/label"/>
+                                    <xf:hint ref="$form-resources/static-initial-value-not-overwritten-by-dataset/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td/>
+                            <xh:td>
+                                <xf:input id="value-from-after-data-service-control" bind="value-from-after-data-service-bind">
+                                    <xf:label ref="$form-resources/value-from-after-data-service/label"/>
+                                    <xf:hint ref="$form-resources/value-from-after-data-service/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="main-section-section-template-control" bind="main-section-section-template-bind">
+                    <xf:label ref="$form-resources/main-section-section-template/label"/>
+                    <component:main-section xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/tests/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
+                </fr:section>
+                <fr:section id="initial-values-section-section-template-control" bind="initial-values-section-section-template-bind">
+                    <xf:label ref="$form-resources/initial-values-section-section-template/label"/>
+                    <component:initial-values-section xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/tests/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
                 </fr:section>
             </fr:body>
         </fr:view>

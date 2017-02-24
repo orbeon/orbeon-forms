@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsValueControl}
 import org.scalatest.FunSpecLike
 
 class DatasetsTest
@@ -33,17 +33,38 @@ class DatasetsTest
 
       withFormRunnerDocument(processorService, docOpt.get) {
 
-        val weatherControl             = resolveObject[XFormsValueControl]("weather-control").get
-        val activityControl            = resolveObject[XFormsValueControl]("activity-control").get
-        val weatherFromDatasetControl  = resolveObject[XFormsValueControl]("weather-from-dataset-control").get
-        val activityFromDatasetControl = resolveObject[XFormsValueControl]("activity-from-dataset-control").get
+        def sectionTemplateResolver(sectionId: String) = {
 
-        assert("sunny"  === weatherControl.getValue)
-        assert("hiking" === activityControl.getValue)
-        assert("sunny"  === weatherFromDatasetControl.getValue)
-        assert("hiking" === activityFromDatasetControl.getValue)
+          val sectionControl  = resolveObject[XFormsComponentControl](sectionId)
+          val sectionTemplate = FormRunner.sectionTemplateForSection(sectionControl.get).get
 
+          sectionTemplate.nestedContainer → sectionTemplate.innerRootControl.effectiveId
+        }
 
+        for ((container, sourceEffectiveId) ← List(document → DocId, sectionTemplateResolver("main-section-section-template-control"))) {
+
+          val weatherControl             = resolveObject[XFormsValueControl]("weather-control",               sourceEffectiveId = sourceEffectiveId, container = container).get
+          val activityControl            = resolveObject[XFormsValueControl]("activity-control",              sourceEffectiveId = sourceEffectiveId, container = container).get
+          val weatherFromDatasetControl  = resolveObject[XFormsValueControl]("weather-from-dataset-control",  sourceEffectiveId = sourceEffectiveId, container = container).get
+          val activityFromDatasetControl = resolveObject[XFormsValueControl]("activity-from-dataset-control", sourceEffectiveId = sourceEffectiveId, container = container).get
+
+          assert("sunny"  === weatherControl.getValue)
+          assert("hiking" === activityControl.getValue)
+          assert("sunny"  === weatherFromDatasetControl.getValue)
+          assert("hiking" === activityFromDatasetControl.getValue)
+        }
+
+        // TODO: Uncomment once #3132 is fixed.
+        for ((container, sourceEffectiveId) ← List(document → DocId/*, sectionTemplateResolver("initial-values-section-section-template-control")*/)) {
+
+          val initialValueFromDatasetControl                   = resolveObject[XFormsValueControl]("initial-value-from-dataset-control"                     , container = container).get
+          val staticInitialValueNotOverwrittenByDatasetControl = resolveObject[XFormsValueControl]("static-initial-value-not-overwritten-by-dataset-control", container = container).get
+          val valueFromAfterDataServiceControl                 = resolveObject[XFormsValueControl]("value-from-after-data-service-control"                  , container = container).get
+
+          assert("42" === initialValueFromDatasetControl.getValue)
+          assert(""   === staticInitialValueNotOverwrittenByDatasetControl.getValue)
+          assert("43" === valueFromAfterDataServiceControl.getValue)
+        }
       }
     }
   }

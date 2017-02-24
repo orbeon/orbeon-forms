@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, Dispatch, XFormsCustomEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.mockito.MockitoSugar
@@ -138,13 +139,13 @@ trait XFormsSupport extends MockitoSugar {
     case _                         ⇒ None
   }
 
-  private val DocId = "#document"
+  val DocId = "#document"
 
-  def resolveObject[T: ClassTag](staticOrAbsoluteId: String, sourceEffectiveId: String = DocId, indexes: List[Int] = Nil): Option[T] = {
+  def resolveObject[T: ClassTag](staticOrAbsoluteId: String, sourceEffectiveId: String = DocId, indexes: List[Int] = Nil, container: XBLContainer = document): Option[T] = {
     val resolvedOpt =
-      document.resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId) collect {
+      container.resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId) collect {
         case result if indexes.nonEmpty ⇒
-          document.getObjectByEffectiveId(Dispatch.resolveRepeatIndexes(document, result, document.prefixedId, indexes mkString " "))
+          document.getObjectByEffectiveId(Dispatch.resolveRepeatIndexes(container, result, container.prefixedId, indexes mkString " "))
         case result ⇒
           result
       }

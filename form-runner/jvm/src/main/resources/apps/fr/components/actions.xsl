@@ -647,7 +647,9 @@
         </xsl:if>
 
         <xf:model id="fr-actions-model">
-            <xsl:call-template name="action-common-impl"/>
+            <xsl:call-template name="action-common-impl">
+                <xsl:with-param name="model" select="$model"/>
+            </xsl:call-template>
         </xf:model>
 
         <xsl:copy>
@@ -661,9 +663,13 @@
 
     <!-- Insert service instances -->
     <xsl:template name="action-common-impl">
-        <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all"><request/></xf:instance>
+        <xsl:param name="model" as="element(xf:model)"/>
+
+        <xf:instance id="fr-service-request-instance"  xxf:exclude-result-prefixes="#all"><request/></xf:instance>
         <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all"><response/></xf:instance>
-        <xsl:copy-of select="$service-instances"/>
+
+        <xsl:copy-of select="$model/xf:instance[p:has-class('fr-service') or p:has-class('fr-database-service')]"/>
+
     </xsl:template>
 
 </xsl:stylesheet>

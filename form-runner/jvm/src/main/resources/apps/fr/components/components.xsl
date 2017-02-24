@@ -511,7 +511,9 @@
         <!-- Common actions implementation -->
         <xsl:if test="$fr-form-model-id = $models-with-actions-model-ids">
             <xf:model id="fr-actions-model">
-                <xsl:call-template name="action-common-impl"/>
+                <xsl:call-template name="action-common-impl">
+                    <xsl:with-param name="model" select="."/>
+                </xsl:call-template>
             </xf:model>
         </xsl:if>
 

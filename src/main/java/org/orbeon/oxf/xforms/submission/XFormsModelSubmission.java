@@ -969,7 +969,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     public XFormsInstance findReplaceInstanceNoTargetref(XFormsInstance refInstance) {
         final XFormsInstance replaceInstance;
         if (xxfReplaceInstanceId != null)
-            replaceInstance = containingDocument.findInstanceOrNull(xxfReplaceInstanceId);
+            replaceInstance = container.findInstanceOrNull(xxfReplaceInstanceId);
         else if (replaceInstanceId != null)
             replaceInstance = model.getInstance(replaceInstanceId);
         else if (refInstance == null)

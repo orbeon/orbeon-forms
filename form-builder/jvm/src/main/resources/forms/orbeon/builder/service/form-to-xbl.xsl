@@ -43,8 +43,8 @@
          future, actions should be described in a more declarative format. See also:
          https://github.com/orbeon/orbeon-forms/issues/224
      -->
-    <xsl:variable name="actions" select="$fr-form-model/xf:action[ends-with(@id, '-binding')]"/>
-    <xsl:variable name="service-instances" select="$fr-form-model/xf:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>
+    <xsl:variable name="actions"             select="$fr-form-model/xf:action[ends-with(@id, '-binding')]"/>
+    <xsl:variable name="service-instances"   select="$fr-form-model/xf:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>
     <xsl:variable name="service-submissions" select="$fr-form-model/xf:submission[p:classes() = ('fr-service', 'fr-database-service')]"/>
 
     <!-- Distinct source ids for the given action -->
@@ -72,7 +72,13 @@
         <xsl:value-of select="(normalize-space($fr-metadata-instance/*/title[@xml:lang = $lang])[. != ''], $default)[1]"/>
     </xsl:function>
 
-    <xsl:variable name="all-action-sources" select="distinct-values($actions/fr:action-sources(.))"/>
+    <xsl:function name="fr:value-except" as="xs:anyAtomicType*">
+      <xsl:param name="arg1" as="xs:anyAtomicType*"/>
+      <xsl:param name="arg2" as="xs:anyAtomicType*"/>
+      <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
+    </xsl:function>
+
+    <xsl:variable name="all-action-sources"      select="distinct-values($actions/fr:action-sources(.))"/>
     <xsl:variable name="all-action-destinations" select="distinct-values($actions/fr:action-destinations(.))"/>
 
     <!-- Generate XBL container -->
@@ -98,12 +104,6 @@
             <xsl:apply-templates select="/xh:html/xh:body//fr:section[empty(ancestor::fr:section)]"/>
         </xbl:xbl>
     </xsl:template>
-
-    <xsl:function name="fr:value-except" as="xs:anyAtomicType*">
-      <xsl:param name="arg1" as="xs:anyAtomicType*"/>
-      <xsl:param name="arg2" as="xs:anyAtomicType*"/>
-      <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
-    </xsl:function>
 
     <!-- We only want to run xxf:default in "new" mode to conform to the semantic of the top-level form. So we rewrite
          xxf:default expressions to test on the mode. See: https://github.com/orbeon/orbeon-forms/issues/786 -->
@@ -162,9 +162,11 @@
         <!-- Unique service ids used by relevant actions -->
         <xsl:variable name="relevant-service-ids" select="distinct-values($relevant-actions/xf:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1'))"/>
         <!-- Unique service instances and submissions used by relevant actions -->
-        <xsl:variable name="relevant-services" select="
-            $service-instances[replace(@id, '(.*)-instance$', '$1') = $relevant-service-ids] |
-            $service-submissions[replace(@id, '(.*)-submission$', '$1') = $relevant-service-ids]"/>
+        <xsl:variable
+            name="relevant-services"
+            select="
+                $service-instances  [replace(@id, '(.*)-instance$', '$1')   = $relevant-service-ids] |
+                $service-submissions[replace(@id, '(.*)-submission$', '$1') = $relevant-service-ids]"/>
 
         <!-- Create binding for the section/grid as a component -->
         <!-- NOTE: In component|foo-section, the namespace already contains the app name. So it's not necessary to

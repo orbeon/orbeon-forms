@@ -31,9 +31,7 @@ class DatasetsTest
       val (processorService, docOpt, _) =
         runFormRunner("tests", "datasets", "new", document = "", noscript = false, initialize = true)
 
-      val doc = docOpt.get
-
-      withFormRunnerDocument(processorService, doc) {
+      withFormRunnerDocument(processorService, docOpt.get) {
 
         val weatherControl             = resolveObject[XFormsValueControl]("weather-control").get
         val activityControl            = resolveObject[XFormsValueControl]("activity-control").get
@@ -44,6 +42,7 @@ class DatasetsTest
         assert("hiking" === activityControl.getValue)
         assert("sunny"  === weatherFromDatasetControl.getValue)
         assert("hiking" === activityFromDatasetControl.getValue)
+
 
       }
     }

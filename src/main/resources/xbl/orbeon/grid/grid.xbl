@@ -598,7 +598,8 @@
                                                                     context="$context"
                                                                     ref="$items[$p - 1]"
                                                                     origin="frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template), $source"
-                                                                    position="after"/>
+                                                                    position="after"
+                                                                    xxf:defaults="{$apply-defaults}"/>
 
                                                                 <!-- HACK: Specify id so that action id remains stable in Form Builder -->
                                                                 <xf:setfocus
@@ -616,7 +617,8 @@
                                                                     context="$context"
                                                                     ref="$items[$p - 1]"
                                                                     origin="$source, frf:updateTemplateFromInScopeItemsetMaps($repeat-context, $repeat-template)"
-                                                                    position="after"/>
+                                                                    position="after"
+                                                                    xxf:defaults="{$apply-defaults}"/>
 
                                                                 <!-- HACK: Specify id so that action id remains stable in Form Builder -->
                                                                 <xf:setfocus

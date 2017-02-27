@@ -141,7 +141,13 @@ trait XFormsSupport extends MockitoSugar {
 
   val DocId = "#document"
 
-  def resolveObject[T: ClassTag](staticOrAbsoluteId: String, sourceEffectiveId: String = DocId, indexes: List[Int] = Nil, container: XBLContainer = document): Option[T] = {
+  def resolveObject[T: ClassTag](
+    staticOrAbsoluteId : String,
+    sourceEffectiveId  : String = DocId,
+    indexes            : List[Int] = Nil,
+    container          : XBLContainer = document
+  ): Option[T] = {
+
     val resolvedOpt =
       container.resolveObjectByIdInScope(sourceEffectiveId, staticOrAbsoluteId) collect {
         case result if indexes.nonEmpty ⇒

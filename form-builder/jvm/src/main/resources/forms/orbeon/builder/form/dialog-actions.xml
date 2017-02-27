@@ -102,7 +102,7 @@
                         <xf:var name="observer" value="$instance/fb:action/xf:action[1]/@ev:observer"/>
                         <xf:var name="event"    value="$instance/fb:action/xf:action[1]/@fb:event"/>
 
-                        <xf:group ref="$observer">
+                        <xf:group ref="$observer" class="fb-action-phrase-outer">
                             <xf:label value="$form-resources/dialog-actions/observer-type/label"/>
 
                             <xh:div class="fb-action-phrase">

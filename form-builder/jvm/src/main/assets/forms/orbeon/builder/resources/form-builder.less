@@ -325,6 +325,13 @@ div.orbeon.orbeon-portlet-div {
         width: 800px;
         max-width: none;
 
+        .fb-action-phrase-outer > .xforms-label {
+            border-bottom: none;
+            &:after {
+                content: ": ";
+            }
+        }
+
         .fb-action-phrase {
             display: flex;
             justify-content: flex-start;

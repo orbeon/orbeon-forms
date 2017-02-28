@@ -358,7 +358,7 @@ object Connection extends Logging {
     )
   }
 
-  def isInternalPath(path: String) = {
+  def isInternalPath(path: String): Boolean = {
     val propertySet = Properties.instance.getPropertySet
     val p = propertySet.getProperty(HttpInternalPathsProperty)
     val r = p.associatedValue(_.value.toString.r)
@@ -366,7 +366,7 @@ object Connection extends Logging {
     r.pattern.matcher(path).matches()
   }
 
-  def findInternalURL(url: String) = {
+  def findInternalURL(url: String): Option[String] = {
 
     val servicePrefix =
       URLRewriterUtils.rewriteServiceURL(
@@ -384,7 +384,7 @@ object Connection extends Logging {
   }
 
   // Whether the given method requires a request body
-  def requiresRequestBody(httpMethodUpper: String) = Set("POST", "PUT")(httpMethodUpper)
+  def requiresRequestBody(httpMethodUpper: String): Boolean = Set("POST", "PUT")(httpMethodUpper)
 
   private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT)
   def requiresRequestBody(httpMethod: HttpMethod) = HttpMethodsWithRequestBody(httpMethod)

@@ -186,6 +186,7 @@ trait ExternalContext {
   // NOTE: The only reason the session is available here is for session created/destroyed listeners, which make
   // available a session even though no request or response is available.
   def getSession(create: Boolean): Session
+  def getSessionOpt(create: Boolean): Option[Session] = Option(getSession(create))
 
   /**
     * Return a request dispatcher usable to perform forwards and includes.

@@ -267,7 +267,7 @@ trait ConnectionState {
     stateScope match {
       case "request" ⇒
         Some(externalContext.getRequest.getAttributesMap)
-      case "session" if externalContext.getSession(createSession) ne null ⇒
+      case "session" if externalContext.getSessionOpt(createSession).isDefined ⇒
         Some(externalContext.getSession(createSession).getAttributesMap)
       case "application" ⇒
         Some(externalContext.getWebAppContext.getAttributesMap)
@@ -650,11 +650,11 @@ object Connection extends Logging {
           } yield
             cookie.getValue
 
-        val sessionOption = Option(externalContext.getSession(false))
+        val sessionOpt = externalContext.getSessionOpt(false)
 
         debug("setting cookie", List(
-          "new session"              → (sessionOption map (_.isNew.toString) orNull),
-          "session id"               → (sessionOption map (_.getId) orNull),
+          "new session"              → (sessionOpt map (_.isNew.toString) orNull),
+          "session id"               → (sessionOpt map (_.getId) orNull),
           "requested session id"     → (requestOption flatMap (r ⇒ Option(r.getRequestedSessionId)) orNull),
           "session cookie name"      → sessionCookieName,
           "incoming session cookies" → (incomingSessionCookies mkString " - "),
@@ -675,7 +675,7 @@ object Connection extends Logging {
   ): Option[(String, List[String])] = {
 
     def requestedSessionIdMatches =
-      Option(externalContext.getSession(false)) exists { session ⇒
+      externalContext.getSessionOpt(false) exists { session ⇒
         val requestedSessionId = externalContext.getRequest.getRequestedSessionId
         session.getId == requestedSessionId
       }
@@ -715,7 +715,7 @@ object Connection extends Logging {
     externalContext   : ExternalContext,
     sessionCookieName : String
   ): Option[(String, List[String])] =
-    Option(externalContext.getSession(false)) map
+    externalContext.getSessionOpt(false) map
       { session ⇒ Headers.Cookie →  List(sessionCookieName + "=" + session.getId) }
 
   private def buildSOAPHeadersCapitalizedIfNeeded(

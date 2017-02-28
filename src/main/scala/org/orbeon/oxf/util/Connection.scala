@@ -127,12 +127,16 @@ class Connection(
           val capitalizedHeaders =
             for {
               (name, values) ← headers.to[List]
-              if name == name.toLowerCase
               if values ne null
               value ← values
               if value ne null
             } yield
-              capitalizeCommonOrSplitHeader(name) → value
+              (
+                if (name == name.toLowerCase)
+                  capitalizeCommonOrSplitHeader(name)
+                else
+                  name
+              ) → value
 
           combineValues[String, String, List](capitalizedHeaders).toMap
         }

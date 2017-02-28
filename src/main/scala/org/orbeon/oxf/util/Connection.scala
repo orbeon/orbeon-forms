@@ -53,7 +53,7 @@ class Connection(
   url            : URI,
   credentials    : Option[Credentials],
   content        : Option[StreamedContent],
-  headers        : Map[String, List[String]],
+  headers        : Map[String, List[String]], // capitalized, or entirely lowercase in which case capitalization is attempted
   logBody        : Boolean)(implicit
   logger         : IndentedLogger
 ) extends ConnectionState with Logging {
@@ -109,12 +109,25 @@ class Connection(
       } else if (isHTTPOrHTTPS(scheme)) {
         // Any method with http: or https:
 
-        val cleanHeaders = {
+        val cleanCapitalizedHeaders = {
 
-          // Gather all headers nicely capitalized
+          // Capitalize only headers which are entirely lowercase.
+          //
+          // See https://github.com/orbeon/orbeon-forms/issues/3135
+          //
+          // We used to capitalize all headers, but we want to keep the original capitalization for:
+          //
+          // 1. custom headers
+          // 2. headers forwarded by name, where the header name is provided via configuration
+          //
+          // So could we just not capitalize anything at all? I can see some examples where old code
+          // would have the explicit or forwarded header names lowercase, and that would break. Anything
+          // else?
+
           val capitalizedHeaders =
             for {
-              (name, values) ← headers.toList
+              (name, values) ← headers.to[List]
+              if name == name.toLowerCase
               if values ne null
               value ← values
               if value ne null
@@ -139,7 +152,7 @@ class Connection(
             credentials,
             cookieStore,
             method,
-            cleanHeaders,
+            cleanCapitalizedHeaders,
             content
           )
 
@@ -168,7 +181,7 @@ class Connection(
             List(
               "method" → method.name,
               "URL"    → connectionURI.toString
-            ) ++ (cleanHeaders mapValues (_ mkString ",")))
+            ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
         }
 
         // Create result
@@ -376,7 +389,7 @@ object Connection extends Logging {
   private def isHTTPOrHTTPS(scheme: String)         = Set("http", "https")(scheme)
 
   // Build all the connection headers
-  def buildConnectionHeadersLowerIfNeeded(
+  def buildConnectionHeadersCapitalizedIfNeeded(
     scheme           : String,
     hasCredentials   : Boolean,
     customHeaders    : Map[String, List[String]],
@@ -386,12 +399,12 @@ object Connection extends Logging {
     logger           : IndentedLogger
   ): Map[String, List[String]] =
     if (schemeRequiresHeaders(scheme))
-      buildConnectionHeadersLower(hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
+      buildConnectionHeadersCapitalized(hasCredentials, customHeaders, headersToForward, cookiesToForward, getHeader)
     else
       EmptyHeaders
 
   // For Java callers
-  def jBuildConnectionHeadersLowerIfNeeded(
+  def jBuildConnectionHeadersCapitalizedIfNeeded(
     scheme              : String,
     hasCredentials      : Boolean,
     customHeadersOrNull : JMap[String, Array[String]],
@@ -399,7 +412,7 @@ object Connection extends Logging {
     getHeader           : String ⇒ Option[List[String]],
     logger              : IndentedLogger
   ): Map[String, List[String]] =
-    buildConnectionHeadersLowerIfNeeded(
+    buildConnectionHeadersCapitalizedIfNeeded(
       scheme,
       hasCredentials,
       Option(customHeadersOrNull) map (_.asScala.toMap mapValues (_.toList)) getOrElse EmptyHeaders,
@@ -409,7 +422,7 @@ object Connection extends Logging {
       logger
     )
 
-  def buildConnectionHeadersLowerWithSOAPIfNeeded(
+  def buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
     scheme           : String,
     method           : HttpMethod,
     hasCredentials   : Boolean,
@@ -436,8 +449,8 @@ object Connection extends Logging {
 
       // NOTE: SOAP processing overrides Content-Type in the case of a POST
       // So we have: @serialization → @mediatype →  xf:header → SOAP
-      val connectionHeadersLower =
-        buildConnectionHeadersLower(
+      val connectionHeadersCapitalized =
+        buildConnectionHeadersCapitalized(
           hasCredentials,
           headersWithContentTypeIfNeeded,
           headersToForward,
@@ -445,14 +458,14 @@ object Connection extends Logging {
           getHeader
         )
 
-      val soapHeadersLower =
-        buildSOAPHeadersLowerIfNeeded(
+      val soapHeadersCapitalized =
+        buildSOAPHeadersCapitalizedIfNeeded(
           method,
           soapMediatypeWithContentType,
           encodingForSOAP
         )
 
-      connectionHeadersLower ++ soapHeadersLower
+      connectionHeadersCapitalized ++ soapHeadersCapitalized
     } else
       EmptyHeaders
 
@@ -479,15 +492,14 @@ object Connection extends Logging {
     valueAs[List](getPropertyHandleCustom(HttpForwardCookiesProperty)).distinct
 
   // From header names and a getter for header values, find the list of headers to forward
-  def getHeadersToForward(
-    hasCredentials : Boolean, // exclude `Authorization` header when true
-    headerNames    : Set[String],
-    getHeader      : String ⇒ Option[List[String]])(implicit
-    logger         : IndentedLogger
+  def getHeadersToForwardCapitalized(
+    hasCredentials         : Boolean, // exclude `Authorization` header when true
+    headerNamesCapitalized : Set[String],
+    getHeader              : String ⇒ Option[List[String]])(implicit
+    logger                 : IndentedLogger
   ): List[(String, List[String])] = {
 
     // NOTE: Forwarding the `Cookie` header may yield unpredictable results.
-    val forwardHeaderNamesLower = headerNames map (_.toLowerCase)
 
     def canForwardHeader(nameLower: String) = {
       // Only forward Authorization header if there is no credentials provided
@@ -500,16 +512,17 @@ object Connection extends Logging {
     }
 
     for {
-      nameLower ← forwardHeaderNamesLower.to[List]
-      values    ← getHeader(nameLower)
+      nameCapitalized ← headerNamesCapitalized.to[List]
+      nameLower       = nameCapitalized.toLowerCase
+      values          ← getHeader(nameLower)
       if canForwardHeader(nameLower)
     } yield {
       debug("forwarding header", List(
-        "name"  → nameLower,
+        "name"  → nameCapitalized,
         "value" → (values mkString " ")
         )
       )
-      nameLower → values
+      nameCapitalized → values
     }
   }
 
@@ -526,50 +539,47 @@ object Connection extends Logging {
    * - a list of headers names and values to set
    * - whether explicit credentials are available (disables forwarding of session cookies and Authorization header)
    * - a list of headers to forward
-   *
-   * NOTE: All header names returned are lowercase.
    */
-  private def buildConnectionHeadersLower(
-    hasCredentials   : Boolean,
-    customHeaders    : Map[String, List[String]],
-    headersToForward : Set[String],
-    cookiesToForward : List[String],
-    getHeader        : String ⇒ Option[List[String]])(implicit
-    logger           : IndentedLogger
+  private def buildConnectionHeadersCapitalized(
+    hasCredentials           : Boolean,
+    customHeadersCapitalized : Map[String, List[String]],
+    headersToForward         : Set[String],
+    cookiesToForward         : List[String],
+    getHeader                : String ⇒ Option[List[String]])(implicit
+    logger                   : IndentedLogger
   ): Map[String, List[String]] = {
 
     val externalContext = NetUtils.getExternalContext
 
     // 1. Caller-specified list of headers to forward based on a space-separated list of header names
-    val headersToForwardLower =
-      getHeadersToForward(hasCredentials, headersToForward, getHeader)
+    val headersToForwardCapitalized =
+      getHeadersToForwardCapitalized(hasCredentials, headersToForward, getHeader)
 
     // 2. Explicit caller-specified header name/values
-    val explicitHeadersLower = customHeaders map { case (k, v) ⇒ k.toLowerCase → v }
 
     // 3. Forward cookies for session handling only if no credentials have been explicitly set
-    val newCookieHeaderLower =
+    val newCookieHeaderCapitalized =
       if (! hasCredentials)
-        sessionCookieHeaderLower(externalContext, cookiesToForward)
+        sessionCookieHeaderCapitalized(externalContext, cookiesToForward)
       else
         None
 
     // 4. Authorization token
-    val tokenHeaderLower = {
+    val tokenHeaderCapitalized = {
 
       // Get token from web app scope
       val token =
         externalContext.getWebAppContext.attributes.getOrElseUpdate(OrbeonTokenLower, SecureUtils.randomHexId).asInstanceOf[String]
 
-      Seq(OrbeonTokenLower → List(token))
+      Seq(OrbeonToken → List(token))
     }
 
     // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
     // New cookie header, if present, overrides any existing cookies
-    headersToForwardLower.toMap ++ explicitHeadersLower ++ newCookieHeaderLower ++ tokenHeaderLower
+    headersToForwardCapitalized.toMap ++ customHeadersCapitalized ++ newCookieHeaderCapitalized ++ tokenHeaderCapitalized
   }
 
-  private def sessionCookieHeaderLower(
+  private def sessionCookieHeaderCapitalized(
     externalContext  : ExternalContext,
     cookiesToForward : List[String])(implicit
     logger           : IndentedLogger
@@ -611,16 +621,16 @@ object Connection extends Logging {
       // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
       def fromIncoming =
         nativeRequestOption flatMap
-        (sessionCookieFromIncomingLower(externalContext, _, cookiesToForward, sessionCookieName))
+        (sessionCookieFromIncomingCapitalized(externalContext, _, cookiesToForward, sessionCookieName))
 
       // 2. If there is no incoming session cookie, try to make our own cookie. This may fail with e.g. WebSphere.
-      def fromSession = sessionCookieFromGuessLower(externalContext, sessionCookieName)
+      def fromSession = sessionCookieFromGuessCapitalized(externalContext, sessionCookieName)
 
       // Logging
       ifDebug {
         val incomingSessionHeaders =
           for {
-            request ← requestOption.toList
+            request       ← requestOption.toList
             cookieHeaders ← request.getHeaderValuesMap.asScala.get("cookie").toList
             cookieValue   ← cookieHeaders
             if cookieValue.contains(sessionCookieName) // rough test
@@ -652,7 +662,7 @@ object Connection extends Logging {
       None
   }
 
-  private def sessionCookieFromIncomingLower(
+  private def sessionCookieFromIncomingCapitalized(
     externalContext   : ExternalContext,
     nativeRequest     : HttpServletRequest,
     cookiesToForward  : List[String],
@@ -690,21 +700,21 @@ object Connection extends Logging {
           "requested session id" → externalContext.getRequest.getRequestedSessionId)
         )
 
-        Some("cookie" → List(cookieHeaderValue))
+        Some(Headers.Cookie → List(cookieHeaderValue))
       } else
         None
     } else
       None
   }
 
-  private def sessionCookieFromGuessLower(
+  private def sessionCookieFromGuessCapitalized(
     externalContext   : ExternalContext,
     sessionCookieName : String
   ): Option[(String, List[String])] =
     Option(externalContext.getSession(false)) map
-      { session ⇒ "cookie" →  List(sessionCookieName + "=" + session.getId) }
+      { session ⇒ Headers.Cookie →  List(sessionCookieName + "=" + session.getId) }
 
-  private def buildSOAPHeadersLowerIfNeeded(
+  private def buildSOAPHeadersCapitalizedIfNeeded(
     method                    : HttpMethod,
     mediatypeMaybeWithCharset : String,
     encoding                  : String)(implicit
@@ -733,7 +743,7 @@ object Connection extends Logging {
           val acceptHeader = SoapContentType + charsetSuffix(getContentTypeCharset(mediatypeMaybeWithCharset))
 
           // Accept header with optional charset
-          List("accept" → List(acceptHeader))
+          List(Accept → List(acceptHeader))
 
         case POST if contentTypeMediaType contains SoapContentType ⇒
           // Set Content-Type and optionally SOAPAction headers
@@ -743,14 +753,14 @@ object Connection extends Logging {
           val actionParameter       = parameters.get(ContentTypes.ActionParameter)
 
           // Content-Type with optional charset and SOAPAction header if any
-          List(ContentTypeLower → List(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → List(a)))
+          List(ContentType → List(overriddenContentType)) ++ (actionParameter map (a ⇒ SOAPAction → List(a)))
         case _ ⇒
           // Not a SOAP submission
           Nil
       }
 
     if (newHeaders.nonEmpty)
-      debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ capitalizeCommonOrSplitHeader(k) → v.head })
+      debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ k → v.head })
 
     newHeaders
   }

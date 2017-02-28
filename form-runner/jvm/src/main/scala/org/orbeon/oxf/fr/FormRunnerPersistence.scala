@@ -163,7 +163,7 @@ trait FormRunnerPersistence {
 
     val url = new URI(rewrittenURLString)
 
-    val headers = Connection.buildConnectionHeadersLowerIfNeeded(
+    val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
       scheme           = url.getScheme,
       hasCredentials   = false,
       customHeaders    = Map(),

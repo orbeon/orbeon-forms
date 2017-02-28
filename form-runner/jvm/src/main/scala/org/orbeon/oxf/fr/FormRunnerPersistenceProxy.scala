@@ -134,7 +134,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     implicit val logger = new IndentedLogger(ProcessorImpl.logger)
 
     val allHeaders =
-      Connection.buildConnectionHeadersLowerIfNeeded(
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
         scheme           = outgoingURL.getScheme,
         hasCredentials   = false,
         customHeaders    = persistenceHeaders ++ proxiedHeaders,

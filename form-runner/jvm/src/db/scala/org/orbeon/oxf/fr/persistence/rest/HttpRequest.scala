@@ -45,7 +45,7 @@ private object HttpRequest {
 
     val documentURL = PersistenceBase + path
 
-    val headers = {
+    val headersCapitalized = {
 
       import Version._
 
@@ -56,7 +56,7 @@ private object HttpRequest {
         case ForDocument(documentId) ⇒ Map(OrbeonForDocumentId         → List(documentId))
       }
 
-      Connection.buildConnectionHeadersLowerIfNeeded(
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
         scheme           = "http",
         hasCredentials   = false,
         customHeaders    = versionHeader,
@@ -83,7 +83,7 @@ private object HttpRequest {
       TestHttpClient.connect(
         url          = documentURL,
         method       = method,
-        headers      = headers,
+        headers      = headersCapitalized,
         content      = content,
         credentials  = credentials
       )

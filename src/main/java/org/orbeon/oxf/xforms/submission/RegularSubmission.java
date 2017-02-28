@@ -52,7 +52,7 @@ public class RegularSubmission extends BaseSubmission {
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
 
         final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
-            Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+            Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
                 absoluteResolvedURL.getScheme(),
                 HttpMethod$.MODULE$.getOrElseThrow(p.actualHttpMethod),
                 p2.credentials != null,

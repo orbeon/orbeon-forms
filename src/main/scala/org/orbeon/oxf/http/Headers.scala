@@ -34,6 +34,9 @@ object Headers {
   val Location                = "Location"
   val OrbeonClient            = "Orbeon-Client"
   val Created                 = "Created"
+  val Cookie                  = "Cookie"
+  val Accept                  = "Accept"
+  val SOAPAction              = "SOAPAction"
 
   val OrbeonTokenLower        = OrbeonToken.toLowerCase
   val OrbeonUsernameLower     = OrbeonUsername.toLowerCase

@@ -136,8 +136,8 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         NetUtils.getFirstPathElement(resource)
 
     // Determine headers
-    val requestHeaders =
-      Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+    val requestHeadersCapitalized =
+      Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         scheme            = "http",
         method            = httpMethod,
         hasCredentials    = false,
@@ -175,7 +175,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         if (Connection.requiresRequestBody(httpMethod) && indentedLogger.isDebugEnabled && isLogBody)
           Connection.logRequestBody(actualRequestMediatype, bytes)(indentedLogger)
 
-        StreamedContent.fromBytes(bytes, Headers.firstHeaderIgnoreCase(requestHeaders, Headers.ContentType))
+        StreamedContent.fromBytes(bytes, Headers.firstHeaderIgnoreCase(requestHeadersCapitalized, Headers.ContentType))
       }
 
     val localRequest =
@@ -184,7 +184,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         contextPath             = destinationContextPath,
         pathQuery               = rootAdjustedResourceURI,
         method                  = httpMethod,
-        headersMaybeCapitalized = requestHeaders,
+        headersMaybeCapitalized = requestHeadersCapitalized,
         content                 = content
       )
 

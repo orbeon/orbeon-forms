@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{GET, POST, StreamedContent}
+import org.orbeon.oxf.http.{GET, Headers, POST, StreamedContent}
 
 import collection.JavaConverters._
 import org.junit.Test
@@ -33,8 +33,8 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
 
     // Custom headers
     val customHeaderValuesMap = Map(
-      "my-stuff"   → List("my-value"),
-      "your-stuff" → List("your-value-1", "your-value-2")
+      "My-Stuff"   → List("my-value"),
+      "Your-Stuff" → List("your-value-1", "your-value-2")
     )
 
     // Create request and wrapper
@@ -56,15 +56,15 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
 
     // NOTE: Should instead use withExternalContext()
     PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-    val headers =
-      Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+    val headersCapitalized =
+      Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         scheme            = "http",
         method            = GET,
         hasCredentials    = false,
         mediatype         = null,
         encodingForSOAP   = "UTF-8",
         customHeaders     = customHeaderValuesMap,
-        headersToForward  = Set("cookie", "authorization", "user-agent"),
+        headersToForward  = Set(Headers.Cookie, Headers.Authorization, "User-Agent"),
         getHeader         = Connection.getHeaderFromRequest(externalContext.getRequest))(
         logger            = ResourceManagerTestBase.newIndentedLogger
       )
@@ -75,11 +75,12 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         contextPath             = "/orbeon",
         pathQuery               = "/foo/bar",
         method                  = GET,
-        headersMaybeCapitalized = headers,
+        headersMaybeCapitalized = headersCapitalized,
         content                 = None
       )
 
     // Test standard headers received
+    // See #3135 regarding `LocalRequest` capitalization. We might want to change how this works.
     val headerValuesMap = request.getHeaderValuesMap.asScala
 
     assert("Mozilla 12.1"                                === headerValuesMap("user-agent")(0))
@@ -104,8 +105,8 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     val bodyMediaType = "application/x-www-form-urlencoded"
     val explicitHeaders = Map(ContentTypeLower → List(bodyMediaType))
 
-    val headers =
-      Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+    val headersCapitalized =
+      Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         scheme           = "http",
         method           = method,
         hasCredentials   = false,
@@ -123,7 +124,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         contextPath             = "/orbeon",
         pathQuery               = s"/foobar?$queryString",
         method                  = method,
-        headersMaybeCapitalized = headers,
+        headersMaybeCapitalized = headersCapitalized,
         content                 = Some(StreamedContent.fromBytes(messageBody, Some(bodyMediaType)))
       )
 

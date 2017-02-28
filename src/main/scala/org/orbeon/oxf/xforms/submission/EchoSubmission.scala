@@ -51,7 +51,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll)
 
-    val headers = Connection.buildConnectionHeadersLowerWithSOAPIfNeeded(
+    val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
       scheme           = "http",
       method           = HttpMethod.getOrElseThrow(p.actualHttpMethod),
       hasCredentials   = p2.credentials != null,

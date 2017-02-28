@@ -61,7 +61,7 @@ object SubmissionUtils {
       url             = url,
       credentials     = None,
       content         = None,
-      headers         = Connection.buildConnectionHeadersLowerIfNeeded(
+      headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
         scheme           = url.getScheme,
         hasCredentials   = false,
         customHeaders    = Map(),

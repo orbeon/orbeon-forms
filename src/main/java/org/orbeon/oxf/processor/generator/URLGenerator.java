@@ -968,7 +968,7 @@ public class URLGenerator extends ProcessorImpl {
                     throw new OXFException(e);
                 }
                 final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headers =
-                    Connection.jBuildConnectionHeadersLowerIfNeeded(
+                    Connection.jBuildConnectionHeadersCapitalizedIfNeeded(
                         url.getScheme(),
                         credentials != null,
                         newHeaders,

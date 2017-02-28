@@ -256,7 +256,7 @@ object XFormsResourceServer {
     )
 
     val outgoingHeaders =
-      Connection.buildConnectionHeadersLowerIfNeeded(
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
         scheme           = serviceURI.getScheme,
         hasCredentials   = false,
         customHeaders    = customHeaders,

@@ -152,7 +152,7 @@ object TestHttpClient {
             contextPath             = ServerState.ContextPath,
             pathQuery               = url,
             method                  = method,
-            headersMaybeCapitalized = headers + (OrbeonTokenLower → List(ServerState.OrbeonTokenValue)),
+            headersMaybeCapitalized = headers + (OrbeonToken → List(ServerState.OrbeonTokenValue)),
             content                 = content
           )
 

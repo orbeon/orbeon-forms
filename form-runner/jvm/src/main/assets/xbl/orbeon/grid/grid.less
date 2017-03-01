@@ -308,67 +308,83 @@
 
             // 1/1
             .fr-grid-1 .fr-grid-td,
-                .fr-grid-2 .fr-grid-td[colspan = "2"],
-                .fr-grid-3 .fr-grid-td[colspan = "3"],
-                .fr-grid-4 .fr-grid-td[colspan = "4"],
-                .fr-grid-5 .fr-grid-td[colspan = "5"],
-                .fr-grid-6 .fr-grid-td[colspan = "6"] {
+                .fr-grid-2  .fr-grid-td[colspan =  "2"],
+                .fr-grid-3  .fr-grid-td[colspan =  "3"],
+                .fr-grid-4  .fr-grid-td[colspan =  "4"],
+                .fr-grid-5  .fr-grid-td[colspan =  "5"],
+                .fr-grid-6  .fr-grid-td[colspan =  "6"],
+                .fr-grid-7  .fr-grid-td[colspan =  "7"],
+                .fr-grid-8  .fr-grid-td[colspan =  "8"],
+                .fr-grid-9  .fr-grid-td[colspan =  "9"],
+                .fr-grid-10 .fr-grid-td[colspan = "10"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 98.65%;
                 }
             }
 
             // 1/2
-            .fr-grid-2, .fr-grid-4 .fr-grid-td[colspan = "2"], .fr-grid-6 .fr-grid-td[colspan = "3"] {
+            .fr-grid-2,
+                .fr-grid-4  .fr-grid-td[colspan = "2"],
+                .fr-grid-6  .fr-grid-td[colspan = "3"],
+                .fr-grid-8  .fr-grid-td[colspan = "4"],
+                .fr-grid-10 .fr-grid-td[colspan = "5"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 97.4%;
                 }
             }
 
             // 1/3
-            .fr-grid-3, .fr-grid-6 .fr-grid-td[colspan = "2"] {
+            .fr-grid-3,
+                .fr-grid-6 .fr-grid-td[colspan = "2"],
+                .fr-grid-9 .fr-grid-td[colspan = "3"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 96%;
                 }
             }
 
             // 1/4
-            .fr-grid-4 {
+            .fr-grid-4,
+                .fr-grid-8 .fr-grid-td[colspan = "2"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 94.6%;
                 }
             }
 
             // 3/4
-            .fr-grid-4 .fr-grid-td[colspan = "3"] {
+            .fr-grid-4 .fr-grid-td[colspan = "3"],
+            .fr-grid-8 .fr-grid-td[colspan = "6"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 98.25%;
                 }
             }
 
             // 1/5
-            .fr-grid-5 {
+            .fr-grid-5,
+                .fr-grid-10 .fr-grid-td[colspan = "2"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 93.1%;
+                    width: 93.3%;
                 }
             }
 
             // 2/5
-            .fr-grid-5 .fr-grid-td[colspan = "2"] {
+            .fr-grid-5 .fr-grid-td[colspan = "2"],
+                .fr-grid-10 .fr-grid-td[colspan = "4"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 96.7%;
                 }
             }
 
             // 3/5
-            .fr-grid-5 .fr-grid-td[colspan = "3"] {
+            .fr-grid-5 .fr-grid-td[colspan = "3"],
+                .fr-grid-10 .fr-grid-td[colspan = "6"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 97.75%;
                 }
             }
 
             // 4/5
-            .fr-grid-5 .fr-grid-td[colspan = "4"] {
+            .fr-grid-5 .fr-grid-td[colspan = "4"],
+                .fr-grid-10 .fr-grid-td[colspan = "8"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 98.35%;
                 }
@@ -382,7 +398,9 @@
             }
 
             // 2/3
-            .fr-grid-6 .fr-grid-td[colspan = "4"], .fr-grid-3 .fr-grid-td[colspan = "2"] {
+            .fr-grid-6 .fr-grid-td[colspan = "4"],
+                .fr-grid-3 .fr-grid-td[colspan = "2"],
+                .fr-grid-9 .fr-grid-td[colspan = "6"] {
                 .xforms-field, .xforms-textarea > pre {
                     width: 98%;
                 }
@@ -391,7 +409,40 @@
             // 5/6
             .fr-grid-6 .fr-grid-td[colspan = "5"] {
                 .xforms-field, .xforms-textarea > pre {
-                    width: 98.35%;
+                    width: 98.45%;
+                }
+            }
+
+            // Not handled yet
+            // 1/7, 2/7, 3/7, 4/7, 5/7, 6/7
+            // 1/8, 3/8, 5/8, 7/8
+            // 1/9, 2/9, 4/9, 5/9, 7/9, 8/9
+
+            // 1/10
+            .fr-grid-10 {
+                .xforms-field, .xforms-textarea > pre {
+                    width: 86.5%;
+                }
+            }
+
+            // 3/10
+            .fr-grid-10 .fr-grid-td[colspan = "3"] {
+                .xforms-field, .xforms-textarea > pre {
+                    width: 95.7%;
+                }
+            }
+
+            // 7/10
+            .fr-grid-10 .fr-grid-td[colspan = "7"] {
+                .xforms-field, .xforms-textarea > pre {
+                    width: 98.1%;
+                }
+            }
+
+            // 9/10
+            .fr-grid-10 .fr-grid-td[colspan = "9"] {
+                .xforms-field, .xforms-textarea > pre {
+                    width: 98.5%;
                 }
             }
 

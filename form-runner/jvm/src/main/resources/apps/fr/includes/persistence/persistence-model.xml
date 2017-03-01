@@ -17,19 +17,18 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:saxon="http://saxon.sf.net/"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
     xmlns:migration="java:org.orbeon.oxf.fr.DataMigration">
 
-    <xf:var name="parameters"       value="xxf:instance('fr-parameters-instance')"/>
-    <xf:var name="app"              value="$parameters/app/string()"/>
-    <xf:var name="form"             value="$parameters/form/string()"/>
-    <xf:var name="document-element" value="$parameters/document"/>
-    <xf:var name="document"         value="$document-element/string()"/>
-    <xf:var name="mode"             value="$parameters/mode/string()"/>
-    <xf:var name="is-fb"            value="fr:is-design-time()"/>
+    <xf:var name="parameters"           value="xxf:instance('fr-parameters-instance')"/>
+    <xf:var name="app"                  value="$parameters/app/string()"/>
+    <xf:var name="form"                 value="$parameters/form/string()"/>
+    <xf:var name="document-element"     value="$parameters/document"/>
+    <xf:var name="document"             value="$document-element/string()"/>
+    <xf:var name="mode"                 value="$parameters/mode/string()"/>
+    <xf:var name="is-fb"                value="fr:is-design-time()"/>
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
 

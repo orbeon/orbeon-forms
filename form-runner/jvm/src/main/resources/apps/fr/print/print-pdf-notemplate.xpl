@@ -76,7 +76,16 @@
                 <xsl:template match="*:script | *:noscript" mode="#all"/>
 
                 <!-- https://github.com/orbeon/orbeon-forms/issues/3096 -->
-                <xsl:template match="*:label/*:br[empty(following-sibling::*) and p:is-blank(following-sibling::text())]" mode="#all"/>
+                <xsl:template
+                    match="
+                        *[
+                            p:has-class('xforms-label')
+                        ]/*:br[
+                            (exists(preceding-sibling::*) or p:non-blank(..)) and (: avoid removing a single `br` :)
+                            empty(following-sibling::*)                       and
+                            p:is-blank(following-sibling::text())
+                        ]"
+                    mode="#all"/>
 
                 <!--
                     Hyperlinks, see:

@@ -846,4 +846,21 @@
         <name>image/vnd.microsoft.icon</name>
         <pattern>*.ico</pattern>
     </mime-type>
+    <!-- Web fonts -->
+    <mime-type>
+        <name>application/vnd.ms-fontobject</name>
+        <pattern>*.eot</pattern>
+    </mime-type>
+    <mime-type>
+        <name>font/truetype</name>
+        <pattern>*.ttf</pattern>
+    </mime-type>
+    <mime-type>
+        <name>application/font-woff</name>
+        <pattern>*.woff</pattern>
+    </mime-type>
+    <mime-type>
+        <name>font/woff2</name>
+        <pattern>*.woff2</pattern>
+    </mime-type>
 </mime-types>

@@ -144,7 +144,7 @@
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
                  in the binds are updated). -->
-            <xf:action if="$new-from-service or ($mode = ('new', 'test') and $is-submit)">
+            <xf:action if="$mode = ('new', 'test') and ($new-from-service or $is-submit)">
                 <!-- After we get the document from the persistence layer, recalculate defaults (and rebuild so the refs in the binds are updated) -->
                 <xf:message level="xxf:log-debug">Updating initial values for externally-loaded new document</xf:message>
                 <xf:rebuild model="fr-form-model"/>

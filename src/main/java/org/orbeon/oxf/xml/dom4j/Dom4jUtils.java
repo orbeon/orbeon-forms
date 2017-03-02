@@ -34,6 +34,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.*;
 
+// TODO: move this to Scala/remove unneeded stuff
 public class Dom4jUtils {
 
     /**

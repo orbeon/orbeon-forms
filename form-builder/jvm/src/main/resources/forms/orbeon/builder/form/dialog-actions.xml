@@ -555,6 +555,9 @@
             "/>
 
         <xf:bind ref="instance('fb-actions-editor-instance')">
+
+            <!-- NOTE: Considered restricting with `matches(., '^[A-Za-z0-9\-_]+$')`, but do we need to? For example
+                 action names with accented characters could be ok. -->
             <xf:bind
                 ref="name"
                 type="xs:NCName"

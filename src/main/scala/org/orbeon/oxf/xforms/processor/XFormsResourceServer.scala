@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{Caches, Loggers, XFormsProperties}
+import org.orbeon.oxf.xforms.{Caches, Loggers, ResourceConfig, XFormsProperties}
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -149,7 +149,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
       if (cacheElement ne null) {
         // Mapping found
         val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
-        resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
+        resourcesStrings map (r ⇒ ResourceConfig(r, hasMin = false))
       } else {
         // Not found, either because the hash is invalid, or because the cache lost the mapping
         response.setStatus(StatusCode.NotFound)

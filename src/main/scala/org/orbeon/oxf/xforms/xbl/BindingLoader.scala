@@ -47,8 +47,8 @@ trait BindingLoader extends Logging {
 
       val propertySet = getPropertySet
 
-      val libraryProperty  = propertySet.getProperty(XBLLibraryProperty)
-      val baselineProperty = propertySet.getProperty(XBLBaselineProperty)
+      val libraryProperty  = propertySet.getPropertyOrThrow(XBLLibraryProperty)
+      val baselineProperty = propertySet.getPropertyOrThrow(XBLBaselineProperty)
 
       def reloadLibraryAndBaseline = {
 
@@ -311,7 +311,7 @@ trait BindingLoader extends Logging {
     // Associate result with the property so it won't be computed until properties are reloaded
     mappingProperties.headOption match {
       case Some(firstPropertyName) ⇒
-        propertySet.getProperty(firstPropertyName).associatedValue(evaluate)
+        propertySet.getPropertyOrThrow(firstPropertyName).associatedValue(evaluate)
       case None ⇒
         Map()
     }

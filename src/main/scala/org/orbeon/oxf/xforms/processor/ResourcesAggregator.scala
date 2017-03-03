@@ -308,7 +308,7 @@ object ResourcesAggregator extends Logging {
 
       // Store on disk if requested to make the resource available to external software, like Apache
       if (isCacheCombinedResources) {
-        val resourcesConfig = resources.toSeq map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
+        val resourcesConfig = resources.toSeq map (r ⇒ ResourceConfig(r, hasMin = false))
 
         assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
 

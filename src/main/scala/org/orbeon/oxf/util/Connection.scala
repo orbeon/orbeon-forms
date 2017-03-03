@@ -360,7 +360,7 @@ object Connection extends Logging {
 
   def isInternalPath(path: String): Boolean = {
     val propertySet = Properties.instance.getPropertySet
-    val p = propertySet.getProperty(HttpInternalPathsProperty)
+    val p = propertySet.getPropertyOrThrow(HttpInternalPathsProperty)
     val r = p.associatedValue(_.value.toString.r)
 
     r.pattern.matcher(path).matches()

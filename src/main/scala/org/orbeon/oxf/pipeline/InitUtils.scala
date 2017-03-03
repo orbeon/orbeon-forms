@@ -241,7 +241,7 @@ object InitUtils {
 
   // Read-only view of the properties as a Map
   private object PropertiesMap extends Map[String, String] {
-    def get(key: String) = Option(Properties.instance.getPropertySet.getObject(key)) map (_.toString)
+    def get(key: String) = Properties.instance.getPropertySet.getObjectOpt(key) map (_.toString)
     def iterator         = Properties.instance.getPropertySet.keySet.asScala.toIterator map (key ⇒ key → this(key))
 
     def -(key: String)                    = Map() ++ this - key

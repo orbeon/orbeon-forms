@@ -146,43 +146,29 @@ class PropertySet {
   // For Java callers
   def getPropertiesStartsWith(name: String): ju.List[String] = propertiesStartsWith(name).asJava
 
-  /**
-   * Get a property.
-   *
-   * @param name      property name
-   * @param typ      property type to check against, or null
-   * @         property object if found
-   */
-  private def getProperty(name: String, typ: QName): Property = {
+  private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {
 
-    def getPropertyWorker(propertyNode: PropertyNode, tokens: List[String], currentTokenPosition: Int): Property = {
-      if (propertyNode eq null) {
-        // Dead end
-        null
-      } else if (currentTokenPosition == tokens.length) {
-        // We're done with the search, see if we found something here
-        if (propertyNode.property ne null) propertyNode.property else null
-      } else {
-        // Dead end
-        if (propertyNode.children eq null)
-          return null
-
-        val currentToken = tokens(currentTokenPosition)
-
-        // Look for value with actual token
-        var newNode = propertyNode.children.get(currentToken).orNull
-        val result = getPropertyWorker(newNode, tokens, currentTokenPosition + 1)
-        if (result ne null)
-          return result
-        // If we couldn't find a value with the actual token, look for value with *
-        newNode = propertyNode.children.get("*").orNull
-        getPropertyWorker(newNode, tokens, currentTokenPosition + 1)
+    def getPropertyWorker(
+      propertyNodeOpt : Option[PropertyNode],
+      tokens          : List[String]
+    ): Option[Property] =
+      propertyNodeOpt match {
+        case None               ⇒ None
+        case Some(propertyNode) ⇒
+          tokens match {
+            case Nil ⇒
+              Option(propertyNode.property)
+            case head :: tail ⇒
+              propertyNode.children match {
+                case null     ⇒ None
+                case children ⇒ getPropertyWorker(children.get(head), tail) orElse getPropertyWorker(children.get("*"), tail)
+              }
+          }
       }
-    }
 
     def getExact = exactProperties.get(name)
 
-    def getWildcard = Option(getPropertyWorker(wildcardProperties, name.splitTo[List]("."), 0))
+    def getWildcard = getPropertyWorker(Some(wildcardProperties), name.splitTo[List]("."))
 
     def checkType(p: Property) =
       if ((typ ne null) && typ != p.typ)
@@ -192,22 +178,31 @@ class PropertySet {
       else
         p
 
-    getExact orElse getWildcard map checkType orNull
+    getExact orElse getWildcard map checkType
   }
 
   /* All getters */
 
-  private def getPropertyValue(name: String, typ: QName): AnyRef =
-    Option(getProperty(name, typ)) map (_.value) orNull
+  private def getPropertyValueOpt(name: String, typ: QName): Option[AnyRef] =
+    getPropertyOptThrowIfTypeMismatch(name, typ) map (_.value)
 
-  def getProperty(name: String): Property =
-    getProperty(name, null)
+  private def getPropertyValueOrNull(name: String, typ: QName): AnyRef =
+    getPropertyValueOpt(name, typ).orNull
+
+  def getPropertyOrThrow(name: String): Property =
+    getPropertyOpt(name) getOrElse (throw new OXFException(s"property `$name` not found"))
+
+  def getPropertyOpt(name: String): Option[Property] =
+    getPropertyOptThrowIfTypeMismatch(name, null)
 
   def getObject(name: String): AnyRef =
-    getPropertyValue(name, null)
+    getObjectOpt(name).orNull
+
+  def getObjectOpt(name: String): Option[AnyRef] =
+    getPropertyValueOpt(name, null)
 
   def getObject(name: String, default: AnyRef): AnyRef =
-    Option(getObject(name)) getOrElse default
+    getObjectOpt(name) getOrElse default
 
   def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
     getObject(name) match {
@@ -221,50 +216,50 @@ class PropertySet {
     Option(getStringOrURIAsString(name, allowEmpty)) getOrElse default
 
   def getNonBlankString(name: String): Option[String] =
-    getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToOpt
+    getPropertyValueOrNull(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToOpt
 
   def getString(name: String): String =
-    getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToNull
+    getPropertyValueOrNull(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String].trimAllToNull
 
   def getString(name: String, default: String): String =
     getNonBlankString(name) getOrElse default
 
   def getNmtokens(name: String): ju.Set[String] =
-    getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
+    getPropertyValueOrNull(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[ju.Set[String]]
 
   def getInteger(name: String): jl.Integer =
-    getPropertyValue(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]
+    getPropertyValueOrNull(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[jl.Integer]
 
   def getInteger(name: String, default: Int): jl.Integer =
     Option(getInteger(name)) getOrElse new jl.Integer(default)
 
   def getBoolean(name: String): jl.Boolean =
-    getPropertyValue(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[jl.Boolean]
+    getPropertyValueOrNull(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[jl.Boolean]
 
   def getBoolean(name: String, default: Boolean): Boolean =
     Option(getBoolean(name)) map (_.booleanValue) getOrElse default
 
   def getDate(name: String): ju.Date =
-    getPropertyValue(name, XMLConstants.XS_DATE_QNAME).asInstanceOf[ju.Date]
+    getPropertyValueOrNull(name, XMLConstants.XS_DATE_QNAME).asInstanceOf[ju.Date]
 
   def getDateTime(name: String): ju.Date =
-    getPropertyValue(name, XMLConstants.XS_DATETIME_QNAME).asInstanceOf[ju.Date]
+    getPropertyValueOrNull(name, XMLConstants.XS_DATETIME_QNAME).asInstanceOf[ju.Date]
 
   def getQName(name: String): QName =
-    getPropertyValue(name, XMLConstants.XS_QNAME_QNAME).asInstanceOf[QName]
+    getPropertyValueOrNull(name, XMLConstants.XS_QNAME_QNAME).asInstanceOf[QName]
 
   def getQName(name: String, default: QName): QName =
     Option(getQName(name)) getOrElse default
 
   def getURI(name: String): URI =
-    getPropertyValue(name, XMLConstants.XS_ANYURI_QNAME).asInstanceOf[URI]
+    getPropertyValueOrNull(name, XMLConstants.XS_ANYURI_QNAME).asInstanceOf[URI]
 
   def getNonNegativeInteger(nm: String): jl.Integer =
-    getPropertyValue(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME).asInstanceOf[jl.Integer]
+    getPropertyValueOrNull(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME).asInstanceOf[jl.Integer]
 
   def getNCName(nm: String): String =
-    getPropertyValue(nm, XMLConstants.XS_NCNAME_QNAME).asInstanceOf[String]
+    getPropertyValueOrNull(nm, XMLConstants.XS_NCNAME_QNAME).asInstanceOf[String]
 
   def getNMTOKEN(nm: String): String =
-    getPropertyValue(nm, XMLConstants.XS_NMTOKEN_QNAME).asInstanceOf[String]
+    getPropertyValueOrNull(nm, XMLConstants.XS_NMTOKEN_QNAME).asInstanceOf[String]
 }

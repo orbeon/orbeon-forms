@@ -25,7 +25,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
+import org.orbeon.oxf.xforms.ResourceConfig
 
 import scala.util.Try
 import scala.util.control.NonFatal

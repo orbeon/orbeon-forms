@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.processor.XFormsFeatures._
+import org.orbeon.oxf.xforms.ResourceConfig
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.{breakOut, mutable}

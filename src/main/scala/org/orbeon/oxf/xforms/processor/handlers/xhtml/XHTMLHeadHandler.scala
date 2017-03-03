@@ -23,10 +23,9 @@ import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XXFormsDialogControl}
+import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
-import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLResources
 import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
@@ -159,7 +158,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // Output all CSS
     XBLResources.outputResources(
       outputCSSElement,
-      XFormsFeatures.cssResources.asScala,
+      XFormsAssets.fromJSONProperty.css,
       headElements,
       baselineResources,
       minimal
@@ -186,7 +185,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // Output all JS
     XBLResources.outputResources(
       outputJSElement,
-      XFormsFeatures.javaScriptResources.asScala,
+      XFormsAssets.fromJSONProperty.js,
       headElements,
       baselineResources,
       minimal

@@ -159,11 +159,11 @@ trait FormRunnerBaseOps {
 
   // Return a property using the form's app/name, None if the property is not defined
   def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
-    Option(properties.getObject(buildPropertyName(name))) map (_.toString)
+    properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
 
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams) =
-    Option(properties.getObject(buildPropertyName(name))) map (_.toString) contains "true"
+    properties.getObjectOpt(buildPropertyName(name)) map (_.toString) contains "true"
 
   // Interrupt current processing and send an error code to the client.
   // NOTE: This could be done through ExternalContext

@@ -30,8 +30,10 @@ import org.xml.sax.helpers.AttributesImpl
 import scala.collection.mutable.{Buffer, LinkedHashSet}
 
 /**
- * Aggregate CSS and JS resources under <head>.
- */
+  * Aggregate CSS and JS resources under <head>.
+  *
+  * NOTE: Should rename to AssetsAggregator?
+  */
 class ResourcesAggregator extends ProcessorImpl {
 
   import ResourcesAggregator._
@@ -181,14 +183,14 @@ class ResourcesAggregator extends ProcessorImpl {
                 builder append
                   (aggregate(baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
                     aggregate(supplementalJS -- baselineJS, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
-                      (preservedJS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
+                      (preservedJS flatMap (appendPreservedElement(_).toList)) mkString ",")
 
                 builder append """],"styles":["""
 
                 builder append
                   (aggregate(baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
                     aggregate(supplementalCSS -- baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
-                      (preservedCSS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
+                      (preservedCSS flatMap (appendPreservedElement(_).toList)) mkString ",")
 
                 builder append """]}"""
 
@@ -308,12 +310,12 @@ object ResourcesAggregator extends Logging {
 
       // Store on disk if requested to make the resource available to external software, like Apache
       if (isCacheCombinedResources) {
-        val resourcesConfig = resources.toSeq map (r ⇒ ResourceConfig(r, hasMin = false))
+        val resourcesConfig = resources.to[List] map (r ⇒ AssetPath(r, hasMin = false))
 
-        assert(resourcesConfig.head.resourcePath(tryMin = false) == resources.head) // set order is tricky so make sure order is kept
+        assert(resourcesConfig.head.assetPath(tryMin = false) == resources.head) // set order is tricky so make sure order is kept
 
         val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, isMinimal = false)
-        XFormsResourceRewriter.cacheResources(resourcesConfig, path, namespaceOpt, combinedLastModified, isCSS, isMinimal = false)
+        XFormsResourceRewriter.cacheAssets(resourcesConfig, path, namespaceOpt, combinedLastModified, isCSS, isMinimal = false)
       }
 
       result

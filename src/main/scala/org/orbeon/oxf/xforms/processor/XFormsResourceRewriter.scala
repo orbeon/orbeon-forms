@@ -25,49 +25,43 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.ResourceConfig
+import org.orbeon.oxf.xforms.AssetPath
 
 import scala.util.Try
 import scala.util.control.NonFatal
 
+// NOTE: Should rename to XFormsAssetRewriter?
 object XFormsResourceRewriter extends Logging {
-  /**
-   * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
-   *
-   * @param logger                logger
-   * @param resources             list of ResourceConfig to consider
-   * @param os                    OutputStream to write to
-   * @param isCSS                 whether to generate CSS or JavaScript resources
-   * @param isMinimal             whether to use minimal resources
-   */
+
+  // Generate the resources into the given OutputStream. The stream is flushed and closed when done.
   def generateAndClose(
-    resources      : Seq[ResourceConfig],
-    namespaceOpt   : Option[String],
-    os             : OutputStream,
-    isCSS          : Boolean,
-    isMinimal      : Boolean)(
-    implicit logger: IndentedLogger
+    assetPaths   : List[AssetPath],
+    namespaceOpt : Option[String],
+    os           : OutputStream,
+    isCSS        : Boolean,
+    isMinimal    : Boolean)(implicit
+    logger       : IndentedLogger
   ): Unit =
     useAndClose(os) { _ ⇒
       if (isCSS)
-        generateCSS(resources, namespaceOpt, os, isMinimal)
+        generateCSS(assetPaths, namespaceOpt, os, isMinimal)
       else
-        generateJS(resources, os, isMinimal)
+        generateJS(assetPaths, os, isMinimal)
 
       os.flush()
     }
 
   private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Any] = {
-    case NonFatal(t) ⇒
-      error("could not read resource to aggregate", Seq("resource" → path))
+    case NonFatal(_) ⇒
+      error("could not read asset to aggregate", List("asset" → path))
   }
 
   private def generateCSS(
-    resources      : Seq[ResourceConfig],
-    namespaceOpt   : Option[String],
-    os             : OutputStream,
-    isMinimal      : Boolean)(
-    implicit logger: IndentedLogger
+    assetPaths   : List[AssetPath],
+    namespaceOpt : Option[String],
+    os           : OutputStream,
+    isMinimal    : Boolean)(implicit
+    logger       : IndentedLogger
   ): Unit = {
 
     val response = NetUtils.getExternalContext.getResponse
@@ -84,16 +78,16 @@ object XFormsResourceRewriter extends Logging {
 
     // NOTE: The idea is that:
     // - we recover and log resource read errors (a file can be missing for example during development)
-    // - we don't recover when writing (writing the resources will be interupted)
+    // - we don't recover when writing (writing the resources will be interrupted)
     def tryInputStream(path: String) =
       Try(rm.getContentAsStream(path)) onFailure logFailure(path)
 
     // Use iterators so that we don't open all input streams at once
     def inputStreamIterator =
       for {
-        resource ← resources.iterator
-        path     = resource.resourcePath(isMinimal)
-        is       ← tryInputStream(path).iterator
+        asset ← assetPaths.iterator
+        path  = asset.assetPath(isMinimal)
+        is    ← tryInputStream(path).iterator
       } yield
         path → is
 
@@ -137,11 +131,11 @@ object XFormsResourceRewriter extends Logging {
 
   // Public for unit tests
   def rewriteCSS(
-    css            : String,
-    resourcePath   : String,
-    namespaceOpt   : Option[String],
-    response       : ExternalContext.Response)(
-    implicit logger: IndentedLogger
+    css          : String,
+    resourcePath : String,
+    namespaceOpt : Option[String],
+    response     : ExternalContext.Response)(implicit
+    logger       : IndentedLogger
   ): String = {
 
     // Match and rewrite an id within a selector
@@ -157,7 +151,7 @@ object XFormsResourceRewriter extends Logging {
         val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
         "url(" + rewrittenURI + ")"
       } recover {
-        case NonFatal(t) ⇒
+        case NonFatal(_) ⇒
           warn("found invalid URI in CSS file", Seq("uri" → url))
           "url(" + url + ")"
       }
@@ -172,10 +166,10 @@ object XFormsResourceRewriter extends Logging {
   }
 
   private def generateJS(
-    resources      : Seq[ResourceConfig],
-    os             : OutputStream,
-    isMinimal      : Boolean)(
-    implicit logger: IndentedLogger
+    assetPaths : List[AssetPath],
+    os         : OutputStream,
+    isMinimal  : Boolean)(implicit
+    logger     : IndentedLogger
   ): Unit = {
     // Output Orbeon Forms version if allowed
     Version.versionStringIfAllowed foreach { version ⇒
@@ -191,7 +185,7 @@ object XFormsResourceRewriter extends Logging {
 
     // Use iterators so that we don't open all input streams at once
     def inputStreamIterator =
-      resources.iterator flatMap (r ⇒ tryInputStream(r.resourcePath(isMinimal)).iterator)
+      assetPaths.iterator flatMap (r ⇒ tryInputStream(r.assetPath(isMinimal)).iterator)
 
     // Write all resources one after the other
     inputStreamIterator foreach { is ⇒
@@ -201,24 +195,24 @@ object XFormsResourceRewriter extends Logging {
   }
 
   // Compute the last modification date of the given resources.
-  def computeCombinedLastModified(resources: Seq[ResourceConfig], isMinimal: Boolean): Long = {
+  def computeCombinedLastModified(assetPaths: List[AssetPath], isMinimal: Boolean): Long = {
 
     val rm = ResourceManagerWrapper.instance
 
     // NOTE: Actual aggregation will log missing files so we ignore them here
-    def lastModified(r: ResourceConfig) =
-      Try(rm.lastModified(r.resourcePath(isMinimal), false)) getOrElse 0L
+    def lastModified(r: AssetPath) =
+      Try(rm.lastModified(r.assetPath(isMinimal), false)) getOrElse 0L
 
-    if (resources.isEmpty) 0L else resources map lastModified max
+    if (assetPaths.isEmpty) 0L else assetPaths map lastModified max
   }
 
-  def cacheResources(
-    resources           : Seq[ResourceConfig],
-    resourcePath        : String,
-    namespaceOpt        : Option[String],
-    combinedLastModified: Long,
-    isCSS               : Boolean,
-    isMinimal           : Boolean
+  def cacheAssets(
+    assetPaths           : List[AssetPath],
+    resourcePath         : String,
+    namespaceOpt         : Option[String],
+    combinedLastModified : Long,
+    isCSS                : Boolean,
+    isMinimal            : Boolean
   ): Option[File] = {
 
     implicit val indentedLogger = XFormsResourceServer.indentedLogger
@@ -237,7 +231,7 @@ object XFormsResourceRewriter extends Logging {
             // Resource is out of date, generate
             debug("cached combined resources out of date, saving", logParameters)
             val fos = new FileOutputStream(resourceFile)
-            generateAndClose(resources, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
+            generateAndClose(assetPaths, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
           } else
             debug("cached combined resources exist and are up-to-date", logParameters)
         } else {
@@ -246,7 +240,7 @@ object XFormsResourceRewriter extends Logging {
           resourceFile.getParentFile.mkdirs()
           resourceFile.createNewFile()
           val fos = new FileOutputStream(resourceFile)
-          generateAndClose(resources, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
+          generateAndClose(assetPaths, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
         }
         Some(resourceFile)
       case None ⇒

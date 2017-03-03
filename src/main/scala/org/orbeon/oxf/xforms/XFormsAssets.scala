@@ -17,17 +17,17 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.PathUtils._
 import spray.json._
 
-case class XFormsAssets(css: List[ResourceConfig], js: List[ResourceConfig])
+case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])
 
-case class ResourceConfig(full: String, minOpt: Option[String]) {
-  def resourcePath(tryMin: Boolean): String =
+case class AssetPath(full: String, minOpt: Option[String]) {
+  def assetPath(tryMin: Boolean): String =
     if (tryMin) minOpt getOrElse full else full
 }
 
-object ResourceConfig {
+object AssetPath {
 
-  def apply(full: String, hasMin: Boolean): ResourceConfig =
-    ResourceConfig(full, Some(minFromFull(full)))
+  def apply(full: String, hasMin: Boolean): AssetPath =
+    AssetPath(full, Some(minFromFull(full)))
 
   def minFromFull(full: String): String =
     findExtension(full) match {
@@ -49,7 +49,7 @@ object XFormsAssets {
             val full   = fields.get("full") collect { case JsString(v)  ⇒ v } getOrElse (throw new IllegalArgumentException)
             val hasMin = fields.get("min")  collect { case JsBoolean(v) ⇒ v } getOrElse false
 
-            ResourceConfig(full, hasMin)
+            AssetPath(full, hasMin)
           }
         case _ ⇒ throw new IllegalArgumentException
       }

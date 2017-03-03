@@ -25,14 +25,16 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{Caches, Loggers, ResourceConfig, XFormsProperties}
+import org.orbeon.oxf.xforms.{AssetPath, Caches, Loggers, XFormsProperties}
 
 import scala.util.Try
 import scala.util.control.NonFatal
 
 /**
- * Serve XForms engine JavaScript and CSS resources by combining them.
- */
+  * Serve XForms engine JavaScript and CSS resources by combining them.
+  *
+  * NOTE: Should rename to XFormsAssetServer?
+  */
 class XFormsResourceServer extends ProcessorImpl with Logging {
 
   import org.orbeon.oxf.xforms.processor.XFormsResourceServer._
@@ -149,7 +151,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
       if (cacheElement ne null) {
         // Mapping found
         val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
-        resourcesStrings map (r ⇒ ResourceConfig(r, hasMin = false))
+        resourcesStrings map (r ⇒ AssetPath(r, hasMin = false))
       } else {
         // Not found, either because the hash is invalid, or because the cache lost the mapping
         response.setStatus(StatusCode.NotFound)
@@ -191,7 +193,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
     if (XFormsProperties.isCacheCombinedResources) {
 
       // Caching requested
-      XFormsResourceRewriter.cacheResources(
+      XFormsResourceRewriter.cacheAssets(
         resources,
         requestPath,
         namespaceOpt,

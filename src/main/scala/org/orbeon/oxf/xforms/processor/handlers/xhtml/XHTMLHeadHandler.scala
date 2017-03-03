@@ -27,8 +27,8 @@ import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.xbl.XBLResources
-import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
+import org.orbeon.oxf.xforms.xbl.XBLAssets
+import org.orbeon.oxf.xforms.xbl.XBLAssets.HeadElement
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
@@ -156,7 +156,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
       )(_, _, _)
 
     // Output all CSS
-    XBLResources.outputResources(
+    XBLAssets.outputResources(
       outputCSSElement,
       XFormsAssets.fromJSONProperty.css,
       headElements,
@@ -183,7 +183,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
       )(_, _, _)
 
     // Output all JS
-    XBLResources.outputResources(
+    XBLAssets.outputResources(
       outputJSElement,
       XFormsAssets.fromJSONProperty.js,
       headElements,

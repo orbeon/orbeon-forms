@@ -91,7 +91,7 @@ trait BindingLoader extends Logging {
         originalOrUpdatedIndex = newIndex
 
         // 2: Collect resource baselines
-        import XBLResources._
+        import XBLAssets._
 
         def collectUniqueReferenceElements(getHeadElements : AbstractBinding ⇒ Seq[HeadElement]) =
           (orderedHeadElements(baselineBindings, getHeadElements).collect{ case e: ReferenceElement ⇒ e.src }(breakOut): mutable.LinkedHashSet[String]).to[List]
@@ -346,7 +346,7 @@ trait BindingLoader extends Logging {
 
     // Extract xbl:xbl/xbl:script
     // TODO: should do this differently, in order to include only the scripts and resources actually used
-    val scriptElements = Dom4j.elements(xblElement, XBL_SCRIPT_QNAME) map XBLResources.HeadElement.apply
+    val scriptElements = Dom4j.elements(xblElement, XBL_SCRIPT_QNAME) map XBLAssets.HeadElement.apply
 
     // Create binding for all xbl:binding[@element]
     for {

@@ -33,7 +33,7 @@ import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
  * - resources
  *   - PartXBLAnalysis.allBindingsMaybeDuplicates{2}
  *     - Metadata.allBindingsMaybeDuplicates
- *   - XBLResources.baselineResources
+ *   - XBLAssets.baselineResources
  *     - XBLLoader.findMostSpecificBinding
  * - XFormsToSomething
  *     - bindingsIncludesAreUpToDate (to see if static state has expired)

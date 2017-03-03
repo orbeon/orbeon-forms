@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLResources}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLAssets}
 
 import scala.collection.JavaConverters._
 
@@ -92,7 +92,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def bindingResources = {
     val bindings = allBindingsMaybeDuplicates
-    (XBLResources.orderedHeadElements(bindings, _.scripts), XBLResources.orderedHeadElements(bindings, _.styles))
+    (XBLAssets.orderedHeadElements(bindings, _.scripts), XBLAssets.orderedHeadElements(bindings, _.styles))
   }
 
   /**

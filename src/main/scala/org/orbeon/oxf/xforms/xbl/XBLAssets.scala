@@ -19,21 +19,19 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.{breakOut, mutable}
 
-object XBLResources {
+object XBLAssets {
 
   sealed trait HeadElement
   case   class ReferenceElement(src: String) extends HeadElement
   case   class InlineElement(text: String)   extends HeadElement
 
-  val EmptyHeadElementSeq = Seq[HeadElement]()
-
   object HeadElement {
     def apply(e: Element): HeadElement = {
 
-      val href = e.attributeValue("href")
-      val src = e.attributeValue("src")
+      val href    = e.attributeValue("href")
+      val src     = e.attributeValue("src")
       val resType = e.attributeValue("type")
-      val rel = Option(e.attributeValue("rel")) getOrElse "" toLowerCase
+      val rel     = Option(e.attributeValue("rel")) getOrElse "" toLowerCase
 
       e.getName match {
         case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒

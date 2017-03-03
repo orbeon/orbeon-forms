@@ -75,7 +75,7 @@ object XBLResources {
   ): Unit = {
 
     // For now, actual builtin resources always include the baseline builtin resources
-    val builtinBaseline: mutable.LinkedHashSet[String] = builtin.map(_.getResourcePath(minimal))(breakOut)
+    val builtinBaseline: mutable.LinkedHashSet[String] = builtin.map(_.resourcePath(minimal))(breakOut)
     val allBaseline = builtinBaseline ++ xblBaseline
 
     // Output baseline resources with a CSS class
@@ -84,7 +84,7 @@ object XBLResources {
     // This is in the order defined by XBLBindings.orderedHeadElements
     val xbl = headElements
 
-    val builtinUsed: mutable.LinkedHashSet[String] = builtin.map(_.getResourcePath(minimal))(breakOut)
+    val builtinUsed: mutable.LinkedHashSet[String] = builtin.map(_.resourcePath(minimal))(breakOut)
     val xblUsed: List[String] = xbl.collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
 
     // Output remaining resources if any, with no CSS class

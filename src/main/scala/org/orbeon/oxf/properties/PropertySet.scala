@@ -148,7 +148,7 @@ class PropertySet {
 
   private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {
 
-    def getPropertyWorker(
+    def wildcardSearch(
       propertyNodeOpt : Option[PropertyNode],
       tokens          : List[String]
     ): Option[Property] =
@@ -161,14 +161,14 @@ class PropertySet {
             case head :: tail ⇒
               propertyNode.children match {
                 case null     ⇒ None
-                case children ⇒ getPropertyWorker(children.get(head), tail) orElse getPropertyWorker(children.get("*"), tail)
+                case children ⇒ wildcardSearch(children.get(head), tail) orElse wildcardSearch(children.get("*"), tail)
               }
           }
       }
 
     def getExact = exactProperties.get(name)
 
-    def getWildcard = getPropertyWorker(Some(wildcardProperties), name.splitTo[List]("."))
+    def getWildcard = wildcardSearch(Some(wildcardProperties), name.splitTo[List]("."))
 
     def checkType(p: Property) =
       if ((typ ne null) && typ != p.typ)

@@ -92,7 +92,7 @@ object XFormsResourceRewriter extends Logging {
     def inputStreamIterator =
       for {
         resource ← resources.iterator
-        path     = resource.getResourcePath(isMinimal)
+        path     = resource.resourcePath(isMinimal)
         is       ← tryInputStream(path).iterator
       } yield
         path → is
@@ -191,7 +191,7 @@ object XFormsResourceRewriter extends Logging {
 
     // Use iterators so that we don't open all input streams at once
     def inputStreamIterator =
-      resources.iterator flatMap (r ⇒ tryInputStream(r.getResourcePath(isMinimal)).iterator)
+      resources.iterator flatMap (r ⇒ tryInputStream(r.resourcePath(isMinimal)).iterator)
 
     // Write all resources one after the other
     inputStreamIterator foreach { is ⇒
@@ -207,7 +207,7 @@ object XFormsResourceRewriter extends Logging {
 
     // NOTE: Actual aggregation will log missing files so we ignore them here
     def lastModified(r: ResourceConfig) =
-      Try(rm.lastModified(r.getResourcePath(isMinimal), false)) getOrElse 0L
+      Try(rm.lastModified(r.resourcePath(isMinimal), false)) getOrElse 0L
 
     if (resources.isEmpty) 0L else resources map lastModified max
   }

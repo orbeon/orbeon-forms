@@ -310,7 +310,7 @@ object ResourcesAggregator extends Logging {
       if (isCacheCombinedResources) {
         val resourcesConfig = resources.toSeq map (r ⇒ ResourceConfig(r, hasMin = false))
 
-        assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
+        assert(resourcesConfig.head.resourcePath(tryMin = false) == resources.head) // set order is tricky so make sure order is kept
 
         val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, isMinimal = false)
         XFormsResourceRewriter.cacheResources(resourcesConfig, path, namespaceOpt, combinedLastModified, isCSS, isMinimal = false)

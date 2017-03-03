@@ -20,7 +20,7 @@ import spray.json._
 case class XFormsAssets(css: List[ResourceConfig], js: List[ResourceConfig])
 
 case class ResourceConfig(full: String, minOpt: Option[String]) {
-  def getResourcePath(tryMin: Boolean): String =
+  def resourcePath(tryMin: Boolean): String =
     if (tryMin) minOpt getOrElse full else full
 }
 

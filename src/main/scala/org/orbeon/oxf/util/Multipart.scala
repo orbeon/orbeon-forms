@@ -21,17 +21,17 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
 import org.orbeon.errorified.Exceptions
+import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 
 import scala.collection.JavaConverters._
-import scala.collection.{immutable ⇒ i, mutable ⇒ m}
+import scala.collection.{mutable ⇒ m}
 import scala.util.control.NonFatal
 
 
@@ -61,7 +61,7 @@ object Multipart {
     }
 
   // Delete all items which are of type FileItem
-  def deleteFileItems(nameValues: i.Seq[(String, AnyRef)]) = (
+  def deleteFileItems(nameValues: List[(String, AnyRef)]) = (
     nameValues
     collect { case (_, fileItem: FileItem) ⇒ fileItem }
     foreach (fileItem ⇒ runQuietly(fileItem.delete()))
@@ -75,7 +75,7 @@ object Multipart {
     if (maxSize < 0) -1L else Math.max(maxSize, 4096) // MultipartStream.DEFAULT_BUFSIZE
 
   // Decode a multipart/form-data request and return all the successful parameters.
-  def parseMultipartRequest(request: Request, maxSize: Long, headerEncoding: String): (i.Seq[(String, AnyRef)], Option[Throwable]) = {
+  def parseMultipartRequest(request: Request, maxSize: Long, headerEncoding: String): (List[(String, AnyRef)], Option[Throwable]) = {
 
     require(request ne null)
     require(headerEncoding ne null)
@@ -157,7 +157,7 @@ object Multipart {
     requestContext : RequestContext,
     upload         : ServletFileUpload,
     sessionOpt     : Option[Session]
-  ): (i.Seq[(String, AnyRef)], Option[Throwable]) = {
+  ): (List[(String, AnyRef)], Option[Throwable]) = {
 
     val requestUntrustedSize = requestContext.getContentLength
 

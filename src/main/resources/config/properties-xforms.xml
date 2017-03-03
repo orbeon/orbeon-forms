@@ -265,6 +265,7 @@
             { "full": "/ops/javascript/orbeon/xforms/control/Control.js",                    "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },
+            { "full": "/ops/javascript/orbeon/xforms/control/Upload.js",                     "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/action/Message.js",                     "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/controls/Placement.js",                 "min": true  },

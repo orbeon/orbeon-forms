@@ -75,6 +75,7 @@
         </xbl:implementation>
         <xbl:template>
             <xf:upload ref="xxf:binding('fr-attachment')" xbl:attr="accept" xxf:title="{xxf:label('fr-attachment')}">
+                <xxf:setvisited event="xxforms-upload-done" control="fr-attachment"/>
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xxf:size     ref="@size"      xxbl:scope="outer"/>

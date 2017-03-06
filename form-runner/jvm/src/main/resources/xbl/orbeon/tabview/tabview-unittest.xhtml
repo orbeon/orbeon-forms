@@ -63,19 +63,19 @@
             <xh:legend>Switch to a tab by dispatching an event</xh:legend>
             <xf:repeat ref="tab" id="toggle-repeat">
                 <xf:var name="position" value="position()"/>
-                <fr:button id="toggle">
+                <xf:trigger id="toggle">
                     <xf:label>Toggle tab <xf:output value="$position"/></xf:label>
                     <xf:dispatch ev:event="DOMActivate" targetid="tab-{$position}" name="fr-toggle"/>
-                </fr:button>
+                </xf:trigger>
             </xf:repeat>
-            <fr:button id="focus1">
+            <xf:trigger id="focus1">
                 <xf:label>Focus on input in 4th tab</xf:label>
                 <xf:setfocus ev:event="DOMActivate" control="my-input"/>
-            </fr:button>
-            <fr:button id="focus2">
+            </xf:trigger>
+            <xf:trigger id="focus2">
                 <xf:label>Focus on 4th tab</xf:label>
                 <xf:setfocus ev:event="DOMActivate" control="tab-4"/>
-            </fr:button>
+            </xf:trigger>
         </xh:fieldset>
 
         <fr:tabview id="tabview">

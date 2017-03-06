@@ -60,21 +60,21 @@
                         <xxf:hide ev:event="DOMActivate" dialog="fr-dialog-editor-dialog"/>
                         <!-- Read-write: OK / Cancel buttons -->
                         <xf:group ref=".[readonly = 'false']">
-                            <fr:button class="fr-dialog-editor-positive" id="fr-dialog-editor-positive">
+                            <xf:trigger class="fr-dialog-editor-positive" id="fr-dialog-editor-positive">
                                 <xf:label>OK</xf:label>
                                 <xf:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
                                     <xf:property name="fr-text" value="text"/>
                                 </xf:dispatch>
-                            </fr:button>
-                            <fr:button class="fr-dialog-editor-negative" id="fr-dialog-editor-negative">
+                            </xf:trigger>
+                            <xf:trigger class="fr-dialog-editor-negative" id="fr-dialog-editor-negative">
                                 <xf:label>Cancel</xf:label>
-                            </fr:button>
+                            </xf:trigger>
                         </xf:group>
                         <!-- Readonly: just Cancel button -->
                         <xf:group ref=".[readonly = 'true']" id="fr-dialog-editor-readonly">
-                            <fr:button class="fr-dialog-editor-close" id="fr-dialog-editor-close">
+                            <xf:trigger class="fr-dialog-editor-close" id="fr-dialog-editor-close">
                                 <xf:label>Close</xf:label>
-                            </fr:button>
+                            </xf:trigger>
                         </xf:group>
                     </xf:group>
                 </xh:div>
@@ -98,9 +98,9 @@
                             <xf:property name="fr-callback-id" value="event('xxf:absolute-targetid')"/>
                         </xf:dispatch>
                         <xf:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
-                        <fr:button id="open" class="fr-dialog-editor-open-{if ($readonly) then 'view' else 'edit'}">
+                        <xf:trigger id="open" class="fr-dialog-editor-open-{if ($readonly) then 'view' else 'edit'}">
                             <xf:label value="if ($readonly) then 'View' else 'Edit'"/>
-                        </fr:button>
+                        </xf:trigger>
                     </xf:group>
                 </xf:group>
             </xf:group>

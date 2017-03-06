@@ -35,14 +35,14 @@
         <fr:accordion id="my-accordion" class="fr-accordion-lnf">
             <fr:case selected="false" id="message-action">
                 <fr:label>Message</fr:label>
-                <fr:button>
+                <xf:trigger>
                     <xf:label>Save, failure</xf:label>
                     <xf:message ev:event="DOMActivate">Document could not be saved.</xf:message>
-                </fr:button>
-                <fr:button>
+                </xf:trigger>
+                <xf:trigger>
                     <xf:label>Save, success</xf:label>
                     <xf:message ev:event="DOMActivate">The document was saved.</xf:message>
-                </fr:button>
+                </xf:trigger>
             </fr:case>
             <fr:case selected="false" id="dialog-section">
                 <fr:label>Dialog</fr:label>
@@ -60,22 +60,22 @@
                             </xf:repeat>
                         </xh:table>
                     </xh:div>
-                    <fr:button id="dialog-close">
+                    <xf:trigger id="dialog-close">
                         <xf:label>Close</xf:label>
                         <xxf:hide ev:event="DOMActivate" dialog="dialog"/>
-                    </fr:button>
+                    </xf:trigger>
                 </xxf:dialog>
-                <fr:button>
+                <xf:trigger>
                     <xf:label>Show, initial</xf:label>
                     <xxf:show ev:event="DOMActivate" dialog="dialog"/>
-                </fr:button>
-                <fr:button>
+                </xf:trigger>
+                <xf:trigger>
                     <xf:label>Show, new</xf:label>
                     <xf:action ev:event="DOMActivate">
                         <xf:insert context="." origin="xf:element('dialog-message', 'This is the new message you will see/hear.')"/>
                         <xxf:show dialog="dialog"/>
                     </xf:action>
-                </fr:button>
+                </xf:trigger>
             </fr:case>
         </fr:accordion>
     </xh:body>

@@ -11,7 +11,7 @@
     <xh:head>
         <xh:title>External validation</xh:title>
         <xf:model>
-            
+
             <xf:instance id="user-info">
                 <user-info>
                     <first-name>Tom</first-name>
@@ -48,14 +48,14 @@
                     <xf:dispatch name="fr-update" targetid="error-summary"/>
                 </xf:action>
             </xf:submission>
-            
+
         </xf:model>
         <xh:style type="text/css">
             .fields .xforms-alert.xforms-active { background-image: url('../../../apps/fr/style/images/silk/bullet_red.png') }
 
             .fields .xforms-control { line-height: 2.5em; }
             .fields .xforms-label { display: inline-block; width: 10em; }
-            
+
             .buttons { margin-top: 2em; }
             .buttons .xbl-fr-button { line-height: 1em; }
             .buttons .xbl-fr-button img { margin-right: .3em; }
@@ -89,25 +89,25 @@
         </xf:group>
 
         <xh:div class="buttons">
-            <fr:button>
+            <xf:trigger>
                 <xf:label>
                     <xh:img src="/apps/fr/style/images/silk/disk.png"/>
                     <xh:span>Save</xh:span>
                 </xf:label>
                 <xf:send ev:event="DOMActivate" submission="validation-submission"/>
-            </fr:button>
-            <fr:button>
+            </xf:trigger>
+            <xf:trigger>
                 <xf:label>
                     <xh:span>Clear</xh:span>
                 </xf:label>
                 <xf:dispatch ev:event="DOMActivate" name="fr-clear" targetid="error-summary"/>
-            </fr:button>
-            <fr:button>
+            </xf:trigger>
+            <xf:trigger>
                 <xf:label>
                     <xh:span>Update</xh:span>
                 </xf:label>
                 <xf:dispatch ev:event="DOMActivate" name="fr-update" targetid="error-summary"/>
-            </fr:button>
+            </xf:trigger>
         </xh:div>
 
         <fr:error-summary id="error-summary-incremental" observer="form-group">

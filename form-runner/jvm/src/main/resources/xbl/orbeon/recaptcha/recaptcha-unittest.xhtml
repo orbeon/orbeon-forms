@@ -51,10 +51,10 @@
                         <xf:toggle case="failure-case"/>
                     </xf:action>
                 </fr:recaptcha>
-                <fr:button>
+                <xf:trigger>
                     <xf:label>Verify</xf:label>
                     <xf:dispatch ev:event="DOMActivate" targetid="recaptcha" name="fr-verify"/>
-                </fr:button>
+                </xf:trigger>
             </xf:case>
             <xf:case id="success-case">
                 Yes, correct! Wasn't that fun? Yep?<xh:br/>

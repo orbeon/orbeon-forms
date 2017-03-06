@@ -46,47 +46,47 @@
     <xh:body>
         <xh:fieldset>
             <xh:legend>Relevant / readonly</xh:legend>
-            <fr:button id="toggle-relevant">
+            <xf:trigger id="toggle-relevant">
                 <xf:label>Toggle relevant</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
-            </fr:button>
-            <fr:button id="toggle-readonly">
+            </xf:trigger>
+            <xf:trigger id="toggle-readonly">
                 <xf:label>Toggle readonly</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
-            </fr:button>
-            <fr:button id="trigger-full-update">
+            </xf:trigger>
+            <xf:trigger id="trigger-full-update">
                 <xf:label>Trigger full update</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="trigger-full-update-increment" value=". + 1"/>
-            </fr:button>
-            <fr:button ref="button" id="my-button-normal" tabindex="42">
+            </xf:trigger>
+            <xf:trigger ref="button" id="my-button-normal" tabindex="42">
                 <xf:label>Normal button</xf:label>
-            </fr:button>
-            <fr:button ref="button" id="my-button-empty-label">
+            </xf:trigger>
+            <xf:trigger ref="button" id="my-button-empty-label">
                 <xf:label/>
-            </fr:button>
+            </xf:trigger>
             <xf:group id="full-update" xxf:update="full">
                 <xf:output value="trigger-full-update-increment" style="display: none"/>
-                <fr:button ref="button" id="my-button-full-update">
+                <xf:trigger ref="button" id="my-button-full-update">
                     <xf:label>Full update button</xf:label>
-                </fr:button>
+                </xf:trigger>
             </xf:group>
             <xf:group ref="button">
-                <fr:button id="my-button-in-group">
+                <xf:trigger id="my-button-in-group">
                     <xf:label>Button in bound group</xf:label>
-                </fr:button>
+                </xf:trigger>
             </xf:group>
         </xh:fieldset>
         <xh:fieldset>
             <xh:legend>Component initialization inside repeat</xh:legend>
             <xf:group xxf:update="full">
-                <fr:button id="init-add">
+                <xf:trigger id="init-add">
                     <xf:label>Add</xf:label>
                     <xf:insert ev:event="DOMActivate" ref="component-init/button" position="before" at="1"/>
-                </fr:button>
+                </xf:trigger>
                 <xf:repeat ref="component-init/button">
-                    <fr:button ref="." id="init-in-repeat">
+                    <xf:trigger ref="." id="init-in-repeat">
                         <xf:label>In repeat</xf:label>
-                    </fr:button>
+                    </xf:trigger>
                 </xf:repeat>
             </xf:group>
         </xh:fieldset>

@@ -43,10 +43,10 @@
         <xf:input id="count" ref="count"/>
         <xf:repeat ref="enabled">
             <xh:div>
-                <fr:button>
+                <xf:trigger>
                     <xf:label>Toggle level <xf:output value="@level"/><xf:output value="if (@position) then concat(' position ', @position) else ''"/></xf:label>
                     <xf:setvalue ev:event="DOMActivate" ref="." value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
+                </xf:trigger>
                 <xf:output value="if (. = 'true') then 'Shown' else 'Hidden'"/>
                 <xf:input id="level-enabled" ref="."/>
             </xh:div>

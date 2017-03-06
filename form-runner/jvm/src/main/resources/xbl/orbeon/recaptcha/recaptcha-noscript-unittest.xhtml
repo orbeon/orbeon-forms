@@ -77,33 +77,33 @@
                         <xf:toggle case="failure-case"/>
                     </xf:action>
                 </fr:recaptcha>
-                <fr:button id="verify-button">
+                <xf:trigger id="verify-button">
                     <xf:label>Verify</xf:label>
                     <xf:dispatch ev:event="DOMActivate" targetid="recaptcha" name="fr-verify"/>
-                </fr:button>
+                </xf:trigger>
             </xf:case>
             <xf:case id="success-case">
                 Yes, correct! Wasn't that fun? Yep?<xh:br/>
                 Then let's try again:<xh:br/>
-                <fr:button>
+                <xf:trigger>
                     <xf:label>Try again</xf:label>
                     <xf:action ev:event="DOMActivate">
                         <xf:dispatch targetid="recaptcha" name="fr-reload"/>
                         <xf:toggle ev:event="DOMActivate" case="recaptcha-case"/>
                     </xf:action>
-                </fr:button>
+                </xf:trigger>
             </xf:case>
             <xf:case id="failure-case">
                 Oops, something went wrong.<xh:br/>
                 The error code is: <xf:output value="instance('ui')/error-code" id="error-code"/>.<xh:br/>
                 Let's try to give it another shot:<xh:br/>
-                <fr:button>
+                <xf:trigger>
                     <xf:label>Try again</xf:label>
                     <xf:action ev:event="DOMActivate">
                         <xf:dispatch targetid="recaptcha" name="fr-reload"/>
                         <xf:toggle ev:event="DOMActivate" case="recaptcha-case"/>
                     </xf:action>
-                </fr:button>
+                </xf:trigger>
             </xf:case>
         </xf:switch>
 

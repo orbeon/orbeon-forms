@@ -94,19 +94,19 @@
                     <xf:label>Excerpt</xf:label>
                 </fr:dialog-editor>
                 <fr:spell-checker ref="text" id="my-spell-checker"/>
-                <fr:button id="toggle-readonly">
+                <xf:trigger id="toggle-readonly">
                     <xf:label>Toggle readonly</xf:label>
                     <xf:setvalue ev:event="DOMActivate" ref="text/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
-                <fr:button id="toggle-relevant">
+                </xf:trigger>
+                <xf:trigger id="toggle-relevant">
                     <xf:label>Toggle relevant</xf:label>
                     <xf:setvalue ev:event="DOMActivate" ref="text/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
+                </xf:trigger>
             </xh:div>
         </xf:repeat>
 
         <xh:div class="add">
-            <fr:button id="add">
+            <xf:trigger id="add">
                 <xf:label>Add</xf:label>
                 <xf:action ev:event="DOMActivate">
                     <xf:insert ref="line" origin="xf:element('line',
@@ -115,7 +115,7 @@
                             xf:attribute('relevant', 'true')
                         )))"/>
                 </xf:action>
-            </fr:button>
+            </xf:trigger>
         </xh:div>
     </xh:body>
 </xh:html>

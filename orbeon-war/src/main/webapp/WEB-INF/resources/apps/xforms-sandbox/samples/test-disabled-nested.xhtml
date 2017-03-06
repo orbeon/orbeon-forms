@@ -214,12 +214,12 @@
                     <xf:setvalue ref="$enabled" value="if (. = 'true') then 'false' else 'true'"/>
                     <xf:toggle case="{$enabled/@section}-{if ($enabled = 'true') then 'enabled' else 'disabled'}"/>
                 </xf:action>
-                <fr:button id="toggle-outer">
+                <xf:trigger id="toggle-outer">
                     <xf:label>Toggle outer</xf:label>
-                </fr:button>
-                <fr:button id="toggle-inner">
+                </xf:trigger>
+                <xf:trigger id="toggle-inner">
                     <xf:label>Toggle inner</xf:label>
-                </fr:button>
+                </xf:trigger>
             </xf:group>
         </xh:fieldset>
         <xh:fieldset>
@@ -236,9 +236,9 @@
                 <xf:input ref="input" id="group-nested-outer-input-2">
                     <xf:label>Group nested outer 2</xf:label>
                 </xf:input>
-                <fr:button id="group-nested-outer-button">
+                <xf:trigger id="group-nested-outer-button">
                     <xf:label>Button</xf:label>
-                </fr:button>
+                </xf:trigger>
             </xf:group>
         </xh:fieldset>
         <xh:fieldset>
@@ -264,9 +264,9 @@
                             </xf:input>
                         </xh:td>
                         <xh:td>
-                            <fr:button id="group-flat-outer-button">
+                            <xf:trigger id="group-flat-outer-button">
                                 <xf:label>Button</xf:label>
-                            </fr:button>
+                            </xf:trigger>
                         </xh:td>
                     </xf:group>
                 </xh:tr>
@@ -286,9 +286,9 @@
                 <xf:input ref="instance()/input" id="repeat-iteration-outer-input-2">
                     <xf:label>Repeat iteration outer 2</xf:label>
                 </xf:input>
-                <fr:button id="repeat-iteration-outer-button">
+                <xf:trigger id="repeat-iteration-outer-button">
                     <xf:label>Button</xf:label>
-                </fr:button>
+                </xf:trigger>
             </xf:repeat>
         </xh:fieldset>
         <xh:fieldset>
@@ -305,9 +305,9 @@
                 <xf:input ref="instance()/input" id="repeat-repeat-outer-input-2">
                     <xf:label>Repeat repeat outer 2</xf:label>
                 </xf:input>
-                <fr:button id="repeat-repeat-outer-button">
+                <xf:trigger id="repeat-repeat-outer-button">
                     <xf:label>Button</xf:label>
-                </fr:button>
+                </xf:trigger>
             </xf:repeat>
         </xh:fieldset>
         <xh:fieldset>
@@ -329,9 +329,9 @@
                     <xf:input ref="input" id="case-outer-input-2">
                         <xf:label>Case outer 2</xf:label>
                     </xf:input>
-                    <fr:button id="case-outer-button">
+                    <xf:trigger id="case-outer-button">
                         <xf:label>Button</xf:label>
-                    </fr:button>
+                    </xf:trigger>
                 </xf:case>
             </xf:switch>
         </xh:fieldset>

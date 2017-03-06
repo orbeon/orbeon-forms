@@ -95,17 +95,17 @@
             <xh:div class="buttons">
                 <xf:group>
                     <xf:delete ev:event="DOMActivate" ref="*"/>
-                    <fr:button>
+                    <xf:trigger>
                         <xf:label>OK</xf:label>
                         <xf:action ev:event="DOMActivate">
                             <xf:insert ref="instance('company')/employees/employee[@id = instance('edit-employee')/@id]"
                                 origin="instance('edit-employee')"/>
                             <xf:delete ref="(instance('company')/employees/employee[@id = instance('edit-employee')/@id])[1]"/>
                         </xf:action>
-                    </fr:button>
-                    <fr:button>
+                    </xf:trigger>
+                    <xf:trigger>
                         <xf:label>Cancel</xf:label>
-                    </fr:button>
+                    </xf:trigger>
                 </xf:group>
             </xh:div>
         </xf:group>

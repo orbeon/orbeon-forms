@@ -47,14 +47,14 @@
         </xh:style>
     </xh:head>
     <xh:body>
-        <fr:button id="copy-to-input">
+        <xf:trigger id="copy-to-input">
             <xf:label>Copy to input</xf:label>
             <xf:setvalue ev:event="DOMActivate" ref="input" value="../date-picker"/>
-        </fr:button>
-        <fr:button id="copy-to-date-picker">
+        </xf:trigger>
+        <xf:trigger id="copy-to-date-picker">
             <xf:label>Copy to date picker</xf:label>
             <xf:setvalue ev:event="DOMActivate" ref="date-picker" value="../input"/>
-        </fr:button>
+        </xf:trigger>
         <xh:div>
             <fr:date-picker ref="date-picker" id="date-picker">
                 <xf:label>Date picker:</xf:label>

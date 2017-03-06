@@ -58,10 +58,10 @@
     <xh:body>
         <xh:fieldset>
             <xh:legend>Full update on group around tr</xh:legend>
-            <fr:button id="toggle-two">
+            <xf:trigger id="toggle-two">
                 <xf:label>Toggle two</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="instance('ui')/show-two" value="if (. = 'true') then 'false' else 'true'"/>
-            </fr:button>
+            </xf:trigger>
             <xh:div>
                 <xh:table>
                     <xf:repeat ref="instance('numbers')/number">
@@ -84,10 +84,10 @@
         </xh:fieldset>
         <xh:fieldset>
             <xh:legend>Full update on case</xh:legend>
-            <fr:button id="increment-case-value">
+            <xf:trigger id="increment-case-value">
                 <xf:label>Increment case value</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="case-value" value=". + 1"/>
-            </fr:button>
+            </xf:trigger>
             <xh:div>
                 <xf:switch>
                     <xf:case id="case-1" xxf:update="full">
@@ -98,10 +98,10 @@
         </xh:fieldset>
         <xh:fieldset>
             <xh:legend>Full update on repeat</xh:legend>
-            <fr:button id="toggle-one">
+            <xf:trigger id="toggle-one">
                 <xf:label>Show one</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="show-one" value="if (. = 'true') then 'false' else 'true'"/>
-            </fr:button>
+            </xf:trigger>
             <xh:div>
                 <xf:repeat ref="instance('numbers')/number[if (instance('ui')/show-one = 'false') then @value != 1 else true()]"  xxf:update="full" id="repeat-update-full">
                     <xf:output value="." id="repeat-value"/>
@@ -123,14 +123,14 @@
         </xh:fieldset>
         <xh:fieldset>
             <xh:legend>Resetting server values</xh:legend>
-            <fr:button id="server-value-true">
+            <xf:trigger id="server-value-true">
                 <xf:label>Set to true</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="server-value">true</xf:setvalue>
-            </fr:button>
-            <fr:button id="server-value-false">
+            </xf:trigger>
+            <xf:trigger id="server-value-false">
                 <xf:label>Set to false</xf:label>
                 <xf:setvalue ev:event="DOMActivate" ref="server-value">false</xf:setvalue>
-            </fr:button>
+            </xf:trigger>
             <xf:group id="server-value-group" xxf:update="full">
                 <xf:input ref="server-value" id="server-value-input"/>
             </xf:group>
@@ -138,10 +138,10 @@
         </xh:fieldset>
         <xh:fieldset>
             <xh:legend>Dialog initialization</xh:legend>
-            <fr:button id="add-iteration">
+            <xf:trigger id="add-iteration">
                 <xf:label>Add iteration</xf:label>
                 <xf:insert ev:event="DOMActivate" ref="*" origin="xf:element('dialog')"/>
-            </fr:button>
+            </xf:trigger>
             <xh:div>
                 <xf:group id="dialog-container" xxf:update="full">
                     <xf:repeat ref="dialog">

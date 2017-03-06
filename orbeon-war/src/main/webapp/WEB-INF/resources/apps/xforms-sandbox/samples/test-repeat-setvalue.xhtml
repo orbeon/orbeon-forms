@@ -57,10 +57,10 @@
         </xh:script>
     </xh:head>
     <xh:body>
-        <fr:button id="add">
+        <xf:trigger id="add">
             <xf:label>Add</xf:label>
             <xf:insert ev:event="DOMActivate" ref="name"/>
-        </fr:button>
+        </xf:trigger>
         <xf:repeat ref="name">
             <xf:input id="name" ref="."/>
         </xf:repeat>

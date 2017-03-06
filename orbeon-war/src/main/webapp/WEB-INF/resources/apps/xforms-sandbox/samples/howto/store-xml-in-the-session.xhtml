@@ -37,20 +37,20 @@
             <xf:input ref="instance('ui')/value">
                 <xf:label>Value:</xf:label>
             </xf:input>
-            <fr:button>
+            <xf:trigger>
                 <xf:label>Store value in session</xf:label>
                 <xf:action ev:event="DOMActivate">
                     <xf:insert context="." origin="xxf:set-session-attribute('session-howto', instance('ui'))"/>
                     <xf:toggle case="reload-page"/>
                 </xf:action>
-            </fr:button>
-            <fr:button>
+            </xf:trigger>
+            <xf:trigger>
                 <xf:label>Reset content of session</xf:label>
                 <xf:action ev:event="DOMActivate">
                     <xf:insert context="." origin="xxf:set-session-attribute('session-howto', ())"/>
                     <xf:toggle case="reload-page"/>
                 </xf:action>
-            </fr:button>
+            </xf:trigger>
         </xh:div>
         <xh:div>
             <xf:switch>

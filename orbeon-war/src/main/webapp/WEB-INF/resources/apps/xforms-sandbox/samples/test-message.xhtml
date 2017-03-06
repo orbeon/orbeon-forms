@@ -37,12 +37,12 @@
         <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-message.js"/>
     </xh:head>
     <xh:body>
-        <fr:button id="show-messages">
+        <xf:trigger id="show-messages">
             <xf:label>Show messages</xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:message>Message 3</xf:message>
                 <xf:message>Message 4</xf:message>
             </xf:action>
-        </fr:button>
+        </xf:trigger>
     </xh:body>
 </xh:html>

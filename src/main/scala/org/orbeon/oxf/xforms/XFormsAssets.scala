@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import spray.json._
 
@@ -27,7 +28,7 @@ case class AssetPath(full: String, minOpt: Option[String]) {
 object AssetPath {
 
   def apply(full: String, hasMin: Boolean): AssetPath =
-    AssetPath(full, Some(minFromFull(full)))
+    AssetPath(full, hasMin option minFromFull(full))
 
   def minFromFull(full: String): String =
     findExtension(full) match {

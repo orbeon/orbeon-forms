@@ -86,13 +86,16 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
     // Stylesheets
     val attributesImpl = new AttributesImpl
-    outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, styles, baselineStyles)
+
+
+
+    outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, styles, baselineStyles)
 
     // Scripts
     if (! handlerContext.isNoScript) {
 
       // Main JavaScript resources
-      outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, scripts, baselineScripts)
+      outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, scripts, baselineScripts)
 
       // Configuration properties
       outputConfigurationProperties(xhtmlPrefix, isVersionedResources)
@@ -137,6 +140,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     xhtmlPrefix       : String,
     minimal           : Boolean,
     attributesImpl    : AttributesImpl,
+    assets            : XFormsAssets,
     headElements      : List[HeadElement],
     baselineResources : List[String])(implicit
     helper            : XMLReceiverHelper
@@ -158,7 +162,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // Output all CSS
     XBLAssets.outputResources(
       outputCSSElement,
-      XFormsAssets.fromJSONProperty.css,
+      assets.css,
       headElements,
       baselineResources,
       minimal
@@ -169,6 +173,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     xhtmlPrefix       : String,
     minimal           : Boolean,
     attributesImpl    : AttributesImpl,
+    assets            : XFormsAssets,
     headElements      : List[HeadElement],
     baselineResources : List[String])(implicit
     helper            : XMLReceiverHelper
@@ -185,7 +190,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     // Output all JS
     XBLAssets.outputResources(
       outputJSElement,
-      XFormsAssets.fromJSONProperty.js,
+      assets.js,
       headElements,
       baselineResources,
       minimal

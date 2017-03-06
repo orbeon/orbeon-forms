@@ -66,10 +66,12 @@ object XFormsAssets {
     }
   }
 
+  def assetsFromString(json: String): XFormsAssets = assetsFromJSON(json.parseJson)
+
   private def properties = Properties.instance.getPropertySet
 
   def fromJSONProperty: XFormsAssets = {
     val property = properties.getPropertyOrThrow(AssetsBaselineProperty)
-    property.associatedValue(v ⇒ assetsFromJSON(v.value.toString.parseJson))
+    property.associatedValue(v ⇒ assetsFromString(v.value.toString))
   }
 }

@@ -389,7 +389,9 @@
             xxf:xforms11-switch="false"
             xxf:xpath-analysis="true"
             xxf:label.appearance="{$label-appearance}"
-            xxf:hint.appearance="{$hint-appearance}">
+            xxf:hint.appearance="{$hint-appearance}"
+            xxf:assets.baseline.excludes=""
+        >
 
             <!-- Don't enable client events filtering for FB -->
             <xsl:if test="$is-form-builder">

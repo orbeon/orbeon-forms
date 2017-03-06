@@ -133,6 +133,8 @@ public class XFormsProperties {
 
     public static final String SANITIZE_PROPERTY = "sanitize";
 
+    public static final String ASSETS_BASELINE_EXCLUDES_PROPERTY = "assets.baseline.excludes";
+
     public static class PropertyDefinition {
 
         public final String name;
@@ -230,6 +232,7 @@ public class XFormsProperties {
             new PropertyDefinition(CALCULATE_ANALYSIS_PROPERTY, false, false),
             new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
             new PropertyDefinition(SANITIZE_PROPERTY, "", false),
+            new PropertyDefinition(ASSETS_BASELINE_EXCLUDES_PROPERTY, "", false),
 
             // Properties to propagate to the client
             new PropertyDefinition(RETRY_DELAY_INCREMENT, 5000, true),

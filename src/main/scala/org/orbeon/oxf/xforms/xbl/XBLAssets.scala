@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.AssetPath
+import org.orbeon.oxf.xforms.{AssetPath, XFormsAssets}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.{breakOut, mutable}
@@ -66,7 +66,7 @@ object XBLAssets {
   // Output baseline, remaining, and inline resources
   def outputResources(
     outputElement : (Option[String], Option[String], Option[String]) ⇒ Unit,
-    builtin       : Seq[AssetPath],
+    builtin       : List[AssetPath],
     headElements  : Iterable[HeadElement],
     xblBaseline   : Iterable[String],
     minimal       : Boolean

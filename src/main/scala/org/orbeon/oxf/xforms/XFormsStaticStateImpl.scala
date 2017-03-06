@@ -71,6 +71,16 @@ class XFormsStaticStateImpl(
 
   lazy val sanitizeInput           = StringReplacer(staticStringProperty(P.SANITIZE_PROPERTY))
 
+  lazy val assets: XFormsAssets = {
+
+    val excludesProp = staticStringProperty(P.ASSETS_BASELINE_EXCLUDES_PROPERTY)
+
+    def update(assets: XFormsAssets, exclude: String): XFormsAssets =
+      assets.copy(css = assets.css.filter(_.full != exclude), js = assets.js.filter(_.full != exclude))
+
+    excludesProp.splitTo[List]().foldLeft(XFormsAssets.fromJSONProperty)(update)
+  }
+
   // This is a bit tricky because during analysis, XPath expression require the function library. This means this
   // property cannot use `nonDefaultPropertiesOnly` below, which collects all non-default properties and attempts to
   // evaluates AVT properties, which themselves require finding the default model, which is not yet ready! So we

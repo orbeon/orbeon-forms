@@ -40,6 +40,7 @@ trait XFormsStaticState {
 
   def functionLibrary: FunctionLibrary
   def sanitizeInput: String ⇒ String
+  def assets: XFormsAssets
 
   def staticProperty       (name: String): Any
   def staticStringProperty (name: String): String

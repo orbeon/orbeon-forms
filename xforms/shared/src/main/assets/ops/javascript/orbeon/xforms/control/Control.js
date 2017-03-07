@@ -54,17 +54,6 @@
     Control.prototype.change = function() {};
 
     /**
-     * Returns an array of the elements with the given class name that are inside this control. If there are no
-     * such elements, an empty array is returned.
-     *
-     * @param   {String}            className
-     * @return  {Array.<Element>}   Elements with the given class name
-     */
-    Control.prototype.getElementsByClassName = function(className) {
-        return $(this.container).find("." + className).toArray();
-    };
-
-    /**
      * Returns the first element with the given class name that are inside this control. If there are no
      * such elements, undefined is returned.
      *
@@ -72,7 +61,7 @@
      * @return  {?Element}   Elements with the given class name
      */
     Control.prototype.getElementByClassName = function(className) {
-        return _.first(this.getElementsByClassName(className));
+        return $(this.container).find("." + className).first().toArray();
     };
 
     /**

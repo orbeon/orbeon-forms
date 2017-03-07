@@ -13,6 +13,8 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.EventNames._
+import org.orbeon.xforms.controls.Upload._
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
 
@@ -29,21 +31,9 @@ class ProgressBar(config: js.Object) extends js.Object {
 
 private object Upload {
 
-  val States                         = Set("empty", "progress", "file") // TODO: move to XForms defs, shared between client/server
-  val StateClassPrefix               = "xforms-upload-state-"           // TODO: move to XForms defs, shared between client/server
-  val XXFormsUploadProgressEventName = "xforms-upload-progress"         // TODO: move to XForms defs, shared between client/server
-  val XXFormsUploadCancelEventName   = "xxforms-upload-cancel"          // TODO: move to XForms defs, shared between client/server
-  val XXFormsUploadErrorEventName    = "xxforms-upload-error"           // TODO: move to XForms defs, shared between client/server
-  val ComponentSeparator             = "\u2261"                         // TODO: move to XForms defs, shared between client/server
-
-  val XFormsUploadProgressClass      = "xforms-upload-progress"
-  val XFormsUploadSelectClass        = "xforms-upload-select"
-  val XFormsUploadCancelClass        = "xforms-upload-cancel"
-
   def log(s: String) = () // println(s"Upload: $s")
 
   log(s"init object")
-
   Page.registerControlConstructor(() ⇒ new Upload, (e: HTMLElement) ⇒ $(e).hasClass("xforms-upload"))
 }
 
@@ -63,15 +53,15 @@ class Upload extends Control {
 
     log("init class")
 
-    if (getElementByClassName(XFormsUploadProgressClass).isEmpty) {
+    if (getElementByClassName(UploadProgressClass).isEmpty) {
 
       // Add markup to the DOM
       // TODO: i18n of "Cancel" link
-      val innerHtml = s"""<span class="$XFormsUploadProgressClass-bar"></span><a href="#" class="$XFormsUploadCancelClass">Cancel</a>"""
-      $(s"""<span class="$XFormsUploadProgressClass">$innerHtml</span>""").insertAfter(getElementByClassName(XFormsUploadSelectClass))
+      val innerHtml = s"""<span class="$UploadProgressClass-bar"></span><a href="#" class="$UploadCancelClass">Cancel</a>"""
+      $(s"""<span class="$UploadProgressClass">$innerHtml</span>""").insertAfter(getElementByClassName(UploadSelectClass))
 
       // Register listener on the cancel link
-      val cancelAnchor = getElementByClassName(XFormsUploadCancelClass)
+      val cancelAnchor = getElementByClassName(UploadCancelClass)
 
       $(cancelAnchor).on("click.orbeon", self.cancel _)
     }
@@ -96,7 +86,7 @@ class Upload extends Control {
   // server.
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
-      case "interrupted"                    ⇒ UploadServer.cancel(doAbort = true, XXFormsUploadErrorEventName); log("cancel")
+      case "interrupted"                    ⇒ UploadServer.cancel(doAbort = true, XXFormsUploadError); log("cancel")
       case _ if self.yuiProgressBar ne null ⇒ self.yuiProgressBar.set("value", 10 + 110 * received / expected); log(s"update progress ${100 * received / expected}")
       case _ ⇒
     }
@@ -125,7 +115,7 @@ class Upload extends Control {
   def cancel(event: js.Object): Unit = {
     log("cancel")
     Event.preventDefault(event)
-    UploadServer.cancel(doAbort = true, XXFormsUploadCancelEventName)
+    UploadServer.cancel(doAbort = true, XXFormsUploadCancel)
   }
 
   // Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"
@@ -144,7 +134,7 @@ class Upload extends Control {
 
     if (state == "progress") {
       // Create or recreate progress bar
-      val progressBarSpan = getElementByClassName(s"$XFormsUploadProgressClass-bar").get
+      val progressBarSpan = getElementByClassName(s"$UploadProgressClass-bar").get
       progressBarSpan.innerHTML = ""
 
       self.yuiProgressBar = new ProgressBar(
@@ -169,7 +159,7 @@ class Upload extends Control {
 
     log(s"clear")
 
-    val oldInputElement = getElementByClassName(XFormsUploadSelectClass).get.asInstanceOf[HTMLInputElement]
+    val oldInputElement = getElementByClassName(UploadSelectClass).get.asInstanceOf[HTMLInputElement]
 
     // TODO: Would be good to copy attributes generically.
     val newInputElement =

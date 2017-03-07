@@ -156,9 +156,6 @@ class Control extends js.Object {
   // Return the current value of the control
   def getValue(): String = js.native
 
-  // Return elements with the given class name that are inside this control
-  def getElementsByClassName(className: String): js.Array[Element] = js.native
-
   // Returns the first element with the given class name that are inside this control
   def getElementByClassName(className: String): js.UndefOr[Element] = js.native
 }

@@ -30,17 +30,11 @@ object UploadServer {
 
   val uploadEventQueue = new ExecutionQueue(asyncUploadRequestSetPromise)
 
-  // While an upload is in progress, the YUI object for that connection
-  var yuiConnectionOpt: Option[js.Object] = None
-
-  // While an upload is in progress, the event for the field being uploaded
-  var processingEventOpt: Option[UploadEvent] = None
-
-  // While an upload is in progress, the events for the fields that are left to be uploaded
-  var remainingEvents: List[UploadEvent] = Nil
-
-  // While an upload is in progress, call-back function when we are done processing all the events
-  var executionQueuePromiseOpt: Option[Promise[Unit]] = None
+  // While an upload is in progress:
+  var yuiConnectionOpt         : Option[js.Object]     = None // connection object
+  var processingEventOpt       : Option[UploadEvent]   = None // event for the field being uploaded
+  var remainingEvents          : List[UploadEvent]     = Nil  // events for the fields that are left to be uploaded
+  var executionQueuePromiseOpt : Option[Promise[Unit]] = None // promise to complete when we are done processing all events
 
   // Method called by YUI when the upload ends successfully.
   private def uploadSuccess(xhr: XMLHttpRequest) = {
@@ -118,29 +112,20 @@ object UploadServer {
 
       import org.scalajs.dom.ext._
 
-      // Disabling fields other than the one we want to upload
-      val disabledElems = {
+      val newlyDisabledElems = {
 
-        // NOTE: Don't compare element id but name, as id might be prefixed in portlet environment.
-        def isUuidInput(e: html.Input) =
-          e.name == "$uuid"
+        def isUuidInput (e: html.Input) = e.name == "$uuid"                   // use `name` as `id` might be prefixed when embedding
+        def isFieldset  (e: html.Input) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables all nested controls
+        def isThisUpload(e: html.Input) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(processingEvent.upload.container, e)
 
-        def isThisUpload(e: html.Input) =
-          $(e).hasClass(controls.Upload.UploadSelectClass)  &&
-          $.contains(processingEvent.upload.container, e)
-
-        // NOTE: Skip fieldsets, as disabling them disables all the elements inside the fieldset.
-        def isFieldset(e: html.Input) =
-          e.tagName.toLowerCase == "fieldset"
-
-        val inputElemsIt = processingEvent.form.elements.iterator collect { case e: html.Input ⇒ e }
-
-        inputElemsIt filterNot { e ⇒
-          e.disabled.toOption.contains(true) || isUuidInput(e) || isThisUpload(e) || isFieldset(e)
+        processingEvent.form.elements.iterator collect {
+          case e: html.Input ⇒ e
+        } filterNot { e ⇒
+          e.disabled.toOption.contains(true) || isUuidInput(e) || isFieldset(e) || isThisUpload(e)
         } toList
       }
 
-      disabledElems foreach (_.disabled = true)
+      newlyDisabledElems foreach (_.disabled = true)
 
       // Trigger actual upload through a form POST and start asking server for progress
       YUIConnect.setForm(processingEvent.form, isUpload = true, secureUri = true)
@@ -164,8 +149,7 @@ object UploadServer {
 
       askForProgressUpdate()
 
-      // Enable the controls we previously disabled
-      disabledElems foreach (_.disabled = false)
+      newlyDisabledElems foreach (_.disabled = false)
   }
 
   /**
@@ -211,9 +195,8 @@ object UploadServer {
         js.Array(
           new AjaxServer.Event(
             new js.Object {
-              val targetId     = processingEvent.upload.container.id
-              val eventName    = event
-              //val showProgress = false // ?
+              val targetId  = processingEvent.upload.container.id
+              val eventName = event
             }
           )
         ),

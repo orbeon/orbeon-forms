@@ -18,6 +18,7 @@ object EventNames {
 
   private val Prefix = "xxforms-upload-"
 
+  val XXFormsUploadStart    = Prefix + "start"
   val XXFormsUploadProgress = Prefix + "progress"
   val XXFormsUploadCancel   = Prefix + "cancel"
   val XXFormsUploadError    = Prefix + "error"

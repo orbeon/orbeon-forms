@@ -16,9 +16,10 @@ val Slf4jVersion                  = "1.7.21"
 val HttpComponentsVersion         = "4.3.5"  // 4.5.2
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.0.1"  // 2.5
+val EnumeratumVersion             = "1.5.6"
 
 val CoreLibraryDependencies = Seq(
-  "com.beachape"              %% "enumeratum"          % "1.5.6",
+  "com.beachape"              %% "enumeratum"          % EnumeratumVersion,
   "org.parboiled"             %% "parboiled-scala"     % "1.1.7",
   "io.spray"                  %% "spray-json"          % "1.3.2",
   "org.scala-lang.modules"    %% "scala-xml"           % "1.0.6",
@@ -443,8 +444,8 @@ lazy val formRunnerJS = formRunner.js
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js",
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js",
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js" dependsOn "jquery-orbeon.js",
 
     // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
     unmanagedResourceDirectories in Test += sharedAssetsDir((baseDirectory in xformsJS).value),
@@ -504,8 +505,10 @@ lazy val formBuilderJS: Project = formBuilder.js
     skip in packageJSDependencies  := false,
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
 
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+
     persistLauncher     in Compile := true,
-    persistLauncher     in Test    := true,
+    persistLauncher     in Test    := false,
 
     testOptions         in Test    += Tests.Setup(() ⇒ println("Setup")),
     testOptions         in Test    += Tests.Cleanup(() ⇒ println("Cleanup")),
@@ -550,7 +553,9 @@ lazy val xformsJS: Project = xforms.js
 
     libraryDependencies            ++= Seq(
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
+      "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+      "com.beachape" %%% "enumeratum"     % EnumeratumVersion
+
     ),
 
     skip in packageJSDependencies  := false,
@@ -559,11 +564,11 @@ lazy val xformsJS: Project = xforms.js
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),
 
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js",
-    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js",
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js" dependsOn "jquery-orbeon.js",
 
     persistLauncher     in Compile := true,
-    persistLauncher     in Test    := true,
+    persistLauncher     in Test    := false,
 
 //    jsEnv                         := NodeJSEnv().value,
 

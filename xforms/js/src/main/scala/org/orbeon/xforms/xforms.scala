@@ -13,13 +13,20 @@
   */
 package org.orbeon.xforms
 
+import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
-import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.raw.{HTMLElement, XMLHttpRequest}
 import org.scalajs.jquery.JQueryCallback
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
 import scala.scalajs.js.|
+
+@JSName("ORBEON.xforms.Globals")
+@js.native
+object Globals extends js.Object {
+  val xformsServerUploadURL: js.Dictionary[String] = js.native
+}
 
 @js.native
 trait Item extends js.Object {
@@ -60,6 +67,22 @@ object XBL extends js.Object {
   def declareCompanion(name: String, companion: XBLCompanion): Unit = js.native
 }
 
+@JSName("YAHOO.util.Connect")
+@js.native
+object YUIConnect extends js.Object {
+  def setForm(formId: html.Form | String, isUpload: Boolean, secureUri: Boolean): Unit = js.native
+  def asyncRequest(method: String, uri: String, callback: YUICallback, postData: js.UndefOr[String] = js.undefined): js.Object = js.native
+  def abort(o: js.Object, callback: js.UndefOr[YUICallback] = js.undefined, isTimeout: js.UndefOr[Boolean] = js.undefined): Boolean = js.native
+}
+
+@ScalaJSDefined
+trait YUICallback extends js.Object {
+  val upload: js.Function
+  val failure: js.Function
+  val argument: js.Object
+}
+
+
 @js.native
 trait YUICustomEvent extends js.Object {
   def subscribe(fn: js.Function)   : Unit = js.native
@@ -81,7 +104,12 @@ object Events extends js.Object {
 @JSName("ORBEON.xforms.server.AjaxServer")
 @js.native
 object AjaxServer extends js.Object {
+  def handleResponseAjax(o: XMLHttpRequest): Unit = js.native
   def ajaxResponseReceived: JQueryCallback = js.native
+  def fireEvents(events: js.Array[Event], incremental: Boolean): Unit = js.native
+
+  @js.native
+  class Event(args: js.Object) extends js.Object
 }
 
 @JSName("ORBEON.xforms.Document")
@@ -90,26 +118,6 @@ object Document extends js.Object {
   def dispatchEvent(event: js.Object): Unit = js.native
   def setValue(controlIdOrElem: String | Element, newValue: String, form: js.UndefOr[Element] = js.undefined): Unit = js.native
   def getValue(controlIdOrElem: String | Element, form: js.UndefOr[Element] = js.undefined): js.UndefOr[String] = js.native
-}
-
-@JSName("ORBEON.util.ExecutionQueue")
-@js.native
-class ExecutionQueue extends js.Object {
-  def add(event: js.Object, waitMs: Int, waitType: Int): Unit = js.native
-}
-
-@JSName("ORBEON.util.ExecutionQueue")
-@js.native
-object ExecutionQueue extends js.Object {
-  val MIN_WAIT: Int = js.native
-  val MAX_WAIT: Int = js.native
-}
-
-@JSName("ORBEON.xforms.server.UploadServer")
-@js.native
-object UploadServer extends js.Object {
-  val uploadEventQueue: ExecutionQueue = js.native
-  def cancel(doAbort: Boolean, event: String): Unit = js.native
 }
 
 @JSName("ORBEON.util.Property")
@@ -143,9 +151,9 @@ class Control extends js.Object {
 
   val container: HTMLElement = js.native
 
-  def init(container: Element) : Unit    = js.native
-  def getForm()                : Element = js.native
-  def change()                 : Unit    = js.native
+  def init(container: Element) : Unit      = js.native
+  def getForm()                : html.Form = js.native
+  def change()                 : Unit      = js.native
 
   // Provide a new itemset for a control, if the control supports this.
   def setItemset(itemset: js.Any): Unit = js.native

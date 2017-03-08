@@ -13,11 +13,11 @@
   */
 package org.orbeon.builder
 
+import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalatest.FunSpec
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 class DemoFormBuilderClientTest extends FunSpec {
 
@@ -29,7 +29,6 @@ class DemoFormBuilderClientTest extends FunSpec {
   }
 
   describe("jQuery") {
-    val $ = g.$.asInstanceOf[org.scalajs.jquery.JQueryStatic]
     it ("must be in scope") {
       assert(! js.isUndefined($))
     }

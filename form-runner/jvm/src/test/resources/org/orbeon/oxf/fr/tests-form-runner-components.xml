@@ -138,13 +138,11 @@
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/fQuery.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/StringOps.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/util/ExecutionQueue.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/FiniteStateMachine.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/Server.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/server/UploadServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/LoadingIndicator.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/Document.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/Form.min.js" class="xforms-baseline"/>

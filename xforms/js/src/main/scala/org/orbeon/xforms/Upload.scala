@@ -72,12 +72,9 @@ class Upload extends Control {
   override def change(): Unit = {
     log("change → queueing")
     UploadServer.uploadEventQueue.add(
-      new js.Object {
-        val form   = self.getForm()
-        val upload = self
-      },
+      UploadEvent(self.getForm(), self),
       Properties.delayBeforeIncrementalRequest.get(),
-      ExecutionQueue.MIN_WAIT
+      ExecutionWait.MinWait
     )
   }
 

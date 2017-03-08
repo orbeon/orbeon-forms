@@ -61,7 +61,7 @@
      * @return  {?Element}   Elements with the given class name
      */
     Control.prototype.getElementByClassName = function(className) {
-        return $(this.container).find("." + className).first().toArray();
+        return $(this.container).find("." + className)[0];
     };
 
     /**

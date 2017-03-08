@@ -80,7 +80,7 @@
                                 <!-- XBL non-baseline control must be added -->
                                 <fr:currency ref="."/>
                                 <!-- XBL baseline control must not be added as it's already in the baseline -->
-                                <fr:button><xf:label/></fr:button>
+                                <fr:autocomplete ref="."/>
                             </xh:body>
                         </xh:html>
                     </p:input>
@@ -116,7 +116,6 @@
                 <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/button/assets/skins/sam/button.css"/>
                 <xh:script src="/ops/jquery/jquery-1.12.0.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/jquery/jquery-browser-mobile.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
@@ -165,8 +164,6 @@
                 <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/number/number.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/button/button.min.js"/>
-                <xh:script src="/xbl/orbeon/button/button.js"/>
                 <xh:script src="/xbl/orbeon/currency/currency.js"/>
             </xh:head>
         </output>

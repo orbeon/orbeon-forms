@@ -42,7 +42,7 @@
             <fb:display-name lang="es">Texto sobre Imagenz</fb:display-name>
             <fb:display-name lang="fi">Kuvakommentti</fb:display-name>
             <fb:display-name lang="fr">Annotation d'image</fb:display-name>
-            <fb:display-name lang="ru" only="true">[Image Annotation]</fb:display-name>
+            <fb:display-name lang="ru" todo="true">[Image Annotation]</fb:display-name>
             <fb:display-name lang="de">Bearbeitbares Bild</fb:display-name>
             <fb:display-name lang="it">Immagine modificabile</fb:display-name>
             <fb:display-name lang="sv">Noteringar till bild</fb:display-name>

@@ -26,6 +26,8 @@ object Dragula {
     g.dragula(initialContainers, options).asInstanceOf[Drake]
 }
 
+// TODO: Consider moving to trait with `js.UndefOr[Boolean] = js.undefined`, `val`s, see:
+// https://www.scala-js.org/news/2016/12/21/announcing-scalajs-0.6.14/
 @ScalaJSDefined
 abstract class DragulaOptions extends js.Object {
   def isContainer(el: Element)                                                 = false

@@ -89,6 +89,14 @@ trait YUICustomEvent extends js.Object {
   def unsubscribe(fn: js.Function) : Unit = js.native
 }
 
+@JSName("YAHOO.widget.ProgressBar")
+@js.native
+class ProgressBar(config: js.Object) extends js.Object {
+  def render(parent: Element, before: js.UndefOr[Element] = js.undefined): Unit = js.native
+  def set(key: String, value: Int): Unit = js.native
+  def get(key: String): js.Dynamic = js.native
+}
+
 @JSName("YAHOO.util.Event")
 @js.native
 object Event extends js.Object {

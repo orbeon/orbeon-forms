@@ -21,14 +21,6 @@ import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
 
-@JSName("YAHOO.widget.ProgressBar")
-@js.native
-class ProgressBar(config: js.Object) extends js.Object {
-  def render(parent: Element, before: js.UndefOr[Element] = js.undefined): Unit = js.native
-  def set(key: String, value: Int): Unit = js.native
-  def get(key: String): js.Dynamic = js.native
-}
-
 private object Upload {
 
   def log(s: String) = () // println(s"Upload: $s")
@@ -37,6 +29,7 @@ private object Upload {
   Page.registerControlConstructor(() ⇒ new Upload, (e: HTMLElement) ⇒ $(e).hasClass("xforms-upload"))
 }
 
+// Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 @ScalaJSDefined
 class Upload extends Control {
 

@@ -21,11 +21,9 @@ import scala.scalajs.js
 
 case class UploadEvent(form: html.Form, upload: Upload)
 
-// NOTES:
-//
-// - This got converted from JavaScript/CoffeeScript.
-// - There is no retry, see [#315398](https://goo.gl/pPByq).
-// - There is a bit too much state to our taste.
+// - Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
+// - We should move away from YUI's Connect for Ajax. Other enhancements are listed here:
+//   https://github.com/orbeon/orbeon-forms/issues/3150
 object UploadServer {
 
   val uploadEventQueue = new ExecutionQueue(asyncUploadRequestSetPromise)
@@ -60,10 +58,8 @@ object UploadServer {
     }
   }
 
-  /**
-   * Once we are done processing the events (either because the uploads have been completed or canceled), handle the
-   * remaining events.
-   */
+  // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
+  // remaining events.
   def continueWithRemainingEvents(): Unit = {
     currentEventOpt foreach (_.upload.uploadDone())
     yuiConnectionOpt = None
@@ -82,10 +78,8 @@ object UploadServer {
     promise.future
   }
 
-  /**
-   * Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
-   * the upload can be done.
-   */
+  // Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
+  // the upload can be done.
   private def asyncUploadRequest(events: List[UploadEvent]): Unit = events match {
 
     case Nil ⇒ throw new IllegalArgumentException

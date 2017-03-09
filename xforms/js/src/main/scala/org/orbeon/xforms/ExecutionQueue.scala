@@ -28,22 +28,18 @@ object ExecutionWait extends Enum[ExecutionWait] {
    case object MaxWait extends ExecutionWait
 }
 
-/**
- * Handle a queue of events to which events can be added, and where after a certain delay all the events are
- * executed at once.
- */
+// Handle a queue of events to which events can be added, and where after a certain delay all the events are
+// executed at once. Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
 
   private var waitingCompletion = false
   private var delayFunctions = 0
   private var events: List[T] = Nil
 
-  /**
-   * Add an event to the queue and executes all the events in the queue either:
-   *
-   * a. If waitType is MinWait, after the specified delay unless another event is added to the queue before that.
-   * b. If waitType is MaxWait, after the specified delay.
-   */
+  // Add an event to the queue and executes all the events in the queue either:
+  //
+  // a. If waitType is MinWait, after the specified delay unless another event is added to the queue before that.
+  // b. If waitType is MaxWait, after the specified delay.
   def add(event: T, waitMs: Int, waitType: ExecutionWait): Unit = {
     events ::= event
     if (! waitingCompletion) {

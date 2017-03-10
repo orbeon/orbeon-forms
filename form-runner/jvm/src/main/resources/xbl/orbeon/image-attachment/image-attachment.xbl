@@ -62,6 +62,33 @@
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xxf:size     ref="@size"      xxbl:scope="outer"/>
+
+                <!-- Retarget of upload events -->
+                <!-- NOTE: Duplicated logic in attachment.xbl -->
+                <xf:dispatch
+                    event="xxforms-upload-start xxforms-upload-cancel"
+                    targetid="fr-image-attachmentZ"
+                    name="{event('xxf:type')}"/>
+
+                <xf:dispatch
+                    event="xxforms-upload-done"
+                    targetid="fr-image-attachmentZ"
+                    name="{event('xxf:type')}">
+                    <xf:property name="file"           value="event('file')"/>
+                    <xf:property name="filename"       value="event('filename')"/>
+                    <xf:property name="content-type"   value="event('content-type')"/>
+                    <xf:property name="content-length" value="event('content-length')"/>
+                </xf:dispatch>
+
+                <xf:dispatch
+                    event="xxforms-upload-error"
+                    targetid="fr-image-attachmentZ"
+                    name="{event('xxf:type')}">
+                    <xf:property name="xxf:error-type" value="event('xxf:error-type')"/>
+                    <xf:property name="xxf:permitted"  value="event('xxf:permitted')"/>
+                    <xf:property name="xxf:actual"     value="event('xxf:actual')"/>
+                </xf:dispatch>
+
             </xf:upload>
             <xf:output mediatype="image/*" ref="xxf:binding('fr-image-attachment')[xxf:non-blank()]">
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>

@@ -78,6 +78,33 @@
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xxf:size     ref="@size"      xxbl:scope="outer"/>
+
+                <!-- Retarget of upload events -->
+                <!-- NOTE: Duplicated logic in image-attachment.xbl -->
+                <xf:dispatch
+                    event="xxforms-upload-start xxforms-upload-cancel"
+                    targetid="fr-attachment"
+                    name="{event('xxf:type')}"/>
+
+                <xf:dispatch
+                    event="xxforms-upload-done"
+                    targetid="fr-attachment"
+                    name="{event('xxf:type')}">
+                    <xf:property name="file"           value="event('file')"/>
+                    <xf:property name="filename"       value="event('filename')"/>
+                    <xf:property name="content-type"   value="event('content-type')"/>
+                    <xf:property name="content-length" value="event('content-length')"/>
+                </xf:dispatch>
+
+                <xf:dispatch
+                    event="xxforms-upload-error"
+                    targetid="fr-attachment"
+                    name="{event('xxf:type')}">
+                    <xf:property name="xxf:error-type" value="event('xxf:error-type')"/>
+                    <xf:property name="xxf:permitted"  value="event('xxf:permitted')"/>
+                    <xf:property name="xxf:actual"     value="event('xxf:actual')"/>
+                </xf:dispatch>
+
             </xf:upload>
             <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[xxf:non-blank()]">
                 <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>

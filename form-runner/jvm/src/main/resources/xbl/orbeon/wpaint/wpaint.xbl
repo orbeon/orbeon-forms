@@ -27,7 +27,6 @@
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.js"/>
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/wPaint.js"/>
     <xbl:script src="/ops/javascript/imagesloaded/imagesloaded.pkgd.min.js"/>
-    <xbl:script src="/xbl/orbeon/wpaint/wpaint.js"/>
 
     <xbl:binding id="fr-wpaint" element="fr|wpaint" xxbl:mode="lhha binding" xxf:external-events="fr-update-annotation">
 

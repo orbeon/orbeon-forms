@@ -65,9 +65,9 @@
         </fb:metadata>
 
         <xbl:handlers>
-            <xbl:handler event="xforms-enabled"   type="javascript">YAHOO.xbl.fr.WPaint.instance(this).enabled  ();</xbl:handler>
-            <xbl:handler event="xforms-readonly"  type="javascript">YAHOO.xbl.fr.WPaint.instance(this).readonly ();</xbl:handler>
-            <xbl:handler event="xforms-readwrite" type="javascript">YAHOO.xbl.fr.WPaint.instance(this).readwrite();</xbl:handler>
+            <xbl:handler event="xforms-enabled"   type="javascript">ORBEON.xforms.XBL.instanceForControl(this).enabled  ();</xbl:handler>
+            <xbl:handler event="xforms-readonly"  type="javascript">ORBEON.xforms.XBL.instanceForControl(this).readonly ();</xbl:handler>
+            <xbl:handler event="xforms-readwrite" type="javascript">ORBEON.xforms.XBL.instanceForControl(this).readwrite();</xbl:handler>
             <!-- On upload, set annotation to be the image that was just uploaded -->
             <xbl:handler event="xxforms-upload-done" observer="image"><xf:setvalue ref="annotation" value="../image"/></xbl:handler>
             <xbl:handler event="fr-update-annotation"><xf:setvalue ref="annotation" value="event('value')"/></xbl:handler>

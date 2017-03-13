@@ -24,6 +24,7 @@ import org.orbeon.scaxon.XML._
 
 object Permissions {
 
+  //@XPathFunction
   def checkPermissions(
     app            : String,
     form           : String,

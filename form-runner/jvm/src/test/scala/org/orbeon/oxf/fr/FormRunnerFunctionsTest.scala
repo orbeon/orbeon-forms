@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.junit.Test
 import org.orbeon.dom.{Document ⇒ JDocument}
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
@@ -31,11 +32,11 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
   @Test def persistenceHeaders(): Unit = {
 
-    val obf = getPersistenceHeadersAsXML("cities", "form1", "form")
+    val obf = getPersistenceHeadersAsXML("cities", "form1", FormOrData.Form)
     assert(TransformerUtils.tinyTreeToString(obf) ===
       """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/Mexico_City</value></header><header><name>Orbeon-City-Name</name><value>Mexico City</value></header><header><name>Orbeon-Population</name><value>8851080</value></header></headers>""")
 
-    val obd = getPersistenceHeadersAsXML("cities", "form1", "data")
+    val obd = getPersistenceHeadersAsXML("cities", "form1", FormOrData.Data)
     assert(TransformerUtils.tinyTreeToString(obd) ===
       """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/S%C3%A3o_Paulo</value></header><header><name>Orbeon-City-Name</name><value>São Paulo</value></header><header><name>Orbeon-Population</name><value>11244369</value></header></headers>""")
   }

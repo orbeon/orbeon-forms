@@ -48,9 +48,15 @@
                 id="read-form-data"
                 method="get"
                 serialization="none"
-                action="{$data-base-path}/data.xml"
+                action="{
+                        $data-base-path
+                    }/data.xml?data-format-version={
+                        (: See also persistence-model.xml :)
+                        frp:providerDataFormatVersion(fr:app-name(), fr:form-name())
+                    }"
                 replace="instance"
-                instance="fr-form-instance">
+                instance="fr-form-instance"
+                xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava">
 
                 <!-- Duplicate form data and attachments under new document id, using the same form version if any is specified -->
                 <xf:action event="xforms-submit-done">

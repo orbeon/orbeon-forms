@@ -90,29 +90,83 @@ object DataMigration {
 
   import org.orbeon.oxf.xforms.action.XFormsAPI._
 
+  // Maybe migrate the data based on whether:
+  //
+  // - it is already in the format expected by the database or not
+  // - the form definition contains data migration information or not
+  //
+  def dataMaybeMigratedToDatabaseFormat(
+    app           : String,
+    form          : String,
+    data          : DocumentInfo,
+    metadata      : Option[DocumentInfo],
+    pruneMetadata : Boolean
+  ): (DocumentInfo, String) = {
+
+    val srcDataFormatVersion = FormRunnerPersistence.FormRunnerCurrentInternalDataFormatVersion
+    val dstDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
+
+    val migratedDatabaseDataOpt =
+      if (srcDataFormatVersion != dstDataFormatVersion)
+        dataMaybeMigratedFrom(data, metadata, pruneMetadata)
+      else
+        None
+
+    val databaseData = migratedDatabaseDataOpt getOrElse copyDocumentKeepInstanceData(data)
+
+    // Add data format version attribute on root element
+    insert(
+      into       = databaseData / *,
+      origin     = attributeInfo(XMLNames.DataFormatVersionQName, dstDataFormatVersion),
+      doDispatch = false
+    )
+
+    databaseData → dstDataFormatVersion
+  }
+
   //@XPathFunction
-  def dataMaybeMigratedFrom(data: DocumentInfo, metadata: Option[DocumentInfo], pruneMetadata: Boolean): Option[DocumentInfo] =
+  def dataMaybeMigratedFrom(data: DocumentInfo, metadata: Option[DocumentInfo], pruneMetadata: Boolean): Option[DocumentWrapper] =
     dataMaybeMigratedFromTo(data, metadata, migrateDataFrom(_, _, pruneMetadata))
 
   //@XPathFunction
-  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]): Option[DocumentInfo] =
+  def dataMaybeMigratedFromDatabaseFormat(
+    app           : String,
+    form          : String,
+    data          : DocumentInfo,
+    metadata: Option[DocumentInfo]
+  ): DocumentInfo = {
+
+    val srcDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
+    val dstDataFormatVersion = FormRunnerPersistence.FormRunnerCurrentInternalDataFormatVersion
+
+    val migratedDatabaseDataOpt =
+      if (srcDataFormatVersion != dstDataFormatVersion)
+        dataMaybeMigratedTo(data, metadata)
+      else
+        None
+
+    migratedDatabaseDataOpt getOrElse data
+  }
+
+  //@XPathFunction
+  def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]): Option[DocumentWrapper] =
     dataMaybeMigratedFromTo(data, metadata, migrateDataTo)
 
   private def dataMaybeMigratedFromTo(
     data     : DocumentInfo,
     metadata : Option[DocumentInfo],
-    migrate  : (DocumentInfo, String) ⇒ DocumentInfo
-  ): Option[DocumentInfo] =
+    migrate  : (DocumentInfo, String) ⇒ DocumentWrapper
+  ): Option[DocumentWrapper] =
     for {
       metadata  ← metadata
       migration ← migrationMapFromMetadata(metadata.rootElement)
     } yield
       migrate(data, migration)
 
-  def migrationMapFromMetadata(metadataRootElement: NodeInfo) =
+  def migrationMapFromMetadata(metadataRootElement: NodeInfo): Option[String] =
     metadataRootElement firstChild "migration" filter (_.attValue("version") == "4.8.0") map (_.stringValue)
 
-  def migrateDataTo(data: DocumentInfo, jsonMigrationMap: String): DocumentInfo = {
+  def migrateDataTo(data: DocumentInfo, jsonMigrationMap: String): DocumentWrapper = {
 
     val mutableData = TransformerUtils.extractAsMutableDocument(data)
 
@@ -155,7 +209,7 @@ object DataMigration {
     mutableData
   }
 
-  def migrateDataFrom(data: DocumentInfo, jsonMigrationMap: String, pruneMetadata: Boolean): DocumentInfo = {
+  def migrateDataFrom(data: DocumentInfo, jsonMigrationMap: String, pruneMetadata: Boolean): DocumentWrapper = {
 
     val mutableData = copyDocumentKeepInstanceData(data)
 
@@ -190,7 +244,7 @@ object DataMigration {
     mutableData
   }
 
-  private def copyDocumentKeepInstanceData(data: DocumentInfo) =
+  private def copyDocumentKeepInstanceData(data: DocumentInfo): DocumentWrapper =
     new DocumentWrapper(
       data match {
         case virtualNode: VirtualNode ⇒

@@ -107,7 +107,7 @@ class IndexTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>
 
-    val indexedControls = Index.findIndexedControls(elemToDocumentInfo(formElem))
+    val indexedControls = Index.findIndexedControls(elemToDocumentInfo(formElem), app = "test", form = "index")
 
     assert(indexedControls(0) === IndexedControl("in-summary", false, true,  "section-1/in-summary",       "xs:string", "input", false))
     assert(indexedControls(1) === IndexedControl("in-search",  true,  false, "section-1/in-search",        "xs:string", "input", false))

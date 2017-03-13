@@ -48,7 +48,8 @@ object XMLNames {
 
   val FRContainerTest = FRSectionTest || FRGridTest
 
-  val FRNamespace     = Namespace("fr", FR)
-  val ItemsetIdQName  = QName.get("itemsetid",  FRNamespace)
-  val ItemsetMapQName = QName.get("itemsetmap", FRNamespace)
+  val FRNamespace            = Namespace("fr", FR)
+  val ItemsetIdQName         = QName.get("itemsetid",           FRNamespace)
+  val ItemsetMapQName        = QName.get("itemsetmap",          FRNamespace)
+  val DataFormatVersionQName = QName.get("data-format-version", FRNamespace)
 }

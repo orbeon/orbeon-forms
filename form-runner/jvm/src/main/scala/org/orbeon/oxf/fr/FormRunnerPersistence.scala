@@ -15,7 +15,9 @@ package org.orbeon.oxf.fr
 
 import java.net.URI
 
+import enumeratum._
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.http.Headers._
@@ -32,88 +34,60 @@ import org.orbeon.scaxon.XML._
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
-trait FormRunnerPersistence {
+sealed abstract class FormOrData(override val entryName: String) extends EnumEntry
 
-  import org.orbeon.oxf.fr.FormRunner._
+object FormOrData extends Enum[FormOrData] {
 
-  sealed abstract class FormOrData(val token: String)
+  val values = findValues
+
   case object Form extends FormOrData("form")
   case object Data extends FormOrData("data")
+}
 
-  val CRUDBasePath                       = "/fr/service/persistence/crud"
-  val FormMetadataBasePath               = "/fr/service/persistence/form"
-  val PersistencePropertyPrefix          = "oxf.fr.persistence"
-  val PersistenceProviderPropertyPrefix  = PersistencePropertyPrefix + ".provider"
+object FormRunnerPersistenceJava {
+  //@XPathFunction
+  def providerDataFormatVersion(app: String, form: String) =
+    FormRunnerPersistence.providerDataFormatVersion(app, form)
+}
+
+object FormRunnerPersistence {
+
+  val DataFormatVersion400                       = "4.0.0"
+  val DataFormatVersion480                       = "4.8.0"
+  val DataFormatVersionEdge                      = "edge"
+
+  val DataFormatVersionName                      = "data-format-version"
+  val PruneMetadataName                          = "prune-metadata"
+
+  val DefaultDataFormatVersion                   = DataFormatVersion400
+  val FormRunnerCurrentInternalDataFormatVersion = DataFormatVersion480
+
+  val AllowedDataFormatVersions = Set(DataFormatVersion400, DataFormatVersion480)
+
+  val CRUDBasePath                               = "/fr/service/persistence/crud"
+  val FormMetadataBasePath                       = "/fr/service/persistence/form"
+  val PersistencePropertyPrefix                  = "oxf.fr.persistence"
+  val PersistenceProviderPropertyPrefix          = PersistencePropertyPrefix + ".provider"
 
   val StandardProviderProperties = Set("uri", "autosave", "active", "permissions")
 
-  // NOTE: We generate .bin, but sample data can contain other extensions
-  private val RecognizedAttachmentExtensions = Set("bin", "jpg", "jpeg", "gif", "png", "pdf")
-
-  // Check whether a value correspond to an uploaded file
-  //
-  // For this to be true
-  // - the protocol must be file:
-  // - the URL must have a valid signature
-  //
-  // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
-  def isUploadedFileURL(value: String): Boolean =
-    value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
-
-  //@XPathFunction
-  def createFormDataBasePath(app: String, form: String, isDraft: Boolean, document: String): String =
-    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
-
-  //@XPathFunction
-  def createFormDefinitionBasePath(app: String, form: String) =
-    CRUDBasePath :: app :: form :: "form" :: "" :: Nil mkString "/"
-
-  def createFormMetadataPath(app: String, form: String) =
-    FormMetadataBasePath :: app :: form :: Nil mkString "/"
-
-  // Whether the given path is an attachment path (ignoring an optional query string)
-  def isAttachmentURLFor(basePath: String, url: String) =
-    url.startsWith(basePath) && (splitQuery(url)._1.splitTo[List](".").lastOption exists RecognizedAttachmentExtensions)
-
-  // For a given attachment path, return the filename
-  def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last
-
-  def findProvider(app: String, form: String, formOrData: String) = {
-    val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData :: Nil mkString "."
+  def findProvider(app: String, form: String, formOrData: FormOrData): Option[String] = {
+    val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData.entryName :: Nil mkString "."
     properties.getNonBlankString(providerProperty)
   }
 
-  def providerPropertyAsURL(provider: String, property: String) =
+  def providerPropertyAsURL(provider: String, property: String): String =
     properties.getStringOrURIAsString(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".")
 
-  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean) =
-    properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
+  def getPersistenceURLHeaders(app: String, form: String, formOrData: FormOrData): (String, Map[String, String]) = {
 
-  //@XPathFunction
-  def autosaveSupported(app: String, form: String) =
-    providerPropertyAsBoolean(findProvider(app, form, "data").get, "autosave", default = false)
-
-  //@XPathFunction
-  def ownerGroupPermissionsSupported(app: String, form: String) =
-    providerPropertyAsBoolean(findProvider(app, form, "data").get, "permissions", default = false)
-
-  //@XPathFunction
-  def versioningSupported(app: String, form: String) =
-    providerPropertyAsBoolean(findProvider(app, form, "data").get, "versioning", default = false)
-
-  def isActiveProvider(provider: String) =
-    providerPropertyAsBoolean(provider, "active", default = true)
-
-  def getPersistenceURLHeaders(app: String, form: String, formOrData: String) = {
-
-    require(augmentString(app).nonEmpty)
+    require(augmentString(app).nonEmpty) // Q: why `augmentString`?
     require(augmentString(form).nonEmpty)
-    require(Set("form", "data")(formOrData))
 
     getPersistenceURLHeadersFromProvider(findProvider(app, form, formOrData).get)
   }
 
-  def getPersistenceURLHeadersFromProvider(provider: String) = {
+  def getPersistenceURLHeadersFromProvider(provider: String): (String, Map[String, String]) = {
 
     val propertyPrefix = PersistencePropertyPrefix :: provider :: Nil mkString "."
     val propertyPrefixTokenCount = propertyPrefix.splitTo[List](".").size
@@ -132,7 +106,7 @@ trait FormRunnerPersistence {
     (providerPropertyAsURL(provider, "uri"), headers)
   }
 
-  def getPersistenceHeadersAsXML(app: String, form: String, formOrData: String) = {
+  def getPersistenceHeadersAsXML(app: String, form: String, formOrData: FormOrData): DocumentInfo = {
 
     val (_, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
@@ -148,6 +122,83 @@ trait FormRunnerPersistence {
     // Convert to TinyTree
     TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, headersXML, false, false)
   }
+
+  def providerDataFormatVersion(app: String, form: String): String = {
+
+    val provider =
+      findProvider(app, form, FormOrData.Data) getOrElse
+        (throw new IllegalArgumentException(s"no provider property configuration found for `$app/$form`"))
+
+    val dataFormatVersion = providerPropertyAsString(provider, DataFormatVersionName, DefaultDataFormatVersion)
+
+    require(
+      AllowedDataFormatVersions(dataFormatVersion),
+      s"`${fullProviderPropertyName(provider, DataFormatVersionName)}` property must be one of ${AllowedDataFormatVersions mkString ", "}"
+    )
+
+    dataFormatVersion
+  }
+
+  private def fullProviderPropertyName(provider: String, property: String) =
+    PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
+
+  private def providerPropertyAsString(provider: String, property: String, default: String) =
+    properties.getString(fullProviderPropertyName(provider, property), default)
+
+  // NOTE: We generate .bin, but sample data can contain other extensions
+  private val RecognizedAttachmentExtensions = Set("bin", "jpg", "jpeg", "gif", "png", "pdf")
+}
+
+trait FormRunnerPersistence {
+
+  import FormRunnerPersistence._
+  import org.orbeon.oxf.fr.FormRunner._
+
+  // Check whether a value correspond to an uploaded file
+  //
+  // For this to be true
+  // - the protocol must be file:
+  // - the URL must have a valid signature
+  //
+  // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
+  def isUploadedFileURL(value: String): Boolean =
+    value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
+
+  //@XPathFunction
+  def createFormDataBasePath(app: String, form: String, isDraft: Boolean, document: String): String =
+    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
+
+  //@XPathFunction
+  def createFormDefinitionBasePath(app: String, form: String) =
+    CRUDBasePath :: app :: form :: FormOrData.Form.entryName :: "" :: Nil mkString "/"
+
+  def createFormMetadataPath(app: String, form: String) =
+    FormMetadataBasePath :: app :: form :: Nil mkString "/"
+
+  // Whether the given path is an attachment path (ignoring an optional query string)
+  def isAttachmentURLFor(basePath: String, url: String) =
+    url.startsWith(basePath) && (splitQuery(url)._1.splitTo[List](".").lastOption exists RecognizedAttachmentExtensions)
+
+  // For a given attachment path, return the filename
+  def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last
+
+  def providerPropertyAsBoolean(provider: String, property: String, default: Boolean) =
+    properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
+
+  //@XPathFunction
+  def autosaveSupported(app: String, form: String) =
+    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "autosave", default = false)
+
+  //@XPathFunction
+  def ownerGroupPermissionsSupported(app: String, form: String) =
+    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "permissions", default = false)
+
+  //@XPathFunction
+  def versioningSupported(app: String, form: String) =
+    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "versioning", default = false)
+
+  def isActiveProvider(provider: String) =
+    providerPropertyAsBoolean(provider, "active", default = true)
 
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
   def readDocument(urlString: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {

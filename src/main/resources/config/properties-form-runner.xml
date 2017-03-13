@@ -65,6 +65,9 @@
     <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>
 
+    <!-- Default data format version -->
+    <property as="xs:string" name="oxf.fr.persistence.*.data-format-version"                    value="4.0.0"/>
+
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
         /apps/fr/style/orbeon-navbar-logo.png

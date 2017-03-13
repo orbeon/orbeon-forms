@@ -484,7 +484,7 @@ public class TransformerUtils {
         }
     }
 
-    public static DocumentInfo extractAsMutableDocument(NodeInfo elementOrDocument) {
+    public static DocumentWrapper extractAsMutableDocument(NodeInfo elementOrDocument) {
         return new DocumentWrapper(tinyTreeToDom4j(elementOrDocument), null, XPath.GlobalConfiguration());
     }
 

@@ -27,8 +27,7 @@ class SendTest
      with XFormsSupport
      with XMLSupport {
 
-  val DataFormatVersion400  = "4.0.0"
-  val DataFormatVersionEdge = "edge"
+  import FormRunnerPersistence._
 
   describe("The `send` action") {
 
@@ -149,7 +148,7 @@ class SendTest
       )
 
     for (((dataFormatVersion, prune, pruneMetadata), expected) ← Expected) {
-      it(s"""must pass with `data-format-version = "$dataFormatVersion"`, `prune = "$prune"` and `prune-metadata = "$pruneMetadata"`""") {
+      it(s"""must pass with `$DataFormatVersionName = "$dataFormatVersion"`, `prune = "$prune"` and `$PruneMetadataName = "$pruneMetadata"`""") {
 
         val (processorService, docOpt, _) =
           runFormRunner("tests", "send-action", "new", document = "", noscript = false, initialize = true)
@@ -165,13 +164,13 @@ class SendTest
               "process" → Some(
                 s"""
                   send(
-                    uri                 = "/fr/service/custom/orbeon/echo",
-                    data-format-version = "$dataFormatVersion",
-                    content             = "xml",
-                    method              = "post",
-                    replace             = "instance",
-                    prune               = "$prune",
-                    prune-metadata      = "$pruneMetadata"
+                    uri                    = "/fr/service/custom/orbeon/echo",
+                    $DataFormatVersionName = "$dataFormatVersion",
+                    content                = "xml",
+                    method                 = "post",
+                    replace                = "instance",
+                    prune                  = "$prune",
+                    $PruneMetadataName     = "$pruneMetadata"
                   )
                 """
               )

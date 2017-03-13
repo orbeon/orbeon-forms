@@ -315,7 +315,7 @@
                 <xf:insert
                     context="instance('fr-search-instance')"
                     ref="query"
-                    origin="index:findIndexedControlsAsXML(instance('fr-source-form-instance')/root())"/>
+                    origin="index:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form)"/>
 
                 <!-- If requested to, only show drafts for never saved document -->
                 <xf:insert

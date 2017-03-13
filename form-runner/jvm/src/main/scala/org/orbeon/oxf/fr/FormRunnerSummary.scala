@@ -17,6 +17,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
 
 trait FormRunnerSummary {
 
@@ -30,7 +31,8 @@ trait FormRunnerSummary {
   //@XPathFunction
   def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {
 
-    val someFormVersion = Some(formVersion) // use the same form version as the data to clone
+    val someFormVersion           = Some(formVersion) // use the same form version as the data to clone
+    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersion(app, form)
 
     putWithAttachments(
       data               = data.root,
@@ -38,7 +40,7 @@ trait FormRunnerSummary {
       fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
       filename           = "data.xml",
-      commonQueryString  = "",
+      commonQueryString = s"$DataFormatVersionName=$databaseDataFormatVersion",
       forceAttachments   = true,
       formVersion        = someFormVersion
     )

@@ -129,9 +129,10 @@
                     context="xxf:instance('fr-form-instance')/root()"
                     origin="
                         (
-                            if (not(xxf:get-request-parameter('data-format-version') = 'edge'))
-                            then migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
-                            else (),
+                            if (not(xxf:get-request-parameter('data-format-version') = 'edge')) then
+                                migration:dataMaybeMigratedTo($form-data, xxf:instance('fr-form-metadata')/root())
+                            else
+                                (),
                             $form-data
                         )[1]"
                     />
@@ -391,12 +392,31 @@
     <xf:instance id="fr-search-response"><dummy/></xf:instance>
 
     <!-- Get document -->
-    <xf:submission id="fr-get-document-submission"
-            method="get"
-            serialization="none"
-            resource="/fr/service/persistence/crud/{$app}/{$form}/{event('data-or-draft')}/{$document}/data.xml"
-            replace="instance"
-            xxf:instance="fr-form-instance">
+    <xf:submission
+        id="fr-get-document-submission"
+        method="get"
+        serialization="none"
+        resource="/fr/service/persistence/crud/{
+                $app
+            }/{
+                $form
+            }/{
+                event('data-or-draft')
+            }/{
+                $document
+            }/data.xml?data-format-version={
+
+                (: Tell the persistence layer the format we expect for the configured provider. This gives
+                   the persistence layer a chance to check that the format is compatible and throw an error
+                   if not. Later, once the persistence proxy can perform conversions, we will be able to
+                   directly request the format we need. See https://github.com/orbeon/orbeon-forms/issues/3110 :)
+
+                frp:providerDataFormatVersion($app, $form)
+            }"
+        replace="instance"
+        xxf:instance="fr-form-instance"
+        xmlns:frp="java:org.orbeon.oxf.fr.FormRunnerPersistenceJava">
+
         <xf:action event="xforms-submit-done">
             <!-- Save value of Orbeon-Operations header -->
             <xf:var
@@ -431,12 +451,17 @@
         replace="instance"
         xxf:instance="fr-form-instance"/>
 
-    <!-- Migrate data if needed when loading instance from a service.
+    <!-- Migrate data if needed when loading instance from the persistence layer or a service.
 
          NOTE: Ideally this would just a be a transformation *before* the submission replaces the node in
          fr-form-instance. Here, replacement takes place, and then we replace again with the updated data.
      -->
-    <xf:action event="xforms-submit-done" observer="fr-get-document-submission fr-get-instance-from-service">
+    <xf:action event="xforms-submit-done" observer="fr-get-document-submission">
+        <xf:insert
+            context="xxf:instance('fr-form-instance')/root()"
+            origin="migration:dataMaybeMigratedFromDatabaseFormat($app, $form, root(), xxf:instance('fr-form-metadata')/root())"/>
+    </xf:action>
+    <xf:action event="xforms-submit-done" observer="fr-get-instance-from-service">
         <xf:insert
             context="xxf:instance('fr-form-instance')/root()"
             origin="migration:dataMaybeMigratedTo(root(), xxf:instance('fr-form-metadata')/root())"/>

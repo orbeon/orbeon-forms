@@ -14,34 +14,45 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{DataMigration, FormRunner}
+import org.orbeon.oxf.fr.{DataMigration, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
 trait FormDefinition {
 
+  private val FBLangPredicate = "[@xml:lang = $fb-lang]"
+
   // For Summary page
-  def findIndexedControlsAsXML(formDoc: DocumentInfo): Seq[NodeInfo] =
-    findIndexedControls(formDoc) map (_.toXML)
+  //@XPathFunction
+  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =
+    findIndexedControls(formDoc, app, form) map (_.toXML)
 
   // Returns the controls that are searchable from a form definition
-  def findIndexedControls(formDoc: DocumentInfo): Seq[IndexedControl] = {
+  def findIndexedControls(formDoc: DocumentInfo, app: String, form: String): Seq[IndexedControl] = {
+
+    // NOTE: Once we introduce
+    val migratePathsTo40Format =
+      FormRunnerPersistence.providerDataFormatVersion(app, form) == FormRunnerPersistence.DataFormatVersion400
 
     // Controls in the view, with the fr-summary or fr-search class
     val indexedControlElements = {
       // NOTE: Can't use getAllControlsWithIds() because Form Builder's form.xhtml doesn't follow the same body
       // pattern.
-      val body = formDoc \ "*:html" \ "*:body"
+      val body        = formDoc \ "*:html" \ "*:body"
       val allControls = body \\ * filter (_ \@ "bind" nonEmpty)
+
       allControls filter (_.attClasses & Set("fr-summary", "fr-search") nonEmpty)
     }
 
     val migrationPaths =
-      FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap DataMigration.migrationMapFromMetadata flatMap
-      DataMigration.decodeMigrationsFromJSON map { case (path, iterationName) ⇒
-        path.splitTo[List]("/")
-      }
+      if (migratePathsTo40Format)
+        FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap
+          DataMigration.migrationMapFromMetadata        flatMap
+          DataMigration.decodeMigrationsFromJSON        map
+          { case (path, iterationName) ⇒ path.splitTo[List]("/") }
+      else
+        Nil
 
     indexedControlElements map { control ⇒
 
@@ -49,9 +60,10 @@ trait FormDefinition {
       val bindForControl = FormRunner.findBindByName(formDoc, controlName).get
       val bindsToControl = bindForControl.ancestorOrSelf("*:bind").reverse.tail // skip instance root bind
       val bindRefs       =
-        for (bind ← bindsToControl) yield {
-          val bindRef = bind.attValue("ref")
-          val FBLangPredicate = "[@xml:lang = $fb-lang]"
+        for {
+          bind    ← bindsToControl.to[List]
+          bindRef = bind.attValue("ref")
+        } yield {
           // Specific case for Form Builder: drop language predicate, as we want to index/return
           // values for all languages. So far, this is handled as a special case, as this is not
           // something that happens in other forms.
@@ -61,10 +73,10 @@ trait FormDefinition {
             bindRef
         }
 
-      // Adjust the search paths if data migration is present by dropping the repeated grid iteration element
+      // Adjust the search paths if needed by dropping the repeated grid iteration element
       val adjustedBindRefs =
-        if (migrationPaths exists (bindRefs.startsWith(_)))
-          bindRefs.toList.dropRight(2) ::: bindRefs.last :: Nil
+        if (migratePathsTo40Format && (migrationPaths exists (bindRefs.startsWith(_))))
+          bindRefs.dropRight(2) ::: bindRefs.last :: Nil
         else
           bindRefs
 

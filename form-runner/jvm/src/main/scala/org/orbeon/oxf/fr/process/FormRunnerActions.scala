@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import org.orbeon.oxf.util.NetUtils
@@ -26,9 +27,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.scaxon.XML._
-import org.orbeon.xbl.Wizard
 
 import scala.language.postfixOps
 import scala.util.Try
@@ -112,8 +112,14 @@ trait FormRunnerActions {
 
       import DataMigration._
 
-      val dataMaybeMigrated =
-        dataMaybeMigratedFrom(formInstance.root, metadataInstance map (_.root), pruneMetadata = false) getOrElse formInstance.root
+      val (dataMaybeMigrated, databaseDataFormatVersion) =
+        dataMaybeMigratedToDatabaseFormat(
+          app,
+          form,
+          formInstance.root,
+          metadataInstance map (_.root),
+          pruneMetadata = false
+        )
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(
@@ -122,7 +128,7 @@ trait FormRunnerActions {
         fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
         toBasePath        = createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
-        commonQueryString = s"valid=$dataValid" + querySuffix,
+        commonQueryString = s"valid=$dataValid&$DataFormatVersionName=$databaseDataFormatVersion" + querySuffix,
         forceAttachments  = false,
         formVersion       = Some(formVersion.toString)
       )
@@ -229,15 +235,15 @@ trait FormRunnerActions {
     "annotate"            → "",
     "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
     "content"             → "xml",
-    "data-format-version" → "4.0.0",
-    "parameters"          → "app form form-version document valid language process data-format-version"
+    DataFormatVersionName → "4.0.0",
+    "parameters"          → s"app form form-version document valid language process $DataFormatVersionName"
   )
 
   private val SendParameterKeys = List(
     "uri",
     "serialization",
     "content-type",
-    "prune-metadata"
+    PruneMetadataName
   ) ++ DefaultSendParameters.keys
 
   def trySend(params: ActionParams): Try[Any] =
@@ -258,7 +264,7 @@ trait FormRunnerActions {
 
       // This is used both as URL parameter and as submission parameter
       val dataVersion =
-        findParamValue("data-format-version") map evaluateValueTemplate get
+        findParamValue(DataFormatVersionName) map evaluateValueTemplate get
 
       val paramsToAppend =
         stringOptionToSet(findParamValue("parameters")).to[List]
@@ -272,7 +278,7 @@ trait FormRunnerActions {
         case name @ "valid"               ⇒ name → dataValid.toString
         case name @ "language"            ⇒ name → currentLang.stringValue
         case name @ "noscript"            ⇒ name → isNoscript.toString
-        case name @ "data-format-version" ⇒ name → dataVersion
+        case name @ DataFormatVersionName ⇒ name → dataVersion
       }
 
       val propertiesAsPairs =
@@ -315,13 +321,13 @@ trait FormRunnerActions {
             findDefaultContentType
 
         val effectivePruneMetadata =
-          evaluatedPropertiesAsMap.get("prune-metadata").flatten orElse
-            (evaluatedPropertiesAsMap.get("data-format-version").flatten map findDefaultPruneMetadata)
+          evaluatedPropertiesAsMap.get(PruneMetadataName).flatten orElse
+            (evaluatedPropertiesAsMap.get(DataFormatVersionName).flatten map findDefaultPruneMetadata)
 
         evaluatedPropertiesAsMap +
-          ("serialization"  → effectiveSerialization) +
-          ("mediatype"      → effectiveContentType  ) + // `<xf:submission>` uses `mediatype`
-          ("prune-metadata" → effectivePruneMetadata)
+          ("serialization"   → effectiveSerialization) +
+          ("mediatype"       → effectiveContentType  ) + // `<xf:submission>` uses `mediatype`
+          (PruneMetadataName → effectivePruneMetadata)
       }
 
       // Create PDF and/or TIFF if needed
@@ -345,7 +351,7 @@ trait FormRunnerActions {
   )
 
   private val StateParamNames               = (StateParams map (_._1) toSet) + "form-version"
-  private val ParamsToExcludeUponModeChange = StateParamNames + "data-format-version"
+  private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName
 
   // Automatically prepend `fr-noscript`, `fr-language` and `orbeon-embeddable` based on their current value unless
   // they are already specified in the given path.
@@ -400,9 +406,9 @@ trait FormRunnerActions {
         Some("prune")               → "false",
         Some("replace")             → replace,
         Some("content")             → "xml",
-        Some("data-format-version") → "edge",
-        Some("prune-metadata")      → "false",
-        Some("parameters")          → "form-version data-format-version"
+        Some(DataFormatVersionName) → "edge",
+        Some(PruneMetadataName)     → "false",
+        Some("parameters")          → s"form-version $DataFormatVersionName"
       )
     } flatMap
       trySend

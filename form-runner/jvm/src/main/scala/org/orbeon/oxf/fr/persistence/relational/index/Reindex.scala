@@ -169,7 +169,6 @@ trait Reindex extends FormDefinition {
         paramSetter(ps)
         useAndClose(ps.executeQuery()) { currentData ⇒
 
-
           // Info on indexed controls for a given app/form
           case class FormIndexedControls(
             app             : String,
@@ -198,12 +197,13 @@ trait Reindex extends FormDefinition {
                     RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                     Seq.empty
                   case Some(formDefinition) ⇒
-                    findIndexedControls(formDefinition)
+                    findIndexedControls(formDefinition, app, form)
                 }
             }
 
             // Insert into the "current data" table
             val position = Iterator.from(1)
+
             val insertIntoCurrentSql =
               """INSERT INTO orbeon_i_current
                 |           (data_id,
@@ -220,6 +220,7 @@ trait Reindex extends FormDefinition {
                 |            draft)
                 |    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               """.stripMargin
+
             useAndClose(connection.prepareStatement(insertIntoCurrentSql)) { ps ⇒
               ps.setInt      (position.next(), currentData.getInt("id"))
               ps.setTimestamp(position.next(), currentData.getTimestamp("created"))

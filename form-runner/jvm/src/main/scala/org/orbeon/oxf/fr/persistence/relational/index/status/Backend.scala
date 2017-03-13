@@ -19,8 +19,8 @@ object Backend {
 
   def reindexingProviders(
     providers     : List[String],
-    indexProvider : String ⇒ Unit)
-  : Unit = {
+    indexProvider : String ⇒ Unit
+  ): Unit = {
     StatusStore.setStatus(Starting(providers))
     providers
       .zipWithIndex
@@ -39,6 +39,7 @@ object Backend {
 
   def setProviderDocumentTotal(total: Int): Unit =
     setIndexing(i ⇒ Some(i.copy(documentCount = Some(Count(total = total, current = 0)))))
+
   def setProviderDocumentNext(): Unit =
     setDocumentCount(c ⇒ c.copy(current = c.current + 1))
 

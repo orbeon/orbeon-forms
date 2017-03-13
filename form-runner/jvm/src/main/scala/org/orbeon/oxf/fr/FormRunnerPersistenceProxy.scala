@@ -18,11 +18,13 @@ import java.net.URI
 import javax.xml.transform.stream.StreamResult
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.{PUT, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -31,12 +33,24 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
+
+private object FormRunnerPersistenceProxy {
+  val FormPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
+  val DataPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
+  val DataCollectionPath         = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
+  val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
+  val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
+  val ReindexPath                =   "/fr/service/persistence/reindex"
+
+  val RawDataFormatVersion = "raw"
+
+  val AllowedDataFormatVersionParams = AllowedDataFormatVersions + RawDataFormatVersion
+}
 
 /**
  * The persistence proxy processor:
@@ -47,12 +61,7 @@ import scala.collection.JavaConverters._
  */
 class FormRunnerPersistenceProxy extends ProcessorImpl {
 
-  private val FormPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
-  private val DataPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
-  private val DataCollectionPath         = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
-  private val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
-  private val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
-  private val ReindexPath                =   "/fr/service/persistence/reindex"
+  import FormRunnerPersistenceProxy._
 
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
@@ -64,15 +73,41 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
   def proxyRequest(request: Request, response: Response): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
-      case FormPath(path, app, form, _)                ⇒ proxyRequest(request, response, app, form, "form", path)
-      case DataPath(path, app, form, _, _, _)          ⇒ proxyRequest(request, response, app, form, "data", path)
-      case DataCollectionPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, "data", path)
-      case SearchPath(path, app, form)                 ⇒ proxyRequest(request, response, app, form, "data", path)
+      case FormPath(path, app, form, _)                ⇒ proxyRequest(request, response, app, form, FormOrData.Form, path)
+      case DataPath(path, app, form, _, _, _)          ⇒ proxyRequest(request, response, app, form, FormOrData.Data, path)
+      case DataCollectionPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, FormOrData.Data, path)
+      case SearchPath(path, app, form)                 ⇒ proxyRequest(request, response, app, form, FormOrData.Data, path)
       case PublishedFormsMetadataPath(path, app, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
       case ReindexPath                                 ⇒ proxyReindex(request, response)
       case _                                           ⇒ throw new OXFException(s"Unsupported path: $incomingPath")
     }
   }
+
+  private def checkDataFormatVersions(
+    request    : Request,
+    app        : String,
+    form       : String,
+    formOrData : FormOrData
+  ): Unit =
+    if (formOrData == FormOrData.Data && Set[HttpMethod](GET, PUT)(HttpMethod.getOrElseThrow(request.getMethod))) {
+
+      val incomingVersion =
+        request.getFirstParamAsString(DataFormatVersionName) getOrElse
+          DefaultDataFormatVersion
+
+      val providerVersion =
+        providerDataFormatVersion(app, form)
+
+      require(
+        AllowedDataFormatVersionParams(incomingVersion),
+        s"`$FormRunnerPersistence.DataFormatVersionName` parameter must be one of ${AllowedDataFormatVersionParams mkString ", "}"
+      )
+
+      // We can remove this once we are able to perform conversions here, see:
+      // https://github.com/orbeon/orbeon-forms/issues/3110
+      if (! Set(RawDataFormatVersion, providerVersion)(incomingVersion))
+        throw HttpStatusCodeException(400)
+    }
 
   // Proxy the request depending on app/form name and whether we are accessing form or data
   private def proxyRequest(
@@ -80,15 +115,18 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     response   : Response,
     app        : String,
     form       : String,
-    formOrData : String,
+    formOrData : FormOrData,
     path       : String
   ): Unit = {
 
+    // Throws if there is an incompatibility
+    checkDataFormatVersions(request, app, form, formOrData)
+
     // Get persistence implementation target URL and configuration headers
-    val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
+    val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
     assert(
       persistenceBaseURL ne null,
-      s"no base URL specified for requested persistence provider `${FormRunner.findProvider(app, form, formOrData).get}` (check properties)"
+      s"no base URL specified for requested persistence provider `${findProvider(app, form, formOrData).get}` (check properties)"
     )
 
     val serviceURI = NetUtils.appendQueryString(
@@ -194,11 +232,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       (app, form) match {
         case (Some(appName), Some(formName)) ⇒
           // Get the specific provider for this app/form
-          FormRunner.findProvider(appName, formName, "form").toList
+          findProvider(appName, formName, FormOrData.Form).toList
         case _ ⇒
           // Get providers independently from app/form
           // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
-          getProviders(usableFor = FormRunner.Form)
+          getProviders(usableFor = FormOrData.Form)
       }
     }
 
@@ -207,7 +245,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     val allFormElements =
       for {
         provider           ← providers
-        (baseURI, headers) = FormRunner.getPersistenceURLHeadersFromProvider(provider)
+        (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
       } yield {
         // Read all the forms for the current service
         val serviceURI = NetUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
@@ -233,15 +271,15 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     request  : Request,
     response : Response
   ): Unit = {
-    val dataProviders = getProviders(usableFor = FormRunner.Data)
+    val dataProviders = getProviders(usableFor = FormOrData.Data)
     val dataProvidersWithIndexSupport =
       dataProviders.filter { provider ⇒
-        val providerURI = FormRunner.providerPropertyAsURL(provider, "uri")
+        val providerURI = providerPropertyAsURL(provider, "uri")
         Index.ProvidersWithIndexSupport.map(_.uri).contains(providerURI)
       }
     Backend.reindexingProviders(
       dataProvidersWithIndexSupport, p ⇒ {
-        val (baseURI, headers) = FormRunner.getPersistenceURLHeadersFromProvider(p)
+        val (baseURI, headers) = getPersistenceURLHeadersFromProvider(p)
         val serviceURI = baseURI + "/reindex"
         proxyRequest(request, serviceURI, headers, response)
       }
@@ -249,11 +287,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
   }
 
   // Get all providers that can be used either for form data or for form definitions
-  private def getProviders(usableFor: FormRunner.FormOrData): List[String] = {
+  private def getProviders(usableFor: FormOrData): List[String] = {
     val propertySet = Properties.instance.getPropertySet
-    propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix, matchWildcards = false)
+    propertySet.propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
       .filter (propName ⇒ propName.endsWith(".*") ||
-                          propName.endsWith(s".${usableFor.token}"))
+                          propName.endsWith(s".${usableFor.entryName}"))
       .flatMap(propertySet.getNonBlankString)
       .distinct
       .filter(FormRunner.isActiveProvider)

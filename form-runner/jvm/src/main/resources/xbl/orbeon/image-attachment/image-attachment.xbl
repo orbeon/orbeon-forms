@@ -67,12 +67,12 @@
                 <!-- NOTE: Duplicated logic in attachment.xbl -->
                 <xf:dispatch
                     event="xxforms-upload-start xxforms-upload-cancel"
-                    targetid="fr-image-attachmentZ"
+                    targetid="fr-image-attachment"
                     name="{event('xxf:type')}"/>
 
                 <xf:dispatch
                     event="xxforms-upload-done"
-                    targetid="fr-image-attachmentZ"
+                    targetid="fr-image-attachment"
                     name="{event('xxf:type')}">
                     <xf:property name="file"           value="event('file')"/>
                     <xf:property name="filename"       value="event('filename')"/>
@@ -82,7 +82,7 @@
 
                 <xf:dispatch
                     event="xxforms-upload-error"
-                    targetid="fr-image-attachmentZ"
+                    targetid="fr-image-attachment"
                     name="{event('xxf:type')}">
                     <xf:property name="xxf:error-type" value="event('xxf:error-type')"/>
                     <xf:property name="xxf:permitted"  value="event('xxf:permitted')"/>

@@ -130,10 +130,10 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
   extends XFormsEvent(XXFORMS_UPLOAD_DONE, target, properties, bubbles = true, cancelable = true) {
 
   // These properties come from the client
-  def file      = property[String]("file").get
-  def filename  = property[String]("filename").get
-  def mediatype = property[String](Headers.ContentTypeLower).get
-  def size      = property[String](Headers.ContentLengthLower).get // comes as String from the client
+  def file          = property[String]("file").get
+  def filename      = property[String]("filename").get
+  def contentType   = property[String](Headers.ContentTypeLower).get
+  def contentLength = property[String](Headers.ContentLengthLower).get // comes as String from the client
 }
 
 object XXFormsUploadDoneEvent {

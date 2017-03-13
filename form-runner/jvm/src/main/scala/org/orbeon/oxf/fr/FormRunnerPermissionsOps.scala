@@ -36,7 +36,6 @@ trait FormRunnerPermissionsOps {
   def permissionOperations(permissionElement: NodeInfo): List[String] =
     permissionElement attTokens "operations" toList
 
-
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo) =
     authorizedOperationsBasedOnRoles(permissionsElOrNull)

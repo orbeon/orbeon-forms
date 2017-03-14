@@ -17,30 +17,6 @@ private object ConcreteElement {
   }
 }
 
-/**
-  * 4/7/2005 d : Under JDK 1.5 the fact that dom4j isn't thread safe by default became apparent.
-  * In particular DefaultElement ( and sub-classes thereof ) are not thread safe because of the
-  * following :
-  *
-  * - DefaultElement has a single field, private Object content, by which it refers to all of its
-  *   child nodes.  If there is a single child node then content points to it.  If there are more
-  *   then content points to a java.util.List which in turns points to all the children.
-  * - However, if you do almost anything with an instance of DefaultElement, i.e. iterate over
-  *   children, it will first create and fill a list before completing the operation.  This even
-  *   if there was only a single child.
-  *   The consequence of the above is that DefaultElement and its sub-classes aren't thread safe,
-  *   even if all of the threads are just readers.
-  *
-  * The 'usual' solution is to use dom4j's NonLazyElement and NonLazyElementDocumentFactory.
-  * However in our case we were using a sub-class of DefaultElement, UserDataElement, whose
-  * functionality is unmatched by NonLazyElement.  Hence this class, a subclass of NonLazyElement
-  * with the safe functionality as UserDataElement.
-  *
-  * Btw ConcreteElement also tries to be smart wrt to cloning and parent specifying.  That
-  * is, if you clone the clone will have parent eq null but will have all of the requisite
-  * namespace declarations and if you setParent( notNull ) then any redundant namespace declarations
-  * are removed.
-  */
 class ConcreteElement(var qname: QName)
   extends AbstractBranch with Element with WithData {
 
@@ -175,6 +151,16 @@ class ConcreteElement(var qname: QName)
       }
     }
     null
+  }
+
+  override def containsElement: Boolean = {
+
+    import scala.collection.JavaConverters._
+
+    internalContent.iterator.asScala exists {
+      case e: Element ⇒ true
+      case _          ⇒ false
+    }
   }
 
   def element(name: String): Element = {
@@ -506,12 +492,12 @@ class ConcreteElement(var qname: QName)
 
   override def setText(text: String): Unit = {
     val allContent = internalContent
-    if (allContent ne null) {
+    if (allContent ne null) { // TODO: can this ever be null?
       val it = allContent.iterator()
       while (it.hasNext) {
         it.next() match {
           case _: Text ⇒ it.remove()
-          case _                  ⇒
+          case _       ⇒
         }
       }
     }

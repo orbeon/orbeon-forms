@@ -146,6 +146,8 @@ trait Element extends Branch {
    */
   def attributeValue(qName: QName, defaultValue: String): String
 
+  def containsElement: Boolean
+
   /**
    * Returns the first element for the given local name and any namespace.
    */
@@ -158,9 +160,7 @@ trait Element extends Branch {
 
   /**
    * Returns the elements contained in this element. If this element does not
-   * contain any elements then this method returns an empty list. The list is
-   * backed by the element such that changes to the list will be reflected in
-   * the element though the reverse is not the case.
+   * contain any elements then this method returns an empty list.
    */
   def elements: ju.List[Element]
 

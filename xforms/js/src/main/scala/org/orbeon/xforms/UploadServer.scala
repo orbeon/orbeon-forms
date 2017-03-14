@@ -135,7 +135,7 @@ object UploadServer {
               // Failure isn't called; instead we detect if an upload is interrupted through
               // `progress-state="interrupted"` in the Ajax response.
               val failure: js.Function = () ⇒ ()
-              val argument = new ConnectCallbackArgument(isUpload = true, formId = currentEvent.form.id)
+              val argument = new ConnectCallbackArgument(formId = currentEvent.form.id, isUpload = true)
             }
           )
         )

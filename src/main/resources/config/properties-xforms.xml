@@ -256,7 +256,6 @@
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.js",  "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.js", "min": true  },
-            { "full": "/ops/javascript/orbeon/xforms/LoadingIndicator.js",                   "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/Document.js",                           "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/Form.js",                               "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/Page.js",                               "min": true  },

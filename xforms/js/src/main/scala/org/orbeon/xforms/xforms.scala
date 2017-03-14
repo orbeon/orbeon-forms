@@ -25,22 +25,23 @@ import scala.scalajs.js.|
 @JSName("ORBEON.xforms.Globals")
 @js.native
 object Globals extends js.Object {
-  val xformsServerUploadURL: js.Dictionary[String] = js.native
+  val xformsServerUploadURL : js.Dictionary[String]      = js.native
+  var loadingOtherPage      : Boolean                    = js.native
 }
 
 @js.native
 trait Item extends js.Object {
-  val label      : String                     = js.native
-  val value      : String                     = js.native
-  val attributes : js.UndefOr[ItemAttributes] = js.native
-  val children   : js.UndefOr[js.Array[Item]] = js.native
+  val label                 : String                     = js.native
+  val value                 : String                     = js.native
+  val attributes            : js.UndefOr[ItemAttributes] = js.native
+  val children              : js.UndefOr[js.Array[Item]] = js.native
 }
 
 @js.native
 trait ItemAttributes extends js.Object {
-  val `class`        : js.UndefOr[String] = js.native
-  val style          : js.UndefOr[String] = js.native
-  val `xxforms-open` : js.UndefOr[String] = js.native
+  val `class`               : js.UndefOr[String]         = js.native
+  val style                 : js.UndefOr[String]         = js.native
+  val `xxforms-open`        : js.UndefOr[String]         = js.native
 }
 
 @ScalaJSDefined
@@ -67,41 +68,8 @@ object XBL extends js.Object {
   def declareCompanion(name: String, companion: XBLCompanion): Unit = js.native
 }
 
-@JSName("YAHOO.util.Connect")
-@js.native
-object YUIConnect extends js.Object {
-  def setForm(formId: html.Form | String, isUpload: Boolean, secureUri: Boolean): Unit = js.native
-  def asyncRequest(method: String, uri: String, callback: YUICallback, postData: js.UndefOr[String] = js.undefined): js.Object = js.native
-  def abort(o: js.Object, callback: js.UndefOr[YUICallback] = js.undefined, isTimeout: js.UndefOr[Boolean] = js.undefined): Boolean = js.native
-}
-
 @ScalaJSDefined
-trait YUICallback extends js.Object {
-  val upload: js.Function
-  val failure: js.Function
-  val argument: js.Object
-}
-
-
-@js.native
-trait YUICustomEvent extends js.Object {
-  def subscribe(fn: js.Function)   : Unit = js.native
-  def unsubscribe(fn: js.Function) : Unit = js.native
-}
-
-@JSName("YAHOO.widget.ProgressBar")
-@js.native
-class ProgressBar(config: js.Object) extends js.Object {
-  def render(parent: Element, before: js.UndefOr[Element] = js.undefined): Unit = js.native
-  def set(key: String, value: Int): Unit = js.native
-  def get(key: String): js.Dynamic = js.native
-}
-
-@JSName("YAHOO.util.Event")
-@js.native
-object Event extends js.Object {
-  def preventDefault(event: js.Object): Unit = js.native
-}
+class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object
 
 @JSName("ORBEON.xforms.Events")
 @js.native
@@ -139,6 +107,7 @@ class Property[T] extends js.Object {
 object Properties extends js.Object {
   val delayBeforeIncrementalRequest    : Property[Int] = js.native
   val delayBeforeUploadProgressRefresh : Property[Int] = js.native
+  val delayBeforeDisplayLoading        : Property[Int] = js.native
 }
 
 @JSName("ORBEON.util.Utils")

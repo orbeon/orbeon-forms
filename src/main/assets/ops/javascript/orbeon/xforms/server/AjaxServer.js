@@ -361,7 +361,7 @@
 
                     // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
                     var loadingIndicator = ORBEON.xforms.Page.getForm(formID).getLoadingIndicator();
-                    loadingIndicator.setNextConnectProgressShown(showProgress);
+                    loadingIndicator.setNextConnectShow(showProgress);
 
                     // Build request
                     var requestDocumentString = [];

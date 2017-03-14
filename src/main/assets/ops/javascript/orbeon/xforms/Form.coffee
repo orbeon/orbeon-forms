@@ -10,12 +10,10 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-LoadingIndicator = ORBEON.xforms.LoadingIndicator
-
 class Form
 
     constructor: (@formElement) ->
-        @loadingIndicator = new LoadingIndicator(@formElement)
+        @loadingIndicator = new ORBEON.xforms.LoadingIndicator(@formElement)
 
     getLoadingIndicator: -> @loadingIndicator
 

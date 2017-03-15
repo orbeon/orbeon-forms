@@ -360,7 +360,7 @@
                     }
 
                     // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
-                    var loadingIndicator = ORBEON.xforms.Page.getForm(formID).getLoadingIndicator();
+                    var loadingIndicator = ORBEON.xforms.Page().getForm(formID).loadingIndicator;
                     loadingIndicator.setNextConnectShow(showProgress);
 
                     // Build request
@@ -1555,7 +1555,7 @@
                                     var sizeSpan      = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, documentElement)[0];
 
                                     // Set values in DOM
-                                    var upload = ORBEON.xforms.Page.getControl(documentElement);
+                                    var upload = ORBEON.xforms.Page().getControl(documentElement);
 
                                     var state     = ORBEON.util.Dom.getAttribute(elem, "state");
                                     var fileName  = ORBEON.util.Dom.getAttribute(elem, "filename");
@@ -1670,7 +1670,7 @@
 
                             // Handle progress for upload controls
                             if (progressState != null && progressState != "")
-                                ORBEON.xforms.Page.getControl(documentElement).progress(
+                                ORBEON.xforms.Page().getControl(documentElement).progress(
                                     progressState,
                                     progressReceived != null && progressReceived != "" ? parseInt(progressReceived) : null,
                                     progressExpected != null && progressExpected != "" ? parseInt(progressExpected) : null);
@@ -2168,7 +2168,7 @@
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                ORBEON.xforms.Page.getForm(formID).getLoadingIndicator().show();
+                ORBEON.xforms.Page().getForm(formID).loadingIndicator.show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
         } catch (e) {

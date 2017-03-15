@@ -26,8 +26,7 @@ object NProgress extends js.Object {
 }
 
 @ScalaJSDefined
-@JSExport("ORBEON.xforms.LoadingIndicator") // used by `Form.coffee`
-class LoadingIndicator(form: html.Element) extends js.Object{
+class LoadingIndicator extends js.Object{
 
   private var nextConnectShow = false
   private var shownCounter    = 0

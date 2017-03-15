@@ -116,12 +116,6 @@ object Utils extends js.Object {
   def appendToEffectiveId(effectiveId: String, ending: String): String = js.native
 }
 
-@JSName("ORBEON.xforms.Page")
-@js.native
-object Page extends js.Object {
-  def registerControlConstructor(controlConstructor: js.Function0[Control], predicate: js.Function1[HTMLElement, Boolean]): Unit = js.native
-}
-
 @JSName("ORBEON.xforms.control.Control")
 @js.native
 class Control extends js.Object {

@@ -144,8 +144,6 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/Document.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/Form.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/Page.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Control.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>

@@ -714,7 +714,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             },
 
             _calendarResources: function() {
-                var lang = ORBEON.xforms.Page.getLang();
+                var lang = ORBEON.xforms.Page().getLang();
                 return ORBEON.xforms.control.CalendarResources[lang];
             },
 
@@ -2569,7 +2569,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             if (target != null) {
                 if ($(target).is('.xforms-upload')) {
                     // Dispatch change event to upload control
-                    ORBEON.xforms.Page.getControl(target).change();
+                    ORBEON.xforms.Page().getControl(target).change();
                 } else {
                     // When we move out from a field, we don't receive the keyup events corresponding to keydown
                     // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
@@ -3500,7 +3500,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 YAHOO.util.Dom.removeClass(formElement, "xforms-initially-hidden");
 
                 // Create Orbeon Form object, which give it a change to perform its own initialization
-                ORBEON.xforms.Page.getForm(formID);
+                ORBEON.xforms.Page().getForm(formID);
 
                 // Initialize loading and error indicator
                 ORBEON.xforms.Globals.formErrorPanel[formID] = null;

@@ -48,8 +48,8 @@ trait FormDefinition {
     val migrationPaths =
       if (migratePathsTo40Format)
         FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap
-          DataMigration.migrationMapFromMetadata        flatMap
-          DataMigration.decodeMigrationsFromJSON        map
+          DataMigration.migrationMapFromMetadata           flatMap
+          DataMigration.decodeMigrationsFromJSON           map
           { case (path, iterationName) ⇒ path.splitTo[List]("/") }
       else
         Nil

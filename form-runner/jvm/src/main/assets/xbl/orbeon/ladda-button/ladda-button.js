@@ -14,7 +14,6 @@
 (function() {
 
     var $ = ORBEON.jQuery;
-    var Document = ORBEON.xforms.Document;
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
 
     var STATE_BEGIN   = 0;

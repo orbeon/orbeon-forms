@@ -15,7 +15,6 @@
 (function() {
     var OD = ORBEON.util.Dom;
     var YD = YAHOO.util.Dom;
-    var Document = ORBEON.xforms.Document;
 
     YAHOO.namespace("xbl.fr");
     YAHOO.xbl.fr.Autocomplete = function() {};
@@ -69,7 +68,7 @@
 
             // Set maximum number of items displayed
             var maxResultsDisplayedOutput = YD.getElementsByClassName("xbl-fr-autocomplete-max-results-displayed", null, this.container)[0];
-            var maxResultsDisplayed = Document.getValue(maxResultsDisplayedOutput.id);
+            var maxResultsDisplayed = ORBEON.xforms.Document.getValue(maxResultsDisplayedOutput.id);
             if (maxResultsDisplayed == "") maxResultsDisplayed = 10;
             this.yuiAutoComplete.maxResultsDisplayed = parseInt(maxResultsDisplayed, 10);
 
@@ -83,7 +82,7 @@
         itemSelected: function(type, args) {
             var itemLabel = args[2][0];
             this.justMadeSelection = true;
-            Document.setValue(this.searchControl.id, itemLabel);
+            ORBEON.xforms.Document.setValue(this.searchControl.id, itemLabel);
             ORBEON.xforms.Document.dispatchEvent(this.container.id, "fr-value-selected");
         },
 
@@ -145,7 +144,7 @@
             var autoComplete = this;
             if (autoComplete.dynamicItemset === null) {
                 var output = YD.getElementsByClassName("fr-autocomplete-dynamic-itemset", null, autoComplete.container)[0];
-                autoComplete.dynamicItemset = Document.getValue(output.id) == "true";
+                autoComplete.dynamicItemset = ORBEON.xforms.Document.getValue(output.id) == "true";
             }
             return autoComplete.dynamicItemset;
         },

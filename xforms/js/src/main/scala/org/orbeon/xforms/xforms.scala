@@ -25,8 +25,12 @@ import scala.scalajs.js.|
 @JSName("ORBEON.xforms.Globals")
 @js.native
 object Globals extends js.Object {
-  val xformsServerUploadURL : js.Dictionary[String]      = js.native
-  var loadingOtherPage      : Boolean                    = js.native
+  val xformsServerUploadURL : js.Dictionary[String]     = js.native
+  val formClientState       : js.Dictionary[html.Input] = js.native
+  var loadingOtherPage      : Boolean                   = js.native
+  val isReloading           : Boolean                   = js.native
+  val repeatIndexes         : js.Dictionary[String]     = js.native
+  val ns                    : js.Dictionary[String]     = js.native
 }
 
 @js.native
@@ -68,6 +72,14 @@ object XBL extends js.Object {
   def declareCompanion(name: String, companion: XBLCompanion): Unit = js.native
 }
 
+@JSName("ORBEON.xforms.Controls")
+@js.native
+object Controls extends js.Object {
+  def setCurrentValue(control: html.Element, newControlValue: String) : Unit               = js.native
+  def getCurrentValue(elem: html.Element)                             : js.UndefOr[String] = js.native
+  def isInRepeatTemplate(elem: html.Element)                          : Boolean            = js.native
+}
+
 @ScalaJSDefined
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object
 
@@ -85,15 +97,7 @@ object AjaxServer extends js.Object {
   def fireEvents(events: js.Array[Event], incremental: Boolean): Unit = js.native
 
   @js.native
-  class Event(args: js.Object) extends js.Object
-}
-
-@JSName("ORBEON.xforms.Document")
-@js.native
-object Document extends js.Object {
-  def dispatchEvent(event: js.Object): Unit = js.native
-  def setValue(controlIdOrElem: String | Element, newValue: String, form: js.UndefOr[Element] = js.undefined): Unit = js.native
-  def getValue(controlIdOrElem: String | Element, form: js.UndefOr[Element] = js.undefined): js.UndefOr[String] = js.native
+  class Event(args: js.Any*) extends js.Object
 }
 
 @JSName("ORBEON.util.Property")

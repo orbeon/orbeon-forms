@@ -14,7 +14,6 @@
 
 (function() {
     var $ = ORBEON.jQuery;
-    var Document = ORBEON.xforms.Document;
     var Event = YAHOO.util.Event;
 
     YAHOO.namespace('xbl.fr');
@@ -37,12 +36,12 @@
 
             // Public key comes from property
             var publicKeyElement = $(this.container).find('.xbl-fr-recaptcha-public-key').get(0);
-            var publicKey        = Document.getValue(publicKeyElement.id);
+            var publicKey        = ORBEON.xforms.Document.getValue(publicKeyElement.id);
             // Other configurations
             var themeElement     = $(this.container).find('.xbl-fr-recaptcha-theme').get(0);
-            var theme            = Document.getValue(themeElement.id);
+            var theme            = ORBEON.xforms.Document.getValue(themeElement.id);
             var langElement      = $(this.container).find('.xbl-fr-recaptcha-lang').get(0);
-            var lang             = Document.getValue(langElement.id);
+            var lang             = ORBEON.xforms.Document.getValue(langElement.id);
 
             Recaptcha.create(publicKey, recaptchaDiv.id, {
                theme: theme,
@@ -57,13 +56,13 @@
          */
         recaptchaInitialized: function() {
             Event.addListener(this.recaptchaInput(), 'change', _.bind(function() {
-                Document.setValue(this.challengeId, Recaptcha.get_challenge());
-                Document.setValue(this.responseId, Recaptcha.get_response());
+                ORBEON.xforms.Document.setValue(this.challengeId, Recaptcha.get_challenge());
+                ORBEON.xforms.Document.setValue(this.responseId, Recaptcha.get_response());
             }, this));
         },
 
         reload: function() {
-            Document.setValue(this.responseId, '');
+            ORBEON.xforms.Document.setValue(this.responseId, '');
             Recaptcha.reload();
         },
 

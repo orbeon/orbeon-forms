@@ -12,7 +12,6 @@
 
 $ = ORBEON.jQuery
 Builder = ORBEON.Builder
-OD = ORBEON.xforms.Document
 
 # Global state
 Builder.resourceEditorCurrentControl = null
@@ -172,7 +171,7 @@ Builder.resourceEditorEndEdit = ->
         # Send value to server, handled in FB's model.xml
         newValue = resourceEditor().getValue()
         isHTML = resourceEditor().isHTML()
-        OD.dispatchEvent
+        ORBEON.xforms.Document.dispatchEvent
             targetId: Builder.resourceEditorCurrentControl.attr('id')
             eventName: 'fb-update-control-lhha'
             properties: lhha: lhha(), value: newValue, isHtml: isHTML.toString()

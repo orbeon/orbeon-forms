@@ -13,7 +13,6 @@
  */
 (function() {
     var $ = ORBEON.jQuery;
-    var Document = ORBEON.xforms.Document;
 
     YAHOO.namespace("xbl.fr");
     YAHOO.xbl.fr.Map= function() {};
@@ -50,8 +49,8 @@
             me.geoCoder = new google.maps.Geocoder();
 
             // Set location
-            var initialLatitude  = Document.getValue(me.latitudeInputID);
-            var initialLongitude = Document.getValue(me.longitudeInputID);
+            var initialLatitude  = ORBEON.xforms.Document.getValue(me.latitudeInputID);
+            var initialLongitude = ORBEON.xforms.Document.getValue(me.longitudeInputID);
             if (initialLatitude != "" && initialLongitude != "") {
                 var latLng = new google.maps.LatLng(Number(initialLatitude), Number(initialLongitude));
                 me.updateMarkerFromLatLng(latLng);
@@ -63,7 +62,7 @@
 
         updateMarkerFromAddress: function() {
             var me = this;
-            var address = Document.getValue(me.addressOutputID);
+            var address = ORBEON.xforms.Document.getValue(me.addressOutputID);
             me.geoCoder.geocode({ 'address': address}, function (results, status) {
                 if (status == google.maps.GeocoderStatus.OK)
                     me.updateMarkerFromLatLng(results[0].geometry.location);
@@ -95,8 +94,8 @@
         },
 
         _updateLongLat: function(longLat) {
-            Document.setValue(this.longitudeInputID, longLat.lng());
-            Document.setValue(this.latitudeInputID,  longLat.lat());
+            ORBEON.xforms.Document.setValue(this.longitudeInputID, longLat.lng());
+            ORBEON.xforms.Document.setValue(this.latitudeInputID,  longLat.lat());
         }
     };
 })();

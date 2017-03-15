@@ -443,13 +443,6 @@
                             requestDocumentString.push(' name="' + event.eventName + '"');
                             if (event.targetId != null)
                                 requestDocumentString.push(' source-control-id="' + event.targetId.substring(ORBEON.xforms.Globals.ns[formID].length) + '"');
-                            if (event.additionalAttribs != null) {
-                                for(var attribIndex = 0; attribIndex < event.additionalAttribs.length - 1; attribIndex+=2) {
-                                    var attribName = event.additionalAttribs[attribIndex];
-                                    var escapedAttribValue = event.additionalAttribs[attribIndex+1].replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&/g, "&amp;");
-                                    requestDocumentString.push(' '+ attribName +'="' + escapedAttribValue + '"');
-                                }
-                            }
                             requestDocumentString.push('>');
                             if (event.value != null) {
                                 // When the range is used we get an int here when the page is first loaded

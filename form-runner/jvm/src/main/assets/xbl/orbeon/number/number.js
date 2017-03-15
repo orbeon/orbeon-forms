@@ -15,7 +15,6 @@
 
     var $ = ORBEON.jQuery;
     var AS = ORBEON.xforms.server.AjaxServer;
-    var Document = ORBEON.xforms.Document;
 
     YAHOO.namespace('xbl.fr');
     YAHOO.xbl.fr.Number = function() {};
@@ -47,7 +46,7 @@
             }
 
             this.decimalSeparatorElement  = $(this.container).find('.' + controlClassPrefix + '-decimal-separator')[0];
-            this.decimalSeparator         = Document.getValue(this.decimalSeparatorElement);
+            this.decimalSeparator         = ORBEON.xforms.Document.getValue(this.decimalSeparatorElement);
 
             // Register listeners
 
@@ -103,14 +102,14 @@
 
         sendValueToServer: function() {
             var newValue = this.visibleInputElement.value;
-            var xformsValue = Document.getValue(this.xformsInputElement);
+            var xformsValue = ORBEON.xforms.Document.getValue(this.xformsInputElement);
             // Document.setValue() doesn't automatically avoid sending the value if it hasn't changed
             if (newValue != xformsValue)
-                Document.setValue(this.xformsInputElement, newValue);
+                ORBEON.xforms.Document.setValue(this.xformsInputElement, newValue);
         },
 
         getEditString: function() {
-            return Document.getValue(this.xformsOutputElement);
+            return ORBEON.xforms.Document.getValue(this.xformsOutputElement);
         },
 
         updateWithServerValue: function() {
@@ -120,7 +119,7 @@
             this.visibleInputElement.value =
                 hasFocus ?
                 this.getEditString() :
-                Document.getValue(this.xformsInputElement);
+                ORBEON.xforms.Document.getValue(this.xformsInputElement);
 
             // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
             this.visibleInputElement.disabled = $(this.xformsInputElement).hasClass('xforms-readonly');
@@ -135,7 +134,7 @@
         },
 
         parameterDecimalSeparatorChanged: function() {
-            this.decimalSeparator = Document.getValue(this.decimalSeparatorElement);
+            this.decimalSeparator = ORBEON.xforms.Document.getValue(this.decimalSeparatorElement);
             this.updateWithServerValue();
         }
     };

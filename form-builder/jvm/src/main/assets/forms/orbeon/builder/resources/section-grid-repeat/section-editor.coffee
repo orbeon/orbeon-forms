@@ -5,7 +5,7 @@ $ ->
     Controls = ORBEON.xforms.Controls
     Events = ORBEON.xforms.Events
     FSM = ORBEON.util.FiniteStateMachine
-    OD = ORBEON.xforms.Document
+
     Properties = ORBEON.util.Properties
 
     sectionEditor = $ '.fb-section-editor'
@@ -78,7 +78,7 @@ $ ->
             section = Builder.findInCache sectionsCache, (Builder.adjustedOffset labelInput).top
             f$.text newLabelValue, f$.find SectionLabelSelector, section.el
             sectionId = f$.attr 'id', section.el
-            OD.dispatchEvent
+            ORBEON.xforms.Document.dispatchEvent
                 targetId: sectionId
                 eventName: 'fb-update-section-label'
                 properties: label: newLabelValue

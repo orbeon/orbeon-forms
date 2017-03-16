@@ -15,16 +15,19 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -45,9 +48,9 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     	return this.handlerContext;
     }
 
-    private void addConstraintClasses(StringBuilder sb, scala.Option<ValidationLevels.ValidationLevel> constraintLevel) {
+    private void addConstraintClasses(StringBuilder sb, scala.Option<ValidationLevel> constraintLevel) {
         if (constraintLevel.isDefined()) {
-            final String levelName = constraintLevel.get().name();
+            final String levelName = constraintLevel.get().entryName();
             if (sb.length() > 0)
                 sb.append(' ');
             sb.append("xforms-");
@@ -319,7 +322,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 if (isAlert) {
                     if (control instanceof XFormsSingleNodeControl) {
                         final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                        final scala.Option<ValidationLevels.ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
+                        final scala.Option<ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
 
                         if (constraintLevel.isDefined()) {
                             if (classes.length() > 0)

@@ -14,12 +14,13 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(DOM_ACTIVATE, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
@@ -146,7 +147,7 @@ private object XXFormsConstraintsChangedEvent {
   }
 
   def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
-    case "level"            ⇒ level map (_.name)
+    case "level"            ⇒ level map (_.entryName)
     case "constraints"      ⇒ Option(current map (_.id))
     case "errors"           ⇒ Some(validationsForLevel(current, ErrorLevel))
     case "warnings"         ⇒ Some(validationsForLevel(current, WarningLevel))

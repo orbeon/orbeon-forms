@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -261,7 +261,7 @@ trait FormRunnerPersistence {
 
   // Return the number of failed validations captured by the error summary for the given level
   def countValidationsByLevel(level: ValidationLevel) =
-    (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
+    (errorSummaryInstance.rootElement \ "counts" \@ level.entryName stringValue).toInt
 
   // Return whether the data is saved
   def isFormDataSaved =

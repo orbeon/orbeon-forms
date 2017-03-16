@@ -21,7 +21,8 @@ import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR
@@ -216,7 +217,7 @@ object XFormsModelSubmissionBase {
           levelsToAnnotate =
             attributeNamesForTokens.keySet collect
               LevelByName                  map { level ⇒
-                level → attributeNamesForTokens(level.name)
+                level → attributeNamesForTokens(level.entryName)
             } toMap
         )
 

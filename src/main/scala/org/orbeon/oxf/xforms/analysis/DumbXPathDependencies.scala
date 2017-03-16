@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
-import org.orbeon.oxf.xforms.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.NodeInfo
 
 // This implementation of dependencies simply says that everything must be updated all the time.

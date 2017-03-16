@@ -17,7 +17,8 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
@@ -340,7 +341,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       addAttribute(RELEVANT_ATTRIBUTE_NAME, control2.isRelevant.toString)
 
     if (control1Opt.isEmpty && control2.alertLevel.isDefined || control1Opt.exists(_.alertLevel != control2.alertLevel))
-      addAttribute(CONSTRAINT_LEVEL_ATTRIBUTE_NAME, control2.alertLevel map (_.name) getOrElse "")
+      addAttribute(CONSTRAINT_LEVEL_ATTRIBUTE_NAME, control2.alertLevel map (_.entryName) getOrElse "")
 
     added |= addAjaxCustomMIPs(attributesImpl, control1Opt, control2)
 

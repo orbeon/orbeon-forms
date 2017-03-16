@@ -18,16 +18,16 @@ import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath.Reporter
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsModelBinds._
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}

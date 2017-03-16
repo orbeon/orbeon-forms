@@ -26,8 +26,8 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
+import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.scaxon.XML._
 
@@ -89,7 +89,7 @@ trait FormRunnerActions {
       }
 
       if (countValidationsByLevel(level) > 0)
-        throw new OXFException(s"Data has failed validations for level ${level.name}")
+        throw new OXFException(s"Data has failed validations for level ${level.entryName}")
     }
 
   def tryUpdateCurrentWizardPageValidity(params: ActionParams): Try[Any] =

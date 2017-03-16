@@ -9,6 +9,7 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils.getElementId
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, ShareableXPathStaticContext, XMLReceiverHelper}
 import org.orbeon.oxf.{util ⇒ u}
@@ -31,8 +32,6 @@ class StaticBind(
 ) {
 
   staticBind ⇒
-
-  import ValidationLevels._
 
   def parentBind = parent match {
     case parentBind: StaticBind ⇒ Some(parentBind)
@@ -416,24 +415,4 @@ class StaticBind(
     for (child ← _children)
       child.toXML(helper)
   }
-}
-
-object ValidationLevels {
-  sealed trait ValidationLevel { val name: String }
-  case object ErrorLevel   extends { val name = "error" }   with ValidationLevel
-  case object WarningLevel extends { val name = "warning" } with ValidationLevel
-  case object InfoLevel    extends { val name = "info" }    with ValidationLevel
-
-  implicit object LevelOrdering extends Ordering[ValidationLevel] {
-    override def compare(x: ValidationLevel, y: ValidationLevel) =
-      if (x == y) 0
-      else if (y == ErrorLevel || y == WarningLevel && x == InfoLevel) -1
-      else 1
-  }
-
-  val LevelsByPriority = Seq(ErrorLevel, WarningLevel, InfoLevel): Seq[ValidationLevel]
-  val LevelByName      = LevelsByPriority map (l ⇒ l.name → l) toMap
-  val LevelSet         = LevelsByPriority.to[Set]
-
-  def jErrorLevel: ValidationLevel = ErrorLevel
 }

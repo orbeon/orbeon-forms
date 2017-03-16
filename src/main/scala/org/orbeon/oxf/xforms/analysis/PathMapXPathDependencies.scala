@@ -14,18 +14,18 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.w3c.dom.Node._
-import scala.collection.JavaConverters._
 
+import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
 
 class PathMapXPathDependencies(

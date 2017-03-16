@@ -23,7 +23,8 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels._
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -166,7 +167,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 val dummyMIPElem =
                   <xf:dummy
                     id={idOpt.orNull}
-                    level={if (level != ErrorLevel) level.name else null}
+                    level={if (level != ErrorLevel) level.entryName else null}
                     value={if (mip != Type) nonEmptyValue else null}
                     xmlns:xf={XF}
                     xmlns:fb={FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
@@ -282,7 +283,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def stringValue = eitherToXPath(required)
 
     def toXML(forLang: String): sx.Elem =
-      <validation type={Required.name} level={level.name} default-alert={alert.isEmpty.toString}>
+      <validation type={Required.name} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <required>{eitherToXPath(required)}</required>
         {alertOrPlaceholder(alert, forLang)}
       </validation>
@@ -375,7 +376,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         case _                   ⇒ ""
       }
 
-      <validation type="datatype" id={idOpt.orNull} level={level.name} default-alert={alert.isEmpty.toString}>
+      <validation type="datatype" id={idOpt.orNull} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <builtin-type>{builtinTypeString}</builtin-type>
         <builtin-type-required>{builtinTypeRequired}</builtin-type-required>
         <schema-type>{datatype.right.toOption map (_.getQualifiedName) getOrElse ""}</schema-type>
@@ -486,7 +487,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       <validation
         type={analyzed map (_._1) getOrElse "formula"}
         id={idOpt getOrElse ""}
-        level={level.name}
+        level={level.entryName}
         default-alert={alert.isEmpty.toString}>
         <constraint
           expression={if (analyzed.isEmpty) expression else ""}

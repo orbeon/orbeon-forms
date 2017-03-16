@@ -76,10 +76,12 @@ class SharedUtilsTest extends FunSpec {
 
   describe("The `decodeSimpleQuery()` function") {
 
-    val query    = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1="""
-    val expected = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "")
+    val query    = """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&=v3&p3&"""
+    val expected = Seq("p1" → "v11", "p2" → "v21", "p1" → "v12", "p2" → "", "p2" → "v23", "p1" → "", "p3" → "")
 
-    assert(expected === decodeSimpleQuery(query))
+    it(s"must parse `$query`") {
+      assert(expected === decodeSimpleQuery(query))
+    }
   }
 
   describe("The `getFirstQueryParameter()` function") {
@@ -140,21 +142,44 @@ class SharedUtilsTest extends FunSpec {
     assert(collectByErasedType[Seq[String]](Seq(42)).isDefined) // erasure!
   }
 
-  describe("The `splitTo()` function") {
+  describe("The `splitTo()` function with space separator") {
 
     val expected = Seq(
-      ""                    → Seq(),
-      "  "                  → Seq(),
-      " GET "               → Seq("GET"),
-      " GET  POST  PUT "    → Seq("GET", "POST", "PUT"),
-      " GET  POST  PUT GET" → Seq("GET", "POST", "PUT", "GET")
+      ("empty string",                ""                   , Seq()),
+      ("whitespace only",             "  "                 , Seq()),
+      ("one token with space around", " GET "              , Seq("GET")),
+      ("multiple tokens",             " GET  POST  PUT "   , Seq("GET", "POST", "PUT")),
+      ("repeated token",              " GET  POST  PUT GET", Seq("GET", "POST", "PUT", "GET"))
     )
 
-    for ((in, out) ← expected) {
-      assert(out === in.splitTo[List]())
-      assert(out === in.splitTo[Array]().to[List])
-      assert(out.to[Set] === in.splitTo[Set]())
-      assert(out.to[mutable.LinkedHashSet].to[List] === in.splitTo[mutable.LinkedHashSet]().to[List])
+    for ((desc, in, out) ← expected) {
+      it(s"must pass $desc") {
+        assert(out === in.splitTo[List]())
+        assert(out === in.splitTo[Array]().to[List])
+        assert(out.to[Set] === in.splitTo[Set]())
+        assert(out.to[mutable.LinkedHashSet].to[List] === in.splitTo[mutable.LinkedHashSet]().to[List])
+      }
+    }
+  }
+
+  describe("The `splitTo()` function with `=` separator") {
+
+    val expected = Seq(
+      ("empty string",                 ""   , Seq()),
+      ("space string",                 " "  , Seq(" ")),
+      ("empty tokens on each side",    "="  , Seq()),
+      ("space tokens on each side",    " = ", Seq(" ", " ")),
+      ("two tokens",                   "a=b", Seq("a", "b")),
+      ("token on left",                "a=" , Seq("a")),
+      ("token on right",               "=b" , Seq("b")),
+      ("token on left/space on right", "a= ", Seq("a", " ")),
+      ("space on left/token on right", " =b", Seq(" ", "b"))
+    )
+
+    for ((desc, in, out) ← expected) {
+      it(s"must pass $desc") {
+        assert(out === in.splitTo[List]("="))
+      }
     }
   }
 

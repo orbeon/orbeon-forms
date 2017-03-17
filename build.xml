@@ -157,7 +157,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/target/webapp/WEB-INF/lib/
+            -injars      orbeon-war/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -191,7 +191,6 @@
             <rule pattern="scala.**"                                           result="org.orbeon.private.scala.@1"/>
             <rule pattern="jcifs.**"                                           result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                           result="org.orbeon.private.spray.@1"/>
-            <!--<rule pattern="org/slf4j.**"                                       result="org.orbeon.private.slf4j.@1"/>-->
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
@@ -207,7 +206,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/target/webapp/WEB-INF/lib/
+            -injars      orbeon-war/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -242,7 +241,6 @@
             <rule pattern="scala.**"                                                    result="org.orbeon.private.scala.@1"/>
             <rule pattern="jcifs.**"                                                    result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                                    result="org.orbeon.private.spray.@1"/>
-            <!--<rule pattern="org/slf4j.**"                                                result="org.orbeon.private.slf4j.@1"/>-->
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>
@@ -259,7 +257,7 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/target/webapp/WEB-INF/lib/
+            -injars      orbeon-war/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -283,7 +281,6 @@
             <rule pattern="scala.**"                                   result="org.orbeon.private.scala.@1"/>
             <rule pattern="jcifs.**"                                   result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                   result="org.orbeon.private.spray.@1"/>
-            <!--<rule pattern="org/slf4j.**"                               result="org.orbeon.private.slf4j.@1"/>-->
         </jarjar>
         <delete file="${temp.jar}"/>
     </target>

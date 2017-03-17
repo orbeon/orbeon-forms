@@ -164,6 +164,11 @@
         /apps/fr/resources/scalajs/orbeon-form-runner-launcher.js
     </property>
 
+    <property as="xs:string"  name="oxf.fr.summary.js.uri.*.*">
+        /apps/fr/resources/scalajs/orbeon-form-runner.js
+        /apps/fr/resources/scalajs/orbeon-form-runner-launcher.js
+    </property>
+
     <!-- PDF template formatting -->
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
     <!-- NOTE: Can't use xxf:split() in these expressions yet (saxon:evaluate() doesn't find the functions). -->

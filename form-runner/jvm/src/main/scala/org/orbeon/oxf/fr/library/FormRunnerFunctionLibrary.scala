@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, XMLNames}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevels.ErrorLevel
+import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsAncestorOrganizations, XXFormsUserOrganizations, XXFormsUserRoles}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary

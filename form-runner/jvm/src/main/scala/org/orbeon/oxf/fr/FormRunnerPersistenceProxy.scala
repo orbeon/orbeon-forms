@@ -115,8 +115,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         throw HttpStatusCodeException(400)
     }
 
-  def handleRelevantOpt(request: Request, formOrData: String): Option[RelevanceHandling] =
-    if (formOrData == "data" && HttpMethod.getOrElseThrow(request.getMethod) == GET)
+  def handleRelevantOpt(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
+    if (formOrData == FormOrData.Data && HttpMethod.getOrElseThrow(request.getMethod) == GET)
       request.getFirstParamAsString("relevant") flatMap RelevanceHandling.withNameLowercaseOnlyOption
     else
       None
@@ -135,7 +135,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     checkDataFormatVersions(request, app, form, formOrData)
 
     // Get persistence implementation target URL and configuration headers
-    val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
+    val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
     assert(
       persistenceBaseURL ne null,

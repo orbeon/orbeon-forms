@@ -329,6 +329,16 @@
                                 <xsl:if test="$is-table">
                                     <xsl:attribute name="role" select="'presentation'"/>
                                 </xsl:if>
+
+                                <!-- Add relevance expression on table if needed -->
+                                <xsl:if test="not($is-editable) and not($is-repeat)">
+                                    <xsl:variable name="expr" select="fr:nested-controls-relevant-expression(.)"/>
+                                    <xsl:if test="exists($expr)">
+                                        <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                        <xsl:attribute name="ref" select="concat('xxf:component-context()[', fr:nested-controls-relevant-expression(.), ']')"/>
+                                    </xsl:if>
+                                </xsl:if>
+
                                 <!-- If repeat, add buttons and headers-->
                                 <xsl:if test="$is-repeat">
                                     <!-- Colgroup to make column sizing with CSS easier -->
@@ -695,6 +705,15 @@
 
                         <xsl:variable name="static-row-pos" select="count(preceding::*:tr) + 1"/>
 
+                        <!-- Add relevance expression on row if needed -->
+                        <xsl:if test="not($is-editable)">
+                            <xsl:variable name="expr" select="fr:nested-controls-relevant-expression(.)"/>
+                            <xsl:if test="exists($expr)">
+                                <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                <xsl:attribute name="ref" select="concat('.[', fr:nested-controls-relevant-expression(.), ']')"/>
+                            </xsl:if>
+                        </xsl:if>
+
                         <xsl:choose>
                             <xsl:when test="$is-repeat and $static-row-pos = 1">
                                 <xsl:attribute name="class" select="'fr-grid-tr', @class, '{$can-classes}'"/>
@@ -845,6 +864,30 @@
                         </xsl:choose>
                     </xsl:element>
                 </xsl:template>
+
+                <xsl:function name="fr:nested-controls-relevant-expression" as="xs:string?">
+                    <xsl:param name="elem" as="element()"/>
+
+                    <xsl:variable
+                        name="nested-control-names"
+                        select="frf:getAllControlNamesInViewUnder($elem)"/>
+
+                    <xsl:copy-of
+                        select="
+                            if (exists($nested-control-names)) then
+                                concat(
+                                    '(for $bind-name in (',
+                                    string-join(
+                                        for $name in $nested-control-names
+                                            return concat('''', $name, '-bind', ''''),
+                                        ','
+                                    ),
+                                    ') return xxf:relevant(bind($bind-name))) = true()'
+                                )
+                            else
+                                ()
+                    "/>
+                </xsl:function>
 
                 <!-- Because we expect that <td class="{expr}"> to be in the outer scope. -->
                 <xsl:function name="fr:scope-outer-avt-class" as="element(xf:var)*">

@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
@@ -74,6 +74,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def getControlNameOpt(control: NodeInfo) =
     (control \@ "id" headOption) flatMap
       (id ⇒ Option(controlNameFromId(id.stringValue)))
+
+  // Return all the controls in the view under the given element
+  def getAllControlsInViewUnder(start: NodeInfo): Seq[NodeInfo] =
+    start descendant * filter (e ⇒ isIdForControl(e.id))
+
+  //@XPathFunction
+  def getAllControlNamesInViewUnder(start: NodeInfo): SequenceIterator =
+    start descendant * filter (e ⇒ isIdForControl(e.id)) flatMap (e ⇒ controlNameFromIdOpt(e.id))
 
   def hasName(control: NodeInfo) = getControlNameOpt(control).isDefined
 

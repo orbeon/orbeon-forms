@@ -237,7 +237,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @return              object, or null if not found
      */
     public XFormsControl getObjectByEffectiveId(String effectiveId) {
-        return currentControlTree.findControlOrNull(effectiveId);
+        return currentControlTree.findControlOrNullJava(effectiveId);
     }
 
     /**

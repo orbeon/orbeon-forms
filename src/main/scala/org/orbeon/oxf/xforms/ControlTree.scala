@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import java.{util ⇒ ju}
 
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
@@ -147,7 +147,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def dispatchRefreshEvents(controlsEffectiveIds: Iterable[String]): Unit =
     withDebug("dispatching refresh events") {
       for (controlEffectiveId ← controlsEffectiveIds)
-        dispatchRefreshEvents(findControlOrNull(controlEffectiveId))
+        findControl(controlEffectiveId) foreach dispatchRefreshEvents
     }
 
   private def dispatchRefreshEvents(control: XFormsControl): Unit =
@@ -265,8 +265,12 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     case None       ⇒ ju.Collections.emptyList[XFormsControl]
   }
 
-  def effectiveIdsToControls                 = _controlIndex.effectiveIdsToControls
-  def findControlOrNull(effectiveId: String) = effectiveIdsToControls.getOrElse(effectiveId, null)
+  def effectiveIdsToControls                     = _controlIndex.effectiveIdsToControls
+  def findControl(effectiveId: String)           = effectiveIdsToControls.get(effectiveId)
+  def findControlOrNullJava(effectiveId: String) = findControl(effectiveId).orNull
+
+  def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
+    findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]
 
   def getUploadControlsJava      = _controlIndex.controlsOfName(UPLOAD_NAME).asJava
   def getUploadControls          = _controlIndex.controlsOfName(UPLOAD_NAME).asInstanceOf[Iterable[XFormsUploadControl]]

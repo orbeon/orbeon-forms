@@ -734,7 +734,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (beforeFocusEffectiveId != null && afterFocusEffectiveId == null) {
                         // Focus removed: notify the client only if the control still exists
-                        if (containingDocument.getControls().getCurrentControlTree().findControlOrNull(beforeFocusEffectiveId) != null)
+                        if (containingDocument.getControls().getCurrentControlTree().findControl(beforeFocusEffectiveId).isDefined())
                             outputFocusInfo(ch, containingDocument, false, beforeFocusEffectiveId);
 
                     } else if (afterFocusEffectiveId != null && ! afterFocusEffectiveId.equals(beforeFocusEffectiveId)) {

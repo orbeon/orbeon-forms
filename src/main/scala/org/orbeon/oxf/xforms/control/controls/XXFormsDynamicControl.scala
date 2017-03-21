@@ -288,11 +288,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val tree = containingDocument.getControls.getCurrentControlTree
 
     for ((prefixedId, elementInSource) ← groupChanges(xblChanges)) {
-      // Get control
-      val control = tree.findControlOrNull(prefixedId) // TODO: should use effective id if in repeat and process all
-
-      control match {
-        case componentControl: XFormsComponentControl ⇒
+      tree.findControl(prefixedId) match { // TODO: should use effective id if in repeat and process all
+        case Some(componentControl: XFormsComponentControl) ⇒
           // Update and restore switch state
           // LATER: See above comments
           // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {

@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.{BindingContext, _}
 
 import scala.collection.JavaConverters._
 
@@ -257,16 +257,15 @@ object Controls {
         case Nil ⇒
           List(indexes)
         case repeatPrefixedId :: remainingPrefixedIds ⇒
-
-          val repeatControl =
-            tree.findControlOrNull(repeatPrefixedId + buildSuffix(indexes)).asInstanceOf[XFormsRepeatControl]
-
-          if (repeatControl eq null) {
-            Nil // control might not exist (but why?)
-          } else if (followIndexes) {
-            searchNextRepeatLevel(repeatControl.getIndex :: indexes, remainingPrefixedIds)
-          } else {
-            1 to repeatControl.getSize flatMap (i ⇒ searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)) toList
+          tree.findRepeatControl(repeatPrefixedId + buildSuffix(indexes)) match {
+            case None ⇒
+              Nil // control might not exist (but why?)
+            case Some(repeatControl) if followIndexes ⇒
+              searchNextRepeatLevel(repeatControl.getIndex :: indexes, remainingPrefixedIds)
+            case Some(repeatControl) ⇒
+              1 to repeatControl.getSize flatMap (i ⇒ searchNextRepeatLevel(i :: indexes, remainingPrefixedIds)) toList
+            case _ ⇒
+              throw new IllegalStateException
           }
       }
 

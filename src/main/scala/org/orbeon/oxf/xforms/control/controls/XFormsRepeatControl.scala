@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.control.controls
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CollectionUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -30,7 +32,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, ControlTree, XFormsContainingDocument}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -687,7 +688,7 @@ object XFormsRepeatControl {
     // Build a suffix based on the ancestor repeats' current indexes
     val suffix = suffixForRepeats(indexes, ancestorRepeatsFromRoot)
 
-    Option(tree.findControlOrNull(addSuffix(control.prefixedId, suffix)))
+    tree.findControl(addSuffix(control.prefixedId, suffix))
   }
 
   // Return all the controls with the same prefixed id as the control specified
@@ -704,7 +705,10 @@ object XFormsRepeatControl {
         case head :: tail ⇒
 
           val repeatEffectiveId = addSuffix(head.prefixedId, suffix)
-          val repeatControl     = tree.findControlOrNull(repeatEffectiveId).asInstanceOf[XFormsRepeatControl]
+
+          val repeatControl =
+            tree.findRepeatControl(repeatEffectiveId) getOrElse
+              (throw new IllegalStateException)
 
           for {
             index ← Iterator.from(1).take(repeatControl.getSize)
@@ -713,7 +717,7 @@ object XFormsRepeatControl {
             i
       }
 
-    search(control.staticControl.ancestorRepeatsAcrossParts.reverse, "") map tree.findControlOrNull
+    search(control.staticControl.ancestorRepeatsAcrossParts.reverse, "") flatMap tree.findControl
   }
 
   // Find indexes for the given repeats in the current document
@@ -729,9 +733,9 @@ object XFormsRepeatControl {
 
         // Add the index to the map (0 if the control is not found)
         indexes += (repeat.prefixedId → {
-          tree.findControlOrNull(effectiveId) match {
-            case control: XFormsRepeatControl ⇒ index(control)
-            case _ ⇒ 0
+          tree.findRepeatControl(effectiveId) match {
+            case Some(control) ⇒ index(control)
+            case _             ⇒ 0
           }
         })
     }

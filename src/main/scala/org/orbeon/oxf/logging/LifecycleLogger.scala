@@ -84,7 +84,7 @@ object LifecycleLogger {
     }
 
   private def findSessionId(req: Request): Option[String] =
-    Option(req.getSession(false)) map (_.getId)
+    req.sessionOpt map (_.getId)
 
   private def event(req: Request, source: String, message: String, params: Seq[(String, String)]): Unit =
     try {

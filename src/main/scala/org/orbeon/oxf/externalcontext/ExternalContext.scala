@@ -91,6 +91,7 @@ object ExternalContext {
     def parameters: collection.Map[String, Array[AnyRef]] = getParameterMap.asScala
     def getFirstParamAsString(name: String)               = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
     def getFirstHeader(name: String)                      = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
+    def sessionOpt: Option[Session]                       = Option(getSession(create = false))
   }
 
   trait Rewriter extends URLRewriter {

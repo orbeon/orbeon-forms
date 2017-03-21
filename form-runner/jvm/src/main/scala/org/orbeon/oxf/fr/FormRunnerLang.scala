@@ -165,7 +165,7 @@ trait FormRunnerLang {
   }
 
   private def stringFromSession(request: Request, name: String) =
-    Option(request.getSession(false)) flatMap
+    request.sessionOpt flatMap
       (s ⇒ Option(s.getAttributesMap.get(LanguageParam))) map {
         case item: Item ⇒ item.getStringValue
         case other ⇒ other.toString

@@ -63,7 +63,7 @@ object Authorizer extends Logging {
   def authorizeIfNeededAndRemember(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
 
     def alreadyAuthorized =
-      Option(request.getSession(false)) flatMap
+      request.sessionOpt flatMap
       (_.getAttributesMap.asScala.get(AuthorizedKey)) collect
       { case value: JBoolean ⇒ value.booleanValue() } exists
       identity

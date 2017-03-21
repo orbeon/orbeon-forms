@@ -295,7 +295,7 @@ object XFormsResourceServer {
     implicit val externalContext = NetUtils.getExternalContext
 
     findDynamicResource(requestPath) foreach { resource ⇒
-      Option(externalContext.getRequest.getSession(false)) foreach { session ⇒
+      externalContext.getRequest.sessionOpt foreach { session ⇒
 
         if (removeFile)
           Try(new File(resource.uri)) foreach { file ⇒
@@ -311,7 +311,7 @@ object XFormsResourceServer {
     requestPath     : String)(implicit
     externalContext : ExternalContext
   ): Option[DynamicResource] =
-    Option(externalContext.getRequest.getSession(false)) flatMap { session ⇒
+    externalContext.getRequest.sessionOpt flatMap { session ⇒
       val digestFromPath = filename(requestPath)
       val lookupKey      = DynamicResourcesSessionKey + digestFromPath
 

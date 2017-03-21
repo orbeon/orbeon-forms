@@ -130,6 +130,10 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-ajax-timeout"                   value="30000"/>
+
+    <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
+    <property as="xs:string"  name="oxf.xforms.upload.max-size"                             value=""/>
+    <property as="xs:integer" name="oxf.xforms.upload.delay-before-xforms-timeout"          value="45000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"        value="2000"/>
 
     <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                 value=""/>

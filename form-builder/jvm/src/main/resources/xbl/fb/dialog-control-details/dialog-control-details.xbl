@@ -491,9 +491,15 @@
                     name="decimal-constraints"
                     value="$integer-constraints, 'fraction-digits'"/>
 
+                <!-- 2017-03-22: Unused still. -->
                 <xf:var
                     name="date-constraints"
                     value="$min-max-constraints"/>
+
+                <!-- LATER: `attachment-accepted-mediatypes` (#3015) -->
+                <xf:var
+                    name="attachment-constraints"
+                    value="'attachment-max-size'"/>
 
                 <xf:var
                     name="noargs-constraints"
@@ -745,6 +751,8 @@
                                                         $integer-constraints
                                                     else if ($builtin-type = 'decimal') then
                                                         $decimal-constraints
+                                                    else if ($builtin-type = 'anyURI') then
+                                                        $attachment-constraints
                                                     else
                                                         ()
                                                 ),

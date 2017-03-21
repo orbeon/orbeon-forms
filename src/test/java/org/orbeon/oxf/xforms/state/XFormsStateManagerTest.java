@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.junit.Test;
-import org.orbeon.oxf.externalcontext.TestSession;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.TestSession;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
@@ -247,7 +247,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // New state
         final State state2 = new State();
 
-        final Lock lock = stateManager.acquireDocumentLock(parameters, 0L);
+        final Lock lock = stateManager.acquireDocumentLock(parameters.getUUID(), 0L);
         if (lock == null)
             fail("Ajax update lock timeout exceeded");
         try {

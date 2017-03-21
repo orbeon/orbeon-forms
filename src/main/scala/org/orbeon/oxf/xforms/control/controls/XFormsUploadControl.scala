@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
@@ -74,18 +75,18 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       case _: XXFormsUploadCancelEvent ⇒
         // Upload canceled by the user
         containingDocument.endUpload(getUploadUniqueId)
-        removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
       case doneEvent: XXFormsUploadDoneEvent ⇒
         // Upload done: process upload to this control
         // Notify that the upload has ended
         containingDocument.endUpload(getUploadUniqueId)
-        removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
         handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
         visited = true
       case _: XXFormsUploadErrorEvent ⇒
         // Upload error: sent by the client in case of error
         containingDocument.endUpload(getUploadUniqueId)
-        removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
       case _ ⇒
     }
   }

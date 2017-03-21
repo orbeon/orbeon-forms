@@ -519,7 +519,7 @@
     </processor>
 
     <processor name="oxf:xforms-upload">
-        <class name="org.orbeon.oxf.xforms.processor.Upload"/>
+        <class name="org.orbeon.oxf.xforms.processor.UploaderProcessor"/>
     </processor>
 
     <processor name="oxf:xforms-submission">

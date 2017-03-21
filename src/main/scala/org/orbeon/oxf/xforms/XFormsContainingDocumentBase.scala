@@ -13,14 +13,17 @@
  */
 package org.orbeon.oxf.xforms
 
+import java.util.concurrent.locks.Lock
 import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -30,12 +33,15 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
+import org.orbeon.oxf.xforms.function.xxforms.AttachmentMaxSizeValidation
 import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState}
+import org.orbeon.oxf.xforms.state.XFormsStateLifecycle.RequestParameters
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState, XFormsStateManager}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
 
@@ -44,8 +50,44 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-private object XFormsContainingDocumentBase {
-  val ContainingDocumentPseudoId = "#document"
+object XFormsContainingDocumentBase {
+
+  private val ContainingDocumentPseudoId = "#document"
+
+  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument ⇒ T): T = {
+    XFormsStateManager.instance.acquireDocumentLock(uuid, timeout) match {
+      case lock: Lock ⇒
+        try {
+          val containingDocument =
+            XFormsStateManager.instance.beforeUpdate(
+              new RequestParameters {
+                def getUUID = uuid
+                def getEncodedClientStaticState = ""
+                def getEncodedClientDynamicState = ""
+              }
+            )
+
+          var keepDocument = false
+          try {
+            val result = block(containingDocument)
+
+            XFormsStateManager.instance.beforeUpdateResponse(containingDocument, true)
+            XFormsStateManager.instance.afterUpdateResponse(containingDocument)
+
+            keepDocument = true
+
+            result
+          } finally {
+            XFormsStateManager.instance.afterUpdate(containingDocument, keepDocument)
+          }
+
+        } finally {
+          XFormsStateManager.instance.releaseDocumentLock(lock)
+        }
+      case null ⇒
+        throw new IllegalStateException
+    }
+  }
 }
 
 import org.orbeon.oxf.xforms.XFormsContainingDocumentBase._
@@ -54,6 +96,7 @@ abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
   extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
   with ContainingDocumentLogging
   with ContainingDocumentMisc
+  with ContainingDocumentUpload
   with ContainingDocumentEvent
   with ContainingDocumentTemplate
   with ContainingDocumentProperties
@@ -63,6 +106,33 @@ abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
   with XFormsDocumentLifecycle
   with Cacheable
   with XFormsObject
+
+trait ContainingDocumentUpload {
+
+  def getControls   : XFormsControls
+  def getStaticState: XFormsStaticState
+
+  def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
+
+    def fromCommonConstraint =
+      getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
+        CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
+        (_.customMIPs.get(AttachmentMaxSizeValidation.PropertyName))        flatMap
+        MaximumSize.tryFromString
+
+    def fromFormSetting =
+      getStaticState.staticStringProperty(UPLOAD_MAX_SIZE_PROPERTY).trimAllToOpt flatMap
+        MaximumSize.tryFromString
+
+    def fromProperty = MaximumSize.tryFromString(RequestGenerator.getMaxSizeProperty.toString)
+
+    fromCommonConstraint orElse
+      fromFormSetting    orElse
+      fromProperty       getOrElse
+      MaximumSize.LimitedSize(0)
+  }
+
+}
 
 trait ContainingDocumentMisc {
 

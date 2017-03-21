@@ -14,14 +14,13 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.util.{CollectionUtils, Interrupted, SizeReason, UploadProgress}
+import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl}
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel.Reason
-import XFormsEvent._
-import org.orbeon.oxf.util.CollectionUtils
-import org.orbeon.oxf.xforms.control.controls.{XFormsUploadControl, FileMetadata}
-import org.orbeon.oxf.util.Multipart.{SizeReason, Interrupted, UploadProgress}
+import org.orbeon.oxf.xml.dom4j.LocationData
 
 class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = false) {

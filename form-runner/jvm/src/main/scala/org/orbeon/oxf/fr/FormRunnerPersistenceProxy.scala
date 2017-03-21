@@ -247,7 +247,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         StreamedContent(
           is,
           Option(request.getContentType),
-          Some(request.getContentLength.toLong) filter (_ >= 0L),
+          request.contentLengthOpt,
           None
         )
       }

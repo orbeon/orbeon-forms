@@ -263,5 +263,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Fun("fraction-digits", classOf[MaxFractionDigitsValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
+
+    Fun(AttachmentMaxSizeValidation.PropertyName, classOf[AttachmentMaxSizeValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
+    )
   }
 }

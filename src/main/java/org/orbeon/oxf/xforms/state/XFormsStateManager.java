@@ -290,18 +290,18 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     /**
      * Return the locked document lock. Must be called before beforeUpdate().
      *
-     * @param parameters    incoming Ajax request
-     * @return              the document lock, already locked
+     * @param uuid    incoming UUID
+     * @return        the document lock, already locked
      */
-    public Lock acquireDocumentLock(RequestParameters parameters, long timeout) {
-        assert parameters.getUUID() != null;
+    public Lock acquireDocumentLock(String uuid, long timeout) {
+        assert uuid != null;
 
         // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
         // for a given UUID must belong to the same session that created the document. If the session expires, the
         // key goes away as well, and the key won't be present. If we don't do this check, the XForms server might
         // handle requests for a given UUID within a separate session, therefore providing access to other sessions,
         // which is not desirable. Further, we now have a lock stored in the session.
-        final Lock lock = getDocumentLock(parameters.getUUID());
+        final Lock lock = getDocumentLock(uuid);
         if (lock == null)
             throw new SessionExpiredException("Unknown form document requested.");
 

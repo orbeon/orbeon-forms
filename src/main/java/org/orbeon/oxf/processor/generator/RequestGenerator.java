@@ -21,8 +21,8 @@ import org.orbeon.dom.*;
 import org.orbeon.dom.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -607,6 +607,7 @@ public class RequestGenerator extends ProcessorImpl {
         }
     }
 
+    // TODO: Should be a `long`.
     public static int getMaxSizeProperty() {
         PropertySet propertySet = Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
         Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);

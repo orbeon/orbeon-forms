@@ -140,6 +140,15 @@
             )[1]"/>
 
     <xsl:variable
+        name="valid-attachment-max-size-or-empty"
+        as="xs:string?"
+        select="
+            p:property(string-join(('oxf.fr.detail.attachment.max-size', $app, $form), '.'))[
+                (: Allow -1 to mean 'unlimited' :)
+                . castable as xs:integer and xs:integer(.) ge -1
+            ]"/>
+
+    <xsl:variable
         name="view-appearance"
         as="xs:string"
         select="
@@ -403,6 +412,17 @@
             <xsl:copy-of select="@xxf:encrypt-item-values"/>
             <xsl:copy-of select="@xxf:label.appearance"/>
             <xsl:copy-of select="@xxf:hint.appearance"/>
+
+            <xsl:choose>
+                <xsl:when test="exists(@xxf:upload.max-size)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.max-size"/>
+                </xsl:when>
+                <xsl:when test="exists($valid-attachment-max-size-or-empty)">
+                    <!-- Else use Form Runner property if specified and valid -->
+                    <xsl:attribute name="xxf:upload.max-size" select="$valid-attachment-max-size-or-empty"/>
+                </xsl:when>
+            </xsl:choose>
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

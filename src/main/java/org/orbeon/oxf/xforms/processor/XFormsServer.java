@@ -202,8 +202,8 @@ public class XFormsServer extends ProcessorImpl {
         // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
         final Lock lock =
             XFormsStateManager.instance().acquireDocumentLock(
-                parameters,
-                isAjaxRequest ? 0 : XFormsProperties.getAjaxTimeout()
+                parameters.getUUID(),
+                isAjaxRequest ? 0L : XFormsProperties.getAjaxTimeout()
             );
 
         if (lock != null) {

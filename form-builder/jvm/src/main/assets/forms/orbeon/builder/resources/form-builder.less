@@ -283,6 +283,12 @@ div.orbeon.orbeon-portlet-div {
             td { text-align: right; padding-left: .5em }
             &> .xforms-label { border-bottom: 1px solid #DDE }
         }
+
+        .fb-upload-max-size-control > .fr-component-group{
+            display: flex;
+            min-height: 28px; // so that there is no change in height when showing/hiding
+            align-items: center;
+        }
     }
 
     // Submission editor dialog

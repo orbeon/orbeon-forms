@@ -194,6 +194,12 @@ object NumericValidation {
           case v: ValidationFailure ⇒ None
         }
     }
+
+  def tryParseAsLong(value: String): Option[Long] =
+    IntegerValue.stringToInteger(value) match {
+      case v: Int64Value        ⇒ Some(v.longValue)
+      case _                    ⇒ None
+    }
 }
 
 class MaxFractionDigitsValidation extends ValidationFunction {
@@ -229,4 +235,19 @@ class MaxFractionDigitsValidation extends ValidationFunction {
     case Some(constraint) ⇒ countDigitsAfterDecimalSeparator(value) <= constraint
     case None             ⇒ true
   }
+}
+
+object AttachmentMaxSizeValidation {
+  val PropertyName = "attachment-max-size"
+}
+
+class AttachmentMaxSizeValidation extends ValidationFunction {
+
+  val propertyName = AttachmentMaxSizeValidation.PropertyName
+
+  def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
+    case Some(constraint) ⇒ true // for now, don't actually validate, see #2956
+    case None             ⇒ true
+  }
+
 }

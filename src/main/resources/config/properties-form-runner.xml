@@ -166,6 +166,9 @@
     <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                           value=""/>
     <property as="xs:string"  name="oxf.fr.detail.focus.excludes.*.*"                           value="xf:trigger"/>
 
+    <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
+    <property as="xs:string"  name="oxf.fr.detail.attachment.max-size.*.*"                      value=""/>
+
     <!-- PDF fonts -->
     <!-- Optional PDF font embedding. Specifying a family name is optional.
     <property as="xs:string"  name="oxf.fr.pdf.font.path.ID"                                    value=""/>

@@ -101,7 +101,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
   def setRequiredValid(value: Boolean, mip: Option[StaticBind#MIP]) = this._requiredValidation    = if (! value) mip.orNull else null
 
   def setCustom(name: String, value: String) = _customMips += name → value
-  def clearCustom(name: String)             = _customMips -= name
+  def clearCustom(name: String)              = _customMips -= name
 
   def relevant        = _relevant
   def readonly        = _readonly

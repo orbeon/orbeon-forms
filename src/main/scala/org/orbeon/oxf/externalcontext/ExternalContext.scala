@@ -16,6 +16,9 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 import java.{util ⇒ ju}
 
+import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.NumericUtils
+
 import scala.collection.JavaConverters._
 
 /**
@@ -92,6 +95,7 @@ object ExternalContext {
     def getFirstParamAsString(name: String)               = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String ⇒ s })
     def getFirstHeader(name: String)                      = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
     def sessionOpt: Option[Session]                       = Option(getSession(create = false))
+    lazy val contentLengthOpt: Option[Long]               = getFirstHeader(Headers.ContentLength) flatMap NumericUtils.parseLong filter (_ >= 0L)
   }
 
   trait Rewriter extends URLRewriter {

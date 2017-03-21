@@ -426,6 +426,7 @@
                 <item id="non-positive">Negative or Zero</item>
                 <item id="negative">Negative</item>
                 <item id="fraction-digits">Maximum Fractional Digits</item>
+                <item id="attachment-max-size">Maximum Attachment Size</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -1385,6 +1386,7 @@
                 <item id="non-positive">Négatif ou zéro</item>
                 <item id="negative">Négatif</item>
                 <item id="fraction-digits">Maximum chiffres fractionnaires </item>
+                <item id="attachment-max-size">Taille maximale du fichier joint]</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -2347,6 +2349,7 @@
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -3335,6 +3338,7 @@
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -4324,6 +4328,7 @@
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -5305,6 +5310,7 @@
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -6289,6 +6295,7 @@
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -7271,6 +7278,7 @@
                 <item id="non-positive">Negativo o Cero]</item>
                 <item id="negative">Negativo</item>
                 <item id="fraction-digits">Máximo de dígitos para fracciones</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -8253,6 +8261,7 @@
                 <item id="non-positive" todo="true">[Negative or Zero]</item>
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -9241,6 +9250,7 @@
                 <item id="non-positive">Negativt eller noll</item>
                 <item id="negative">Negativt</item>
                 <item id="fraction-digits">Decimaler max</item>
+                <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
             </constraint>
             <formula>
                 <label>Formel</label>

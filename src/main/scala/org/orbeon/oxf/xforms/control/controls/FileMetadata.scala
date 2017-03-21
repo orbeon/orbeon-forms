@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.control.controls
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.{Multipart, NetUtils}
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
@@ -24,9 +25,9 @@ import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsV
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.saxon.om.NodeInfo
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util.StringUtils._
 
 import scala.util.control.NonFatal
 
@@ -181,7 +182,7 @@ object FileMetadata {
   val AllMetadataNames: Seq[String] = Evaluators.keys.toList
 
   def progress(metadata: FileMetadata) = {
-    val option = Multipart.getUploadProgress(NetUtils.getExternalContext.getRequest, metadata.containingDocument.getUUID, metadata.getEffectiveId)
+    val option = UploaderServer.getUploadProgress(NetUtils.getExternalContext.getRequest, metadata.containingDocument.getUUID, metadata.getEffectiveId)
     option filter (_.fieldName == metadata.getEffectiveId)
   }
 

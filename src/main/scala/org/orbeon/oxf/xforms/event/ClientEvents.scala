@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.state.XFormsStateManager
+import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
 
@@ -426,7 +427,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         val ids                  = uploadProgressEvents map (_.targetEffectiveId)
 
         val requestUUID          = XFormsStateManager.getRequestUUID(requestDocument)
-        val allProgress          = ids flatMap (id ⇒ Multipart.getUploadProgress(request, requestUUID, id).toList)
+        val allProgress          = ids flatMap (id ⇒ UploaderServer.getUploadProgress(request, requestUUID, id).toList)
 
         if (allProgress.nonEmpty) {
 

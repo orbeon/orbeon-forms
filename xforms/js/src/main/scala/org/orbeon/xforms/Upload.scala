@@ -21,7 +21,7 @@ import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
 
-private object Upload {
+object Upload {
 
   def log(s: String) = () // println(s"Upload: $s")
 

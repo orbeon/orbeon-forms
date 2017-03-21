@@ -19,10 +19,9 @@ import org.scalajs.dom.raw.{HTMLElement, XMLHttpRequest}
 import org.scalajs.jquery.JQueryCallback
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
-import scala.scalajs.js.|
+import scala.scalajs.js.annotation.{JSGlobal, ScalaJSDefined}
 
-@JSName("ORBEON.xforms.Globals")
+@JSGlobal("ORBEON.xforms.Globals")
 @js.native
 object Globals extends js.Object {
   val xformsServerUploadURL : js.Dictionary[String]     = js.native
@@ -66,13 +65,13 @@ class XBLCompanion extends js.Object {
   def containerElem: Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[Element]
 }
 
-@JSName("ORBEON.xforms.XBL")
+@JSGlobal("ORBEON.xforms.XBL")
 @js.native
 object XBL extends js.Object {
   def declareCompanion(name: String, companion: XBLCompanion): Unit = js.native
 }
 
-@JSName("ORBEON.xforms.Controls")
+@JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {
   def setCurrentValue(control: html.Element, newControlValue: String) : Unit               = js.native
@@ -83,13 +82,13 @@ object Controls extends js.Object {
 @ScalaJSDefined
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object
 
-@JSName("ORBEON.xforms.Events")
+@JSGlobal("ORBEON.xforms.Events")
 @js.native
 object Events extends js.Object {
   def ajaxResponseProcessedEvent: YUICustomEvent = js.native
 }
 
-@JSName("ORBEON.xforms.server.AjaxServer")
+@JSGlobal("ORBEON.xforms.server.AjaxServer")
 @js.native
 object AjaxServer extends js.Object {
   def handleResponseAjax(o: XMLHttpRequest): Unit = js.native
@@ -100,13 +99,13 @@ object AjaxServer extends js.Object {
   class Event(args: js.Any*) extends js.Object
 }
 
-@JSName("ORBEON.util.Property")
+@JSGlobal("ORBEON.util.Property")
 @js.native
 class Property[T] extends js.Object {
   def get(): T = js.native
 }
 
-@JSName("ORBEON.util.Properties")
+@JSGlobal("ORBEON.util.Properties")
 @js.native
 object Properties extends js.Object {
   val delayBeforeIncrementalRequest    : Property[Int] = js.native
@@ -114,13 +113,13 @@ object Properties extends js.Object {
   val delayBeforeDisplayLoading        : Property[Int] = js.native
 }
 
-@JSName("ORBEON.util.Utils")
+@JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {
   def appendToEffectiveId(effectiveId: String, ending: String): String = js.native
 }
 
-@JSName("ORBEON.xforms.control.Control")
+@JSGlobal("ORBEON.xforms.control.Control")
 @js.native
 class Control extends js.Object {
 

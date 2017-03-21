@@ -13,12 +13,11 @@
   */
 package org.orbeon.xforms
 
-import org.scalajs.dom.html
-
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, ScalaJSDefined}
+import scala.scalajs.js.annotation.{JSGlobal, ScalaJSDefined}
 
 @js.native
+@JSGlobal
 object NProgress extends js.Object {
   def configure(options: js.Object) : Unit = js.native
   def start()                       : Unit = js.native

@@ -161,12 +161,10 @@
     <property as="xs:string"  name="oxf.fr.detail.js.uri.*.*">
         /apps/fr/script/form-runner.min.js
         /apps/fr/resources/scalajs/orbeon-form-runner.js
-        /apps/fr/resources/scalajs/orbeon-form-runner-launcher.js
     </property>
 
     <property as="xs:string"  name="oxf.fr.summary.js.uri.*.*">
         /apps/fr/resources/scalajs/orbeon-form-runner.js
-        /apps/fr/resources/scalajs/orbeon-form-runner-launcher.js
     </property>
 
     <!-- PDF template formatting -->

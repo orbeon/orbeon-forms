@@ -104,7 +104,6 @@ def scalaJsFiles(sourceFile: File, pathPrefix: String): Seq[(File, String)] = {
   val (prefix, optType) =
     sourceFile.name match { case MatchScalaJSFileNameFormatRE(_, prefix, optType) ⇒ prefix → optType }
 
-  val launcherName  = s"$prefix-launcher.js"
   val jsdepsName    = s"$prefix-jsdeps${if (optType == "opt") ".min" else ""}.js"
   val sourceMapName = s"${sourceFile.name}.map"
 
@@ -112,7 +111,6 @@ def scalaJsFiles(sourceFile: File, pathPrefix: String): Seq[(File, String)] = {
 
   List(
     sourceFile                                 → s"$prefix.js",
-    (sourceFile.getParentFile / launcherName)  → launcherName,
     (sourceFile.getParentFile / jsdepsName)    → jsdepsName,
     (sourceFile.getParentFile / sourceMapName) → sourceMapName
   ) map { case (f, p) ⇒ f → (targetPath + '/' + p) }
@@ -450,8 +448,8 @@ lazy val formRunnerJS = formRunner.js
     // HACK: Not sure why `xformsJS % "test->test;compile->compile"` doesn't expose this.
     unmanagedResourceDirectories in Test += sharedAssetsDir((baseDirectory in xformsJS).value),
 
-    persistLauncher     in Compile := true,
-    persistLauncher     in Test    := false,
+    scalaJSUseMainModuleInitializer in Compile := true,
+    scalaJSUseMainModuleInitializer in Test    := false,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
@@ -507,8 +505,8 @@ lazy val formBuilderJS: Project = formBuilder.js
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
-    persistLauncher     in Compile := true,
-    persistLauncher     in Test    := false,
+    scalaJSUseMainModuleInitializer in Compile := true,
+    scalaJSUseMainModuleInitializer in Test    := false,
 
     testOptions         in Test    += Tests.Setup(() ⇒ println("Setup")),
     testOptions         in Test    += Tests.Cleanup(() ⇒ println("Cleanup")),
@@ -567,8 +565,8 @@ lazy val xformsJS: Project = xforms.js
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/xforms/control/Control.js" dependsOn "jquery-orbeon.js",
 
-    persistLauncher     in Compile := true,
-    persistLauncher     in Test    := false,
+    scalaJSUseMainModuleInitializer in Compile := true,
+    scalaJSUseMainModuleInitializer in Test    := false,
 
 //    jsEnv                         := NodeJSEnv().value,
 

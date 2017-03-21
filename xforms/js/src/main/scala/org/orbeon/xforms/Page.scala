@@ -18,9 +18,10 @@ import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js.Dynamic.{global ⇒ g}
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExport("ORBEON.xforms.Page") // used by `xforms.js`, `AjaxServer.js`, `Calendar.coffee`
+@JSExportTopLevel("ORBEON.xforms.Page") // used by `xforms.js`, `AjaxServer.js`, `Calendar.coffee`
+@JSExportAll
 object Page {
 
   case class ConstructorPredicate(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean)
@@ -31,7 +32,6 @@ object Page {
   private var idToControl = Map[String, Control]()
 
   // Return the form object (not HTML element) corresponding to the specified id.
-  @JSExport
   def getForm(id: String): Form =
     forms.get(id) match {
       case Some(form) ⇒
@@ -43,7 +43,6 @@ object Page {
     }
 
   // Return the language for the page, defaulting to English if none is set on html/@lang.
-  @JSExport
   def getLang(): String =
     ($(g.document.documentElement).attr("lang") getOrElse "en").substring(0, 2)
 
@@ -51,8 +50,13 @@ object Page {
   // form, so getControl() could be a method of a form, but since we can given a container or control id determine
   // the control object without knowing the form, this method is defined at the Page level which makes it easier
   // to use for a caller who doesn't necessarily have a reference to the form object.
-  @JSExport
   def getControl(container: html.Element): Control = {
+
+    def getControlConstructor(container: html.Element): () ⇒ Control =
+      controlConstructors find (_.predicate(container)) match {
+        case Some(result) ⇒ result.controlConstructor
+        case None         ⇒ throw new IllegalArgumentException(s"Can't find a relevant control for container: `${container.id}`")
+      }
 
     def createAndRegisterNewControl() = {
       val newControl = getControlConstructor(container)()
@@ -68,14 +72,7 @@ object Page {
     }
   }
 
-  private def getControlConstructor(container: html.Element): () ⇒ Control =
-    controlConstructors find (_.predicate(container)) match {
-      case Some(result) ⇒ result.controlConstructor
-      case None         ⇒ throw new IllegalArgumentException(s"Can't find a relevant control for container: `${container.id}`")
-    }
-
   // Register a control constructor (such as tree, input...). This is expected to be called by the control itself when loaded.
-  @JSExport
   def registerControlConstructor(controlConstructor: () ⇒ Control, predicate: html.Element ⇒ Boolean): Unit =
     controlConstructors ::= ConstructorPredicate(controlConstructor, predicate)
 }

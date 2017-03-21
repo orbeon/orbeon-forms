@@ -81,7 +81,7 @@
         <parameter value="utf8" />
       </parameters>
     </profile>
-    <profile name="SBT 7" modules="commonJS,formBuilderJS,formRunnerJS,xformsJS">
+    <profile name="SBT 8" modules="commonJS,formBuilderJS,formRunnerJS,xformsJS">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />
@@ -93,7 +93,7 @@
         <parameter value="utf8" />
       </parameters>
       <plugins>
-        <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.14.jar" />
+        <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.15.jar" />
       </plugins>
     </profile>
   </component>

@@ -20,18 +20,12 @@ import org.scalajs.dom.html
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSStringOps._
-import scala.scalajs.js.annotation.JSExportAll
+import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import scala.scalajs.js.{URIUtils, |}
 
+@JSExportTopLevel("ORBEON.xforms.Document")
 @JSExportAll
 object Document {
-
-  // Do this by hand because JavaScript callers expect `ORBEON.xforms.Document.getValue()`, etc.
-  // and not `ORBEON.xforms.Document().getValue()`.
-  if (js.isUndefined(g.ORBEON))        g.ORBEON        = new js.Object
-  if (js.isUndefined(g.ORBEON.xforms)) g.ORBEON.xforms = new js.Object
-
-  g.ORBEON.xforms.Document = Document.asInstanceOf[js.Object]
 
   // Dispatch an event
   // NOTE: This doesn't support all parameters.

@@ -35,7 +35,6 @@
         /forms/orbeon/builder/resources/section-grid-repeat/grid-repeat-editor.min.js
 
         /forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
-        /forms/orbeon/builder/resources/scalajs/orbeon-form-builder-launcher.js
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">

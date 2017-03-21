@@ -17,13 +17,13 @@ import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
+import scala.scalajs.js.annotation.{JSGlobal, ScalaJSDefined}
 import scala.scalajs.js.|
 
 // YUI definitions. Eventually this will go away, see:
 // https://github.com/orbeon/orbeon-forms/issues/1599
 
-@JSName("YAHOO.util.Connect")
+@JSGlobal("YAHOO.util.Connect")
 @js.native
 object YUIConnect extends js.Object {
 
@@ -72,7 +72,7 @@ trait YUICustomEvent extends js.Object {
   def unsubscribe(fn: js.Function) : Unit = js.native
 }
 
-@JSName("YAHOO.widget.ProgressBar")
+@JSGlobal("YAHOO.widget.ProgressBar")
 @js.native
 class ProgressBar(config: js.Object) extends js.Object {
   def render(parent: Element, before: js.UndefOr[Element] = js.undefined) : Unit       = js.native
@@ -80,7 +80,7 @@ class ProgressBar(config: js.Object) extends js.Object {
   def get(key: String)                                                    : js.Dynamic = js.native
 }
 
-@JSName("YAHOO.util.Event")
+@JSGlobal("YAHOO.util.Event")
 @js.native
 object Event extends js.Object {
   def preventDefault(event: js.Object): Unit = js.native

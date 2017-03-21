@@ -66,12 +66,12 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   override def performTargetAction(event: XFormsEvent): Unit = {
     super.performTargetAction(event)
     event match {
-      case startEvent: XXFormsUploadStartEvent ⇒
+      case _: XXFormsUploadStartEvent ⇒
         // Upload started
         containingDocument.startUpload(getUploadUniqueId)
-      case progressEvent: XXFormsUploadProgressEvent ⇒
+      case _: XXFormsUploadProgressEvent ⇒
         // NOP: upload progress information will be sent through the diff process
-      case cancelEvent: XXFormsUploadCancelEvent ⇒
+      case _: XXFormsUploadCancelEvent ⇒
         // Upload canceled by the user
         containingDocument.endUpload(getUploadUniqueId)
         removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
@@ -82,7 +82,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
         handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
         visited = true
-      case errorEvent: XXFormsUploadErrorEvent ⇒
+      case _: XXFormsUploadErrorEvent ⇒
         // Upload error: sent by the client in case of error
         containingDocument.endUpload(getUploadUniqueId)
         removeUploadProgress(NetUtils.getExternalContext.getRequest, this)

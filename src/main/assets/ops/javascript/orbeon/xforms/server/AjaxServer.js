@@ -1854,7 +1854,7 @@
                         });
 
                         // Notification event if the type changed
-                        _.each(recreatedInputs, function(controlId, documentElement) {
+                        _.each(recreatedInputs, function(documentElement, controlId) {
                             Controls.typeChangedEvent.fire({control: documentElement});
                         });
                     }

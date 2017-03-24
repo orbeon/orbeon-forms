@@ -64,7 +64,7 @@ class Upload extends Control {
   // background  as soon as possible (pseudo-Ajax request).
   override def change(): Unit = {
     log("change → queueing")
-    UploadServer.uploadEventQueue.add(
+    UploaderClient.uploadEventQueue.add(
       UploadEvent(self.getForm(), self),
       Properties.delayBeforeIncrementalRequest.get(),
       ExecutionWait.MinWait
@@ -76,7 +76,7 @@ class Upload extends Control {
   // server.
   def progress(state: String, received: Int, expected: Int): Unit =
     state match {
-      case "interrupted"                    ⇒ UploadServer.cancel(doAbort = true, XXFormsUploadError); log("cancel")
+      case "interrupted"                    ⇒ UploaderClient.cancel(doAbort = true, XXFormsUploadError); log("cancel")
       case _ if self.yuiProgressBar ne null ⇒ self.yuiProgressBar.set("value", 10 + 110 * received / expected); log(s"update progress ${100 * received / expected}")
       case _ ⇒
     }
@@ -105,7 +105,7 @@ class Upload extends Control {
   def cancel(event: js.Object): Unit = {
     log("cancel")
     Event.preventDefault(event)
-    UploadServer.cancel(doAbort = true, XXFormsUploadCancel)
+    UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
   }
 
   // Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"

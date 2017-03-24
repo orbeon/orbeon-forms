@@ -15,6 +15,7 @@ package org.orbeon.oxf.http
 
 import java.io.{ByteArrayInputStream, InputStream}
 
+import enumeratum._
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.IOUtils._
@@ -204,24 +205,19 @@ object StatusCode {
   val InternalServerError   = 500
 }
 
-sealed trait HttpMethod { def name: String }
+sealed abstract class HttpMethod(override val entryName: String) extends EnumEntry
 
-case object GET     extends { val name = "GET"     } with HttpMethod
-case object POST    extends { val name = "POST"    } with HttpMethod
-case object PUT     extends { val name = "PUT"     } with HttpMethod
-case object DELETE  extends { val name = "DELETE"  } with HttpMethod
-case object HEAD    extends { val name = "HEAD"    } with HttpMethod
-case object OPTIONS extends { val name = "OPTIONS" } with HttpMethod
-case object TRACE   extends { val name = "TRACE"   } with HttpMethod
+object HttpMethod extends Enum[HttpMethod] {
 
-object HttpMethod {
+  val values = findValues
 
-  private val AllMethods    = List(GET, POST, PUT, DELETE, HEAD, OPTIONS, TRACE)
-  private val MethodsByName = AllMethods map (m ⇒ m.name → m) toMap
-
-  def find(name: String): Option[HttpMethod] = MethodsByName.get(name.toUpperCase)
-
-  def getOrElseThrow(name: String): HttpMethod = find(name) getOrElse (throw new IllegalArgumentException(name))
+  case object GET     extends HttpMethod("GET")
+  case object POST    extends HttpMethod("POST")
+  case object PUT     extends HttpMethod("PUT")
+  case object DELETE  extends HttpMethod("DELETE")
+  case object HEAD    extends HttpMethod("HEAD")
+  case object OPTIONS extends HttpMethod("OPTIONS")
+  case object TRACE   extends HttpMethod("TRACE")
 }
 
 trait HttpClient {

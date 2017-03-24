@@ -53,7 +53,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
       scheme           = "http",
-      method           = HttpMethod.getOrElseThrow(p.actualHttpMethod),
+      method           = HttpMethod.withNameInsensitive(p.actualHttpMethod),
       hasCredentials   = p2.credentials != null,
       mediatype        = sp.actualRequestMediatype,
       encodingForSOAP  = p2.encoding,

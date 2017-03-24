@@ -19,8 +19,8 @@ import enumeratum._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.http.GET
 import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._

@@ -44,7 +44,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         absoluteResolvedURL.getScheme,
-        HttpMethod.getOrElseThrow(p.actualHttpMethod),
+        HttpMethod.withNameInsensitive(p.actualHttpMethod),
         p2.credentials ne null,
         sp.actualRequestMediatype,
         p2.encoding,
@@ -54,7 +54,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         detailsLogger
       )
 
-    val httpMethod = HttpMethod.getOrElseThrow(p.actualHttpMethod)
+    val httpMethod = HttpMethod.withNameInsensitive(p.actualHttpMethod)
 
     val submissionEffectiveId = submission.getEffectiveId
 

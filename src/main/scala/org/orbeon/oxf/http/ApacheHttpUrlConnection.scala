@@ -73,7 +73,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
         }
 
         val methodName = _method getOrElse "GET"
-        val method     = HttpMethod.getOrElseThrow(methodName)
+        val method     = HttpMethod.withNameInsensitive(methodName)
         val body       = _os map (_.toByteArray) map (new ByteArrayInputStream(_))
         val bodyLength = _os map (_.size.toLong)
 

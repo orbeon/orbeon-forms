@@ -121,7 +121,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     if (! resource.startsWith("/"))
       throw new OXFException("Action does not start with a '/': " + resource)
 
-    val httpMethod = HttpMethod.getOrElseThrow(p.actualHttpMethod)
+    val httpMethod = HttpMethod.withNameInsensitive(p.actualHttpMethod)
 
     // handle case of empty body
     val messageBody = Option(messageBodyOrNull)
@@ -192,7 +192,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
       indentedLogger.logDebug(
         "",
         "dispatching request",
-        "method", httpMethod.name,
+        "method", httpMethod.entryName,
         "mediatype", actualRequestMediatype,
         "context path", destinationContextPath,
         "effective resource URI (original)", effectiveResourceURI,

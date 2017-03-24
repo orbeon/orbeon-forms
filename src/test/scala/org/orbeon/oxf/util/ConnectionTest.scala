@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{GET, Headers, POST, StreamedContent}
-
-import collection.JavaConverters._
 import org.junit.Test
 import org.mockito.Mockito
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
+import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.HttpMethod.{GET, POST}
+import org.orbeon.oxf.http.{Headers, StreamedContent}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mockito.MockitoSugar
 
-import collection.mutable
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 

@@ -23,7 +23,7 @@ import com.lowagie.text.{Image, Rectangle}
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.http.GET
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.generator.URLGeneratorBase
 import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor._

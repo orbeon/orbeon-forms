@@ -23,6 +23,7 @@ import org.apache.log4j.Level
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.HttpMethod.{GET, POST, PUT}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
@@ -183,7 +184,7 @@ class Connection(
 
           debug("opening URL connection",
             List(
-              "method" → method.name,
+              "method" → method.entryName,
               "URL"    → connectionURI.toString
             ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
         }
@@ -338,7 +339,7 @@ object Connection extends Logging {
     logger            : IndentedLogger
   ): Connection = {
 
-    val httpMethod = HttpMethod.getOrElseThrow(httpMethodUpper)
+    val httpMethod = HttpMethod.withNameInsensitive(httpMethodUpper)
 
     val messageBody: Option[Array[Byte]] =
       if (requiresRequestBody(httpMethodUpper)) Option(messageBodyOrNull) orElse Some(Array()) else None

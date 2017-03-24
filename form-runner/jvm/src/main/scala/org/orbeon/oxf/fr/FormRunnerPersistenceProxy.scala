@@ -26,7 +26,8 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{PUT, _}
+import org.orbeon.oxf.http.HttpMethod._
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -95,7 +96,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     form       : String,
     formOrData : FormOrData
   ): Unit =
-    if (formOrData == FormOrData.Data && Set[HttpMethod](GET, PUT)(HttpMethod.getOrElseThrow(request.getMethod))) {
+    if (formOrData == FormOrData.Data && Set[HttpMethod](GET, PUT)(HttpMethod.withNameInsensitive(request.getMethod))) {
 
       val incomingVersion =
         request.getFirstParamAsString(DataFormatVersionName) getOrElse
@@ -116,7 +117,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     }
 
   def handleRelevantOpt(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
-    if (formOrData == FormOrData.Data && HttpMethod.getOrElseThrow(request.getMethod) == GET)
+    if (formOrData == FormOrData.Data && HttpMethod.withNameInsensitive(request.getMethod) == GET)
       request.getFirstParamAsString("relevant") flatMap RelevanceHandling.withNameLowercaseOnlyOption
     else
       None
@@ -229,7 +230,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         getHeader        = Connection.getHeaderFromRequest(request)
       )
 
-    val method = HttpMethod.getOrElseThrow(request.getMethod)
+    val method = HttpMethod.withNameInsensitive(request.getMethod)
 
     if (! Set[HttpMethod](GET, DELETE, PUT, POST)(method))
       throw new OXFException(s"Unsupported method: $method")

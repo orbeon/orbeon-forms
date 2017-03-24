@@ -17,6 +17,7 @@ import java.{util ⇒ ju}
 
 import org.apache.commons.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.http.HttpMethod.POST
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.IOUtils._
@@ -100,7 +101,7 @@ class LocalRequest(
 
   /* SUPPORTED: methods called by ExternalContextToHttpServletRequestWrapper */
 
-  def getMethod            = method.name
+  def getMethod            = method.entryName
   def getParameterMap      = _queryAndBodyParameters
   def getQueryString       = _queryString.orNull
   def getCharacterEncoding = null;//TODO? // not used by our code

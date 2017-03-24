@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerSupport._
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}

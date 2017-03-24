@@ -19,12 +19,11 @@ import java.net.URI
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
-import org.orbeon.oxf.http.GET
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
-import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {

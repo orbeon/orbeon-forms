@@ -35,9 +35,10 @@ import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException ⇒ _, _}
+import org.orbeon.oxf.http.HttpMethod._
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 
 
 class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
@@ -135,7 +136,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
 
         val is =
           content map (_.inputStream) getOrElse
-          (throw new IllegalArgumentException(s"No request content provided for method ${method.name}"))
+          (throw new IllegalArgumentException(s"No request content provided for method ${method.entryName}"))
 
         val contentLength =
           content flatMap (_.contentLength) filter (_ >= 0L)

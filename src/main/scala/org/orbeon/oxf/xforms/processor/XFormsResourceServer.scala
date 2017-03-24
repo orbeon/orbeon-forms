@@ -19,7 +19,8 @@ import java.net.{URI, URLEncoder}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext.ApplicationSessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
-import org.orbeon.oxf.http.{GET, StatusCode}
+import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.IOUtils._

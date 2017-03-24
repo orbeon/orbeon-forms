@@ -46,7 +46,7 @@ class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
       delayFunctions += 1
       js.timers.setTimeout(waitMs) {
         delayFunctions -= 1
-        if ((waitType == ExecutionWait.MaxWait|| delayFunctions == 0) && ! waitingCompletion)
+        if ((waitType == ExecutionWait.MaxWait || delayFunctions == 0) && ! waitingCompletion)
           executeEvents()
       }
     }
@@ -56,7 +56,7 @@ class ExecutionQueue[T](execute: List[T] ⇒ Future[Unit]) {
   private def executeEvents(): Unit =
     if (events.nonEmpty) {
       waitingCompletion = true
-      var localEvents = events
+      val localEvents = events
       events = Nil
 
       import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

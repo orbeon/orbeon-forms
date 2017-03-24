@@ -26,37 +26,10 @@ case class UploadEvent(form: html.Form, upload: Upload)
 //   https://github.com/orbeon/orbeon-forms/issues/3150
 object UploaderClient {
 
+  import Private._
+
+  // Used by `Upload`
   val uploadEventQueue = new ExecutionQueue(asyncUploadRequestSetPromise)
-
-  // While an upload is in progress:
-  var currentEventOpt          : Option[UploadEvent]   = None // event for the field being uploaded
-  var remainingEvents          : List[UploadEvent]     = Nil  // events for the fields that are left to be uploaded
-  var yuiConnectionOpt         : Option[js.Object]     = None // connection object
-
-  var executionQueuePromiseOpt : Option[Promise[Unit]] = None // promise to complete when we are done processing all events
-
-  // Method called by YUI when the upload ends successfully.
-  private def uploadSuccess(xhr: XMLHttpRequest) = {
-
-    // uploadSuccess can be called:
-    // - on all browsers when the file is too large, and the server returns an error HTML page, instead of a
-    //   xxf:event-response wrapped in an <html><body>
-    // - on IE 7 and IE 8 in IE 7 mode when the upload is interrupted, say because of a connection issue (in that
-    //   case o.responseText is undefined or null)
-    // In both cases, we don't want to process the body as an Ajax response, as this could lead to errors.
-
-    (xhr.responseText: js.UndefOr[String]).toOption match {
-      case Some(text) if (text ne null) && text.startsWith("&lt;xxf:event-response") ⇒
-        // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
-        currentEventOpt foreach (_.upload.clear())
-        // The Ajax response typically contains information about each file (name, size, etc)
-        AjaxServer.handleResponseAjax(xhr)
-        // Are we done, or do we still need to handle events for other forms?
-        continueWithRemainingEvents()
-      case _ ⇒
-        cancel(doAbort = false, EventNames.XXFormsUploadError)
-    }
-  }
 
   // Once we are done processing the events (either because the uploads have been completed or canceled), handle the
   // remaining events.
@@ -69,80 +42,6 @@ object UploaderClient {
       executionQueuePromiseOpt = None
     } else
       asyncUploadRequest(remainingEvents)
-  }
-
-  private def asyncUploadRequestSetPromise(events: List[UploadEvent]): Future[Unit] = {
-    val promise = Promise[Unit]()
-    executionQueuePromiseOpt = Some(promise)
-    asyncUploadRequest(events)
-    promise.future
-  }
-
-  // Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
-  // the upload can be done.
-  private def asyncUploadRequest(events: List[UploadEvent]): Unit = events match {
-
-    case Nil ⇒ throw new IllegalArgumentException
-    case currentEvent :: tail ⇒
-
-      currentEventOpt = Some(currentEvent)
-      remainingEvents = tail
-
-      // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-      currentEvent.upload.setState("progress")
-
-      // Tell server we're starting uploads
-      AjaxServer.fireEvents(
-        js.Array(
-          new AjaxServer.Event(
-            new js.Object {
-              val targetId     = currentEvent.upload.container.id
-              val eventName    = EventNames.XXFormsUploadStart
-              val showProgress = false
-            }
-          )
-        ),
-        incremental = false
-      )
-
-      import org.scalajs.dom.ext._
-
-      val newlyDisabledElems = {
-
-        def isUuidInput (e: html.Input) = e.name == "$uuid"                   // `id` might be prefixed when embedding
-        def isFieldset  (e: html.Input) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
-        def isThisUpload(e: html.Input) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
-
-        currentEvent.form.elements.iterator collect {
-          case e: html.Input ⇒ e
-        } filterNot { e ⇒
-          e.disabled.toOption.contains(true) || isUuidInput(e) || isFieldset(e) || isThisUpload(e)
-        } toList
-      }
-
-      newlyDisabledElems foreach (_.disabled = true)
-
-      // Trigger actual upload through a form POST and start asking server for progress
-      YUIConnect.setForm(currentEvent.form, isUpload = true, secureUri = true)
-
-      yuiConnectionOpt =
-        Some(
-          YUIConnect.asyncRequest(
-            "POST",
-            Globals.xformsServerUploadURL(currentEvent.form.id),
-            new YUICallback {
-              val upload: js.Function = uploadSuccess _
-              // Failure isn't called; instead we detect if an upload is interrupted through
-              // `progress-state="interrupted"` in the Ajax response.
-              val failure: js.Function = () ⇒ ()
-              val argument = new ConnectCallbackArgument(formId = currentEvent.form.id, isUpload = true)
-            }
-          )
-        )
-
-      askForProgressUpdate()
-
-      newlyDisabledElems foreach (_.disabled = false)
   }
 
   // While there is a file upload going, this method runs at a regular interval and keeps asking the server for
@@ -197,5 +96,112 @@ object UploaderClient {
     }
 
     continueWithRemainingEvents()
+  }
+
+  private object Private {
+
+    // While an upload is in progress:
+    var currentEventOpt          : Option[UploadEvent]   = None // event for the field being uploaded
+    var remainingEvents          : List[UploadEvent]     = Nil  // events for the fields that are left to be uploaded
+    var yuiConnectionOpt         : Option[js.Object]     = None // connection object
+
+    var executionQueuePromiseOpt : Option[Promise[Unit]] = None // promise to complete when we are done processing all events
+
+    // Method called by YUI when the upload ends successfully.
+    def uploadSuccess(xhr: XMLHttpRequest): Unit = {
+
+      // uploadSuccess can be called:
+      // - on all browsers when the file is too large, and the server returns an error HTML page, instead of a
+      //   xxf:event-response wrapped in an <html><body>
+      // - on IE 7 and IE 8 in IE 7 mode when the upload is interrupted, say because of a connection issue (in that
+      //   case o.responseText is undefined or null)
+      // In both cases, we don't want to process the body as an Ajax response, as this could lead to errors.
+
+      (xhr.responseText: js.UndefOr[String]).toOption match {
+        case Some(text) if (text ne null) && text.startsWith("&lt;xxf:event-response") ⇒
+          // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+          currentEventOpt foreach (_.upload.clear())
+          // The Ajax response typically contains information about each file (name, size, etc)
+          AjaxServer.handleResponseAjax(xhr)
+          // Are we done, or do we still need to handle events for other forms?
+          continueWithRemainingEvents()
+        case _ ⇒
+          cancel(doAbort = false, EventNames.XXFormsUploadError)
+      }
+    }
+
+    def asyncUploadRequestSetPromise(events: List[UploadEvent]): Future[Unit] = {
+      val promise = Promise[Unit]()
+      executionQueuePromiseOpt = Some(promise)
+      asyncUploadRequest(events)
+      promise.future
+    }
+
+    // Run background form post do to the upload. This method is called by the ExecutionQueue when it determines that
+    // the upload can be done.
+    def asyncUploadRequest(events: List[UploadEvent]): Unit = events match {
+
+      case Nil ⇒ throw new IllegalArgumentException
+      case currentEvent :: tail ⇒
+
+        currentEventOpt = Some(currentEvent)
+        remainingEvents = tail
+
+        // Switch the upload to progress state, so users can't change the file and know the upload is in progress
+        currentEvent.upload.setState("progress")
+
+        // Tell server we're starting uploads
+        AjaxServer.fireEvents(
+          js.Array(
+            new AjaxServer.Event(
+              new js.Object {
+                val targetId     = currentEvent.upload.container.id
+                val eventName    = EventNames.XXFormsUploadStart
+                val showProgress = false
+              }
+            )
+          ),
+          incremental = false
+        )
+
+        import org.scalajs.dom.ext._
+
+        val newlyDisabledElems = {
+
+          def isUuidInput (e: html.Input) = e.name == "$uuid"                   // `id` might be prefixed when embedding
+          def isFieldset  (e: html.Input) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
+          def isThisUpload(e: html.Input) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
+
+          currentEvent.form.elements.iterator collect {
+            case e: html.Input ⇒ e
+          } filterNot { e ⇒
+            e.disabled.toOption.contains(true) || isUuidInput(e) || isFieldset(e) || isThisUpload(e)
+          } toList
+        }
+
+        newlyDisabledElems foreach (_.disabled = true)
+
+        // Trigger actual upload through a form POST and start asking server for progress
+        YUIConnect.setForm(currentEvent.form, isUpload = true, secureUri = true)
+
+        yuiConnectionOpt =
+          Some(
+            YUIConnect.asyncRequest(
+              "POST",
+              Globals.xformsServerUploadURL(currentEvent.form.id),
+              new YUICallback {
+                val upload: js.Function = uploadSuccess _
+                // Failure isn't called; instead we detect if an upload is interrupted through
+                // `progress-state="interrupted"` in the Ajax response.
+                val failure: js.Function = () ⇒ ()
+                val argument = new ConnectCallbackArgument(formId = currentEvent.form.id, isUpload = true)
+              }
+            )
+          )
+
+        askForProgressUpdate()
+
+        newlyDisabledElems foreach (_.disabled = false)
+    }
   }
 }

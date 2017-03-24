@@ -107,8 +107,6 @@ public class XFormsProperties {
     // Could be `upload.delay-before-progress-refresh` for consistency with new properties
     public static final String DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY = "delay-before-upload-progress-refresh";
 
-    public static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
-
     public static final String REVISIT_HANDLING_PROPERTY = "revisit-handling";
     public static final String REVISIT_HANDLING_RESTORE_VALUE = "restore";
     public static final String REVISIT_HANDLING_RELOAD_VALUE = "reload";
@@ -284,7 +282,6 @@ public class XFormsProperties {
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY                 , 10,                             true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY         , 500,                            true),
             new PropertyDefinition(DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY , 2000,                           true),
-            new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY              , 10,                             true),
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY                     , REVISIT_HANDLING_RESTORE_VALUE, true),
             new PropertyDefinition(HELP_HANDLER_PROPERTY                         , false,                          true), // dynamic
             new PropertyDefinition(HELP_TOOLTIP_PROPERTY                         , false,                          true),

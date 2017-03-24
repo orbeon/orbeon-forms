@@ -18,14 +18,15 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.JSStringOps._
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 import scala.scalajs.js.{URIUtils, |}
 
 @JSExportTopLevel("ORBEON.xforms.Document")
 @JSExportAll
-object Document {
+object DocumentAPI {
+
+  import Private._
 
   // Dispatch an event
   // NOTE: This doesn't support all parameters.
@@ -58,6 +59,7 @@ object Document {
 
   // Dispatch an event defined by an object
   // NOTE: Use the first XForms form on the page when no form is provided.
+  // TODO: Can we type `eventObject`?
   def dispatchEvent(eventObject: js.Object): Unit = {
 
     val eventDynamic = eventObject.asInstanceOf[js.Dynamic]
@@ -129,68 +131,71 @@ object Document {
   def storeInClientState(formId: String, key: String, value: String | Double | Boolean): Unit =
     mapToClientState(formId, clientStateToMap(formId) + (key → value.toString))
 
-  private def adjustIdNamespace(
-    formElem : js.UndefOr[html.Element],
-    targetId : String
-  ): (html.Element, String) = {
+  private object Private {
 
-    val form   = formElem getOrElse $(dom.document.forms).filter(".xforms-form")(0)
-    val ns     = Globals.ns(form.id)
+    def adjustIdNamespace(
+      formElem : js.UndefOr[html.Element],
+      targetId : String
+    ): (html.Element, String) = {
 
-    // For backward compatibility, handle the case where the id is already prefixed.
-    // This is not great as we don't know for sure whether the control starts with a namespace, e.g. `o0`,
-    // `o1`, etc. It might be safer to disable the short namespaces feature because of this.
-    form → (
-      if (targetId.startsWith(ns))
-        targetId
-      else
-        ns + targetId
-    )
-  }
+      val form   = formElem getOrElse $(dom.document.forms).filter(".xforms-form")(0)
+      val ns     = Globals.ns(form.id)
 
-  private def findControl(
-    controlIdOrElem : String | html.Element,
-    formElem        : js.UndefOr[html.Element]
-  ): html.Element = {
+      // For backward compatibility, handle the case where the id is already prefixed.
+      // This is not great as we don't know for sure whether the control starts with a namespace, e.g. `o0`,
+      // `o1`, etc. It might be safer to disable the short namespaces feature because of this.
+      form → (
+        if (targetId.startsWith(ns))
+          targetId
+        else
+          ns + targetId
+      )
+    }
 
-    val (resolvedControlId, resolvedControlOpt) =
-      (controlIdOrElem: Any) match {
-        case givenControlId: String ⇒
-          givenControlId → Option(dom.document.getElementById(adjustIdNamespace(formElem, givenControlId)._2))
-        case givenElement: html.Element ⇒
-          givenElement.id → Some(givenElement)
+    def findControl(
+      controlIdOrElem : String | html.Element,
+      formElem        : js.UndefOr[html.Element]
+    ): html.Element = {
+
+      val (resolvedControlId, resolvedControlOpt) =
+        (controlIdOrElem: Any) match {
+          case givenControlId: String ⇒
+            givenControlId → Option(dom.document.getElementById(adjustIdNamespace(formElem, givenControlId)._2))
+          case givenElement: html.Element ⇒
+            givenElement.id → Some(givenElement)
+        }
+
+      resolvedControlOpt match {
+        case Some(resolvedControl: html.Element) if Controls.isInRepeatTemplate(resolvedControl) ⇒
+          throw new IllegalArgumentException(s"Control is within a repeat template for id `$resolvedControlId`")
+        case Some(resolvedControl: html.Element) ⇒
+          resolvedControl
+        case _ ⇒
+          throw new IllegalArgumentException(s"Cannot find control for id `$resolvedControlId`")
+      }
+    }
+
+    def clientStateToMap(formId: String): Map[String, String] =
+      Globals.formClientState(formId).value.trimAllToOpt match {
+        case Some(clientState) ⇒
+          // Careful: JavaScript's `split` is different from Scala's `split`!
+          clientState.jsSplit("&").to[List].sliding(2, 2) map {
+            case List(key, value) ⇒
+              key → URIUtils.decodeURIComponent(value)
+          } toMap
+        case None ⇒
+          Map.empty
       }
 
-    resolvedControlOpt match {
-      case Some(resolvedControl: html.Element) if Controls.isInRepeatTemplate(resolvedControl) ⇒
-        throw new IllegalArgumentException(s"Control is within a repeat template for id `$resolvedControlId`")
-      case Some(resolvedControl: html.Element) ⇒
-        resolvedControl
-      case _ ⇒
-        throw new IllegalArgumentException(s"Cannot find control for id `$resolvedControlId`")
+    def mapToClientState(formId: String, map: Map[String, String]): Unit = {
+
+      val stateString =
+        map.iterator flatMap {
+          case (key, value) ⇒
+            Iterator(key, URIUtils.encodeURIComponent(value))
+        } mkString "&"
+
+      Globals.formClientState(formId).value = stateString
     }
-  }
-
-  private def clientStateToMap(formId: String): Map[String, String] =
-    Globals.formClientState(formId).value.trimAllToOpt match {
-      case Some(clientState) ⇒
-        // Careful: JavaScript's `split` is different from Scala's `split`!
-        clientState.jsSplit("&").to[List].sliding(2, 2) map {
-          case List(key, value) ⇒
-            key → URIUtils.decodeURIComponent(value)
-        } toMap
-      case None ⇒
-        Map.empty
-    }
-
-  private def mapToClientState(formId: String, map: Map[String, String]): Unit = {
-
-    val stateString =
-      map.iterator flatMap {
-        case (key, value) ⇒
-          Iterator(key, URIUtils.encodeURIComponent(value))
-      } mkString "&"
-
-    Globals.formClientState(formId).value = stateString
   }
 }

@@ -36,13 +36,13 @@ object DialogItemset {
       val labelXFormsInput = $(event.target).closest(".fb-itemset-label-input")(0)
       val valueXFormsInput = $(labelXFormsInput).closest(".fr-grid-tr").find(".fb-itemset-value-input")(0)
 
-      if (Document.getValue(valueXFormsInput).toOption exists (_.isBlank)) {
+      if (DocumentAPI.getValue(valueXFormsInput).toOption exists (_.isBlank)) {
         // If user pressed tab, after `change` on the label input, there is a `focus` on the value input,
         // which stores the value as a server value, so if we set the value before the `focus`, the value
         // isn't sent, hence the deferring.
-        Document.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue ⇒
+        DocumentAPI.getValue(labelXFormsInput).toOption flatMap suggestValueFromLabel foreach { suggestedValue ⇒
           setTimeout(1) {
-            Document.setValue(valueXFormsInput, suggestedValue)
+            DocumentAPI.setValue(valueXFormsInput, suggestedValue)
           }
         }
       }

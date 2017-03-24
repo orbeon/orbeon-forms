@@ -128,7 +128,7 @@ object DndRepeat {
               // Thinking this should instead block input, but only after a while show a modal screen.
               // ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(container).id)
 
-              xforms.Document.dispatchEvent(
+              xforms.DocumentAPI.dispatchEvent(
                 new js.Object {
                   val targetId  = repeatId
                   val eventName = "xxforms-dnd"

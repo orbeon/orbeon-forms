@@ -119,7 +119,7 @@ object TreeSelect1 {
                   if (this.currentValue != newValue) {
                     this.currentValue = newValue
 
-                    xforms.Document.setValue(
+                    xforms.DocumentAPI.setValue(
                         containerElem.id,
                         newValue
                     )

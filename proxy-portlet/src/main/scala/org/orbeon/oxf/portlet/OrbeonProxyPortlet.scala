@@ -35,15 +35,18 @@ import scala.util.control.NonFatal
  */
 class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with BufferedPortlet {
 
-  import org.orbeon.oxf.portlet.OrbeonProxyPortlet._
+  import OrbeonProxyPortlet._
 
   private case class PortletSettings(
-    forwardHeaders     : Map[String, String], // lowercase name → original name
-    forwardParams      : Set[String],
-    forwardProperties  : Map[String, String], // lowercase name → original name
-    useShortNamespaces : Boolean,
-    httpClient         : HttpClient
-   )
+    forwardHeaders         : Map[String, String], // lowercase name → original name
+    forwardParams          : Set[String],
+    forwardProperties      : Map[String, String], // lowercase name → original name
+    useShortNamespaces     : Boolean,
+    resourcesRegex : String,
+    httpClient             : HttpClient
+   ) {
+    val FormRunnerResourcePath = resourcesRegex.r
+  }
 
   // For BufferedPortlet
   def title(request: RenderRequest) = getTitle(request)
@@ -59,6 +62,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         forwardParams      = stringToSet(config.getInitParameter("forward-parameters")),
         forwardProperties  = stringToSet(config.getInitParameter("forward-properties")).map(name ⇒ name.toLowerCase → name)(breakOut),
         useShortNamespaces = config.getInitParameter("use-short-namespaces") != "false",
+        resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
       )
     )
@@ -79,9 +83,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   private def findServletRequest(request: PortletRequest) =
     getHttpServletRequest flatMap (f ⇒ Option(f(request)))
 
-  private val FormRunnerHome         = """/fr/(\?(.*))?""".r
-  private val FormRunnerPath         = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
-  private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
+  private val FormRunnerHome           = """/fr/(\?(.*))?""".r
+  private val FormRunnerPath           = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
+  private val FormRunnerDocumentPath   = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
+  private val XFormsServerResourcePath = """(/xforms-server/(?:(?:dynamic/[^/]+)|(?:.+[.](?:css|js))))""".r
 
   // Portlet render
   override def doView(request: RenderRequest, response: RenderResponse): Unit =
@@ -143,18 +148,30 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings.httpClient,
           settings.useShortNamespaces
         )
-        val resourceId = request.getResourceID
-        val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
 
-        val requestDetails =
-          newRequestDetails(
-            settings,
-            request,
-            contentFromRequest(request, response.getNamespace),
-            url
-          )
+        // Resources are whitelisted to prevent unauthorized access to pages
+        val resourceIdOpt = Option(request.getResourceID) collect {
+          case XFormsServerResourcePath(resourceId) ⇒ resourceId
+          case settings.FormRunnerResourcePath(resourceId)   ⇒ resourceId
+        }
 
-        APISupport.proxyResource(requestDetails)
+        resourceIdOpt match {
+          case Some(resourceId) ⇒
+            val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
+
+            val requestDetails =
+              newRequestDetails(
+                settings,
+                request,
+                contentFromRequest(request, response.getNamespace),
+                url
+              )
+
+            APISupport.proxyResource(requestDetails)
+
+          case None ⇒
+            throw new PortletException(s"Unsupported resource path: `${request.getResourceID}`")
+        }
       }
     }
 
@@ -203,7 +220,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           APISupport.formRunnerHomePath(Option(query))
         // Unsupported path
         case otherPath ⇒
-          throw new PortletException("Unsupported path: " + otherPath)
+          throw new PortletException(s"Unsupported path: `$otherPath`")
       }
     }
 
@@ -301,6 +318,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 }
 
 object OrbeonProxyPortlet {
+
+  private val DefaultFormRunnerResourcePath =
+    """((?:/[^/]+)?/(?:apps/fr/style|ops|xbl)/.+[.](?:gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2))"""
+
   def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit ctx: PortletContext): T =
     try body
     catch {

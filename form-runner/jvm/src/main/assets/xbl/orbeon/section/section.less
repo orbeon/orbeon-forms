@@ -147,11 +147,19 @@
             color: black;
         }
 
+        .fr-page-break-before {
+            page-break-before: always;
+        }
+
         .xbl-fr-section {
 
             page-break-before: auto;
             page-break-inside: auto;
             page-break-after: auto;
+
+            &.fr-page-break-before {
+                page-break-before: always;
+            }
 
             .fr-section-title {
 
@@ -182,10 +190,18 @@
                     page-break-inside: auto;
                     page-break-after:  auto;
 
+                    &.fr-page-break-before {
+                        page-break-before: always;
+                    }
+
                     .fr-grid-tr {
                         page-break-before: auto;
                         page-break-inside: avoid; // no break within a `<tr>`
                         page-break-after:  auto;
+
+                        &.fr-page-break-before {
+                            page-break-before: always;
+                        }
                       }
                   }
             }

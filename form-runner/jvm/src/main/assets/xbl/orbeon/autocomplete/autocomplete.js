@@ -61,9 +61,6 @@
 
             // Create YUI auto-complete object
             this.yuiAutoComplete = new YAHOO.widget.AutoComplete(this.searchField.id, yuiDiv.id, dataSource);
-            // Use iframe method for IE6/7
-            if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7)
-                this.yuiAutoComplete.useIFrame = true;
             this.yuiAutoComplete.animVert = false;
 
             // Set maximum number of items displayed

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet._
+import javax.servlet.http.HttpServletResponse
 
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
@@ -151,8 +152,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
         // Resources are whitelisted to prevent unauthorized access to pages
         val resourceIdOpt = Option(request.getResourceID) collect {
-          case XFormsServerResourcePath(resourceId) ⇒ resourceId
-          case settings.FormRunnerResourcePath(resourceId)   ⇒ resourceId
+          case XFormsServerResourcePath(resourceId)        ⇒ resourceId
+          case settings.FormRunnerResourcePath(resourceId) ⇒ resourceId
         }
 
         resourceIdOpt match {
@@ -170,7 +171,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             APISupport.proxyResource(requestDetails)
 
           case None ⇒
-            throw new PortletException(s"Unsupported resource path: `${request.getResourceID}`")
+            // What were the Portlet API designers thinking?
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpServletResponse.SC_NOT_FOUND.toString)
         }
       }
     }

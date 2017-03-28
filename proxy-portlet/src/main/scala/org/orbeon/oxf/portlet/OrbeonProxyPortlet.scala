@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.breakOut
 import scala.util.control.NonFatal
+import scala.util.matching.Regex
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -43,7 +44,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     forwardParams          : Set[String],
     forwardProperties      : Map[String, String], // lowercase name → original name
     useShortNamespaces     : Boolean,
-    resourcesRegex : String,
+    resourcesRegex         : String,
     httpClient             : HttpClient
    ) {
     val FormRunnerResourcePath = resourcesRegex.r
@@ -83,11 +84,6 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def findServletRequest(request: PortletRequest) =
     getHttpServletRequest flatMap (f ⇒ Option(f(request)))
-
-  private val FormRunnerHome           = """/fr/(\?(.*))?""".r
-  private val FormRunnerPath           = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
-  private val FormRunnerDocumentPath   = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
-  private val XFormsServerResourcePath = """(/xforms-server/(?:(?:dynamic/[^/]+)|(?:.+[.](?:css|js))))""".r
 
   // Portlet render
   override def doView(request: RenderRequest, response: RenderResponse): Unit =
@@ -150,8 +146,17 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings.useShortNamespaces
         )
 
+        // First level of sanitation: parse, normalize and keep the path only
+        def sanitizeResourcePath(s: String) =
+          new java.net.URI(s).normalize().getPath
+
+        def hasNoParent(s: String) =
+          ! s.contains("../")
+
+        // TODO: check no /../ segments left
+
         // Resources are whitelisted to prevent unauthorized access to pages
-        val resourceIdOpt = Option(request.getResourceID) collect {
+        val resourceIdOpt = Option(request.getResourceID) map sanitizeResourcePath filter hasNoParent collect {
           case XFormsServerResourcePath(resourceId)        ⇒ resourceId
           case settings.FormRunnerResourcePath(resourceId) ⇒ resourceId
         }
@@ -319,10 +324,31 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     }
 }
 
-object OrbeonProxyPortlet {
+private[portlet] object OrbeonProxyPortlet {
 
-  private val DefaultFormRunnerResourcePath =
-    """((?:/[^/]+)?/(?:apps/fr/style|ops|xbl)/.+[.](?:gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2))"""
+  val FormRunnerHome           = """/fr/(\?(.*))?""".r
+  val FormRunnerPath           = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
+  val FormRunnerDocumentPath   = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
+  val XFormsServerResourcePath = """(/xforms-server(?:(?:|/dynamic/[^/]+)|(?:/.+[.](?:css|js))))""".r
+
+  val DefaultFormRunnerResourcePath =
+    """((?:/[^/]+)?/(?:apps/fr/style|ops|xbl)/[^#]+[.](?:gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2))"""
+
+  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[Any] = {
+
+    // First level of sanitation: parse, normalize and keep the path only
+    def sanitizeResourcePath(s: String) =
+      new java.net.URI(s).normalize().getPath
+
+    def hasNoParent(s: String) =
+      ! s.contains("/..") && ! s.contains("../")
+
+    // Resources are whitelisted to prevent unauthorized access to pages
+    Option(s) map sanitizeResourcePath filter hasNoParent collect {
+      case XFormsServerResourcePath(resourceId) ⇒ resourceId
+      case FormRunnerResourcePath(resourceId)   ⇒ resourceId
+    }
+  }
 
   def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit ctx: PortletContext): T =
     try body

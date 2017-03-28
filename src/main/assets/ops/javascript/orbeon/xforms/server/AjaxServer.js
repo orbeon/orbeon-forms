@@ -259,7 +259,8 @@
 
                                 var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
                                 if ($(ORBEON.util.Dom.get(event.targetId)).is('.xforms-upload') ||
-                                        (serverValue == null || serverValue != event.value)) {
+                                    serverValue == null                                         ||
+                                    serverValue != event.value) {
 
                                     // Add event
                                     seenControlValue[event.targetId] = event;

@@ -146,22 +146,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings.useShortNamespaces
         )
 
-        // First level of sanitation: parse, normalize and keep the path only
-        def sanitizeResourcePath(s: String) =
-          new java.net.URI(s).normalize().getPath
-
-        def hasNoParent(s: String) =
-          ! s.contains("../")
-
-        // TODO: check no /../ segments left
-
-        // Resources are whitelisted to prevent unauthorized access to pages
-        val resourceIdOpt = Option(request.getResourceID) map sanitizeResourcePath filter hasNoParent collect {
-          case XFormsServerResourcePath(resourceId)        ⇒ resourceId
-          case settings.FormRunnerResourcePath(resourceId) ⇒ resourceId
-        }
-
-        resourceIdOpt match {
+        OrbeonProxyPortlet.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePath) match {
           case Some(resourceId) ⇒
             val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
 
@@ -329,12 +314,79 @@ private[portlet] object OrbeonProxyPortlet {
   val FormRunnerHome           = """/fr/(\?(.*))?""".r
   val FormRunnerPath           = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
   val FormRunnerDocumentPath   = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
-  val XFormsServerResourcePath = """(/xforms-server(?:(?:|/dynamic/[^/]+)|(?:/.+[.](?:css|js))))""".r
 
   val DefaultFormRunnerResourcePath =
-    """((?:/[^/]+)?/(?:apps/fr/style|ops|xbl)/[^#]+[.](?:gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2))"""
+    """(?xi)
+      (
+        # XForms server paths
+        (?:
+          /xforms-server
+          (?:
+            (?:
+              |
+              /dynamic/[^/^.]+
+            )
+            |
+            (?:
+              /.+[.]
+              (?:
+                css|js
+              )
+            )
+          )
+        )
+        |
+        # PDF/TIFF service paths
+        (?:
+          /fr/service/
+          [^/^.]+
+          /
+          [^/^.]+
+          /
+          (?:
+            pdf|tiff
+          )
+          /
+          [^/^.]+
+          /
+          [0-9A-Za-z\-]+
+          (?:
+            /[^/]+
+          )?
+          [.]
+          (?:
+            pdf|tiff
+          )
+        )
+        |
+        # Other asset paths
+        (?:
+          # Optional versioned resources token
+          (?:
+            /
+            [^/^.]+
+          )?
+          /
+          (?:
+            apps/fr/style
+            |
+            ops
+            |
+            xbl
+          )
+          /
+          .+
+          [.]
+          (
+            ?:
+            gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2
+          )
+        )
+      )
+    """
 
-  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[Any] = {
+  // Resources are whitelisted to prevent unauthorized access to pages
+  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[String] = {
 
     // First level of sanitation: parse, normalize and keep the path only
     def sanitizeResourcePath(s: String) =
@@ -343,10 +395,8 @@ private[portlet] object OrbeonProxyPortlet {
     def hasNoParent(s: String) =
       ! s.contains("/..") && ! s.contains("../")
 
-    // Resources are whitelisted to prevent unauthorized access to pages
     Option(s) map sanitizeResourcePath filter hasNoParent collect {
-      case XFormsServerResourcePath(resourceId) ⇒ resourceId
-      case FormRunnerResourcePath(resourceId)   ⇒ resourceId
+      case FormRunnerResourcePath(resourceId) ⇒ resourceId
     }
   }
 

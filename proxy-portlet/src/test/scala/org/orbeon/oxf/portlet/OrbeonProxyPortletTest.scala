@@ -44,7 +44,10 @@ class OrbeonProxyPortletTest extends FunSpec {
       s"/$Versioned../xbl/orbeon/california-plate/images/platetahoe_small.jpg",
       s"/$optionalPath./xbl/orbeon/california-plate/images/platetahoe_small.jpg",
       s"/$Versioned../apps/fr/style/bootstrap/img/glyphicons-halflings.png",
-      s"/$Versioned../${optionalPath}apps/fr/style/bootstrap/img/glyphicons-halflings.png"
+      s"/$Versioned../${optionalPath}apps/fr/style/bootstrap/img/glyphicons-halflings.png",
+
+      s"/fr/service/acme/sales/pdf/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.pdf",
+      s"/fr/service/acme/sales/tiff/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.tiff"
     )
   }
 
@@ -76,7 +79,15 @@ class OrbeonProxyPortletTest extends FunSpec {
 
       s"/${optionalPath}xbl/orbeon/california-plate/images/platetahoe_small.xml",
       s"/${optionalPath}xbl/orbeon/california-plate/images/platetahoe_small",
-      s"/${optionalPath}xbl/orbeon/california-plate/images/platetahoe_small/"
+      s"/${optionalPath}xbl/orbeon/california-plate/images/platetahoe_small/",
+
+      s"/fr/service/acme/sales/pdf/a/b/c/d.pdf",
+      s"/fr/service/acme/sales/tiff/a/b/c/d.tiff",
+      s"/fr/service/acme/sales/pdf/a.b/c/d.pdf",
+      s"/fr/service/acme/sales/tiff/a.b/c/d.tiff",
+
+      s"/fr/service/acme/sales/other/service",
+      s"/fr/service/persistence/crud/acme/sales/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/data.xml"
     )
   }
 

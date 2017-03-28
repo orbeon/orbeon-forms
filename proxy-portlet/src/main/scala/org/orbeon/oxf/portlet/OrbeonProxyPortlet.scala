@@ -377,8 +377,7 @@ private[portlet] object OrbeonProxyPortlet {
           /
           .+
           [.]
-          (
-            ?:
+          (?:
             gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2
           )
         )

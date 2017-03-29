@@ -1210,11 +1210,21 @@
                                             currentValue != newControlValue
                                             // Update only if the value in the control is the same now as it was when we sent it to the server,
                                             // so not to override a change done by the user since the control value was last sent to the server
-                                            && (previousServerValue == null || currentValue == previousServerValue)
+                                            && (
+                                                (previousServerValue == null || currentValue == previousServerValue) ||
+                                                // For https://github.com/orbeon/orbeon-forms/issues/3130
+                                                //
+                                                // We would like to test for "becomes readonly", but test below is equivalent:
+                                                //
+                                                // - either the control was already readonly, so `currentValue != newControlValue` was `true`
+                                                //   as server wouldn't send a value otherwise
+                                                // - or it was readwrite and became readonly, in which case we test for this below
+                                                jDocumentElement.is('.xforms-readonly')
+                                            )
                                         );
 
                                     if (doUpdate) {
-                                        var promiseOrUndef = ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                        var promiseOrUndef = ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, true);
 
                                         // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
                                         //

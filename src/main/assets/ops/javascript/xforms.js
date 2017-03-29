@@ -1501,7 +1501,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
-        setCurrentValue: function (control, newControlValue) {
+        setCurrentValue: function (control, newControlValue, force) {
             var customEvent = {control: control, newValue: newControlValue};
             ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
             ORBEON.xforms.Controls.valueChange.fire(customEvent);
@@ -1548,9 +1548,10 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                         ORBEON.util.Dom.setStringValue(output[0], newControlValue);
                     }
                 }
-            } else if (_.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {
-                // User has modified the value of this control since we sent our request:
-                // so don't try to update it
+            } else if ((_.isUndefined(force) || force == false) && _.isNumber(ORBEON.xforms.Globals.changedIdsRequest[control.id])) {
+                // User has modified the value of this control since we sent our request so don't try to update it
+                // 2017-03-29: Added `force` attribute to handle https://github.com/orbeon/orbeon-forms/issues/3130 as we
+                // weren't sure we wanted to fully disable the test on `changedIdsRequest`.
             } else if (jControl.is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
                 // No value
             } else if (jControl.is('.xforms-type-time')) {

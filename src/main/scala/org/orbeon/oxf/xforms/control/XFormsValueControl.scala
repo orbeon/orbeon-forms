@@ -254,7 +254,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
     val hasNestedValueContent =
       previousControl.isEmpty && getEscapedExternalValue != getNonRelevantEscapedExternalValue ||
-      previousControl.nonEmpty && ! (previousValue contains getExternalValue)
+      previousControl.nonEmpty && ! (previousValue contains getExternalValue) ||
+      (previousControl exists (! _.isReadonly)) && isReadonly // https://github.com/orbeon/orbeon-forms/issues/3130
 
     val hasNestedContent =
       content.isDefined || hasNestedValueContent

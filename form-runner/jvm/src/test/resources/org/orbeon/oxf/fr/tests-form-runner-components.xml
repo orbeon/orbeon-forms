@@ -903,7 +903,7 @@
                         </xxf:control>
                     </xxf:control-values>
                     <xxf:script name="xf_d4f6ea393e77ed5e81903deb659f91bb70adae1a" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
-                    <xxf:focus control-id="my-autocomplete≡search"/>
+                    <xxf:focus control-id="my-autocomplete≡show-suggestions-button"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

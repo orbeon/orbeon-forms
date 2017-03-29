@@ -333,7 +333,7 @@
                                      knowledge that the button was static readonly. By making the whole thing
                                      non-relevant, we avoid this change of state. Of course ideally static
                                      readonly would not have this unwanted behavior. -->
-                                <xf:group ref=".[not($local/readonly = 'true' and property('xxf:readonly-appearance') = 'static')]" xxf:internal="trye">
+                                <xf:group ref=".[not($local/readonly = 'true' and property('xxf:readonly-appearance') = 'static')]" xxf:internal="true">
                                     <!-- Bound to text field value so button becomes readonly when the textfield is readonly -->
                                     <xf:trigger ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
                                         <xf:label>

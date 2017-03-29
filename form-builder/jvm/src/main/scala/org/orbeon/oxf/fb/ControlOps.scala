@@ -425,8 +425,9 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     getAllControlNames(inDoc).iterator map StringValue.makeStringValue
 
   // Return all the controls in the view
-  def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
-    getAllControlsInViewUnder(findFRBodyElement(inDoc))
+  def getAllControlsWithIds(inDoc: NodeInfo) =
+    findFRBodyElement(inDoc) \\ * filter
+      (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
   def hasEditor(controlElement: NodeInfo, editor: String) =

@@ -195,7 +195,7 @@ Event.onDOMReady ->
                 YD.setStyle calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex
 
                 # Find resource for selected language
-                lang = Page().getLang()
+                lang = Page.getLang()
                 resources = CalendarResources[lang]
                 # Default to English if resources are not found
                 resources = CalendarResources["en"] unless resources?

@@ -17,22 +17,19 @@
     display: inline-block;
     width: 100%;
 
-    // Use table layout as Flexbox doesn't work with IE < 11
-    .fr-autocomplete-container {
-        display: table;
-        width: 100%;
-        &> .yui-ac {
-            position: static;
-            display: table-row;
-            &> .fr-autocomplete-search, &> .fr-autocomplete-show-suggestions-button {
-                display: table-cell;
-            }
-        }
+    .fr-autocomplete-show-suggestions-button button {
+        float: right;
+        width: 40px;                            // Enough to see the button and arrow
+        height: @baseLineHeight + 8px;
+        margin-left: 3px;                       // Get the button to show as if it was merged with the text field (well, almost)
+        padding-top: 0; padding-bottom: 0;      // Remove top padding so the bottom shows vertically centered
     }
 
     // Make cell with field take all the space possible
     .fr-autocomplete-search {
-        width: 100%;
+        display: block;
+        overflow: hidden;
+        width: auto;
     }
 
     // Override position: absolute in YUI, otherwise the the input is taken out of the flow and content after the
@@ -44,21 +41,12 @@
         width: 100%;
     }
 
-    // For testing, to keep the suggestion list open while interacting with Firefox, disable the `display: none` on
-    // <span class="yui-ac-content">.
     .yui-ac-content {
-        width: auto;
         min-width: 200px;
-        max-width: 400px;
         overflow-y: auto;
         max-height: 200px;
         .box-sizing(border-box);
+        border: 1px solid #ccc; // Lighter color, more inline with what the browser does
     }
 
-    .fr-autocomplete-show-suggestions-button button {
-        width: 40px;                            // Enough to see the button and arrow
-        height: @baseLineHeight + 8px;
-        margin-left: 3px;                       // Get the button to show as if it was merged with the text field (well, almost)
-        padding-top: 0; padding-bottom: 0;      // Remove top padding so the bottom shows vertically centered
-    }
 }

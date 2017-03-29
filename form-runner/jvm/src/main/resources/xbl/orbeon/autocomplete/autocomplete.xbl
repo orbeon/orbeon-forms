@@ -324,7 +324,6 @@
                         <!-- Markup with input for the YUI autocomplete -->
                         <!--  NOTE: YUI expects this to be a <div>. -->
                         <xh:div class="yui-ac">
-                            <xf:input id="search" ref="$local/textfield-value" incremental="true" class="fr-autocomplete-search" xbl:attr="tabindex accesskey"/>
                             <!-- Button that opens the list of suggestions -->
                             <xsl:if test="not(@show-suggestions-button = 'false')">
                                 <!-- Make button non-relevant in static readonly mode, in order to avoid updates to
@@ -334,7 +333,7 @@
                                      knowledge that the button was static readonly. By making the whole thing
                                      non-relevant, we avoid this change of state. Of course ideally static
                                      readonly would not have this unwanted behavior. -->
-                                <xf:group ref=".[not($local/readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
+                                <xf:group ref=".[not($local/readonly = 'true' and property('xxf:readonly-appearance') = 'static')]" xxf:internal="trye">
                                     <!-- Bound to text field value so button becomes readonly when the textfield is readonly -->
                                     <xf:trigger ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
                                         <xf:label>
@@ -343,6 +342,7 @@
                                     </xf:trigger>
                                 </xf:group>
                             </xsl:if>
+                            <xf:input id="search" ref="$local/textfield-value" incremental="true" class="fr-autocomplete-search" xbl:attr="tabindex accesskey"/>
                             <!--  NOTE: YUI expects this to be a <div>. -->
                             <xh:div class="fr-autocomplete-yui-div"/>
                         </xh:div>

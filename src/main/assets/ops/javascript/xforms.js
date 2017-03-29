@@ -3926,75 +3926,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         }
     };
 
-    /**
-     * Store for values are we think they are known to the server.
-     *
-     * @namespace ORBEON.xforms
-     * @class ServerValueStore
-     */
-    ORBEON.xforms.ServerValueStore = {
-
-        /** @private @type {Object.<string, HTMLElement>} */    _idToControl: {},
-        /** @private @type {Object.<string, string>} */         _idToValue: {},
-
-        /**
-         * Stores a value for a control which we know the server knows about.
-         *
-         * @param {!string} id       Id of the control
-         * @param {!string} value    Value for the control
-         * @returns {void}
-         */
-        set: function (id, value) {
-            this._idToControl[id] = document.getElementById(id);
-            this._idToValue[id] = value;
-        },
-
-        /**
-         * Returns the value of a control as known by the server, or null if we don't know what the value known by the
-         * server is.
-         *
-         * @param {!string} id      Id of the control
-         * @return {string}         Value of null
-         */
-        get: function (id) {
-            var cachedControl = this._idToControl[id];
-            if (cachedControl == null) {
-                // We known nothing about this control
-                return null;
-            } else if (cachedControl == document.getElementById(id)) {
-                // We have the value and it is for the right control
-                return ORBEON.xforms.ServerValueStore._idToValue[id];
-            } else {
-                // We have a value but it is for an obsolete control
-                this._idToControl[id] = null;
-                ORBEON.xforms.ServerValueStore._idToValue[id] = null;
-                return null;
-            }
-        },
-
-        /**
-         * Removes the value we know for a specific control.
-         *
-         * @param {!string} id
-         * @return {void}
-         */
-        remove: function (id) {
-            delete this._idToControl[id];
-        },
-
-        /**
-         * Got through all the server, check that each one of for a control which is still in the DOM, and if not purge it.
-         *
-         * @return {void}
-         */
-        purgeExpired: function () {
-            _.each(_.keys(this._idToControl), _.bind(function (id) {
-                if (! YAHOO.util.Dom.inDocument(this._idToControl[id]))
-                    this.remove(id);
-            }, this));
-        }
-    };
-
+    // TODO: Shouldn't this not be done directly in AjaxServer instead of using the indirection of an event?
     ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
         ORBEON.xforms.ServerValueStore.purgeExpired();
     });

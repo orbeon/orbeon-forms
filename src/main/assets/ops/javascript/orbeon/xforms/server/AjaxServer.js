@@ -128,7 +128,7 @@
      */
     AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, discardable, formID) {
         var timerId = window.setTimeout(function () {
-            var event = new AjaxServer.Event(ORBEON.util.Dom.get(formID), null,
+            var event = new AjaxServer.Event(document.getElementById(formID), null,
                     serverEvents, "xxforms-server-events", null, null, null, showProgress);
             AjaxServer.fireEvents([event]);
         }, delay);
@@ -189,7 +189,7 @@
                     // Check if we find a class on the target that tells us this is an activating event
                     // Do NOT consider a filtered event as an activating event
                     if (event.targetId != null) {
-                        var target = ORBEON.util.Dom.get(event.targetId);
+                        var target = document.getElementById(event.targetId);
                         if (target == null) {
                             // Target is not on the client. For most use cases, assume event should be dispatched right away.
                             foundActivatingEvent = true;
@@ -258,7 +258,7 @@
                                 // Haven't yet seen this control in current block of events
 
                                 var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
-                                if ($(ORBEON.util.Dom.get(event.targetId)).is('.xforms-upload') ||
+                                if ($(document.getElementById(event.targetId)).is('.xforms-upload') ||
                                     serverValue == null                                         ||
                                     serverValue != event.value) {
 
@@ -851,7 +851,7 @@
                             {
                                 // Locate end of the repeat
                                 var delimiterTagName = null;
-                                var templateRepeatEnd = ORBEON.util.Dom.get("repeat-end-" + repeatId);
+                                var templateRepeatEnd = document.getElementById("repeat-end-" + repeatId);
                                 var templateNode = templateRepeatEnd.previousSibling;
                                 var nestedRepeatLevel = 0;
                                 while (! (nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
@@ -891,7 +891,7 @@
                             {
                                 if (parentIndexes == "") {
                                     // Top level repeat: contains a template
-                                    var repeatEnd = ORBEON.util.Dom.get("repeat-end-" + repeatId);
+                                    var repeatEnd = document.getElementById("repeat-end-" + repeatId);
                                     var cursor = repeatEnd.previousSibling;
                                     while (! (cursor.nodeType == ELEMENT_TYPE
                                             && $(cursor).is('.xforms-repeat-delimiter')
@@ -901,7 +901,7 @@
                                     afterInsertionPoint = cursor;
                                 } else {
                                     // Nested repeat: does not contain a template
-                                    var repeatEnd = ORBEON.util.Dom.get("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatId, parentIndexes));
+                                    var repeatEnd = document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatId, parentIndexes));
                                     afterInsertionPoint = repeatEnd;
                                 }
                             }
@@ -943,7 +943,7 @@
                             var count = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
 
                             // Find end of the repeat
-                            var repeatEnd = ORBEON.util.Dom.get("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));
+                            var repeatEnd = document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));
 
                             // Find last element to delete
                             var lastElementToDelete;
@@ -1011,7 +1011,7 @@
                             if (itemsetTree == null)
                                 itemsetTree = [];
 
-                            var documentElement = ORBEON.util.Dom.get(controlId);
+                            var documentElement = document.getElementById(controlId);
 
                             controlsWithUpdatedItemsets[controlId] = true;
 
@@ -1105,8 +1105,8 @@
                                 // Get template
                                 var isSelect = $(documentElement).is('.xforms-select');
                                 var template = isSelect
-                                        ? ORBEON.util.Dom.get("xforms-select-full-template")
-                                        : ORBEON.util.Dom.get("xforms-select1-full-template");
+                                        ? document.getElementById("xforms-select-full-template")
+                                        : document.getElementById("xforms-select1-full-template");
                                 template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
 
                                 // Get the span that contains the one span per checkbox/radio
@@ -1178,7 +1178,7 @@
 
                         function handleValue(elem, controlId, recreatedInput) {
                             var newControlValue  = ORBEON.util.Dom.getStringValue(elem);
-                            var documentElement  = ORBEON.util.Dom.get(controlId);
+                            var documentElement  = document.getElementById(controlId);
                             var jDocumentElement = $(documentElement);
 
                             // Save new value sent by server (upload controls don't carry their value the same way as other controls)
@@ -1245,7 +1245,7 @@
                                         function setServerValue() {
                                             ORBEON.xforms.ServerValueStore.set(
                                                 controlId,
-                                                ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.get(controlId))
+                                                ORBEON.xforms.Controls.getCurrentValue(document.getElementById(controlId))
                                             );
                                         }
 
@@ -1283,7 +1283,7 @@
                             var newSchemaType    = ORBEON.util.Dom.getAttribute(elem, "type");
                             var mustInitialize   = ORBEON.util.Dom.getAttribute(elem, "init") == "true";
 
-                            var documentElement = ORBEON.util.Dom.get(controlId);
+                            var documentElement = document.getElementById(controlId);
 
                             // Done to fix #2935; can be removed when we have taken care of #2940
                             if (documentElement == null &&
@@ -1292,7 +1292,7 @@
                                 return;
 
                             if (documentElement == null) {
-                                documentElement = ORBEON.util.Dom.get("group-begin-" + controlId);
+                                documentElement = document.getElementById("group-begin-" + controlId);
                                 if (documentElement == null) ORBEON.util.Utils.logMessage ("Can't find element or iteration with ID '" + controlId + "'");
                             }
                             var jDocumentElement = $(documentElement);
@@ -1441,7 +1441,7 @@
                                         } else if (newType.type == "boolean") {
 
                                             // Make copy of the template
-                                            var booleanTemplate = ORBEON.util.Dom.get("xforms-select-full-template");
+                                            var booleanTemplate = document.getElementById("xforms-select-full-template");
                                             booleanTemplate = ORBEON.util.Dom.getChildElementByIndex(booleanTemplate, 0);
                                             var booleanTemplateClone = booleanTemplate.cloneNode(true);
 
@@ -1787,7 +1787,7 @@
                             var newAttributeValue = ORBEON.util.Dom.getStringValue(elem);
                             var forAttribute = ORBEON.util.Dom.getAttribute(elem, "for");
                             var nameAttribute = ORBEON.util.Dom.getAttribute(elem, "name");
-                            var htmlElement = ORBEON.util.Dom.get(forAttribute);
+                            var htmlElement = document.getElementById(forAttribute);
                             if (htmlElement != null) {// use case: xh:html/@lang but HTML fragment produced
                                 ORBEON.util.Dom.setAttribute(htmlElement, nameAttribute, newAttributeValue);
                             }
@@ -1796,7 +1796,7 @@
                         function handleText(elem) {
                             var newTextValue = ORBEON.util.Dom.getStringValue(elem);
                             var forAttribute = ORBEON.util.Dom.getAttribute(elem, "for");
-                            var htmlElement = ORBEON.util.Dom.get(forAttribute);
+                            var htmlElement = document.getElementById(forAttribute);
 
                             if (htmlElement != null && htmlElement.tagName.toLowerCase() == "title") {
                                 // Set HTML title
@@ -1983,7 +1983,7 @@
 
                                     ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsValue != null ? serverEventsValue : "";
                                     // Increment and send sequence number
-                                    var requestForm = ORBEON.util.Dom.get(formID);
+                                    var requestForm = document.getElementById(formID);
                                     // Go to another page
                                     if (showProgress != "false") {
                                         // Display loading indicator unless the server tells us not to display it
@@ -2112,7 +2112,7 @@
                                 case "help": {
                                     var helpElement = childNode;
                                     var controlId = ORBEON.util.Dom.getAttribute(helpElement, "control-id");
-                                    var control = ORBEON.util.Dom.get(controlId);
+                                    var control = document.getElementById(controlId);
                                     ORBEON.xforms.Controls.showHelp(control);
                                     break;
                                 }

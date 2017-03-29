@@ -1149,7 +1149,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 }
 
                 var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
-                var beginElement = ORBEON.util.Dom.get(beginElementId);
+                var beginElement = document.getElementById(beginElementId);
                 if (! beginElement) return null;
                 var cursor = beginElement;
                 var cursorPosition = 0;
@@ -1692,7 +1692,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             // Search by id first
             // See https://github.com/orbeon/orbeon-forms/issues/793
             var lhhaElementId = ORBEON.util.Utils.appendToEffectiveId(control.id, ORBEON.xforms.Controls._classNameToId[lhhaType]);
-            var byId = ORBEON.util.Dom.get(lhhaElementId);
+            var byId = document.getElementById(lhhaElementId);
             if (byId != null)
                 return byId;
 
@@ -1712,7 +1712,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             var suffix = ORBEON.xforms.Controls._classNameToId[lhhaType];
             // NOTE: could probably do without llhaType parameter
             return element.id.indexOf(suffix) != -1
-                    ? ORBEON.util.Dom.get(element.id.replace(new RegExp(ORBEON.util.Utils.escapeRegex(ORBEON.xforms.Controls._classNameToId[lhhaType]), "g"), ''))
+                    ? document.getElementById(element.id.replace(new RegExp(ORBEON.util.Utils.escapeRegex(ORBEON.xforms.Controls._classNameToId[lhhaType]), "g"), ''))
                     : element.parentNode;
         },
 
@@ -2028,7 +2028,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             if (ORBEON.xforms.Globals.currentFocusControlId == controlId)
                 return;
 
-            var control = ORBEON.util.Dom.get(controlId);
+            var control = document.getElementById(controlId);
 
             // Keep track of the id of the last known control which has focus
             ORBEON.xforms.Globals.currentFocusControlId = controlId;
@@ -2083,7 +2083,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             if (ORBEON.xforms.Globals.currentFocusControlId == null)
                 return;
 
-            var control = ORBEON.util.Dom.get(controlId);
+            var control = document.getElementById(controlId);
 
             if ($(control).is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Radio button or checkbox
@@ -2141,13 +2141,13 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         },
 
         showDialog: function (controlId, neighbor) {
-            var divElement = ORBEON.util.Dom.get(controlId);
+            var divElement = document.getElementById(controlId);
             var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
 
             // Take out the focus from the current control. This is particularly important with non-modal dialogs
             // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
             if (ORBEON.xforms.Globals.currentFocusControlId != null) {
-                var focusedElement = ORBEON.util.Dom.get(ORBEON.xforms.Globals.currentFocusControlId);
+                var focusedElement = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
                 if (focusedElement != null) focusedElement.blur();
             }
 
@@ -2197,7 +2197,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
          */
         findCaseBegin: function (controlId) {
             var caseBeginId = "xforms-case-begin-" + controlId;
-            return ORBEON.util.Dom.get(caseBeginId);
+            return document.getElementById(caseBeginId);
         },
 
         /**
@@ -2503,7 +2503,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             if (! ORBEON.xforms.Globals.maskFocusEvents) {
                 // Control elements
                 var newFocusControlElement = ORBEON.xforms.Events._findAncestorFocusableControl(eventTarget);
-                var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? ORBEON.util.Dom.get(ORBEON.xforms.Globals.currentFocusControlId) : null;
+                var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? document.getElementById(ORBEON.xforms.Globals.currentFocusControlId) : null;
 
                 if (newFocusControlElement != null) {
                     // Store initial value of control if we don't have a server value already, and if this is is not a list
@@ -2971,7 +2971,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
 
         sliderValueChange: function (offset) {
             // Notify server that value changed
-            var rangeControl = ORBEON.util.Dom.get(this.id).parentNode;
+            var rangeControl = document.getElementById(this.id).parentNode;
 
             var value = offset / 200;
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, rangeControl.id, String(value), "xxforms-value");
@@ -2985,7 +2985,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         dialogClose: function (type, args, me) {
             if (! ORBEON.xforms.Globals.maskDialogCloseEvents) {
                 var dialogId = me;
-                var dialog = ORBEON.util.Dom.get(dialogId);
+                var dialog = document.getElementById(dialogId);
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, dialog.id, null, "xxforms-dialog-close");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
             }
@@ -3094,7 +3094,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         sendHeartBeatIfNeeded: function (heartBeatDelay) {
             var currentTime = new Date().getTime();
             if ((currentTime - ORBEON.xforms.Globals.lastEventSentTime) >= heartBeatDelay) {
-                var heartBeatDiv = ORBEON.util.Dom.get("xforms-heartbeat");
+                var heartBeatDiv = document.getElementById("xforms-heartbeat");
                 if (heartBeatDiv == null) {
                     var form;
                     for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
@@ -3180,7 +3180,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                 var componentIds = this._fullUpdateToComponents[fullUpdateId];
                 if (componentIds) {
                     _.each(componentIds, function (componentId) {
-                        /** @type {HTMLElement} */ var componentContainer = ORBEON.util.Dom.get(componentId);
+                        /** @type {HTMLElement} */ var componentContainer = document.getElementById(componentId);
                         if (componentContainer != null) {
                             // Call instance which will call init if necessary
                             var component = me._componentsXblClass[componentId].instance(componentContainer);
@@ -3640,7 +3640,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                             keyListener.isDocumentListener = keyListener.observer == "#document";
                             keyListener.isDialogListener = false;
                             if (! keyListener.isDocumentListener) {
-                                keyListener.observerElement = ORBEON.util.Dom.get(keyListener.observer);
+                                keyListener.observerElement = document.getElementById(keyListener.observer);
                                 keyListener.isDialogListener = $(keyListener.observerElement).is('.xforms-dialog');
                             }
                             if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
@@ -3945,7 +3945,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
          * @returns {void}
          */
         set: function (id, value) {
-            this._idToControl[id] = ORBEON.util.Dom.get(id);
+            this._idToControl[id] = document.getElementById(id);
             this._idToValue[id] = value;
         },
 
@@ -3961,7 +3961,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             if (cachedControl == null) {
                 // We known nothing about this control
                 return null;
-            } else if (cachedControl == ORBEON.util.Dom.get(id)) {
+            } else if (cachedControl == document.getElementById(id)) {
                 // We have the value and it is for the right control
                 return ORBEON.xforms.ServerValueStore._idToValue[id];
             } else {

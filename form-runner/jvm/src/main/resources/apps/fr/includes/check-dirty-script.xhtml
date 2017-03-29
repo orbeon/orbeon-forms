@@ -19,7 +19,7 @@
                 var dirty =
                     _.find(_.values(ORBEON.xforms.Globals.ns), function(prefix) {
                         var controlId = prefix + 'fr-data-safe';
-                        var control = ORBEON.util.Dom.get(controlId);
+                        var control = document.getElementById(controlId);
                         return control && ORBEON.xforms.Document.getValue(controlId) != 'true';
                     });
 

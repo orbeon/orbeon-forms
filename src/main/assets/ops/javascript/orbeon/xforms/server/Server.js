@@ -23,10 +23,10 @@
     Server.callUserScript = function(functionName, targetId, observerId) {
 
         function getElement(id) {
-            var element = ORBEON.util.Dom.get(id);
+            var element = document.getElementById(id);
             if (element == null) {
                 // Try to find repeat (some events xxforms-nodeset-changed can target the repeat)
-                element = ORBEON.util.Dom.get("repeat-begin-" + id);
+                element = document.getElementById("repeat-begin-" + id);
                 if (element == null) {
                     // Try getting repeat delimiter
                     var separatorPosition = Math.max(id.lastIndexOf(XF_REPEAT_SEPARATOR), id.lastIndexOf(XF_REPEAT_INDEX_SEPARATOR));
@@ -36,7 +36,7 @@
                         element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
                         if (element == null) {
                             // If everything else has failed, the id might be an xf:repeat id!
-                            element = ORBEON.util.Dom.get("repeat-begin-" + id);
+                            element = document.getElementById("repeat-begin-" + id);
                         }
                     }
                 }

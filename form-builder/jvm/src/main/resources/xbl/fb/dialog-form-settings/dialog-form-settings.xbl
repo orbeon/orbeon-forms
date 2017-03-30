@@ -39,8 +39,8 @@
                     value="event(context())"/>
 
                 <xf:setvalue
-                    ref="$i/upload-max-size"
-                    value="(event('upload-max-size'), -2)[1]"/>
+                    ref="$i/attachment-max-size"
+                    value="(event('attachment-max-size'), -2)[1]"/>
 
                 <xf:setvalue
                     ref="$i/wizard"
@@ -123,7 +123,7 @@
                     <xf:property name="title"             value="$i/title/string()"/>
                     <xf:property name="description"       value="$i/description/string()"/>
                     <xf:property name="singleton"         value="$i/singleton/string()"/>
-                    <xf:property name="upload-max-size"   value="$i/upload-max-size/string()"/>
+                    <xf:property name="attachment-max-size"   value="$i/attachment-max-size/string()"/>
                     <xf:property name="wizard"            value="$i/wizard/string()"/>
                     <xf:property name="mode"              value="$i/mode/string()"/>
 
@@ -168,8 +168,8 @@
                         <description/>
                         <singleton/>
                         <wizard/>
-                        <upload-max-size/>
-                        <upload-max-size-aggregate/>
+                        <attachment-max-size/>
+                        <attachment-max-size-aggregate/>
                         <labels/>
                         <labels-placeholders/>
                         <hints/>
@@ -218,7 +218,7 @@
                     readonly="false()"
                     type="xs:boolean"/>
                 <xf:bind
-                    ref="upload-max-size"
+                    ref="attachment-max-size"
                     readonly="false()"
                     type="xs:integer"
                     constraint="xxf:non-negative() or  . = -2"/>
@@ -389,9 +389,9 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <fr:open-select1 ref="upload-max-size" appearance="full xxf:horizontal" type="integer" suffix="bytes" class="fb-upload-max-size-control">
-                                                <xf:label>Maximum Attachment Size per Control</xf:label>
-                                                <xf:hint>Can also be set on a per-control basis in Control Settings</xf:hint>
+                                            <fr:open-select1 ref="attachment-max-size" appearance="full xxf:horizontal" type="integer" suffix="bytes" class="fb-attachment-max-size-control">
+                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-size/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size/hint"/>
                                                 <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>

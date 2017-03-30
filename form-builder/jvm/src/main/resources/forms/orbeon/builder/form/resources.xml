@@ -272,6 +272,10 @@
                 <label>Wizard View</label>
                 <hint>Whether to show top-level sections as separate wizard pages</hint>
             </wizard>
+            <attachment-max-size>
+                <label>Maximum Attachment Size per Control</label>
+                <hint>Can also be set on a per-control basis in Control Settings</hint>
+            </attachment-max-size>
             <labels>
                 <label>Appearance of Control Labels</label>
             </labels>
@@ -1232,6 +1236,10 @@
                 <label>Vue "wizard"</label>
                 <hint>Montrer les sections de premier niveau dans des pages de wizard séparées</hint>
             </wizard>
+            <attachment-max-size>
+                <label>Taille maximale des fichiers joints par contrôle</label>
+                <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
+            </attachment-max-size>
             <labels>
                 <label>Apparence des libellés</label>
             </labels>
@@ -1386,7 +1394,7 @@
                 <item id="non-positive">Négatif ou zéro</item>
                 <item id="negative">Négatif</item>
                 <item id="fraction-digits">Maximum chiffres fractionnaires </item>
-                <item id="attachment-max-size">Taille maximale du fichier joint]</item>
+                <item id="attachment-max-size">Taille maximale du fichier joint</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -2194,6 +2202,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -3184,6 +3196,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -4173,7 +4189,10 @@
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
-            </wizard>
+            </wizard><attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -5156,6 +5175,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -6141,6 +6164,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -7124,6 +7151,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -8107,6 +8138,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -9096,6 +9131,10 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <attachment-max-size>
+                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            </attachment-max-size>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>

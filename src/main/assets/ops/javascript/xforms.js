@@ -131,21 +131,6 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
             },
 
             /**
-             * In February 2010, we determined that the particular bug we work around in safeGetElementById() cannot
-             * happen in the vast majority of the cases. So instead, we call document.getElementById() directly.
-             * Between February 2010 and October 2010, we have been calling here YAHOO.util.Dom.get() which was pretty
-             * much directly calling document.getElementById(). In October 2010, we upgraded to YUI 2.8. YUI 2.8 version
-             * of ORBEON.util.Dom.get() started working around IE's bug, sometimes incorrectly returning null on IE in a
-             * case where an element with the specified id did exist. So we are now here calling document.getElementById()
-             * directly instead of going through YUI.
-             *
-             * @param {string} controlId
-             */
-            get: function(controlId) {
-                return document.getElementById(controlId);
-            },
-
-            /**
              * Return null when the attribute is not there.
              */
             getAttribute: function(element, name) {

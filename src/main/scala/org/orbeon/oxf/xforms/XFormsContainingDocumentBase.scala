@@ -18,12 +18,12 @@ import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -42,6 +42,7 @@ import org.orbeon.oxf.xforms.function.xxforms.AttachmentMaxSizeValidation
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.XFormsStateLifecycle.RequestParameters
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState, XFormsStateManager}
+import org.orbeon.oxf.xforms.upload.UploadCheckerLogic
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
 
@@ -109,28 +110,44 @@ abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
 
 trait ContainingDocumentUpload {
 
-  def getControls   : XFormsControls
-  def getStaticState: XFormsStaticState
+  def getControls    : XFormsControls
+  def getStaticState : XFormsStaticState
+  def defaultModel   : Option[XFormsModel]
+  def getRequestStats: RequestStats
 
-  def uploadMaxSizeForControl(controlEffectiveId: String): MaximumSize = {
+  def getUploadChecker: UploadCheckerLogic = UploadChecker
 
-    def fromCommonConstraint =
+  private object UploadChecker extends UploadCheckerLogic {
+
+    def findAttachmentMaxSizeValidationMipFor(controlEffectiveId: String) =
       getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
         CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
-        (_.customMIPs.get(AttachmentMaxSizeValidation.PropertyName))        flatMap
-        MaximumSize.tryFromString
+        (_.customMIPs.get(AttachmentMaxSizeValidation.PropertyName))
 
-    def fromFormSetting =
-      getStaticState.staticStringProperty(UPLOAD_MAX_SIZE_PROPERTY).trimAllToOpt flatMap
-        MaximumSize.tryFromString
+    def currentUploadSizeAggregate = {
 
-    def fromProperty = MaximumSize.tryFromString(RequestGenerator.getMaxSizeProperty.toString)
+      def evaluateAsLong(expr: CompiledExpression) =
+        defaultModel match {
+          case Some(m) ⇒
+            val bindingContext = m.getDefaultEvaluationContext
+            XPath.evaluateSingle(
+              contextItems       = bindingContext.nodeset,
+              contextPosition    = bindingContext.position,
+              compiledExpression = expr,
+              functionContext    = m.getContextStack.getFunctionContext(m.getEffectiveId, bindingContext),
+              variableResolver   = m.variableResolver
+            )(getRequestStats.getReporter).asInstanceOf[Long] // we statically ensure that the expression returns an `xs:integer`
+          case None ⇒
+            throw new AssertionError("can only evaluate dynamic properties if a model is present")
+        }
 
-    fromCommonConstraint orElse
-      fromFormSetting    orElse
-      fromProperty       getOrElse
-      MaximumSize.LimitedSize(0)
+      getStaticState.uploadMaxSizeAggregateExpression map evaluateAsLong map (0L max)
+    }
+
+    def uploadMaxSizeProperty          = getStaticState.uploadMaxSize
+    def uploadMaxSizeAggregateProperty = getStaticState.uploadMaxSizeAggregate
   }
+
 
 }
 

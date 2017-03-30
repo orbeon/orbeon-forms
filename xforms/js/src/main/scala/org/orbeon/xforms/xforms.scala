@@ -85,7 +85,7 @@ class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boole
 @JSGlobal("ORBEON.xforms.Events")
 @js.native
 object Events extends js.Object {
-  def ajaxResponseProcessedEvent: YUICustomEvent = js.native
+  val ajaxResponseProcessedEvent: YUICustomEvent = js.native
 }
 
 @JSGlobal("ORBEON.xforms.server.AjaxServer")
@@ -116,8 +116,9 @@ object Properties extends js.Object {
 @JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {
-  def appendToEffectiveId(effectiveId: String, ending: String): String = js.native
-  def findRepeatDelimiter(repeatId: String, iteration: Int): raw.Element = js.native
+  def appendToEffectiveId(effectiveId: String, ending: String) : String =           js.native
+  def getRepeatIndexes(effectiveId: String)                    : js.Array[String] = js.native
+  def findRepeatDelimiter(repeatId: String, iteration: Int)    : raw.Element =      js.native
 }
 
 @JSGlobal("ORBEON.xforms.control.Control")

@@ -162,6 +162,12 @@ object StringUtils {
 
         s.substring(prefix, s.size - suffix)
       }
+
+    def lastIndexOfOpt(search: String): Option[Int] = {
+      val index = s.lastIndexOf(search)
+      index >= 0 option index
+    }
+
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {

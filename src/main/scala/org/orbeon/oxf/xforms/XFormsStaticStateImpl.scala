@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.{OXFException, Version}
+import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath.CompiledExpression
@@ -31,7 +33,9 @@ import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationDocumentResult}
 import org.orbeon.oxf.xml.{XMLReceiver, _}
+import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
+import org.orbeon.saxon.sxpath.XPathExpression
 import org.xml.sax.Attributes
 
 import scala.collection.JavaConverters._
@@ -109,6 +113,47 @@ class XFormsStaticStateImpl(
       case None ⇒
         XFormsFunctionLibrary
     }
+
+  lazy val uploadMaxSize: MaximumSize =
+    staticStringProperty(UPLOAD_MAX_SIZE_PROPERTY).trimAllToOpt flatMap
+      MaximumSize.tryFromString orElse
+      MaximumSize.tryFromString(RequestGenerator.getMaxSizeProperty.toString) getOrElse
+      MaximumSize.LimitedSize(0L)
+
+  lazy val uploadMaxSizeAggregate: MaximumSize =
+    staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY).trimAllToOpt flatMap
+      MaximumSize.tryFromString getOrElse
+      MaximumSize.UnlimitedSize
+
+  lazy val uploadMaxSizeAggregateExpression: Option[CompiledExpression] = {
+
+    val compiledExpressionOpt =
+      for {
+        rawProperty ← staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY).trimAllToOpt
+        model       ← topLevelPart.defaultModel // ∃ property ⇒ ∃ model, right?
+      } yield
+        XPath.compileExpression(
+          xpathString      = rawProperty,
+          namespaceMapping = model.namespaceMapping,
+          locationData     = null,
+          functionLibrary  = functionLibrary,
+          avt              = false
+        )
+
+    def getExpressionType(expr: XPathExpression) = {
+      val internalExpr = expr.getInternalExpression
+      internalExpr.getItemType(internalExpr.getExecutable.getConfiguration.getTypeHierarchy)
+    }
+
+    compiledExpressionOpt match {
+      case Some(CompiledExpression(expr, _, _)) if getExpressionType(expr) == BuiltInAtomicType.INTEGER ⇒
+        compiledExpressionOpt
+      case Some(_) ⇒
+        throw new IllegalArgumentException(s"property `$UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY` must return `xs:integer` type")
+      case None ⇒
+        None
+    }
+  }
 
   def isCacheDocument       = staticBooleanProperty(P.CACHE_DOCUMENT_PROPERTY)
   def isClientStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE

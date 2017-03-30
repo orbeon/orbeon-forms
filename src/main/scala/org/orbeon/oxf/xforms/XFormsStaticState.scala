@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.IndentedLogger
-import state.AnnotatedTemplate
-import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.functions.FunctionLibrary
 
 trait XFormsStaticState {
@@ -41,6 +42,9 @@ trait XFormsStaticState {
   def functionLibrary: FunctionLibrary
   def sanitizeInput: String ⇒ String
   def assets: XFormsAssets
+  def uploadMaxSize: MaximumSize
+  def uploadMaxSizeAggregate: MaximumSize
+  def uploadMaxSizeAggregateExpression: Option[CompiledExpression]
 
   def staticProperty       (name: String): Any
   def staticStringProperty (name: String): String

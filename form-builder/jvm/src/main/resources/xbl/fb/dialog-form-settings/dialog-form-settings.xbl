@@ -39,8 +39,9 @@
                     value="event(context())"/>
 
                 <xf:setvalue
-                    ref="$i/attachment-max-size"
-                    value="(event('attachment-max-size'), -2)[1]"/>
+                    iterate="'attachment-max-size', 'attachment-max-size-aggregate'"
+                    ref="$i/*[name() = context()]"
+                    value="(event(context()), -2)[1]"/>
 
                 <xf:setvalue
                     ref="$i/wizard"
@@ -118,14 +119,15 @@
 
                 <!-- Dispatch event with result -->
                 <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                    <xf:property name="app"               value="$i/app/string()"/>
-                    <xf:property name="form"              value="$i/form/string()"/>
-                    <xf:property name="title"             value="$i/title/string()"/>
-                    <xf:property name="description"       value="$i/description/string()"/>
-                    <xf:property name="singleton"         value="$i/singleton/string()"/>
-                    <xf:property name="attachment-max-size"   value="$i/attachment-max-size/string()"/>
-                    <xf:property name="wizard"            value="$i/wizard/string()"/>
-                    <xf:property name="mode"              value="$i/mode/string()"/>
+                    <xf:property name="app"                           value="$i/app/string()"/>
+                    <xf:property name="form"                          value="$i/form/string()"/>
+                    <xf:property name="title"                         value="$i/title/string()"/>
+                    <xf:property name="description"                   value="$i/description/string()"/>
+                    <xf:property name="singleton"                     value="$i/singleton/string()"/>
+                    <xf:property name="attachment-max-size"           value="$i/attachment-max-size/string()"/>
+                    <xf:property name="attachment-max-size-aggregate" value="$i/attachment-max-size-aggregate/string()"/>
+                    <xf:property name="wizard"                        value="$i/wizard/string()"/>
+                    <xf:property name="mode"                          value="$i/mode/string()"/>
 
                     <xf:property
                         name="labels"
@@ -218,7 +220,7 @@
                     readonly="false()"
                     type="xs:boolean"/>
                 <xf:bind
-                    ref="attachment-max-size"
+                    ref="attachment-max-size | attachment-max-size-aggregate"
                     readonly="false()"
                     type="xs:integer"
                     constraint="xxf:non-negative() or  . = -2"/>
@@ -389,9 +391,33 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <fr:open-select1 ref="attachment-max-size" appearance="full xxf:horizontal" type="integer" suffix="bytes" class="fb-attachment-max-size-control">
+                                            <fr:open-select1
+                                                ref="attachment-max-size"
+                                                appearance="full xxf:horizontal"
+                                                type="integer"
+                                                suffix="bytes"
+                                                class="fb-attachment-max-size-control">
+
                                                 <xf:label ref="$resources/dialog-form-settings/attachment-max-size/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
+                                                    <xf:label ref="."/>
+                                                    <xf:value>-2</xf:value>
+                                                </xf:itemset>
+                                            </fr:open-select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:open-select1
+                                                ref="attachment-max-size-aggregate"
+                                                appearance="full xxf:horizontal"
+                                                type="integer"
+                                                suffix="bytes"
+                                                class="fb-attachment-max-size-aggregate-control">
+
+                                                <xf:label ref="$resources/dialog-form-settings/attachment-max-size-aggregate/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-max-size-aggregate/hint"/>
                                                 <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>

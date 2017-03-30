@@ -149,6 +149,15 @@
             ]"/>
 
     <xsl:variable
+        name="valid-attachment-max-size-aggregate-or-empty"
+        as="xs:string?"
+        select="
+            p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate', $app, $form), '.'))[
+                (: Allow -1 to mean 'unlimited' :)
+                . castable as xs:integer and xs:integer(.) ge -1
+            ]"/>
+
+    <xsl:variable
         name="view-appearance"
         as="xs:string"
         select="
@@ -400,6 +409,16 @@
             xxf:label.appearance="{$label-appearance}"
             xxf:hint.appearance="{$hint-appearance}"
             xxf:assets.baseline.excludes="/ops/javascript/scalajs/orbeon-xforms.js"
+            xxf:upload.max-size-aggregate-expression="
+                sum(
+                    xxf:instance('fr-form-instance')//*[
+                        @filename and @mediatype and @size
+                    ]/@size[
+                        . castable as xs:integer
+                    ]/xs:integer(.),
+                    0
+                )
+            "
         >
 
             <!-- Don't enable client events filtering for FB -->
@@ -421,6 +440,17 @@
                 <xsl:when test="exists($valid-attachment-max-size-or-empty)">
                     <!-- Else use Form Runner property if specified and valid -->
                     <xsl:attribute name="xxf:upload.max-size" select="$valid-attachment-max-size-or-empty"/>
+                </xsl:when>
+            </xsl:choose>
+
+            <xsl:choose>
+                <xsl:when test="exists(@xxf:upload.max-size-aggregate)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.max-size-aggregate"/>
+                </xsl:when>
+                <xsl:when test="exists($valid-attachment-max-size-aggregate-or-empty)">
+                    <!-- Else use Form Runner property if specified and valid -->
+                    <xsl:attribute name="xxf:upload.max-size-aggregate" select="$valid-attachment-max-size-aggregate-or-empty"/>
                 </xsl:when>
             </xsl:choose>
 

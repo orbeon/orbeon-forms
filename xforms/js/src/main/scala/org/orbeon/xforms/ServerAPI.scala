@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.Constants._
 import org.scalajs.dom
 import org.scalajs.dom.raw
@@ -34,18 +35,19 @@ object ServerAPI {
       def fromRepeat =
         Option(dom.document.getElementById(s"repeat-begin-$id")) // e.g. with `xxforms-nodeset-changed`
 
-      def fromDelimiter = {
-          val separatorPosition = id.lastIndexOf(RepeatSeparator) max id.lastIndexOf(RepeatIndexSeparator)
-          if (separatorPosition != -1) {
-            Option(
-              Utils.findRepeatDelimiter(
-                repeatId  = id.substring(0, separatorPosition),
-                iteration = id.substring(separatorPosition + 1).toInt
-              )
+      def fromDelimiter =
+        id.lastIndexOfOpt(RepeatSeparator) flatMap { lastRepeatSeparatorIndex ⇒
+
+          val separatorPosition =
+            id.lastIndexOfOpt(RepeatIndexSeparator) map (lastRepeatSeparatorIndex max) getOrElse lastRepeatSeparatorIndex
+
+          Option(
+            Utils.findRepeatDelimiter(
+              repeatId  = id.substring(0, separatorPosition),
+              iteration = id.substring(separatorPosition + 1).toInt
             )
-          } else
-            None
-      }
+          )
+        }
 
       fromId orElse fromRepeat orElse fromDelimiter orNull
     }

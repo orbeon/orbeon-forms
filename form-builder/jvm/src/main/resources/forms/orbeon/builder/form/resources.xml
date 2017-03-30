@@ -276,6 +276,9 @@
                 <label>Maximum Attachment Size per Control</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label>Maximum Aggregate Attachment Size</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label>Appearance of Control Labels</label>
             </labels>
@@ -1240,6 +1243,9 @@
                 <label>Taille maximale des fichiers joints par contrôle</label>
                 <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label>Taille maximale agrégée des fichiers joints</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label>Apparence des libellés</label>
             </labels>
@@ -2206,6 +2212,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -3200,6 +3209,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -4189,10 +4201,14 @@
             <wizard>
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
-            </wizard><attachment-max-size>
+            </wizard>
+            <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -5179,6 +5195,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -6168,6 +6187,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -7155,6 +7177,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -8142,6 +8167,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -9135,6 +9163,9 @@
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
+            <attachment-max-size-aggregate>
+                <label todo="true">[Maximum Aggregate Attachment Size]</label>
+            </attachment-max-size-aggregate>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>

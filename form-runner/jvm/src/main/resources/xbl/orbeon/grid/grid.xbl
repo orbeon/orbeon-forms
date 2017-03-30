@@ -137,8 +137,6 @@
                 <xsl:variable name="td-elem"                  select="if ($is-table) then 'xh:td'    else 'xh:div'"/>
 
                 <xsl:template match="/*">
-
-                    <!-- Root element -->
                     <xf:group appearance="xxf:internal">
 
                         <xsl:if test="$is-editable">

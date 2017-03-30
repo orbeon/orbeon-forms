@@ -13,9 +13,9 @@
   */
 package org.orbeon.xforms
 
-import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.raw.{HTMLElement, XMLHttpRequest}
+import org.scalajs.dom.{html, raw}
 import org.scalajs.jquery.JQueryCallback
 
 import scala.scalajs.js
@@ -117,6 +117,7 @@ object Properties extends js.Object {
 @js.native
 object Utils extends js.Object {
   def appendToEffectiveId(effectiveId: String, ending: String): String = js.native
+  def findRepeatDelimiter(repeatId: String, iteration: Int): raw.Element = js.native
 }
 
 @JSGlobal("ORBEON.xforms.control.Control")

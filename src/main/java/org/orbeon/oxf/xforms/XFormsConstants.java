@@ -378,6 +378,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_EVENT_MODE_QNAME = QName.get("events-mode", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_VALIDATION_MODE_QNAME = QName.get("validation-mode", XXFORMS_NAMESPACE);
 
+    // TODO: Remove once callers use shared `xforms.Constants`
     public static final char COMPONENT_SEPARATOR    = '\u2261'; // ≡ IDENTICAL TO
     public static final char REPEAT_SEPARATOR       = '\u2299'; // ⊙ CIRCLED DOT OPERATOR
     public static final char REPEAT_INDEX_SEPARATOR = '-';      // - (just has to not be a digit)

@@ -2104,7 +2104,7 @@
                                         return $(paramElement).text();
                                     });
                                     args = [functionName, targetId, observerId].concat(paramValues);
-                                    ORBEON.xforms.server.Server.callUserScript.apply(null, args);
+                                    ORBEON.xforms.server.Server.callUserScript.apply(ORBEON.xforms.server.Server, args);
                                     break;
                                 }
 

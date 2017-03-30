@@ -256,7 +256,6 @@
             { "full": "/ops/javascript/orbeon/util/fQuery.js",                               "min": true  },
             { "full": "/ops/javascript/orbeon/util/StringOps.js",                            "min": true  },
             { "full": "/ops/javascript/orbeon/util/FiniteStateMachine.js",                   "min": true  },
-            { "full": "/ops/javascript/orbeon/xforms/server/Server.js",                      "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.js",  "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.js", "min": true  },

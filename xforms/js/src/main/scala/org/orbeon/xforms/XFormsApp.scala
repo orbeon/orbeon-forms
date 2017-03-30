@@ -22,7 +22,6 @@ object XFormsApp extends JSApp {
 
     def initializeOnDomReady(): Unit = {
       Upload
-      DocumentAPI
     }
 
     $(initializeOnDomReady _)

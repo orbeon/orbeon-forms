@@ -66,48 +66,67 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/open-select1/open-select1.css"/>
         </xbl:resources>
-        <xbl:template>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            <xsl:transform version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
-            <xf:var name="binding" value="xxf:binding('fr-open-select1')"/>
+                <xsl:template match="/*">
+                    <xf:group appearance="xxf:internal">
 
-            <xf:select1 id="hidden-select1" ref="$binding" appearance="xxf:internal">
-                <!-- Copy user items -->
-                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
-            </xf:select1>
+                        <xf:var name="binding" value="xxf:binding('fr-open-select1')"/>
 
-            <xf:var name="items" value="xxf:itemset('hidden-select1', 'xml')//item"/>
+                        <xf:select1 id="hidden-select1" ref="$binding" appearance="xxf:internal">
+                            <!-- Copy user items -->
+                            <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                        </xf:select1>
 
-            <xf:var name="closed-value" value="$binding = $items/value/string()"/>
+                        <xf:var name="items"        value="xxf:itemset('hidden-select1', 'xml')//item"/>
+                        <xf:var name="closed-value" value="$binding/string() = $items/value/string()"/>
 
-            <xh:span class="fr-component-group">
-                <xf:select1
-                    id         = "select1"
-                    ref        = "$binding"
-                    appearance = "full"
-                    xbl:attr   = "appearance xxf:encrypt-item-values"
-                    class      = "xxforms-events-mode-default">
+                        <xh:span class="fr-component-group">
+                            <xf:select1
+                                id         = "select1"
+                                ref        = "$binding"
+                                appearance = "full"
+                                xbl:attr   = "appearance xxf:encrypt-item-values"
+                                class      = "xxforms-events-mode-default">
 
-                    <xf:itemset ref="$items">
-                        <xf:label ref="label"/>
-                        <xf:hint  ref="hint"/>
-                        <xf:value ref="value"/>
-                    </xf:itemset>
-                    <xf:item>
-                        <xf:label ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
-                        <xf:value ref="if ($closed-value) then '' else ."/>
-                    </xf:item>
-                    <!-- Focus asynchronously because the input is not visible yet and a plain `setfocus` would fail -->
-                    <xf:dispatch
-                        event="xforms-select"
-                        if="xxf:is-blank(event('xxf:item-value'))"
-                        delay="0"
-                        name="xforms-focus"
-                        targetid="input"/>
-                </xf:select1>
-                <xf:input id="input" ref="$binding[not($closed-value)]">
-                    <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
-                </xf:input>
-            </xh:span>
+                                <xf:itemset ref="$items">
+                                    <xf:label ref="label"/>
+                                    <xf:hint  ref="hint"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
+                                    <xf:value ref="if ($closed-value) then '' else ."/>
+                                </xf:item>
+                                <!-- Focus asynchronously because the input is not visible yet and a plain `setfocus` would fail -->
+                                <xf:dispatch
+                                    event="xforms-select"
+                                    if="xxf:is-blank(event('xxf:item-value'))"
+                                    delay="0"
+                                    name="xforms-focus"
+                                    targetid="input"/>
+                            </xf:select1>
+                            <xsl:element
+                                name="{
+                                    if (@type = ('integer', 'decimal')) then
+                                        'fr:number'
+                                    else
+                                        'xf:input'
+                                }">
+                                <xsl:attribute name="id">input</xsl:attribute>
+                                <xsl:attribute name="ref">if ($closed-value) then '' else $binding</xsl:attribute>
+                                <xsl:if test="@type = ('integer', 'decimal')">
+                                    <xsl:copy-of select="@prefix | @suffix"/>
+                                </xsl:if>
+                                <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
+                            </xsl:element>
+                        </xh:span>
+                    </xf:group>
+                </xsl:template>
+            </xsl:transform>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

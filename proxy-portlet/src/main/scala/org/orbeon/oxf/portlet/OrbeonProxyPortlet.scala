@@ -324,6 +324,8 @@ private[portlet] object OrbeonProxyPortlet {
           (?:
             (?:
               |
+              /upload
+              |
               /dynamic/[^/^.]+
             )
             |

@@ -31,6 +31,7 @@ class OrbeonProxyPortletTest extends FunSpec {
       s"/xforms-server/${optionalPath}orbeon-b1e8ca0abe4480447f361045b4620f13e92a0953.js",
 
       s"/xforms-server",
+      s"/xforms-server/upload",
       s"/xforms-server/dynamic/d921062a9e04c30f098cce5659d3fcd769d161d7",
 
       s"/${optionalPath}apps/fr/style/bootstrap/img/glyphicons-halflings.png",
@@ -65,6 +66,8 @@ class OrbeonProxyPortletTest extends FunSpec {
       s"/xforms-server/../",
       s"/xforms-server/dynamic",
       s"/xforms-server/dynamic/",
+      s"/xforms-server/upload/",
+      s"/xforms-server/upload/foo",
       s"/xforms-server/dynamic/d921062a9e04c30f098cce5659d3fcd769d161d7/fake.png",
       s"/abc/def.png",
       s"/xforms-server/${optionalPath}orbeon-6894eff3d69256b3d8e076b0b689b84d810606af.xml",

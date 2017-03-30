@@ -244,6 +244,15 @@ div.orbeon.orbeon-portlet-div {
         .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
 
         fieldset { padding: 0 }
+
+        .tab-content {
+
+            margin-bottom: 10px;
+
+            .tab-pane > .xbl-fr-grid:last-child {
+                margin-bottom: 0; // default is set to 10px somewhere else
+            }
+        }
     }
 
     // Metadata editor dialog
@@ -257,10 +266,6 @@ div.orbeon.orbeon-portlet-div {
         // Hide tabs in `new` mode
         .fb-settings-mode-new .nav-tabs {
             display: none
-        }
-
-        .tab-content {
-            padding: 10px 0;
         }
 
         .fb-dialog-form-settings-fields {
@@ -348,7 +353,6 @@ div.orbeon.orbeon-portlet-div {
 
         .tab-pane {
             .dialog-scrollable(600px);
-            padding: 5px;
         }
 
         .xbl-fr-dnd-repeat {
@@ -556,6 +560,10 @@ div.orbeon.orbeon-portlet-div {
         .alert {
             display: block;
         }
+    }
+
+    .xxforms-dialog-body.bd {
+        background-color: #fafafa;
     }
 
     .xxforms-set-height {                           // Dialogs for which we want the main area to take remaining height

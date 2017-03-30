@@ -65,7 +65,26 @@
         }
     }
 
-    .tab-pane {
+    .tab-content {
+        border: 1px solid #ddd;
+        border-top: none;
         background-color: white;
+        padding: 10px;
+    }
+
+    .xforms-tabbable-appearance-left {
+
+        .nav-tabs {
+            margin-right: 0;
+        }
+
+        .tab-content {
+            border: 1px solid #ddd;
+            border-left: none;
+
+            .tab-pane {
+                padding-left: 1px; // prevent radio buttons from being truncated on the left in some cases
+            }
+        }
     }
 }

@@ -885,8 +885,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-autocomplete≡component-inner-group" class="fr-autocomplete-container"/>
-                        <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
                         <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
+                        <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
                         <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden">
                             <xxf:value>true</xxf:value>
                         </xxf:control>
@@ -902,7 +902,6 @@
                         </xxf:control>
                     </xxf:control-values>
                     <xxf:script name="xf_d4f6ea393e77ed5e81903deb659f91bb70adae1a" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
-                    <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
                     <xxf:focus control-id="my-autocomplete≡show-suggestions-button"/>
                 </xxf:action>
             </xxf:event-response>

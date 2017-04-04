@@ -158,6 +158,11 @@
             ]"/>
 
     <xsl:variable
+        name="attachment-mediatypes"
+        as="xs:string"
+        select="p:property(string-join(('oxf.fr.detail.attachment.mediatypes', $app, $form), '.'))"/>
+
+    <xsl:variable
         name="view-appearance"
         as="xs:string"
         select="
@@ -452,6 +457,17 @@
                     <!-- Else use Form Runner property if specified and valid -->
                     <xsl:attribute name="xxf:upload.max-size-aggregate" select="$valid-attachment-max-size-aggregate-or-empty"/>
                 </xsl:when>
+            </xsl:choose>
+
+            <xsl:choose>
+                <xsl:when test="exists(@xxf:upload.mediatypes)">
+                    <!-- Use if explicitly specified -->
+                    <xsl:copy-of select="@xxf:upload.mediatypes"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Else use Form Runner property (blank is the same as `*/*`) -->
+                    <xsl:attribute name="xxf:upload.mediatypes" select="$attachment-mediatypes"/>
+                </xsl:otherwise>
             </xsl:choose>
 
             <!-- Parameters passed to this page -->

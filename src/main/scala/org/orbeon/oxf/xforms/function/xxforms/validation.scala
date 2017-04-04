@@ -26,18 +26,19 @@ import org.orbeon.saxon.value._
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-trait ValidationFunction extends XFormsFunction {
+trait ValidationFunction[T] extends XFormsFunction {
 
   def propertyName: String
 
-  def evaluate(value: String, constraintOpt: Option[Long]): Boolean
+  def argumentOpt(implicit xpathContext: XPathContext): Option[T]
+  def evaluate(value: String, constraintOpt: Option[T]): Boolean
 
   override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
 
     implicit val ctx = xpathContext
 
     val valueOpt      = Option(xpathContext.getContextItem) map (_.getStringValue)
-    val constraintOpt = longArgumentOpt(0)
+    val constraintOpt = argumentOpt
 
     val propertyStringOpt = constraintOpt map (_.toString) orElse Some("true")
 
@@ -72,6 +73,15 @@ trait ValidationFunction extends XFormsFunction {
   }
 }
 
+trait LongValidationFunction   extends ValidationFunction[Long] {
+  def argumentOpt(implicit xpathContext: XPathContext): Option[Long] = longArgumentOpt(0)
+}
+
+trait StringValidationFunction extends ValidationFunction[String] {
+  def argumentOpt(implicit xpathContext: XPathContext): Option[String] = stringArgumentOpt(0)
+}
+
+
 // NOTE: This should probably be scope in the Form Builder module.
 object ValidationFunction {
 
@@ -103,7 +113,7 @@ object ValidationFunction {
 
     def analyze(expr: Expression) =
       expr match {
-        case e: ValidationFunction ⇒
+        case e: ValidationFunction[_] ⇒
           e.arguments.headOption match {
             case Some(l: Literal) ⇒ Some(e.propertyName → Some(l.getValue.getStringValue))
             case None             ⇒ Some(e.propertyName → None)
@@ -118,7 +128,7 @@ object ValidationFunction {
 
 }
 
-class MaxLengthValidation extends ValidationFunction {
+class MaxLengthValidation extends LongValidationFunction {
 
   val propertyName = "max-length"
 
@@ -128,7 +138,7 @@ class MaxLengthValidation extends ValidationFunction {
   }
 }
 
-class MinLengthValidation extends ValidationFunction {
+class MinLengthValidation extends LongValidationFunction {
 
   val propertyName = "min-length"
 
@@ -138,7 +148,7 @@ class MinLengthValidation extends ValidationFunction {
   }
 }
 
-class NonNegativeValidation extends ValidationFunction {
+class NonNegativeValidation extends LongValidationFunction {
 
   val propertyName = "non-negative"
 
@@ -146,7 +156,7 @@ class NonNegativeValidation extends ValidationFunction {
     NumericValidation.trySignum(value) exists (_ != -1)
 }
 
-class NegativeValidation extends ValidationFunction {
+class NegativeValidation extends LongValidationFunction {
 
   val propertyName = "negative"
 
@@ -154,7 +164,7 @@ class NegativeValidation extends ValidationFunction {
     NumericValidation.trySignum(value) contains -1
 }
 
-class NonPositiveValidation extends ValidationFunction {
+class NonPositiveValidation extends LongValidationFunction {
 
   val propertyName = "non-positive"
 
@@ -162,7 +172,7 @@ class NonPositiveValidation extends ValidationFunction {
     NumericValidation.trySignum(value) exists (_ != 1)
 }
 
-class PositiveValidation extends ValidationFunction {
+class PositiveValidation extends LongValidationFunction {
 
   val propertyName = "positive"
 
@@ -202,7 +212,7 @@ object NumericValidation {
     }
 }
 
-class MaxFractionDigitsValidation extends ValidationFunction {
+class MaxFractionDigitsValidation extends LongValidationFunction {
 
   val propertyName = "fraction-digits"
 
@@ -241,12 +251,27 @@ object AttachmentMaxSizeValidation {
   val PropertyName = "attachment-max-size"
 }
 
-class AttachmentMaxSizeValidation extends ValidationFunction {
+class AttachmentMaxSizeValidation extends LongValidationFunction {
 
   val propertyName = AttachmentMaxSizeValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
     case Some(constraint) ⇒ true // for now, don't actually validate, see #2956
+    case None             ⇒ true
+  }
+
+}
+
+object AttachmentMediatypesValidation {
+  val PropertyName = "attachment-mediatypes"
+}
+
+class AttachmentMediatypesValidation extends StringValidationFunction {
+
+  val propertyName = AttachmentMediatypesValidation.PropertyName
+
+  def evaluate(value: String, constraintOpt: Option[String]) = constraintOpt match {
+    case Some(constraint) ⇒ true // for now, don't actually validate, see #3015
     case None             ⇒ true
   }
 

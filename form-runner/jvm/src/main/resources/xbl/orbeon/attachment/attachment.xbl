@@ -74,7 +74,15 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:upload ref="xxf:binding('fr-attachment')" xbl:attr="accept" xxf:title="{xxf:label('fr-attachment')}">
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-attachment')"/>
+            <xf:upload
+                ref="$binding"
+                accept="{xxf:custom-mip($binding, 'attachment-mediatypes')}"
+                xbl:attr="accept"
+                xxf:title="{xxf:label('fr-attachment')}">
+
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xxf:size     ref="@size"      xxbl:scope="outer"/>
@@ -106,7 +114,7 @@
                 </xf:dispatch>
 
             </xf:upload>
-            <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[xxf:non-blank()]">
+            <xf:output appearance="xxf:download" ref="$binding[xxf:non-blank()]">
                 <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>

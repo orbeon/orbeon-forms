@@ -457,6 +457,17 @@
                                 event('actual')
                             )
                         )
+                    else if (event('error-type') = 'mediatype-error') then
+                        xxf:format-message(
+                            xxf:r(
+                                'detail.messages.upload-error-mediatype',
+                                'fr-fr-resources'
+                            ),
+                            (
+                                event('permitted'),
+                                event('actual')
+                            )
+                        )
                     else
                         xxf:r(
                             concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')),

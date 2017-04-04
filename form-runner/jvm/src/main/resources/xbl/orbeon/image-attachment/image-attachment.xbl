@@ -44,7 +44,7 @@
                 <large-icon>/apps/fr/style/images/silk/picture.png</large-icon>
             </icon>
             <templates>
-                <bind type="xf:anyURI"/>
+                <bind type="xf:anyURI" constraint="xxf:attachment-mediatypes('image/*')"/>
                 <instance filename="" mediatype="" size=""/>
                 <view>
                      <fr:image-attachment id="" ref="" class="fr-attachment">
@@ -58,7 +58,13 @@
         </metadata>
 
         <xbl:template>
-            <xf:upload ref="xxf:binding('fr-image-attachment')" accept="image/*">
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-image-attachment')"/>
+            <xf:upload
+                ref="$binding"
+                accept="{(xxf:custom-mip($binding, 'attachment-mediatypes')[xxf:non-blank()], 'image/*')[1]}">
+
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xxf:size     ref="@size"      xxbl:scope="outer"/>
@@ -90,7 +96,7 @@
                 </xf:dispatch>
 
             </xf:upload>
-            <xf:output mediatype="image/*" ref="xxf:binding('fr-image-attachment')[xxf:non-blank()]">
+            <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                 <xf:header ref="fr:form-version()">

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.{CollectionUtils, Interrupted, SizeReason, UploadProgress}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.controls.{FileMetadata, XFormsUploadControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -157,14 +157,20 @@ object XXFormsUploadErrorEvent {
     CollectionUtils.collectByErasedType[XFormsUploadControl](target).to[List]
     flatMap FileMetadata.progress
     flatMap {
-      case UploadProgress(_, _, _, Interrupted(Some(SizeReason(permitted, actual)))) ⇒
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) ⇒
         List(
           "error-type" → Some("size-error"),
           "permitted"  → Some(permitted),
           "actual"     → Some(actual)
         )
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(permitted, actual)))) ⇒
+        List(
+          "error-type" → Some("mediatype-error"),
+          "permitted"  → Some(permitted.to[List] map (_.toString)),
+          "actual"     → (actual map (_.toString))
+        )
       case _ ⇒
-        List("reason"     → Some("upload-error"))
+        List("error-type" → Some("upload-error"))
     }
   )
 }

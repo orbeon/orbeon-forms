@@ -18,8 +18,8 @@ import org.apache.commons.fileupload._
 import org.apache.commons.fileupload.disk.DiskFileItemFactory
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
-import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.LimitedSize
+import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.externalcontext.ExternalContext._
@@ -27,24 +27,30 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.xforms.upload.DisallowedMediatypeException
 
 import scala.collection.{mutable ⇒ m}
 import scala.util.control.NonFatal
 
 sealed trait Reason
-case class SizeReason(permitted: Long, actual: Long) extends Reason
+object Reason {
+  case class SizeReason     (permitted: Long,                actual: Long)              extends Reason
+  case class MediatypeReason(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends Reason
+}
 
 sealed trait UploadState { def name: String }
-case object Started                             extends UploadState { val name = "started" }
-case object Completed                           extends UploadState { val name = "completed" }
-case class  Interrupted(reason: Option[Reason]) extends UploadState { val name = "interrupted" }
+object UploadState {
+  case object Started                             extends UploadState { val name = "started" }
+  case object Completed                           extends UploadState { val name = "completed" }
+  case class  Interrupted(reason: Option[Reason]) extends UploadState { val name = "interrupted" }
+}
 
 // NOTE: Fields don't need to be @volatile as they are accessed via the session, which provides synchronized access.
 case class UploadProgress(
   fieldName        : String,
   expectedSize     : Option[Long],
   var receivedSize : Long        = 0L,
-  var state        : UploadState = Started
+  var state        : UploadState = UploadState.Started
 )
 
 trait MultipartLifecycle {
@@ -225,14 +231,17 @@ object Multipart {
 
           println()
 
-          lifecycleOpt foreach (_.fileItemState(Completed))
+          lifecycleOpt foreach (_.fileItemState(UploadState.Completed))
           fieldName → fileItem
         } catch {
           case NonFatal(t) ⇒
             lifecycleOpt foreach (_.fileItemState(
-              Interrupted(
+              UploadState.Interrupted(
                Option(Exceptions.getRootThrowable(t))
-               collect { case root: SizeLimitExceededException ⇒ SizeReason(root.getPermittedSize, root.getActualSize) }
+               collect {
+                 case root: SizeLimitExceededException   ⇒ Reason.SizeReason(root.getPermittedSize, root.getActualSize)
+                 case root: DisallowedMediatypeException ⇒ Reason.MediatypeReason(root.permitted, root.actual)
+               }
               )
             ))
             throw t

@@ -13,15 +13,17 @@
   */
 package org.orbeon.oxf.xforms.upload
 
-import org.apache.commons.fileupload.{FileItem, FileItemHeadersSupport, UploadContext}
-import org.orbeon.datatypes.MaximumSize
+import org.apache.commons.fileupload.{FileItem, FileItemHeadersSupport, FileUploadException, UploadContext}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
+import org.orbeon.datatypes.MediatypeRange.WildcardMediatypeRange
+import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.IOUtils.runQuietly
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentBase._
 import org.orbeon.oxf.xforms.XFormsProperties
@@ -71,6 +73,35 @@ trait UploadCheckerLogic {
   }
 }
 
+case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype])
+  extends FileUploadException
+
+sealed trait AllowedMediatypes
+object AllowedMediatypes {
+
+  case object AllowedAnyMediatype                                    extends AllowedMediatypes
+  case class  AllowedSomeMediatypes(mediatypes: Set[MediatypeRange]) extends AllowedMediatypes {
+    require(! mediatypes(WildcardMediatypeRange))
+  }
+
+  def unapply(s: String): Option[AllowedMediatypes] = {
+
+    val mediatypeRanges =
+      s.splitTo[List](" ,") flatMap { token ⇒
+        token.trimAllToOpt
+      } flatMap { trimmed ⇒
+          MediatypeRange.unapply(trimmed)
+      }
+
+    if (mediatypeRanges.isEmpty)
+      None
+    else if (mediatypeRanges contains WildcardMediatypeRange)
+      Some(AllowedAnyMediatype)
+    else
+      Some(AllowedSomeMediatypes(mediatypeRanges.to[Set]))
+  }
+}
+
 object UploaderServer {
 
   import Private._
@@ -101,9 +132,9 @@ object UploaderServer {
       uploadContext  = trustedUploadContext,
       lifecycleOpt   = Some(
         new UploadProgressMultipartLifecycle(request.contentLengthOpt, trustedUploadContext.getInputStream, session) {
-          def getMaxUploadSizeForControl(uuid: String, controlName: String): MaximumSize =
+          def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes) =
             withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) {
-              _.getUploadChecker.uploadMaxSizeForControl(controlName)
+              _.getUploadConstraintsForControl(controlName)
             }
         }
       ),
@@ -147,7 +178,7 @@ object UploaderServer {
     // Session keys created, for cleanup
     val sessionKeys = m.ListBuffer[String]()
 
-    def getMaxUploadSizeForControl(uuid: String, controlName: String): MaximumSize
+    def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes)
 
     def fileItemStarting(name: String, fileItem: FileItem): Option[MaximumSize] = {
 
@@ -157,47 +188,77 @@ object UploaderServer {
       if (progressOpt.isDefined)
         throw new IllegalStateException("more than one file provided")
 
-      val maxUploadSizeForControl = getMaxUploadSizeForControl(uuid, name)
+      val (maxUploadSizeForControl, allowedMediatypeRangesForControl) =
+        getUploadConstraintsForControl(uuid, name)
 
-      // This is `None` with Chrome and Firefox at least
-      val untrustedPartContentLengthOpt =
-        for {
-          headersSupport      ← collectByErasedType[FileItemHeadersSupport](fileItem)
-          headers             ← Option(headersSupport.getHeaders)
-          contentLengthString ← Option(headers.getHeader(Headers.ContentLength))
-          contentLengthLong   ← NumericUtils.parseLong(contentLengthString)
-        } yield
-          contentLengthLong
-
-      val untrustedExpectedSizeOpt = untrustedPartContentLengthOpt orElse requestContentLengthOpt
-
-      // So that the XFCD is aware of progress information
-      // Do this before checking size so that we can report the interrupted upload
+      // Handle max size
       locally {
-        val progress = UploadProgress(name, untrustedExpectedSizeOpt)
+        // This is `None` with Chrome and Firefox at least
+        val untrustedPartContentLengthOpt =
+          for {
+            headersSupport      ← collectByErasedType[FileItemHeadersSupport](fileItem)
+            headers             ← Option(headersSupport.getHeaders)
+            contentLengthString ← Option(headers.getHeader(Headers.ContentLength))
+            contentLengthLong   ← NumericUtils.parseLong(contentLengthString)
+          } yield
+            contentLengthLong
 
-        val newSessionKey = getProgressSessionKey(uuid, name)
-        sessionKeys += newSessionKey
-        session.getAttributesMap.put(newSessionKey, progress)
+        val untrustedExpectedSizeOpt = untrustedPartContentLengthOpt orElse requestContentLengthOpt
 
-        progressOpt = Some(progress)
+        // So that the XFCD is aware of progress information
+        // Do this before checking size so that we can report the interrupted upload
+        locally {
+          val progress = UploadProgress(name, untrustedExpectedSizeOpt)
+
+          val newSessionKey = getProgressSessionKey(uuid, name)
+          sessionKeys += newSessionKey
+          session.getAttributesMap.put(newSessionKey, progress)
+
+          progressOpt = Some(progress)
+        }
+
+        // As of 2017-03-22: part `Content-Length` takes precedence if provided (but browsers don't set it).
+        // Browsers do set the outer `Content-Length` though. Again we assume that the overhead of the
+        // entire request vs. the part is small so it's ok, for progress purposes, to use the outer size.
+        untrustedExpectedSizeOpt foreach { untrustedExpectedSize ⇒
+          checkSizeLimitExceeded(maxSize = maxUploadSizeForControl, currentSize = untrustedExpectedSize)
+        }
+
+        // Otherwise update the outer limiter to support enough additional bytes
+        // This is an approximation as there is overhead for `$uuid` and the part's headers.
+        // The assumption is that the content of the upload is typically much larger than
+        // the overhead.
+        (outerLimiterInputStream.maxBytes, maxUploadSizeForControl) match {
+          case (_,                   UnlimitedSize)         ⇒ outerLimiterInputStream.maxBytes = UnlimitedSize
+          case (UnlimitedSize, LimitedSize(control))        ⇒ throw new IllegalStateException
+          case (LimitedSize(current), LimitedSize(control)) ⇒ outerLimiterInputStream.maxBytes = LimitedSize(current + control)
+        }
       }
 
-      // As of 2017-03-22: part `Content-Length` takes precedence if provided (but browsers don't set it).
-      // Browsers do set the outer `Content-Length` though. Again we assume that the overhead of the
-      // entire request vs. the part is small so it's ok, for progress purposes, to use the outer size.
-      untrustedExpectedSizeOpt foreach { untrustedExpectedSize ⇒
-        checkSizeLimitExceeded(maxSize = maxUploadSizeForControl, currentSize = untrustedExpectedSize)
-      }
+      // Handle mediatypes
+      locally {
+        allowedMediatypeRangesForControl match {
+          case AllowedMediatypes.AllowedAnyMediatype ⇒
+          case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) ⇒
 
-      // Otherwise update the outer limiter to support enough additional bytes
-      // This is an approximation as there is overhead for `$uuid` and the part's headers.
-      // The assumption is that the content of the upload is typically much larger than
-      // the overhead.
-      (outerLimiterInputStream.maxBytes, maxUploadSizeForControl) match {
-        case (_,                   UnlimitedSize)         ⇒ outerLimiterInputStream.maxBytes = UnlimitedSize
-        case (UnlimitedSize, LimitedSize(control))        ⇒ throw new IllegalStateException
-        case (LimitedSize(current), LimitedSize(control)) ⇒ outerLimiterInputStream.maxBytes = LimitedSize(current + control)
+            val untrustedPartMediatypeOpt =
+              for {
+                headersSupport    ← collectByErasedType[FileItemHeadersSupport](fileItem)
+                headers           ← Option(headersSupport.getHeaders)
+                contentTypeString ← Option(headers.getHeader(Headers.ContentType))
+                mediatypeString   ← ContentTypes.getContentTypeMediaType(contentTypeString)
+                mediatype         ← Mediatype.unapply(mediatypeString)
+              } yield
+                mediatype
+
+            untrustedPartMediatypeOpt match {
+              case None ⇒
+                throw DisallowedMediatypeException(allowedMediatypeRanges, None)
+              case Some(untrustedPartMediatype) ⇒
+                if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
+                  throw DisallowedMediatypeException(allowedMediatypeRanges, Some(untrustedPartMediatype))
+            }
+        }
       }
 
       Some(maxUploadSizeForControl)
@@ -215,8 +276,8 @@ object UploaderServer {
       for (sessionKey ← sessionKeys)
         runQuietly (
           getUploadProgress(sessionKey)
-          collect { case p @ UploadProgress(_, _, _, Started | Completed ) ⇒ p }
-          foreach (_.state = Interrupted(None))
+          collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed ) ⇒ p }
+          foreach (_.state = UploadState.Interrupted(None))
         )
     }
 

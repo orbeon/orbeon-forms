@@ -25,8 +25,10 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.orbeon.oxf.util.Multipart._
 import org.orbeon.oxf.util.NetUtils.inputStreamToByteArray
-import org.orbeon.oxf.xforms.upload.UploaderServer
+import org.orbeon.oxf.util.Reason.SizeReason
+import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadProgressMultipartLifecycle
+import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploaderServer}
 import org.scalatest.FunSpecLike
 
 import scala.collection.{mutable ⇒ m}
@@ -79,8 +81,8 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
         uploadContext,
         Some(
           new UploadProgressMultipartLifecycle(Some(body.length.toLong), uploadContext.getInputStream, session) {
-            def getMaxUploadSizeForControl(uuid: String, controlName: String): MaximumSize =
-              MaximumSize.tryFromString(maxSize.toString).get
+            def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes) =
+              MaximumSize.tryFromString(maxSize.toString).get → AllowedAnyMediatype
           }
         ),
         MaximumSize.tryFromString(maxSize.toString) getOrElse LimitedSize(0L),
@@ -110,7 +112,7 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
 
         it("must set completed `UploadProgress` into session") {
           assert(
-            Some(UploadProgress(FieldName, Some(body.length), miserables.length, Completed)) ===
+            Some(UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed)) ===
               UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName)
           )
         }
@@ -140,7 +142,7 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
 
         it("must set `Interrupted` `UploadProgress` into session") {
           assert(
-            Some(UploadProgress(FieldName, Some(body.length), 0, Interrupted(Some(SizeReason(limit, 8326))))) ===
+            Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeReason(limit, 8326))))) ===
               UploaderServer.getUploadProgressFromSession(Some(session), UUID, FieldName)
           )
         }

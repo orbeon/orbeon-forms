@@ -168,6 +168,7 @@
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size.*.*"                      value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                    value="*/*"/>
 
     <!-- PDF fonts -->
     <!-- Optional PDF font embedding. Specifying a family name is optional.

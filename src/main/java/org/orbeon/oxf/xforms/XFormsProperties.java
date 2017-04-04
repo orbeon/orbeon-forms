@@ -63,6 +63,7 @@ public class XFormsProperties {
     public static final String UPLOAD_MAX_SIZE_PROPERTY                      = "upload.max-size";
     public static final String UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY            = "upload.max-size-aggregate";
     public static final String UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY = "upload.max-size-aggregate-expression";
+    public static final String UPLOAD_MEDIATYPES_PROPERTY                    = "upload.mediatypes";
 
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
 
@@ -255,6 +256,7 @@ public class XFormsProperties {
             new PropertyDefinition(UPLOAD_MAX_SIZE_PROPERTY                      , "",                             false), // blank default (see #2956)
             new PropertyDefinition(UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY            , "",                             false),
             new PropertyDefinition(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY , "",                             false),
+            new PropertyDefinition(UPLOAD_MEDIATYPES_PROPERTY                    , "*/*",                          false),
             new PropertyDefinition(UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY   , 45000,                          false),
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY                      , "",                             false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY                     , true,                           false),

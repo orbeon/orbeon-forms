@@ -515,17 +515,18 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     val Library = XFormsFunctionLibrary
     val Logger  = new IndentedLogger(LoggerFactory.createLogger(classOf[FormBuilderFunctionsTest]), true)
 
-    assert(Some("max-length"          → Some("5"))          === analyzeKnownConstraint("xxf:max-length(5)",                   Library)(Logger))
-    assert(Some("min-length"          → Some("5"))          === analyzeKnownConstraint("xxf:min-length(5)",                   Library)(Logger))
-    assert(Some("min-length"          → Some("5"))          === analyzeKnownConstraint("xxf:min-length('5')",                 Library)(Logger))
-    assert(Some("min-length"          → Some("5"))          === analyzeKnownConstraint("(xxf:min-length(5))",                 Library)(Logger))
-    assert(Some("non-negative"        → None)               === analyzeKnownConstraint("(xxf:non-negative())",                Library)(Logger))
-    assert(Some("negative"            → None)               === analyzeKnownConstraint("(xxf:negative())",                    Library)(Logger))
-    assert(Some("non-positive"        → None)               === analyzeKnownConstraint("(xxf:non-positive())",                Library)(Logger))
-    assert(Some("positive"            → None)               === analyzeKnownConstraint("(xxf:positive())",                    Library)(Logger))
-    assert(Some("attachment-max-size" → Some("3221225472")) === analyzeKnownConstraint("xxf:attachment-max-size(3221225472)", Library)(Logger))
-    assert(None                                             === analyzeKnownConstraint("xxf:min-length(foo)",                 Library)(Logger))
-    assert(None                                             === analyzeKnownConstraint("xxf:foobar(5)",                       Library)(Logger))
+    assert(Some("max-length"            → Some("5"))                          === analyzeKnownConstraint("xxf:max-length(5)",                                       Library)(Logger))
+    assert(Some("min-length"            → Some("5"))                          === analyzeKnownConstraint("xxf:min-length(5)",                                       Library)(Logger))
+    assert(Some("min-length"            → Some("5"))                          === analyzeKnownConstraint("xxf:min-length('5')",                                     Library)(Logger))
+    assert(Some("min-length"            → Some("5"))                          === analyzeKnownConstraint("(xxf:min-length(5))",                                     Library)(Logger))
+    assert(Some("non-negative"          → None)                               === analyzeKnownConstraint("(xxf:non-negative())",                                    Library)(Logger))
+    assert(Some("negative"              → None)                               === analyzeKnownConstraint("(xxf:negative())",                                        Library)(Logger))
+    assert(Some("non-positive"          → None)                               === analyzeKnownConstraint("(xxf:non-positive())",                                    Library)(Logger))
+    assert(Some("positive"              → None)                               === analyzeKnownConstraint("(xxf:positive())",                                        Library)(Logger))
+    assert(Some("attachment-max-size"   → Some("3221225472"))                 === analyzeKnownConstraint("xxf:attachment-max-size(3221225472)",                     Library)(Logger))
+    assert(Some("attachment-mediatypes" → Some("image/jpeg application/pdf")) === analyzeKnownConstraint("xxf:attachment-mediatypes('image/jpeg application/pdf')", Library)(Logger))
+    assert(None                                                               === analyzeKnownConstraint("xxf:min-length(foo)",                                     Library)(Logger))
+    assert(None                                                               === analyzeKnownConstraint("xxf:foobar(5)",                                           Library)(Logger))
 
   }
 

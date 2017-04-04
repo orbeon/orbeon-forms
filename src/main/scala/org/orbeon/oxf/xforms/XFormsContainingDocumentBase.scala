@@ -18,7 +18,6 @@ import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
@@ -38,11 +37,11 @@ import org.orbeon.oxf.xforms.event.ClientEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
-import org.orbeon.oxf.xforms.function.xxforms.AttachmentMaxSizeValidation
+import org.orbeon.oxf.xforms.function.xxforms.{AttachmentMaxSizeValidation, AttachmentMediatypesValidation}
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.XFormsStateLifecycle.RequestParameters
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState, XFormsStateManager}
-import org.orbeon.oxf.xforms.upload.UploadCheckerLogic
+import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
 
@@ -117,12 +116,15 @@ trait ContainingDocumentUpload {
 
   def getUploadChecker: UploadCheckerLogic = UploadChecker
 
+  private def customMipForControl(controlEffectiveId: String, mipName: String) =
+    getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
+      CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
+      (_.customMIPs.get(mipName))
+
   private object UploadChecker extends UploadCheckerLogic {
 
     def findAttachmentMaxSizeValidationMipFor(controlEffectiveId: String) =
-      getControls.getCurrentControlTree.findControl(controlEffectiveId) flatMap
-        CollectionUtils.collectByErasedType[XFormsSingleNodeControl]    flatMap
-        (_.customMIPs.get(AttachmentMaxSizeValidation.PropertyName))
+      customMipForControl(controlEffectiveId, AttachmentMaxSizeValidation.PropertyName)
 
     def currentUploadSizeAggregate = {
 
@@ -148,7 +150,25 @@ trait ContainingDocumentUpload {
     def uploadMaxSizeAggregateProperty = getStaticState.uploadMaxSizeAggregate
   }
 
+  def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, AllowedMediatypes) = {
 
+    val allowedMediatypesMaybeRange = {
+
+      def fromCommonConstraint =
+        customMipForControl(controlEffectiveId, AttachmentMediatypesValidation.PropertyName) flatMap
+          AllowedMediatypes.unapply
+
+      def fromFormSetting =
+        getStaticState.staticStringProperty(UPLOAD_MEDIATYPES_PROPERTY).trimAllToOpt flatMap
+          AllowedMediatypes.unapply
+
+      fromCommonConstraint orElse
+        fromFormSetting    getOrElse
+        AllowedMediatypes.AllowedAnyMediatype
+    }
+
+    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) → allowedMediatypesMaybeRange
+  }
 }
 
 trait ContainingDocumentMisc {

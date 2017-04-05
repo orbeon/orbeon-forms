@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.datatypes.MediatypeRange
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
@@ -21,11 +22,10 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
-import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xforms.function.xxforms.ValidationFunction
+import org.orbeon.oxf.xforms.function.xxforms.{AttachmentMediatypesValidation, ValidationFunction}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.om.NodeInfo
@@ -49,6 +49,19 @@ trait AlertsAndConstraintsOps extends ControlOps {
     getOrElse AlertDetails(None, List(currentLang → ""), global = true)
     toXML     currentLang
   )
+
+  //@XPathFunction
+  def isValidListOfMediatypeRanges(s: String): Boolean = {
+
+    val mediatypeRanges =
+      s.splitTo[List](" ,") flatMap { token ⇒
+        token.trimAllToOpt
+      } map { trimmed ⇒
+          MediatypeRange.unapply(trimmed).isDefined
+      }
+
+    mediatypeRanges forall identity
+  }
 
   // Return all validations as XML for the given control
   def readValidationsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
@@ -512,8 +525,9 @@ trait AlertsAndConstraintsOps extends ControlOps {
         (validationElem child Constraint.name attValue attName headOption) flatMap trimAllToOpt
 
       val constraintExpressionOpt = validationElem attValue "type" match {
-        case "formula"      ⇒ normalizedAttOpt("expression")
-        case validationName ⇒ Some(s"xxf:$validationName(${normalizedAttOpt("argument") getOrElse ""})")
+        case "formula"                                        ⇒ normalizedAttOpt("expression")
+        case vn @ AttachmentMediatypesValidation.PropertyName ⇒ Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')")
+        case vn                                               ⇒ Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")
       }
 
       constraintExpressionOpt map { expr ⇒

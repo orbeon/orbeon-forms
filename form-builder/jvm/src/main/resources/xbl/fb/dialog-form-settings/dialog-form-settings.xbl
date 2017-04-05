@@ -44,6 +44,10 @@
                     value="(event(context()), -2)[1]"/>
 
                 <xf:setvalue
+                    ref="$i/attachment-mediatypes"
+                    value="(event('attachment-mediatypes'), $unlikely-mediatype)[1]"/>
+
+                <xf:setvalue
                     ref="$i/wizard"
                     value="(event('wizard')[. = ('true', 'false')], 'default')[1]"/>
 
@@ -126,6 +130,7 @@
                     <xf:property name="singleton"                     value="$i/singleton/string()"/>
                     <xf:property name="attachment-max-size"           value="$i/attachment-max-size/string()"/>
                     <xf:property name="attachment-max-size-aggregate" value="$i/attachment-max-size-aggregate/string()"/>
+                    <xf:property name="attachment-mediatypes"         value="$i/attachment-mediatypes/string()[. != $unlikely-mediatype]"/>
                     <xf:property name="wizard"                        value="$i/wizard/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
 
@@ -172,6 +177,7 @@
                         <wizard/>
                         <attachment-max-size/>
                         <attachment-max-size-aggregate/>
+                        <attachment-mediatypes/>
                         <labels/>
                         <labels-placeholders/>
                         <hints/>
@@ -185,8 +191,13 @@
                     value="instance()"/>
 
                 <xf:var
+                    name="unlikely-mediatype"
+                    value="'orbeon/a26ffc179d3013f2726fbed92d03e9ed74a1c029'"/>
+
+                <xf:var
                     name="has-roles"
-                    value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
+                    value="not(xxf:instance('fb-permissions')/@
+                    has-roles = 'false')"/>
 
                 <!-- NOTE: Can contain '*'. -->
                 <xf:var
@@ -221,9 +232,11 @@
                     type="xs:boolean"/>
                 <xf:bind
                     ref="attachment-max-size | attachment-max-size-aggregate"
-                    readonly="false()"
                     type="xs:integer"
-                    constraint="xxf:non-negative() or  . = -2"/>
+                    constraint="xxf:non-negative() or . = -2"/>
+                <xf:bind
+                    ref="attachment-mediatypes"
+                    constraint="fbf:isValidListOfMediatypeRanges(.)"/>
                 <xf:bind
                     ref="labels-placeholders"
                     readonly="../labels = 'default'"
@@ -421,6 +434,22 @@
                                                 <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
                                                     <xf:label ref="."/>
                                                     <xf:value>-2</xf:value>
+                                                </xf:itemset>
+                                            </fr:open-select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <fr:open-select1
+                                                ref="attachment-mediatypes"
+                                                appearance="full xxf:horizontal"
+                                                class="fb-attachment-mediatypes-control">
+
+                                                <xf:label ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item[@id = 0]">
+                                                    <xf:label ref="."/>
+                                                    <xf:value value="$unlikely-mediatype"/>
                                                 </xf:itemset>
                                             </fr:open-select1>
                                         </xh:td>

@@ -285,11 +285,15 @@ div.orbeon.orbeon-portlet-div {
             &> .xforms-label { border-bottom: 1px solid #DDE }
         }
 
-        .fb-attachment-max-size-control, .fb-attachment-max-size-aggregate-control {
+        .fb-attachment-max-size-control, .fb-attachment-max-size-aggregate-control, .fb-attachment-mediatypes-control {
             &> .fr-component-group {
                 display: flex;
                 min-height: 28px; // so that there is no change in height when showing/hiding
                 align-items: center;
+
+                &> .xforms-input, &> .xbl-fr-number {
+                    flex-grow: 1;
+                }
             }
         }
     }

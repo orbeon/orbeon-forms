@@ -134,6 +134,7 @@
                                         <xf:property name="singleton"                     value="bind('singleton-bind')"/>
                                         <xf:property name="attachment-max-size"           value="bind('attachment-max-size-bind')"/>
                                         <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
+                                        <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
                                         <xf:property name="wizard"                        value="bind('wizard-bind')"/>
                                         <xf:property name="labels"                        value="bind('labels-bind')"/>
                                         <xf:property name="hints"                         value="bind('hints-bind')"/>
@@ -332,6 +333,13 @@
                                                 xs:integer(event('attachment-max-size-aggregate')) ge 0"
                                             context="bind('fb-form-model-bind')"
                                             origin="xf:attribute('xxf:upload.max-size-aggregate', event('attachment-max-size-aggregate'))"/>
+
+                                        <xf:delete
+                                            bind="attachment-mediatypes-bind"/>
+                                        <xf:insert
+                                            if="xxf:non-blank(event('attachment-mediatypes'))"
+                                            context="bind('fb-form-model-bind')"
+                                            origin="xf:attribute('xxf:upload.mediatypes', event('attachment-mediatypes'))"/>
 
                                         <xf:delete
                                             bind="labels-bind"/>

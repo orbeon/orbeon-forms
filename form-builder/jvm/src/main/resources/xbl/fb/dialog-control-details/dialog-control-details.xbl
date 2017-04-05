@@ -496,14 +496,17 @@
                     name="date-constraints"
                     value="$min-max-constraints"/>
 
-                <!-- LATER: `attachment-accepted-mediatypes` (#3015) -->
                 <xf:var
                     name="attachment-constraints"
-                    value="'attachment-max-size'"/>
+                    value="'attachment-max-size', 'attachment-mediatypes'"/>
 
                 <xf:var
                     name="noargs-constraints"
                     value="'required', 'datatype', 'formula', $noargs-integer-constraints"/>
+
+                <xf:var
+                    name="string-arg-constraints"
+                    value="'attachment-mediatypes'"/>
 
                 <xf:bind ref="validations">
 
@@ -545,12 +548,19 @@
 
                         <xf:bind
                             ref="constraint/@argument"
-                            type="xf:integer"
                             calculate="if ($type = $noargs-constraints) then '' else ."
                             readonly="false()"
                             required="not($type = $noargs-constraints)"
-                            constraint=". ge 0"
                             relevant="not($type = $noargs-constraints)"/>
+
+                        <xf:bind
+                            ref="constraint/@argument[not(../../@type = ($noargs-constraints, $string-arg-constraints))]"
+                            type="xf:integer"
+                            constraint=". ge 0"/>
+
+                        <xf:bind
+                            ref="constraint/@argument[../../@type = 'attachment-mediatypes']"
+                            constraint="fbf:isValidListOfMediatypeRanges(.)"/>
 
                         <xf:bind
                             ref="required"
@@ -773,6 +783,13 @@
                                                 <xf:label ref="."/>
                                                 <xf:value ref="@id"/>
                                             </xf:itemset>
+
+                                            <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:rebuild/>
+                                                <xf:recalculate/>
+                                            </xf:action>
+
                                         </xf:select1>
                                     </xh:td>
                                     <xh:td>
@@ -867,8 +884,15 @@
                                                         ref="$resources/dialog-control-details/formula/label"/>
                                                     <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
                                                 </xf:textarea>
-                                                <xf:input ref="constraint/@argument">
+                                                <fr:number ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']">
                                                     <xf:label appearance="minimal" ref="$resources/dialog-control-details/integer-argument/label"/>
+                                                    <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
+                                                </fr:number>
+                                                <!-- NOTE: Later label/hint can be different depending on specific constraint -->
+                                                <!--<xf:input ref="constraint/@argument[../../@type = $string-arg-constraints]">-->
+                                                <xf:input ref="constraint/@argument[not(local-name-from-QName(xxf:type()) = 'integer')]">
+                                                    <xf:label appearance="minimal" ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
+                                                    <xf:hint ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
                                                     <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
                                                 </xf:input>
                                             </xf:group>
@@ -1006,6 +1030,7 @@
                             </fr:tab>
                         </xsl:if>
                     </fr:tabbable>
+                    <!--<fr:xforms-inspector/>-->
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
                         <xh:div class="pull-left">

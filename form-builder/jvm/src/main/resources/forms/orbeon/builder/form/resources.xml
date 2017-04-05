@@ -279,6 +279,10 @@
             <attachment-max-size-aggregate>
                 <label>Maximum Aggregate Attachment Size</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label>Allowed file types</label>
+                <hint>For example "image/* application/pdf"</hint>
+            </attachment-mediatypes>
             <labels>
                 <label>Appearance of Control Labels</label>
             </labels>
@@ -409,7 +413,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Base64-encoded binary">base64Binary</type>
                         <type label="Hexadecimal-encoded binary">hexBinary</type>
-                        <type label="Any URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -434,6 +438,7 @@
                 <item id="negative">Negative</item>
                 <item id="fraction-digits">Maximum Fractional Digits</item>
                 <item id="attachment-max-size">Maximum Attachment Size</item>
+                <item id="attachment-mediatypes">Supported File Types</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -1246,6 +1251,10 @@
             <attachment-max-size-aggregate>
                 <label>Taille maximale agrégée des fichiers joints</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label>Types de fichiers supportés</label>
+                <hint>Par exemple "image/* application/pdf"</hint>
+            </attachment-mediatypes>
             <labels>
                 <label>Apparence des libellés</label>
             </labels>
@@ -1401,6 +1410,7 @@
                 <item id="negative">Négatif</item>
                 <item id="fraction-digits">Maximum chiffres fractionnaires </item>
                 <item id="attachment-max-size">Taille maximale du fichier joint</item>
+                <item id="attachment-mediatypes">Types de fichiers supportés</item>
             </constraint>
             <formula>
                 <label>Formule</label>
@@ -2215,6 +2225,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -2346,7 +2360,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Binærfil i base64-format">base64Binary</type>
                         <type label="Binærfil i heksadesimalformat">hexBinary</type>
-                        <type label="Enhver URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -2371,6 +2385,7 @@
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -3212,6 +3227,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -3367,6 +3386,7 @@
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -4209,6 +4229,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -4339,7 +4363,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Binario con codifica Base64">base64Binary</type>
                         <type label="Binario con codifica esadecimale">hexBinary</type>
-                        <type label="Qualsiasi URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -4364,6 +4388,7 @@
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -5198,6 +5223,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -5328,7 +5357,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Base64-codierte Binärdaten">base64Binary</type>
                         <type label="Hexadecimal-codierte Binärdaten">hexBinary</type>
-                        <type label="Jede URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -5353,6 +5382,7 @@
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -6190,6 +6220,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -6320,7 +6354,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Base64-encoded binary">base64Binary</type>
                         <type label="Hexadecimal-encoded binary">hexBinary</type>
-                        <type label="Mikätahansa URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -6345,6 +6379,7 @@
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -7180,6 +7215,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -7310,7 +7349,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Base64-encoded binary">base64Binary</type>
                         <type label="Hexadecimal-encoded binary">hexBinary</type>
-                        <type label="Any URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -7335,6 +7374,7 @@
                 <item id="negative">Negativo</item>
                 <item id="fraction-digits">Máximo de dígitos para fracciones</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label>Formula</label>
@@ -8170,6 +8210,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -8300,7 +8344,7 @@
                         <!-- Not 100% sure if these two types allow empty content -->
                         <type label="Base64-encoded binary">base64Binary</type>
                         <type label="Hexadecimal-encoded binary">hexBinary</type>
-                        <type label="Any URI">anyURI</type>
+                        <type label="URI">anyURI</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -8325,6 +8369,7 @@
                 <item id="negative" todo="true">[Negative]</item>
                 <item id="fraction-digits" todo="true">[Maximum Fractional Digits]</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label todo="true">[Formula]</label>
@@ -9166,6 +9211,10 @@
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
             </attachment-max-size-aggregate>
+            <attachment-mediatypes>
+                <label todo="true">[Allowed mediatypes]</label>
+                <hint todo="true">[For example "image/* application/pdf"]</hint>
+            </attachment-mediatypes>
             <labels>
                 <label todo="true">[Appearance of Control Labels]</label>
             </labels>
@@ -9321,6 +9370,7 @@
                 <item id="negative">Negativt</item>
                 <item id="fraction-digits">Decimaler max</item>
                 <item id="attachment-max-size" todo="true">[Maximum Attachment Size]</item>
+                <item id="attachment-mediatypes" todo="true">[Supported File Types</item>
             </constraint>
             <formula>
                 <label>Formel</label>

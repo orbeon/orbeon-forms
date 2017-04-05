@@ -17,6 +17,7 @@ import java.lang.StringBuilder
 
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
@@ -80,21 +81,23 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     control     : XFormsControl
   ) = handlerContext.popComponentContext()
 
-  protected override def handleLabel() = {
-    if (handleLHHA && hasLabelFor)
-      super.handleLabel()
-    else if (handleLHHA)
-      handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHAC.LABEL),
-        getEffectiveId,
-        getForEffectiveId(getEffectiveId),
-        LHHAC.LABEL,
-        "span",
-        currentControlOrNull,
-        isTemplate,
-        false
-      )
-  }
+  protected override def handleLabel() =
+    if (handleLHHA && ! LHHAAnalysis.hasLHHAPlaceholder(containingDocument.getStaticOps.findControlAnalysis(getPrefixedId).get, "label")) {
+      if (hasLabelFor) {
+        super.handleLabel()
+      } else {
+          handleLabelHintHelpAlert(
+            getStaticLHHA(getPrefixedId, LHHAC.LABEL),
+            getEffectiveId,
+            getForEffectiveId(getEffectiveId),
+            LHHAC.LABEL,
+            "span",
+            currentControlOrNull,
+            isTemplate,
+            false
+          )
+      }
+    }
 
   protected override def handleAlert() = if (handleLHHA) super.handleAlert()
   protected override def handleHint()  = if (handleLHHA) super.handleHint()

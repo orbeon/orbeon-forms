@@ -320,6 +320,7 @@
                 <xf:property name="singleton"                     value="()"/>
                 <xf:property name="attachment-max-size"           value="-2"/>
                 <xf:property name="attachment-max-size-aggregate" value="-2"/>
+                <xf:property name="attachment-mediatypes"         value="()"/>
                 <xf:property name="wizard"                        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
@@ -336,6 +337,7 @@
                 <xf:property name="singleton"                     value="()"/>
                 <xf:property name="attachment-max-size"           value="-2"/>
                 <xf:property name="attachment-max-size-aggregate" value="-2"/>
+                <xf:property name="attachment-mediatypes"         value="()"/>
                 <xf:property name="wizard"                        value="()"/>
                 <xf:property name="labels"                        value="()"/>
                 <xf:property name="hints"                         value="()"/>
@@ -364,6 +366,7 @@
                 <!-- Properties on main form model -->
                 <xf:bind id="attachment-max-size-bind"           ref="@xxf:upload.max-size"/>
                 <xf:bind id="attachment-max-size-aggregate-bind" ref="@xxf:upload.max-size-aggregate"/>
+                <xf:bind id="attachment-mediatypes-bind"         ref="@xxf:upload.mediatypes"/>
                 <xf:bind id="labels-bind"                        ref="@xxf:label.appearance"/>
                 <xf:bind id="hints-bind"                         ref="@xxf:hint.appearance"/>
             </xf:bind>

@@ -247,13 +247,13 @@ class MaxFractionDigitsValidation extends LongValidationFunction {
   }
 }
 
-object AttachmentMaxSizeValidation {
-  val PropertyName = "attachment-max-size"
+object UploadMaxSizeValidation {
+  val PropertyName = "upload-max-size"
 }
 
-class AttachmentMaxSizeValidation extends LongValidationFunction {
+class UploadMaxSizeValidation extends LongValidationFunction {
 
-  val propertyName = AttachmentMaxSizeValidation.PropertyName
+  val propertyName = UploadMaxSizeValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[Long]) = constraintOpt match {
     case Some(constraint) ⇒ true // for now, don't actually validate, see #2956
@@ -262,13 +262,13 @@ class AttachmentMaxSizeValidation extends LongValidationFunction {
 
 }
 
-object AttachmentMediatypesValidation {
-  val PropertyName = "attachment-mediatypes"
+object UploadMediatypesValidation {
+  val PropertyName = "upload-mediatypes"
 }
 
-class AttachmentMediatypesValidation extends StringValidationFunction {
+class UploadMediatypesValidation extends StringValidationFunction {
 
-  val propertyName = AttachmentMediatypesValidation.PropertyName
+  val propertyName = UploadMediatypesValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[String]) = constraintOpt match {
     case Some(constraint) ⇒ true // for now, don't actually validate, see #3015

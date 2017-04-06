@@ -264,11 +264,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
 
-    Fun(AttachmentMaxSizeValidation.PropertyName, classOf[AttachmentMaxSizeValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+    Fun(UploadMaxSizeValidation.PropertyName, classOf[UploadMaxSizeValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(INTEGER, ALLOWS_ZERO_OR_ONE)
     )
 
-    Fun(AttachmentMediatypesValidation.PropertyName, classOf[AttachmentMediatypesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+    Fun(UploadMediatypesValidation.PropertyName, classOf[UploadMediatypesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
   }

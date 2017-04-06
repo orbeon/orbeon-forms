@@ -79,7 +79,7 @@
                 value="xxf:binding('fr-attachment')"/>
             <xf:upload
                 ref="$binding"
-                accept="{xxf:custom-mip($binding, 'attachment-mediatypes')}"
+                accept="{xxf:custom-mip($binding, 'upload-mediatypes')}"
                 xbl:attr="accept"
                 xxf:title="{xxf:label('fr-attachment')}">
 

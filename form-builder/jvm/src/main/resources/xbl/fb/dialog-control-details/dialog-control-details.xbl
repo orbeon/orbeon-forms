@@ -498,7 +498,7 @@
 
                 <xf:var
                     name="attachment-constraints"
-                    value="'attachment-max-size', 'attachment-mediatypes'"/>
+                    value="'upload-max-size', 'upload-mediatypes'"/>
 
                 <xf:var
                     name="noargs-constraints"
@@ -506,7 +506,7 @@
 
                 <xf:var
                     name="string-arg-constraints"
-                    value="'attachment-mediatypes'"/>
+                    value="'upload-mediatypes'"/>
 
                 <xf:bind ref="validations">
 
@@ -559,7 +559,7 @@
                             constraint=". ge 0"/>
 
                         <xf:bind
-                            ref="constraint/@argument[../../@type = 'attachment-mediatypes']"
+                            ref="constraint/@argument[../../@type = 'upload-mediatypes']"
                             constraint="fbf:isValidListOfMediatypeRanges(.)"/>
 
                         <xf:bind

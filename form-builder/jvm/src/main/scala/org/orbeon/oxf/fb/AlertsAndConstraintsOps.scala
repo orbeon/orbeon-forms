@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xforms.function.xxforms.{AttachmentMediatypesValidation, ValidationFunction}
+import org.orbeon.oxf.xforms.function.xxforms.{UploadMediatypesValidation, ValidationFunction}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.om.NodeInfo
@@ -526,7 +526,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val constraintExpressionOpt = validationElem attValue "type" match {
         case "formula"                                        ⇒ normalizedAttOpt("expression")
-        case vn @ AttachmentMediatypesValidation.PropertyName ⇒ Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')")
+        case vn @ UploadMediatypesValidation.PropertyName ⇒ Some(s"xxf:$vn('${normalizedAttOpt("argument") getOrElse ""}')")
         case vn                                               ⇒ Some(s"xxf:$vn(${normalizedAttOpt("argument") getOrElse ""})")
       }
 

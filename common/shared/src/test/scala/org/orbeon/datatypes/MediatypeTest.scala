@@ -25,14 +25,14 @@ class MediatypeTest extends FunSpec {
 
   val InvalidMediatypesOrMediatypeRanges = List("*/jpeg", "image/", "image") ::: MediatypesWithDisallowedChars
 
-  describe("invalid mediatypes") {
+  describe("Invalid mediatypes") {
     for (mediatypeString ← List("*/*", "image/*") ::: InvalidMediatypesOrMediatypeRanges)
       it(s"must fail with `$mediatypeString`") {
         assert(Mediatype.unapply(mediatypeString).isEmpty)
       }
   }
 
-  describe("valid mediatypes") {
+  describe("Valid mediatypes") {
 
     val expectations = List(
       "application/pdf"                         → Mediatype(SpecificType("application"), SpecificType("pdf")),
@@ -48,14 +48,14 @@ class MediatypeTest extends FunSpec {
       }
   }
 
-  describe("invalid mediatype ranges") {
+  describe("Invalid mediatype ranges") {
     for (mediatypeString ← InvalidMediatypesOrMediatypeRanges)
       it(s"must fail with `$mediatypeString`") {
         assert(MediatypeRange.unapply(mediatypeString).isEmpty)
       }
   }
 
-  describe("valid mediatype ranges") {
+  describe("Valid mediatype ranges") {
 
     val expectations = List(
       "*/*"        → WildcardMediatypeRange,

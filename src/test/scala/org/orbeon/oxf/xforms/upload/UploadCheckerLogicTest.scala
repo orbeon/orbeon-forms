@@ -30,7 +30,7 @@ class UploadCheckerLogicTest extends FunSpec {
       controlIdToMaxSize.get(controlEffectiveId) map (_.toString)
   }
 
-  describe("with `upload.max-size` property only") {
+  describe("With `upload.max-size` property only") {
     for (limit ← List(LimitedSize(0L), LimitedSize(1000L), UnlimitedSize))
       it(s"limit = `$limit`") {
         assert(limit === TestUploadCheckerLogic(
@@ -42,7 +42,7 @@ class UploadCheckerLogicTest extends FunSpec {
       }
   }
 
-  describe("with `upload.max-size` property and limit per control") {
+  describe("With `upload.max-size` property and limit per control") {
 
     val expectations = List(
       LimitedSize(0L) → List(
@@ -79,7 +79,7 @@ class UploadCheckerLogicTest extends FunSpec {
     }
   }
 
-  describe("with `upload.max-size` property and aggregate limit") {
+  describe("With `upload.max-size` property and aggregate limit") {
 
     val expectations = List(
       (1000L, LimitedSize(0L), List(

@@ -28,7 +28,6 @@ import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.breakOut
 import scala.util.control.NonFatal
-import scala.util.matching.Regex
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -64,7 +63,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         forwardParams      = stringToSet(config.getInitParameter("forward-parameters")),
         forwardProperties  = stringToSet(config.getInitParameter("forward-properties")).map(name ⇒ name.toLowerCase → name)(breakOut),
         useShortNamespaces = config.getInitParameter("use-short-namespaces") != "false",
-        resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse DefaultFormRunnerResourcePath,
+        resourcesRegex     = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
         httpClient         = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
       )
     )
@@ -146,9 +145,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           settings.useShortNamespaces
         )
 
-        OrbeonProxyPortlet.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePath) match {
-          case Some(resourceId) ⇒
-            val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
+        APISupport.sanitizeResourceId(request.getResourceID, settings.FormRunnerResourcePath) match {
+          case Some(sanitizedResourcePath) ⇒
+            val url = APISupport.formRunnerURL(getPreference(request, FormRunnerURL), sanitizedResourcePath, embeddable = false)
 
             val requestDetails =
               newRequestDetails(
@@ -314,92 +313,6 @@ private[portlet] object OrbeonProxyPortlet {
   val FormRunnerHome           = """/fr/(\?(.*))?""".r
   val FormRunnerPath           = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
   val FormRunnerDocumentPath   = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
-
-  val DefaultFormRunnerResourcePath =
-    """(?xi)
-      (
-        # XForms server paths
-        (?:
-          /xforms-server
-          (?:
-            (?:
-              |
-              /upload
-              |
-              /dynamic/[^/^.]+
-            )
-            |
-            (?:
-              /.+[.]
-              (?:
-                css|js
-              )
-            )
-          )
-        )
-        |
-        # PDF/TIFF service paths
-        (?:
-          /fr/service/
-          [^/^.]+
-          /
-          [^/^.]+
-          /
-          (?:
-            pdf|tiff
-          )
-          /
-          [^/^.]+
-          /
-          [0-9A-Za-z\-]+
-          (?:
-            /[^/]+
-          )?
-          [.]
-          (?:
-            pdf|tiff
-          )
-        )
-        |
-        # Other asset paths
-        (?:
-          # Optional versioned resources token
-          (?:
-            /
-            [^/^.]+
-          )?
-          /
-          (?:
-            apps/fr/style
-            |
-            ops
-            |
-            xbl
-          )
-          /
-          .+
-          [.]
-          (?:
-            gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2
-          )
-        )
-      )
-    """
-
-  // Resources are whitelisted to prevent unauthorized access to pages
-  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[String] = {
-
-    // First level of sanitation: parse, normalize and keep the path only
-    def sanitizeResourcePath(s: String) =
-      new java.net.URI(s).normalize().getPath
-
-    def hasNoParent(s: String) =
-      ! s.contains("/..") && ! s.contains("../")
-
-    Option(s) map sanitizeResourcePath filter hasNoParent collect {
-      case FormRunnerResourcePath(resourceId) ⇒ resourceId
-    }
-  }
 
   def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit ctx: PortletContext): T =
     try body

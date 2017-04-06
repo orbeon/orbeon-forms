@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.Writer
+import javax.portlet.ResourceResponse
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.apache.commons.io.IOUtils
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
+import scala.util.matching.Regex
 
 object APISupport {
 
@@ -46,11 +48,11 @@ object APISupport {
   val AllModesByName = AllModes map (a ⇒ a.name → a) toMap
 
   def proxyPage(
-    baseURL     : String,
-    path        : String,
-    headers     : immutable.Seq[(String, String)] = Nil,
-    params      : immutable.Seq[(String, String)] = Nil)(
-    implicit ctx: EmbeddingContextWithResponse
+    baseURL      : String,
+    path         : String,
+    headers      : immutable.Seq[(String, String)] = Nil,
+    params       : immutable.Seq[(String, String)] = Nil)(
+    implicit ctx : EmbeddingContextWithResponse
   ): Unit = {
 
     val url  = formRunnerURL(baseURL, path, embeddable = true)
@@ -64,10 +66,10 @@ object APISupport {
   }
 
   def proxyServletResources(
-    req         : HttpServletRequest,
-    res         : HttpServletResponse,
-    namespace   : String,
-    resourcePath: String
+    req          : HttpServletRequest,
+    res          : HttpServletResponse,
+    namespace    : String,
+    resourcePath : String
   ): Unit =
     withSettings(req, res.getWriter) { settings ⇒
 
@@ -79,25 +81,32 @@ object APISupport {
         settings.httpClient
       )
 
-      val url = formRunnerURL(settings.formRunnerURL, resourcePath, embeddable = false)
+      APISupport.sanitizeResourceId(resourcePath, settings.FormRunnerResourcePath) match {
+        case Some(sanitizedResourcePath) ⇒
 
-      val contentFromRequest =
-        req.getMethod == "POST" option
-          StreamedContent(
-            req.getInputStream,
-            Option(req.getContentType),
-            Some(req.getContentLength.toLong) filter (_ >= 0L),
-            None
+          val url = formRunnerURL(settings.formRunnerURL, sanitizedResourcePath, embeddable = false)
+
+          val contentFromRequest =
+            req.getMethod == "POST" option
+              StreamedContent(
+                req.getInputStream,
+                Option(req.getContentType),
+                Some(req.getContentLength.toLong) filter (_ >= 0L),
+                None
+              )
+
+          proxyResource(
+            RequestDetails(
+              content = contentFromRequest,
+              url     = url,
+              headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
+              params  = Nil
+            )
           )
 
-      proxyResource(
-        RequestDetails(
-          content = contentFromRequest,
-          url     = url,
-          headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
-          params  = Nil
-        )
-      )
+        case None ⇒
+          ctx.setStatusCode(HttpServletResponse.SC_NOT_FOUND)
+      }
     }
 
   def proxySubmission(
@@ -254,6 +263,92 @@ object APISupport {
     req.setAttribute(LastNamespaceIndexKey, newValue)
 
     NamespacePrefix + newValue
+  }
+
+  val DefaultFormRunnerResourcePath =
+    """(?xi)
+      (
+        # XForms server paths
+        (?:
+          /xforms-server
+          (?:
+            (?:
+              |
+              /upload
+              |
+              /dynamic/[^/^.]+
+            )
+            |
+            (?:
+              /.+[.]
+              (?:
+                css|js
+              )
+            )
+          )
+        )
+        |
+        # PDF/TIFF service paths
+        (?:
+          /fr/service/
+          [^/^.]+
+          /
+          [^/^.]+
+          /
+          (?:
+            pdf|tiff
+          )
+          /
+          [^/^.]+
+          /
+          [0-9A-Za-z\-]+
+          (?:
+            /[^/]+
+          )?
+          [.]
+          (?:
+            pdf|tiff
+          )
+        )
+        |
+        # Other asset paths
+        (?:
+          # Optional versioned resources token
+          (?:
+            /
+            [^/^.]+
+          )?
+          /
+          (?:
+            apps/fr/style
+            |
+            ops
+            |
+            xbl
+          )
+          /
+          .+
+          [.]
+          (?:
+            gif|css|pdf|js|map|png|jpg|ico|svg|ttf|eot|woff|woff2
+          )
+        )
+      )
+    """
+
+  // Resources are whitelisted to prevent unauthorized access to pages
+  def sanitizeResourceId(s: String, FormRunnerResourcePath: Regex): Option[String] = {
+
+    // First level of sanitation: parse, normalize and keep the path only
+    def sanitizeResourcePath(s: String) =
+      new java.net.URI(s).normalize().getPath
+
+    def hasNoParent(s: String) =
+      ! s.contains("/..") && ! s.contains("../")
+
+    Option(s) map sanitizeResourcePath filter hasNoParent collect {
+      case FormRunnerResourcePath(resourcePath) ⇒ resourcePath
+    }
   }
 
   val NamespacePrefix = "o"

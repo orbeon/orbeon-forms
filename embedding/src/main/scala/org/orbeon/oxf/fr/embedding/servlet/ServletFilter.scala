@@ -85,9 +85,10 @@ class ServletFilter extends Filter {
     settingsOpt =
       Some(
         EmbeddingSettings(
-          formRunnerURL = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
-          orbeonPrefix  = Option(config.getInitParameter("orbeon-prefix")) getOrElse "/orbeon",
-          httpClient    = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
+          formRunnerURL  = Option(config.getInitParameter("form-runner-url")) getOrElse "http://localhost:8080/orbeon/",
+          orbeonPrefix   = Option(config.getInitParameter("orbeon-prefix"))   getOrElse "/orbeon",
+          resourcesRegex = Option(config.getInitParameter("resources-regex")) getOrElse APISupport.DefaultFormRunnerResourcePath,
+          httpClient     = new ApacheHttpClient(HttpClientSettings(config.getInitParameter))
         )
       )
   }

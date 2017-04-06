@@ -13,12 +13,13 @@
   */
 package org.orbeon.oxf.portlet
 
+import org.orbeon.oxf.fr.embedding.APISupport
 import org.scalatest.FunSpec
 
 
 class OrbeonProxyPortletTest extends FunSpec {
 
-  import OrbeonProxyPortlet._
+  import APISupport._
 
   val Versioned = "0f55c3fc5685f7ed8e45e4e18f1ab8912ecb227c/"
 

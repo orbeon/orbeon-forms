@@ -59,10 +59,12 @@ trait EmbeddingContextWithResponse extends EmbeddingContext{
 }
 
 private case class EmbeddingSettings(
-  formRunnerURL : String,
-  orbeonPrefix  : String,
-  httpClient    : HttpClient
+  formRunnerURL  : String,
+  orbeonPrefix   : String,
+  resourcesRegex : String,
+  httpClient     : HttpClient
 ) {
-  val OrbeonSubmitPath    = s"$orbeonPrefix/xforms-server-submit"
-  val OrbeonResourceRegex = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
+  val OrbeonSubmitPath       = s"$orbeonPrefix/xforms-server-submit"
+  val OrbeonResourceRegex    = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
+  val FormRunnerResourcePath = resourcesRegex.r
 }

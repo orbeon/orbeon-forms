@@ -278,6 +278,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label>Maximum Aggregate Attachment Size</label>
+                <hint>Applies to all attachment controls in this form</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label>Allowed file types</label>
@@ -1250,6 +1251,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label>Taille maximale agrégée des fichiers joints</label>
+                <hint>S'applique à tous les fichiers joints de ce formulaire</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label>Types de fichiers supportés</label>
@@ -2224,6 +2226,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -3226,6 +3229,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -4228,6 +4232,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -5222,6 +5227,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -6219,6 +6225,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -7214,6 +7221,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -8209,6 +8217,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>
@@ -9210,6 +9219,7 @@
             </attachment-max-size>
             <attachment-max-size-aggregate>
                 <label todo="true">[Maximum Aggregate Attachment Size]</label>
+                <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
                 <label todo="true">[Allowed mediatypes]</label>

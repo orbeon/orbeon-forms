@@ -82,10 +82,10 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
         Some(
           new UploadProgressMultipartLifecycle(Some(body.length.toLong), uploadContext.getInputStream, session) {
             def getUploadConstraintsForControl(uuid: String, controlName: String): (MaximumSize, AllowedMediatypes) =
-              MaximumSize.tryFromString(maxSize.toString).get → AllowedAnyMediatype
+              MaximumSize.unapply(maxSize.toString).get → AllowedAnyMediatype
           }
         ),
-        MaximumSize.tryFromString(maxSize.toString) getOrElse LimitedSize(0L),
+        MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),
         ExternalContext.StandardHeaderCharacterEncoding
       )
 

@@ -84,7 +84,7 @@ object Multipart {
       def getContentLength     = if (contentLength > Int.MaxValue) -1 else contentLength.toInt // this won't be used anyway
     }
 
-    val maxSize = MaximumSize.tryFromString(RequestGenerator.getMaxSizeProperty.toString) getOrElse LimitedSize(0)
+    val maxSize = MaximumSize.unapply(RequestGenerator.getMaxSizeProperty.toString) getOrElse LimitedSize(0)
 
     parseMultipartRequest(uploadContext, None, maxSize, headerEncoding) match {
       case (nameValues, None) ⇒

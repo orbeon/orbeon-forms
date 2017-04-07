@@ -116,13 +116,13 @@ class XFormsStaticStateImpl(
 
   lazy val uploadMaxSize: MaximumSize =
     staticStringProperty(UPLOAD_MAX_SIZE_PROPERTY).trimAllToOpt flatMap
-      MaximumSize.tryFromString orElse
-      MaximumSize.tryFromString(RequestGenerator.getMaxSizeProperty.toString) getOrElse
+      MaximumSize.unapply orElse
+      MaximumSize.unapply(RequestGenerator.getMaxSizeProperty.toString) getOrElse
       MaximumSize.LimitedSize(0L)
 
   lazy val uploadMaxSizeAggregate: MaximumSize =
     staticStringProperty(UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY).trimAllToOpt flatMap
-      MaximumSize.tryFromString getOrElse
+      MaximumSize.unapply getOrElse
       MaximumSize.UnlimitedSize
 
   lazy val uploadMaxSizeAggregateExpression: Option[CompiledExpression] = {

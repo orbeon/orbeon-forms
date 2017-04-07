@@ -44,7 +44,7 @@ trait UploadCheckerLogic {
 
     def maximumSizeForControlOrDefault =
       findAttachmentMaxSizeValidationMipFor(controlEffectiveId) flatMap
-        MaximumSize.tryFromString                               getOrElse
+        MaximumSize.unapply                                     getOrElse
         uploadMaxSizeProperty
 
     uploadMaxSizeAggregateProperty match {

@@ -25,7 +25,7 @@ object MaximumSize {
   case object UnlimitedSize           extends MaximumSize
 
   // Return `None` if blank, not a long number, or lower than -1
-  def tryFromString(s: String): Option[MaximumSize] =
+  def unapply(s: String): Option[MaximumSize] =
     s.trimAllToOpt flatMap NumericUtils.parseLong match {
       case Some(l) if l >= 0  ⇒ Some(LimitedSize(l))
       case Some(l) if l == -1 ⇒ Some(UnlimitedSize)

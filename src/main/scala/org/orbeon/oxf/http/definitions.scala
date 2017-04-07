@@ -205,19 +205,19 @@ object StatusCode {
   val InternalServerError   = 500
 }
 
-sealed abstract class HttpMethod(override val entryName: String) extends EnumEntry
+sealed abstract class HttpMethod extends EnumEntry
 
 object HttpMethod extends Enum[HttpMethod] {
 
   val values = findValues
 
-  case object GET     extends HttpMethod("GET")
-  case object POST    extends HttpMethod("POST")
-  case object PUT     extends HttpMethod("PUT")
-  case object DELETE  extends HttpMethod("DELETE")
-  case object HEAD    extends HttpMethod("HEAD")
-  case object OPTIONS extends HttpMethod("OPTIONS")
-  case object TRACE   extends HttpMethod("TRACE")
+  case object GET     extends HttpMethod
+  case object POST    extends HttpMethod
+  case object PUT     extends HttpMethod
+  case object DELETE  extends HttpMethod
+  case object HEAD    extends HttpMethod
+  case object OPTIONS extends HttpMethod
+  case object TRACE   extends HttpMethod
 }
 
 trait HttpClient {

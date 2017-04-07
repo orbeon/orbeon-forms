@@ -26,7 +26,7 @@ case class Mediatype(typ: SpecificType, subtype: SpecificType) {
     case SingletonMediatypeRange(mediatype) ⇒ mediatype == this
   }
 
-  override def toString: String = typ.value + '/' + subtype.value
+  override def toString = s"${typ.value}/${subtype.value}"
 }
 
 object Mediatype {
@@ -58,7 +58,7 @@ sealed trait MediatypeRange
 object MediatypeRange {
 
   case object WildcardMediatypeRange                           extends MediatypeRange { override def toString = "*/*" }
-  case class  WildcardTypeMediatypeRange(typ: SpecificType)    extends MediatypeRange { override def toString = typ.toString + "/*" }
+  case class  WildcardTypeMediatypeRange(typ: SpecificType)    extends MediatypeRange { override def toString = s"$typ/*" }
   case class  SingletonMediatypeRange   (mediatype: Mediatype) extends MediatypeRange { override def toString = mediatype.toString }
 
   def unapply(s: String): Option[MediatypeRange] = {

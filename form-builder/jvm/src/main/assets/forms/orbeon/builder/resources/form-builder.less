@@ -49,6 +49,7 @@ div.orbeon.orbeon-portlet-div {
 }
 
 .orbeon {
+
     .fb-main {
         position: absolute;
         top: 40px + @fbGutter;
@@ -219,6 +220,20 @@ div.orbeon.orbeon-portlet-div {
 
     // All dialogs
     .xforms-dialog {
+
+        // Improve layout of prefixes/suffixes
+        .input-append {
+
+            display: flex;
+
+            &> .add-on {
+            }
+
+            &> input {
+                width: auto; // otherwise set at 100%
+                flex-grow: 1;
+            }
+        }
 
         .xforms-label:empty {
             display: none;

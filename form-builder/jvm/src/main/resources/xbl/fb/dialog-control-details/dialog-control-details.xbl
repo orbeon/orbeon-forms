@@ -793,9 +793,14 @@
                                         </xf:select1>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:group>
+                                        <xf:group appearance="xxf:internal">
+
+                                            <xf:var
+                                                name="validation-type"
+                                                value="@type"/>
+
                                             <xf:label ref="$resources/dialog-control-details/validation-details/label"/>
-                                            <xf:group ref=".[@type = 'required']/required">
+                                            <xf:group ref=".[$validation-type = 'required']/required">
                                                 <xf:var name="required"      value="."/>
                                                 <xf:var name="true-or-false" value="$required = ('true()', 'false()')"/>
                                                 <xf:var name="items"         value="$resources/dialog-control-details/required/item"/>
@@ -825,7 +830,7 @@
                                             </xf:group>
 
                                             <!-- Built-in type -->
-                                            <xf:group ref=".[@type = 'datatype']">
+                                            <xf:group ref=".[$validation-type = 'datatype']">
                                                 <!--
                                                     - only keep "reasonable" types
                                                     - add supported type only if already present in the data
@@ -876,7 +881,7 @@
                                             </xf:group>
 
                                             <!-- Formula or common constraint argument -->
-                                            <xf:group ref=".[not(@type = ('required', 'datatype'))]">
+                                            <xf:group ref=".[not($validation-type = ('required', 'datatype'))]">
                                                 <xf:textarea ref="constraint/@expression">
                                                     <xf:label
                                                         class="xforms-hidden"
@@ -884,14 +889,23 @@
                                                         ref="$resources/dialog-control-details/formula/label"/>
                                                     <xf:alert ref="$resources/dialog-control-details/formula/alert"/>
                                                 </xf:textarea>
-                                                <fr:number ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']">
-                                                    <xf:label appearance="minimal" ref="$resources/dialog-control-details/integer-argument/label"/>
+                                                <fr:number
+                                                    ref="constraint/@argument[local-name-from-QName(xxf:type()) = 'integer']"
+                                                    suffix="{{'bytes'[$validation-type = 'upload-max-size']}}">
+                                                    <xf:label
+                                                        appearance="minimal"
+                                                        ref="
+                                                            if ($validation-type = 'upload-max-size') then
+                                                                $resources/dialog-form-settings/attachment-max-size/label
+                                                            else
+                                                                $resources/dialog-control-details/integer-argument/label"/>
                                                     <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
                                                 </fr:number>
                                                 <!-- NOTE: Later label/hint can be different depending on specific constraint -->
-                                                <!--<xf:input ref="constraint/@argument[../../@type = $string-arg-constraints]">-->
-                                                <xf:input ref="constraint/@argument[not(local-name-from-QName(xxf:type()) = 'integer')]">
-                                                    <xf:label appearance="minimal" ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
+                                                <xf:input ref="constraint/@argument[$validation-type = 'upload-mediatypes']">
+                                                    <xf:label
+                                                        appearance="minimal"
+                                                        ref="$resources/dialog-form-settings/attachment-mediatypes/label"/>
                                                     <xf:hint ref="$resources/dialog-form-settings/attachment-mediatypes/hint"/>
                                                     <xf:alert ref="$resources/dialog-control-details/integer-argument/alert"/>
                                                 </xf:input>

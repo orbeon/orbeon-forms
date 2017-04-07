@@ -81,7 +81,7 @@
                         select="concat('YAHOO.xbl.fr.', if ($is-currency) then 'Currency' else 'Number', '.instance(this)')"/>
 
                     <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
-                    <xf:group>
+                    <xf:group appearance="xxf:internal">
                         <xf:action
                             type="javascript"
                             event="xforms-disabled"

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.Writer
-import javax.portlet.ResourceResponse
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.apache.commons.io.IOUtils
@@ -421,8 +420,8 @@ object APISupport {
         writer.write(content, currentIndex, content.length - currentIndex)
     }
 
-    def getOrCreateCookieStore(implicit ctx: EmbeddingContext) =
-      Option(ctx.getSessionAttribute(RemoteSessionIdKey).asInstanceOf[CookieStore]) getOrElse {
+    def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =
+      ctx.getSessionAttribute(RemoteSessionIdKey) map (_.asInstanceOf[CookieStore]) getOrElse {
         val newCookieStore = new BasicCookieStore
         ctx.setSessionAttribute(RemoteSessionIdKey, newCookieStore)
         newCookieStore

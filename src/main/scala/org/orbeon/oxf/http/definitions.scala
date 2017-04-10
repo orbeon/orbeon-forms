@@ -200,6 +200,7 @@ trait HttpResponse {
 object StatusCode {
   val Ok                    = 200
   val NotModified           = 304
+  val Forbidden             = 403
   val NotFound              = 404
   val RequestEntityTooLarge = 413
   val InternalServerError   = 500

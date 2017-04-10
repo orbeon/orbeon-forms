@@ -44,7 +44,7 @@ case class RequestDetails(
 
 trait EmbeddingContext {
   def namespace                                        : String
-  def getSessionAttribute(name: String)                : AnyRef
+  def getSessionAttribute(name: String)                : Option[AnyRef]
   def setSessionAttribute(name: String, value: AnyRef) : Unit
   def removeSessionAttribute(name: String)             : Unit
   def httpClient                                       : HttpClient

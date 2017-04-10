@@ -43,7 +43,7 @@ class PortletEmbeddingContext(
     else
       response.getNamespace
 
-  def getSessionAttribute(name: String)                = session.getAttribute(name)
+  def getSessionAttribute(name: String)                = Option(session.getAttribute(name))
   def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
   def removeSessionAttribute(name: String)             = session.removeAttribute(name)
 }
@@ -173,7 +173,7 @@ trait BufferedPortlet {
   }
 
   protected def getStoredResponseWithParameters(implicit ctx: EmbeddingContext) =
-    Option(ctx.getSessionAttribute(ResponseSessionKey).asInstanceOf[ResponseWithParameters])
+    ctx.getSessionAttribute(ResponseSessionKey) map (_.asInstanceOf[ResponseWithParameters])
 
   private def storeResponseWithParameters(responseWithParameters: ResponseWithParameters)(implicit ctx: EmbeddingContext) =
     ctx.setSessionAttribute(ResponseSessionKey, responseWithParameters)

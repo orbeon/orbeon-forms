@@ -33,7 +33,7 @@ class ServletEmbeddingContext(
 
   private val session = req.getSession(true)
 
-  def getSessionAttribute(name: String)                = session.getAttribute(name)
+  def getSessionAttribute(name: String)                = Option(session.getAttribute(name))
   def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
   def removeSessionAttribute(name: String)             = session.removeAttribute(name)
 }

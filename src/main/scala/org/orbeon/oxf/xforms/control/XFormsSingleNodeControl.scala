@@ -17,9 +17,8 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
 import org.orbeon.oxf.xforms.event.events._
@@ -121,12 +120,12 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
         // Validation
         if ((staticControl eq null) || ! staticControl.explicitValidation)
-          readValidation()
+          readValidation foreach setValidation
 
         // Custom MIPs
         this._customMIPs = Option(InstanceData.collectAllCustomMIPs(nodeInfo)) map (_.toMap) getOrElse Map()
 
-      case atomicValue: AtomicValue ⇒
+      case _: AtomicValue ⇒
         // Control is not bound to a node (i.e. bound to an atomic value)
         setAtomicValueMIPs()
       case _ ⇒
@@ -135,23 +134,41 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     }
   }
 
-  def readValidation(): Unit =
+  def getValidation: Option[(Boolean, Option[ValidationLevel], List[StaticBind#MIP])] =
+    this._boundItem match {
+      case _: NodeInfo ⇒ Some((_valid, _alertLevel, _failedValidations))
+      case _           ⇒ None
+    }
+
+  def setValidation(validation: (Boolean, Option[ValidationLevel], List[StaticBind#MIP])): Unit = {
+    this._valid             = validation._1
+    this._alertLevel        = validation._2
+    this._failedValidations = validation._3
+  }
+
+  def readValidation: Option[(Boolean, Option[ValidationLevel], List[StaticBind#MIP])] =
     this._boundItem match {
       case nodeInfo: NodeInfo ⇒
 
-        this._valid = InstanceData.getValid(nodeInfo)
+        val nodeValid = InstanceData.getValid(nodeInfo)
 
         // Instance data stores all failed validations
         // If there is any type, required, or failed constraint, we have at least one failed failedValidation
         // returned. The only exception is schema type validation, which can cause the node to be invalid, yet
         // doesn't have an associated validation because it doesn't have a MIP. Conceivably, something could be
         // associated with a type validation error.
-        val failedValidations = BindNode.failedValidationsForHighestLevelPrioritizeRequired(nodeInfo)
+        val nodeFailedValidations = BindNode.failedValidationsForHighestLevelPrioritizeRequired(nodeInfo)
 
-        this._alertLevel        = failedValidations map (_._1) orElse (! _valid option ErrorLevel)
-        this._failedValidations = failedValidations map (_._2) getOrElse Nil
+        Some(
+          (
+            nodeValid,
+            nodeFailedValidations map (_._1) orElse (! nodeValid option ErrorLevel),
+            nodeFailedValidations map (_._2) getOrElse Nil
+          )
+        )
 
       case _ ⇒
+        None
     }
 
   private def setAtomicValueMIPs(): Unit = {

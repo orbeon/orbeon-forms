@@ -40,7 +40,7 @@ object XXFormsUpdateValidityAction {
 
   def updateValidity(initialControl: XFormsControl, recurse: Boolean): Unit = {
 
-    var scheduleRefresh = false
+    var first = true
 
     def updateOneThenRecurse(control: XFormsControl): Unit =
       if (control.isRelevant && ! control.isStaticReadonly) {
@@ -48,18 +48,20 @@ object XXFormsUpdateValidityAction {
         for {
           singleNodeControl ← collectByErasedType[XFormsSingleNodeControl](control)
           if singleNodeControl.staticControl.explicitValidation
+          controlValidation = singleNodeControl.getValidation
+          nodeValidation    = singleNodeControl.readValidation
+          if controlValidation != nodeValidation
         } locally {
 
-          val previousValid             = singleNodeControl.isValid
-          val previousAlertLevel        = singleNodeControl.alertLevel
-          val previousFailedValidations = singleNodeControl.failedValidations
+          // This is important as we don't have a guarantee that other changes will cause a refresh
+          if (first) {
+            val doc = initialControl.containingDocument
+            doc.getControls.cloneInitialStateIfNeeded()
+            doc.requireRefresh()
+            first = false
+          }
 
-          singleNodeControl.readValidation()
-
-          scheduleRefresh |=
-            previousValid             != singleNodeControl.isValid           ||
-            previousAlertLevel        != singleNodeControl.alertLevel        ||
-            previousFailedValidations != singleNodeControl.failedValidations
+          nodeValidation foreach singleNodeControl.setValidation
         }
 
         if (recurse)
@@ -68,10 +70,6 @@ object XXFormsUpdateValidityAction {
       }
 
     updateOneThenRecurse(initialControl)
-
-    // This is important as we don't have a guarantee that other changes will cause a refresh
-    if (scheduleRefresh)
-      initialControl.containingDocument.getControls.requireRefresh()
   }
 
 }

@@ -433,6 +433,7 @@
                                          (: Allow if next is visited if lax :)
                                          or (
                                             xxf:instance('local')/validate/data(.) = 'lax' and
+                                            exists($next-top-level-case-ids)               and
                                             xxf:visited($next-top-level-case-ids[1])
                                          )
                                          (: No errors :)

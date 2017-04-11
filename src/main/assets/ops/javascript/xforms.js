@@ -1342,7 +1342,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
     var $ = ORBEON.jQuery;
 
     // Define packages
-    ORBEON.xforms = {};
+    ORBEON.xforms = ORBEON.xforms || {};
     ORBEON.xforms.action = {};
     ORBEON.xforms.control = {};
     ORBEON.xforms.server = {};

@@ -28,7 +28,7 @@ trait VisitableTrait extends XFormsControl {
   override def visited = _visited
 
   def visited_=(visited: Boolean) =
-    if (visited != _visited && ! (visited && isStaticReadonly)) { // don't set to true if isStaticReadonly
+    if (visited != _visited && ! (visited && isStaticReadonly)) {
       // This mutation requires a clone. We could use XFormsControlLocal but that is more complex. In addition, most
       // non-trivial forms e.g. Form Runner will require a clone anyway as other stuff takes place upon focus out,
       // such as updating the error summary. What should be implemented is a better diff mechanism, for example lazy

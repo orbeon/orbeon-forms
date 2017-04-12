@@ -19,6 +19,8 @@ import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.{ApplicationSessionScope, PortletSessionScope}
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, SessionScope}
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletPortletRequest, WSRPURLRewriter, WebAppContext}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -26,7 +28,6 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.externalcontext.ExternalContext.{ApplicationSessionScope, PortletSessionScope, Request, SessionScope}
 import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._

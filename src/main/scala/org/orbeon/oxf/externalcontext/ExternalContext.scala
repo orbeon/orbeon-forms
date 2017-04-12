@@ -16,6 +16,7 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 import java.{util ⇒ ju}
 
+import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.NumericUtils
 
@@ -147,9 +148,16 @@ object ExternalContext {
     def getNativeResponse: AnyRef
   }
 
-  sealed trait SessionScope                   { def value: Int }
-  case object ApplicationSessionScope extends { val value = 1  } with SessionScope
-  case object PortletSessionScope     extends { val value = 2  } with SessionScope
+  sealed abstract class SessionScope(val value: Int) extends IntEnumEntry
+  object SessionScope extends IntEnum[SessionScope] {
+
+    val values = findValues
+
+    case object ApplicationSessionScope extends SessionScope(1)
+    case object PortletSessionScope     extends SessionScope(2)
+  }
+
+  def javaApplicationSessionScope = SessionScope.ApplicationSessionScope
 
   trait SessionListener {
     def sessionDestroyed()
@@ -179,7 +187,6 @@ object ExternalContext {
     def include(request: Request, response: Response)
     def isDefaultContext: Boolean
   }
-
 }
 
 trait ExternalContext {

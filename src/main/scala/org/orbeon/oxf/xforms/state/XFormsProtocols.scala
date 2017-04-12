@@ -30,7 +30,7 @@ object XFormsOperations {
   // NOTE: We use immutable.Seq instead of Array to indicate immutability
 
   def toByteSeq[T: Writes](t: T): Seq[Byte] =
-    toByteArray(t).toSeq
+    toByteArray(t).toSeq // actually a `WrappedArray`
 
   def fromByteSeq[T: Reads](bytes: Seq[Byte]): T =
     fromByteArray(bytes.toArray) // TODO: inefficient copy to array → implement Input instead

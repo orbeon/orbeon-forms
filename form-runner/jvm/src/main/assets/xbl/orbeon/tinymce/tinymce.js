@@ -47,10 +47,9 @@
                     TINYMCE_CUSTOM_CONFIG :
                     YAHOO.xbl.fr.Tinymce.DefaultConfig;
                 // Our onchange listener, not using onChange as it doesn't work with the fullscreen plugin
-                config.onchange_callback = _.bind(this.clientToServer, this);
+                config.onchange_callback = _.bind(this._clientToServer, this);
                 return config;
             }).call(this);
-            tinyMceConfig.onchange_callback = _.bind(this.clientToServer, this);
             var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
             var tabindex = $(tinyMceDiv).attr('tabindex');
             this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig);
@@ -83,16 +82,19 @@
         },
 
         // Send value in MCE to server
-        clientToServer: function() {
+        _clientToServer: function() {
             var editor = arguments[0];
-            var content = editor.getContent();
-            // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
-            if (content == '<div>\xa0</div>') content = '';
-            ORBEON.xforms.Document.dispatchEvent({
-                targetId:   this.container.id,
-                eventName:  'fr-set-client-value',
-                properties: { 'fr-value': content }
-            });
+            // Check the change event is for the editor corresponding to this component instance
+            if (editor.id == this.myEditor.id) {
+                var content = editor.getContent();
+                // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+                if (content == '<div>\xa0</div>') content = '';
+                ORBEON.xforms.Document.dispatchEvent({
+                    targetId:   this.container.id,
+                    eventName:  'fr-set-client-value',
+                    properties: { 'fr-value': content }
+                });
+            }
         },
 
         // TinyMCE got the focus

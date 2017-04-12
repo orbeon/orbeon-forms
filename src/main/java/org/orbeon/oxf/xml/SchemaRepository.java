@@ -86,7 +86,7 @@ public class SchemaRepository {
         SCHEMAS.put(XSLFOConverter.XSLFO_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/xslfo-converter-config.rng");
         SCHEMAS.put(QNameConverter.QNAME_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/qname-converter-config.rng");
 
-        SCHEMAS.put(ScopeProcessorBase.SCOPE_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scope/scope-config.rng");
+        SCHEMAS.put(ScopeProcessorBase.ScopeConfigNamespaceUri(), PROCESSORS_SCHEMA_PATH + "scope/scope-config.rng");
 
         SCHEMAS.put(EmailProcessor.ConfigNamespaceURI(), "schemas/email.rng");
         SCHEMAS.put(BeanGenerator.BEAN_CONFIG_NAMESPACE_URI, "schemas/bean-generator-config.rng");

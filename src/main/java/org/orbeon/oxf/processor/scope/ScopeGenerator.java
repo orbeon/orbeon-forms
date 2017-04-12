@@ -18,11 +18,11 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Marshaller;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
-import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
@@ -43,7 +43,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
     public static final String INPUT_MAPPING = "mapping";
 
     public ScopeGenerator() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SCOPE_CONFIG_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, ScopeProcessorBase.ScopeConfigNamespaceUri()));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_MAPPING)); // optional
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -71,27 +71,27 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     State state = (State) digestState;
                     if (state.saxStore == null) {
 
-                        ContextConfig config = readConfig(pipelineContext);
+                        ScopeProcessorBase.ContextConfig config = readConfig(pipelineContext);
 
                         // Get value from context
                         ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                         if (externalContext == null)
                             throw new OXFException("Missing external context");
-                        Object value = config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT
-                                ? externalContext.getRequest().getAttributesMap().get(config.getKey())
-                                : config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT
-                                ? ((config.getSessionScope() == null)
-                                    ? externalContext.getSession(true).getAttributesMap().get(config.getKey())
-                                    : externalContext.getSession(true).getAttributesMap(config.getSessionScope()).get(config.getKey()))
-                                : config.getContextType() == ScopeProcessorBase.APPLICATION_CONTEXT
-                                ? externalContext.getWebAppContext().getAttributesMap().get(config.getKey())
+                        Object value = config.javaIsRequestScope()
+                                ? externalContext.getRequest().getAttributesMap().get(config.key())
+                                : config.javaIsSessionScope()
+                                ? ((config.sessionScope() == null)
+                                    ? externalContext.getSession(true).getAttributesMap().get(config.key())
+                                    : externalContext.getSession(true).getAttributesMap(config.sessionScope()).get(config.key()))
+                                : config.javaIsApplicationScope()
+                                ? externalContext.getWebAppContext().getAttributesMap().get(config.key())
                                 : null;
 
                         if (value != null) {
                             if (value instanceof ScopeStore) {
                                 // Use the stored key/validity as internal key/validity
                                 final ScopeStore contextStore = (ScopeStore) value;
-                                if (!config.isTestIgnoreStoredKeyValidity()) {
+                                if (!config.testIgnoreStoredKeyValidity()) {
                                     // Regular case
                                     state.key = contextStore.getKey();
                                     state.validity = contextStore.getValidity();
@@ -113,7 +113,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                     mapping = readMapping(pipelineContext);
                                 }
 
-                                state.saxStore = getSAXStore(value, mapping, config.getContentType(), config.getKey());
+                                state.saxStore = getSAXStore(value, mapping, config.isTextPlain() ? ScopeProcessorBase.TextPlain() : null, config.key());
                             }
                         } else {
                             // Store empty document
@@ -141,13 +141,13 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     public static SAXStore getSAXStore(Object value, Mapping mapping, String contentType, String key) throws SAXException, TransformerException, IOException, MappingException {
-        if (ScopeProcessorBase.TEXT_PLAIN.equals(contentType)) {
+        if (ScopeProcessorBase.TextPlain().equals(contentType)) {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
                 // Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
                 BinaryTextSupport.readText((String) value, result, contentType, System.currentTimeMillis());
             } else {
-                logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + key);
+                logger.error("Content-type: " + ScopeProcessorBase.TextPlain() + " not applicable for key: " + key);
                 SAXUtils.streamNullDocument(result);
             }
             return result;

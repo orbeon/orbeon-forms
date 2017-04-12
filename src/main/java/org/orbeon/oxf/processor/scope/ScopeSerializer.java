@@ -15,13 +15,13 @@ package org.orbeon.oxf.processor.scope;
 
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -32,7 +32,7 @@ public class ScopeSerializer extends ScopeProcessorBase {
     private boolean isNull = false;
 
     public ScopeSerializer() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SCOPE_CONFIG_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, ScopeConfigNamespaceUri()));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
@@ -66,21 +66,21 @@ public class ScopeSerializer extends ScopeProcessorBase {
         final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         // Find the map for the scope
         Map<String, Object> map = null;
-        if (config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT) {
+        if (config.javaIsRequestScope()) {
             map = externalContext.getRequest().getAttributesMap();
-        } else if (config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT) {
-            if (config.getSessionScope() == null)
+        } else if (config.javaIsSessionScope()) {
+            if (config.sessionScope() == null)
                 map = externalContext.getSession(true).getAttributesMap();
             else
-                map = externalContext.getSession(true).getAttributesMap(config.getSessionScope());
-        } else if (config.getContextType() == ScopeProcessorBase.APPLICATION_CONTEXT) {
+                map = externalContext.getSession(true).getAttributesMap(config.sessionScope());
+        } else if (config.javaIsApplicationScope()) {
             map = externalContext.getWebAppContext().getAttributesMap();
         }
         // Delete when null, otherwise store...
         if (isNull) {
-            map.remove(config.getKey());
+            map.remove(config.key());
         } else {
-            map.put(config.getKey(), store);
+            map.put(config.key(), store);
         }
 
     }

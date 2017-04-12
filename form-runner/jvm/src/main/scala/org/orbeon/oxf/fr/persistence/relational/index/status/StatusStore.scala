@@ -24,9 +24,6 @@ object StatusStore {
 
   private var currentStatus: Status = Stopped
 
-  private def session =
-    NetUtils.getExternalContext.getSession(true).getAttributesMap.asScala
-
   def getStatus: Status = currentStatus
 
   def setStatus(status: Status): Unit = {

@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.XQuery.XQueryProcessor;
-import org.orbeon.oxf.processor.converter.JFreeChartConverter;
 import org.orbeon.oxf.processor.converter.QNameConverter;
 import org.orbeon.oxf.processor.converter.XMLConverter;
 import org.orbeon.oxf.processor.converter.XSLFOConverter;
@@ -31,7 +30,6 @@ import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.processor.serializer.HttpSerializer;
-import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
@@ -85,8 +83,6 @@ public class SchemaRepository {
 
         // Converter schemas
         SCHEMAS.put(XMLConverter.STANDARD_TEXT_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/standard-text-converter-config.rng");
-        SCHEMAS.put(JFreeChartSerializer.CHART_CONVERTER_CHART_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-chart.rng");
-        SCHEMAS.put(JFreeChartConverter.CHART_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-config.rng");
         SCHEMAS.put(XSLFOConverter.XSLFO_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/xslfo-converter-config.rng");
         SCHEMAS.put(QNameConverter.QNAME_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/qname-converter-config.rng");
 

@@ -172,8 +172,6 @@ In addition, this product includes the following software:
 - [iText](http://itextpdf.com/)
 - Jaxen
 - [JCIFS](http://jcifs.samba.org/)
-- [JCommon](http://www.jfree.org/jcommon/)
-- [JFreeChart](http://www.jfree.org/jfreechart/)
 - [JTidy](http://jtidy.sourceforge.net/)
 - [JUnit](http://junit.org/)
 - [Saxon](http://saxon.sourceforge.net/)

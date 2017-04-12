@@ -171,27 +171,8 @@ object XPathUtils {
   def selectIntegerValue(node: dom.Node, expr: String): Integer =
     Option(selectStringValueOrNull(node, expr, EmptyNamespaces, null, null)) map (new java.lang.Integer(_)) orNull
 
-  // 2 callers from JFreeChart, both return xs:boolean
-  def selectBooleanValue(node: dom.Node, expr: String): Boolean =
-    selectBooleanValueImp(node, expr, EmptyNamespaces, null, null)
-
   // 1 caller from SQL interpreter, implication is that expressions must return xs:boolean
   def selectBooleanValue(
-    contextNode     : dom.Node,
-    expr            : String,
-    prefixes        : ju.Map[String, String],
-    functionLibrary : FunctionLibrary,
-    functionContext : FunctionContext
-  ): Boolean =
-    selectBooleanValueImp(
-      contextNode,
-      expr,
-      prefixes,
-      functionLibrary,
-      functionContext
-    )
-
-  private def selectBooleanValueImp(
     contextNode     : dom.Node,
     expr            : String,
     prefixes        : ju.Map[String, String],

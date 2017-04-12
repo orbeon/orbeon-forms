@@ -397,10 +397,6 @@
         <class name="org.orbeon.oxf.processor.converter.XSLFOConverter"/>
     </processor>
 
-    <processor name="oxf:chart-converter">
-        <class name="org.orbeon.oxf.processor.converter.JFreeChartConverter"/>
-    </processor>
-
     <processor name="oxf:svg-converter">
         <class name="org.orbeon.oxf.processor.converter.SVGConverter"/>
     </processor>
@@ -467,21 +463,12 @@
         <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
 
-    <processor name="oxf:chart-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer"/>
-    </processor>
-
     <processor name="oxf:svg-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.SVGSerializer"/>
     </processor>
 
     <processor name="oxf:legacy-file-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.FileSerializer"/>
-    </processor>
-
-    <!-- Chart info processor -->
-    <processor name="oxf:chart">
-        <class name="org.orbeon.oxf.processor.JFreeChartProcessor"/>
     </processor>
 
     <!-- Session and scope processors -->

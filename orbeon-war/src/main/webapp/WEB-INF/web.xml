@@ -250,10 +250,6 @@
             <param-value>oxf:/config/error.xpl</param-value>
         </init-param>
     </servlet>
-    <servlet>
-        <servlet-name>display-chart-servlet</servlet-name>
-        <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
-    </servlet>
     <!-- Uncomment this for the eXist XMLRPC support -->
     <!--
     <servlet>
@@ -314,10 +310,6 @@
         <url-pattern>/exist/webdav/*</url-pattern>
     </servlet-mapping>-->
     <!-- End eXist WebDAV support -->
-    <servlet-mapping>
-        <servlet-name>display-chart-servlet</servlet-name>
-        <url-pattern>/chartDisplay</url-pattern>
-    </servlet-mapping>
     <!-- Uncomment this for the relational persistence, and change oracle if necessary -->
     <!--
     <resource-ref>

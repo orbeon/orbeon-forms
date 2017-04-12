@@ -14,7 +14,7 @@
 <group description="Converters" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!--
-    TODO: o all converters (XML, HTML, Text, XSL:FO, Chart)
+    TODO: o all converters (XML, HTML, Text, XSL:FO)
           o check that content-type incl. encoding attribute is correctly generated
 
     -->

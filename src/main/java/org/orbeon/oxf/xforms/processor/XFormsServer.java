@@ -41,6 +41,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
+import org.orbeon.oxf.xforms.state.RequestParameters;
 import org.orbeon.oxf.xforms.state.XFormsStateLifecycle;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
@@ -187,7 +188,7 @@ public class XFormsServer extends ProcessorImpl {
         final ExternalContext.Response response = PipelineResponse.getResponse(xmlReceiver, externalContext);
 
         // The following throws if the session has expired
-        final XFormsStateLifecycle.RequestParameters parameters = XFormsStateManager.instance().extractParameters(requestDocument, false);
+        final RequestParameters parameters = XFormsStateManager.instance().extractParameters(requestDocument, false);
         Callable<SubmissionResult> replaceAllCallable = null;
 
         // IMPORTANT: We now have a lock associated with the document

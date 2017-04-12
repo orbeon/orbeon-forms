@@ -224,25 +224,17 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertNull(StringUtils.trimAllToNull(state4.dynamicStateString));
         // Make sure we found the initial dynamic state
         {
-            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState(), false)));
+            assertEquals(
+                stripSequenceNumber(initialDynamicStateString),
+                stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState(), false))
+            );
         }
     }
 
     private State doUpdate(boolean isCache, final State state1, EventCallback callback) {
 
-        final XFormsStateLifecycle.RequestParameters parameters = new XFormsStateLifecycle.RequestParameters() {
-            public String getUUID() {
-                return state1.uuid;
-            }
-
-            public String getEncodedClientStaticState() {
-                return state1.staticStateString;
-            }
-
-            public String getEncodedClientDynamicState() {
-                return state1.dynamicStateString;
-            }
-        };
+        final RequestParameters parameters =
+            RequestParameters.apply(state1.uuid, state1.staticStateString, state1.dynamicStateString);
 
         // New state
         final State state2 = new State();
@@ -286,19 +278,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
     private State getInitialState(final State state1) {
 
-        final XFormsStateLifecycle.RequestParameters parameters = new XFormsStateLifecycle.RequestParameters() {
-            public String getUUID() {
-                return state1.uuid;
-            }
-
-            public String getEncodedClientStaticState() {
-                return state1.staticStateString;
-            }
-
-            public String getEncodedClientDynamicState() {
-                return state1.dynamicStateString;
-            }
-        };
+        final RequestParameters parameters =
+            RequestParameters.apply(state1.uuid, state1.staticStateString, state1.dynamicStateString);
 
         // New state
         final State state2 = new State();

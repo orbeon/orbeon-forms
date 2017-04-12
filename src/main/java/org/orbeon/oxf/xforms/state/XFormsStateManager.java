@@ -366,30 +366,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         }
     }
 
-    private static class RequestParametersImpl implements RequestParameters, java.io.Serializable {
-        private final String uuid;
-        private final String encodedClientStaticState;
-        private final String encodedClientDynamicState;
-
-        private RequestParametersImpl(String uuid, String encodedClientStaticState, String encodedClientDynamicState) {
-            this.uuid = uuid;
-            this.encodedClientStaticState = encodedClientStaticState;
-            this.encodedClientDynamicState = encodedClientDynamicState;
-        }
-
-        public String getUUID() {
-            return uuid;
-        }
-
-        public String getEncodedClientStaticState() {
-            return encodedClientStaticState;
-        }
-
-        public String getEncodedClientDynamicState() {
-            return encodedClientDynamicState;
-        }
-    }
-
     public RequestParameters extractParameters(Document request, boolean isInitialState) {
 
         // Get UUID
@@ -413,7 +389,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         assert (encodedStaticState != null && encodedDynamicState != null) || (encodedStaticState == null && encodedDynamicState == null);
 
-        return new RequestParametersImpl(uuid, encodedStaticState, encodedDynamicState);
+        return RequestParameters.apply(uuid, encodedStaticState, encodedDynamicState);
     }
 
     /**

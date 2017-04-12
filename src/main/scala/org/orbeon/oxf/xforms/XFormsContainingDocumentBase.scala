@@ -39,8 +39,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventFactory, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.orbeon.oxf.xforms.state.XFormsStateLifecycle.RequestParameters
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState, XFormsStateManager}
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, DynamicState, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport}
@@ -59,19 +58,13 @@ object XFormsContainingDocumentBase {
       case lock: Lock ⇒
         try {
           val containingDocument =
-            XFormsStateManager.instance.beforeUpdate(
-              new RequestParameters {
-                def getUUID = uuid
-                def getEncodedClientStaticState = ""
-                def getEncodedClientDynamicState = ""
-              }
-            )
+            XFormsStateManager.instance.beforeUpdate(RequestParameters(uuid, "", ""))
 
           var keepDocument = false
           try {
             val result = block(containingDocument)
 
-            XFormsStateManager.instance.beforeUpdateResponse(containingDocument, true)
+            XFormsStateManager.instance.beforeUpdateResponse(containingDocument, ignoreSequence = true)
             XFormsStateManager.instance.afterUpdateResponse(containingDocument)
 
             keepDocument = true

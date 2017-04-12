@@ -263,7 +263,7 @@ trait ConnectionState {
       }
     }
 
-  private def stateAttributes(createSession: Boolean) = {
+  private def stateAttributes(createSession: Boolean): Option[JMap[String, AnyRef]] = {
     val externalContext = NetUtils.getExternalContext
     stateScope match {
       case "request" ⇒

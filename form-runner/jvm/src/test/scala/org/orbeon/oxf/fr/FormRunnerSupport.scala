@@ -77,7 +77,7 @@ trait FormRunnerSupport extends DocumentTestBase {
     val responseContent = BufferedContent(response.content)
     val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, "utf-8")) map (_.group(1))
 
-    val docOpt = uuidOpt map XFormsDocumentCache.instance.takeDocument
+    val docOpt = uuidOpt flatMap XFormsDocumentCache.takeDocument
 
     (processorService, docOpt, events)
   }

@@ -242,29 +242,30 @@ object XFormsStateManager extends XFormsStateLifecycle {
     parameters     : RequestParameters,
     isInitialState : Boolean,
     disableUpdates : Boolean
-  ): XFormsContainingDocument = {
-    // Try cache first unless the initial state is requested
-    if (! isInitialState)
+  ): XFormsContainingDocument =
+    if (! isInitialState) {
+      // Try cache first unless the initial state is requested
       if (XFormsProperties.isCacheDocument) {
         // Try to find the document in cache using the UUID
         // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
         // we can't know that the property is set to false before trying.
-        val cachedDocument = XFormsDocumentCache.instance.takeDocument(parameters.getUUID)
-        if (cachedDocument ne null) {
-          // Found in cache
-          Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
-          return cachedDocument
+        XFormsDocumentCache.takeDocument(parameters.getUUID) match {
+          case Some(cachedDocument) ⇒
+            // Found in cache
+            Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
+            cachedDocument
+          case None ⇒
+            Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
+            createDocumentFromStore(parameters, isInitialState, disableUpdates)
         }
-        Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
       } else {
         Logger.logDebug(LogType, "Document cache disabled. Retrieving state from store.")
+        createDocumentFromStore(parameters, isInitialState, disableUpdates)
       }
-    else {
+    } else {
       Logger.logDebug(LogType, "Initial document state requested. Retrieving state from store.")
+      createDocumentFromStore(parameters, isInitialState, disableUpdates)
     }
-    // Must recreate from store
-    createDocumentFromStore(parameters, isInitialState, disableUpdates)
-  }
 
   // Return the static state string to send to the client in the HTML page.
   def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): String =
@@ -357,10 +358,10 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     def cacheOrStore(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
 
-      if (XFormsDocumentCache.instance.isEnabled(containingDocument.getStaticState)) {
+      if (XFormsDocumentCache.isEnabled(containingDocument.getStaticState)) {
         // Cache the document
         Logger.logDebug(LogType, "Document cache enabled. Storing document in cache.")
-        XFormsDocumentCache.instance.storeDocument(containingDocument)
+        XFormsDocumentCache.storeDocument(containingDocument)
         if (isInitialState && containingDocument.getStaticState.isServerStateHandling) {
           // Also store document state (used by browser back and <xf:reset>)
           Logger.logDebug(LogType, "Storing initial document state.")
@@ -376,8 +377,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
         "xforms",
         "after cacheOrStore",
         List(
-          "document cache current size" → XFormsDocumentCache.instance.getCurrentSize.toString,
-          "document cache max size"     → XFormsDocumentCache.instance.getMaxSize.toString
+          "document cache current size" → XFormsDocumentCache.getCurrentSize.toString,
+          "document cache max size"     → XFormsDocumentCache.getMaxSize.toString
         )
       )
     }
@@ -399,7 +400,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
             Logger.logDebug(
               LogType,
               "Getting document state from store.",
-              "current cache size", XFormsDocumentCache.instance.getCurrentSize.toString,
+              "current cache size", XFormsDocumentCache.getCurrentSize.toString,
               "current store size", EhcacheStateStore.getCurrentSize.toString,
               "max store size", EhcacheStateStore.getMaxSize.toString
             )
@@ -433,7 +434,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
           def sessionDestroyed(): Unit = {
             Logger.logDebug(LogType, "Removing document from cache following session expiration.")
             // NOTE: This will call onRemoved() on the document, and onRemovedFromCache() on XFormsStateManager
-            XFormsDocumentCache.instance.removeDocument(uuid)
+            XFormsDocumentCache.removeDocument(uuid)
           }
         }
         // Add listener
@@ -442,7 +443,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         } catch {
           case e: IllegalStateException ⇒
             Logger.logInfo(LogType, s"Unable to add session listener: ${e.getMessage}")
-            XFormsDocumentCache.instance.removeDocument(uuid) // remove immediately
+            XFormsDocumentCache.removeDocument(uuid) // remove immediately
             throw e
         }
         // Remember, in session, mapping (UUID -> session listener)

@@ -73,13 +73,13 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertNotNull(session.javaGetAttribute(XFormsStateManager.getListenerSessionKey(document.getUUID())));
 
         // Test that the document is in cache
-        assertSame(document, XFormsDocumentCache.instance().takeDocument(document.getUUID()));
+        assertSame(document, XFormsDocumentCache$.MODULE$.takeDocument(document.getUUID()).get());
 
         // Expire session
         ((TestSession) session).expireSession();
 
         // Test that the document is no longer in cache
-        assertNull(XFormsDocumentCache.instance().takeDocument(document.getUUID()));
+        assertTrue(XFormsDocumentCache$.MODULE$.takeDocument(document.getUUID()).isEmpty());
     }
 
     private static class State {

@@ -9,7 +9,10 @@ build-local.properties
 src/resources-packaged-target/
 src/resources-packaged/xbl/orbeon/code-mirror/CodeMirror-2.34/
 src/resources-local/
+resources-local-A/
+resources-local-B/
 resources-local/
 node_modules/
 tmp
+scratch.txt
 *~

@@ -35,10 +35,10 @@ import scala.collection.JavaConverters._
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
-  timeToLive     : Long,
-  handleXInclude : Boolean,
-  sourceURI      : String,
-  requestBodyHash: Option[String]
+  timeToLive      : Long,
+  handleXInclude  : Boolean,
+  sourceURI       : String,
+  requestBodyHash : Option[String]
 ) {
 
   require(
@@ -164,7 +164,6 @@ class XFormsInstance(
         _instanceCaching match {
           case Some(instanceCaching) ⇒
             XFormsServerSharedInstancesCache.remove(
-              indentedLogger,
               instanceCaching.sourceURI,
               null,
               instanceCaching.handleXInclude
@@ -174,7 +173,6 @@ class XFormsInstance(
               "xxforms-instance-invalidate event dispatched to non-cached instance",
               Seq("instance id" → getEffectiveId)
             )
-
         }
       case ev: XXFormsActionErrorEvent ⇒
         XFormsError.handleNonFatalActionError(this, ev.throwable)
@@ -553,7 +551,6 @@ object XFormsInstance extends Logging {
           (
             Some(caching),
             XFormsServerSharedInstancesCache.findContentOrLoad(
-              logger,
               instance,
               caching,
               instanceState.readonly,

@@ -87,10 +87,10 @@ public class CacheableSubmission extends BaseSubmission {
         // As an optimization, try from cache first
         // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
         final DocumentInfo cachedDocumentInfo = XFormsServerSharedInstancesCache.findContentOrNull(
-                detailsLogger,
                 staticInstance,
                 instanceCaching,
-                p2.isReadonly);
+                p2.isReadonly,
+                detailsLogger);
 
         if (cachedDocumentInfo != null) {
             // Here we cheat a bit: instead of calling generically deserialize(), we directly set the instance document
@@ -115,7 +115,7 @@ public class CacheableSubmission extends BaseSubmission {
                     final boolean[] status = { false , false};
                     try {
                         final DocumentInfo newDocumentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(
-                                detailsLogger, staticInstance, instanceCaching, p2.isReadonly,
+                                staticInstance, instanceCaching, p2.isReadonly,
                                 new XFormsServerSharedInstancesCache.Loader() {
                                     public DocumentInfo load(String instanceSourceURI, boolean handleXInclude) {
 
@@ -180,7 +180,8 @@ public class CacheableSubmission extends BaseSubmission {
                                             throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.getConnectionResult() : null);
                                         }
                                     }
-                                });
+                                },
+                                detailsLogger);
 
                         // Here we cheat a bit: instead of calling generically deserialize(), we directly set the DocumentInfo
                         replacer.setCachedResult(newDocumentInfo, instanceCaching);

@@ -560,11 +560,11 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 final InstanceCaching caching = InstanceCaching.fromInstance(instance, resolveInstanceURL(instance), null);
                 final DocumentInfo documentInfo =
                     XFormsServerSharedInstancesCache.findContentOrLoad(
-                            indentedLogger(),
                             instance,
                             caching,
                             instance.readonly(),
-                            INSTANCE_LOADER);
+                            INSTANCE_LOADER,
+                            indentedLogger());
 
                 indexInstance(
                     new XFormsInstance(

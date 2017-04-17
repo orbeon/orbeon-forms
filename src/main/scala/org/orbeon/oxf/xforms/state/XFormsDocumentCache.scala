@@ -15,26 +15,22 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.cache.{InternalCacheKey, ObjectCache}
 import org.orbeon.oxf.util.SecureUtils
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 object XFormsDocumentCache {
 
   import Private._
 
-  // Whether the cache is enabled for this static state.
-  def isEnabled(staticState: XFormsStaticState): Boolean =
-    staticState.isCacheDocument
-
   // Add a document to the cache using the document's UUID as cache key.
-  def storeDocument(containingDocument: XFormsContainingDocument): Unit =
+  def put(containingDocument: XFormsContainingDocument): Unit =
     cache.add(createCacheKey(containingDocument.getUUID), ConstantValidity, containingDocument)
 
-  // Find a document in the cache. If found, the document is removed from the cache. If not found, return null.
-  def takeDocument(uuid: String): Option[XFormsContainingDocument] =
+  // Find a document in the cache. If found, the document is removed from the cache.
+  def take(uuid: String): Option[XFormsContainingDocument] =
     Option(cache.takeValid(createCacheKey(uuid), ConstantValidity).asInstanceOf[XFormsContainingDocument])
 
   // Remove a document from the cache. This does NOT cause the document state to be serialized to store.
-  def removeDocument(uuid: String): Unit =
+  def remove(uuid: String): Unit =
     cache.remove(createCacheKey(uuid))
 
   def getCurrentSize : Int = cache.getCurrentSize

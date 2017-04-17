@@ -249,7 +249,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         // Try to find the document in cache using the UUID
         // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
         // we can't know that the property is set to false before trying.
-        XFormsDocumentCache.takeDocument(parameters.getUUID) match {
+        XFormsDocumentCache.take(parameters.getUUID) match {
           case Some(cachedDocument) ⇒
             // Found in cache
             Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
@@ -358,7 +358,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     def cacheOrStore(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
 
-      if (XFormsDocumentCache.isEnabled(containingDocument.getStaticState)) {
+      if (containingDocument.getStaticState.isCacheDocument) {
         // Cache the document
         Logger.logDebug(LogType, "Document cache enabled. Storing document in cache.")
         XFormsDocumentCache.storeDocument(containingDocument)
@@ -434,7 +434,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
           def sessionDestroyed(): Unit = {
             Logger.logDebug(LogType, "Removing document from cache following session expiration.")
             // NOTE: This will call onRemoved() on the document, and onRemovedFromCache() on XFormsStateManager
-            XFormsDocumentCache.removeDocument(uuid)
+            XFormsDocumentCache.remove(uuid)
           }
         }
         // Add listener
@@ -443,7 +443,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         } catch {
           case e: IllegalStateException ⇒
             Logger.logInfo(LogType, s"Unable to add session listener: ${e.getMessage}")
-            XFormsDocumentCache.removeDocument(uuid) // remove immediately
+            XFormsDocumentCache.remove(uuid) // remove immediately
             throw e
         }
         // Remember, in session, mapping (UUID -> session listener)
@@ -453,9 +453,11 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     def storeDocumentState(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
       require(containingDocument.getStaticState.isServerStateHandling)
-      val externalContext = NetUtils.getExternalContext
-      val session = externalContext.getRequest.getSession(ForceSessionCreation)
-      EhcacheStateStore.storeDocumentState(containingDocument, session, isInitialState)
+      EhcacheStateStore.storeDocumentState(
+        containingDocument,
+        NetUtils.getExternalContext.getRequest.getSession(ForceSessionCreation),
+        isInitialState
+      )
     }
   }
 }

@@ -193,19 +193,22 @@ case class DynamicState(
 }
 
 // Minimal immutable representation of a serialized control
-case class ControlState(effectiveId: String, visited: Boolean, keyValues: Map[String, String]) {
-  def keyValuesJava = keyValues.asJava
-}
+case class ControlState(
+  effectiveId : String,
+  visited     : Boolean,
+  keyValues   : Map[String, String]
+)
 
 // Minimal immutable representation of a serialized instance
 // If there is caching information, don't include the actual content
 case class InstanceState(
-    effectiveId: String,
-    modelEffectiveId: String,
-    cachingOrContent: InstanceCaching Either String,
-    readonly: Boolean,
-    modified: Boolean,
-    valid: Boolean) {
+  effectiveId      : String,
+  modelEffectiveId : String,
+  cachingOrContent : InstanceCaching Either String,
+  readonly         : Boolean,
+  modified         : Boolean,
+  valid            : Boolean
+) {
 
   def this(instance: XFormsInstance) =
     this(

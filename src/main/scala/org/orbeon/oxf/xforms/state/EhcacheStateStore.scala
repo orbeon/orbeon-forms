@@ -19,14 +19,15 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.SecureUtils
 import org.orbeon.oxf.xforms._
 
-/**
- * XForms state cache based on Ehcache.
- */
 object EhcacheStateStore extends XFormsStateStore {
 
   import Private._
 
-  def storeDocumentState(document: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean): Unit = {
+  def storeDocumentState(
+    document       : XFormsContainingDocument,
+    session        : ExternalContext.Session,
+    isInitialState : Boolean
+  ): Unit = {
 
     assert(document.getStaticState.isServerStateHandling)
 
@@ -34,7 +35,7 @@ object EhcacheStateStore extends XFormsStateStore {
       LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" → document.getUUID))
 
     if (isDebugEnabled)
-      debug("store size before storing: " + getCurrentSize + " entries.")
+      debug(s"store size before storing: $getCurrentSize entries.")
 
     val documentUUID      = document.getUUID
     val staticStateDigest = document.getStaticState.digest
@@ -47,15 +48,27 @@ object EhcacheStateStore extends XFormsStateStore {
     addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
     // Static and dynamic states
-    addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
+    // XXX Q: is there a cost to replacing static state? value will be the same!
+    addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState)
     addOrReplaceOne(dynamicStateKey, DynamicState(document))
   }
 
-  def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState =
-    LifecycleLogger.withEventAssumingRequest("xforms", "restore state", List("uuid" → documentUUID, "backOrReload" → isInitialState.toString)) {
+  def findState(
+    session        : ExternalContext.Session,
+    documentUUID   : String,
+    isInitialState : Boolean
+  ): XFormsState =
+    LifecycleLogger.withEventAssumingRequest(
+      "xforms",
+      "restore state",
+      List(
+        "uuid" → documentUUID,
+        "backOrReload" → isInitialState.toString
+      )
+    ) {
 
       if (isDebugEnabled)
-        debug("store size before finding: " + getCurrentSize + " entries.")
+        debug(s"store size before finding: $getCurrentSize entries.")
 
       def findOne(key: String) = Caches.stateCache.get(key) match {
         case element: EhElement ⇒ element.getObjectValue

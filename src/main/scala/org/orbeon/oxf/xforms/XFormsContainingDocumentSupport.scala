@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.concurrent.locks.Lock
 import java.{util ⇒ ju}
 
 import org.apache.commons.lang3.StringUtils
@@ -22,6 +21,7 @@ import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter
 import org.orbeon.oxf.util.CoreUtils._
@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.orbeon.oxf.util.XPath.CompiledExpression
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
@@ -49,26 +50,45 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-object XFormsContainingDocumentBase {
+object XFormsContainingDocumentSupport {
 
   private val ContainingDocumentPseudoId = "#document"
 
   def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument ⇒ T): T = {
-    XFormsStateManager.acquireDocumentLock(uuid, timeout) match {
-      case lock: Lock ⇒
+    withLock(RequestParameters(uuid, None, None, None), timeout) {
+      case Some(containingDocument) ⇒
+        withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
+      case None ⇒
+        throw new IllegalStateException
+    }
+  }
+
+  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] ⇒ T): T = {
+
+    LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" → params.uuid))
+
+    XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
+      case Some(lock) ⇒
         try {
+
+          LifecycleLogger.eventAssumingRequest(
+            "xforms",
+            "got document lock",
+            LifecycleLogger.basicRequestDetailsAssumingRequest(
+              List(
+                "uuid" → params.uuid,
+                "wait" → LifecycleLogger.formatDelay(System.currentTimeMillis)
+              )
+            )
+          )
+
           val containingDocument =
-            XFormsStateManager.beforeUpdate(RequestParameters(uuid, "", ""))
+            XFormsStateManager.beforeUpdate(params)
 
           var keepDocument = false
           try {
-            val result = block(containingDocument)
-
-            XFormsStateManager.beforeUpdateResponse(containingDocument, ignoreSequence = true)
-            XFormsStateManager.afterUpdateResponse(containingDocument)
-
+            val result = block(Some(containingDocument))
             keepDocument = true
-
             result
           } finally {
             XFormsStateManager.afterUpdate(containingDocument, keepDocument)
@@ -77,15 +97,23 @@ object XFormsContainingDocumentBase {
         } finally {
           XFormsStateManager.releaseDocumentLock(lock)
         }
-      case null ⇒
-        throw new IllegalStateException
+      case None ⇒
+        LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" → params.uuid))
+        block(None)
     }
+  }
+
+  def withUpdateResponse[T](containingDocument: XFormsContainingDocument, ignoreSequence: Boolean)(block: ⇒ T): T = {
+    XFormsStateManager.beforeUpdateResponse(containingDocument, ignoreSequence = ignoreSequence)
+    val result = block
+    XFormsStateManager.afterUpdateResponse(containingDocument)
+    result
   }
 }
 
-import org.orbeon.oxf.xforms.XFormsContainingDocumentBase._
+case class Load(resource: String, target: Option[String], urlType: String, isReplace: Boolean, isShowProgress: Boolean)
 
-abstract class XFormsContainingDocumentBase(var disableUpdates: Boolean)
+abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
   extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
   with ContainingDocumentLogging
   with ContainingDocumentMisc
@@ -533,9 +561,6 @@ trait ContainingDocumentDelayedEvents {
 
   def delayedEvents =
     _delayedEvents.toList
-
-  def delayedEventsJava =
-    delayedEvents.asJava
 
   def clearAllDelayedEvents() =
     _delayedEvents.clear()

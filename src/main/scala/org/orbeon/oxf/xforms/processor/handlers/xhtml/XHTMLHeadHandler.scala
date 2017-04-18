@@ -300,14 +300,14 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
         dialogControl
 
     val javascriptLoads =
-      containingDocument.getLoadsToRun.asScala filter (_.getResource.startsWith("javascript:"))
+      containingDocument.getLoadsToRun.asScala filter (_.resource.startsWith("javascript:"))
 
     val hasScriptDefinitions =
       uniqueClientScripts.nonEmpty
 
     val mustRunAnyScripts =
       errorsToShow.nonEmpty       ||
-      scriptInvocations.nonEmpty       ||
+      scriptInvocations.nonEmpty  ||
       focusElementIdOpt.isDefined ||
       messagesToRun.nonEmpty      ||
       dialogsToOpen.nonEmpty      ||
@@ -341,7 +341,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
 
         // javascript: loads
         for (load ← javascriptLoads) {
-          val body = escapeJavaScript(load.getResource.substring("javascript:".size))
+          val body = escapeJavaScript(load.resource.substring("javascript:".size))
           sb append s"""(function(){$body})();"""
         }
 

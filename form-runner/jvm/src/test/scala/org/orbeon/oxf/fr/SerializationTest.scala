@@ -53,8 +53,8 @@ class SerializationTest
 
         val serializedState = XFormsState(
           staticStateDigest = Option(doc.getStaticState.digest),
-          staticState       = doc.getStaticState.encodedState,
-          dynamicState      = DynamicState(doc)
+          staticState       = Option(doc.getStaticState.encodedState),
+          dynamicState      = Some(DynamicState(doc))
         )
 
         val restoredDoc = new XFormsContainingDocument(serializedState, false, false)
@@ -112,8 +112,8 @@ class SerializationTest
 
         val serializedState = XFormsState(
           staticStateDigest = Option(doc.getStaticState.digest),
-          staticState       = doc.getStaticState.encodedState,
-          dynamicState      = DynamicState(doc)
+          staticState       = Option(doc.getStaticState.encodedState),
+          dynamicState      = Some(DynamicState(doc))
         )
 
         val restoredDoc = new XFormsContainingDocument(serializedState, false, false)

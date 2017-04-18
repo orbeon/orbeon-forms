@@ -38,11 +38,12 @@ object EhcacheStateStore extends XFormsStateStore {
       debug(s"store size before storing: $getCurrentSize entries.")
 
     val documentUUID      = document.getUUID
+    val sequence          = document.getSequence
     val staticStateDigest = document.getStaticState.digest
-    val dynamicStateKey   = getDynamicStateKey(documentUUID, isInitialState)
+    val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)
 
     def addOrReplaceOne(key: String, value: java.io.Serializable) =
-      Caches.stateCache.put(new EhElement(key, value))
+      Caches.stateCache.put(new EhElement(key, value, sequence))
 
     // Mapping (UUID → static state key : dynamic state key
     addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
@@ -53,11 +54,14 @@ object EhcacheStateStore extends XFormsStateStore {
     addOrReplaceOne(dynamicStateKey, DynamicState(document))
   }
 
+  def findSequence(documentUUID: String): Option[Long] =
+    Option(Caches.stateCache.get(documentUUID)) map (_.getVersion)
+
   def findState(
     session        : ExternalContext.Session,
     documentUUID   : String,
     isInitialState : Boolean
-  ): XFormsState =
+  ): Option[XFormsState] =
     LifecycleLogger.withEventAssumingRequest(
       "xforms",
       "restore state",
@@ -70,13 +74,11 @@ object EhcacheStateStore extends XFormsStateStore {
       if (isDebugEnabled)
         debug(s"store size before finding: $getCurrentSize entries.")
 
-      def findOne(key: String) = Caches.stateCache.get(key) match {
-        case element: EhElement ⇒ element.getObjectValue
-        case _                  ⇒ null
-      }
+      def findOne(key: String) = Option(Caches.stateCache.get(key)) map (_.getObjectValue)
 
       findOne(documentUUID) match {
-        case keyString: String ⇒
+        case Some(keyString: String) ⇒
+
           // Found the keys, split into parts
           val parts = keyString split ':'
 
@@ -84,16 +86,18 @@ object EhcacheStateStore extends XFormsStateStore {
           assert(parts(0).length == SecureUtils.HexIdLength)   // static state key is an hex hash
 
           // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
-          val dynamicStateKey = if (isInitialState) getDynamicStateKey(documentUUID, isInitialState = true) else parts(1)
+          val dynamicStateKey = if (isInitialState) createDynamicStateKey(documentUUID, isInitialState = true) else parts(1)
 
           // Gather values from cache for both keys and return state only if both are non-null
-          Stream(parts(0), dynamicStateKey) map findOne filter (_ ne null) match {
+          Stream(parts(0), dynamicStateKey) flatMap findOne filter (_ ne null) match {
             case Stream(staticState: String, dynamicState: DynamicState) ⇒
-              XFormsState(Some(parts(0)), staticState, dynamicState)
-            case _ ⇒ null
+              Some(XFormsState(Some(parts(0)), Some(staticState), Some(dynamicState)))
+            case _ ⇒
+              None
           }
 
-        case _ ⇒ null
+        case _ ⇒
+          None
       }
     }
 
@@ -104,7 +108,7 @@ object EhcacheStateStore extends XFormsStateStore {
 
     val StoreDebugName = "Ehcache"
 
-    def getDynamicStateKey(documentUUID: String, isInitialState: Boolean) =
+    def createDynamicStateKey(documentUUID: String, isInitialState: Boolean) =
       documentUUID + (if (isInitialState) "-I" else "-C") // key is different for initial vs. subsequent state
 
     def isDebugEnabled =

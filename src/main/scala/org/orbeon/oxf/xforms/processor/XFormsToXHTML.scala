@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.event.ClientEvents
 import org.orbeon.oxf.xforms.processor.handlers.{XHTMLOutput, XMLOutput}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
@@ -40,15 +41,14 @@ class XFormsToXHTML extends XFormsToSomething {
       indentedLogger       : IndentedLogger,
       stage2CacheableState : XFormsToSomething.Stage2CacheableState,
       containingDocument   : XFormsContainingDocument,
-      xmlReceiver          : XMLReceiver) =
+      xmlReceiver          : XMLReceiver): Unit =
     if (outputName == "document")
       outputResponseDocument(
         externalContext,
-        indentedLogger,
         stage2CacheableState.template,
         containingDocument,
         xmlReceiver
-      )
+      )(indentedLogger)
     else
       testOutputResponseState(
         containingDocument,
@@ -61,15 +61,15 @@ object XFormsToXHTML {
 
   def outputResponseDocument(
     externalContext    : ExternalContext,
-    indentedLogger     : IndentedLogger,
     template           : AnnotatedTemplate,
     containingDocument : XFormsContainingDocument,
-    xmlReceiver        : XMLReceiver
+    xmlReceiver        : XMLReceiver)(implicit
+    indentedLogger     : IndentedLogger
   ): Unit =
     XFormsAPI.withContainingDocument(containingDocument) { // scope because dynamic properties can cause lazy XPath evaluations
 
       val nonJavaScriptLoads =
-        containingDocument.getLoadsToRun.asScala filterNot (_.getResource.startsWith("javascript:"))
+        containingDocument.getLoadsToRun.asScala filterNot (_.resource.startsWith("javascript:"))
 
       if (containingDocument.isGotSubmissionReplaceAll) {
         // 1. Got a submission with replace="all"
@@ -80,9 +80,9 @@ object XFormsToXHTML {
 
         // This is the "load upon initialization in Servlet container, embedded or not" case.
         // See `XFormsLoadAction` for details.
-        val location = nonJavaScriptLoads.head.getResource
+        val location = nonJavaScriptLoads.head.resource
         indentedLogger.logDebug("", "handling redirect response for xf:load", "url", location)
-        externalContext.getResponse.sendRedirect(location, false, false)
+        externalContext.getResponse.sendRedirect(location, isServerSide = false, isExitPortal = false)
 
         // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
         SAXUtils.streamNullDocument(xmlReceiver)
@@ -107,15 +107,13 @@ object XFormsToXHTML {
   ): Unit =
     if (! containingDocument.isGotSubmissionReplaceAll)
       XFormsServer.outputAjaxResponse(
-        containingDocument,
-        indentedLogger,
-        null,
-        null,
-        null,
-        null,
-        null,
-        xmlReceiver,
-        false,
-        true
+        containingDocument             = containingDocument,
+        eventFindings                  = ClientEvents.EmptyEventsFindings,
+        beforeFocusedControlOpt        = None,
+        repeatHierarchyOpt             = None,
+        requestDocument                = null,
+        testOutputAllActions           = true)(
+        xmlReceiver                    = xmlReceiver,
+        indentedLogger                 = indentedLogger
       )
 }

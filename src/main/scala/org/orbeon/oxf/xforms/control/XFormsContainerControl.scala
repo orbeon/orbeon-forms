@@ -27,7 +27,6 @@ trait XFormsContainerControl extends VisitableTrait {
 
   // Get all the direct children controls (never null)
   def children: Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
-  def childrenJava: JList[XFormsControl] = children.asJava
 
   // Add a child control
   def addChild(control: XFormsControl): Unit = {

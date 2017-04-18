@@ -478,10 +478,11 @@ trait ContainerResolver {
 
   def getFirstControlEffectiveId: String =
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
-    (getChildrenControls(containingDocument.getControls).asScala headOption) map (_.getEffectiveId) orNull
+    getChildrenControls(containingDocument.getControls).headOption map (_.getEffectiveId) orNull
 
-  protected def getChildrenControls(controls: XFormsControls): JList[XFormsControl] = (associatedControl match {
-    case container: XFormsContainerControl ⇒ container.children
-    case _ ⇒ Seq()
-  }) asJava
+  def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =
+    associatedControl match {
+      case container: XFormsContainerControl ⇒ container.children
+      case _                                 ⇒ Nil
+    }
 }

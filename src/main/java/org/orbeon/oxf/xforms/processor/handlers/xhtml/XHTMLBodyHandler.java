@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import scala.Option;
 
 /**
  * Handle xhtml:body.
@@ -146,11 +147,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                         "value", clientEncodedStaticState
                 });
 //            }
-            final String clientEncodedDynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
+            final Option<String> clientEncodedDynamicStateOpt = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
 //            if (clientEncodedDynamicState != null) {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                         "type", "hidden", "name", "$dynamic-state",
-                        "value", clientEncodedDynamicState
+                        "value", clientEncodedDynamicStateOpt.isDefined() ? clientEncodedDynamicStateOpt.get() : null
                 });
 //            }
         }

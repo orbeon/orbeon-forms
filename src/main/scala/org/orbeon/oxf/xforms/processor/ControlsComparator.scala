@@ -19,8 +19,6 @@ import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.{ContentHandlerWriter, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
-import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.processor.handlers._
@@ -28,7 +26,6 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLEl
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
 
-import scala.collection.JavaConverters._
 import scala.collection.{immutable ⇒ i}
 import scala.util.control.Breaks
 
@@ -365,30 +362,4 @@ class ControlsComparator(
         )
       )
     }
-}
-
-object ControlsComparator {
-
-  def diffJava(
-    document                             : XFormsContainingDocument,
-    left                                 : ju.List[XFormsControl],
-    right                                : ju.List[XFormsControl],
-    valueChangeControlIdsAndValuesOrNull : i.Map[String, String],
-    isTestMode                           : Boolean,
-    receiver                             : XMLReceiver
-  ) = XFormsAPI.withContainingDocument(document) { // scope because dynamic properties can cause lazy XPath evaluations
-
-    val comparator = new ControlsComparator(
-      document,
-      Option(valueChangeControlIdsAndValuesOrNull) getOrElse i.Map.empty,
-      isTestMode
-    )
-
-    comparator.diffChildren(
-      if (left  ne null) left.asScala  else Nil,
-      if (right ne null) right.asScala else Nil,
-      None)(
-      receiver
-    )
-  }
 }

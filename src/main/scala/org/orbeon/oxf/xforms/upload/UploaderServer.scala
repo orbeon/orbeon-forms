@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.IOUtils.runQuietly
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsContainingDocumentBase._
+import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 

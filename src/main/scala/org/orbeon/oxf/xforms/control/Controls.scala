@@ -486,7 +486,7 @@ object Controls {
 
   // Visit all the controls
   def visitAllControls(tree: ControlTree, listener: XFormsControlVisitorListener): Unit =
-    visitSiblings(listener, tree.children.asScala)
+    visitSiblings(listener, tree.children)
 
   // Iterator over the given control and its descendants
   class ControlsIterator(

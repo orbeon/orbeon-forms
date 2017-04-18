@@ -104,8 +104,8 @@ object LifecycleLogger {
   private def logInternalError(t: Throwable) =
     Logger.error(s"throwable caught during logging: ${t.getMessage}")
 
-  def basicRequestDetailsAssumingRequestJava(params: Array[String]) =
-    basicRequestDetails(NetUtils.getExternalContext.getRequest) ::: arrayToParams(params)
+  def basicRequestDetailsAssumingRequest(params: List[(String, String)]): List[(String, String)] =
+    basicRequestDetails(NetUtils.getExternalContext.getRequest) ::: params
 
   def basicRequestDetails(req: Request) =
     List(

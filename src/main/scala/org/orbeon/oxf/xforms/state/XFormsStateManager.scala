@@ -24,11 +24,13 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.{Loggers, XFormsConstants, XFormsContainingDocument, XFormsProperties}
-
+import org.orbeon.oxf.util.CoreUtils._
 
 object XFormsStateManager extends XFormsStateLifecycle {
 
   import Private._
+
+  private val ReplicationEnabled = false
 
   def indentedLogger: IndentedLogger = Logger
 
@@ -55,16 +57,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
     val uuidElement = request.getRootElement.element(XFormsConstants.XXFORMS_UUID_QNAME)
     assert(uuidElement != null)
     uuidElement.getTextTrim.trimAllToNull
-  }
-
-  /**
-    * Get the request sequence number from an incoming request.
-    *
-    * @return request sequence number, or -1 if missing
-    */
-  def getRequestSequence(request: Document): Long = {
-    val sequenceElement = request.getRootElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME) ensuring (_ ne null)
-    sequenceElement.getTextTrim.trimAllToOpt map (_.toLong) getOrElse -1L // allow empty value for non-Ajax cases
   }
 
   def getDocumentLock(uuid: String): Option[ReentrantLock] =
@@ -145,8 +137,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
     * @param uuid incoming UUID
     * @return the document lock, already locked
     */
-  def acquireDocumentLock(uuid: String, timeout: Long): Lock = {
-    assert(uuid != null)
+  def acquireDocumentLock(uuid: String, timeout: Long): Option[Lock] = {
+    assert(uuid ne null)
     // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
     // for a given UUID must belong to the same session that created the document. If the session expires, the
     // key goes away as well, and the key won't be present. If we don't do this check, the XForms server might
@@ -158,9 +150,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     // Lock document for at most the max retry delay plus an increment
     try {
-      val acquired = lock.tryLock(timeout, TimeUnit.MILLISECONDS)
-      if (acquired) lock
-      else null
+      lock.tryLock(timeout, TimeUnit.MILLISECONDS) option lock
     } catch {
       case e: InterruptedException ⇒
         throw new OXFException(e)
@@ -201,32 +191,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
   }
 
-  def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
-
-    val uuid = XFormsStateManager.getRequestUUID(request) ensuring (_ ne null)
-
-    val encodedStaticStateOpt =
-      Option(request.getRootElement.element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME)) flatMap
-        (_.getTextTrim.trimAllToOpt)
-
-    val qName =
-      if (isInitialState)
-        XFormsConstants.XXFORMS_INITIAL_DYNAMIC_STATE_QNAME
-    else
-        XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME
-
-    val encodedDynamicStateOpt =
-      Option(request.getRootElement.element(qName)) flatMap
-        (_.getTextTrim.trimAllToOpt)
-
-    assert(
-      (encodedStaticStateOpt.isDefined && encodedDynamicStateOpt.isDefined) ||
-        (encodedStaticStateOpt.isEmpty && encodedDynamicStateOpt.isEmpty)
-    )
-
-    RequestParameters(uuid, encodedStaticStateOpt.orNull, encodedDynamicStateOpt.orNull)
-  }
-
   /**
     * Find or restore a document based on an incoming request.
     *
@@ -249,7 +213,15 @@ object XFormsStateManager extends XFormsStateLifecycle {
         // Try to find the document in cache using the UUID
         // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
         // we can't know that the property is set to false before trying.
-        XFormsDocumentCache.take(parameters.getUUID) match {
+
+        def newerSequenceNumberInStore(cachedDocument: XFormsContainingDocument) =
+          ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.getSequence))
+
+        XFormsDocumentCache.take(parameters.uuid) match {
+          case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  ⇒
+            Logger.logDebug(LogType, "Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
+            XFormsDocumentCache.remove(parameters.uuid)
+            createDocumentFromStore(parameters, isInitialState, disableUpdates)
           case Some(cachedDocument) ⇒
             // Found in cache
             Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
@@ -278,10 +250,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
 
   // Return the dynamic state string to send to the client in the HTML page.
-  def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): String =
-    if (containingDocument.getStaticState.isServerStateHandling)
-      null
-    else
+  def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] =
+    containingDocument.getStaticState.isClientStateHandling option
       DynamicState.encodeDocumentToString(containingDocument, XFormsProperties.isGZIPState, isForceEncryption = true)
 
   /**
@@ -360,10 +330,10 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
       if (containingDocument.getStaticState.isCacheDocument) {
         // Cache the document
-        Logger.logDebug(LogType, "Document cache enabled. Storing document in cache.")
-        XFormsDocumentCache.storeDocument(containingDocument)
-        if (isInitialState && containingDocument.getStaticState.isServerStateHandling) {
-          // Also store document state (used by browser back and <xf:reset>)
+        Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
+        XFormsDocumentCache.put(containingDocument)
+        if ((isInitialState || ReplicationEnabled) && containingDocument.getStaticState.isServerStateHandling) {
+          // Also store document state (used by browser soft reload, browser back and <xf:reset>)
           Logger.logDebug(LogType, "Storing initial document state.")
           storeDocumentState(containingDocument, isInitialState)
         }
@@ -389,32 +359,39 @@ object XFormsStateManager extends XFormsStateLifecycle {
       disableUpdates : Boolean
     ): XFormsContainingDocument = {
 
-      val isServerState = parameters.getEncodedClientStaticState eq null
+      val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
       val xformsState =
-        if (isServerState) {
-          // State must be found by UUID in the store
-          val externalContext = NetUtils.getExternalContext
+        parameters.encodedClientDynamicStateOpt match {
+          case None ⇒
 
-          if (Logger.isDebugEnabled)
-            Logger.logDebug(
-              LogType,
-              "Getting document state from store.",
-              "current cache size", XFormsDocumentCache.getCurrentSize.toString,
-              "current store size", EhcacheStateStore.getCurrentSize.toString,
-              "max store size", EhcacheStateStore.getMaxSize.toString
-            )
+            assert(isServerState)
 
-          val session = externalContext.getRequest.getSession(ForceSessionCreation)
-          Option(EhcacheStateStore.findState(session, parameters.getUUID, isInitialState)) getOrElse {
-            // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
-            // document, yet we didn't find it. This means that somehow state was not placed into or expired from
-            // the state store.
-            throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
-          }
-        } else {
-          // State comes directly with request
-          XFormsState(None, parameters.getEncodedClientStaticState, DynamicState(parameters.getEncodedClientDynamicState))
+            // State must be found by UUID in the store
+            val externalContext = NetUtils.getExternalContext
+
+            if (Logger.isDebugEnabled)
+              Logger.logDebug(
+                LogType,
+                "Getting document state from store.",
+                "current cache size", XFormsDocumentCache.getCurrentSize.toString,
+                "current store size", EhcacheStateStore.getCurrentSize.toString,
+                "max store size", EhcacheStateStore.getMaxSize.toString
+              )
+
+            val session = externalContext.getRequest.getSession(ForceSessionCreation)
+            EhcacheStateStore.findState(session, parameters.uuid, isInitialState) getOrElse {
+              // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
+              // document, yet we didn't find it. This means that somehow state was not placed into or expired from
+              // the state store.
+              throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
+            }
+          case Some(encodedClientDynamicState) ⇒
+            // State comes directly with request
+
+            assert(! isServerState)
+
+            XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState)))
         }
 
       // Create document

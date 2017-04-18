@@ -204,6 +204,7 @@ object StatusCode {
   val NotFound              = 404
   val RequestEntityTooLarge = 413
   val InternalServerError   = 500
+  val ServiceUnavailable    = 503
 }
 
 sealed abstract class HttpMethod extends EnumEntry

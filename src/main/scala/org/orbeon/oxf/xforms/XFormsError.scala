@@ -203,16 +203,18 @@ object XFormsError {
     }
   }
 
-  import XFormsConstants.XXFORMS_NAMESPACE_URI
+  import XMLReceiverSupport._
 
   // Insert server errors into the Ajax response
-  def outputAjaxErrors(ch: XMLReceiverHelper, errors: JList[ServerError]): Unit = {
-    ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "errors")
-    for (error ← errors.asScala) {
-      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "error",  ServerError.getDetailsAsArray(error))
-      ch.text(error.message)
-      ch.endElement()
+  def outputAjaxErrors(errors: Seq[ServerError])(implicit xmlReceiver: XMLReceiver): Unit = {
+    withElement(localName = "errors", prefix = "xxf", uri = XFormsConstants.XXFORMS_NAMESPACE_URI) {
+      for (error ← errors)
+        element(
+          localName = "error",
+          prefix    = "xxf",
+          uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+          text      = error.message
+        )
     }
-    ch.endElement()
   }
 }

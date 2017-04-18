@@ -260,9 +260,9 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def deindexSubtree(containerControl: XFormsContainerControl, includeCurrent: Boolean): Unit =
     ControlsIterator(containerControl, includeCurrent) foreach _controlIndex.deindexControl
 
-  def children: ju.List[XFormsControl] = _root match {
-    case Some(root) ⇒ root.childrenJava
-    case None       ⇒ ju.Collections.emptyList[XFormsControl]
+  def children: Seq[XFormsControl] = _root match {
+    case Some(root) ⇒ root.children
+    case None       ⇒ Nil
   }
 
   def effectiveIdsToControls                     = _controlIndex.effectiveIdsToControls

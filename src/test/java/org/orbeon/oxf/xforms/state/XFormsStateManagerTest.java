@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent;
+import scala.Option;
 
 import java.util.Collections;
 import java.util.List;
@@ -105,7 +106,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             state1.uuid = state1.document.getUUID();
             state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
-            state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
+            state1.dynamicStateString = stateManager.getClientEncodedDynamicStateJava(state1.document);
 
             assertEquals(state1.uuid.length(), SecureUtils.HexIdLength());
             assertNotNull(StringUtils.trimAllToNull(state1.staticStateString));
@@ -170,7 +171,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             state1.uuid = state1.document.getUUID();
             state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
-            state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
+            state1.dynamicStateString = stateManager.getClientEncodedDynamicStateJava(state1.document);
 
             assertEquals(state1.uuid.length(), SecureUtils.HexIdLength());
             assertNull(StringUtils.trimAllToNull(state1.staticStateString));
@@ -234,13 +235,17 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
     private State doUpdate(boolean isCache, final State state1, EventCallback callback) {
 
         final RequestParameters parameters =
-            RequestParameters.apply(state1.uuid, state1.staticStateString, state1.dynamicStateString);
+            RequestParameters.apply(state1.uuid,
+                scala.Option.apply(null),
+                scala.Option.apply(state1.staticStateString),
+                scala.Option.apply(state1.dynamicStateString)
+            );
 
         // New state
         final State state2 = new State();
 
-        final Lock lock = stateManager.acquireDocumentLock(parameters.getUUID(), 0L);
-        if (lock == null)
+        final Option<Lock> lock = stateManager.acquireDocumentLock(parameters.uuid(), 0L);
+        if (lock.isEmpty())
             fail("Ajax update lock timeout exceeded");
         try {
             state2.document = stateManager.beforeUpdate(parameters);
@@ -264,13 +269,13 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             // New state
             state2.uuid = state2.document.getUUID();
             state2.staticStateString = stateManager.getClientEncodedStaticState(state2.document);
-            state2.dynamicStateString = stateManager.getClientEncodedDynamicState(state2.document);
+            state2.dynamicStateString = stateManager.getClientEncodedDynamicStateJava(state2.document);
 
             stateManager.afterUpdateResponse(state2.document);
 
             stateManager.afterUpdate(state2.document, true);
         } finally {
-            stateManager.releaseDocumentLock(lock);
+            stateManager.releaseDocumentLock(lock.get());
         }
 
         return state2;
@@ -279,7 +284,12 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
     private State getInitialState(final State state1) {
 
         final RequestParameters parameters =
-            RequestParameters.apply(state1.uuid, state1.staticStateString, state1.dynamicStateString);
+            RequestParameters.apply(
+                state1.uuid,
+                scala.Option.apply(null),
+                scala.Option.apply(state1.staticStateString),
+                scala.Option.apply(state1.dynamicStateString)
+            );
 
         // New state
         final State state2 = new State();
@@ -292,7 +302,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // New state
         state2.uuid = state2.document.getUUID();
         state2.staticStateString = stateManager.getClientEncodedStaticState(state2.document);
-        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(state2.document);
+        state2.dynamicStateString = stateManager.getClientEncodedDynamicStateJava(state2.document);
 
         return state2;
     }

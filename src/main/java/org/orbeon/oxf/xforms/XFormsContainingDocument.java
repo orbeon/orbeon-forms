@@ -18,8 +18,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.logging.LifecycleLogger;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import scala.collection.Seq;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -50,7 +51,7 @@ import java.util.concurrent.locks.Lock;
  * - Contains XForms controls
  * - Handles event handlers hierarchy
  */
-public class XFormsContainingDocument extends XFormsContainingDocumentBase {
+public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
 
     private String uuid;        // UUID of this document
     private long sequence = 1;  // sequence number of changes to this document
@@ -207,7 +208,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
                     // Not found static state in cache, create static state from input
                     indentedLogger().logDebug("", "did not find static state by digest in cache");
                     indentedLogger().startHandleOperation("initialization", "restoring static state");
-                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState(), forceEncryption);
+                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState().get(), forceEncryption);
                     indentedLogger().endHandleOperation();
 
                     // Store in cache
@@ -218,7 +219,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             } else {
                 // Not digest provided, create static state from input
                 indentedLogger().logDebug("", "did not find static state by digest in cache");
-                this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState(), forceEncryption);
+                this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState().get(), forceEncryption);
 
                 assert this.staticState.isClientStateHandling();
             }
@@ -232,7 +233,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
         // 2. Restore the dynamic state
         indentedLogger().startHandleOperation("initialization", "restoring containing document");
         try {
-            restoreDynamicState(xformsState.dynamicState());
+            restoreDynamicState(xformsState.dynamicState().get());
         } catch (Exception e) {
             throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(null, "re-initializing XForms containing document"));
         }
@@ -545,14 +546,14 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     /**
      * Add an XForms load to send to the client.
      */
-    public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isShowProgress) {
+    public void addLoadToRun(String resource, String targetOrNull, String urlType, boolean isReplace, boolean isShowProgress) {
 
         if (activeSubmissionFirstPass != null)
             throw new ValidationException("Unable to run a two-pass submission and xf:load within a same action sequence.", activeSubmissionFirstPass.getLocationData());
 
         if (loadsToRun == null)
             loadsToRun = new ArrayList<Load>();
-        loadsToRun.add(new Load(resource, target, urlType, isReplace, isShowProgress));
+        loadsToRun.add(new Load(resource, scala.Option.apply(targetOrNull), urlType, isReplace, isShowProgress));
     }
 
     /**
@@ -563,42 +564,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
             return loadsToRun;
         else
             return Collections.emptyList();
-    }
-
-    public static class Load {
-        private final String resource;
-        private final String target;
-        private final String urlType;
-        private final boolean isReplace;
-        private final boolean isShowProgress;
-
-        public Load(String resource, String target, String urlType, boolean isReplace, boolean isShowProgress) {
-            this.resource = resource;
-            this.target = target;
-            this.urlType = urlType;
-            this.isReplace = isReplace;
-            this.isShowProgress = isShowProgress;
-        }
-
-        public String getResource() {
-            return resource;
-        }
-
-        public String getTarget() {
-            return target;
-        }
-
-        public String getUrlType() {
-            return urlType;
-        }
-
-        public boolean isReplace() {
-            return isReplace;
-        }
-
-        public boolean isShowProgress() {
-            return isShowProgress;
-        }
     }
 
     /**
@@ -663,25 +628,6 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     public Scope innerScope() {
         // Do it here because at construction time, we don't yet have access to the static state!
         return staticState.topLevelPart().startScope();
-    }
-
-    /**
-     * Check if there is a pending two-pass submission and run it if needed.
-     *
-     * This must NOT synchronize on this document and must NOT modify the document, because further Ajax request might
-     * run concurrently on this document.
-     *
-     * @param callable          callable to run or null
-     * @param response          response to write to if needed
-     * @return                  true if calling the callable was successful
-     */
-    public static boolean checkAndRunDeferredSubmission(Callable<SubmissionResult> callable, ExternalContext.Response response) {
-        if (callable != null) {
-            XFormsModelSubmission.runDeferredSubmission(callable, response);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public void afterInitialResponse() {
@@ -796,7 +742,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
     }
 
     @Override
-    public List<XFormsControl> getChildrenControls(XFormsControls controls) {
+    public Seq<XFormsControl> getChildrenControls(XFormsControls controls) {
         return controls.getCurrentControlTree().children();
     }
 

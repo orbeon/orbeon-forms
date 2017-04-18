@@ -35,20 +35,18 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
 
-import scala.collection.JavaConverters._
-import scala.collection.{immutable ⇒ i}
-
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
 
-  // Only a few events specify custom properties that can be set by the client
-  private val AllStandardProperties =
-    XXFormsDndEvent.StandardProperties        ++
-    KeypressEvent.StandardProperties          ++
-    XXFormsUploadDoneEvent.StandardProperties ++
-    XXFormsLoadEvent.StandardProperties
+  import Private._
 
-  private val DummyEvent = List(LocalEvent(DocumentFactory.createElement("dummy"), trusted = false))
+  case class EventsFindings(
+    allEvents                      : Boolean,
+    valueChangeControlIdsAndValues : Map[String, String],
+    clientFocusControlIdOpt        : Option[Option[String]]
+  )
+
+  val EmptyEventsFindings = EventsFindings(allEvents = false, Map.empty, None)
 
   case class LocalEvent(private val element: Element, trusted: Boolean) {
 
@@ -70,15 +68,15 @@ object ClientEvents extends Logging with XMLReceiverSupport {
     else
       Nil
 
-  def extractServerEventsElements(rootElement: Element) =
-    Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME) toList
+  def extractServerEventsElements(rootElement: Element): List[Element] =
+    Dom4j.elements(rootElement, XXFORMS_SERVER_EVENTS_QNAME).to[List]
 
   // Entry point called by the server: process a sequence of incoming client events.
   def processEvents(
     doc                  : XFormsContainingDocument,
     clientEvents         : List[LocalEvent],
     serverEventsElements : List[Element]
-  ): (Boolean, i.Map[String, String], Option[String]) = {
+  ): EventsFindings = {
 
     val allClientAndServerEvents = {
 
@@ -98,78 +96,72 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       val globalServerEvents = serverEventsElements flatMap (e ⇒ decodeServerEvents(e.getStringValue))
 
       // Gather all events including decoding action server events
-      globalServerEvents ++
-        (clientEventsAfterNoscript flatMap {
-          case event if event.name == XXFORMS_SERVER_EVENTS ⇒
-            decodeServerEvents(event.value)
-          case event ⇒
-            List(event)
-        })
+      globalServerEvents ++ (
+        clientEventsAfterNoscript flatMap {
+          case event if event.name == XXFORMS_SERVER_EVENTS ⇒ decodeServerEvents(event.value)
+          case event                                        ⇒ List(event)
+        }
+      )
     }
 
-    if (allClientAndServerEvents.nonEmpty) {
+    def filterEvents(events: List[LocalEvent]) = events filter {
+      case a if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒ false
+      case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
+        debug("ignoring invalid client event", List(
+          "control id" → a.targetEffectiveId,
+          "event name" → a.name)
+        )(doc.indentedLogger)
+        false
+      case _ ⇒ true
+    }
 
-      def filterEvents(events: List[LocalEvent]) = events filter {
-        case a if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒ false
-        case a if (a.name eq null) || (a.targetEffectiveId eq null) ⇒
-          debug("ignoring invalid client event", List(
-            "control id" → a.targetEffectiveId,
-            "event name" → a.name)
-          )(doc.indentedLogger)
-          false
-        case _ ⇒ true
-      }
+    def combineValueEvents(events: List[LocalEvent]): List[XFormsEvent] = events match {
+      case Nil              ⇒ Nil
+      case List(localEvent) ⇒ safelyCreateAndMapEvent(doc, localEvent).toList
+      case _                ⇒
 
-      def combineValueEvents(events: List[LocalEvent]): List[XFormsEvent] = events match {
-        case Nil              ⇒ Nil
-        case List(localEvent) ⇒ safelyCreateAndMapEvent(doc, localEvent).toList
-        case _                ⇒
+        // Grouping key for value change events
+        case class EventGroupingKey(name: String, targetId: String) {
+          def this(localEvent: LocalEvent) =
+            this(localEvent.name, localEvent.targetEffectiveId)
+        }
 
-          // Grouping key for value change events
-          case class EventGroupingKey(name: String, targetId: String) {
-            def this(localEvent: LocalEvent) =
-              this(localEvent.name, localEvent.targetEffectiveId)
-          }
+        // Slide over the events so we can filter and compress them
+        // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
+        // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
+        // beforehand.
+        (events ++ DummyEvent).sliding(2).toList flatMap {
+          case List(a, b) ⇒
+            if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
+              safelyCreateAndMapEvent(doc, a)
+            else
+              None
+        }
+    }
 
-          // Slide over the events so we can filter and compress them
-          // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
-          // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
-          // beforehand.
-          (events ++ DummyEvent).sliding(2).toList flatMap {
-            case List(a, b) ⇒
-              if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
-                safelyCreateAndMapEvent(doc, a)
-              else
-                None
-          }
-      }
+    // Combine and process events
+    for (event ← combineValueEvents(filterEvents(allClientAndServerEvents)))
+      processEvent(doc, event)
 
-      // Combine and process events
-      for (event ← combineValueEvents(filterEvents(allClientAndServerEvents)))
-        processEvent(doc, event)
+    // Gather some metadata about the events received to help with the response to the client
 
-      // Gather some metadata about the events received to help with the response to the client
+    // Whether we got a request for all events
+    val gotAllEvents = allClientAndServerEvents exists
+      (_.name == XXFORMS_ALL_EVENTS_REQUIRED)
 
-      // Whether we got a request for all events
-      val gotAllEvents = allClientAndServerEvents exists
-        (_.name == XXFORMS_ALL_EVENTS_REQUIRED)
+    // Set of all control ids for which we got value events
+    val valueChangeControlIdsAndValues = allClientAndServerEvents collect {
+      case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId → e.value
+    }
 
-      // Set of all control ids for which we got value events
-      val valueChangeControlIdsAndValues = allClientAndServerEvents collect {
-        case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId -> e.value
-      }
+    // Last focus/blur event received from the client
+    // This ignores server events, see: https://github.com/orbeon/orbeon-forms/issues/2567
+    val clientFocusControlIdOpt = allClientAndServerEvents.reverse filterNot (_.trusted) collectFirst {
+      case e if e.name == XFORMS_FOCUS ⇒ Some(e.targetEffectiveId)
+      case e if e.name == XXFORMS_BLUR ⇒ None
+    }
 
-      // Last focus/blur event received from the client
-      // This ignores server events, see: https://github.com/orbeon/orbeon-forms/issues/2567
-      val clientFocusControlId = allClientAndServerEvents.reverse filterNot (_.trusted) collectFirst {
-        case e if e.name == XFORMS_FOCUS ⇒ Some(e.targetEffectiveId)
-        case e if e.name == XXFORMS_BLUR ⇒ None
-      }
-
-      (gotAllEvents, valueChangeControlIdsAndValues.toMap, clientFocusControlId.orNull)
-
-    } else
-      (false, i.Map.empty, null)
+    EventsFindings(gotAllEvents, valueChangeControlIdsAndValues.toMap, clientFocusControlIdOpt)
   }
 
   // NOTE: Leave public for unit tests
@@ -244,93 +236,6 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         effectiveId
     }
 
-  private def safelyCreateAndMapEvent(doc: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
-
-    implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
-
-    // Get event target
-    val eventTarget = doc.getObjectByEffectiveId(deNamespaceId(doc, adjustIdForRepeatIteration(doc, event.targetEffectiveId))) match {
-      case eventTarget: XFormsEventTarget ⇒ eventTarget
-      case _ ⇒
-        debug("ignoring client event with invalid target id", List("target id" → event.targetEffectiveId, "event name" → event.name))
-        return None
-    }
-
-    // Check whether the external event is allowed on the given target.
-    def checkAllowedExternalEvents = {
-
-      // Whether an external event name is explicitly allowed by the configuration.
-      def isExplicitlyAllowedExternalEvent = {
-        val externalEventsSet = doc.getStaticState.allowedExternalEvents
-        ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsSet(event.name)
-      }
-
-      // This is also a security measure that also ensures that somebody is not able to change values in an instance
-      // by hacking external events.
-      isExplicitlyAllowedExternalEvent || {
-        val explicitlyAllowed = eventTarget.allowExternalEvent(event.name)
-        if (! explicitlyAllowed)
-          debug("ignoring invalid client event on target", List("id" → eventTarget.getEffectiveId, "event name" → event.name))
-        explicitlyAllowed
-      }
-    }
-
-    // Check the event is allowed on target
-    if (event.trusted)
-      // Event is trusted, don't check if it is allowed
-      debug("processing trusted event", List("target id" → eventTarget.getEffectiveId, "event name" → event.name))
-    else if (! checkAllowedExternalEvents)
-      return None // event is not trusted and is not allowed
-
-    def mapEventName(event: LocalEvent, eventTarget: XFormsEventTarget) = event.name match {
-      // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
-      // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
-      // the static state kept type information for each control.
-      case XXFORMS_VALUE_OR_ACTIVATE ⇒
-        eventTarget match {
-          // Handler produces:
-          //   <button type="submit" name="foobar" value="activate">...
-          //   <input type="submit" name="foobar" value="Hi There">...
-          //   <input type="image" name="foobar" value="Hi There" src="...">...
-
-          // TODO: Remove IE 6/7 support below.
-          // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
-          // we must test for any empty content here instead of !"activate".equals(valueString). (Note that
-          // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
-          // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
-          case triggerControl: XFormsTriggerControl if event.value.isEmpty ⇒ None
-          // Triggers get a DOM activation
-          case triggerControl: XFormsTriggerControl ⇒ Some(DOM_ACTIVATE)
-          // Other controls get a value change
-          case _ ⇒ Some(XXFORMS_VALUE)
-        }
-      case eventName ⇒ Some(eventName)
-    }
-
-    // Create event
-    mapEventName(event, eventTarget) map { eventName ⇒
-
-      def standardProperties =
-        for {
-          attributeNames ← AllStandardProperties.get(eventName).toList
-          attributeName  ← attributeNames
-          attributeValue = event.attributeValue(attributeName)
-          if attributeValue ne null
-        } yield
-          attributeName → Option(attributeValue)
-
-      def eventValue = eventName == XXFORMS_VALUE list ("value" → Option(event.value))
-
-      XFormsEventFactory.createEvent(
-        eventName,
-        eventTarget,
-        event.properties ++ standardProperties ++ eventValue,
-        event.bubbles,
-        event.cancelable
-      )
-    }
-  }
-
   // Send an error document
   def errorDocument(message: String, code: Int)(implicit receiver: XMLReceiver): Unit =
     withDocument {
@@ -349,11 +254,6 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   def assertSessionExists(): Unit =
     Option(NetUtils.getSession(false)) getOrElse
       (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
-
-  private val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
-
-  def allQuickReturnEvents(clientEvents: ju.List[Element]) =
-    clientEvents.asScala map (LocalEvent(_, trusted = false).name) forall QuickResponseEventNames
 
   // Check for and handle events that don't need access to the document but can return an Ajax response rapidly
   def handleQuickReturnEvents(
@@ -549,7 +449,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       // Optimize case where a value change event won't change the control value to actually change
       (event, target) match {
         case (valueChange: XXFormsValueEvent, target: XFormsValueControl) if target.getExternalValue == valueChange.value ⇒
-          // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-activate below.
+          // We completely ignore the event if the value in the instance is the same.
+          // This also saves dispatching xxforms-repeat-activate below.
           debug("ignoring value change event as value is the same", Seq(
             "control id" → targetEffectiveId,
             "event name" → eventName,
@@ -583,6 +484,117 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       // Interpret event
       dispatchEventCheckTarget(event)
       doc.endOutermostActionHandler()
+    }
+  }
+
+  private object Private {
+
+    // Only a few events specify custom properties that can be set by the client
+    val AllStandardProperties =
+      XXFormsDndEvent.StandardProperties        ++
+      KeypressEvent.StandardProperties          ++
+      XXFormsUploadDoneEvent.StandardProperties ++
+      XXFormsLoadEvent.StandardProperties
+
+    val DummyEvent = List(LocalEvent(DocumentFactory.createElement("dummy"), trusted = false))
+
+    val QuickResponseEventNames = Set(XXFORMS_SESSION_HEARTBEAT, XXFORMS_UPLOAD_PROGRESS)
+
+    def safelyCreateAndMapEvent(doc: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
+
+      implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
+
+      // Get event target
+      val eventTarget =
+        doc.getObjectByEffectiveId(deNamespaceId(doc, adjustIdForRepeatIteration(doc, event.targetEffectiveId))) match {
+          case eventTarget: XFormsEventTarget ⇒ eventTarget
+          case _ ⇒
+            debug(
+              "ignoring client event with invalid target id",
+              List("target id" → event.targetEffectiveId, "event name" → event.name)
+            )
+            return None
+        }
+
+      // Check whether the external event is allowed on the given target.
+      def checkAllowedExternalEvents = {
+
+        // Whether an external event name is explicitly allowed by the configuration.
+        def isExplicitlyAllowedExternalEvent = {
+          val externalEventsSet = doc.getStaticState.allowedExternalEvents
+          ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsSet(event.name)
+        }
+
+        // This is also a security measure that also ensures that somebody is not able to change values in an instance
+        // by hacking external events.
+        isExplicitlyAllowedExternalEvent || {
+          val explicitlyAllowed = eventTarget.allowExternalEvent(event.name)
+          if (! explicitlyAllowed)
+            debug(
+              "ignoring invalid client event on target",
+              List("id" → eventTarget.getEffectiveId, "event name" → event.name)
+            )
+          explicitlyAllowed
+        }
+      }
+
+      // Check the event is allowed on target
+      if (event.trusted)
+        // Event is trusted, don't check if it is allowed
+        debug(
+          "processing trusted event",
+          List("target id" → eventTarget.getEffectiveId, "event name" → event.name)
+        )
+      else if (! checkAllowedExternalEvents)
+        return None // event is not trusted and is not allowed
+
+      def mapEventName(event: LocalEvent, eventTarget: XFormsEventTarget) = event.name match {
+        // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
+        // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
+        // the static state kept type information for each control.
+        case XXFORMS_VALUE_OR_ACTIVATE ⇒
+          eventTarget match {
+            // Handler produces:
+            //   <button type="submit" name="foobar" value="activate">...
+            //   <input type="submit" name="foobar" value="Hi There">...
+            //   <input type="image" name="foobar" value="Hi There" src="...">...
+
+            // TODO: Remove IE 6/7 support below.
+            // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
+            // we must test for any empty content here instead of !"activate".equals(valueString). (Note that
+            // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
+            // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
+            case triggerControl: XFormsTriggerControl if event.value.isEmpty ⇒ None
+            // Triggers get a DOM activation
+            case triggerControl: XFormsTriggerControl ⇒ Some(DOM_ACTIVATE)
+            // Other controls get a value change
+            case _ ⇒ Some(XXFORMS_VALUE)
+          }
+        case eventName ⇒ Some(eventName)
+      }
+
+      // Create event
+      mapEventName(event, eventTarget) map { eventName ⇒
+
+        def standardProperties =
+          for {
+            attributeNames ← AllStandardProperties.get(eventName).toList
+            attributeName  ← attributeNames
+            attributeValue = event.attributeValue(attributeName)
+            if attributeValue ne null
+          } yield
+            attributeName → Option(attributeValue)
+
+        def eventValue = eventName == XXFORMS_VALUE list ("value" → Option(event.value))
+
+        XFormsEventFactory.createEvent(
+          eventName,
+          eventTarget,
+          event.properties ++ standardProperties ++ eventValue,
+          event.bubbles,
+          event.cancelable
+        )
+      }
     }
   }
 }

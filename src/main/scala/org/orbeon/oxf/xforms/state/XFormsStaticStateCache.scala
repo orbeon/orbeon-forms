@@ -18,6 +18,8 @@ import org.orbeon.oxf.xforms.XFormsStaticState
 
 object XFormsStaticStateCache {
 
+  import Private._
+
   trait CacheTracer {
     def digestAndTemplateStatus(digestIfFound: Option[String])
     def staticStateStatus(found: Boolean, digest: String)
@@ -32,13 +34,16 @@ object XFormsStaticStateCache {
   def findDocument(digest: String) =
     Option(cache.findValid(createCacheKey(digest), ConstantValidity).asInstanceOf[XFormsStaticState])
 
-  private def createCacheKey(digest: String) =
-    new InternalCacheKey(ContainingDocumentKeyType, digest ensuring (_ ne null))
+  private object Private {
 
-  private val XFormsDocumentCache = "xforms.cache.static-state"
-  private val XFormsDocumentCacheDefaultSize = 50
-  private val ConstantValidity = 0L
-  private val ContainingDocumentKeyType = XFormsDocumentCache
+    def createCacheKey(digest: String) =
+      new InternalCacheKey(ContainingDocumentKeyType, digest ensuring (_ ne null))
 
-  private val cache = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
+    val XFormsDocumentCache            = "xforms.cache.static-state"
+    val XFormsDocumentCacheDefaultSize = 50
+    val ConstantValidity               = 0L
+    val ContainingDocumentKeyType      = XFormsDocumentCache
+
+    val cache = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
+  }
 }

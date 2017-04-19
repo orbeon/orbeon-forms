@@ -862,7 +862,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentBase {
      * @return lock or null in case session just expired
      */
     public Lock getEvictionLock() {
-        return XFormsStateManager.getDocumentLock(getUUID());
+        return XFormsStateManager.getDocumentLockOrNull(getUUID());
     }
 
     /**

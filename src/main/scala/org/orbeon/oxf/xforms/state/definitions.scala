@@ -13,15 +13,31 @@
   */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.dom.Document
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import java.util.concurrent.locks.Lock
+
+import org.orbeon.dom.Document
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+
+// Encoded combination of static an dynamic state that fully represents an XForms document's current state
+case class XFormsState(staticStateDigest: Option[String], staticState: String, dynamicState: DynamicState) {
+  override def toString = "XFormsState(" + staticState + "," + dynamicState + ")"
+}
 
 case class RequestParameters(
   getUUID: String,
   getEncodedClientStaticState: String,
   getEncodedClientDynamicState: String
 )
+
+trait XFormsStateStore {
+
+  def storeDocumentState(containingDocument: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean): Unit
+  def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState
+
+  def getMaxSize     : Long
+  def getCurrentSize : Long
+}
 
 trait XFormsStateLifecycle {
 

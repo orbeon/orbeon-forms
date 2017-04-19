@@ -54,28 +54,28 @@ object XFormsContainingDocumentBase {
   private val ContainingDocumentPseudoId = "#document"
 
   def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument ⇒ T): T = {
-    XFormsStateManager.instance.acquireDocumentLock(uuid, timeout) match {
+    XFormsStateManager.acquireDocumentLock(uuid, timeout) match {
       case lock: Lock ⇒
         try {
           val containingDocument =
-            XFormsStateManager.instance.beforeUpdate(RequestParameters(uuid, "", ""))
+            XFormsStateManager.beforeUpdate(RequestParameters(uuid, "", ""))
 
           var keepDocument = false
           try {
             val result = block(containingDocument)
 
-            XFormsStateManager.instance.beforeUpdateResponse(containingDocument, ignoreSequence = true)
-            XFormsStateManager.instance.afterUpdateResponse(containingDocument)
+            XFormsStateManager.beforeUpdateResponse(containingDocument, ignoreSequence = true)
+            XFormsStateManager.afterUpdateResponse(containingDocument)
 
             keepDocument = true
 
             result
           } finally {
-            XFormsStateManager.instance.afterUpdate(containingDocument, keepDocument)
+            XFormsStateManager.afterUpdate(containingDocument, keepDocument)
           }
 
         } finally {
-          XFormsStateManager.instance.releaseDocumentLock(lock)
+          XFormsStateManager.releaseDocumentLock(lock)
         }
       case null ⇒
         throw new IllegalStateException

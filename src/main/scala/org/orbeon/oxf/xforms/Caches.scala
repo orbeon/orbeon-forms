@@ -14,42 +14,10 @@
 
 package org.orbeon.oxf.xforms
 
-import net.sf.ehcache._
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.common.OXFException
-import scala.util.control.NonFatal
-
-/**
- * All Ehcache-based caches.
- */
+// All Ehcache-based caches for XForms support.
+// XXX TODO: object is already lazy, so probably don't need lazy val's
 object Caches {
-
-  lazy val stateCache     = getCache("xforms.state")
-  lazy val resourcesCache = getCache("xforms.resources")
-  lazy val xblCache       = getCache("xforms.xbl")
-
-  private val ehcachePath = "oxf:/config/ehcache.xml"
-
-  private lazy val cacheManager =
-    try {
-      // Read configuration from XML file in resources
-      val manager = new CacheManager(URLFactory.createURL(ehcachePath))
-      withMessage(manager, "initialized cache manager from " + ehcachePath)
-    } catch {
-      case NonFatal(t) ⇒
-        throw new OXFException("unable to read cache manager configuration from " + ehcachePath, t)
-    }
-
-  private def getCache(cacheName: String) =
-    cacheManager.getCache(cacheName) match {
-      case cache: Cache ⇒
-        withMessage(cache, "found cache configuration for " + cacheName)
-      case _ ⇒
-        throw new OXFException("Cache configuration not found for " + cacheName + ". Make sure an ehcache.xml file is in place.")
-    }
-
-  private val indentedLogger =
-    Loggers.getIndentedLogger("caches")
-
-  private def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
+  lazy val stateCache     = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.state")
+  lazy val resourcesCache = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.resources")
+  lazy val xblCache       = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.xbl")
 }

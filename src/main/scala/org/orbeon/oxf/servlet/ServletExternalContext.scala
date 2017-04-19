@@ -18,6 +18,8 @@ import java.{util ⇒ ju}
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
 
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.ApplicationSessionScope
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.InitUtils

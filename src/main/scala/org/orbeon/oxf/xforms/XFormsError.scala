@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.{List ⇒ JList}
-
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}

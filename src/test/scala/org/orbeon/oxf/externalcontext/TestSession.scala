@@ -35,19 +35,16 @@ class TestSession(sessionId: String) extends Session {
 
   def getAttribute(name: String, scope: SessionScope): Option[AnyRef] = {
     checkExpired()
-    require(scope == SessionScope.Application)
     sessionAtts.get(name)
   }
 
   def setAttribute(name: String, value: AnyRef, scope: SessionScope): Unit = {
     checkExpired()
-    require(scope == SessionScope.Application)
     sessionAtts += name → value
   }
 
   def removeAttribute(name: String, scope: SessionScope): Unit = {
     checkExpired()
-    require(scope == SessionScope.Application)
     sessionAtts -= name
   }
 

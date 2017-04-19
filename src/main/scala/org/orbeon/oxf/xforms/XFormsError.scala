@@ -67,15 +67,16 @@ object ServerError {
   private val attributes  = List("file", "line", "column", "exception")
   private val description = List("in",   "line", "column", "cause")
 
-  private def collectList(error: ServerError, names: List[String]) = (
-    names
-    zip List(error.fileOpt, error.lineOpt, error.colOpt, error.classOpt)
-    collect { case (k, Some(v)) ⇒ List(k, v.toString) }
-    flatten
-  )
+  private def collectTuples(error: ServerError, names: List[String]) =
+    names zip
+      List(error.fileOpt, error.lineOpt, error.colOpt, error.classOpt) collect
+      { case (k, Some(v)) ⇒ k → v.toString }
 
-  def getDetailsAsArray(error: ServerError) =
-    collectList(error, attributes) toArray
+  private def collectList(error: ServerError, names: List[String]) =
+    collectTuples(error, names) collect { case (k, v) ⇒ List(k, v) } flatten
+
+  def getDetailsAsList(error: ServerError) =
+    collectTuples(error, attributes)
 
   // NOTE: A similar concatenation logic is in AjaxServer.js
   def getDetailsAsUserMessage(error: ServerError) =
@@ -213,6 +214,7 @@ object XFormsError {
           localName = "error",
           prefix    = "xxf",
           uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
+          atts      = ServerError.getDetailsAsList(error),
           text      = error.message
         )
     }

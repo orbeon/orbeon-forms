@@ -21,11 +21,11 @@ object ServletPortletRequest {
 
   private val CredentialsSessionKey = "org.orbeon.auth.credentials"
 
-  def findCredentialsInSession(session: SessionFacade): Option[Credentials] =
-     collectByErasedType[Credentials](session.getAttribute(ServletPortletRequest.CredentialsSessionKey))
+  def findCredentialsInSession(session: SessionFacade): Option[Credentials] = // portlet/servlet session
+     collectByErasedType[Credentials](session.getAttribute(CredentialsSessionKey))
 
    def storeCredentialsInSession(session: SessionFacade, credentials: Credentials) =
-    session.setAttribute(ServletPortletRequest.CredentialsSessionKey, credentials)
+    session.setAttribute(CredentialsSessionKey, credentials)
 }
 
 // Implementations shared between ServletExternalContext and Portlet2ExternalContext.
@@ -34,7 +34,9 @@ trait ServletPortletRequest extends ExternalContext.Request {
   protected def headerValuesMap: Map[String, Array[String]]
 
   lazy val credentials: Option[Credentials] =
-    Option(getSession(create = false)) flatMap ServletPortletRequest.findCredentialsInSession
+    sessionOpt flatMap { session ⇒
+      collectByErasedType[Credentials](session.getAttribute(ServletPortletRequest.CredentialsSessionKey))
+    }
 
   def isUserInRole(role: String): Boolean =
     credentials exists (_.roles exists (_.roleName == role))

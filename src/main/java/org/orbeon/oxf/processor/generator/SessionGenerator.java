@@ -60,7 +60,7 @@ public class SessionGenerator extends ProcessorImpl {
 
                     // If there is a session, try to read the object
                     ExternalContext.Session session = externalContext.getSession(false);
-                    Object value = (session == null) ? null : session.getAttributesMap().get(key);
+                    Object value = (session == null) ? null : session.javaGetAttribute(key);
                     if (value == null) {
                         generateNullDocument(key, xmlReceiver);
                     } else if (value instanceof SAXStore) {

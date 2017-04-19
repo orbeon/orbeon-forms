@@ -14,16 +14,15 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.LocalExternalContext;
 import org.orbeon.oxf.externalcontext.AsyncRequest;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.LocalExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
-import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -76,13 +75,13 @@ public class AsynchronousSubmissionManager {
     }
 
     private static AsynchronousSubmissions getAsynchronousSubmissions(boolean create, String sessionKey) {
-        final Map<String, Object> sessionMap = NetUtils.getExternalContext().getRequest().getSession(true).getAttributesMap();
-        final AsynchronousSubmissions existingAsynchronousSubmissions = (AsynchronousSubmissions) sessionMap.get(sessionKey);
+        final ExternalContext.Session session = NetUtils.getExternalContext().getRequest().getSession(true);
+        final AsynchronousSubmissions existingAsynchronousSubmissions = (AsynchronousSubmissions) session.javaGetAttribute(sessionKey);
         if (existingAsynchronousSubmissions != null) {
             return existingAsynchronousSubmissions;
         } else if (create) {
             final AsynchronousSubmissions asynchronousSubmissions = new AsynchronousSubmissions();
-            sessionMap.put(sessionKey, asynchronousSubmissions);
+            session.javaSetAttribute(sessionKey, asynchronousSubmissions);
             return asynchronousSubmissions;
         } else {
             return null;

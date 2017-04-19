@@ -73,11 +73,9 @@ abstract class ScopeProcessorBase extends ProcessorImpl {
           ContextConfig(
             Scope.withNameLowercaseOnly(contextName),
             if ("application" == sessionScopeValue)
-              ExternalContext.SessionScope.ApplicationSessionScope
-            else if ("portlet" == sessionScopeValue)
-              ExternalContext.SessionScope.PortletSessionScope
+              ExternalContext.SessionScope.Application
             else
-              null,
+              ExternalContext.SessionScope.Local,
             rootElement.element("key").getStringValue,
             contentTypeElementOpt map (_.getStringValue) contains TextPlain,
             ProcessorUtils.selectBooleanValue(rootElement, "/*/test-ignore-stored-key-validity", false)

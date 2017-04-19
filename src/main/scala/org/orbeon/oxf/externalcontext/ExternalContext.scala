@@ -153,11 +153,9 @@ object ExternalContext {
 
     val values = findValues
 
-    case object ApplicationSessionScope extends SessionScope(1)
-    case object PortletSessionScope     extends SessionScope(2)
+    case object Application extends SessionScope(1)
+    case object Local       extends SessionScope(2)
   }
-
-  def javaApplicationSessionScope = SessionScope.ApplicationSessionScope
 
   trait SessionListener {
     def sessionDestroyed()
@@ -172,14 +170,15 @@ object ExternalContext {
     def isNew: Boolean
     def setMaxInactiveInterval(interval: Int)
 
-    def getAttributesMap: ju.Map[String, AnyRef]
-    def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef]
-
     def addListener(sessionListener: SessionListener)
     def removeListener(sessionListener: SessionListener)
 
-    def getAttribute(name: String): AnyRef              = getAttributesMap.get(name)
-    def setAttribute(name: String, value: AnyRef): Unit = getAttributesMap.put(name, value)
+    def getAttribute    (name: String               , scope: SessionScope = SessionScope.Local) : Option[AnyRef]
+    def setAttribute    (name: String, value: AnyRef, scope: SessionScope = SessionScope.Local) : Unit
+    def removeAttribute (name: String               , scope: SessionScope = SessionScope.Local) : Unit
+
+    def javaGetAttribute(name: String)                : AnyRef = getAttribute(name).orNull
+    def javaSetAttribute(name: String, value: AnyRef) : Unit   = setAttribute(name, value)
   }
 
   trait RequestDispatcher {

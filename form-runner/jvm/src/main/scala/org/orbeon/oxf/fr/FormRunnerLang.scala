@@ -166,9 +166,9 @@ trait FormRunnerLang {
 
   private def stringFromSession(request: Request, name: String) =
     request.sessionOpt flatMap
-      (s ⇒ Option(s.getAttributesMap.get(LanguageParam))) map {
+      (_.getAttribute(LanguageParam)) map {
         case item: Item ⇒ item.getStringValue
-        case other ⇒ other.toString
+        case other      ⇒ other.toString
       }
 
   // Whether there is a Saxon XPath numberer for the given language

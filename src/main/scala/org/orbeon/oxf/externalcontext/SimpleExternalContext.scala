@@ -16,12 +16,11 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 import java.{util ⇒ ju}
 
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.ApplicationSessionScope
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.Application
 import org.orbeon.oxf.externalcontext.ExternalContext._
-import org.orbeon.oxf.util.{LoggerFactory, StringBuilderWriter}
+import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, StringBuilderWriter}
 
-import scala.collection.mutable
+import scala.collection.{immutable ⇒ i, mutable ⇒ m}
 
 /**
   * Simple implementation of the ExternalContext and related interfaces.
@@ -34,7 +33,7 @@ object SimpleExternalContext {
 
 abstract class SimpleExternalContext extends ExternalContext {
 
-  private   val webAppContext = new TestWebAppContext(SimpleExternalContext.Logger, mutable.LinkedHashMap[String, AnyRef]())
+  private   val webAppContext = new TestWebAppContext(SimpleExternalContext.Logger, m.LinkedHashMap[String, AnyRef]())
   protected var request       = new RequestImpl
   protected var response      = new ResponseImpl
   protected val session       = new SessionImpl
@@ -128,26 +127,22 @@ abstract class SimpleExternalContext extends ExternalContext {
 
   protected class SessionImpl extends Session {
 
-    protected var sessionAttributesMap = new ju.HashMap[String, AnyRef]
+    protected var sessionAtts = i.HashMap[String, AnyRef]()
 
-    def getCreationTime                                                               = 0L
-    def getId                                                                         = sessionAttributesMap.hashCode.toString
-    def getLastAccessedTime                                                           = 0L
-    def getMaxInactiveInterval                                                        = 0
-    def invalidate(): Unit                                                            = sessionAttributesMap = new ju.HashMap[String, AnyRef]
-    def isNew                                                                         = false
+    val getCreationTime                                                               = System.currentTimeMillis
+    val getId                                                                         = SecureUtils.randomHexId
+    val getLastAccessedTime                                                           = 0L
+    val getMaxInactiveInterval                                                        = 0
+    def invalidate(): Unit                                                            = sessionAtts = i.HashMap[String, AnyRef]()
+    val isNew                                                                         = false
     def setMaxInactiveInterval(interval: Int)                                         = ()
-
-    def getAttributesMap: ju.Map[String, AnyRef]                                      = sessionAttributesMap
-
-    def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef] = {
-      if (scope != ApplicationSessionScope)
-        throw new OXFException("Invalid session scope scope: only the application scope is allowed.")
-      getAttributesMap
-    }
 
     def addListener(sessionListener: SessionListener)                                 = ()
     def removeListener(sessionListener: SessionListener)                              = ()
+
+    def getAttribute(name: String, scope: SessionScope): Option[AnyRef]               = sessionAtts.get(name)
+    def setAttribute(name: String, value: AnyRef, scope: SessionScope): Unit          = sessionAtts += name → value
+    def removeAttribute(name: String, scope: SessionScope): Unit                      = sessionAtts -= name
   }
 
   def getWebAppContext: WebAppContext                                                 = webAppContext

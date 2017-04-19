@@ -21,6 +21,7 @@ import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, POST, PUT}
@@ -235,7 +236,7 @@ trait ConnectionState {
   def loadHttpState()(implicit logger: IndentedLogger): Unit = {
     cookieStoreOpt =
       stateAttributes(createSession = false) flatMap
-      (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+      (m ⇒ Option(m._1(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
 
     debugStore("loaded HTTP state", "did not load HTTP state")
   }
@@ -243,7 +244,7 @@ trait ConnectionState {
   def saveHttpState()(implicit logger: IndentedLogger): Unit = {
     cookieStoreOpt foreach { cookieStore ⇒
       stateAttributes(createSession = true) foreach
-      (_.put(HttpCookieStoreAttribute, cookieStore))
+      (_._2(HttpCookieStoreAttribute, cookieStore))
     }
 
     debugStore("saved HTTP state", "did not save HTTP state")
@@ -263,15 +264,21 @@ trait ConnectionState {
       }
     }
 
-  private def stateAttributes(createSession: Boolean): Option[JMap[String, AnyRef]] = {
+  private def stateAttributes(createSession: Boolean): Option[(String ⇒ AnyRef, (String, AnyRef) ⇒ Unit)] = {
     val externalContext = NetUtils.getExternalContext
     stateScope match {
       case "request" ⇒
-        Some(externalContext.getRequest.getAttributesMap)
+        val m = externalContext.getRequest.getAttributesMap
+        Some((m.get, m.put))
       case "session" if externalContext.getSessionOpt(createSession).isDefined ⇒
-        Some(externalContext.getSession(createSession).getAttributesMap)
+        val s = externalContext.getSession(createSession)
+        Some(
+          (name: String)                ⇒ s.getAttribute(name,        SessionScope.Local).orNull,
+          (name: String, value: AnyRef) ⇒ s.setAttribute(name, value, SessionScope.Local)
+        )
       case "application" ⇒
-        Some(externalContext.getWebAppContext.getAttributesMap)
+        val m = externalContext.getWebAppContext.getAttributesMap
+        Some((m.get, m.put))
       case _ ⇒
         None
     }
@@ -280,6 +287,7 @@ trait ConnectionState {
 
 private object ConnectionState {
 
+  // TODO: See `ScopeProcessorBase.Scope` enumeration.
   def stateScopeFromProperty = {
     val propertySet = Properties.instance.getPropertySet
     val scopeString = propertySet.getString(HttpStateProperty, DefaultStateScope)

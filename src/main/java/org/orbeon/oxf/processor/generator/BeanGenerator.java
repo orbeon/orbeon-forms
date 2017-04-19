@@ -197,7 +197,7 @@ public class BeanGenerator extends ProcessorImpl {
             if (Config.REQUEST.equals(source))
                 bean = request.getAttributesMap().get(name);
             else if (Config.SESSION.equals(source))
-                bean = externalContext.getSession(true).getAttributesMap().get(name);
+                bean = externalContext.getSession(true).javaGetAttribute(name);
             if (bean != null)
                 return bean;
         }

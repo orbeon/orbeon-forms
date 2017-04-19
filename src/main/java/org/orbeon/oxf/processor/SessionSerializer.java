@@ -46,7 +46,7 @@ public class SessionSerializer extends ProcessorImpl {
             saxw.write(document);
 
             // Store the document into the session
-            externalContext.getSession(true).getAttributesMap().put(key, store);
+            externalContext.getSession(true).javaSetAttribute(key, store);
 
         } catch (Exception e) {
             throw new OXFException(e);

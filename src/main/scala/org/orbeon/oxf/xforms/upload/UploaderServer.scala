@@ -144,7 +144,7 @@ object UploaderServer {
   }
 
   def getUploadProgressFromSession(session: Option[Session], uuid: String, fieldName: String): Option[UploadProgress] =
-    session flatMap (s ⇒ Option(s.getAttributesMap.get(getProgressSessionKey(uuid, fieldName)))) collect {
+    session flatMap (s ⇒ s.getAttribute(getProgressSessionKey(uuid, fieldName))) collect {
       case progress: UploadProgress ⇒ progress
     }
 
@@ -153,7 +153,7 @@ object UploaderServer {
 
   def removeUploadProgress(request: Request, control: XFormsValueControl): Unit =
     request.sessionOpt foreach {
-      _.getAttributesMap.remove(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
+      _.removeAttribute(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
     }
 
   // Public for tests
@@ -212,7 +212,7 @@ object UploaderServer {
 
           val newSessionKey = getProgressSessionKey(uuid, name)
           sessionKeys += newSessionKey
-          session.getAttributesMap.put(newSessionKey, progress)
+          session.setAttribute(newSessionKey, progress)
 
           progressOpt = Some(progress)
         }
@@ -282,7 +282,7 @@ object UploaderServer {
     }
 
     def getUploadProgress(sessionKey: String): Option[UploadProgress] =
-      Option(session.getAttributesMap.get(sessionKey)) collect {
+      session.getAttribute(sessionKey) collect {
         case progress: UploadProgress ⇒ progress
       }
   }

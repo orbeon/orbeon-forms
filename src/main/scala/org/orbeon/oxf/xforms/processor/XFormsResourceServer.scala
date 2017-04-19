@@ -17,7 +17,8 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.ApplicationSessionScope
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
+import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.Application
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.StatusCode
@@ -273,7 +274,7 @@ object XFormsResourceServer {
       DynamicResource(serviceURI, filename, contentType, lastModified, outgoingHeaders)
 
     // Store mapping into session
-    session.getAttributesMap(ApplicationSessionScope).put(DynamicResourcesSessionKey + resource.digest, resource)
+    session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)
 
     DynamicResourcesPath + resource.digest
   }
@@ -303,7 +304,7 @@ object XFormsResourceServer {
             file.delete()
           }
 
-        session.getAttributesMap(ApplicationSessionScope).remove(DynamicResourcesSessionKey + resource.digest)
+        session.removeAttribute(DynamicResourcesSessionKey + resource.digest, SessionScope.Application)
       }
     }
   }
@@ -316,7 +317,7 @@ object XFormsResourceServer {
       val digestFromPath = filename(requestPath)
       val lookupKey      = DynamicResourcesSessionKey + digestFromPath
 
-      Option(session.getAttributesMap(ApplicationSessionScope).get(lookupKey).asInstanceOf[DynamicResource])
+      Option(session.getAttribute(lookupKey, SessionScope.Application).asInstanceOf[DynamicResource])
     }
 
   // For unit tests only (called from XSLT)

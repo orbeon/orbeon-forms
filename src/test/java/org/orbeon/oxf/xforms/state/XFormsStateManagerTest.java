@@ -70,7 +70,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         stateManager.afterInitialResponse(document, null);
 
         // Check there is a state manager session listener for this document
-        assertNotNull(session.getAttributesMap().get(XFormsStateManager.getListenerSessionKey(document.getUUID())));
+        assertNotNull(session.javaGetAttribute(XFormsStateManager.getListenerSessionKey(document.getUUID())));
 
         // Test that the document is in cache
         assertSame(document, XFormsDocumentCache.instance().takeDocument(document.getUUID()));

@@ -16,10 +16,8 @@ package org.orbeon.oxf.servlet
 import java.io._
 import java.{util ⇒ ju}
 import javax.servlet.ServletContext
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse, HttpSession}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.ApplicationSessionScope
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.InitUtils
@@ -27,7 +25,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._
 
@@ -321,43 +318,6 @@ class ServletExternalContext(
       urlRewriter.rewriteResourceURL(urlString, rewriteMode)
   }
 
-  private class SessionImpl(var httpSession: HttpSession) extends ExternalContext.Session {
-
-    // Delegate to underlying session
-    def getCreationTime                       = httpSession.getCreationTime
-    def getId                                 = httpSession.getId
-    def getLastAccessedTime                   = httpSession.getLastAccessedTime
-    def getMaxInactiveInterval                = httpSession.getMaxInactiveInterval
-    def invalidate()                          = httpSession.invalidate()
-    def isNew                                 = httpSession.isNew
-    def setMaxInactiveInterval(interval: Int) = httpSession.setMaxInactiveInterval(interval)
-
-    lazy val getAttributesMap: ju.Map[String, AnyRef] =
-      new InitUtils.SessionMap(httpSession)
-
-    def getAttributesMap(scope: SessionScope): ju.Map[String, AnyRef] = {
-      if (scope != ApplicationSessionScope)
-        throw new IllegalArgumentException("Only the application scope is allowed in a servlet environment")
-
-      getAttributesMap
-    }
-
-    def addListener(sessionListener: ExternalContext.SessionListener): Unit = {
-      val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
-      if (listeners eq null)
-        throw new IllegalStateException(
-          "`SessionListeners` object not found in session. `OrbeonSessionListener` might be missing from web.xml."
-        )
-      listeners.addListener(sessionListener)
-    }
-
-    def removeListener(sessionListener: ExternalContext.SessionListener): Unit = {
-      val listeners = httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
-      if (listeners ne null)
-        listeners.removeListener(sessionListener)
-    }
-  }
-
   def getWebAppContext: WebAppContext = webAppContext
 
   private lazy val requestImpl = new RequestImpl
@@ -383,7 +343,7 @@ class ServletExternalContext(
         new ServletURLRewriter(getRequest)
     )
 
-  private var sessionImplOpt: Option[SessionImpl] = None
+  private var sessionImplOpt: Option[ExternalContext.Session] = None
 
   def getSession(create: Boolean): ExternalContext.Session =
     sessionImplOpt getOrElse {
@@ -395,7 +355,7 @@ class ServletExternalContext(
       )
 
       if (nativeSession ne null) {
-        val newSessionImpl = new SessionImpl(nativeSession)
+        val newSessionImpl = new ServletSessionImpl(nativeSession)
         sessionImplOpt = Some(newSessionImpl)
         newSessionImpl
       } else

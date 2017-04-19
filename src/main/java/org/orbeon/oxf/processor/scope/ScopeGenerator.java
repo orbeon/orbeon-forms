@@ -81,8 +81,9 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 ? externalContext.getRequest().getAttributesMap().get(config.key())
                                 : config.javaIsSessionScope()
                                 ? ((config.sessionScope() == null)
-                                    ? externalContext.getSession(true).getAttributesMap().get(config.key())
-                                    : externalContext.getSession(true).getAttributesMap(config.sessionScope()).get(config.key()))
+                                    ? externalContext.getSession(true).javaGetAttribute(config.key())
+                                    : null // XXX TODO externalContext.getSession(true).javaGetAttribute(config.key(), config.sessionScope())
+                                )
                                 : config.javaIsApplicationScope()
                                 ? externalContext.getWebAppContext().getAttributesMap().get(config.key())
                                 : null;

@@ -64,13 +64,13 @@ object Authorizer extends Logging {
 
     def alreadyAuthorized =
       request.sessionOpt flatMap
-      (_.getAttributesMap.asScala.get(AuthorizedKey)) collect
+      (_.getAttribute(AuthorizedKey)) collect
       { case value: JBoolean ⇒ value.booleanValue() } exists
       identity
 
     def rememberAuthorized() =
       Option(request.getSession(true)) foreach
-      (_.getAttributesMap.put(AuthorizedKey, JBoolean.TRUE))
+      (_.setAttribute(AuthorizedKey, JBoolean.TRUE))
 
     if (! alreadyAuthorized) {
       val newlyAuthorized = authorizedWithDelegate(request)

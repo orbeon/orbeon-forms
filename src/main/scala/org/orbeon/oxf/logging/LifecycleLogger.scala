@@ -13,33 +13,34 @@
  */
 package org.orbeon.oxf.logging
 
-import java.util
 import java.util.concurrent.atomic.AtomicInteger
 import javax.servlet.http.{HttpServletRequest, HttpSession}
 
+import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session, SessionListener, SessionScope}
 import org.orbeon.oxf.externalcontext.RequestAdapter
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{JSON, NetUtils}
-import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session, SessionListener, SessionScope}
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
 
 private class MinimalSession(session: HttpSession) extends Session {
 
-  override def getId = session.getId
+  def getId = session.getId
 
-  override def getCreationTime: Long                                           = throw new UnsupportedOperationException
-  override def isNew: Boolean                                                  = throw new UnsupportedOperationException
-  override def getLastAccessedTime: Long                                       = throw new UnsupportedOperationException
-  override def removeListener(sessionListener: SessionListener): Unit          = throw new UnsupportedOperationException
-  override def setMaxInactiveInterval(interval: Int): Unit                     = throw new UnsupportedOperationException
-  override def getAttributesMap: util.Map[String, AnyRef]                      = throw new UnsupportedOperationException
-  override def getAttributesMap(scope: SessionScope): util.Map[String, AnyRef] = throw new UnsupportedOperationException
-  override def addListener(sessionListener: SessionListener): Unit             = throw new UnsupportedOperationException
-  override def invalidate(): Unit                                              = throw new UnsupportedOperationException
-  override def getMaxInactiveInterval: Int                                     = throw new UnsupportedOperationException
+  def getCreationTime: Long                                           = throw new UnsupportedOperationException
+  def isNew: Boolean                                                  = throw new UnsupportedOperationException
+  def getLastAccessedTime: Long                                       = throw new UnsupportedOperationException
+  def removeListener(sessionListener: SessionListener): Unit          = throw new UnsupportedOperationException
+  def setMaxInactiveInterval(interval: Int): Unit                     = throw new UnsupportedOperationException
+  def addListener(sessionListener: SessionListener): Unit             = throw new UnsupportedOperationException
+  def invalidate(): Unit                                              = throw new UnsupportedOperationException
+  def getMaxInactiveInterval: Int                                     = throw new UnsupportedOperationException
+
+  def getAttribute(name: String, scope: SessionScope)                 = throw new UnsupportedOperationException
+  def setAttribute(name: String, value: AnyRef, scope: SessionScope)  = throw new UnsupportedOperationException
+  def removeAttribute(name: String, scope: SessionScope)              = throw new UnsupportedOperationException
 }
 
 private class MinimalRequest(req: HttpServletRequest) extends RequestAdapter {

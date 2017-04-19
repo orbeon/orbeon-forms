@@ -60,7 +60,7 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
     assert(Some("es") === findRequestedLang(getAppForm(App, Form), "es"))
     assert(Some("en") === findRequestedLang(getAppForm(App, Form), "en"))
 
-    NetUtils.getExternalContext.getRequest.getSession(true).getAttributesMap.put("fr-language", "fr")
+    NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-language", "fr")
 
     assert(Some("fr") === findRequestedLang(getAppForm(App, Form), null))
     assert(Some("it") === findRequestedLang(getAppForm(App, Form), "it"))

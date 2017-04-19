@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class ScopeSerializer extends ScopeProcessorBase {
 
-    private boolean isNull = false;
+    private boolean isNull = false;// TODO: Why is this here? Should be in `ContextConfig`, right?
 
     public ScopeSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, ScopeConfigNamespaceUri()));
@@ -65,23 +65,25 @@ public class ScopeSerializer extends ScopeProcessorBase {
 
         final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         // Find the map for the scope
-        Map<String, Object> map = null;
         if (config.javaIsRequestScope()) {
-            map = externalContext.getRequest().getAttributesMap();
+            putOrRemove(externalContext.getRequest().getAttributesMap(), config, store);
         } else if (config.javaIsSessionScope()) {
-            if (config.sessionScope() == null)
-                map = externalContext.getSession(true).getAttributesMap();
-            else
-                map = externalContext.getSession(true).getAttributesMap(config.sessionScope());
+            final ExternalContext.Session session = externalContext.getSession(true);
+            if (isNull) {
+                session.removeAttribute(config.key(), config.sessionScope());
+            } else {
+                session.setAttribute(config.key(), store, config.sessionScope());
+            }
         } else if (config.javaIsApplicationScope()) {
-            map = externalContext.getWebAppContext().getAttributesMap();
+            putOrRemove(externalContext.getWebAppContext().getAttributesMap(), config, store);
         }
-        // Delete when null, otherwise store...
+    }
+
+    private void putOrRemove(Map<String, Object> map, ContextConfig config, ScopeStore store) {
         if (isNull) {
             map.remove(config.key());
         } else {
             map.put(config.key(), store);
         }
-
     }
 }

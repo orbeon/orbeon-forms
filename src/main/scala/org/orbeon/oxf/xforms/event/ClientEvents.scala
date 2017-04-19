@@ -554,21 +554,8 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         // the static state kept type information for each control.
         case XXFORMS_VALUE_OR_ACTIVATE ⇒
           eventTarget match {
-            // Handler produces:
-            //   <button type="submit" name="foobar" value="activate">...
-            //   <input type="submit" name="foobar" value="Hi There">...
-            //   <input type="image" name="foobar" value="Hi There" src="...">...
-
-            // TODO: Remove IE 6/7 support below.
-            // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
-            // we must test for any empty content here instead of !"activate".equals(valueString). (Note that
-            // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
-            // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
-            case triggerControl: XFormsTriggerControl if event.value.isEmpty ⇒ None
-            // Triggers get a DOM activation
             case triggerControl: XFormsTriggerControl ⇒ Some(DOM_ACTIVATE)
-            // Other controls get a value change
-            case _ ⇒ Some(XXFORMS_VALUE)
+            case _                                    ⇒ Some(XXFORMS_VALUE)
           }
         case eventName ⇒ Some(eventName)
       }

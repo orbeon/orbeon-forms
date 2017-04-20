@@ -39,14 +39,14 @@ class CacheTest extends DocumentTestBase with FormRunnerSupport with AssertionsF
       )
 
       // First time may or may not pass
-      val (_, docOpt1, events1) = runFormRunner("tests", form, mode, document = Id1, noscript = noscript, initialize = true)
+      val (_, _, events1) = runFormRunner("tests", form, mode, document = Id1, noscript = noscript, initialize = true)
       assert(Some(expectedInitialHit) === staticStateFoundOpt(events1))
-      assert(docOpt1.nonEmpty || mode == "pdf")
+      // NOTE: no XFCD because the form has `xxf:no-updates="true"`.
 
       // Second time with different document must always pass
-      val (_, docOpt2, events2) = runFormRunner("tests", form, mode, document = Id2, noscript = noscript, initialize = true)
+      val (_, _, events2) = runFormRunner("tests", form, mode, document = Id2, noscript = noscript, initialize = true)
       assert(Some(true) === staticStateFoundOpt(events2))
-      assert(docOpt2.nonEmpty || mode == "pdf")
+      // NOTE: no XFCD because the form has `xxf:no-updates="true"`.
 
       assert(Some(staticStateHoldsTemplate) === staticStateHasTemplateOpt(events2))
     }

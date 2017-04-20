@@ -144,7 +144,7 @@ object UploaderServer {
   }
 
   def getUploadProgressFromSession(session: Option[Session], uuid: String, fieldName: String): Option[UploadProgress] =
-    session flatMap (s ⇒ s.getAttribute(getProgressSessionKey(uuid, fieldName))) collect {
+    session flatMap (_.getAttribute(getProgressSessionKey(uuid, fieldName))) collect {
       case progress: UploadProgress ⇒ progress
     }
 

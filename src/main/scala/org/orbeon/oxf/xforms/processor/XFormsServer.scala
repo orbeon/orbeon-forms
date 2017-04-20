@@ -603,19 +603,23 @@ class XFormsServer extends ProcessorImpl {
     val remainingClientEvents =
       xmlReceiverOpt match {
         case Some(xmlReceiver) ⇒
-          ClientEvents.handleQuickReturnEvents(
-            xmlReceiver,
-            request,
-            requestDocument,
-            logRequestResponse,
-            ClientEvents.extractLocalEvents(actionElement)
-          )
+
+          val remainingClientEvents =
+            ClientEvents.handleQuickReturnEvents(
+              xmlReceiver,
+              request,
+              requestDocument,
+              logRequestResponse,
+              ClientEvents.extractLocalEvents(actionElement)
+            )
+
+          if (remainingClientEvents.isEmpty)
+            return
+
+          remainingClientEvents
         case None ⇒
           ClientEvents.extractLocalEvents(actionElement)
       }
-
-    if (remainingClientEvents.isEmpty)
-      return
 
     val isAjaxRequest =
       request.getMethod != null   &&

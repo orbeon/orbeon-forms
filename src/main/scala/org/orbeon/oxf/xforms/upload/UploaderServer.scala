@@ -167,13 +167,14 @@ object UploaderServer {
     private var uuidOpt     : Option[String]         = None
     private var progressOpt : Option[UploadProgress] = None
 
-    def fieldReceived(name: String, value: String): Unit = {
-      require(value ne null)
-      if (uuidOpt.isDefined)
-        throw new IllegalStateException("more than one document UUID provided")
-      else if (name == "$uuid")
-        uuidOpt = Some(value)
-    }
+    def fieldReceived(name: String, value: String): Unit =
+      if (name == "$uuid") {
+        require(value ne null)
+        if (uuidOpt.isDefined)
+          throw new IllegalStateException("more than one document UUID provided")
+        else
+          uuidOpt = Some(value)
+      }
 
     // Session keys created, for cleanup
     val sessionKeys = m.ListBuffer[String]()

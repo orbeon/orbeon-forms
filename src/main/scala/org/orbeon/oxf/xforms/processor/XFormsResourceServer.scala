@@ -317,7 +317,7 @@ object XFormsResourceServer {
       val digestFromPath = filename(requestPath)
       val lookupKey      = DynamicResourcesSessionKey + digestFromPath
 
-      Option(session.getAttribute(lookupKey, SessionScope.Application).asInstanceOf[DynamicResource])
+      session.getAttribute(lookupKey, SessionScope.Application) map (_.asInstanceOf[DynamicResource])
     }
 
   // For unit tests only (called from XSLT)

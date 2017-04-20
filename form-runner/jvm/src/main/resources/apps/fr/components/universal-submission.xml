@@ -22,7 +22,7 @@
     <xf:submission
         id="fr-send-submission"
         resource="{instance('fr-send-submission-params')/@uri}"
-        relevant="{instance('fr-send-submission-params')/@prune}"
+        relevant="{instance('fr-send-submission-params')/@relevant}"
         validate="false"
         xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
@@ -64,7 +64,7 @@
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
-        <params replace="" uri="" prune="" annotate="" method="" content="" serialization="" mediatype="" data-format-version="" prune-metadata=""/>
+        <params replace="" uri="" relevant="" annotate="" method="" content="" serialization="" mediatype="" data-format-version="" prune-metadata=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission">
         <xf:setvalue

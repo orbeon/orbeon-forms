@@ -223,9 +223,11 @@ object DataMigration {
     val mutableData = copyDocumentKeepInstanceData(data)
 
     partitionNodes(mutableData, decodeMigrationsFromJSON(jsonMigrationMap)) foreach {
+      case (_, Nil, _, _) ⇒
+        // This can happen if data is pruned
+        // https://github.com/orbeon/orbeon-forms/issues/3172
       case (_, iterations, _, _) ⇒
-
-        assert(iterations.tail.isEmpty)
+        //assert(iterations.tail.isEmpty)
         val container = iterations.head
 
         val contentForEachIteration =

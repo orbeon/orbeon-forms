@@ -107,13 +107,13 @@ object XFormsToXHTML {
   ): Unit =
     if (! containingDocument.isGotSubmissionReplaceAll)
       XFormsServer.outputAjaxResponse(
-        containingDocument             = containingDocument,
-        eventFindings                  = ClientEvents.EmptyEventsFindings,
-        beforeFocusedControlOpt        = None,
-        repeatHierarchyOpt             = None,
-        requestDocument                = null,
-        testOutputAllActions           = true)(
-        xmlReceiver                    = xmlReceiver,
-        indentedLogger                 = indentedLogger
+        containingDocument        = containingDocument,
+        eventFindings             = ClientEvents.EmptyEventsFindings,
+        beforeFocusedControlIdOpt = None,
+        repeatHierarchyOpt        = None,
+        requestDocument           = null,
+        testOutputAllActions      = true)(
+        xmlReceiver               = xmlReceiver,
+        indentedLogger            = indentedLogger
       )
 }

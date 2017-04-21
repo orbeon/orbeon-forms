@@ -62,19 +62,19 @@ object XFormsServer {
   /**
     * Output an Ajax response for the regular Ajax mode.
     *
-    * @param beforeFocusedControlOpt        control which had the focus before the updates, if any
-    * @param requestDocument                incoming request document (for all events mode)
-    * @param xmlReceiver                    handler for the Ajax result
+    * @param beforeFocusedControlIdOpt control which had the focus before the updates, if any
+    * @param requestDocument           incoming request document (for all events mode)
+    * @param xmlReceiver               handler for the Ajax result
     */
   def outputAjaxResponse(
-    containingDocument      : XFormsContainingDocument,
-    eventFindings           : ClientEvents.EventsFindings,
-    beforeFocusedControlOpt : Option[XFormsControl],
-    repeatHierarchyOpt      : Option[String],
-    requestDocument         : Document,
-    testOutputAllActions    : Boolean)(implicit
-    xmlReceiver             : XMLReceiver,
-    indentedLogger          : IndentedLogger
+    containingDocument        : XFormsContainingDocument,
+    eventFindings             : ClientEvents.EventsFindings,
+    beforeFocusedControlIdOpt : Option[String],
+    repeatHierarchyOpt        : Option[String],
+    requestDocument           : Document,
+    testOutputAllActions      : Boolean)(implicit
+    xmlReceiver               : XMLReceiver,
+    indentedLogger            : IndentedLogger
   ): Unit =
     withDocument {
       xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI)
@@ -264,7 +264,7 @@ object XFormsServer {
               val beforeFocusEffectiveIdOpt =
                 eventFindings.clientFocusControlIdOpt match {
                   case Some(clientFocusControlIdOpt) ⇒ clientFocusControlIdOpt
-                  case None                          ⇒ beforeFocusedControlOpt map (_.getEffectiveId)
+                  case None                          ⇒ beforeFocusedControlIdOpt
                 }
 
               val afterFocusEffectiveIdOpt =
@@ -306,26 +306,28 @@ object XFormsServer {
     externalContext    : ExternalContext)(implicit
     indentedLogger     : IndentedLogger
   ): Unit =
-    // This will also cache the containing document if needed
-    // QUESTION: Do we actually need to cache if a xf:submission[@replace = 'all'] happened?
-    containingDocument.getLoadsToRun.asScala.headOption match {
-      case Some(firstLoad) ⇒
+    withDebug("handling noscript response") {
+      // This will also cache the containing document if needed
+      // QUESTION: Do we actually need to cache if a xf:submission[@replace = 'all'] happened?
+      containingDocument.getLoadsToRun.asScala.headOption match {
+        case Some(firstLoad) ⇒
 
-        // Send redirect
-        debug("handling noscript redirect response for xf:load", List("url" → firstLoad.resource))
+          // Send redirect
+          debug("handling noscript redirect response for xf:load", List("url" → firstLoad.resource))
 
-        // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-        externalContext.getResponse.sendRedirect(firstLoad.resource, isServerSide = false, isExitPortal = false)
-        SAXUtils.streamNullDocument(xmlReceiver)
-      case None ⇒
-        // The template is stored either in the static state or in the dynamic state
-        val template =
-          containingDocument.getStaticState.template orElse
-            containingDocument.getTemplate           getOrElse
-            (throw new IllegalStateException("missing template"))
+          // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
+          externalContext.getResponse.sendRedirect(firstLoad.resource, isServerSide = false, isExitPortal = false)
+          SAXUtils.streamNullDocument(xmlReceiver)
+        case None ⇒
+          // The template is stored either in the static state or in the dynamic state
+          val template =
+            containingDocument.getStaticState.template orElse
+              containingDocument.getTemplate           getOrElse
+              (throw new IllegalStateException("missing template"))
 
-        debug("handling noscript response for XHTML output")
-        XFormsToXHTML.outputResponseDocument(externalContext, template, containingDocument, xmlReceiver)
+          debug("handling noscript response for XHTML output")
+          XFormsToXHTML.outputResponseDocument(externalContext, template, containingDocument, xmlReceiver)
+      }
     }
 
   def extractParameters(request: Document, isInitialState: Boolean): RequestParameters = {
@@ -622,7 +624,7 @@ class XFormsServer extends ProcessorImpl {
       }
 
     val isAjaxRequest =
-      request.getMethod != null   &&
+      (request.getMethod ne null) &&
       request.getMethod == "POST" &&
       ContentTypes.isXMLContentType(request.getContentType)
 
@@ -640,13 +642,11 @@ class XFormsServer extends ProcessorImpl {
     // The following throws if the session has expired
     val parameters = extractParameters(requestDocument, isInitialState = false)
 
-    var replaceAllCallableOpt: Option[Callable[SubmissionResult]] = None
-
     // We don't wait on the lock for an Ajax request. But for a simulated request on GET, we do wait. See:
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult =
+    val lockResult: Try[Option[Callable[SubmissionResult]]] =
       withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
         case Some(containingDocument) ⇒
 
@@ -654,35 +654,35 @@ class XFormsServer extends ProcessorImpl {
           if (ignoreSequence || (parameters.sequenceOpt contains expectedSequenceNumber)) {
             // We are good: process request and produce new sequence number
             try {
-              // Run events if any
-              val isNoscript = containingDocument.noscript
 
-              // Set URL rewriter resource path information based on information in static state
-              if (containingDocument.getVersionedPathMatchers != null && containingDocument.getVersionedPathMatchers.size > 0) {
-                // Don't override existing matchers if any (e.g. case of oxf:xforms-to-xhtml and oxf:xforms-submission
-                // processor running in same pipeline)
-                pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, containingDocument.getVersionedPathMatchers)
+              // State to set before running events
+              locally {
+                // Set URL rewriter resource path information based on information in static state
+                if (containingDocument.getVersionedPathMatchers != null && containingDocument.getVersionedPathMatchers.size > 0) {
+                  // Don't override existing matchers if any (e.g. case of oxf:xforms-to-xhtml and oxf:xforms-submission
+                  // processor running in same pipeline)
+                  pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, containingDocument.getVersionedPathMatchers)
+                }
+
+                // Set deployment mode into request (useful for epilogue)
+                request.getAttributesMap.put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.name)
               }
-
-              // Set deployment mode into request (useful for epilogue)
-              request.getAttributesMap.put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.name)
-              val hasEvents = remainingClientEvents.nonEmpty || serverEventsElements.nonEmpty
-
-              // Whether there are uploaded files to handle
-              val hasFiles = XFormsUploadControl.hasSubmittedFiles(filesElement)
 
               // NOTE: As of 2010-12, background uploads in script mode are handled in xforms-server.xpl. In
               // most cases should get files here only in noscript mode, but there is a chance in script mode in
               // a 2-pass submission that some files could make it here as well.
-              val beforeFocusedControlOpt = Option(containingDocument.getControls.getFocusedControl)
+              val beforeFocusedControlIdOpt = Option(containingDocument.getControls.getFocusedControl) map (_.effectiveId)
 
-              val hasDynamic = containingDocument.getStaticOps.controlsByName("dynamic").nonEmpty
-
-              val repeatHierarchyOpt =
-                hasDynamic option
+              val beforeRepeatHierarchyOpt =
+                containingDocument.getStaticOps.controlsByName("dynamic").nonEmpty option
                   containingDocument.getStaticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
 
-              val eventsFindingsOpt =
+              // Run events if any
+              val eventsFindingsOpt = {
+
+                val hasEvents = remainingClientEvents.nonEmpty || serverEventsElements.nonEmpty
+                val hasFiles  = XFormsUploadControl.hasSubmittedFiles(filesElement)
+
                 if (hasEvents || hasFiles) {
                   // Scope the containing document for the XForms API
                   XFormsAPI.withContainingDocument(containingDocument) {
@@ -709,88 +709,87 @@ class XFormsServer extends ProcessorImpl {
                       result
                     } (eventsIndentedLogger)
                   }
-                }
-              else
-                None
-
-              // Check if there is a submission with replace="all" that needs processing
-              replaceAllCallableOpt = Option(containingDocument.getReplaceAllCallable)
-
-              withUpdateResponse(containingDocument, ignoreSequence) {
-                if (replaceAllCallableOpt.isEmpty) {
-                  xmlReceiverOpt match {
-                    case Some(xmlReceiver) ⇒
-
-                      // Create resulting document if there is a receiver
-                      if (containingDocument.isGotSubmissionRedirect) {
-                        // Redirect already sent
-                        // Output null document so that rest of pipeline doesn't fail and no further processing takes place
-                        debug("handling submission with `replace=\"all\"` with redirect")
-                        SAXUtils.streamNullDocument(xmlReceiver)
-                      } else if (! isNoscript) {
-                        // This is an Ajax response
-                        withDebug("handling regular Ajax response") {
-                          // Hook-up debug content handler if we must log the response document
-                          // Buffer for retries
-                          val responseStore = new SAXStore
-                          // Two receivers possible
-                          val receivers = new ju.ArrayList[XMLReceiver]
-                          receivers.add(responseStore)
-
-                          // Debug output
-                          val debugContentHandlerOpt =
-                            logRequestResponse option {
-                              val result = new LocationSAXContentHandler
-                              receivers.add(result)
-                              result
-                            }
-
-                          val responseReceiver = new TeeXMLReceiver(receivers)
-
-                          // Prepare and/or output response
-                          XFormsServer.outputAjaxResponse(
-                            containingDocument      = containingDocument,
-                            eventFindings           = eventsFindingsOpt getOrElse ClientEvents.EmptyEventsFindings,
-                            beforeFocusedControlOpt = beforeFocusedControlOpt,
-                            repeatHierarchyOpt      = repeatHierarchyOpt,
-                            requestDocument         = requestDocument,
-                            testOutputAllActions    = false)(
-                            xmlReceiver             = responseReceiver,
-                            indentedLogger          = indentedLogger
-                          )
-
-                          // Store response in to document
-                          containingDocument.rememberLastAjaxResponse(responseStore)
-
-                          // Actually output response
-                          // If there is an error, we do not
-                          try {
-                            responseStore.replay(xmlReceiver)
-                          } catch {
-                            case NonFatal(t)⇒
-                              indentedLogger.logDebug("retry", "got exception while sending response; ignoring and expecting client to retry", t)
-                          }
-
-                          debugContentHandlerOpt foreach { debugContentHandler ⇒
-                            debugResults(List("ajax response" → Dom4jUtils.domToPrettyString(debugContentHandler.getDocument)))
-                          }
-                        }
-                      } else {
-                        // Noscript mode
-                        withDebug("handling noscript response") {
-                          outputNoscriptResponse(containingDocument, xmlReceiver, externalContext)
-                        }
-                      }
-                    case None ⇒
-                      // This is the second pass of a submission with replace="all". We ensure that the document is
-                      // not modified.
-                      debug("handling NOP response for submission with `replace=\"all\"`")
-                  }
-                }
+                } else
+                  None
               }
 
-              // Keep the document around
-              Success(())
+              Success(
+                withUpdateResponse(containingDocument, ignoreSequence) {
+                  Option(containingDocument.getReplaceAllCallable) match {
+                    case None ⇒
+                      xmlReceiverOpt match {
+                        case Some(xmlReceiver) ⇒
+
+                          // Create resulting document if there is a receiver
+                          if (containingDocument.isGotSubmissionRedirect) {
+                            // Redirect already sent
+                            // Output null document so that rest of pipeline doesn't fail and no further processing takes place
+                            debug("handling submission with `replace=\"all\"` with redirect")
+                            SAXUtils.streamNullDocument(xmlReceiver)
+                          } else if (! containingDocument.noscript) {
+                            // This is an Ajax response
+                            withDebug("handling regular Ajax response") {
+                              // Hook-up debug content handler if we must log the response document
+                              // Buffer for retries
+                              val responseStore = new SAXStore
+                              // Two receivers possible
+                              val receivers = new ju.ArrayList[XMLReceiver]
+                              receivers.add(responseStore)
+
+                              // Debug output
+                              val debugContentHandlerOpt =
+                                logRequestResponse option {
+                                  val result = new LocationSAXContentHandler
+                                  receivers.add(result)
+                                  result
+                                }
+
+                              val responseReceiver = new TeeXMLReceiver(receivers)
+
+                              // Prepare and/or output response
+                              XFormsServer.outputAjaxResponse(
+                                containingDocument        = containingDocument,
+                                eventFindings             = eventsFindingsOpt getOrElse ClientEvents.EmptyEventsFindings,
+                                beforeFocusedControlIdOpt = beforeFocusedControlIdOpt,
+                                repeatHierarchyOpt        = beforeRepeatHierarchyOpt,
+                                requestDocument           = requestDocument,
+                                testOutputAllActions      = false)(
+                                xmlReceiver               = responseReceiver,
+                                indentedLogger            = indentedLogger
+                              )
+
+                              // Store response in to document
+                              containingDocument.rememberLastAjaxResponse(responseStore)
+
+                              // Actually output response
+                              // If there is an error, we do not
+                              try {
+                                responseStore.replay(xmlReceiver)
+                              } catch {
+                                case NonFatal(t) ⇒
+                                  indentedLogger.logDebug("retry", "got exception while sending response; ignoring and expecting client to retry", t)
+                              }
+
+                              debugContentHandlerOpt foreach { debugContentHandler ⇒
+                                debugResults(List("ajax response" → Dom4jUtils.domToPrettyString(debugContentHandler.getDocument)))
+                              }
+                            }
+                          } else {
+                            // Noscript mode
+                            outputNoscriptResponse(containingDocument, xmlReceiver, externalContext)
+                          }
+                        case None ⇒
+                          // This is the second pass of a submission with replace="all". We ensure that the document is
+                          // not modified.
+                          debug("handling NOP response for submission with `replace=\"all\"`")
+                      }
+                      None
+                    case someCallable ⇒
+                      // Check if there is a submission with replace="all" that needs processing
+                      someCallable
+                  }
+                }
+              )
             } catch {
               case NonFatal(t) ⇒
                 // Log body of Ajax request if needed
@@ -818,6 +817,7 @@ class XFormsServer extends ProcessorImpl {
                   debugResults(List("success" → "false"))
                 }
               }
+              None
             }
           } else {
             // This is not allowed to happen
@@ -833,18 +833,19 @@ class XFormsServer extends ProcessorImpl {
           val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
           ClientEvents.errorResponse(StatusCode.ServiceUnavailable)(xmlReceiver)
 
-          Success(())
+          Success(None)
       }
 
     // Throw the exception if there was any
-    lockResult.get
-
-    // Check and run submission with replace="all"
-    // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
-    //   hit the document.
-    // - No need to output a null document here, `xmlReceiver` is absent anyway.
-    replaceAllCallableOpt foreach { replaceAllCallable ⇒
-      XFormsModelSubmission.runDeferredSubmission(replaceAllCallable, response)
+    lockResult match {
+      case Success(Some(replaceAllCallable)) ⇒
+        // Check and run submission with `replace="all"`
+        // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
+        //   hit the document.
+        // - No need to output a null document here, `xmlReceiver` is absent anyway.
+        XFormsModelSubmission.runDeferredSubmission(replaceAllCallable, response)
+      case Success(None) ⇒
+      case Failure(t)    ⇒ throw t
     }
   }
 }

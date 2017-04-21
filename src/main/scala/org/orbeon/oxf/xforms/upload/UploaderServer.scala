@@ -170,10 +170,9 @@ object UploaderServer {
     def fieldReceived(name: String, value: String): Unit =
       if (name == "$uuid") {
         require(value ne null)
-        if (uuidOpt.isDefined)
-          throw new IllegalStateException("more than one document UUID provided")
-        else
-          uuidOpt = Some(value)
+        require(uuidOpt.isEmpty, "more than one document UUID provided")
+
+        uuidOpt = Some(value)
       }
 
     // Session keys created, for cleanup

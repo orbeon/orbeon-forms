@@ -7,7 +7,6 @@ build-local.properties
 .idea/modules/
 .idea/kotlinc.xml
 src/resources-packaged-target/
-src/resources-packaged/xbl/orbeon/code-mirror/CodeMirror-2.34/
 src/resources-local/
 resources-local-A/
 resources-local-B/

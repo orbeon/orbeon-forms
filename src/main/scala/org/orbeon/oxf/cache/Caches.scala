@@ -17,7 +17,7 @@ import net.sf.ehcache
 import net.sf.ehcache.CacheManager
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.xforms.Loggers
+import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
 
@@ -38,8 +38,9 @@ object Caches {
 
     val EhcachePath = "oxf:/config/ehcache.xml"
 
-    // XXX TODO: object is already lazy, so probably don't need lazy val's
-    lazy val cacheManager =
+    val Logger = LoggerFactory.getLogger("org.orbeon.caches")
+
+    val cacheManager =
       try {
         // Read configuration from XML file in resources
         val manager = new CacheManager(URLFactory.createURL(EhcachePath))
@@ -49,10 +50,6 @@ object Caches {
           throw new OXFException(s"unable to read cache manager configuration from `$EhcachePath`", t)
       }
 
-    /// XXX TODO remove dependency on XForms use own logger
-    val indentedLogger =
-      Loggers.getIndentedLogger("caches")
-
-    def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
+    def withMessage[T](t: T, message: String) = { Logger.debug(message); t }
   }
 }

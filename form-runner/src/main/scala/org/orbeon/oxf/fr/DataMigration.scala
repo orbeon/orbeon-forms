@@ -19,57 +19,66 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+import org.orbeon.saxon.om.{DocumentInfo, Name10Checker, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.XML
 import org.orbeon.scaxon.XML._
 
 object DataMigration {
 
+  case class PathElem(value: String) {
+    require(Name10Checker.getInstance.isValidNCName(value))
+  }
+
+  case class Migration(path: List[PathElem], iterationElem: PathElem) {
+    def toJson = s"""{ "path": "${path map (_.value) mkString "/"}", "iteration-name": "${iterationElem.value}" }"""
+  }
+
   // NOTE: We could build this with JSON objects instead
-  def encodeMigrationsToJSON(migrations: Seq[(String, String)]) =
-    migrations map { case (path, iterationName) ⇒
-      s"""{ "path": "$path", "iteration-name": "$iterationName" }"""
-    } mkString ("[", ",", "]")
+  def encodeMigrationsToJSON(migrations: Seq[Migration]): String =
+    migrations map (_.toJson) mkString ("[", ",", "]")
 
   // Ouch, a lot of boilerplate! (Rapture JSON might provide nicer syntax)
-  def decodeMigrationsFromJSON(jsonMigrationMap: String): List[(String, String)] = {
+  def decodeMigrationsFromJSON(jsonMigrationMap: String): List[Migration] = {
 
     import spray.json._
     val json = jsonMigrationMap.parseJson
 
-    val names =
+    val migrations =
       Iterator(json) collect {
         case JsArray(migrations) ⇒
           migrations.iterator collect {
             case JsObject(fields) ⇒
-              (
-                fields("path").asInstanceOf[JsString].value,
-                fields("iteration-name").asInstanceOf[JsString].value
+
+              val path          = fields("path").asInstanceOf[JsString].value
+              val iterationName = fields("iteration-name").asInstanceOf[JsString].value
+
+              Migration(
+                path.splitTo[List]("/") map {
+                  case TrimPathElementRE(path) ⇒ PathElem(path)
+                  case name                    ⇒ throw new IllegalArgumentException(s"invalid migration name: `$name`")
+                },
+                PathElem(iterationName)
               )
           }
       }
 
-    names.flatten.toList
+    migrations.flatten.to[List]
   }
 
-  private val TrimPathElementRE = """\s*\(?([^)]+)\)?\s*""".r
+  // NOTE: The format of the path is like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
+  // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
+  // the migration data.
+  private val TrimPathElementRE = """\s*\(?([^)^/]+)\)?\s*""".r
 
   private def partitionNodes(
     mutableData : NodeInfo,
-    migration   : List[(String, String)]
-  ): List[(NodeInfo, List[NodeInfo], String, String)] =
+    migration   : List[Migration]
+  ): List[(NodeInfo, List[NodeInfo], String, PathElem)] =
     migration flatMap {
-      case (path, iterationName) ⇒
+      case Migration(path, iterationElem) ⇒
 
-        val (pathToParentNodes, pathToChildNodes) = {
-          // NOTE: The format of the path is like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
-          // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
-          // the migration data. As long as we know that there are no `/` within the parentheses we are fine.
-          val parts                          = path.splitTo[List]("/")
-          val TrimPathElementRE(trimmedLast) = parts.last
-
-          (parts.init mkString "/", trimmedLast)
-        }
+        val (pathToParentNodes, pathToChildNodes) =
+          (path.init map (_.value) mkString "/", path.last.value)
 
         // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
         val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes) collect {
@@ -84,7 +93,7 @@ object DataMigration {
 
           // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which
           // in no namespaces, and if they were in a namespace, the prefixes would likely be unique.
-          (parentNode, nodes.to[List], pathToChildNodes, iterationName)
+          (parentNode, nodes.to[List], pathToChildNodes, iterationElem)
         }
     }
 
@@ -117,7 +126,7 @@ object DataMigration {
     val mutableData = TransformerUtils.extractAsMutableDocument(data)
 
     partitionNodes(mutableData, decodeMigrationsFromJSON(jsonMigrationMap)) foreach {
-      case (parentNode, iterations, repeatName, iterationName) ⇒
+      case (parentNode, iterations, repeatName, iterationElem) ⇒
 
         iterations match {
           case Nil ⇒
@@ -146,7 +155,7 @@ object DataMigration {
 
             insert(
               into       = iterations.head,
-              origin     = contentForEachIteration map (elementInfo(iterationName, _)),
+              origin     = contentForEachIteration map (elementInfo(iterationElem.value, _)),
               doDispatch = false
             )
         }

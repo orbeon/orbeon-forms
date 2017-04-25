@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.DataMigration.PathElem
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsUtils._
@@ -104,27 +105,28 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findBindName(bind: NodeInfo) =
     bind attValueOpt "name"
 
-  def buildBindPath(bind: NodeInfo) =
-    (bind ancestorOrSelf XFBindTest flatMap bindRefOrNodeset).reverse.tail map ("(" + _ + ")") mkString "/"
+  // 2017-04-25: Don't use enclosing parentheses anymore. This now ensures that the `ref` is a single
+  // reference to an XML element. See https://github.com/orbeon/orbeon-forms/issues/3174.
+  private def buildBindPath(bind: NodeInfo): List[DataMigration.PathElem] =
+    (bind ancestorOrSelf XFBindTest flatMap bindRefOrNodeset).reverse.tail map PathElem.apply toList
 
-  def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, String)] = {
-    findBindByName(inDoc, controlName) map { bind ⇒
-      (bind, buildBindPath(bind))
+  def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[(NodeInfo, List[DataMigration.PathElem])] =
+    findBindByName(inDoc, controlName) map { bindNode ⇒
+      bindNode → buildBindPath(bindNode)
     }
-  }
 
   def findDataHoldersInDocument(inDoc: NodeInfo, controlName: String, contextItem: Item): Seq[NodeInfo] =
-    findBindAndPathStatically(inDoc, controlName) map { case (bind, path) ⇒
+    findBindAndPathStatically(inDoc, controlName) map { case (bindNode, pathElems) ⇒
 
       // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
       // overridden along the way!)
-      val namespaces = new NamespaceMapping(bind.namespaceMappings.toMap.asJava)
+      val namespaces = new NamespaceMapping(bindNode.namespaceMappings.toMap.asJava)
 
       // Evaluate path from instance root element
       // NOTE: Don't pass Reporter as not very useful and some tests don't have a containingDocument scoped.
       eval(
         item       = contextItem,
-        expr       = path,
+        expr       = pathElems map (_.value) mkString "/",
         namespaces = namespaces
       ).asInstanceOf[Seq[NodeInfo]]
     } getOrElse

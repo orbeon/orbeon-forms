@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.DataMigration
+import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
@@ -87,7 +88,7 @@ object MigrationOps {
         findRepeatIterationName(grid, controlName).get
     }
 
-    def pathsForBinding(doc: DocumentInfo): Seq[(String, String)] = {
+    def pathsForBinding(doc: DocumentInfo): Seq[Migration] = {
 
       val names =
         findGrids(doc) map
@@ -95,12 +96,12 @@ object MigrationOps {
 
       for {
         (gridName, iterationName) ← names
-        (_, path)                 ← findBindAndPathStatically(doc, gridName)
+        (_, pathElems)            ← findBindAndPathStatically(doc, gridName)
       } yield
-        (path, iterationName)
+        Migration(pathElems, PathElem(iterationName))
     }
 
-    def pathsForSectionTemplate(section: NodeInfo): Seq[(String, String)] = {
+    def pathsForSectionTemplate(section: NodeInfo): Seq[Migration] = {
 
       val sectionName    = getControlNameOpt(section).get                // section must have a name
       val xblBindingName = sectionTemplateBindingName(section).get       // section must have a binding
@@ -108,10 +109,10 @@ object MigrationOps {
 
       // NOTE: Don't use findDataHolders. We don't want current holders, as there might be none if there is are
       // currently no iterations around a section template, for example. We must find this statically.
-      val (_, holderPath) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
+      val (_, holderPathElems) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
 
       pathsForBinding(xblBinding.root) map {
-        case (path, iterationName) ⇒ (holderPath + '/' + path, iterationName)
+        case Migration(pathElems, iterationElem) ⇒ Migration(holderPathElems ++ pathElems, iterationElem)
       }
     }
 

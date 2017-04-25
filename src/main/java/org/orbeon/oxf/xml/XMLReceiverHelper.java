@@ -47,7 +47,7 @@ public class XMLReceiverHelper {
     }
 
     /**
-     * ContentHandler to write to. 
+     * ContentHandler to write to.
      *
      * @param xmlReceiver       receiver to write to
      * @param validateStream    true if the stream must be validated by InspectingContentHandler
@@ -151,29 +151,14 @@ public class XMLReceiverHelper {
         element("", name, number);
     }
 
-    public void element(String namespaceURI, String name, long number) {
+    private void element(String namespaceURI, String name, long number) {
         element("", namespaceURI, name, number);
     }
 
-    public void element(String prefix, String namespaceURI, String name, long number) {
+    private void element(String prefix, String namespaceURI, String name, long number) {
         attributesImpl.clear();
         startElement(prefix, namespaceURI, name);
         text(Long.toString(number));
-        endElement();
-    }
-
-    public void element(String name, double number) {
-        element("", name, number);
-    }
-
-    public void element(String namespaceURI, String name, double number) {
-        element("", namespaceURI,  name, number);
-    }
-
-    public void element(String prefix, String namespaceURI, String name, double number) {
-        attributesImpl.clear();
-        startElement(prefix, namespaceURI, name);
-        text(XMLUtils.removeScientificNotation(number));
         endElement();
     }
 

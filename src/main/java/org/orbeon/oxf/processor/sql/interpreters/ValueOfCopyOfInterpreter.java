@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.sql.interpreters;
 
 import org.orbeon.dom.Node;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
@@ -22,11 +23,9 @@ import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.om.Item;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -72,7 +71,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                 if (result instanceof Number) {
                     String stringValue;
                     if (result instanceof Float || result instanceof Double) {
-                        stringValue = XMLUtils.removeScientificNotation(((Number) result).doubleValue());
+                        stringValue = Util.removeScientificNotation(((Number) result).doubleValue());
                     } else {
                         stringValue = Long.toString(((Number) result).longValue());
                     } // FIXME: what about BigDecimal and BigInteger: can they be returned?

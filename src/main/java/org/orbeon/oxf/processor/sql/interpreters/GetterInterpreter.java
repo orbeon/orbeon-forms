@@ -20,7 +20,10 @@ import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.DateUtils;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.SAXUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -478,7 +481,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 || columnType == Types.REAL) {
             final double value = resultSet.getDouble(columnIndex);
             // For XPath 1.0, we have to get rid of the scientific notation
-            stringValue = resultSet.wasNull() ? null : XMLUtils.removeScientificNotation(value);
+            stringValue = resultSet.wasNull() ? null : Util.removeScientificNotation(value);
         } else if (columnType == Types.CLOB) {
             throw new OXFException("Cannot get String value for CLOB type.");
         } else if (columnType == Types.BLOB) {

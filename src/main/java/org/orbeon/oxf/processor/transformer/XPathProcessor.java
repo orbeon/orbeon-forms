@@ -19,13 +19,16 @@ import org.orbeon.dom.ProcessingInstruction;
 import org.orbeon.dom.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
+import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -130,7 +133,7 @@ public class XPathProcessor extends ProcessorImpl {
             strVal = Long.toString((Long) result);
         } else if (result instanceof Double) {
             final double d = ((Double) result).doubleValue();
-            strVal = XMLUtils.removeScientificNotation(d);
+            strVal = Double.toString(d);
         } else if (result instanceof Boolean) {
             strVal = (result.toString());
         } else if (result instanceof StringBuilder) {

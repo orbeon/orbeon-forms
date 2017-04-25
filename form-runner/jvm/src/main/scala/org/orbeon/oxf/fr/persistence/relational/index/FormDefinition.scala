@@ -13,15 +13,19 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
+import org.orbeon.oxf.fr.DataMigration.PathElem
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner, FormRunnerPersistence}
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
 trait FormDefinition {
 
   private val FBLangPredicate = "[@xml:lang = $fb-lang]"
+  private val FRSummary       = "fr-summary"
+  private val FRSearch        = "fr-search"
+
+  private val ClassesPredicate = Set(FRSummary, FRSearch)
 
   // For Summary page
   //@XPathFunction
@@ -35,22 +39,21 @@ trait FormDefinition {
     val migratePathsTo40Format =
       FormRunnerPersistence.providerDataFormatVersion(app, form) == FormRunnerPersistence.DataFormatVersion400
 
-    // Controls in the view, with the fr-summary or fr-search class
+    // Controls in the view, with the `fr-summary` or `fr-search` class
     val indexedControlElements = {
       // NOTE: Can't use getAllControlsWithIds() because Form Builder's form.xhtml doesn't follow the same body
       // pattern.
       val body        = formDoc \ "*:html" \ "*:body"
       val allControls = body \\ * filter (_ \@ "bind" nonEmpty)
 
-      allControls filter (_.attClasses & Set("fr-summary", "fr-search") nonEmpty)
+      allControls filter (_.attClasses & ClassesPredicate nonEmpty)
     }
 
     val migrationPaths =
       if (migratePathsTo40Format)
         FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap
           DataMigration.migrationMapFromMetadata           flatMap
-          DataMigration.decodeMigrationsFromJSON           map
-          { case (path, iterationName) ⇒ path.splitTo[List]("/") }
+          DataMigration.decodeMigrationsFromJSON
       else
         Nil
 
@@ -59,33 +62,40 @@ trait FormDefinition {
       val controlName    = FormRunner.getControlName(control)
       val bindForControl = FormRunner.findBindByName(formDoc, controlName).get
       val bindsToControl = bindForControl.ancestorOrSelf("*:bind").reverse.tail // skip instance root bind
-      val bindRefs       =
+
+      // Specific case for Form Builder: drop language predicate, as we want to index/return
+      // values for all languages. So far, this is handled as a special case, as this is not
+      // something that happens in other forms.
+      val bindPathElems =
         for {
           bind    ← bindsToControl.to[List]
           bindRef = bind.attValue("ref")
-        } yield {
-          // Specific case for Form Builder: drop language predicate, as we want to index/return
-          // values for all languages. So far, this is handled as a special case, as this is not
-          // something that happens in other forms.
-          if (bindRef.endsWith(FBLangPredicate))
-            bindRef.dropRight(FBLangPredicate.length)
-          else
-            bindRef
-        }
+        } yield
+          PathElem(
+            if (bindRef.endsWith(FBLangPredicate))
+              bindRef.dropRight(FBLangPredicate.length)
+            else
+              bindRef
+          )
 
-      // Adjust the search paths if needed by dropping the repeated grid iteration element
+      // Adjust the search paths if needed by dropping the repeated grid iteration element. We know that a grid
+      // iteration can only contain a leaf control. Example:
+      //
+      // - bind refs      : "my-section" :: "my-grid" :: "my-grid-iteration" :: "my-text" :: Nil
+      // - migration paths: "my-section" :: "my-grid" :: Nil
+      //
       val adjustedBindRefs =
-        if (migratePathsTo40Format && (migrationPaths exists (bindRefs.startsWith(_))))
-          bindRefs.dropRight(2) ::: bindRefs.last :: Nil
+        if (migratePathsTo40Format && (migrationPaths exists (migration ⇒ bindPathElems.startsWith(migration.path))))
+          bindPathElems.dropRight(2) ::: bindPathElems.last :: Nil
         else
-          bindRefs
+          bindPathElems
 
       IndexedControl(
         name      = controlName,
-        inSearch  = control.attClasses("fr-search"),
-        inSummary = control.attClasses("fr-summary"),
-        xpath     = adjustedBindRefs mkString "/",
-        xsType    = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
+        inSearch  = control.attClasses(FRSearch),
+        inSummary = control.attClasses(FRSummary),
+        xpath     = adjustedBindRefs map (_.value) mkString "/",
+        xsType    = (bindForControl /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
         htmlLabel = FormRunner.hasHTMLMediatype(control \ (XF → "label"))
        )

@@ -15,14 +15,20 @@ package org.orbeon.oxf.fb
 
 import org.junit.Test
 import org.orbeon.oxf.fr.DataMigration
-import org.orbeon.oxf.test.{DocumentTestBase, XMLSupport}
+import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSupport with AssertionsForJUnit {
+class MigrationTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike
+     with FormBuilderSupport
+     with XMLSupport {
 
-  val MigrationJSON =
+  val MigrationJSONWithParens =
     """
       [
         {
@@ -48,7 +54,50 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
       ]
     """
 
-  @Test def buildGridMigrationMap(): Unit = {
+  val MigrationJSON =
+    """
+      [
+        {
+          "path": "section-3/section-3-iteration/grid-4",
+          "iteration-name": "grid-4-iteration"
+        },
+        {
+          "path": "section-13/grid-6",
+          "iteration-name": "grid-6-iteration"
+        },
+        {
+          "path": "section-13/grid-14",
+          "iteration-name": "grid-14-iteration"
+        },
+        {
+          "path": "section-8/grid-3",
+          "iteration-name": "my-custom-grid-3-iteration"
+        },
+        {
+          "path": "section-23/grid-3",
+          "iteration-name": "my-custom-grid-3-iteration"
+        }
+      ]
+    """
+
+  describe("Decoding from JSON") {
+
+    val expected =
+      List(
+        Migration(List(PathElem("section-3"),  PathElem("section-3-iteration"), PathElem("grid-4")), PathElem("grid-4-iteration")),
+        Migration(List(PathElem("section-13"), PathElem("grid-6")),                                  PathElem("grid-6-iteration")),
+        Migration(List(PathElem("section-13"), PathElem("grid-14")),                                 PathElem("grid-14-iteration")),
+        Migration(List(PathElem("section-8"),  PathElem("grid-3")),                                  PathElem("my-custom-grid-3-iteration")),
+        Migration(List(PathElem("section-23"), PathElem("grid-3")),                                  PathElem("my-custom-grid-3-iteration"))
+      )
+
+    it("must decode with or without parentheses") {
+      for (migrations ← List(MigrationJSONWithParens, MigrationJSON))
+        assert(expected === DataMigration.decodeMigrationsFromJSON(migrations))
+    }
+  }
+
+  describe("Building the grid migration map") {
 
     val form    = readURLAsImmutableXMLDocument("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml")
     val toolbox = readURLAsImmutableXMLDocument("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml")
@@ -57,10 +106,12 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
       MigrationOps.buildGridMigrationMap(form, Some(toolbox), legacyGridsOnly = false)
 
     import spray.json._
-    assert(MigrationJSON.parseJson === result.parseJson)
+    it("must encode to the expected JSON") {
+      assert(MigrationJSON.parseJson === result.parseJson)
+    }
   }
 
-  val DataOrbeonForms47: NodeInfo =
+  val DataOrbeonForms40: NodeInfo =
     <form>
       <section-1>
         <control-1/>
@@ -263,7 +314,7 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
       </section-23>
     </form>
 
-  val DataOrbeonForms47EmptyIterations: NodeInfo =
+  val DataOrbeonForms40EmptyIterations: NodeInfo =
     <form>
       <section-1>
         <control-1/>
@@ -307,42 +358,51 @@ class MigrationTest extends DocumentTestBase with FormBuilderSupport with XMLSup
       </section-23>
     </form>
 
-  @Test def migrateDataTo(): Unit =
+  describe("Migrating data to newer format") {
     for {
-      (from, to) ← List(
-        DataOrbeonForms47                → DataOrbeonForms48,
-        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      (desc, from, to) ← List(
+        ("from 4.0 format to 4.8 format",                       DataOrbeonForms40               , DataOrbeonForms48),
+        ("from 4.0 format to 4.8 format with empty iterations", DataOrbeonForms40EmptyIterations, DataOrbeonForms48EmptyIterations)
       )
     } locally {
-      assertXMLDocumentsIgnoreNamespacesInScope(
-        to.root,
-        DataMigration.migrateDataTo(from.root, MigrationJSON)
-      )
+      it(s"must pass $desc") {
+        assertXMLDocumentsIgnoreNamespacesInScope(
+          to.root,
+          DataMigration.migrateDataTo(from.root, MigrationJSON)
+        )
+      }
     }
+  }
 
-  @Test def migrateDataFrom(): Unit =
+  describe("Migrating data from newer format") {
     for {
-      (from, to) ← List(
-        DataOrbeonForms47                → DataOrbeonForms48,
-        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      (desc, from, to) ← List(
+        ("from 4.8 format to 4.0 format",                       DataOrbeonForms40               , DataOrbeonForms48),
+        ("from 4.8 format to 4.0 format with empty iterations", DataOrbeonForms40EmptyIterations, DataOrbeonForms48EmptyIterations)
       )
     } locally {
-      assertXMLDocumentsIgnoreNamespacesInScope(
-        from.root,
-        DataMigration.migrateDataFrom(to.root, MigrationJSON, pruneMetadata = false)
-      )
+      it(s"must pass $desc") {
+        assertXMLDocumentsIgnoreNamespacesInScope(
+          from.root,
+          DataMigration.migrateDataFrom(to.root, MigrationJSON, pruneMetadata = false)
+        )
+      }
     }
+  }
 
-  @Test def roundTripData(): Unit =
+  describe("Migrating data to and from newer format") {
     for {
-      (from, to) ← List(
-        DataOrbeonForms47                → DataOrbeonForms48,
-        DataOrbeonForms47EmptyIterations → DataOrbeonForms48EmptyIterations
+      (desc, from) ← List(
+        ("without empty iterations", DataOrbeonForms40),
+        ("with empty iterations",    DataOrbeonForms40EmptyIterations)
       )
     } locally {
-      assertXMLDocumentsIgnoreNamespacesInScope(
-        from.root,
-        DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON, pruneMetadata = false)
-      )
+      it(s"must pass $desc") {
+        assertXMLDocumentsIgnoreNamespacesInScope(
+          from.root,
+          DataMigration.migrateDataFrom(DataMigration.migrateDataTo(from.root, MigrationJSON), MigrationJSON, pruneMetadata = false)
+        )
+      }
     }
+  }
 }

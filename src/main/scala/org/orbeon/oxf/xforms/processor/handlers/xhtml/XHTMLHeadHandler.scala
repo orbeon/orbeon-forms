@@ -228,7 +228,8 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
       def help = dynamicProperty(
         containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
         HELP_HANDLER_PROPERTY,
-        true)
+        true
+      )
 
       // Whether resources are versioned
       def resourcesVersioned = dynamicProperty(

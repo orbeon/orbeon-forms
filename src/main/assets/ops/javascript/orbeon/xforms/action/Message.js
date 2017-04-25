@@ -14,11 +14,11 @@
 
 (function() {
 
-    var OD = ORBEON.util.Dom;
-    var YD = YAHOO.util.Dom;
-    var Event = YAHOO.util.Event;
-    var Utils = ORBEON.util.Utils;
-    var SimpleDialog = YAHOO.widget.SimpleDialog;
+    var $ = ORBEON.jQuery;
+
+    function OD           () { return ORBEON.util.Dom; }
+    function Event        () { return YAHOO.util.Event; }
+    function Utils        () { return ORBEON.util.Utils; }
 
     ORBEON.xforms.action.Message = {
 
@@ -29,9 +29,9 @@
         _initDialog: function() {
             if (this._messageDialog == null) {
                 // Prevent SimpleDialog from registering itself on the form
-                SimpleDialog.prototype.registerForm = function() {};
+                YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
                 // Create one single instance of the YUI dialog used for xf:message
-                this._messageDialog = new SimpleDialog("xforms-message-dialog", {
+                this._messageDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
                     width: "30em",
                     fixedcenter: true,
                     constraintoviewport: true,
@@ -56,18 +56,17 @@
                 });
                 this._messageDialog.setHeader("Message");
                 this._messageDialog.render(document.body);
-                Utils.overlayUseDisplayHidden(this._messageDialog);
+                Utils().overlayUseDisplayHidden(this._messageDialog);
 
                 // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
-                var dialogDiv = OD.get("xforms-message-dialog");
-                dialogDiv.setAttribute("aria-live", "polite");
+                $("#xforms-message-dialog").attr("aria-live", "polite");
             }
         },
 
         _showMessage: function() {
             // Create a span, otherwise setBody() assume the parameters is HTML, while we want it to be text
             var span = document.createElement("span");
-            OD.setStringValue(span, this._messageQueue[0]);
+            OD().setStringValue(span, this._messageQueue[0]);
             this._initDialog();
             this._messageDialog.setBody(span);
             this._messageDialog.show();
@@ -83,12 +82,12 @@
         showMessages: function(messages) {
             this._initDialog();
             _.each(messages, function(message) { this._messageQueue.push(message); }, this);
-            Event.onAvailable("xforms-message-dialog", this._showMessage, this, true);
+            Event().onAvailable("xforms-message-dialog", this._showMessage, this, true);
         },
 
         execute: function(element) {
-            if (OD.getAttribute(element, "level") == "modal") {
-                var message = OD.getStringValue(element);
+            if (OD().getAttribute(element, "level") == "modal") {
+                var message = OD().getStringValue(element);
                 this._messageQueue.push(message);
                 if (this._messageQueue.length == 1) this._showMessage();
             }

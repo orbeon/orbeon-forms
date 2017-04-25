@@ -19,7 +19,11 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 // Encoded combination of static an dynamic state that fully represents an XForms document's current state
-case class XFormsState(staticStateDigest: Option[String], staticState: Option[String], dynamicState: Option[DynamicState]) {
+case class XFormsState(
+  staticStateDigest : Option[String],
+  staticState       : Option[String],
+  dynamicState      : Option[DynamicState]
+) {
   override def toString = s"XFormsState($staticState, $dynamicState)"
 }
 
@@ -63,6 +67,6 @@ trait XFormsStateLifecycle {
   def onRemovedFromCache(uuid: String): Unit
   def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit
 
-  def getClientEncodedDynamicStateJava(containingDocument: XFormsContainingDocument) =
+  def getClientEncodedDynamicStateJava(containingDocument: XFormsContainingDocument): String =
     getClientEncodedDynamicState(containingDocument).orNull
 }

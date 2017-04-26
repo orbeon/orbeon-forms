@@ -40,6 +40,10 @@ import scala.xml.Elem
 
 object XML {
 
+  case class URIQualifiedName(uri: String, localName: String) {
+    require(Name10Checker.getInstance.isValidNCName(localName))
+  }
+
   // This should ideally not be global. Tried 2013-11-14 to use DocumentWrapper.makeWrapper instead, see
   // 2263a3f7b9565fa2102a7cc56ecb007a5c881312 and 0d7bc1fda0a121b2c107adc15a92cba67a09984f, but this is not good
   // enough as NodeWrapper does need a Configuration to operate properly. So for now we keep this wrapper.
@@ -454,9 +458,9 @@ object XML {
       StructuredQName.fromLexicalQName(lexicalQName, true, checker, resolver)
     }
 
-    def resolveURIQualifiedName(lexicalQName: String): (String, String) = {
+    def resolveURIQualifiedName(lexicalQName: String): URIQualifiedName = {
       val structuredQName = resolveStructuredQName(lexicalQName)
-      structuredQName.getNamespaceURI → structuredQName.getLocalName
+      URIQualifiedName(structuredQName.getNamespaceURI, structuredQName.getLocalName)
     }
 
     def resolveQName(lexicalQName: String): QName = {
@@ -465,8 +469,9 @@ object XML {
     }
 
     // Return a qualified name as a (namespace uri, local name) pair
-    // NOTE: The "URI qualified name" terminology comes from XPath 3.
-    def uriQualifiedName = (nodeInfo.getURI, nodeInfo.getLocalPart)
+    // NOTE: The "URI qualified name" terminology comes from XPath 3:
+    // ([`URIQualifiedName`](https://www.w3.org/TR/xpath-31/#doc-xpath31-URIQualifiedName)).
+    def uriQualifiedName = URIQualifiedName(nodeInfo.getURI, nodeInfo.getLocalPart)
 
     def stringValue = nodeInfo.getStringValue
 
@@ -635,6 +640,7 @@ object XML {
 
   implicit def stringToQName(s: String): QName = QName.get(s ensuring ! s.contains(':'))
   implicit def tupleToQName(name: (String, String)): QName = QName.get(name._2, "", name._1)
+  implicit def uriQualifiedNameToQName(uriQualifiedName: URIQualifiedName): QName = QName.get(uriQualifiedName.localName, "", uriQualifiedName.uri)
   def stringToStringValue(s: String) = StringValue.makeStringValue(s)
 
   implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()

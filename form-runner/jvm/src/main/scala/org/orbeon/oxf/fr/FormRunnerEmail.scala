@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
@@ -97,7 +98,7 @@ trait FormRunnerEmail {
       holder
   }
 
-  private def bindingForSection(head: NodeInfo, section: NodeInfo) = {
+  private def bindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
     val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
     sectionTemplateBindingName(section) flatMap mapping.get
   }

@@ -76,7 +76,7 @@ object MigrationOps {
       case None ⇒
         (
           Nil,
-          Map.empty[(String, String), DocumentInfo]
+          Map.empty[URIQualifiedName, DocumentInfo]
         )
     }
 

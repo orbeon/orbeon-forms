@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.NodeInfo
 import XMLNames._
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -69,7 +70,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def isSectionTemplateContent(container: NodeInfo) =
     (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
 
-  def sectionTemplateBindingName(section: NodeInfo) =
+  def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
 
   def findSectionsWithTemplates(view: NodeInfo) =
@@ -81,14 +82,14 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   // Find the binding's first URI qualified name
   // For now takes the first CSS rule and assume the form foo|bar.
-  def bindingFirstURIQualifiedName(binding: NodeInfo) = {
+  def bindingFirstURIQualifiedName(binding: NodeInfo): URIQualifiedName = {
     val firstElementCSSName = (binding /@ "element" stringValue) split "," head
     val elementQName        = firstElementCSSName.replace('|', ':')
 
     binding.resolveURIQualifiedName(elementQName)
   }
 
-  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]) = {
+  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 
     val bindingsForSectionTemplates =
       availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)

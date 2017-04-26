@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.fr
 
-import org.junit.Test
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.scaxon.XML._
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpecLike
 
-class EmailTest extends DocumentTestBase with AssertionsForJUnit {
+class EmailTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
 
   val FormWithEmailControls = "oxf:/org/orbeon/oxf/fr/form-with-email-controls.xhtml"
 
-  @Test def testEmailExtraction(): Unit = {
+  describe("Email address extraction from form definition") {
 
     val formDoc = readURLAsImmutableXMLDocument(FormWithEmailControls)
 
@@ -38,52 +40,68 @@ class EmailTest extends DocumentTestBase with AssertionsForJUnit {
     val data =
       TransformerUtils.extractAsMutableDocument(instance child * head)
 
-    def sequenceIteratorToStringList(it: SequenceIterator) =
-      asScalaIterator(it).map(_.getStringValue).to[List]
+    def valuesForSearch(search: ⇒ Seq[ControlBindPathHolders]) = {
 
-    locally {
+      val searchResult = search
 
-      val expectedForClassName = List(
-        "fr-email-recipient"                → List("info+toplevel@orbeon.com"),
-        "fr-email-subject"                  → List(),
-        "fr-attachment"                     → List("attachment-13.bin", "attachment-14.bin"),
-        "fr-attachment fr-email-attachment" → List("attachment-14.bin")
-      )
+      val distinctPaths =
+        searchResult map { case ControlBindPathHolders(_, _, path, _) ⇒ path map (_.value) mkString "/" } distinct
 
-      def valuesForClassName(className: String) =
-        sequenceIteratorToStringList(
-          searchHoldersForClassTopLevelOnly(
-            body,
-            data,
-            className
-          )
-        )
+      val values =
+        searchResult.flatMap(_.holders).flatten.map(_.getStringValue).to[List]
 
-      for ((className, expected) ← expectedForClassName)
-        assert(expected === valuesForClassName(className))
+      (values, distinctPaths)
     }
 
-    locally {
+    describe("without section templates") {
 
       val expectedForClassName = List(
-        "fr-email-recipient"                → List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"),
-        "fr-email-subject"                  → List("Abc", "Def", "Ghi"),
-        "fr-attachment"                     → List("attachment-10.bin", "attachment-11.bin"),
-        "fr-attachment fr-email-attachment" → List("attachment-11.bin")
+        ("fr-email-recipient"               , List("info+toplevel@orbeon.com")              , List("section-1/control-1")),
+        ("fr-email-subject"                 , Nil                                           , Nil),
+        ("fr-attachment"                    , List("attachment-13.bin", "attachment-14.bin"), List("section-1/control-13", "section-1/control-14")),
+        ("fr-attachment fr-email-attachment", List("attachment-14.bin")                     , List("section-1/control-14"))
       )
 
-      def valuesForClassName(className: String) =
-        sequenceIteratorToStringList(
-          searchHoldersForClassUseSectionTemplates(
-            head,
-            body,
-            data,
-            className
-          )
-        )
+      for ((classNames, expectedValues, expectedPath) ← expectedForClassName)
+        it(s"must pass with $classNames") {
 
-      for ((className, expected) ← expectedForClassName)
-        assert(expected === valuesForClassName(className))
+          val (actualValues, actualPaths) = valuesForSearch {
+            searchControlsTopLevelOnly(
+              body,
+              Some(data),
+              FormRunner.hasAllClassesPredicate(classNames.splitTo[List]())
+            )
+          }
+
+          assert(expectedValues === actualValues)
+          assert(expectedPath   === actualPaths)
+        }
+    }
+
+    describe("within section templates") {
+
+      val expectedForClassName = List(
+        ("fr-email-recipient"               , List("info+0@orbeon.com", "info+1@orbeon.com", "info+2@orbeon.com"), List("section-3/control-1", "section-3/section-3/grid-4/grid-4-iteration/control-6")),
+        ("fr-email-subject"                 , List("Abc", "Def", "Ghi")                                          , List("section-3/control-8", "section-3/section-3/grid-4/grid-4-iteration/control-7")),
+        ("fr-attachment"                    , List("attachment-10.bin", "attachment-11.bin")                     , List("section-3/control-10","section-3/control-11")),
+        ("fr-attachment fr-email-attachment", List("attachment-11.bin")                                          , List("section-3/control-11"))
+      )
+
+      for ((classNames, expectedValues, expectedPath) ← expectedForClassName)
+        it(s"must pass with $classNames") {
+
+          val (actualValues, actualPaths) = valuesForSearch {
+            searchControlsUnderSectionTemplates(
+              head,
+              body,
+              Some(data),
+              FormRunner.hasAllClassesPredicate(classNames.splitTo[List]())
+            )
+          }
+
+          assert(expectedValues === actualValues)
+          assert(expectedPath   === actualPaths)
+        }
     }
   }
 }

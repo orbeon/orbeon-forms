@@ -51,8 +51,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
   // Find data holders (there can be more than one with repeats)
-  def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
-    findDataHoldersInDocument(inDoc, controlName, formInstanceRoot(inDoc))
+  def findDataHolders(inDoc: NodeInfo, controlName: String): List[NodeInfo] =
+    findBindPathHoldersInDocument(inDoc, controlName, Some(formInstanceRoot(inDoc))) flatMap (_.holders) getOrElse Nil
 
   def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 

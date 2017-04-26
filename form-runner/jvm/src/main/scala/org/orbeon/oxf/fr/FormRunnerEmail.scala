@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
@@ -37,12 +35,14 @@ trait FormRunnerEmail {
     data       : NodeInfo,
     classNames : String
   ): SequenceIterator =
-    searchHolderInDoc(
-      controls    = body descendant * filter IsControl,
-      inDoc       = body,
-      contextItem = data.rootElement,
-      classNames  = classNames
-    )
+    searchControlsTopLevelOnly(
+      body      = body,
+      data      = Option(data),
+      predicate = hasAllClassesPredicate(classNames.splitTo[List]())
+    ) flatMap {
+      case ControlBindPathHolders(_, _, _, Some(holders)) ⇒ holders
+      case ControlBindPathHolders(_, _, _, None)          ⇒ Nil
+    }
 
   // Given a form head, form body and instance data:
   //
@@ -64,42 +64,13 @@ trait FormRunnerEmail {
     data       : NodeInfo,
     classNames : String
   ): SequenceIterator =
-    for {
-      section       ← findSectionsWithTemplates(body)
-      sectionName   ← getControlNameOpt(section).toList
-      sectionHolder ← findDataHoldersInDocument(body, sectionName, data.rootElement)
-      binding       ← bindingForSection(head, section).toList
-      holder        ← searchHolderInDoc(
-        controls    = binding.rootElement / XBLTemplateTest descendant * filter IsControl,
-        inDoc       = binding,
-        contextItem = sectionHolder,
-        classNames  = classNames
-      )
-    } yield
-      holder
-
-  private def searchHolderInDoc(
-    controls    : Seq[NodeInfo],
-    inDoc       : NodeInfo,
-    contextItem : NodeInfo,
-    classNames  : String
-  ): Seq[NodeInfo] = {
-
-    val classNamesList = classNames.splitTo[List]()
-
-    for {
-      control        ← controls
-      controlClasses = control.attClasses
-      if classNamesList forall controlClasses.contains
-      bindId         ← control.attValueOpt("bind").toList
-      bindName       ← controlNameFromIdOpt(bindId).toList
-      holder         ← findDataHoldersInDocument(inDoc, bindName, contextItem)
-    } yield
-      holder
-  }
-
-  private def bindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
-    val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
-    sectionTemplateBindingName(section) flatMap mapping.get
-  }
+    searchControlsUnderSectionTemplates(
+      head      = head,
+      body      = body,
+      data      = Option(data),
+      predicate = hasAllClassesPredicate(classNames.splitTo[List]())
+    ) flatMap {
+      case ControlBindPathHolders(_, _, _, Some(holders)) ⇒ holders
+      case ControlBindPathHolders(_, _, _, None)          ⇒ Nil
+    }
 }

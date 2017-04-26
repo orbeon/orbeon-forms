@@ -54,7 +54,7 @@ object MigrationOps {
   // - section templates are not nested (they could be in the future)
   // - repeated grids can have repeat="true|content"
   //
-  // For an example of JSON, see MigrationTest.
+  // For an example of JSON, see `MigrationTest`.
   //
   //@XPathFunction
   def buildGridMigrationMap(
@@ -96,7 +96,7 @@ object MigrationOps {
 
       for {
         (gridName, iterationName) ← names
-        (_, pathElems)            ← findBindAndPathStatically(doc, gridName)
+        BindPath(_, pathElems)    ← findBindAndPathStatically(doc, gridName)
       } yield
         Migration(pathElems, PathElem(iterationName))
     }
@@ -109,10 +109,10 @@ object MigrationOps {
 
       // NOTE: Don't use findDataHolders. We don't want current holders, as there might be none if there is are
       // currently no iterations around a section template, for example. We must find this statically.
-      val (_, holderPathElems) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
+      val BindPath(_, holderPath) = findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
 
       pathsForBinding(xblBinding.root) map {
-        case Migration(pathElems, iterationElem) ⇒ Migration(holderPathElems ++ pathElems, iterationElem)
+        case Migration(path, iterationElem) ⇒ Migration(holderPath ++ path, iterationElem)
       }
     }
 

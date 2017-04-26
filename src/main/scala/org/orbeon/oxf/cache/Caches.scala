@@ -41,14 +41,14 @@ object Caches {
     val Logger = LoggerFactory.getLogger("org.orbeon.caches")
 
     val cacheManager =
-      try {
-        // Read configuration from XML file in resources
-        val manager = new CacheManager(URLFactory.createURL(EhcachePath))
-        withMessage(manager, s"initialized cache manager from `$EhcachePath`")
-      } catch {
-        case NonFatal(t) ⇒
-          throw new OXFException(s"unable to read cache manager configuration from `$EhcachePath`", t)
-      }
+      withMessage(
+        try new CacheManager(URLFactory.createURL(EhcachePath))
+        catch {
+          case NonFatal(t) ⇒
+            throw new OXFException(s"unable to read cache manager configuration from `$EhcachePath`", t)
+        },
+        s"initialized cache manager from `$EhcachePath`"
+      )
 
     def withMessage[T](t: T, message: String) = { Logger.debug(message); t }
   }

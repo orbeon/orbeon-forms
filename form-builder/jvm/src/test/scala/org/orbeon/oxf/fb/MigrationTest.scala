@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fb
 
-import org.junit.Test
 import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}

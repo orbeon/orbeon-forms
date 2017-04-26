@@ -35,8 +35,7 @@ trait FormDefinition {
   // Returns the controls that are searchable from a form definition
   def findIndexedControls(formDoc: DocumentInfo, app: String, form: String): Seq[IndexedControl] = {
 
-    // NOTE: Once we introduce
-    val migratePathsTo40Format =
+    val mustMigratePathsTo40Format =
       FormRunnerPersistence.providerDataFormatVersion(app, form) == FormRunnerPersistence.DataFormatVersion400
 
     // Controls in the view, with the `fr-summary` or `fr-search` class
@@ -50,7 +49,7 @@ trait FormDefinition {
     }
 
     val migrationPaths =
-      if (migratePathsTo40Format)
+      if (mustMigratePathsTo40Format)
         FormRunner.metadataInstanceRootOpt(formDoc).toList flatMap
           DataMigration.migrationMapFromMetadata           flatMap
           DataMigration.decodeMigrationsFromJSON
@@ -61,44 +60,46 @@ trait FormDefinition {
 
       val controlName    = FormRunner.getControlName(control)
       val bindForControl = FormRunner.findBindByName(formDoc, controlName).get
-      val bindsToControl = bindForControl.ancestorOrSelf("*:bind").reverse.tail // skip instance root bind
 
-      // Specific case for Form Builder: drop language predicate, as we want to index/return
-      // values for all languages. So far, this is handled as a special case, as this is not
-      // something that happens in other forms.
-      val bindPathElems =
-        for {
-          bind    ← bindsToControl.to[List]
-          bindRef = bind.attValue("ref")
-        } yield
-          PathElem(
-            if (bindRef.endsWith(FBLangPredicate))
-              bindRef.dropRight(FBLangPredicate.length)
-            else
-              bindRef
-          )
+      val adjustedBindPathElems = {
 
-      // Adjust the search paths if needed by dropping the repeated grid iteration element. We know that a grid
-      // iteration can only contain a leaf control. Example:
-      //
-      // - bind refs      : "my-section" :: "my-grid" :: "my-grid-iteration" :: "my-text" :: Nil
-      // - migration paths: "my-section" :: "my-grid" :: Nil
-      //
-      val adjustedBindRefs =
-        if (migratePathsTo40Format && (migrationPaths exists (migration ⇒ bindPathElems.startsWith(migration.path))))
+        // Specific case for Form Builder: drop language predicate, as we want to index/return
+        // values for all languages. So far, this is handled as a special case, as this is not
+        // something that happens in other forms.
+        val bindPathElems =
+          for {
+            bind    ← bindForControl.ancestorOrSelf("*:bind").reverse.tail.to[List] // skip instance root bind
+            bindRef = bind.attValue("ref")
+          } yield
+            PathElem(
+              if (bindRef.endsWith(FBLangPredicate))
+                bindRef.dropRight(FBLangPredicate.length)
+              else
+                bindRef
+            )
+
+        // Adjust the search paths if needed by dropping the repeated grid iteration element. We know that a grid
+        // iteration can only contain a leaf control. Example:
+        //
+        // - bind refs      : "my-section" :: "my-grid" :: "my-grid-iteration" :: "my-text" :: Nil
+        // - migration path : "my-section" :: "my-grid" :: Nil
+        // - migrated path  : "my-section" :: "my-grid" :: "my-text" :: Nil
+        //
+        if (mustMigratePathsTo40Format && (migrationPaths exists (migration ⇒ bindPathElems.startsWith(migration.path))))
           bindPathElems.dropRight(2) ::: bindPathElems.last :: Nil
         else
           bindPathElems
+      }
 
       IndexedControl(
         name      = controlName,
         inSearch  = control.attClasses(FRSearch),
         inSummary = control.attClasses(FRSummary),
-        xpath     = adjustedBindRefs map (_.value) mkString "/",
+        xpath     = adjustedBindPathElems map (_.value) mkString "/",
         xsType    = (bindForControl /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
         htmlLabel = FormRunner.hasHTMLMediatype(control \ (XF → "label"))
-       )
+      )
     }
   }
 

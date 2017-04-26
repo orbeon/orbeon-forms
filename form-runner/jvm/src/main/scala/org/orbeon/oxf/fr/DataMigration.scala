@@ -26,7 +26,16 @@ import org.orbeon.scaxon.XML._
 object DataMigration {
 
   case class PathElem(value: String) {
-    require(Name10Checker.getInstance.isValidNCName(value))
+    require(Name10Checker.getInstance.isValidNCName(value) || PathElem.SpecialFormBuilderPaths(value))
+  }
+
+  object PathElem {
+    // With Form Builder, `value` can be a `QName` and can even have a predicate.
+    private val SpecialFormBuilderPaths = Set(
+      "xh:head",
+      "xf:model[@id = 'fr-form-model']",
+      "xf:instance[@id = 'fr-form-metadata']/*"
+    )
   }
 
   case class Migration(path: List[PathElem], iterationElem: PathElem) {

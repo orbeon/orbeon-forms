@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xml.FunctionSupport
+import org.orbeon.oxf.xml.{FunctionSupport, RuntimeDependentFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 
@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.SequenceIterator
   *
   * Return the value of the given request attribute.
   */
-class XXFormsGetRequestAttribute extends FunctionSupport {
+class XXFormsGetRequestAttribute extends FunctionSupport with RuntimeDependentFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

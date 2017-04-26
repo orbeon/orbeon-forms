@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xml.FunctionSupport
+import org.orbeon.oxf.xml.{FunctionSupport, RuntimeDependentFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 
@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
   *
   * Set the value of the given session attribute.
   */
-class XXFormsSetRequestAttribute extends FunctionSupport {
+class XXFormsSetRequestAttribute extends FunctionSupport with RuntimeDependentFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 

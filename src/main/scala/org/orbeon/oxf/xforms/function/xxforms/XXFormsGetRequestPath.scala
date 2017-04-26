@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.StringValue
@@ -25,7 +26,7 @@ import org.orbeon.saxon.value.StringValue
   *
   * Return the value of the request path.
   */
-class XXFormsGetRequestPath extends XFormsFunction {
+class XXFormsGetRequestPath extends XFormsFunction with RuntimeDependentFunction {
 
   override def evaluateItem(xpathContext: XPathContext): Item =
     functionOperation == 1 option getContainingDocument(xpathContext) match {

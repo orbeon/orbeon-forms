@@ -25,6 +25,8 @@ import org.orbeon.scaxon.XML._
 
 object DataMigration {
 
+  import Private._
+
   case class PathElem(value: String) {
     require(Name10Checker.getInstance.isValidNCName(value) || PathElem.SpecialFormBuilderPaths(value))
   }
@@ -73,38 +75,6 @@ object DataMigration {
 
     migrations.flatten.to[List]
   }
-
-  // NOTE: The format of the path is like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
-  // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
-  // the migration data.
-  private val TrimPathElementRE = """\s*\(?([^)^/]+)\)?\s*""".r
-
-  private def partitionNodes(
-    mutableData : NodeInfo,
-    migration   : List[Migration]
-  ): List[(NodeInfo, List[NodeInfo], String, PathElem)] =
-    migration flatMap {
-      case Migration(path, iterationElem) ⇒
-
-        val (pathToParentNodes, pathToChildNodes) =
-          (path.init map (_.value) mkString "/", path.last.value)
-
-        // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
-        val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes) collect {
-          case node: NodeInfo ⇒ node
-        }
-
-        parentNodes map { parentNode ⇒
-
-          val nodes = XML.eval(parentNode, pathToChildNodes) collect {
-            case node: NodeInfo ⇒ node
-          }
-
-          // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which
-          // in no namespaces, and if they were in a namespace, the prefixes would likely be unique.
-          (parentNode, nodes.to[List], pathToChildNodes, iterationElem)
-        }
-    }
 
   import org.orbeon.oxf.xforms.action.XFormsAPI._
 
@@ -169,17 +139,6 @@ object DataMigration {
   //@XPathFunction
   def dataMaybeMigratedTo(data: DocumentInfo, metadata: Option[DocumentInfo]): Option[DocumentWrapper] =
     dataMaybeMigratedFromTo(data, metadata, migrateDataTo)
-
-  private def dataMaybeMigratedFromTo(
-    data     : DocumentInfo,
-    metadata : Option[DocumentInfo],
-    migrate  : (DocumentInfo, String) ⇒ DocumentWrapper
-  ): Option[DocumentWrapper] =
-    for {
-      metadata  ← metadata
-      migration ← migrationMapFromMetadata(metadata.rootElement)
-    } yield
-      migrate(data, migration)
 
   def migrationMapFromMetadata(metadataRootElement: NodeInfo): Option[String] =
     metadataRootElement firstChild "migration" filter (_.attValue("version") == "4.8.0") map (_.stringValue)
@@ -264,39 +223,85 @@ object DataMigration {
     mutableData
   }
 
-  private def copyDocumentKeepInstanceData(data: DocumentInfo): DocumentWrapper =
-    new DocumentWrapper(
-      data match {
-        case virtualNode: VirtualNode ⇒
-          virtualNode.getUnderlyingNode match {
-            case doc: Document ⇒ Dom4jUtils.createDocumentCopyElement(doc.getRootElement)
-            case _             ⇒ throw new IllegalStateException
+  private object Private {
+
+    // NOTE: The format of the path can be like `(section-3)/(section-3-iteration)/(grid-4)`. Form Builder
+    // puts parentheses for the abandoned case of a custom XML format, and we kept that when producing
+    // the migration data.
+    val TrimPathElementRE = """\s*\(?([^)^/]+)\)?\s*""".r
+
+    def partitionNodes(
+      mutableData : NodeInfo,
+      migration   : List[Migration]
+    ): List[(NodeInfo, List[NodeInfo], String, PathElem)] =
+      migration flatMap {
+        case Migration(path, iterationElem) ⇒
+
+          val (pathToParentNodes, pathToChildNodes) =
+            (path.init map (_.value) mkString "/", path.last.value)
+
+          // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
+          val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes) collect {
+            case node: NodeInfo ⇒ node
           }
-        case _ ⇒
-          TransformerUtils.tinyTreeToDom4j(data)
-      },
-      null,
-      XPath.GlobalConfiguration
-    )
 
-  // Remove all `fr:*` elements and attributes
-  private def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentInfo): Unit = {
-    // Delete elements from concrete `List` to avoid possible laziness
-    val frElements = mutableData descendant * filter (_.namespaceURI == XMLNames.FR) toList
+          parentNodes map { parentNode ⇒
 
-    frElements.foreach (delete(_, doDispatch = false))
+            val nodes = XML.eval(parentNode, pathToChildNodes) collect {
+              case node: NodeInfo ⇒ node
+            }
 
-    // Attributes OTOH can be deleted in document order just fine
-    val allElements = mutableData descendant *
+            // NOTE: Should ideally test on uriQualifiedName instead. The data in practice has elements which
+            // in no namespaces, and if they were in a namespace, the prefixes would likely be unique.
+            (parentNode, nodes.to[List], pathToChildNodes, iterationElem)
+          }
+      }
 
-    val frAttributes = allElements /@ @* filter (_.namespaceURI == XMLNames.FR)
+    def dataMaybeMigratedFromTo(
+      data     : DocumentInfo,
+      metadata : Option[DocumentInfo],
+      migrate  : (DocumentInfo, String) ⇒ DocumentWrapper
+    ): Option[DocumentWrapper] =
+      for {
+        metadata  ← metadata
+        migration ← migrationMapFromMetadata(metadata.rootElement)
+      } yield
+        migrate(data, migration)
 
-    frAttributes.foreach (delete(_, doDispatch = false))
+    def copyDocumentKeepInstanceData(data: DocumentInfo): DocumentWrapper =
+      new DocumentWrapper(
+        data match {
+          case virtualNode: VirtualNode ⇒
+            virtualNode.getUnderlyingNode match {
+              case doc: Document ⇒ Dom4jUtils.createDocumentCopyElement(doc.getRootElement)
+              case _             ⇒ throw new IllegalStateException
+            }
+          case _ ⇒
+            TransformerUtils.tinyTreeToDom4j(data)
+        },
+        null,
+        XPath.GlobalConfiguration
+      )
 
-    // Also remove all `fr:*` namespaces
-    // TODO: This doesn't work: we find the nodes but the delete action doesn't manage to delete the node.
-    val frlNamespaces = allElements.namespaceNodes filter (_.stringValue == XMLNames.FR)
+    // Remove all `fr:*` elements and attributes
+    def pruneFormRunnerMetadataFromMutableData(mutableData: DocumentInfo): Unit = {
+      // Delete elements from concrete `List` to avoid possible laziness
+      val frElements = mutableData descendant * filter (_.namespaceURI == XMLNames.FR) toList
 
-    frlNamespaces.foreach (delete(_, doDispatch = false))
+      frElements.foreach (delete(_, doDispatch = false))
+
+      // Attributes OTOH can be deleted in document order just fine
+      val allElements = mutableData descendant *
+
+      val frAttributes = allElements /@ @* filter (_.namespaceURI == XMLNames.FR)
+
+      frAttributes.foreach (delete(_, doDispatch = false))
+
+      // Also remove all `fr:*` namespaces
+      // TODO: This doesn't work: we find the nodes but the delete action doesn't manage to delete the node.
+      val frlNamespaces = allElements.namespaceNodes filter (_.stringValue == XMLNames.FR)
+
+      frlNamespaces.foreach (delete(_, doDispatch = false))
+    }
   }
 }

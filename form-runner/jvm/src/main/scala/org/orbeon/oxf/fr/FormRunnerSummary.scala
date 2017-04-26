@@ -40,7 +40,7 @@ trait FormRunnerSummary {
       fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
       filename           = "data.xml",
-      commonQueryString = s"$DataFormatVersionName=$databaseDataFormatVersion",
+      commonQueryString  = s"$DataFormatVersionName=$databaseDataFormatVersion",
       forceAttachments   = true,
       formVersion        = someFormVersion
     )

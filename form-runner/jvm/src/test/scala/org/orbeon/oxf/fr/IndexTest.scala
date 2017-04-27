@@ -1,15 +1,18 @@
 package org.orbeon.oxf.fr
 
-import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
-import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexedControl
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.scaxon.XML._
+import org.scalatest.FunSpecLike
 
-class IndexTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def formBuilderPermissions(): Unit = {
+class IndexTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
+
+  describe("The `findIndexedControls` function") {
 
     val formElem =
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -19,7 +22,7 @@ class IndexTest extends DocumentTestBase with AssertionsForJUnit {
         <xh:head>
           <xf:model id="fr-form-model">
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-              <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+              <xf:bind id="my-section-bind" name="my-section" ref="my-section">
                 <xf:bind id="in-summary-bind" name="in-summary" ref="in-summary"/>
                 <xf:bind id="in-search-bind" ref="in-search" name="in-search"/>
                 <xf:bind id="in-both-bind" ref="in-both" name="in-both"/>
@@ -35,14 +38,14 @@ class IndexTest extends DocumentTestBase with AssertionsForJUnit {
         <xh:body>
           <fr:view>
             <fr:body>
-              <fr:section id="section-1-control" bind="section-1-bind">
-                <xf:label ref="$form-resources/section-1/label"/>
-                <xf:help ref="$form-resources/section-1/help"/>
+              <fr:section id="my-section-control" bind="my-section-bind">
+                <xf:label ref="$form-resources/my-section/label"/>
+                <xf:help ref="$form-resources/my-section/help"/>
                 <fr:grid>
                   <xh:tr>
                     <xh:td>
                       <xf:input id="in-summary-control" bind="in-summary-bind" class="fr-summary">
-                        <xf:label ref="$form-resources/in-summary/label"/>
+                        <xf:label ref="$form-resources/in-summary/label" mediatype="text/html"/>
                         <xf:hint ref="$form-resources/in-summary/hint"/>
                         <xf:help ref="$form-resources/in-summary/help"/>
                         <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -107,12 +110,16 @@ class IndexTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>
 
-    val indexedControls = Index.findIndexedControls(elemToDocumentInfo(formElem), app = "test", form = "index")
+    val expected = List(
+      IndexedControl("in-summary", inSearch = false, inSummary = true,  "my-section/in-summary",       "xs:string", "input", htmlLabel = true,  resources = Nil),
+      IndexedControl("in-search",  inSearch = true,  inSummary = false, "my-section/in-search",        "xs:string", "input", htmlLabel = false, resources = Nil),
+      IndexedControl("in-both",    inSearch = true,  inSummary = true,  "my-section/in-both",          "xs:string", "input", htmlLabel = false, resources = Nil),
+      IndexedControl("date",       inSearch = true,  inSummary = true,  "my-section/date",             "xf:date"  , "input", htmlLabel = false, resources = Nil),
+      IndexedControl("in-repeat",  inSearch = true,  inSummary = true,  "my-section/repeat/in-repeat", "xs:string", "input", htmlLabel = false, resources = Nil)
+    )
 
-    assert(indexedControls(0) === IndexedControl("in-summary", inSearch = false, inSummary = true,  "section-1/in-summary",       "xs:string", "input", htmlLabel = false, resources = Nil))
-    assert(indexedControls(1) === IndexedControl("in-search",  inSearch = true,  inSummary = false, "section-1/in-search",        "xs:string", "input", htmlLabel = false, resources = Nil))
-    assert(indexedControls(2) === IndexedControl("in-both",    inSearch = true,  inSummary = true,  "section-1/in-both",          "xs:string", "input", htmlLabel = false, resources = Nil))
-    assert(indexedControls(3) === IndexedControl("date",       inSearch = true,  inSummary = true,  "section-1/date",             "xf:date"  , "input", htmlLabel = false, resources = Nil))
-    assert(indexedControls(4) === IndexedControl("in-repeat",  inSearch = true,  inSummary = true,  "section-1/repeat/in-repeat", "xs:string", "input", htmlLabel = false, resources = Nil))
+    it("must find the expected indexed controls") {
+      assert(expected == Index.findIndexedControls(elemToDocumentInfo(formElem), app = "test", form = "index"))
+    }
   }
 }

@@ -48,9 +48,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     classNamesList exists controlClasses.contains
   }
 
-  private val ControlName     = """(.+)-(control|bind|grid|section|template|repeat)""".r // `repeat` is for legacy FB
-  private val FBLangPredicate = "[@xml:lang = $fb-lang]"
-
   val LHHAInOrder = Seq("label", "hint", "help", "alert")
   val LHHANames   = LHHAInOrder.to[Set]
 
@@ -72,8 +69,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // Whether the given node corresponds to a control
   // TODO: should be more restrictive
   val IsControl: NodeInfo ⇒ Boolean = hasName
-
-  private val PossibleControlSuffixes = List("control", "grid", "section", "repeat")
 
   // Find a control by name (less efficient than searching by id)
   def findControlByName(inDoc: NodeInfo, controlName: String) = (
@@ -114,10 +109,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) =
     findBindByName(inDoc, name).orNull
 
-  // Find a bind by predicate
-  private def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
-    findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
-
   // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name
   def isBindForName(bind: NodeInfo, name: String) =
     hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind).contains(name) // also check ref/nodeset in case id is not present
@@ -129,29 +120,17 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findBindName(bind: NodeInfo) =
     bind attValueOpt "name"
 
-  // 2017-04-25: Don't use enclosing parentheses anymore. This now ensures that the `ref` is a single
-  // reference to an XML element. See https://github.com/orbeon/orbeon-forms/issues/3174.
-  //
-  // Also, specific case for Form Builder: drop language predicate, as we want to index/return values
-  // for all languages. So far, this is handled as a special case, as this is not something that happens
-  // in other forms.
-  private def buildBindPath(bind: NodeInfo): List[DataMigration.PathElem] =
-    (bind ancestorOrSelf XFBindTest flatMap bindRefOrNodeset).reverse.tail map { bindRef ⇒
-      PathElem(
-        if (bindRef.endsWith(FBLangPredicate))
-          bindRef.dropRight(FBLangPredicate.length)
-        else
-          bindRef
-      )
-    } toList
-
   def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[BindPath] =
     findBindByName(inDoc, controlName) map { bindNode ⇒
       BindPath(bindNode, buildBindPath(bindNode))
     }
 
   // If `contextItemOpt` is `None`, don't search for holders.
-  def findBindPathHoldersInDocument(inDoc: NodeInfo, controlName: String, contextItemOpt: Option[Item]): Option[BindPathHolders] =
+  def findBindPathHoldersInDocument(
+    inDoc          : NodeInfo,
+    controlName    : String,
+    contextItemOpt : Option[Item]
+  ): Option[BindPathHolders] =
     findBindAndPathStatically(inDoc, controlName) map { case BindPath(bind, path) ⇒
 
       // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
@@ -203,26 +182,61 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     predicate : NodeInfo ⇒ Boolean
   ): Seq[ControlBindPathHolders] =
     for {
-      section                                                 ← findSectionsWithTemplates(body)
-      sectionName                                             ← getControlNameOpt(section).toList
-      BindPathHolders(_, sectionPath, sectionHoldersOpt)      ← findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
+      section                  ← findSectionsWithTemplates(body)
+      sectionName              ← getControlNameOpt(section).toList
 
-      contextItem ← sectionHoldersOpt match {
-        case None | Some(Nil) ⇒ List(None)
-        case Some(holders)    ⇒ holders map Some.apply
-      }
+      BindPathHolders(
+        _,
+        sectionPath,
+        sectionHoldersOpt
+      )                       ← findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
 
-      xblBinding                                              ← xblBindingForSection(head, section).toList
-      ControlBindPathHolders(control, bind, path, holdersOpt) ← searchControlBindPathHoldersInDoc(
-        controls       = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
-        inDoc          = xblBinding,
-        contextItemOpt = contextItem,
-        predicate      = predicate
-      )
+      contextItemOpt          ← sectionHoldersOpt match {
+                                  case None | Some(Nil) ⇒ List(None)
+                                  case Some(holders)    ⇒ holders map Some.apply
+                                }
+
+      xblBinding              ← xblBindingForSection(head, section).toList
+
+      ControlBindPathHolders(
+        control,
+        bind,
+        path,
+        holdersOpt
+      )                       ← searchControlBindPathHoldersInDoc(
+                                  controls       = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
+                                  inDoc          = xblBinding,
+                                  contextItemOpt = contextItemOpt,
+                                  predicate      = predicate
+                                )
     } yield
       ControlBindPathHolders(control, bind, sectionPath ::: path, holdersOpt)
 
   private object Private {
+
+    val ControlName             = """(.+)-(control|bind|grid|section|template|repeat)""".r // `repeat` is for legacy FB
+    val FBLangPredicate         = "[@xml:lang = $fb-lang]"
+    val PossibleControlSuffixes = List("control", "grid", "section", "repeat")
+
+    // Find a bind by predicate
+    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
+      findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
+
+    // 2017-04-25: Don't use enclosing parentheses anymore. This now ensures that the `ref` is a single
+    // reference to an XML element. See https://github.com/orbeon/orbeon-forms/issues/3174.
+    //
+    // Also, specific case for Form Builder: drop language predicate, as we want to index/return values
+    // for all languages. So far, this is handled as a special case, as this is not something that happens
+    // in other forms.
+    def buildBindPath(bind: NodeInfo): List[DataMigration.PathElem] =
+      (bind ancestorOrSelf XFBindTest flatMap bindRefOrNodeset).reverse.tail map { bindRef ⇒
+        PathElem(
+          if (bindRef.endsWith(FBLangPredicate))
+            bindRef.dropRight(FBLangPredicate.length)
+          else
+            bindRef
+        )
+      } toList
 
     def searchControlBindPathHoldersInDoc(
       controls       : Seq[NodeInfo],

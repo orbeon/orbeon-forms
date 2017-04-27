@@ -74,3 +74,5 @@ trait FormRunnerEmail {
       case ControlBindPathHolders(_, _, _, None)          ⇒ Nil
     }
 }
+
+object FormRunnerEmail extends FormRunnerEmail

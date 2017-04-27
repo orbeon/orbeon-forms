@@ -37,18 +37,8 @@ trait FormRunnerPermissionsOps {
     permissionElement attTokens "operations" toList
 
   //@XPathFunction
-  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo) =
+  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo): List[String] =
     authorizedOperationsBasedOnRoles(permissionsElOrNull)
-
-  private def allOperationsIfNoPermissionsDefined
-    (permissionsElOrNull : NodeInfo)
-    (computePermissions  : List[Permission] ⇒ List[String])
-  : List[String] =
-    PermissionsXML.parse(permissionsElOrNull) match {
-      // No permissions defined for this form, authorize any operation
-      case UndefinedPermissions ⇒ List("*")
-      case DefinedPermissions(permissions) ⇒ computePermissions(permissions)
-    }
 
   /**
    * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
@@ -207,4 +197,16 @@ trait FormRunnerPermissionsOps {
   //@XPathFunction
   def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =
     orbeonRolesFromCurrentRequest.iterator
+
+  private def allOperationsIfNoPermissionsDefined
+    (permissionsElOrNull : NodeInfo)
+    (computePermissions  : List[Permission] ⇒ List[String]
+  ): List[String] =
+    PermissionsXML.parse(permissionsElOrNull) match {
+      // No permissions defined for this form, authorize any operation
+      case UndefinedPermissions ⇒ List("*")
+      case DefinedPermissions(permissions) ⇒ computePermissions(permissions)
+    }
 }
+
+object FormRunnerPermissionsOps extends FormRunnerPermissionsOps

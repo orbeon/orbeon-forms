@@ -38,11 +38,6 @@ trait FormBuilderPermissionsOps {
       (new DocumentWrapper(_, null, XPath.GlobalConfiguration))
   }
 
-  private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
-    case Some(configuration) ⇒ configuration.root / * / "role" toList
-    case None                ⇒ Nil
-  }
-
   //@XPathFunction
   def formBuilderPermissionsForCurrentUserXPath(configurationOpt: Option[NodeInfo]) =
     formBuilderPermissionsForCurrentUserAsXML(configurationOpt, orbeonRolesFromCurrentRequest)
@@ -88,4 +83,11 @@ trait FormBuilderPermissionsOps {
             app → forms) toMap
         }
     }
+
+  private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
+    case Some(configuration) ⇒ configuration.root / * / "role" toList
+    case None                ⇒ Nil
+  }
 }
+
+object FormBuilderPermissionsOps extends FormBuilderPermissionsOps

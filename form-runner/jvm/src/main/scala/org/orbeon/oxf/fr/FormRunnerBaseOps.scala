@@ -113,11 +113,11 @@ trait FormRunnerBaseOps {
   }
 
   // Find an xf:instance element
-  def instanceElement(inDoc: NodeInfo, id: String) =
+  def instanceElement(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     findModelElement(inDoc) \ "*:instance" find (hasIdValue(_, id))
 
   // Find an inline instance's root element
-  def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =
+  def inlineInstanceRootElement(inDoc: NodeInfo, id: String): Option[NodeInfo] =
     instanceElement(inDoc, id).toList \ * headOption
 
   // Find all template instances
@@ -241,3 +241,5 @@ trait FormRunnerBaseOps {
   def errorMessage(message: String): Unit =
     dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" → Some(message)))
 }
+
+object FormRunnerBaseOps extends FormRunnerBaseOps

@@ -13,18 +13,17 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.scaxon.XML._
-import org.orbeon.saxon.om.NodeInfo
-import XMLNames._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
-  private val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
+  import Private._
 
   def isFBBody(node: NodeInfo) = (node self XFGroupTest) && node.attClasses("fb-body")
 
@@ -64,9 +63,6 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def controlRequiresNestedIterationElement(node: NodeInfo) =
     isRepeat(node)
 
-  // Namespace URL a section template component must match
-  private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
-
   def isSectionTemplateContent(container: NodeInfo) =
     (container parent * exists IsSection) && ComponentURI.findFirstIn(container.namespaceURI).nonEmpty
 
@@ -75,10 +71,6 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   def findSectionsWithTemplates(view: NodeInfo) =
     view descendant * filter IsSection filter (_ \ * exists isSectionTemplateContent)
-
-  // All xbl:binding elements available for section templates
-  def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
-    componentBindings filter (_.attClasses("fr-section-component"))
 
   // Find the binding's first URI qualified name
   // For now takes the first CSS rule and assume the form foo|bar.
@@ -90,6 +82,10 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   }
 
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
+
+    // All xbl:binding elements available for section templates
+    def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
+      componentBindings filter (_.attClasses("fr-section-component"))
 
     val bindingsForSectionTemplates =
       availableSectionTemplateXBLBindings(xblElems / XBLBindingTest)
@@ -177,5 +173,13 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     sectionTemplateElementOpt flatMap
       (e ⇒ frSectionComponent.resolve(e.staticId)) flatMap
       collectByErasedType[XFormsComponentControl]
+  }
+
+  private object Private {
+
+    val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
+
+    // Namespace URL a section template component must match
+    val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
   }
 }

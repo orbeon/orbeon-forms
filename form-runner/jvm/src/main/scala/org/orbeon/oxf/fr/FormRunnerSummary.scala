@@ -46,3 +46,5 @@ trait FormRunnerSummary {
     )
   }
 }
+
+object FormRunnerSummary extends FormRunnerSummary

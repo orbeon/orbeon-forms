@@ -153,10 +153,10 @@ object XML {
   }
 
   // Useful predicates
-  val hasChildren: NodeInfo ⇒ Boolean = element ⇒ element / * nonEmpty
-  val hasId: (NodeInfo) ⇒ Boolean = (element) ⇒ element /@ "id" nonEmpty
-  val hasIdValue: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element /@ "id" === id
-  val exists: (Seq[Item]) ⇒ Boolean = (items) ⇒ items.nonEmpty
+  val hasChildren : NodeInfo           ⇒ Boolean = element ⇒ element / * nonEmpty
+  val hasId       : NodeInfo           ⇒ Boolean = (element) ⇒ element /@ "id" nonEmpty
+  val hasIdValue  : (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element /@ "id" === id
+  val exists      : Seq[Item]          ⇒ Boolean = (items) ⇒ items.nonEmpty
 
   // Node test
   abstract class Test {

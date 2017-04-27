@@ -137,3 +137,5 @@ trait FormRunnerMetadata {
     <metadata>{groupedMetadata}</metadata>
   }
 }
+
+object FormRunnerMetadata extends FormRunnerMetadata

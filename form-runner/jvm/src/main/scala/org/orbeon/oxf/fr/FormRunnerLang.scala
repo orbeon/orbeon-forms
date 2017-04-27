@@ -30,6 +30,7 @@ import scala.collection.JavaConverters._
 // NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {
 
+  import Private._
   import FormRunner._
 
   case class AppForm(app: String, form: String) {
@@ -45,7 +46,6 @@ trait FormRunnerLang {
   def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
   //@XPathFunction
   def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
-  def allResources(resources: NodeInfo)  = resources child "resource"
 
   def formResourcesInLang(lang: String): NodeInfo = {
     val formResources = topLevelModel(FormModel).get.getInstance(FormResources).documentInfo.rootElement
@@ -127,53 +127,63 @@ trait FormRunnerLang {
       Some(getDefaultLang(appForm))
   }
 
-  private val OldLocaleRe = "([a-z|A-Z]{2,3})(?:_.*)?".r
-
-  // We support incoming languages of the form `en_US` (not in the IETF BCP 47 format) for backward compatibility reasons
-  // and because for historical reasons Java's `Locale.toString` produces that kind of strings containing an underscore.
-  //
-  // The proxy portlet passes the result of `LanguageUtil.getLanguageId`, which is in `Locale.toString` format. Since
-  // Liferay 6.2, there is a `LanguageUtil.getBCP47LanguageId` method which we should use if possible.
-  //
-  // The only language codes currently in use in `languages.xml` which have an associated country are `zh_CN` and `zh_TW`.
-  // So we explicitly map those to `zh-Hans` and `zh-Hant` even though Java 1.7's doesn't do this:
-  //
-  //     Locale.CHINA.getScript == ""
-  //
-  // References:
-  //
-  // - https://github.com/orbeon/orbeon-forms/issues/2688
-  // - https://github.com/orbeon/orbeon-forms/issues/2700
-  // - https://docs.oracle.com/javase/7/docs/api/java/util/Locale.html
-  // - https://docs.liferay.com/portal/6.1/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getLanguageId(javax.servlet.http.HttpServletRequest)
-  // - https://docs.liferay.com/portal/6.2/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getBCP47LanguageId(javax.servlet.http.HttpServletRequest)
-  //
-  private def cleanLanguage(lang: String) =
-    lang.trimAllToEmpty match {
-      case OldLocaleRe("zh_CN") ⇒ "zh-Hans"
-      case OldLocaleRe("zh_TW") ⇒ "zh-Hant"
-      case OldLocaleRe(oldLang) ⇒ oldLang
-      case newLang              ⇒ newLang
-    }
-
-  private def selectLangUseDefault(appForm: Option[AppForm], requestedLang: Option[String], availableLangs: List[String]) = {
-
-    def matchingLanguage = availableLangs intersect requestedLang.toList headOption
-    def defaultLanguage  = availableLangs intersect List(getDefaultLang(appForm)) headOption
-    def firstLanguage    = availableLangs headOption
-
-    matchingLanguage orElse defaultLanguage orElse firstLanguage
-  }
-
-  private def stringFromSession(request: Request, name: String) =
-    request.sessionOpt flatMap
-      (_.getAttribute(LanguageParam)) map {
-        case item: Item ⇒ item.getStringValue
-        case other      ⇒ other.toString
-      }
-
   // Whether there is a Saxon XPath numberer for the given language
   //@XPathFunction
   def hasXPathNumberer(lang: String) =
     NumberInstruction.makeNumberer(lang, null, null).getClass.getName.endsWith("Numberer_" + lang)
+
+  private object Private {
+
+    private val OldLocaleRe = "([a-z|A-Z]{2,3})(?:_.*)?".r
+
+    // We support incoming languages of the form `en_US` (not in the IETF BCP 47 format) for backward compatibility reasons
+    // and because for historical reasons Java's `Locale.toString` produces that kind of strings containing an underscore.
+    //
+    // The proxy portlet passes the result of `LanguageUtil.getLanguageId`, which is in `Locale.toString` format. Since
+    // Liferay 6.2, there is a `LanguageUtil.getBCP47LanguageId` method which we should use if possible.
+    //
+    // The only language codes currently in use in `languages.xml` which have an associated country are `zh_CN` and `zh_TW`.
+    // So we explicitly map those to `zh-Hans` and `zh-Hant` even though Java 1.7's doesn't do this:
+    //
+    //     Locale.CHINA.getScript == ""
+    //
+    // References:
+    //
+    // - https://github.com/orbeon/orbeon-forms/issues/2688
+    // - https://github.com/orbeon/orbeon-forms/issues/2700
+    // - https://docs.oracle.com/javase/7/docs/api/java/util/Locale.html
+    // - https://docs.liferay.com/portal/6.1/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getLanguageId(javax.servlet.http.HttpServletRequest)
+    // - https://docs.liferay.com/portal/6.2/javadocs/com/liferay/portal/kernel/language/LanguageUtil.html#getBCP47LanguageId(javax.servlet.http.HttpServletRequest)
+    //
+    def cleanLanguage(lang: String): String =
+      lang.trimAllToEmpty match {
+        case OldLocaleRe("zh_CN") ⇒ "zh-Hans"
+        case OldLocaleRe("zh_TW") ⇒ "zh-Hant"
+        case OldLocaleRe(oldLang) ⇒ oldLang
+        case newLang              ⇒ newLang
+      }
+
+    def selectLangUseDefault(
+      appForm        : Option[AppForm],
+      requestedLang  : Option[String],
+      availableLangs : List[String]
+    ): Option[String] = {
+
+      def matchingLanguage = availableLangs intersect requestedLang.toList headOption
+      def defaultLanguage  = availableLangs intersect List(getDefaultLang(appForm)) headOption
+      def firstLanguage    = availableLangs headOption
+
+      matchingLanguage orElse defaultLanguage orElse firstLanguage
+    }
+
+    def stringFromSession(request: Request, name: String) =
+      request.sessionOpt flatMap
+        (_.getAttribute(LanguageParam)) map {
+          case item: Item ⇒ item.getStringValue
+          case other      ⇒ other.toString
+        }
+
+  }
 }
+
+object FormRunnerLang extends FormRunnerLang

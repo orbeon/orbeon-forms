@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import java.util.{Map ⇒ JMap}
+import java.{util ⇒ ju}
 
 import org.orbeon.oxf.fr.FormRunner.{FormRunnerParams, _}
 import org.orbeon.oxf.util.StringUtils._
@@ -30,7 +30,7 @@ trait FormRunnerPDF {
 
   // Return mappings (formatName → expression) for all PDF formats in the properties
   //@XPathFunction
-  def getPDFFormats = {
+  def getPDFFormats: ju.Map[String, String] = {
 
     def propertiesStartingWith(prefix: String) =
       XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).asScala map (_.getStringValue)
@@ -48,7 +48,13 @@ trait FormRunnerPDF {
 
   // Return the PDF formatting expression for the given parameters
   //@XPathFunction
-  def getPDFFormatExpression(pdfFormats: JMap[String, String], app: String, form: String, name: String, dataType: String) = {
+  def getPDFFormatExpression(
+    pdfFormats : ju.Map[String, String],
+    app        : String,
+    form       : String,
+    name       : String,
+    dataType   : String
+  ): String = {
 
     val propertyName = List("oxf.fr.pdf.map", app, form, name) ::: Option(dataType).toList mkString "."
 
@@ -64,7 +70,7 @@ trait FormRunnerPDF {
 
   // Build a PDF control id from the given HTML control
   //@XPathFunction
-  def buildPDFFieldNameFromHTML(control: NodeInfo) = {
+  def buildPDFFieldNameFromHTML(control: NodeInfo): String = {
 
     def isContainer(e: NodeInfo) = {
       val classes = e.attClasses
@@ -90,7 +96,7 @@ trait FormRunnerPDF {
 
   // Add http/https/mailto hyperlinks to a plain string
   //@XPathFunction
-  def hyperlinkURLs(s: String, hyperlinks: Boolean) =
+  def hyperlinkURLs(s: String, hyperlinks: Boolean): String =
     replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 
   // Custom filename (for PDF and TIFF output) for the detail page if specified and if evaluates to a non-empty name
@@ -103,3 +109,5 @@ trait FormRunnerPDF {
     orNull
   )
 }
+
+object FormRunnerPDF extends FormRunnerPDF

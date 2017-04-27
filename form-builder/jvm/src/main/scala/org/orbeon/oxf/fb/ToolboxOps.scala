@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.{FormRunnerLang, FormRunnerResourcesOps}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
@@ -26,18 +26,11 @@ import org.orbeon.scaxon.XML._
  */
 object ToolboxOps {
 
-  val LHHAResourceNamesToInsert = LHHANames - "alert"
-
-  // NOTE: Help is added when needed
-  private val lhhaTemplate: NodeInfo =
-    <template xmlns:xf="http://www.w3.org/2002/xforms">
-      <xf:label ref=""/>
-      <xf:hint ref=""/>
-      <xf:alert ref=""/>
-    </template>
+  import Private._
 
   // Insert a new control in a cell
-  def insertNewControl(doc: NodeInfo, binding: NodeInfo) = {
+  //@XPathFunction
+  def insertNewControl(doc: NodeInfo, binding: NodeInfo): Option[String] = {
 
     ensureEmptyTd(doc) match {
       case Some(gridTd) ⇒
@@ -77,7 +70,7 @@ object ToolboxOps {
 
         // Create resource holder for all form languages
         val resourceHolders = {
-          val formLanguages = allLangs(formResourcesRoot)
+          val formLanguages = FormRunnerResourcesOps.allLangs(formResourcesRoot)
           formLanguages map { formLang ⇒
 
             // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
@@ -92,7 +85,7 @@ object ToolboxOps {
             // Template items, if needed
             val itemsResourceEls =
               if (hasEditor(newControlElement, "static-itemset")) {
-                val fbResourceInFormLang = FormRunner.formResourcesInLang(formLang)
+                val fbResourceInFormLang = FormRunnerLang.formResourcesInLang(formLang)
                 val originalTemplateItems = fbResourceInFormLang \ "template" \ "items" \ "item"
                 if (hasEditor(newControlElement, "item-hint")) {
                   // Supports hint: keep hint we have in the resources.xml
@@ -148,65 +141,15 @@ object ToolboxOps {
     }
   }
 
-  private def findGridInsertionPoint(inDoc: NodeInfo) =
-    findSelectedTd(inDoc) match {
-      case Some(currentTd) ⇒ // A td is selected
-
-        val containers = findAncestorContainers(currentTd)
-
-        // We must always have a parent (grid) and grandparent (possibly fr:body) container
-        assert(containers.size >= 2)
-
-        val parentContainer = containers.headOption
-        val grandParentContainer = containers.tail.head
-
-        // NOTE: At some point we could allow any grid bound and so with a name/id and bind
-        //val newGridName = "grid-" + nextId(doc, "grid")
-
-        (grandParentContainer, parentContainer, parentContainer)
-
-      case _ ⇒ // No td is selected, add top-level grid
-        val frBody = findFRBodyElement(inDoc)
-        (frBody, childrenContainers(frBody) lastOption, None)
-    }
-
-  private def findSectionInsertionPoint(inDoc: NodeInfo) =
-    findSelectedTd(inDoc) match {
-      case Some(currentTd) ⇒ // A td is selected
-
-        val containers = findAncestorContainers(currentTd)
-
-        // We must always have a parent (grid) and grandparent (possibly fr:body) container
-        assert(containers.size >= 2)
-
-        // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
-        // current section/tabview, the section is inserted after the current grid.
-        val grandParentContainer = containers.tail.head // section/tab, body
-        val greatGrandParentContainerOption = containers.tail.tail.headOption
-
-        greatGrandParentContainerOption match {
-          case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
-          case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
-        }
-
-      case _ ⇒ // No td is selected, add top-level section
-        val frBody = findFRBodyElement(inDoc)
-        (frBody, childrenContainers(frBody) lastOption)
-    }
-
-  // Whether a section can be inserted
-  def canInsertSection(inDoc: NodeInfo) =
-    inDoc ne null
-
-  // Whether a grid can be inserted
-  def canInsertGrid(inDoc: NodeInfo) =
-    (inDoc ne null) && findSelectedTd(inDoc).isDefined
-
-  // Whether a control can be inserted
-  def canInsertControl(inDoc: NodeInfo) =
-    (inDoc ne null) && willEnsureEmptyTdSucceed(inDoc)
+  //@XPathFunction
+  def canInsertSection(inDoc: NodeInfo) = inDoc ne null
+  //@XPathFunction
+  def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedTd(inDoc).isDefined
+  //@XPathFunction
+  def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyTdSucceed(inDoc)
 
   // Insert a new grid
+  //@XPathFunction
   def insertNewGrid(inDoc: NodeInfo): Unit = {
 
     val (into, after, _) = findGridInsertionPoint(inDoc)
@@ -237,7 +180,8 @@ object ToolboxOps {
   }
 
   // Insert a new section with optionally a nested grid
-  def insertNewSection(inDoc: NodeInfo, withGrid: Boolean) = {
+  //@XPathFunction
+  def insertNewSection(inDoc: NodeInfo, withGrid: Boolean): Some[NodeInfo] = {
 
     val (into, after) = findSectionInsertionPoint(inDoc)
 
@@ -297,7 +241,8 @@ object ToolboxOps {
   }
 
   // Insert a new repeat
-  def insertNewRepeatedGrid(inDoc: NodeInfo) = {
+  //@XPathFunction
+  def insertNewRepeatedGrid(inDoc: NodeInfo): Some[String] = {
 
     val (into, after, grid) = findGridInsertionPoint(inDoc)
     val newGridName         = controlNameFromId(nextId(inDoc, "grid"))
@@ -349,7 +294,8 @@ object ToolboxOps {
   }
 
   // Insert a new section template
-  def insertNewSectionTemplate(inDoc: NodeInfo, binding: NodeInfo) =
+  //@XPathFunction
+  def insertNewSectionTemplate(inDoc: NodeInfo, binding: NodeInfo): Unit =
     // Insert new section first
     insertNewSection(inDoc, withGrid = false) foreach { section ⇒
 
@@ -369,6 +315,7 @@ object ToolboxOps {
     }
 
   // Copy control to the clipboard
+  //@XPathFunction
   def copyToClipboard(td: NodeInfo): Unit = {
 
     val doc = td.getDocumentRoot
@@ -379,7 +326,7 @@ object ToolboxOps {
     findControlByName(doc, name) foreach { controlElement ⇒
 
       // Create <resource xml:lang="..."> containers
-      val resourcesWithLang = findResourceHoldersWithLang(name, resourcesRoot) map {
+      val resourcesWithLang = FormRunnerResourcesOps.findResourceHoldersWithLang(name, resourcesRoot) map {
         case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
       }
 
@@ -400,12 +347,14 @@ object ToolboxOps {
   }
 
   // Cut control to the clipboard
+  //@XPathFunction
   def cutToClipboard(td: NodeInfo): Unit = {
     copyToClipboard(td)
     deleteCellContent(td, updateTemplates = true)
   }
 
   // Paste control from the clipboard
+  //@XPathFunction
   def pasteFromClipboard(td: NodeInfo): Unit = {
     ensureEmptyTd(td) foreach { gridTd ⇒
 
@@ -521,5 +470,64 @@ object ToolboxOps {
         updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
       }
     }
+  }
+
+  private object Private {
+
+    val LHHAResourceNamesToInsert = LHHANames - "alert"
+
+    // NOTE: Help is added when needed
+    val lhhaTemplate: NodeInfo =
+      <template xmlns:xf="http://www.w3.org/2002/xforms">
+        <xf:label ref=""/>
+        <xf:hint ref=""/>
+        <xf:alert ref=""/>
+      </template>
+
+    def findGridInsertionPoint(inDoc: NodeInfo) =
+      findSelectedTd(inDoc) match {
+        case Some(currentTd) ⇒ // A td is selected
+
+          val containers = findAncestorContainers(currentTd)
+
+          // We must always have a parent (grid) and grandparent (possibly fr:body) container
+          assert(containers.size >= 2)
+
+          val parentContainer = containers.headOption
+          val grandParentContainer = containers.tail.head
+
+          // NOTE: At some point we could allow any grid bound and so with a name/id and bind
+          //val newGridName = "grid-" + nextId(doc, "grid")
+
+          (grandParentContainer, parentContainer, parentContainer)
+
+        case _ ⇒ // No td is selected, add top-level grid
+          val frBody = findFRBodyElement(inDoc)
+          (frBody, childrenContainers(frBody) lastOption, None)
+      }
+
+    def findSectionInsertionPoint(inDoc: NodeInfo) =
+      findSelectedTd(inDoc) match {
+        case Some(currentTd) ⇒ // A td is selected
+
+          val containers = findAncestorContainers(currentTd)
+
+          // We must always have a parent (grid) and grandparent (possibly fr:body) container
+          assert(containers.size >= 2)
+
+          // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
+          // current section/tabview, the section is inserted after the current grid.
+          val grandParentContainer = containers.tail.head // section/tab, body
+          val greatGrandParentContainerOption = containers.tail.tail.headOption
+
+          greatGrandParentContainerOption match {
+            case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
+            case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
+          }
+
+        case _ ⇒ // No td is selected, add top-level section
+          val frBody = findFRBodyElement(inDoc)
+          (frBody, childrenContainers(frBody) lastOption)
+      }
   }
 }

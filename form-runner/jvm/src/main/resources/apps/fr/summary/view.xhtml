@@ -47,11 +47,10 @@
                 name="app-query"
                 as="element(query)?"
                 value="
-                    if ($has-fb-roles)
-                    then
+                    if ($has-fb-roles) then
                         instance('fr-search-instance')/query[
-                            contains(@path, 'application-name')
-                            and @search-field = 'true'
+                            contains(@path, 'application-name') and
+                            @search-field = 'true'
                         ]
                     else
                         ()"/>
@@ -60,11 +59,10 @@
                 name="form-query"
                 as="element(query)?"
                 value="
-                    if ($app-query)
-                    then
+                    if ($app-query) then
                         instance('fr-search-instance')/query[
-                            contains(@path, 'form-name')
-                            and @search-field = 'true'
+                            contains(@path, 'form-name') and
+                            @search-field = 'true'
                         ]
                     else
                         ()"/>
@@ -77,9 +75,10 @@
                 name="initial-app-value"
                 as="xs:string?"
                 value="
-                    if ($app-query)
-                    then xxf:instance('fb-permissions')/app[1][not(@name = '*')]/@name
-                    else ()"/>
+                    if ($app-query) then
+                        xxf:instance('fb-permissions')/app[1][not(@name = '*')]/@name
+                    else
+                        ()"/>
 
             <xf:var name="selection-is-one-document" value="count(xxf:split(instance('fr-selection-instance'))) = 1"/>
             <xf:var name="selection-data-or-draft"   value="if ($selection-is-one-document) then substring-before(instance('fr-selection-instance'), '/') else ()"/>
@@ -105,10 +104,16 @@
             <!-- NOTE: use xxf:cache="false" otherwise updates to the form won't work in the summary page -->
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
                  improve submissions to handle conditional GET as well when using caching. -->
-            <xf:submission id="get-source-form-submission"
-                    method="get" serialization="none"
-                    resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
-                    replace="instance" instance="fr-source-form-instance" xxf:readonly="true" xxf:cache="false" xxf:xinclude="true"/>
+            <xf:submission
+                id="get-source-form-submission"
+                method="get"
+                serialization="none"
+                resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
+                replace="instance"
+                instance="fr-source-form-instance"
+                xxf:readonly="true"
+                xxf:cache="false"
+                xxf:xinclude="true"/>
 
             <!-- Standard Form Runner data instance -->
             <!-- TODO: Can we remove this? -->
@@ -170,17 +175,36 @@
 
                 <!-- Set default value for app and form if needed -->
                 <!-- Do this declaratively so we don't depend on order of execution of submissions -->
-                <xf:bind ref="$app-query" readonly="false()"
-                             calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
+                <xf:bind
+                    ref="$app-query"
+                    readonly="false()"
+                    calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
                 <!-- Adjust value for form if there is an app constraint and a form constraint -->
-                <xf:bind ref="$form-query" readonly="false()"
-                         calculate="(for $a in xxf:instance('fb-permissions')/app[@name = $app-query]
-                                         return for $current in . return if ($a/form[@name = ($current, '*')]) then .
-                                             else $a/form[1]/@name, .)[1]"/>
+                <xf:bind
+                    ref="$form-query"
+                    readonly="false()"
+                    calculate="
+                        (
+                            for $a in xxf:instance('fb-permissions')/app[@name = $app-query]
+                            return
+                                for $current in .
+                                    return
+                                        if ($a/form[@name = ($current, '*')]) then
+                                            .
+                                        else
+                                            $a/form[1]/@name,
+                            .
+                        )[1]"/>
                 <!-- Force exact query match if there is an app constraint -->
-                <xf:bind ref="$app-query/@match" readonly="false()" calculate="if ($initial-app-value) then 'exact' else ."/>
+                <xf:bind
+                    ref="$app-query/@match"
+                    readonly="false()"
+                    calculate="if ($initial-app-value) then 'exact' else ."/>
                 <!-- Force exact query match if there is a form constraint -->
-                <xf:bind ref="$form-query/@match" readonly="false()" calculate="if (xxf:instance('fb-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
+                <xf:bind
+                    ref="$form-query/@match"
+                    readonly="false()"
+                    calculate="if (xxf:instance('fb-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
 
             </xf:bind>
 
@@ -242,6 +266,7 @@
 
                 <!-- Same code in relational search.xpl but in XSLT -->
                 <!-- TODO: Remove redundancy once relational support is rewritten in Scala -->
+                <!-- 2017-04-27: Well it is now written in Scala! -->
                 <!-- Also similar code in persistence-model.xml, but that code is disabled for the Summary page -->
                 <xf:var name="permissions"                value="$source-form-metadata/permissions"/>
                 <xf:var name="search-operations"          value="('*', 'read', 'update', 'delete')"/>
@@ -292,24 +317,27 @@
             <xf:action ev:event="xforms-model-construct-done">
 
                 <!-- Load resources -->
-                <xf:var name="resources-instance" as="element(xf:instance)"
-                        value="instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']"/>
+                <!-- Dereference `@src` for Form Builder if needed -->
+                <xf:insert
+                    ref="instance('fr-form-resources')"
+                    origin="
+                        let $resources-instance := instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']
+                        return
+                            if ($resources-instance/@src) then
+                                doc($resources-instance/@src)
+                            else
+                                $resources-instance/*
+                        "/>
 
-                <xf:action if="not($resources-instance/@src)">
-                    <!-- Copy inline instance -->
-                    <xf:insert ref="instance('fr-form-resources')" origin="$resources-instance/*"/>
-                </xf:action>
-                <xf:action if="$resources-instance/@src">
-                    <!-- Dereference @src -->
-                    <xf:insert ref="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
-                </xf:action>
                 <!-- Update to current language -->
                 <xf:dispatch name="fr-update-language" targetid="fr-resources-model"/>
 
                 <!-- Set page size -->
                 <xf:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
-                <xf:setvalue ref="$page-size" model="fr-persistence-model"
-                             value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
+                <xf:setvalue
+                    ref="$page-size"
+                    model="fr-persistence-model"
+                    value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
                 <!-- Create elements holding structured search data -->
                 <xf:insert
@@ -365,10 +393,15 @@
             </xf:instance>
 
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
-            <xf:submission id="search-submission"
-                    ref="instance('fr-search-instance')" validate="false"
-                    method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
-                    replace="instance" instance="fr-summary-instance">
+            <xf:submission
+                id="search-submission"
+                ref="instance('fr-search-instance')"
+                validate="false"
+                method="post"
+                resource="/fr/service/persistence/search/{$app}/{$form}"
+                replace="instance"
+                instance="fr-summary-instance">
+
                 <!-- Set language upon submitting -->
                 <xf:action ev:event="xforms-submit">
                     <!-- This works now that #122 is fixed https://github.com/orbeon/orbeon-forms/issues/122 -->

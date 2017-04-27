@@ -13,7 +13,6 @@
   -->
 <html xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -139,11 +138,11 @@
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
-            <xf:action ev:event="fr-summary-create">
+            <xf:action event="fr-summary-create">
                 <xf:load resource="/fr/{$app}/{$form}/new{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"/>
             </xf:action>
 
-            <xf:action ev:event="fr-summary-view" if="$selection-is-one-document">
+            <xf:action event="fr-summary-view" if="$selection-is-one-document">
                 <xf:var name="params" value="(
                         if (property('xxf:noscript'))           then 'fr-noscript=true' else (),
                         if ($selection-data-or-draft = 'draft') then 'draft=true'       else ()
@@ -243,7 +242,7 @@
             </xf:instance>
 
             <!-- 1. Load source form -->
-            <xf:action ev:event="xforms-model-construct-done">
+            <xf:action event="xforms-model-construct-done">
                 <xf:var name="source-form" value="xxf:get-request-attribute('fr-form-definition')"/>
                 <xf:action if="exists($source-form)">
                     <!-- Got it from the request -->
@@ -263,7 +262,7 @@
             </xf:action>
 
             <!-- 2. Check for authorized operations -->
-            <xf:action ev:event="xforms-model-construct-done">
+            <xf:action event="xforms-model-construct-done">
 
                 <!-- Send a "Not Found" error if the form is not available -->
                 <xf:action if="$source-form-metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
@@ -318,7 +317,7 @@
             </xf:action>
 
             <!-- 3. Rest of initialization -->
-            <xf:action ev:event="xforms-model-construct-done">
+            <xf:action event="xforms-model-construct-done">
 
                 <!-- Load resources -->
                 <!-- Dereference `@src` for Form Builder if needed -->
@@ -372,14 +371,14 @@
                 NOTE: Do this upon `xforms-ready` because `fb-permissions` instance is not ready upon
                 `xforms-model-construct-done`. -->
             <xf:action
-                ev:event="xforms-ready"
+                event="xforms-ready"
                 if="$has-fb-roles and not($has-fb-roles-for-all-apps) and empty($initial-app-value)"
                 type="xpath">
                 frf:sendError(403)
             </xf:action>
 
             <!-- Reset search selection and navigation -->
-            <xf:action ev:event="fr-reset-search">
+            <xf:action event="fr-reset-search">
 
                 <xf:setvalue ref="instance('fr-selection-instance')"/>
                 <xf:setindex repeat="documents-repeat" index="1"/>
@@ -415,12 +414,12 @@
                 instance="fr-summary-instance">
 
                 <!-- Set language upon submitting -->
-                <xf:action ev:event="xforms-submit">
+                <xf:action event="xforms-submit">
                     <!-- This works now that #122 is fixed https://github.com/orbeon/orbeon-forms/issues/122 -->
                     <!-- NOTE: xxf:lang() doesn't seem to work here -->
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
-                <xf:action ev:event="xforms-submit-error">
+                <xf:action event="xforms-submit-error">
                     <!-- i18n -->
                     <xf:message>Error performing search.</xf:message>
                 </xf:action>
@@ -451,7 +450,7 @@
                     ref="instance('fr-duplicate')"
                     value="event('document')"/>
 
-                <xf:action ev:event="xforms-submit-error">
+                <xf:action event="xforms-submit-error">
                     <!-- TODO: i18n -->
                     <xf:message>Error performing duplication.</xf:message>
                 </xf:action>
@@ -487,14 +486,14 @@
 
                         <!-- Search also when user presses "enter" in a field -->
                         <xf:dispatch
-                            ev:event="DOMActivate"
+                            event="DOMActivate"
                             name="fr-reset-search"
                             targetid="fr-form-model"/>
 
                         <!-- Search also when dropdown value changes -->
                         <xf:dispatch
-                            ev:event="xforms-value-changed"
-                            ev:target="search-select1"
+                            event="xforms-value-changed"
+                            target="search-select1"
                             name="fr-reset-search"
                             targetid="fr-form-model"/>
 
@@ -538,7 +537,7 @@
                                                 <xf:value ref="@name"/>
                                             </xf:itemset>
 
-                                            <xf:action ev:event="xforms-value-changed">
+                                            <xf:action event="xforms-value-changed">
                                                 <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
                                                 <xf:setvalue ref="$form-query"/>
 
@@ -576,7 +575,7 @@
                                             </xf:itemset>
 
                                             <!-- Update search results when selection changes -->
-                                            <xf:dispatch ev:event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
+                                            <xf:dispatch event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
                                         </xf:select1>
                                     </xf:group>
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
@@ -638,7 +637,7 @@
                             <xf:trigger appearance="minimal" ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">
                                 <!-- Switch label depending on which case is shown -->
                                 <xf:label ref="$fr-resources/summary/search/(if (case('search-switch') = 'search-free') then show-options else close-options)"/>
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <!-- Clear all queries when switching -->
                                     <xf:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
                                     <!-- Switch the other case -->
@@ -957,7 +956,7 @@
                                 <xf:label>
                                     <xh:i class="icon-step-backward"/>&#x200b;
                                 </xf:label>
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
                                     <xf:send submission="search-submission"/>
@@ -969,7 +968,7 @@
                                 <xf:label>
                                     <xh:i class="icon-chevron-left"/>&#x200b;
                                 </xf:label>
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
                                     <xf:send submission="search-submission"/>
@@ -996,7 +995,7 @@
                                 <xf:label>
                                     <xh:i class="icon-chevron-right"/>&#x200b;
                                 </xf:label>
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
                                     <xf:send submission="search-submission"/>
@@ -1008,7 +1007,7 @@
                                 <xf:label>
                                     <xh:i class="icon-step-forward"/>&#x200b;
                                 </xf:label>
-                                <xf:action ev:event="DOMActivate">
+                                <xf:action event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
                                     <xf:setindex repeat="documents-repeat" index="1"/>
                                     <xf:send submission="search-submission"/>
@@ -1052,14 +1051,14 @@
                             <xf:group ref="if ($button-name = 'home') then $enabled else ()">
                                 <xf:trigger ref="." class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/home"/>
-                                    <xf:load ev:event="DOMActivate" resource="/fr/"/>
+                                    <xf:load event="DOMActivate" resource="/fr/"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- Print/review button -->
                             <xf:group ref="if ($button-name = ('print', 'review')) then if ($view-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref="." class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/review"/>
-                                    <xf:action ev:event="DOMActivate">
+                                    <xf:action event="DOMActivate">
                                         <!-- FIXME: assert(only one document selected) -->
                                         <xf:dispatch targetid="fr-form-model" name="fr-summary-view"/>
                                     </xf:action>
@@ -1102,28 +1101,28 @@
                                 <xf:trigger ref="." class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/delete"/>
                                     <!-- Open delete confirmation dialog -->
-                                    <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
+                                    <xf:dispatch event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- Import button -->
                             <xf:group ref="if ($button-name = 'import' and $new-visible) then $enabled else ()">
                                 <xf:trigger ref="." class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/import"/>
-                                    <xf:load ev:event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
+                                    <xf:load event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- New button -->
                             <xf:group ref="if ($button-name = 'new' and $new-visible) then $enabled else ()">
                                 <xf:trigger ref="." appearance="xxf:primary" class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/new"/>
-                                    <xf:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
+                                    <xf:dispatch event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- Duplicate button -->
                             <xf:group ref="if ($button-name = 'duplicate') then if ($duplicate-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref="." class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/duplicate"/>
-                                    <xf:action ev:event="DOMActivate">
+                                    <xf:action event="DOMActivate">
                                         <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
                                             <xf:send submission="call-duplicate-service">
                                                 <xf:property name="document" value="substring-after(., '/')"/>
@@ -1149,7 +1148,7 @@
             <fr:message value="$fr-resources/summary/messages/delete-confirmation"/>
             <fr:negative-choice/>
             <fr:positive-choice>
-                <xf:action ev:event="DOMActivate">
+                <xf:action event="DOMActivate">
                     <!-- Parse the selected rows -->
                     <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
                         <xf:var name="document" value="." as="xs:string"/>

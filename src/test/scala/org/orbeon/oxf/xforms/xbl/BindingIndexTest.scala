@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.junit.Test
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.Selector
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.FunSpec
 
-class BindingIndexTest extends AssertionsForJUnit {
+class BindingIndexTest extends FunSpec {
 
   case class TestBinding(
     selectors           : List[Selector],
@@ -99,10 +98,12 @@ class BindingIndexTest extends AssertionsForJUnit {
 
     val found = BindingIndex.findMostSpecificBinding(index, elem.getQName, atts)
 
-    assert(Some(binding) === (found map (_._1)))
+    it(s"must pass with `$xmlElem`") {
+      assert(Some(binding) === (found map (_._1)))
+    }
   }
 
-  @Test def testSelectorPriority(): Unit = {
+  describe("Selector priority") {
 
     val currentIndex = indexWithAllBindings
 
@@ -115,7 +116,7 @@ class BindingIndexTest extends AssertionsForJUnit {
     assertElemMatched(currentIndex, """<foo:bar appearance="baz"/>""",           fooBarAppearanceBazBinding)
   }
 
-  @Test def testMatchingByAttribute(): Unit = {
+  describe("Matching by attribute") {
 
     val currentIndex = indexWithAllBindings
 

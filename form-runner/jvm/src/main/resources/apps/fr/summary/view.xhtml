@@ -21,7 +21,6 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-      xmlns:index="org.orbeon.oxf.fr.persistence.relational.index.Index"
       xmlns:version="java:org.orbeon.oxf.common.Version"
       xmlns="http://www.w3.org/1999/xhtml">
 
@@ -162,6 +161,11 @@
                     <page-number>1</page-number>
                     <lang/>
                 </search>
+            </xf:instance>
+
+            <!-- Contains search labels -->
+            <xf:instance id="fr-search-labels-instance">
+                <search xmlns=""/>
             </xf:instance>
 
             <xf:bind ref="instance('fr-search-instance')">
@@ -341,9 +345,17 @@
 
                 <!-- Create elements holding structured search data -->
                 <xf:insert
+                    context="instance('fr-search-labels-instance')"
+                    origin="frf:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form)"/>
+
+                <xf:insert
                     context="instance('fr-search-instance')"
                     ref="query"
-                    origin="index:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form)"/>
+                    origin="instance('fr-search-labels-instance')/query[@path]"/>
+
+                <!-- Don't leave nested `<resources>`s -->
+                <xf:delete
+                    ref="instance('fr-search-instance')/query/resources"/>
 
                 <!-- If requested to, only show drafts for never saved document -->
                 <xf:insert
@@ -499,8 +511,17 @@
                                     <!-- Special form builder search: use input or select1 for app/form name -->
 
                                     <!-- Application -->
-                                    <xf:group ref="$app-query[$has-fb-roles]" class="fr-summary-search-item">
-                                        <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
+                                    <xf:group ref="$app-query" class="fr-summary-search-item">
+                                        <xf:var name="control-name" value="@name"/>
+                                        <xf:var
+                                            name="label"
+                                            value="
+                                                instance('fr-search-labels-instance')/
+                                                    query[
+                                                        @name = $control-name
+                                                    ]/resources[
+                                                        @lang = xxf:instance('fr-language-instance')
+                                                    ]/label"/>
                                         <!-- Use an input if app name is a wildcard -->
                                         <xf:var name="is-input" value="$has-fb-roles-for-all-apps"/>
                                         <xf:input ref=".[$is-input]">
@@ -527,7 +548,16 @@
                                     </xf:group>
                                     <!-- Form -->
                                     <xf:group ref="$form-query" class="fr-summary-search-item">
-                                        <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
+                                        <xf:var name="control-name" value="@name"/>
+                                        <xf:var
+                                            name="label"
+                                            value="
+                                                instance('fr-search-labels-instance')/
+                                                    query[
+                                                        @name = $control-name
+                                                    ]/resources[
+                                                        @lang = xxf:instance('fr-language-instance')
+                                                    ]/label"/>
                                         <xf:var name="current-app" value="xxf:instance('fb-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
                                         <xf:var name="is-input" value="$has-fb-roles-for-all-apps or $current-app/form[@name = '*']"/>
@@ -552,7 +582,17 @@
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
                                     <xf:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                         <xf:var name="control-name" value="@name"/>
-                                        <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
+                                        <xf:var
+                                            name="resources"
+                                            value="
+                                                instance('fr-search-labels-instance')/
+                                                    query[
+                                                        @name = $control-name
+                                                    ]/resources[
+                                                        @lang = xxf:instance('fr-language-instance')
+                                                    ]"/>
+
+                                        <xf:var name="label" value="$resources/label"/>
 
                                         <xf:group ref=".[not($has-fb-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
@@ -579,8 +619,7 @@
                                                     <xf:label ref="$fr-resources/summary/labels/any"/>
                                                     <xf:value/>
                                                 </xf:item>
-                                                <xf:itemset model="fr-resources-model"
-                                                            ref="$fr-form-resources/*[local-name() = $control-name]/item">
+                                                <xf:itemset model="fr-resources-model" ref="$resources/item">
                                                     <xf:label ref="label"/>
                                                     <xf:value ref="value"/>
                                                 </xf:itemset>
@@ -659,10 +698,12 @@
                                         <xf:group ref="''[empty($detail-positions)]">
                                             <xh:th/>
                                         </xf:group>
-                                        <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
+                                        <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th>
                                                 <!-- Output showing as the header of the column -->
-                                                <xf:output mediatype="text/html" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
+                                                <xf:output
+                                                    mediatype="text/html"
+                                                    value="resources[@lang = xxf:instance('fr-language-instance')]/label"/>
                                             </xh:th>
                                         </xf:repeat>
                                     </xh:tr>

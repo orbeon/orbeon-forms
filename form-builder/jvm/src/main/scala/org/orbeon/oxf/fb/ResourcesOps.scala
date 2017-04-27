@@ -27,14 +27,9 @@ trait ResourcesOps extends BaseOps {
   def resourcesRoot         = currentResources parent * head
 
   def resourcesInLang(lang: String)      = allResources(resourcesRoot) find (_.attValue("*:lang") == lang) getOrElse currentResources
-  def allResources(resources: NodeInfo)  = resources child "resource"
-  def allLangs(resources: NodeInfo)      = allResources(resources) attValue "*:lang"
-
-  def allLangsWithResources(resources: NodeInfo) =
-    allLangs(resources) zip allResources(resources)
 
   // Find the current resource holder for the given name
-  def findCurrentResourceHolder(controlName: String) =
+  def findCurrentResourceHolder(controlName: String): Option[NodeInfo] =
     currentResources child controlName headOption
 
   // Get the control's resource value or blank
@@ -187,7 +182,7 @@ trait ResourcesOps extends BaseOps {
 
   // Ensure the existence of the resource holder for the current language
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHolder(controlName: String, resourceName: String) =
+  def ensureResourceHolder(controlName: String, resourceName: String): NodeInfo =
     ensureResourceHoldersForCurrentLang(controlName, resourceName, 1).head
 
   // NOTE: Assume enclosing control resource holder already exists
@@ -195,7 +190,7 @@ trait ResourcesOps extends BaseOps {
     ensureResourceHoldersForLang(controlName, resourceName, count, currentLang)
 
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHoldersForLang(controlName: String, resourceName: String, count: Int, lang: String) = {
+  def ensureResourceHoldersForLang(controlName: String, resourceName: String, count: Int, lang: String): Seq[NodeInfo] = {
     val controlHolder = findResourceHolderForLang(controlName, lang, resourcesRoot).get
 
     val existing = controlHolder child resourceName
@@ -206,30 +201,33 @@ trait ResourcesOps extends BaseOps {
     } else if (existing.size == count)
       existing
     else
-      insertElementsImposeOrder(into = controlHolder, origin = 1 to count - existing.size map (_ ⇒ elementInfo(resourceName)), order = LHHAInOrder)
+      insertElementsImposeOrder(
+        into   = controlHolder,
+        origin = 1 to count - existing.size map (_ ⇒ elementInfo(resourceName)),
+        order  = LHHAInOrder
+      )
   }
 
   // NOTE: Assume enclosing control resource holder already exists
-  def ensureResourceHoldersForLangs(controlName: String, resourceName: String, count: Int = 1, langs: Seq[String] = allLangs(resourcesRoot)) =
-    allLangs(resourcesRoot) map (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
+  def ensureResourceHoldersForLangs(
+    controlName  : String,
+    resourceName : String,
+    count        : Int = 1,
+    langs        : Seq[String] = allLangs(resourcesRoot)
+  ): Seq[(String, Seq[NodeInfo])] =
+    allLangs(resourcesRoot) map
+      (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
-  def findResourceHolderForLang(controlName: String, lang: String, resources: NodeInfo) =
-    findResourceHoldersWithLang(controlName ensuring (StringUtils.isNotBlank(_)), resources) collectFirst { case (`lang`, holder) ⇒ holder }
+  def findResourceHolderForLang(controlName: String, lang: String, resources: NodeInfo): Option[NodeInfo] =
+    findResourceHoldersWithLang(controlName ensuring (StringUtils.isNotBlank(_)), resources) collectFirst
+      { case (`lang`, holder) ⇒ holder }
 
   // Find control resource holders
   def findResourceHolders(controlName: String): Seq[NodeInfo] =
     findResourceHoldersWithLang(controlName, resourcesRoot) map (_._2)
 
-  // Find control resource holders with their language
-  def findResourceHoldersWithLang(controlName: String, resources: NodeInfo): Seq[(String, NodeInfo)] =
-    for {
-      (lang, resource) ← allLangsWithResources(resources)
-      holder           ← resource child controlName headOption // there *should* be only one
-    } yield
-      (lang, holder)
-
   // For the given bind and lang, find all associated resource holders
-  def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resources: NodeInfo) =
+  def iterateSelfAndDescendantBindsResourceHolders(rootBind: NodeInfo, lang: String, resources: NodeInfo): Iterator[NodeInfo] =
     for {
       bindNode ← FormBuilder.iterateSelfAndDescendantBinds(rootBind)
       bindName ← findBindName(bindNode)
@@ -241,18 +239,14 @@ trait ResourcesOps extends BaseOps {
   def iterateSelfAndDescendantBindsResourceHoldersXPath(rootBind: NodeInfo, lang: String, resources: NodeInfo): SequenceIterator =
     iterateSelfAndDescendantBindsResourceHolders(rootBind, lang, resources)
 
-  // Same as above but doesn't require a Form Builder context
-  def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
-    findResourceHoldersWithLang(controlName, resourcesInstanceRoot(inDoc))
-
-  def lhhaHoldersForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String) =
+  def lhhaHoldersForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String): Seq[NodeInfo] =
     for {
       (_, controlHolder) ← findResourceHoldersWithLangUseDoc(inDoc, controlName)
       lhhaHolder         ← controlHolder child lhha
     } yield
       lhhaHolder
 
-  def hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String) =
+  def hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String): Boolean =
     findResourceHoldersWithLangUseDoc(inDoc, controlName) forall
     { case (_, holder) ⇒ StringUtils.isBlank(holder child lhha stringValue) }
 }

@@ -13,20 +13,17 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
+import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.XML._
 
 trait FormRunnerSummary {
 
-  // Get a field's label in HTML for the Summary page
   //@XPathFunction
-  def htmlFieldLabel(name: String, htmlLabel: Boolean, resources: NodeInfo): String = {
-    def resourceLabelOpt = (resources \ name \ "label" map (v ⇒ if (htmlLabel) v.stringValue else XMLUtils.escapeXMLMinimal(v.stringValue))).headOption
-    resourceLabelOpt getOrElse '[' + name + ']'
-  }
+  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =
+    Index.findIndexedControls(formDoc, app, form) map (_.toXML)
 
   //@XPathFunction
   def duplicate(data: NodeInfo, app: String, form: String, fromDocument: String, toDocument: String, formVersion: String): Unit = {

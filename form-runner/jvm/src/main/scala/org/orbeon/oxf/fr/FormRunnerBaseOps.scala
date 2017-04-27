@@ -126,7 +126,6 @@ trait FormRunnerBaseOps {
 
   // Get the root element of instances
   def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, FormInstance).get
-  def resourcesInstanceRoot(inDoc: NodeInfo)   = inlineInstanceRootElement(inDoc, FormResources).get
 
   //@XPathFunction
   def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, MetadataInstance)

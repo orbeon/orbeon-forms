@@ -14,17 +14,13 @@
 package org.orbeon.oxf.fr.persistence.relational.crud
 
 import org.junit.Test
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.scalatest.junit.AssertionsForJUnit
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class FlatViewTest extends ResourceManagerTestBase with XMLSupport with AssertionsForJUnit {
 
   @Test def fixupDuplicatesTest(): Unit = {
 
@@ -42,11 +38,6 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
   }
 
   @Test def extractPathsColsTest(): Unit = {
-
-    def readDocument(url: String) =
-      useAndClose(URLFactory.createURL(url).openStream()) { is ⇒
-        TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, "", false, false)
-      }
 
     val expectedForDocuments = List(
       "oxf:/org/orbeon/oxf/fr/form-with-itemsets.xhtml"             → List(
@@ -73,7 +64,7 @@ class FlatViewTest extends ResourceManagerTestBase with AssertionsForJUnit {
     )
 
     for ((url, expected) ← expectedForDocuments)
-      assert(expected === FlatView.extractPathsCols(readDocument(url)))
+      assert(expected === FlatView.extractPathsCols(readURLAsImmutableXMLDocument(url)))
   }
 
   @Test def xmlToSQLIdTest(): Unit = {

@@ -15,8 +15,11 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
+
+import scala.collection.breakOut
 
 trait FormDefinition {
 
@@ -24,11 +27,6 @@ trait FormDefinition {
   private val FRSearch        = "fr-search"
 
   private val ClassesPredicate = Set(FRSummary, FRSearch)
-
-  // For Summary page
-  //@XPathFunction
-  def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =
-    findIndexedControls(formDoc, app, form) map (_.toXML)
 
   // Returns the controls that are searchable from a form definition
   def findIndexedControls(formDoc: DocumentInfo, app: String, form: String): Seq[IndexedControl] = {
@@ -68,7 +66,7 @@ trait FormDefinition {
       else
         Nil
 
-    indexedControlBindPathHolders map { case FormRunner.ControlBindPathHolders(control, bind, path, _) ⇒
+    indexedControlBindPathHolders map { case FormRunner.ControlBindPathHoldersResources(control, bind, path, _, resources) ⇒
 
       val controlName = FormRunner.getControlName(control)
 
@@ -94,7 +92,8 @@ trait FormDefinition {
         xpath     = adjustedBindPathElems map (_.value) mkString "/",
         xsType    = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
-        htmlLabel = FormRunner.hasHTMLMediatype(control \ (XF → "label"))
+        htmlLabel = FormRunner.hasHTMLMediatype(control \ (XF → "label")),
+        resources = resources
       )
     }
   }
@@ -106,7 +105,8 @@ trait FormDefinition {
     xpath     : String,
     xsType    : String,
     control   : String,
-    htmlLabel : Boolean
+    htmlLabel : Boolean,
+    resources : Seq[(String, NodeInfo)]
   ) {
     def toXML: NodeInfo =
       <query
@@ -117,6 +117,24 @@ trait FormDefinition {
         search-field={inSearch.toString}
         summary-field={inSummary.toString}
         match="substring"
-        html-label={htmlLabel.toString}/>
+        html-label={htmlLabel.toString}>{
+        for ((lang, resourceHolder) ← resources)
+          yield
+            <resources lang={lang}>{
+              val labelElemOpt =
+                resourceHolder elemValueOpt "label" map { label ⇒
+                  <label>{if (htmlLabel) label else XMLUtils.escapeXMLMinimal(label)}</label>
+                }
+
+              val itemElems = resourceHolder child "item" map { item ⇒
+                <item>{
+                  <label>{item elemValue "label"}</label>
+                  <value>{item elemValue "value"}</value>
+                }</item>
+              }
+
+              labelElemOpt.toList ++ itemElems
+            }</resources>
+      }</query>
   }
 }

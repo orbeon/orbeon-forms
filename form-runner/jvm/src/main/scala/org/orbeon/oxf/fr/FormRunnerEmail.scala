@@ -40,8 +40,8 @@ trait FormRunnerEmail {
       data      = Option(data),
       predicate = hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
-      case ControlBindPathHolders(_, _, _, Some(holders)) ⇒ holders
-      case ControlBindPathHolders(_, _, _, None)          ⇒ Nil
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
+      case ControlBindPathHoldersResources(_, _, _, None,          _) ⇒ Nil
     }
 
   // Given a form head, form body and instance data:
@@ -70,8 +70,8 @@ trait FormRunnerEmail {
       data      = Option(data),
       predicate = hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
-      case ControlBindPathHolders(_, _, _, Some(holders)) ⇒ holders
-      case ControlBindPathHolders(_, _, _, None)          ⇒ Nil
+      case ControlBindPathHoldersResources(_, _, _, Some(holders), _) ⇒ holders
+      case ControlBindPathHoldersResources(_, _, _, None         , _) ⇒ Nil
     }
 }
 

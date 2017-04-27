@@ -40,12 +40,12 @@ class EmailTest
     val data =
       TransformerUtils.extractAsMutableDocument(instance child * head)
 
-    def valuesForSearch(search: ⇒ Seq[ControlBindPathHolders]) = {
+    def valuesForSearch(search: ⇒ Seq[ControlBindPathHoldersResources]) = {
 
       val searchResult = search
 
       val distinctPaths =
-        searchResult map { case ControlBindPathHolders(_, _, path, _) ⇒ path map (_.value) mkString "/" } distinct
+        searchResult map { case ControlBindPathHoldersResources(_, _, path, _, _) ⇒ path map (_.value) mkString "/" } distinct
 
       val values =
         searchResult.flatMap(_.holders).flatten.map(_.getStringValue).to[List]

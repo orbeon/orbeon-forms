@@ -34,9 +34,9 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // - https://github.com/lampepfl/dotty/issues/964
   // - https://github.com/milessabin/shapeless/wiki/Feature-overview:-shapeless-2.0.0#extensible-records
   //
-  case class BindPath              (                   bind: NodeInfo, path: List[DataMigration.PathElem]                         )
-  case class BindPathHolders       (                   bind: NodeInfo, path: List[DataMigration.PathElem], holders: Option[List[NodeInfo]])
-  case class ControlBindPathHolders(control: NodeInfo, bind: NodeInfo, path: List[DataMigration.PathElem], holders: Option[List[NodeInfo]])
+  case class BindPath                       (                   bind: NodeInfo, path: List[DataMigration.PathElem]                         )
+  case class BindPathHolders                (                   bind: NodeInfo, path: List[DataMigration.PathElem], holders: Option[List[NodeInfo]])
+  case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[DataMigration.PathElem], holders: Option[List[NodeInfo]], resources: Seq[(String, NodeInfo)])
 
   def hasAllClassesPredicate(classNamesList: List[String])(control: NodeInfo): Boolean = {
     val controlClasses = control.attClasses
@@ -167,7 +167,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     body      : NodeInfo,
     data      : Option[NodeInfo],
     predicate : NodeInfo ⇒ Boolean
-  ): Seq[ControlBindPathHolders] =
+  ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
       controls       = body descendant * filter IsControl,
       inDoc          = body,
@@ -180,37 +180,38 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     body      : NodeInfo,
     data      : Option[NodeInfo],
     predicate : NodeInfo ⇒ Boolean
-  ): Seq[ControlBindPathHolders] =
+  ): Seq[ControlBindPathHoldersResources] =
     for {
-      section                  ← findSectionsWithTemplates(body)
-      sectionName              ← getControlNameOpt(section).toList
+      section         ← findSectionsWithTemplates(body)
+      sectionName     ← getControlNameOpt(section).toList
 
       BindPathHolders(
         _,
         sectionPath,
         sectionHoldersOpt
-      )                       ← findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
+      )              ← findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
 
-      contextItemOpt          ← sectionHoldersOpt match {
-                                  case None | Some(Nil) ⇒ List(None)
-                                  case Some(holders)    ⇒ holders map Some.apply
-                                }
+      contextItemOpt ← sectionHoldersOpt match {
+                         case None | Some(Nil) ⇒ List(None)
+                         case Some(holders)    ⇒ holders map Some.apply
+                       }
 
-      xblBinding              ← xblBindingForSection(head, section).toList
+      xblBinding     ← xblBindingForSection(head, section).toList
 
-      ControlBindPathHolders(
+      ControlBindPathHoldersResources(
         control,
         bind,
         path,
-        holdersOpt
-      )                       ← searchControlBindPathHoldersInDoc(
-                                  controls       = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
-                                  inDoc          = xblBinding,
-                                  contextItemOpt = contextItemOpt,
-                                  predicate      = predicate
-                                )
+        holdersOpt,
+        labels
+      )              ← searchControlBindPathHoldersInDoc(
+                         controls       = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
+                         inDoc          = xblBinding,
+                         contextItemOpt = contextItemOpt,
+                         predicate      = predicate
+                       )
     } yield
-      ControlBindPathHolders(control, bind, sectionPath ::: path, holdersOpt)
+      ControlBindPathHoldersResources(control, bind, sectionPath ::: path, holdersOpt, labels)
 
   private object Private {
 
@@ -243,15 +244,16 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       inDoc          : NodeInfo,
       contextItemOpt : Option[NodeInfo],
       predicate      : NodeInfo ⇒ Boolean
-    ): Seq[ControlBindPathHolders] =
+    ): Seq[ControlBindPathHoldersResources] =
       for {
         control                              ← controls
         if predicate(control)
         bindId                               ← control.attValueOpt("bind").toList
-        bindName                             ← controlNameFromIdOpt(bindId).toList
-        BindPathHolders(bind, path, holders) ← findBindPathHoldersInDocument(inDoc, bindName, contextItemOpt).toList
+        controlName                          ← controlNameFromIdOpt(bindId).toList
+        BindPathHolders(bind, path, holders) ← findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
+        resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)
       } yield
-        ControlBindPathHolders(control, bind, path, holders)
+        ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 
     def xblBindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
       val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)

@@ -15,10 +15,11 @@ package org.orbeon.oxf.fr
 
 import java.util.{List ⇒ JList}
 
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.instruct.NumberInstruction
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -47,7 +48,7 @@ trait FormRunnerLang {
   def allResources(resources: NodeInfo)  = resources child "resource"
 
   def formResourcesInLang(lang: String): NodeInfo = {
-    val formResources = topLevelModel("fr-form-model").get.getInstance("fr-form-resources").documentInfo.rootElement
+    val formResources = topLevelModel(FormModel).get.getInstance(FormResources).documentInfo.rootElement
     (formResources \ *).find(_.attValue("*:lang") == lang).getOrElse(currentFormResources)
   }
 

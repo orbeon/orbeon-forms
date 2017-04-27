@@ -19,6 +19,7 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 
+import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
@@ -57,11 +58,11 @@ object RequestReader {
   def isMetadataElement(stack: List[StartElement]): Boolean =
     stack match {
       case
-        StartElement(JXQName("", "metadata"), _)                         ::
-        StartElement(JXQName(XF, "instance"), IdAtt("fr-form-metadata")) ::
-        StartElement(JXQName(XF, "model"),    IdAtt("fr-form-model"))    ::
-        StartElement(JXQName(XH, "head"), _)                             ::
-        StartElement(JXQName(XH, "html"), _)                             ::
+        StartElement(JXQName("", "metadata"), _)                             ::
+        StartElement(JXQName(XF, "instance"), IdAtt(Names.MetadataInstance)) ::
+        StartElement(JXQName(XF, "model"),    IdAtt(Names.FormModel))        ::
+        StartElement(JXQName(XH, "head"), _)                                 ::
+        StartElement(JXQName(XH, "html"), _)                                 ::
         Nil ⇒ true
       case _  ⇒ false
     }

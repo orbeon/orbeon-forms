@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
@@ -41,7 +42,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   def currentXFormsDocumentId = XFormsAPI.inScopeContainingDocument.getUUID
 
   // All XPath runs in the context of the main form instance's root element
-  def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
+  def xpathContext = topLevelInstance(Names.FormModel, Names.FormInstance) map (_.rootElement) orNull
   def xpathFunctionLibrary = inScopeContainingDocument.getFunctionLibrary
   def xpathFunctionContext = XPath.functionContext.orNull
 
@@ -64,10 +65,10 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     tryErrorMessage(Map(Some("resource") → "process-error"))
 
   def writeSuspendedProcess(process: String) =
-    setvalue(topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement, process)
+    setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, process)
 
   def readSuspendedProcess =
-    topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
+    topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
 
   // Search first in properties, then try legacy workflow-send
   // The scope is interpreted as a property prefix.

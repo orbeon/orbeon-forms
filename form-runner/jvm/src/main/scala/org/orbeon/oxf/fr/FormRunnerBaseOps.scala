@@ -14,11 +14,12 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{DateUtils, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -32,13 +33,6 @@ trait FormRunnerBaseOps {
   val EmbeddableParam       = "orbeon-embeddable"
 
   val LiferayLanguageHeader = "orbeon-liferay-language"
-
-  val ParametersModel       = "fr-parameters-model"
-  val PersistenceModel      = "fr-persistence-model"
-  val ResourcesModel        = "fr-resources-model"
-  val FormModel             = "fr-form-model"
-  val ErrorSummaryModel     = "fr-error-summary-model"
-  val SectionsModel         = "fr-sections-model"
 
   val TemplateSuffix        = "-template"
 
@@ -70,7 +64,7 @@ trait FormRunnerBaseOps {
     // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
     // only called from the functions above, which search in a form's view, model, or binds, which implies the
     // existence of a form model.
-    val hasIndex = inDoc.getDocumentRoot.selectID("fr-form-model") ne null
+    val hasIndex = inDoc.getDocumentRoot.selectID(FormModel) ne null
 
     def isUnder(node: NodeInfo) =
       if (includeSelf)
@@ -131,11 +125,11 @@ trait FormRunnerBaseOps {
     findModelElement(inDoc) \ "*:instance" filter (_.id endsWith TemplateSuffix)
 
   // Get the root element of instances
-  def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, "fr-form-instance").get
-  def resourcesInstanceRoot(inDoc: NodeInfo)   = inlineInstanceRootElement(inDoc, "fr-form-resources").get
+  def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, FormInstance).get
+  def resourcesInstanceRoot(inDoc: NodeInfo)   = inlineInstanceRootElement(inDoc, FormResources).get
 
   //@XPathFunction
-  def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-metadata")
+  def metadataInstanceRootOpt(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, MetadataInstance)
 
   private val TopLevelBindIds = Set("fr-form-binds", "fb-form-binds")
 
@@ -176,8 +170,8 @@ trait FormRunnerBaseOps {
   def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)
 
   // Return specific Form Runner instances
-  def formInstance                 = topLevelInstance(FormModel,         "fr-form-instance")          get
-  def metadataInstance             = topLevelInstance(FormModel,         "fr-form-metadata")
+  def formInstance                 = topLevelInstance(FormModel,         FormInstance)                get
+  def metadataInstance             = topLevelInstance(FormModel,         MetadataInstance)
 
   def parametersInstance           = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
   def errorSummaryInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get

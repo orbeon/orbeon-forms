@@ -14,13 +14,20 @@
 package org.orbeon.oxf.fr
 
 object Names {
-  val Constraint       = "constraint"
-  val Validation       = "validation"
+  val Constraint        = "constraint"
+  val Validation        = "validation"
 
-  val FormInstance     = "fr-form-instance"
-  val MetadataInstance = "fr-form-metadata"
-  val FormResources    = "fr-form-resources"
+  val ParametersModel   = "fr-parameters-model"
+  val PersistenceModel  = "fr-persistence-model"
+  val ResourcesModel    = "fr-resources-model"
+  val FormModel         = "fr-form-model"
+  val ErrorSummaryModel = "fr-error-summary-model"
+  val SectionsModel     = "fr-sections-model"
 
-  val Resource         = "resource"
-  val Item             = "item"
+  val FormInstance      = "fr-form-instance"
+  val MetadataInstance  = "fr-form-metadata"
+  val FormResources     = "fr-form-resources"
+
+  val Resource          = "resource"
+  val Item              = "item"
 }

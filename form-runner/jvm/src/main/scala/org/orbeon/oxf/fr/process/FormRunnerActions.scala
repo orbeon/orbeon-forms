@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.process
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner}
 import org.orbeon.oxf.util.NetUtils
@@ -33,7 +34,6 @@ import org.orbeon.scaxon.XML._
 
 import scala.language.postfixOps
 import scala.util.Try
-
 
 trait FormRunnerActions {
 

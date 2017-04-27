@@ -159,7 +159,7 @@ class SendTest
 
           XFormsAPI.dispatch(
             name       = "my-run-process",
-            targetId   = FormRunner.FormModel,
+            targetId   = Names.FormModel,
             properties = Map(
               "process" → Some(
                 s"""
@@ -218,7 +218,7 @@ class SendTest
 
         XFormsAPI.dispatch(
           name       = "my-run-process",
-          targetId   = FormRunner.FormModel,
+          targetId   = Names.FormModel,
           properties = Map(
             "process" → Some(
               s"""

@@ -163,10 +163,10 @@
         <!-- Set initial form and first section titles on template -->
         <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources"/>
         <xf:setvalue
-            ref="fbf:metadataInstanceRootOpt($template)/title"
+            ref="frf:metadataInstanceRootOpt($template)/title"
             value="$form-resources/template/untitled-form"/>
         <xf:setvalue
-            ref="fbf:resourcesInstanceRoot($template)/resource/section-1/label"
+            ref="frf:resourcesInstanceRootOpt($template)/resource/section-1/label"
             value="$form-resources/template/untitled-section"/>
 
         <!-- Annotate data -->

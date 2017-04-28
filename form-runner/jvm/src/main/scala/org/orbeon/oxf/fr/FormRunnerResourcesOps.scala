@@ -28,7 +28,6 @@ trait FormRunnerResourcesOps {
   def allResources(resources: NodeInfo) : Seq[NodeInfo] = resources child "resource"
   def allLangs    (resources: NodeInfo) : Seq[String]   = allResources(resources) attValue "*:lang"
 
-  def resourcesInstanceRoot   (inDoc: NodeInfo): NodeInfo         = resourcesInstanceRootOpt(inDoc).get
   def resourcesInstanceRootOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElement(inDoc, FormResources)
 
   def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =

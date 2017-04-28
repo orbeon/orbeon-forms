@@ -34,9 +34,9 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // - https://github.com/lampepfl/dotty/issues/964
   // - https://github.com/milessabin/shapeless/wiki/Feature-overview:-shapeless-2.0.0#extensible-records
   //
-  case class BindPath                       (                   bind: NodeInfo, path: List[DataMigration.PathElem]                         )
-  case class BindPathHolders                (                   bind: NodeInfo, path: List[DataMigration.PathElem], holders: Option[List[NodeInfo]])
-  case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[DataMigration.PathElem], holders: Option[List[NodeInfo]], resources: Seq[(String, NodeInfo)])
+  case class BindPath                       (                   bind: NodeInfo, path: List[PathElem]                         )
+  case class BindPathHolders                (                   bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]])
+  case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]], resources: Seq[(String, NodeInfo)])
 
   def hasAllClassesPredicate(classNamesList: List[String])(control: NodeInfo): Boolean = {
     val controlClasses = control.attClasses

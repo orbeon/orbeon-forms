@@ -174,7 +174,7 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
         stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(1)).get,
         stateValue   = "CA",
         expected     = List(
-          (List(1, 1), "Los Angeles", "90001"),
+          (List(1, 1), "Los Angeles",   "90001"),
           (List(1, 2), "Beverly Hills", "90212"),
           (List(1, 3), "Hermosa Beach", "90254")
         )
@@ -190,8 +190,8 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
         stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(2)).get,
         stateValue   = "LA",
         expected     = List(
-          (List(2, 1), "Metairie", "70001"),
-          (List(2, 2), "Belle Chasse", "70037"),
+          (List(2, 1), "Metairie",      "70001"),
+          (List(2, 2), "Belle Chasse",  "70037"),
           (List(2, 3), "Des Allemands", "70030")
         )
       )

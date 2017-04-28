@@ -430,6 +430,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
+  //@XPathFunction
   def hasEditor(controlElement: NodeInfo, editor: String) =
     FormBuilder.controlElementHasEditor(controlElement: NodeInfo, editor: String, componentBindings)
 

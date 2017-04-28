@@ -147,7 +147,7 @@
         <p:input name="fr-resources" href="#fr-resources"/>
         <p:input name="attachments" href="#attachments"/>
         <p:input name="config">
-            <message xsl:version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xsl:stylesheet version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
                 <xsl:variable name="data"         select="/*"                          as="element()"/>
                 <xsl:variable name="xhtml"        select="doc('input:xhtml')/*"        as="element(xh:html)"/>
@@ -165,118 +165,142 @@
                 <xsl:variable name="app"  select="doc('input:parameters')/*/app"  as="xs:string"/>
                 <xsl:variable name="form" select="doc('input:parameters')/*/form" as="xs:string"/>
 
-                <!-- Find fr-email-recipient at the top-level and in section templates -->
-                <xsl:variable
-                    name="to-email-addresses"
-                    as="xs:string*"
-                    select="
-                        distinct-values(
-                            for $holder in
-                                (
-                                    frf:searchHoldersForClassTopLevelOnly($xhtml/xh:body, $data, 'fr-email-recipient'),
-                                    frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-email-recipient'),
-                                    p:property(string-join(('oxf.fr.email.to', $app, $form), '.'))
-                                )
-                            return
-                                for $raw-email in
-                                    tokenize(
-                                        $holder,
-                                        '(,|\s)\s*'
+                <xsl:function name="fr:find-emails" as="xs:string*">
+
+                    <xsl:param name="class-name"    as="xs:string"/>
+                    <xsl:param name="property-name" as="xs:string"/>
+
+                    <xsl:variable
+                        name="from-email-addresses"
+                        as="xs:string*"
+                        select="
+                            distinct-values(
+                                for $holder in
+                                    (
+                                        frf:searchHoldersForClassTopLevelOnly       (                $xhtml/xh:body, $data, $class-name),
+                                        frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, $class-name),
+                                        p:property(string-join(($property-name, $app, $form), '.'))
                                     )
                                 return
-                                    normalize-space($raw-email)[. != '']
-                        )
-                    "
-                />
+                                    for $raw-email in
+                                        tokenize(
+                                            $holder,
+                                            '(,|\s)\s*'
+                                        )
+                                    return
+                                        normalize-space($raw-email)[. != '']
+                            )
+                        "
+                    />
+                </xsl:function>
 
-                <!-- Find fr-email-subject at the top-level and in section templates -->
-                <xsl:variable
-                    name="subject-values"
-                    as="xs:string*"
-                    select="
-                        distinct-values(
-                            for $holder in
-                                (
-                                    frf:searchHoldersForClassTopLevelOnly($xhtml/xh:body, $data, 'fr-email-subject'),
-                                    frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-email-subject')
+                <xsl:template match="/">
+                    <message>
+
+                        <xsl:variable
+                            name="from-email-addresses"
+                            as="xs:string*"
+                            select="fr:find-emails('fr-email-sender', 'oxf.fr.email.from')[1]"/>
+
+                        <xsl:variable
+                            name="to-email-addresses"
+                            as="xs:string*"
+                            select="fr:find-emails('fr-email-recipient', 'oxf.fr.email.to')"/>
+
+                        <!-- Find `fr-email-subject` at the top-level and in section templates -->
+                        <xsl:variable
+                            name="subject-values"
+                            as="xs:string*"
+                            select="
+                                distinct-values(
+                                    for $holder in
+                                        (
+                                            frf:searchHoldersForClassTopLevelOnly       (                $xhtml/xh:body, $data, 'fr-email-subject'),
+                                            frf:searchHoldersForClassUseSectionTemplates($xhtml/xh:head, $xhtml/xh:body, $data, 'fr-email-subject')
+                                        )
+                                    return
+                                        normalize-space($holder)[. != '']
                                 )
-                            return
-                                normalize-space($holder)[. != '']
-                        )
-                    "
-                />
+                            "
+                        />
 
-                <!-- SMTP outgoing server settings -->
-                <smtp-host>
-                    <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
-                </smtp-host>
-                <xsl:variable name="port" select="p:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
-                <xsl:if test="normalize-space($port)">
-                    <smtp-port><xsl:value-of select="$port"/></smtp-port>
-                </xsl:if>
-                <encryption>
-                    <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
-                </encryption>
-                <credentials>
-                    <username>
-                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
-                    </username>
-                    <password>
-                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
-                    </password>
-                </credentials>
+                        <!-- SMTP outgoing server settings -->
+                        <smtp-host>
+                            <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
+                        </smtp-host>
+                        <xsl:variable name="port" select="p:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
+                        <xsl:if test="normalize-space($port)">
+                            <smtp-port><xsl:value-of select="$port"/></smtp-port>
+                        </xsl:if>
+                        <encryption>
+                            <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
+                        </encryption>
+                        <credentials>
+                            <username>
+                                <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
+                            </username>
+                            <password>
+                                <xsl:value-of select="p:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
+                            </password>
+                        </credentials>
 
-                <!-- Sender -->
-                <from>
-                    <email>
-                        <xsl:value-of select="p:property(string-join(('oxf.fr.email.from', $app, $form), '.'))"/>
-                    </email>
-                </from>
-                <!-- Recipients -->
-                <xsl:for-each select="$to-email-addresses">
-                    <to>
-                        <email>
-                            <xsl:value-of select="."/>
-                        </email>
-                    </to>
-                </xsl:for-each>
-                <!-- Subject -->
-                <subject>
-                    <xsl:choose>
-                        <xsl:when test="count($subject-values) > 0">
-                            <!-- Append subject values to static subject, comma-separated -->
-                            <xsl:value-of select="concat($fr-resources/resource[@xml:lang = $request-language]/email/subject, ' ', string-join($subject-values, ', '))"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- Just put static subject -->
-                            <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/subject"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </subject>
-                <!-- Multipart body -->
-                <body content-type="multipart/related">
-                    <!-- Email body -->
-                    <part name="text" content-type="text/plain">
-                        <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
-                    </part>
-                    <!-- XML attachment if needed -->
-                    <xsl:if test="p:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
-                        <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
-                    </xsl:if>
-                    <!-- PDF attachment if needed -->
-                    <xsl:if test="p:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
-                        <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
-                    </xsl:if>
-                    <!-- TIFF attachment if needed -->
-                    <xsl:if test="p:property(string-join(('oxf.fr.email.attach-tiff', $app, $form), '.'))">
-                        <part name="form-tiff" content-type="image/tiff" content-disposition="attachment; filename=&quot;form.tiff&quot;" src="input:form-tiff"/>
-                    </xsl:if>
-                    <!-- Other attachments if needed -->
-                    <xsl:for-each select="$attachments/attachment">
-                        <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="attachment; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
-                    </xsl:for-each>
-                </body>
-            </message>
+                        <!-- Sender -->
+                        <!-- Take the first one only, see https://serverfault.com/questions/554520 -->
+                        <xsl:for-each select="$from-email-addresses[1]">
+                            <from>
+                                <email>
+                                    <xsl:value-of select="."/>
+                                </email>
+                            </from>
+                        </xsl:for-each>
+                        <!-- Recipients -->
+                        <xsl:for-each select="$to-email-addresses">
+                            <to>
+                                <email>
+                                    <xsl:value-of select="."/>
+                                </email>
+                            </to>
+                        </xsl:for-each>
+                        <!-- Subject -->
+                        <subject>
+                            <xsl:choose>
+                                <xsl:when test="count($subject-values) > 0">
+                                    <!-- Append subject values to static subject, comma-separated -->
+                                    <xsl:value-of select="concat($fr-resources/resource[@xml:lang = $request-language]/email/subject, ' ', string-join($subject-values, ', '))"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <!-- Just put static subject -->
+                                    <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/subject"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </subject>
+                        <!-- Multipart body -->
+                        <body content-type="multipart/related">
+                            <!-- Email body -->
+                            <part name="text" content-type="text/plain">
+                                <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
+                            </part>
+                            <!-- XML attachment if needed -->
+                            <xsl:if test="p:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
+                                <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
+                            </xsl:if>
+                            <!-- PDF attachment if needed -->
+                            <xsl:if test="p:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
+                                <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
+                            </xsl:if>
+                            <!-- TIFF attachment if needed -->
+                            <xsl:if test="p:property(string-join(('oxf.fr.email.attach-tiff', $app, $form), '.'))">
+                                <part name="form-tiff" content-type="image/tiff" content-disposition="attachment; filename=&quot;form.tiff&quot;" src="input:form-tiff"/>
+                            </xsl:if>
+                            <!-- Other attachments if needed -->
+                            <xsl:for-each select="$attachments/attachment">
+                                <part name="attachment-{position()}" content-type="{@mediatype}" content-disposition="attachment; filename=&quot;{@filename}&quot;" src="input:attachment-{position()}"/>
+                            </xsl:for-each>
+                        </body>
+                    </message>
+
+                </xsl:template>
+            </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="message"/>
     </p:processor>

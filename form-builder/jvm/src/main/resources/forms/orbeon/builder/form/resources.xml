@@ -329,6 +329,10 @@
                     <value>fr-email-subject</value>
                 </item>
                 <item>
+                    <label>Email Sender</label>
+                    <value>fr-email-sender</value>
+                </item>
+                <item>
                     <label>Include as Email Attachment</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -1300,6 +1304,10 @@
                 <item>
                     <label>Utiliser comme sujet d'email</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Expéditeur email</label>
+                    <value>fr-email-sender</value>
                 </item>
                 <item>
                     <label>Inclure à l'email comme fichier joint</label>
@@ -2275,6 +2283,10 @@
                 <item>
                     <label>Vis i epostemne</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -3280,6 +3292,10 @@
                     <value>fr-email-subject</value>
                 </item>
                 <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
+                </item>
+                <item>
                     <label todo="true">[Include as Email Attachment]</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -4283,6 +4299,10 @@
                     <value>fr-email-subject</value>
                 </item>
                 <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
+                </item>
+                <item>
                     <label todo="true">[Include as Email Attachment]</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -5276,6 +5296,10 @@
                 <item>
                     <label>In E-Mail-Betreff anzeigen</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -6276,6 +6300,10 @@
                     <value>fr-email-subject</value>
                 </item>
                 <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
+                </item>
+                <item>
                     <label todo="true">[Include as Email Attachment]</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -7272,6 +7300,10 @@
                     <value>fr-email-subject</value>
                 </item>
                 <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
+                </item>
+                <item>
                     <label>Incluir como Adjuntos al Mail</label>
                     <value>fr-email-attachment</value>
                 </item>
@@ -8266,6 +8298,10 @@
                 <item>
                     <label>Mostrar no assunto do email</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
                 </item>
                 <item>
                     <label todo="true">[Include as Email Attachment]</label>
@@ -9268,6 +9304,10 @@
                 <item>
                     <label>Visa i ärenderaden för mejl</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>[Email Sender]</label>
+                    <value>fr-email-sender</value>
                 </item>
                 <item>
                     <label>Lägg till som mejlbilaga</label>

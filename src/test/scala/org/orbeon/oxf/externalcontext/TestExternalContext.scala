@@ -21,11 +21,11 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.{EmailProcessor, ProcessorUtils}
+import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xml.XPathUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.{PartUtils, XPathUtils}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -113,8 +113,8 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
             else
               locationData.file
 
-          val saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType)
-          val fileItem  = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource)
+          val saxSource = PartUtils.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType)
+          val fileItem  = PartUtils.handleStreamedPartContent(pipelineContext, saxSource)
           if (! (ContentTypes.isTextOrJSONContentType(contentType) || ContentTypes.isXMLContentType(contentType))) {
             // This is binary content
             if (fileItem ne null) {

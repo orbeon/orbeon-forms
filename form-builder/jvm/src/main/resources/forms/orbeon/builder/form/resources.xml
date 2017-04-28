@@ -321,12 +321,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Email Recipient</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Show in Email Subject</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Email Recipient</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>Email Sender</label>
@@ -1290,20 +1290,20 @@
             <options>
                 <label>Options</label>
                 <item>
-                    <label>Montrer dans le sommaire</label>
+                    <label>Inclure dans le sommaire</label>
                     <value>fr-summary</value>
                 </item>
                 <item>
-                    <label>Montrer dans la recherche</label>
+                    <label>Inclure dans la recherche</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label>Inclure dans le sujet d'email</label>
+                    <value>fr-email-subject</value>
                 </item>
                 <item>
                     <label>Destinataire email</label>
                     <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>Utiliser comme sujet d'email</label>
-                    <value>fr-email-subject</value>
                 </item>
                 <item>
                     <label>Expéditeur email</label>
@@ -2277,12 +2277,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Epostmottaker</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Vis i epostemne</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Epostmottaker</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -3284,12 +3284,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Адрес получателя почты</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Показывать в теме письма</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Адрес получателя почты</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -4291,12 +4291,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Destinatario email</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Mostra in oggetto</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Destinatario email</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -5290,12 +5290,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>E-Mail-Empfänger</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>In E-Mail-Betreff anzeigen</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>E-Mail-Empfänger</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -6292,12 +6292,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Sähköpostin vastaanottaja</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Näytä sähköpostin aiheena</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Sähköpostin vastaanottaja</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -7292,12 +7292,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Es receptor del Emails</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Mostrar en Asunto del Mail</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Es receptor del Emails</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -8292,12 +8292,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Receptor do Email</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Mostrar no assunto do email</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Receptor do Email</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -9298,12 +9298,12 @@
                     <value>fr-search</value>
                 </item>
                 <item>
-                    <label>Mottagare av mejl</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
                     <label>Visa i ärenderaden för mejl</label>
                     <value>fr-email-subject</value>
+                </item>
+                <item>
+                    <label>Mottagare av mejl</label>
+                    <value>fr-email-recipient</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>

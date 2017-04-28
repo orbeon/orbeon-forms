@@ -87,7 +87,7 @@ object DataMigration {
     app           : String,
     form          : String,
     data          : DocumentInfo,
-    metadata      : Option[DocumentInfo],
+    metadataOpt   : Option[DocumentInfo],
     pruneMetadata : Boolean
   ): (DocumentInfo, String) = {
 
@@ -96,7 +96,7 @@ object DataMigration {
 
     val migratedDatabaseDataOpt =
       if (srcDataFormatVersion != dstDataFormatVersion)
-        dataMaybeMigratedFrom(data, metadata, pruneMetadata)
+        dataMaybeMigratedFrom(data, metadataOpt, pruneMetadata)
       else
         None
 

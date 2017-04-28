@@ -329,6 +329,14 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
+                    <label>Email Carbon Copy Recipient</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>Email Bind Carbon Copy Recipient</label>
+                    <value>fr-email-bcc</value>
+                </item>
+                <item>
                     <label>Email Sender</label>
                     <value>fr-email-sender</value>
                 </item>
@@ -1304,6 +1312,14 @@
                 <item>
                     <label>Destinataire email</label>
                     <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>Destinataire email en copie carbone</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>Destinataire email en copie carbone invisible</label>
+                    <value>fr-email-bcc</value>
                 </item>
                 <item>
                     <label>Expéditeur email</label>
@@ -2283,6 +2299,14 @@
                 <item>
                     <label>Epostmottaker</label>
                     <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -3292,6 +3316,14 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
+                </item>
+                <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
                 </item>
@@ -4299,6 +4331,14 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
+                </item>
+                <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
                 </item>
@@ -5296,6 +5336,14 @@
                 <item>
                     <label>E-Mail-Empfänger</label>
                     <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -6300,6 +6348,14 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
+                </item>
+                <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
                 </item>
@@ -7300,6 +7356,14 @@
                     <value>fr-email-recipient</value>
                 </item>
                 <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
+                </item>
+                <item>
                     <label>[Email Sender]</label>
                     <value>fr-email-sender</value>
                 </item>
@@ -8298,6 +8362,14 @@
                 <item>
                     <label>Receptor do Email</label>
                     <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>
@@ -9304,6 +9376,14 @@
                 <item>
                     <label>Mottagare av mejl</label>
                     <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>[Email Carbon Copy Recipient]</label>
+                    <value>fr-email-cc</value>
+                </item>
+                <item>
+                    <label>[Email Bind Carbon Copy Recipient]</label>
+                    <value>fr-email-bcc</value>
                 </item>
                 <item>
                     <label>[Email Sender]</label>

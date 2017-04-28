@@ -27,6 +27,9 @@
                 <form>
                     <section-1>
                         <control-1>info+toplevel@orbeon.com</control-1>
+                        <control-2>cc+toplevel@orbeon.com</control-2>
+                        <control-3>bcc+toplevel@orbeon.com</control-3>
+                        <control-4>from+toplevel@orbeon.com</control-4>
                         <control-12>attachment-12.bin</control-12>
                         <control-13 filename="" mediatype="" size="">attachment-13.bin</control-13>
                         <control-14 filename="" mediatype="" size="">attachment-14.bin</control-14>
@@ -57,6 +60,9 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
                     <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                    <xf:bind id="control-2-bind" name="control-2" ref="control-2"/>
+                    <xf:bind id="control-3-bind" name="control-3" ref="control-3"/>
+                    <xf:bind id="control-4-bind" name="control-4" ref="control-4"/>
                     <xf:bind id="control-12-bind" ref="control-12" name="control-12" type="xf:anyURI"/>
                     <xf:bind id="control-13-bind" ref="control-13" name="control-13" type="xf:anyURI"/>
                     <xf:bind id="control-14-bind" ref="control-14" name="control-14" type="xf:anyURI"/>
@@ -99,6 +105,18 @@
                             <label>Email</label>
                             <hint/>
                         </control-1>
+                        <control-2>
+                            <label>Cc</label>
+                            <hint/>
+                        </control-2>
+                        <control-3>
+                            <label>Bcc</label>
+                            <hint/>
+                        </control-3>
+                        <control-4>
+                            <label>From</label>
+                            <hint/>
+                        </control-4>
                         <control-12>
                             <label>Static</label>
                         </control-12>
@@ -328,6 +346,33 @@
                                     <xf:label ref="$form-resources/control-12/label"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-2-control" bind="control-2-bind" class="fr-email-cc">
+                                    <xf:label ref="$form-resources/control-2/label"/>
+                                    <xf:hint ref="$form-resources/control-2/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input id="control-3-control" bind="control-3-bind" class="fr-email-bcc">
+                                    <xf:label ref="$form-resources/control-3/label"/>
+                                    <xf:hint ref="$form-resources/control-4/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-4-control" bind="control-4-bind" class="fr-email-sender">
+                                    <xf:label ref="$form-resources/control-4/label"/>
+                                    <xf:hint ref="$form-resources/control-4/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
                             </xh:td>
                         </xh:tr>
                         <xh:tr>

@@ -19,8 +19,6 @@ import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML._
 
-import scala.collection.breakOut
-
 trait FormDefinition {
 
   private val FRSummary       = "fr-summary"
@@ -37,25 +35,31 @@ trait FormDefinition {
     // Controls in the view, with the `fr-summary` or `fr-search` class
     val indexedControlBindPathHolders = {
 
-      val head = formDoc / "*:html" / "*:head" head
-      val body = formDoc / "*:html" / "*:body" head
+      // Support missing `head` and `body` in particular for tests. That just means there is nothing to index.
+      val headOpt = formDoc / "*:html" / "*:head" headOption
+      val bodyOpt = formDoc / "*:html" / "*:body" headOption
 
-      val topLevelOnly =
-        FormRunner.searchControlsTopLevelOnly(
-          body      = body,
-          data      = None,
-          predicate = FormRunner.hasAnyClassPredicate(ClassesPredicate)
-        )
+      bodyOpt.toList flatMap { body ⇒
 
-      val withSectionTemplates =
-        FormRunner.searchControlsUnderSectionTemplates(
-          head      = head,
-          body      = body,
-          data      = None,
-          predicate = FormRunner.hasAnyClassPredicate(ClassesPredicate)
-        )
+        val topLevelOnly =
+          FormRunner.searchControlsTopLevelOnly(
+            body      = body,
+            data      = None,
+            predicate = FormRunner.hasAnyClassPredicate(ClassesPredicate)
+          )
 
-      topLevelOnly ++ withSectionTemplates
+        val withSectionTemplatesOpt =
+          headOpt map { head ⇒
+            FormRunner.searchControlsUnderSectionTemplates(
+              head      = head,
+              body      = body,
+              data      = None,
+              predicate = FormRunner.hasAnyClassPredicate(ClassesPredicate)
+            )
+          }
+
+        topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
+      }
     }
 
     val migrationPaths =

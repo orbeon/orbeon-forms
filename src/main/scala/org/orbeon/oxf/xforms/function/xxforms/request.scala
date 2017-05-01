@@ -23,17 +23,17 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
-class XXFormsGetRequestMethod extends XFormsFunction {
+class XXFormsGetRequestMethod extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getMethod
 }
 
-class XXFormsGetPortletMode extends XFormsFunction {
+class XXFormsGetPortletMode extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getPortletMode
 }
 
-class XXFormsGetWindowState extends XFormsFunction {
+class XXFormsGetWindowState extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     NetUtils.getExternalContext.getRequest.getWindowState
 }

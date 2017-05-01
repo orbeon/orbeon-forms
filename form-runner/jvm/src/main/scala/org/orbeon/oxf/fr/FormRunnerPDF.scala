@@ -32,18 +32,18 @@ trait FormRunnerPDF {
   //@XPathFunction
   def getPDFFormats: ju.Map[String, String] = {
 
-    def propertiesStartingWith(prefix: String) =
-      XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).asScala map (_.getStringValue)
+    def propertiesStartingWithIt(prefix: String) =
+      XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).iterator map (_.getStringValue)
 
-    val formatPairs =
+    val formatPairsIt =
       for {
-        formatPropertyName ← propertiesStartingWith("oxf.fr.pdf.format")
+        formatPropertyName ← propertiesStartingWithIt("oxf.fr.pdf.format")
         expression         ← XXFormsProperty.propertyAsString(formatPropertyName)
         formatName         = formatPropertyName split '.' last
       } yield
         formatName → expression
 
-    formatPairs.toMap.asJava
+    formatPairsIt.toMap.asJava
   }
 
   // Return the PDF formatting expression for the given parameters

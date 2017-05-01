@@ -28,7 +28,7 @@ import org.xml.sax.InputSource
 
 import scala.util.control.NonFatal
 
-object ScopeFunctionSupport extends XFormsFunction {
+object ScopeFunctionSupport {
 
   def storeAttribute(put: (String, AnyRef) ⇒ Any, attributeName: String, item: Item): Unit = {
     if (item == null) {

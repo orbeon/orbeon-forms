@@ -13,16 +13,19 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import collection.JavaConverters._
 import java.{util ⇒ ju}
+
+import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.StringValue
-import XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.scaxon.XML
+
+import scala.collection.JavaConverters._
 
 /**
  * XForms property() function.
@@ -38,7 +41,7 @@ private object Property {
   val ConformanceLevelProperty = "conformance-level"
 }
 
-class Property extends XFormsFunction {
+class Property extends XFormsFunction with RuntimeDependentFunction {
 
   import Property._
 
@@ -79,7 +82,7 @@ class Property extends XFormsFunction {
     super.checkArguments(visitor)
     if (arg eq null) {
       val namespaceResolver = visitor.getStaticContext.getNamespaceResolver
-      arg = arguments(0) match {
+      arg = arguments.head match {
         case sl: StringLiteral ⇒
           // This is the most common case where the parameter value is known at expression compilation time
           val (prefix, local) = XML.parseQName(sl.getStringValue)

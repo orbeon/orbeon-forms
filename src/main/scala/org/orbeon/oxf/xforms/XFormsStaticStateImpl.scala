@@ -222,7 +222,7 @@ object XFormsStaticStateImpl {
     new XFormsStaticStateImpl(
       encodedState,
       staticStateDocument.getOrComputeDigest(digest),
-      new Scope(null, ""),
+      new Scope(None, ""),
       metadata,
       template,
       staticStateDocument
@@ -232,7 +232,7 @@ object XFormsStaticStateImpl {
   // Create analyzed static state for the given static state document.
   // Used by XFormsToXHTML.
   def createFromStaticStateBits(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
-    val startScope = new Scope(null, "")
+    val startScope = new Scope(None, "")
     val staticStateDocument = new StaticStateDocument(staticStateXML)
 
     new XFormsStaticStateImpl(
@@ -249,7 +249,7 @@ object XFormsStaticStateImpl {
   // Used by unit tests.
   def createFromDocument(formDocument: Document): (SAXStore, XFormsStaticState) = {
 
-    val startScope = new Scope(null, "")
+    val startScope = new Scope(None, "")
 
     def create(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
       val staticStateDocument = new StaticStateDocument(staticStateXML)

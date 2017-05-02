@@ -28,7 +28,7 @@ trait PartStaticAnalysisOps {
   def getDefaultModelForScope(scope: Scope): Option[Model]
   def getModelByInstancePrefixedId(prefixedId: String): Model
   def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
-  def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String
+  def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String]
 
   def getControlAnalysis(prefixedId: String): ElementAnalysis
   def scopeForPrefixedId(prefixedId: String): Scope

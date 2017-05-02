@@ -354,7 +354,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     }
 
   private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {
-    val newScope = new Scope(getResolutionScope, getPrefixedId)
+    val newScope = new Scope(Some(getResolutionScope ensuring (_ ne null)), getPrefixedId)
     val (template, newPart) = XFormsStaticStateImpl.createPart(containingDocument.getStaticState, parent, doc, newScope)
     containingDocument.getStaticOps.addPart(newPart)
     (template, newPart)

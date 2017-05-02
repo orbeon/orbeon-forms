@@ -13,26 +13,23 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import collection.JavaConverters._
-import collection.mutable
-import collection.immutable
 import java.util.{List ⇒ JList}
+
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xforms.control.XFormsContainerControl
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.XFormsEventFactory
+import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsRepeatIterationControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{Item, NodeInfo}
+
+import scala.collection.JavaConverters._
+import scala.collection.{immutable, mutable}
 
 /**
  * Represent an XBL container of models and controls.
@@ -51,7 +48,7 @@ class XBLContainer(
   private var _effectiveId : String,        // effective id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar.1-2", etc.
   val prefixedId           : String,        // prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.
   val fullPrefix           : String,        // prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
-  val parentXBLContainer   : XBLContainer,
+  val parentXBLContainer   : Option[XBLContainer],
   val associatedControlOpt : Option[XFormsControl], // `None` for root container
   val innerScope           : Scope
 ) extends ModelContainer
@@ -69,16 +66,17 @@ class XBLContainer(
       associatedControl.getEffectiveId,
       XFormsUtils.getPrefixedId(associatedControl.getEffectiveId),
       XFormsUtils.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR,
-      parentXBLContainer,
-      Some(associatedControl),
+      Some(parentXBLContainer ensuring (_ ne null)),
+      Some(associatedControl  ensuring (_ ne null)),
       innerScope
     )
 
   // Tell parent it has a child
-  if (parentXBLContainer ne null)
-    parentXBLContainer.addChild(self)
+  parentXBLContainer foreach
+    (_.addChild(self))
 
-  def ancestorsIterator = Iterator.iterate(self)(_.parentXBLContainer) takeWhile (_ ne null)
+  def ancestorsIterator: Iterator[XBLContainer] =
+    Iterator.iterateOpt(self)(_.parentXBLContainer)
 
   val containingDocument = ancestorsIterator collectFirst { case cd: XFormsContainingDocument ⇒ cd } get
 
@@ -88,15 +86,14 @@ class XBLContainer(
   def childrenXBLContainers = _childrenXBLContainers.iterator
 
   def effectiveId = _effectiveId
-  def partAnalysis: PartAnalysis = Option(parentXBLContainer) map (_.partAnalysis) orNull
+  def partAnalysis: PartAnalysis = parentXBLContainer map (_.partAnalysis) orNull
 
   // Legacy getters/setters
-  def getEffectiveId = _effectiveId
-  def getPrefixedId = prefixedId
-  def getFullPrefix = fullPrefix
-  def getParentXBLContainer = parentXBLContainer
+  def getEffectiveId        = _effectiveId
+//  def getPrefixedId         = prefixedId
+  def getFullPrefix         = fullPrefix
   def getContainingDocument = containingDocument
-  def getContextStack = contextStack
+  def getContextStack       = contextStack
   final def getPartAnalysis = partAnalysis
 
   // Create a new container child of the given control
@@ -111,13 +108,13 @@ class XBLContainer(
 
   // Update the effective id when repeat iterations change.
   def updateEffectiveId(effectiveId: String): Unit = {
-    if (parentXBLContainer ne null)
-      parentXBLContainer.removeChild(self)
+    parentXBLContainer foreach
+      (_.removeChild(self))
 
     _effectiveId = effectiveId
 
-    if (parentXBLContainer ne null)
-      parentXBLContainer.addChild(self)
+    parentXBLContainer foreach
+      (_.addChild(self))
 
     for (currentModel ← models) {
 
@@ -131,8 +128,8 @@ class XBLContainer(
 
   // Remove container and destroy models when a repeat iteration is removed.
   def destroy(): Unit = {
-    if (parentXBLContainer ne null)
-      parentXBLContainer.removeChild(self)
+    parentXBLContainer foreach
+      (_.removeChild(self))
 
     destroyModels()
   }

@@ -24,13 +24,13 @@ import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
  * - within a scope, static ids must be unique
  * - static ids might have prefixed ids in different containing scopes
  */
-class Scope(val parent: Scope, val scopeId: String) {
+class Scope(val parent: Option[Scope], val scopeId: String) {
 
-  assert((parent ne null) || scopeId == "")
+  assert(parent.isDefined && scopeId.nonEmpty || parent.isEmpty && scopeId.isEmpty)
 
   private val idMap = mutable.HashMap[String, String]()
   val fullPrefix = if (isTopLevelScope) "" else scopeId + COMPONENT_SEPARATOR
-  
+
   def isTopLevelScope = scopeId.length == 0
 
   // Return the prefixed id of the given control static id within this scope, null if not found

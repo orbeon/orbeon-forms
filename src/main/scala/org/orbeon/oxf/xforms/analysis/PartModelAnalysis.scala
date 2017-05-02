@@ -18,6 +18,7 @@ import model.Model
 import collection.mutable.{LinkedHashMap, Buffer}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.util.CollectionUtils._
 
 // Part analysis: models and instances information
 trait PartModelAnalysis extends TransientState {
@@ -50,17 +51,17 @@ trait PartModelAnalysis extends TransientState {
   def getModelsForScope(scope: Scope) =
     modelsByScope.getOrElse(scope, Seq())
 
-  def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String = {
-    var currentScope = startScope
-    while (currentScope ne null) {
-      for (model ← getModelsForScope(currentScope)) {
-        if (model.instancesMap.containsKey(instanceStaticId)) {
-          return currentScope.prefixedIdForStaticId(instanceStaticId)
-        }
-      }
-      currentScope = currentScope.parent
-    }
-    null
+  def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): Option[String] = {
+
+    val prefixedIdIt =
+      for {
+        scope ← Iterator.iterateOpt(startScope)(_.parent)
+        model ← getModelsForScope(scope)
+        if model.instancesMap.containsKey(instanceStaticId)
+      } yield
+        scope.prefixedIdForStaticId(instanceStaticId)
+
+    prefixedIdIt.nextOption()
   }
 
   protected def indexModel(model: Model, eventHandlers: Buffer[EventHandlerImpl]): Unit = {

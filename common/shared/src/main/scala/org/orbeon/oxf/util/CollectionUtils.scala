@@ -16,7 +16,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.generic.CanBuildFrom
-import scala.collection.{TraversableLike, mutable}
+import scala.collection.{AbstractIterator, TraversableLike, mutable}
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
 
@@ -57,6 +57,23 @@ object CollectionUtils {
 
     def iterateWhileDefined[T](elemOpt: ⇒ Option[T]): Iterator[T] =
       Iterator.continually(elemOpt).takeWhile(_.isDefined).flatten
+
+    def iterateOpt[T <: AnyRef](start: T)(f: T ⇒ Option[T]): Iterator[T] = new AbstractIterator[T] {
+
+      private[this] var _next: Option[T] = Some(start)
+
+      def hasNext: Boolean = _next.isDefined
+
+      def next(): T =
+        _next match {
+          case Some(result) ⇒
+            // Advance on `next()` for simplicity
+            _next = _next flatMap f
+            result
+          case None ⇒
+            throw new NoSuchElementException("next on empty iterator")
+        }
+    }
   }
   implicit def fromIteratorExt(i: Iterator.type): IteratorExt.type = IteratorExt
 

@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.xml
 
-import XMLConstants._
-import collection.JavaConverters._
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
-import org.orbeon.oxf.processor.transformer.TransformerURIResolver
-import org.orbeon.oxf.processor.transformer.XPathProcessor
-import org.orbeon.oxf.util.{XPath, LoggerFactory, XPathCache}
+import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferences
+import org.orbeon.oxf.processor.transformer.{TransformerURIResolver, XPathProcessor}
+import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.{LoggerFactory, XPath, XPathCache}
+import org.orbeon.oxf.xml.XIncludeReceiver._
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLNames._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.xml.sax._
-import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferences
-import XIncludeReceiver._
-import scala.util.control.NonFatal
 
-import XMLNames._
+import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 // Streaming XInclude processing
 // NOTE: Does not support: <xi:fallback>, encoding, accept, or accept-language attributes.
@@ -40,13 +39,27 @@ class XIncludeReceiver(
     uriResolver    : TransformerURIResolver,
     xmlBase        : String,
     generateXMLBase: Boolean,
-    outputLocator  : OutputLocator)
-  extends ForwardingXMLReceiver(xmlReceiver) {
+    outputLocator  : OutputLocator
+) extends ForwardingXMLReceiver(xmlReceiver) {
 
   self ⇒
 
-  def this(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver, uriReferences: URIReferences, uriResolver: TransformerURIResolver) =
-    this(pipelineContext, None, xmlReceiver, uriReferences, uriResolver, null, true, new OutputLocator)
+  def this(
+    pipelineContext: PipelineContext,
+    xmlReceiver    : XMLReceiver,
+    uriReferences  : URIReferences,
+    uriResolver    : TransformerURIResolver
+  ) =
+    this(
+      pipelineContext,
+      None,
+      xmlReceiver,
+      uriReferences,
+      uriResolver,
+      null,
+      true,
+      new OutputLocator
+    )
 
   private val topLevel = parent.isEmpty
   private val namespaceContext = new NamespaceContext
@@ -73,10 +86,10 @@ class XIncludeReceiver(
   //
   // We don't send out namespace events when reaching xi:include itself, as those would be unneeded events.
   //
-  def findPending(pending: Map[String, String]) =
+  def findPending(pending: Map[String, String]): Map[String, String] =
     if (! topLevel && level == 0) {
 
-      def ancestors = Iterator.iterate(self)(_.parent.orNull) takeWhile (_ ne null)
+      def ancestors = Iterator.iterateOpt(self)(_.parent)
       def relevantContexts = ancestors flatMap (_.contexts) filter (_.relevant)
 
       val closestAncestorMappings =

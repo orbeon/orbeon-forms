@@ -73,8 +73,9 @@ object XXFormsInstance {
         None
 
     def findDynamic = {
-      val containers = Iterator.iterate(startContainer)(_.getParentXBLContainer) takeWhile (_ ne null)
+      val containers = Iterator.iterateOpt(startContainer)(_.parentXBLContainer)
       val instances  = containers flatMap (_.findInstance(instanceId))
+
       instances.nextOption() map (_.rootElement)
     }
 
@@ -84,7 +85,7 @@ object XXFormsInstance {
       val ops = containingDocument.getStaticOps
       val startScope = startContainer.innerScope
 
-      val scopes    = Iterator.iterate(startScope)(_.parent) takeWhile (_ ne null)
+      val scopes    = Iterator.iterateOpt(startScope)(_.parent)
       val instances = scopes flatMap ops.getModelsForScope flatMap (_.instances.get(instanceId))
 
       if (! instances.hasNext)

@@ -775,9 +775,9 @@
                         <xxf:control id="my-date≡xf-6">
                             <xxf:value>2010-01-13</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-date≡xf-10" class="xbl-fr-date-mindate xforms-hidden"/>
-                        <xxf:control id="my-date≡xf-14" class="xbl-fr-date-maxdate xforms-hidden"/>
-                        <xxf:control id="my-date≡xf-18" class="xbl-fr-date-pagedate xforms-hidden"/>
+                        <xxf:control id="my-date≡xf-8" class="xbl-fr-date-mindate xforms-hidden"/>
+                        <xxf:control id="my-date≡xf-10" class="xbl-fr-date-maxdate xforms-hidden"/>
+                        <xxf:control id="my-date≡xf-12" class="xbl-fr-date-pagedate xforms-hidden"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-date≡xf-6"/>
                 </xxf:action>
@@ -816,26 +816,26 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency≡xf-10" class="xbl-fr-currency-decimal-separator xforms-hidden">
+                        <xxf:control id="my-currency≡xf-8" class="xbl-fr-currency-decimal-separator xforms-hidden">
                             <xxf:value>.</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-currency≡xf-40" class="xbl-fr-number-xforms-output xforms-hidden">
+                        <xxf:control id="my-currency≡xf-26" class="xbl-fr-number-xforms-output xforms-hidden">
                             <xxf:value>12.34</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-currency≡xf-41" class="xbl-fr-number-xforms-input xforms-hidden">
+                        <xxf:control id="my-currency≡xf-27" class="xbl-fr-number-xforms-input xforms-hidden">
                             <xxf:value>12.34</xxf:value>
                         </xxf:control>
-                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-42"/>
-                        <xxf:control id="my-currency≡xf-44" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-45">
+                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-28"/>
+                        <xxf:control id="my-currency≡xf-30" class="add-on"/>
+                        <xxf:control id="my-currency≡xf-31">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-49" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-50" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-51" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-35" class="add-on" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-36" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-37" relevant="false"/>
                     </xxf:control-values>
                     <xxf:script name="xf_efdc0056b6438f9c969545432feab52728756c34" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>
@@ -884,14 +884,13 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-autocomplete≡component-inner-group" class="fr-autocomplete-container"/>
-                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
+                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button"
+                                     label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
                         <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
                         <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden">
                             <xxf:value>true</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-autocomplete≡xf-74" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
-                            <xxf:value>10</xxf:value>
-                        </xxf:control>
+                        <xxf:control id="my-autocomplete≡xf-72" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden"/>
                         <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1 xforms-hidden">
                             <xxf:itemset>[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
                             <xxf:value>One</xxf:value>

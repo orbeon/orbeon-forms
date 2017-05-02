@@ -38,7 +38,7 @@ trait ControlXPathSupport {
    * @param attributeValue    value of the attribute
    * @return                  value of the AVT or null if cannot be computed
    */
-  def evaluateAvt(attributeValue: String) = {
+  def evaluateAvt(attributeValue: String): String = {
 
     assert(isRelevant)
 

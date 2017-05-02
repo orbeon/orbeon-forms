@@ -43,7 +43,7 @@
 
         <xsl:choose>
             <xsl:when test="exists($context/*[local-name() = $property and namespace-uri() = $namespace])">
-                <!-- Parameter bound to a node -->
+                <!-- Child element ⇒ the parameter bound to a node -->
                 <!-- Create an input field with all the binding attributes of the nested element, i.e. fr:foo/fr:bar/@ref -->
                 <xf:var name="{$property}">
                     <xxf:value
@@ -66,22 +66,8 @@
                 </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-                <!-- Parameter is constant -->
-                <!-- NOTE: We have a "default" value in the variable so we can detect the difference between the
-                     attribute value being the empty string vs. the attribute not being there -->
-                <xf:var
-                    name="{$property}-orbeon-xbl"
-                    xbl:attr="xbl:text={$property}"
-                    xxbl:scope="outer">&#xb7;</xf:var>
-                <xf:var name="{$property}">
-                    <xxf:value
-                        value="
-                            if (${$property}-orbeon-xbl != '&#xb7;') then
-                                xxf:evaluate-avt(${$property}-orbeon-xbl)
-                            else
-                                xxf:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"
-                        xxbl:scope="outer"/>
-                </xf:var>
+                <!-- Parameter is readonly and can be an AVT -->
+                <xf:var name="{$property}" value="xxf:component-param-value('{$property}')"/>
                 <xsl:if test="not($server-only)">
                     <xf:output
                         class="xbl-{$prefix}-{$component}-{$property} xforms-hidden"

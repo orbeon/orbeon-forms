@@ -35,18 +35,22 @@ class XXFormsComponentParam extends XFormsFunction {
 
       val concreteBinding = c.staticControl.binding
 
-      def fromElem =
-        concreteBinding.boundElementAtts.get(paramName)
+      // NOTE: In the future, we would like constant values to be available right away, and
+      // AVTs to support dependencies. Those should probably be stored lazily at the control
+      // level.
+
+      def fromElemAlsoTryAvt =
+        concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt
 
       def propertyName =
         concreteBinding.abstractBinding.directName map { name ⇒
-          List("oxf.xforms.xbl", name.getNamespacePrefix, name.getName) mkString "."
+          List("oxf.xforms.xbl", name.getNamespacePrefix, name.getName, paramName) mkString "."
         }
 
       def fromProperties =
         propertyName flatMap Properties.instance.getPropertySet.getNonBlankString
 
-      fromElem orElse fromProperties
+      fromElemAlsoTryAvt orElse fromProperties
     }
   }
 }

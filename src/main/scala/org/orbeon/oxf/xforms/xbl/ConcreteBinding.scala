@@ -14,17 +14,18 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.dom.{Element, Document}
+import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.xml.SAXStore
 
 case class ConcreteBinding(
   abstractBinding   : AbstractBinding,
-  innerScope        : Scope,          // each binding defines a new scope
-  outerScope        : Scope,          // this binding's outer scope
-  handlers          : Seq[Element],   // annotated event handler elements
-  models            : Seq[Element],   // annotated implementation model elements
-  templateTree      : SAXStore,       // template with relevant markup for output, including XHTML when needed
-  compactShadowTree : Document        // without full content, only the XForms controls
+  innerScope        : Scope,             // each binding defines a new scope
+  outerScope        : Scope,             // this binding's outer scope
+  handlers          : Seq[Element],      // annotated event handler elements
+  models            : Seq[Element],      // annotated implementation model elements
+  templateTree      : SAXStore,          // template with relevant markup for output, including XHTML when needed
+  compactShadowTree : Document,          // without full content, only the XForms controls
+  boundElementAtts  : Map[QName, String] // attributes on the bound element
 ) {
   require(
     abstractBinding.bindingId.isDefined,

@@ -49,6 +49,7 @@ case class InlineBindingRef(
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
   selectors      : List[Selector],
+  directName     : Option[QName],
   cssName        : Option[String],
   bindingElement : Element,
   path           : Option[String],
@@ -186,17 +187,18 @@ object AbstractBinding {
     val selectors =
       CSSSelectorParser.parseSelectors(bindingElement.attributeValue(ELEMENT_QNAME))
 
-    // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
-    val cssName = {
-
-      val ns    = Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
-      val qName = selectors collectFirst BindingDescriptor.directBindingPF(ns, None) flatMap (_.elementName)
-
-      qName map (_.getQualifiedName) map (_.replace(':', '-'))
+    val directName = {
+      val ns = Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap
+      selectors collectFirst BindingDescriptor.directBindingPF(ns, None) flatMap (_.elementName)
     }
+
+    // Get CSS name from direct binding if there is one. In the other cases, we won't have a class for now.
+    val cssName =
+      directName map (_.getQualifiedName) map (_.replace(':', '-'))
 
     AbstractBinding(
       selectors,
+      directName,
       cssName,
       bindingElement,
       path,

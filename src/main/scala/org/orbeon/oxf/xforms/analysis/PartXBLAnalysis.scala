@@ -54,7 +54,7 @@ trait PartXBLAnalysis extends TransientState {
     )
   }
 
-  def newScope(parent: Scope, scopeId: String) =
+  def newScope(parent: Scope, scopeId: String): Scope =
     registerScope(new Scope(parent, scopeId))
 
   private def registerScope(scope: Scope) = {

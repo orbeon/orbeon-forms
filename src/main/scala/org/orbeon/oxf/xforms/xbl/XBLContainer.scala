@@ -52,7 +52,7 @@ class XBLContainer(
   val prefixedId           : String,        // prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.
   val fullPrefix           : String,        // prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
   val parentXBLContainer   : XBLContainer,
-  val associatedControl    : XFormsControl, // null if this instanceof XFormsContainingDocument BUT could use a root control instead!
+  val associatedControlOpt : Option[XFormsControl], // `None` for root container
   val innerScope           : Scope
 ) extends ModelContainer
   with RefreshSupport
@@ -70,7 +70,7 @@ class XBLContainer(
       XFormsUtils.getPrefixedId(associatedControl.getEffectiveId),
       XFormsUtils.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR,
       parentXBLContainer,
-      associatedControl,
+      Some(associatedControl),
       innerScope
     )
 
@@ -95,7 +95,6 @@ class XBLContainer(
   def getPrefixedId = prefixedId
   def getFullPrefix = fullPrefix
   def getParentXBLContainer = parentXBLContainer
-  def getAssociatedControl = associatedControl
   def getContainingDocument = containingDocument
   def getContextStack = contextStack
   final def getPartAnalysis = partAnalysis
@@ -164,7 +163,7 @@ class XBLContainer(
 
   // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container
   // control componentControl will be null if we are at the top-level
-  def isRelevant: Boolean = (associatedControl eq null) || associatedControl.isRelevant
+  def isRelevant: Boolean = ! (associatedControlOpt exists (! _.isRelevant))
 }
 
 trait ModelContainer {
@@ -481,8 +480,8 @@ trait ContainerResolver {
     getChildrenControls(containingDocument.getControls).headOption map (_.getEffectiveId) orNull
 
   def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =
-    associatedControl match {
-      case container: XFormsContainerControl ⇒ container.children
-      case _                                 ⇒ Nil
+    associatedControlOpt match {
+      case Some(container: XFormsContainerControl) ⇒ container.children
+      case _                                       ⇒ Nil
     }
 }

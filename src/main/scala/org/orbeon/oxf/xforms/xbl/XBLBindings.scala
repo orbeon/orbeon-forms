@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, LocationDocumentResult}
 import org.xml.sax.Attributes
+import scala.collection.JavaConverters._
 
 import scala.collection.mutable
 
@@ -153,7 +154,8 @@ class XBLBindings(
         annotatedHandlers,
         annotatedModels,
         templateTree,
-        compactShadowTree
+        compactShadowTree,
+        boundElement.attributes.asScala map { att ⇒ att.getQName → att.getValue } toMap
       )
 
     // Process globals here as the component is in use

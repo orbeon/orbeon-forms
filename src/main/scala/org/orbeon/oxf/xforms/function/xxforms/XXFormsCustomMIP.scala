@@ -30,7 +30,7 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
         // NOTE: Custom MIPs are registered with a qualified name string. It would be better to use actual QNames
         // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
         // the one used on the binds.
-        val qName = getQNameFromExpression(xpathContext, argument(1))
+        val qName = getQNameFromExpression(argument(1))(xpathContext)
         val name  = Model.buildCustomMIPName(qName.getQualifiedName)
 
         // Return the value or null

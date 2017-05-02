@@ -114,7 +114,7 @@ object XFormsContainingDocumentSupport {
 case class Load(resource: String, target: Option[String], urlType: String, isReplace: Boolean, isShowProgress: Boolean)
 
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
-  extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, null,null)
+  extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", null, None, null)
   with ContainingDocumentLogging
   with ContainingDocumentMisc
   with ContainingDocumentUpload

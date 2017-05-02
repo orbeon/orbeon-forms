@@ -19,11 +19,11 @@ import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.model.BindNode
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, XFormsModel, XFormsObject, XFormsUtils}
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.FunctionSupport
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
@@ -88,21 +88,21 @@ abstract class XFormsFunction extends FunctionSupport {
     context.container.partAnalysis.getControlAnalysisOption(prefixedId)
   }
 
-  def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext) = {
+  def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext): Option[ElementAnalysis] = {
     val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
     context.container.partAnalysis.getControlAnalysisOption(prefixedId)
   }
 
-  def sourceScope(implicit xpathContext: XPathContext) =
+  def sourceScope(implicit xpathContext: XPathContext): Scope =
     context.container.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
 
-  def getContainingDocument(implicit xpathContext: XPathContext) =
+  def getContainingDocument(implicit xpathContext: XPathContext): XFormsContainingDocument =
     Option(context) map (_.container.getContainingDocument) orNull
 
   def setProperty(name: String, value: Option[String]) =
     context.setProperty(name, value)
 
-  protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): dom.QName = {
+  protected def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName = {
 
     val evaluatedExpression =
       qNameExpression.evaluateItem(xpathContext)

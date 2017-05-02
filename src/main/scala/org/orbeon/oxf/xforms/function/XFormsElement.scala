@@ -26,7 +26,7 @@ class XFormsElement extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {
 
     // Element QName and content sequence
-    val qName   = argument.lift(0) map (getQNameFromExpression(xpathContext, _)) get
+    val qName   = argument.lift(0) map (getQNameFromExpression(_)(xpathContext)) get
     val content = argument.lift(1) map (_.iterate(xpathContext)) getOrElse EmptyIterator.getInstance
 
     XML.elementInfo(qName, asScalaIterator(content).toList)

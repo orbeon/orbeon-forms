@@ -114,6 +114,19 @@
                         <xsl:attribute name="id"              select="concat('fr-view-', $view-appearance)"/>
                         <xsl:attribute name="app"             select="$app"/>
                         <xsl:attribute name="form"            select="$form"/>
+
+                        <xsl:for-each select="$wizard-mode[1]">
+                            <!--
+                                We'd prefer `mode` to match the term used in the documentation, or maybe
+                                `forward-validation-mode`. But `validate` is how the property was named.
+                            -->
+                            <xsl:attribute name="validate" select="."/>
+                        </xsl:for-each>
+
+                        <!--
+                            This is the `incremental|explicit` Form Runner validation mode, which is passed to the wizard but
+                            is also used separately from the wizard. Here too the name should be clearer.
+                        -->
                         <xsl:attribute name="validation-mode" select="$validation-mode"/>
 
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>

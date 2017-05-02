@@ -24,11 +24,11 @@ import org.orbeon.scaxon.XML._
 object Wizard {
 
   //@XPathFunction
-  def wizardMode: String =
-    formRunnerProperty("oxf.xforms.xbl.fr.wizard.validate")(FormRunnerParams()) match {
-      case Some("true" | "lax") ⇒ "lax"
-      case Some("strict")       ⇒ "strict"
-      case _                    ⇒ "false"
+  def normalizeWizardMode(mode: String): String =
+    mode match {
+      case "true" | "lax" ⇒ "lax"
+      case "strict"       ⇒ "strict"
+      case _              ⇒ "free"
     }
 
   //@XPathFunction

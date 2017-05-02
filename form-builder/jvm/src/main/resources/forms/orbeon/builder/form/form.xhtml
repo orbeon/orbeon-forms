@@ -136,6 +136,7 @@
                                         <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
                                         <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
                                         <xf:property name="wizard"                        value="bind('wizard-bind')"/>
+                                        <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
                                         <xf:property name="labels"                        value="bind('labels-bind')"/>
                                         <xf:property name="hints"                         value="bind('hints-bind')"/>
                                     </xxf:show>
@@ -316,6 +317,15 @@
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="xf:element('wizard', event('wizard'))"/>
+
+                                        <!-- Add/remove wizard mode setting as needed -->
+                                        <xf:delete
+                                            bind="wizard-mode-bind"/>
+                                        <xf:insert
+                                            if="event('wizard-mode') = ('free', 'lax', 'strict')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('wizard-mode', event('wizard-mode'))"/>
 
                                         <!-- Add/remove XForms properties as needed -->
                                         <xf:delete

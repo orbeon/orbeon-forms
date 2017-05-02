@@ -172,12 +172,31 @@
                 'full'
             )[1]"/>
 
+     <xsl:variable
+        name="wizard-mode"
+        as="xs:string"
+        select="
+            (
+                $fr-form-metadata/wizard-mode[
+                    . = ('free', 'lax', 'strict')
+                ],
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.validate', $app, $form), '.'))[
+                    . = (
+                        'free', 'lax', 'strict',
+                        'true' (: for backward compatibility :)
+                    )
+                ],
+                'free'
+            )[1]"/>
+
     <xsl:variable
         name="validation-mode"
         as="xs:string"
         select="
             (
-                p:property(string-join(('oxf.fr.detail.validation-mode', $app, $form), '.'))[. = ('incremental', 'explicit')],
+                p:property(string-join(('oxf.fr.detail.validation-mode', $app, $form), '.'))[
+                    . = ('incremental', 'explicit')
+                ],
                 'incremental'
             )[1]"/>
 

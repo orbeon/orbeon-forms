@@ -272,6 +272,14 @@
                 <label>Wizard View</label>
                 <hint>Whether to show top-level sections as separate wizard pages</hint>
             </wizard>
+            <wizard-mode>
+                <label>Wizard Navigation Validation Mode</label>
+                <hint>How wizard navigation behaves when data is not valid</hint>
+                <item id="0">Use Default</item>
+                <item id="1">Free</item>
+                <item id="2">Lax</item>
+                <item id="3">Strict</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label>Maximum Attachment Size per Control</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
@@ -1257,6 +1265,14 @@
                 <label>Vue "wizard"</label>
                 <hint>Montrer les sections de premier niveau dans des pages de wizard séparées</hint>
             </wizard>
+            <wizard-mode>
+                <label>Mode de navigation du "wizard"</label>
+                <hint>Navigation entre pages lorsque les données sont invalides</hint>
+                <item id="0">Utiliser le défaut</item>
+                <item id="1">Libre</item>
+                <item id="2">Permissif</item>
+                <item id="3">Strict</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label>Taille maximale des fichiers joints par contrôle</label>
                 <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
@@ -2244,6 +2260,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -3259,6 +3283,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -4274,6 +4306,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -5281,6 +5321,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -6291,6 +6339,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -7299,6 +7355,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -8307,6 +8371,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -9321,6 +9393,14 @@
                 <label todo="true">[Wizard View]</label>
                 <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
             </wizard>
+            <wizard-mode>
+                <label todo="true">[Wizard Navigation Validation Mode]</label>
+                <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
+                <item todo="true" id="0">[Use Default]</item>
+                <item todo="true" id="1">[Free]</item>
+                <item todo="true" id="2">[Lax]</item>
+                <item todo="true" id="3">[Strict]</item>
+            </wizard-mode>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per Control]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>

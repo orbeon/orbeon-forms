@@ -332,12 +332,12 @@
     -->
     <property as="xs:string"  name="oxf.fr.home.remote-servers" value='[]'/>
 
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="free"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                  value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.subsections-nav.*.*"               value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"               value="active"/>
 
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.orbeon.w9"                value="lax"/>
 
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.animate.*.*"                      value="true"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.section.collapsible.*.*"                  value="true"/>

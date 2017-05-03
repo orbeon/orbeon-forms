@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
 import org.orbeon.oxf.xforms.state.ControlState
 
 trait VisitableTrait extends XFormsControl {
@@ -34,6 +35,12 @@ trait VisitableTrait extends XFormsControl {
       // such as updating the error summary. What should be implemented is a better diff mechanism, for example lazy
       // copy of control properties upon mutation, rather than the current XFormsControlLocal/full clone alternative.
       containingDocument.getControls.cloneInitialStateIfNeeded()
+
+      // There is no dependency handling with the xxf:visited() function. So instead of requiring callers to do this,
+      // as was the case at some point, we require an RR.
+      bindingContext.modelOpt foreach
+        (_.deferredActionContext.markRecalculateRevalidate(NoDefaultsStrategy, None))
+
       containingDocument.requireRefresh()
       _visited = visited
     }

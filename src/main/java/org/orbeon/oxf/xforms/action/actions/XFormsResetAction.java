@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsResetEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
+import scala.Option;
 
 /**
  * 10.1.11 The reset Element
@@ -31,9 +32,10 @@ public class XFormsResetAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentBindingContext().model();
+        final Option<XFormsModel> modelOpt = actionInterpreter.actionXPathContext().getCurrentBindingContext().modelOpt();
 
         // "This action initiates reset processing by dispatching an xforms-reset event to the specified model."
-        Dispatch.dispatchEvent(new XFormsResetEvent(model));
+        if (modelOpt.isDefined())
+            Dispatch.dispatchEvent(new XFormsResetEvent(modelOpt.get()));
     }
 }

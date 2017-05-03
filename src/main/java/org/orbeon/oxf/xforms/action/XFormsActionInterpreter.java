@@ -340,7 +340,7 @@ public class XFormsActionInterpreter {
 
             // We don't have an evaluation context so return
             // CHECK: In the future we want to allow an empty evaluation context so do we really want this check?
-            if (bindingContext.getSingleItem() == null)
+            if (bindingContext.singleItemOpt().isEmpty())
                 return null;
 
             final NamespaceMapping namespaceMapping = getNamespaceMappings(actionElement);
@@ -459,7 +459,8 @@ public class XFormsActionInterpreter {
             model = (XFormsModel) o;
         } else {
             // Id is not specified
-            model = _actionXPathContext.getCurrentBindingContext().model();
+            final Option<XFormsModel> modelOpt = _actionXPathContext.getCurrentBindingContext().modelOpt();
+            model = modelOpt.isDefined() ? modelOpt.get() : null;
         }
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
@@ -471,7 +472,7 @@ public class XFormsActionInterpreter {
         final BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
 
         final boolean deferredUpdates;
-        if (bindingContext.getSingleItem() != null) {
+        if (bindingContext.singleItemOpt().isDefined()) {
             deferredUpdates = ! "false".equals(resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME));
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not

@@ -58,15 +58,17 @@ trait RRRAction extends XFormsAction with RRRFunctions {
   override def execute(context: DynamicActionContext): Unit = {
 
     val interpreter = context.interpreter
-    val model       = interpreter.actionXPathContext.getCurrentBindingContext.model
+    val modelOpt    = interpreter.actionXPathContext.getCurrentBindingContext.modelOpt
 
     def resolve(qName: QName) =
       (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
 
-    val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
-    val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
+    modelOpt foreach { model ⇒
+      val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
+      val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 
-    RRRAction.execute(this, model, deferred, applyDefaults)
+      RRRAction.execute(this, model, deferred, applyDefaults)
+    }
   }
 }
 

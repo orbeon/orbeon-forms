@@ -35,9 +35,13 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.SAXException;
+import scala.Option;
 
 import javax.xml.transform.sax.TransformerHandler;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handle a stack of XPath evaluation context information. This is used by controls (with one stack rooted at each
@@ -103,7 +107,7 @@ public class XFormsContextStack {
     }
 
     private BindingContext pushCopy(BindingContext parent) {
-        this.head = new BindingContext(parent, parent.model(), parent.bind(), parent.nodeset(),
+        this.head = new BindingContext(parent, parent.modelOpt(), parent.bind(), parent.nodeset(),
                 parent.position(), parent.elementId(), false, parent.controlElement(),
                 parent.locationData(), false, parent.contextItem(), parent.scope());
 
@@ -124,11 +128,11 @@ public class XFormsContextStack {
     }
 
     public XFormsFunction.Context getFunctionContext(String sourceEffectiveId, BindingContext binding) {
-        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.model(), null);
+        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt(), null);
     }
 
     public XFormsFunction.Context getFunctionContext(String sourceEffectiveId, BindingContext binding, Object data) {
-        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.model(), data);
+        return new XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt(), data);
     }
 
     /**
@@ -149,7 +153,7 @@ public class XFormsContextStack {
             // Push the default context if there is a model with an instance
             final Item defaultNode = model.getDefaultInstance().rootElement();
             final List<Item> defaultNodeset = Collections.singletonList(defaultNode);
-            this.head = new BindingContext(parentBindingContext, model, null, defaultNodeset, 1, null, true, null,
+            this.head = new BindingContext(parentBindingContext, Option.apply(model), null, defaultNodeset, 1, null, true, null,
                     model.getDefaultInstance().getLocationData(), false, defaultNode, container.innerScope());
         } else {
             // Push empty context
@@ -166,7 +170,7 @@ public class XFormsContextStack {
      */
     public static BindingContext defaultContext(BindingContext parentBindingContext, XBLContainer container, XFormsModel model) {
         final List<Item> defaultContext = DEFAULT_CONTEXT;
-        return new BindingContext(parentBindingContext, model, null, defaultContext, defaultContext.size(), null, true, null,
+        return new BindingContext(parentBindingContext, Option.apply(model), null, defaultContext, defaultContext.size(), null, true, null,
                 (model != null) ? model.getLocationData() : null, false, null, container.innerScope());
     }
 
@@ -291,7 +295,7 @@ public class XFormsContextStack {
             final BindingContext baseBindingContext = getBindingContext(scope);
 
             // Handle model
-            final XFormsModel newModel;
+            final Option<XFormsModel> newModelOpt;
             final boolean isNewModel;
             if (modelId != null) {
                 final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
@@ -304,14 +308,21 @@ public class XFormsContextStack {
                         throw new ValidationException("Reference to non-existing model id: " + modelId, locationData);
 
                     // Default to not changing the model
-                    newModel = baseBindingContext.model();
+                    newModelOpt = baseBindingContext.modelOpt();
                     isNewModel = false;
                 } else {
-                    newModel = (XFormsModel) o;
-                    isNewModel = newModel != baseBindingContext.model();// don't say it's a new model unless it has really changed
+                    newModelOpt = Option.apply((XFormsModel) o);
+                    // Don't say it's a new model unless it has really changed
+                    isNewModel =
+                        baseBindingContext.modelOpt().isEmpty()  && newModelOpt.nonEmpty() ||
+                        baseBindingContext.modelOpt().nonEmpty() && newModelOpt.isEmpty()  || (
+                            baseBindingContext.modelOpt().nonEmpty() &&
+                            newModelOpt.nonEmpty()                   &&
+                            baseBindingContext.modelOpt().get() != newModelOpt.get()
+                        );
                 }
             } else {
-                newModel = baseBindingContext.model();
+                newModelOpt = baseBindingContext.modelOpt();
                 isNewModel = false;
             }
 
@@ -513,12 +524,13 @@ public class XFormsContextStack {
 
                     bind = null;
 
-                    final BindingContext modelBindingContext = this.head.currentBindingContextForModel(newModel);
-                    if (modelBindingContext != null) {
+                    final Option<BindingContext> modelBindingContextOpt = this.head.currentBindingContextForModel(newModelOpt);
+                    if (modelBindingContextOpt.isDefined()) {
+                        final BindingContext modelBindingContext = modelBindingContextOpt.get();
                         newNodeset = modelBindingContext.nodeset();
                         newPosition = modelBindingContext.position();
                     } else {
-                        newNodeset = this.head.currentNodeset(newModel);
+                        newNodeset = this.head.currentNodeset(newModelOpt);
                         newPosition = 1;
                     }
 
@@ -562,7 +574,7 @@ public class XFormsContextStack {
 
             // Push new context
             final String bindingElementId = (bindingElement == null) ? null : XFormsUtils.getElementId(bindingElement);
-            this.head = new BindingContext(this.head, newModel, bind, newNodeset, newPosition, bindingElementId, isNewBind,
+            this.head = new BindingContext(this.head, newModelOpt, bind, newNodeset, newPosition, bindingElementId, isNewBind,
                     bindingElement, locationData, hasOverriddenContext, contextItem, scope);
         } catch (Exception e) {
             if (bindingElement != null) {
@@ -581,7 +593,7 @@ public class XFormsContextStack {
     private BindingContext updateBindingWithContextItem(BindingContext parent, BindingContext base, Item contextItem) {
         return new BindingContext(
             parent,
-            base.model(),
+            base.modelOpt(),
             null,
             base.nodeset(),
             base.position(),
@@ -611,7 +623,7 @@ public class XFormsContextStack {
         else
             newContextItem = currentNodeset.get(currentPosition - 1);
 
-        this.head = new BindingContext(currentBindingContext, currentBindingContext.model(), null,
+        this.head = new BindingContext(currentBindingContext, currentBindingContext.modelOpt(), null,
                 currentNodeset, currentPosition, currentBindingContext.elementId(), true, null, currentBindingContext.locationData(),
                 false, newContextItem, currentBindingContext.scope());
 

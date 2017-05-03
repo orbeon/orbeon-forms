@@ -26,7 +26,7 @@ class XXFormsEvaluateBindProperty extends XFormsFunction {
     val bindId   = stringArgument(0)
     val mipQName = getQNameFromExpression(arguments(1))(xpathContext)
 
-    XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, Option(bindingContext.getSingleItem)) collect
+    XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, bindingContext.singleItemOpt) collect
       { case bind: RuntimeBind ⇒ bind.model.getBinds.evaluateBindByType(bind, 1, mipQName).orNull } orNull
   }
 }

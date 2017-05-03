@@ -72,7 +72,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Use resource attribute
 
             // NOP if there is an AVT but no context node
-            if (bindingContext.getSingleItem() == null && XFormsUtils.maybeAVT(resourceAttributeValue))
+            if (bindingContext.singleItemOpt().isEmpty() && XFormsUtils.maybeAVT(resourceAttributeValue))
                 return;
 
             // Resolve AVT

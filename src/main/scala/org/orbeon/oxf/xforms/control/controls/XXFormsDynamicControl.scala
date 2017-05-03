@@ -348,9 +348,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
    }
 
   private def getBoundElement =
-    bindingContext.getSingleItem match {
-      case node: VirtualNode if node.getNodeKind == ELEMENT_NODE ⇒ Some(node)
-      case _ ⇒ None
+    bindingContext.singleNodeOpt match {
+      case Some(node: VirtualNode) if node.getNodeKind == ELEMENT_NODE ⇒ Some(node)
+      case _                                                           ⇒ None
     }
 
   private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {

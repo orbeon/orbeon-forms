@@ -36,9 +36,12 @@ object Wizard {
     formRunnerProperty("oxf.xforms.xbl.fr.wizard.separate-toc")(FormRunnerParams()) contains "true"
 
   private def findWizardState =
-    XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-wizard") flatMap
-      (_.nestedContainer.defaultModel)                            map
-      (_.getDefaultInstance.rootElement)
+    for {
+      component ← XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-wizard")
+      model     ← component.nestedContainer.defaultModel
+      instance  ← model.defaultInstanceOpt
+    } yield
+      instance.rootElement
 
   def isWizardTocShown =
     findWizardState map (_ elemValue "show-toc") contains "true"

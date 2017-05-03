@@ -71,7 +71,7 @@ class XFormsOutputControl(
     val value =
       if (valueAttribute eq null)
         // Get value from single-node binding
-        Option(DataModel.getValue(bc.getSingleItem))
+        bc.singleItemOpt map DataModel.getValue
       else
         // Value comes from the XPath expression within the value attribute
         evaluateAsString(valueAttribute, bc.nodeset.asScala, bc.position)

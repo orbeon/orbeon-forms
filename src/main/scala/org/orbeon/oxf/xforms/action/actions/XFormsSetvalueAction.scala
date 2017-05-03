@@ -55,18 +55,18 @@ class XFormsSetvalueAction extends XFormsAction {
     assert(valueToSet ne null)
 
     // Set the value on target node if possible
-    contextStack.getCurrentBindingContext.getSingleItem match {
-      case nodeInfo: NodeInfo ⇒
+    contextStack.getCurrentBindingContext.singleNodeOpt match {
+      case Some(node: NodeInfo) ⇒
         // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot
         // be written to. But because of the way we now handle errors in actions, we throw an exception instead
         // and action processing is interrupted.
         DataModel.setValueIfChanged(
-          nodeInfo   = nodeInfo,
+          nodeInfo   = node,
           newValue   = valueToSet,
           onSuccess  = oldValue ⇒ DataModel.logAndNotifyValueChange(
             containingDocument = containingDocument,
             source             = "setvalue",
-            nodeInfo           = nodeInfo,
+            nodeInfo           = node,
             oldValue           = oldValue,
             newValue           = valueToSet,
             isCalculate        = false,

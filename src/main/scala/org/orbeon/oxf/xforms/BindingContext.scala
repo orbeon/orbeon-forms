@@ -13,23 +13,25 @@
  */
 package org.orbeon.oxf.xforms
 
-import collection.JavaConverters._
 import java.{util ⇒ ju}
+
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
 import org.orbeon.oxf.xforms.model.RuntimeBind
+import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, Item}
-import xbl.Scope
+import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 
+import scala.collection.JavaConverters._
 import scala.language.postfixOps
 
 // Represent the XPath binding of an XForms object (control, action, etc.)
 case class BindingContext(
   parent                    : BindingContext,
-  model                     : XFormsModel,
+  modelOpt                  : Option[XFormsModel],
   bind                      : RuntimeBind,
   nodeset                   : ju.List[Item],
   position                  : Int,
@@ -67,7 +69,7 @@ case class BindingContext(
   ) = {
     this(
       parent               = parent,
-      model                = base.model,
+      modelOpt             = base.modelOpt,
       bind                 = null,
       nodeset              = base.nodeset,
       position             = base.position,
@@ -92,11 +94,14 @@ case class BindingContext(
     new BindingContext(this, ancestorOrSelfInScope(scope), variableElement.element, variableElement.locationData, name, value, scope)
   }
 
-  def getSingleItem =
-    if (nodeset.isEmpty)
-      null
-    else
-      nodeset.get(position - 1)
+  def singleItemOpt: Option[Item] =
+    ! nodeset.isEmpty option nodeset.get(position - 1)
+
+  def singleNodeOpt: Option[NodeInfo] =
+    singleItemOpt collect { case node: NodeInfo ⇒ node }
+
+  def getSingleItem: Item =
+    singleItemOpt.orNull
 
   def getInScopeVariables: ju.Map[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
 
@@ -117,10 +122,12 @@ case class BindingContext(
     }
 
     // Scope model variables at the bottom if needed
-    if (scopeModelVariables && (model ne null))
-      for ((name, value) ← model.getTopLevelVariables.asScala)
-        if (! tempVariablesMap.containsKey(name))
-          tempVariablesMap.put(name, value)
+    if (scopeModelVariables)
+      modelOpt foreach { model ⇒
+        for ((name, value) ← model.getTopLevelVariables.asScala)
+          if (! tempVariablesMap.containsKey(name))
+            tempVariablesMap.put(name, value)
+      }
 
     tempVariablesMap
   }
@@ -168,9 +175,9 @@ case class BindingContext(
 
   // NOTE: This is as of 2009-09-17 used only to determine the submission instance based on a submission node.
   def instance: Option[XFormsInstance] =
-    Option(getSingleItem) collect { case node: NodeInfo ⇒
-      model.containingDocument.instanceForNodeOpt(node)
-    } flatten
+    singleNodeOpt flatMap { node ⇒
+      modelOpt flatMap (_.containingDocument.instanceForNodeOpt(node))
+    }
 
   // We don't have a bound element, but the parent is bound to xf:repeat
   def isRepeatIterationBindingContext =
@@ -238,25 +245,29 @@ case class BindingContext(
     }
   }
 
-  def currentBindingContextForModel(model: XFormsModel) =
-    new AncestorIterator(includeSelf = true) find (_.model eq model) orNull
+  def currentBindingContextForModel(modelOpt: Option[XFormsModel]): Option[BindingContext]  =
+    modelOpt match {
+      case Some(model) ⇒ new AncestorIterator(includeSelf = true) find (_.modelOpt exists (_ eq model))
+      case None        ⇒ None
+    }
 
   // Get the current binding for the given model.
-  def currentNodeset(model: XFormsModel ): ju.List[Item] = {
-
-    val bindingContext = currentBindingContextForModel(model)
-
-    // If a context exists, return its nodeset
-    if (bindingContext ne null)
-      return bindingContext.nodeset
-
-    // If there is no default instance, return an empty node-set
-    val defaultInstance = model.getDefaultInstance
-    if (defaultInstance eq null)
-      return XFormsConstants.EMPTY_ITEM_LIST
-
-    // If not found, return the document element of the model's default instance
-    ju.Collections.singletonList(defaultInstance.rootElement.asInstanceOf[Item])
+  def currentNodeset(modelOpt: Option[XFormsModel]): ju.List[Item] =
+    modelOpt match {
+      case Some(model) ⇒
+        currentBindingContextForModel(modelOpt) match {
+          case Some(bindingContext) ⇒
+            bindingContext.nodeset
+          case None ⇒
+            model.defaultInstanceOpt match {
+              case Some(defaultInstance) ⇒
+                ju.Collections.singletonList(defaultInstance.rootElement.asInstanceOf[Item])
+              case None ⇒
+                XFormsConstants.EMPTY_ITEM_LIST
+            }
+        }
+      case None ⇒
+        XFormsConstants.EMPTY_ITEM_LIST
   }
 
   class AncestorIterator(includeSelf: Boolean) extends Iterator[BindingContext] {
@@ -277,5 +288,5 @@ object BindingContext {
   // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context
   // should simply be None.
   def empty(bindingElement: Element, scope: Scope) =
-    BindingContext(null, null, null, Seq.empty[Item].asJava, 0, null, newBind = false, bindingElement, null, hasOverriddenContext = false, null, scope)
+    BindingContext(null, None, null, Seq.empty[Item].asJava, 0, null, newBind = false, bindingElement, null, hasOverriddenContext = false, null, scope)
 }

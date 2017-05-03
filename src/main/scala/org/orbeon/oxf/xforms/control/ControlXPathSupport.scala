@@ -150,5 +150,5 @@ trait ControlXPathSupport {
 
   // Return an XPath function context having this control as source control.
   def newFunctionContext =
-    XFormsFunction.Context(container, bindingContext, getEffectiveId, bindingContext.model, null)
+    XFormsFunction.Context(container, bindingContext, getEffectiveId, bindingContext.modelOpt, null)
 }

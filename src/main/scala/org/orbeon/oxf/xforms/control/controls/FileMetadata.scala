@@ -142,15 +142,14 @@ trait FileMetadata extends XFormsValueControl {
         contextStack.setBinding(self.bindingContext)
         contextStack.pushBinding(e, self.getEffectiveId, self.getChildElementScope(e))
 
-        contextStack.getCurrentBindingContext.getSingleItem match {
-          case currentSingleItem: NodeInfo ⇒
+        contextStack.getCurrentBindingContext.singleNodeOpt foreach { currentSingleNode ⇒
             DataModel.setValueIfChanged(
-              nodeInfo  = currentSingleItem,
+              nodeInfo  = currentSingleNode,
               newValue  = value,
               onSuccess = oldValue ⇒ DataModel.logAndNotifyValueChange(
                 containingDocument = self.container.getContainingDocument,
                 source             = "file metadata",
-                nodeInfo           = currentSingleItem,
+                nodeInfo           = currentSingleNode,
                 oldValue           = oldValue,
                 newValue           = value,
                 isCalculate        = false,
@@ -158,7 +157,6 @@ trait FileMetadata extends XFormsValueControl {
               ),
               reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self, self.getLocationData, reason))
             )
-          case _ ⇒
         }
       }
 }

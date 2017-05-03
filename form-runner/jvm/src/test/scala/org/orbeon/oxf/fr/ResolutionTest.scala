@@ -191,7 +191,7 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
       val model = resolveObject[XFormsModel]("fr-form-model").get
 
-      XPath.withFunctionContext(XFormsFunction.Context(inScopeContainingDocument, null, model.getId, model, null)) {
+      XPath.withFunctionContext(XFormsFunction.Context(inScopeContainingDocument, null, model.getId, Some(model), null)) {
 
         // 1. Resolution via concrete controls
 

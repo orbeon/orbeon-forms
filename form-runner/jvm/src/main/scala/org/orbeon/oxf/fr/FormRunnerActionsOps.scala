@@ -88,31 +88,31 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       boundNodes.nonEmpty option new SequenceExtent(boundNodes.toArray[Item])
     }
 
-    def fromBind: Option[ValueRepresentation] = {
+    def fromBind: Option[ValueRepresentation] =
+      XFormsFunction.context.modelOpt flatMap { model ⇒
 
-      val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
-      val model             = XFormsFunction.context.model
+        val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
 
-      val modelBinds        = model.getBinds
-      val staticModel       = model.staticModel
+        val modelBinds        = model.getBinds
+        val staticModel       = model.staticModel
 
-      def findBindForSource =
-        container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
-          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
-          case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
-        } flatten
+        def findBindForSource =
+          container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
+            case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
+            case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+          } flatten
 
-      def findBindNodeForSource =
-        for (sourceRuntimeBind ← findBindForSource)
-        yield
-          sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
+        def findBindNodeForSource =
+          for (sourceRuntimeBind ← findBindForSource)
+          yield
+            sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
 
-      for {
-        targetStaticBind  ← staticModel.bindsById.get(bindId(targetControlName))
-        value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
-      } yield
-        value
-    }
+        for {
+          targetStaticBind  ← staticModel.bindsById.get(bindId(targetControlName))
+          value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
+        } yield
+          value
+      }
 
     fromControl orElse fromBind orNull
   }

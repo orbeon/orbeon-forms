@@ -42,6 +42,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Value;
+import scala.None$;
 import scala.Option;
 
 import java.io.InputStream;
@@ -266,6 +267,10 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
      */
     public XFormsInstance getDefaultInstance() {
         return ! instances.isEmpty() ? instances.get(0) : null;
+    }
+
+    public Option<XFormsInstance> defaultInstanceOpt() {
+        return ! instances.isEmpty() ? scala.Option.apply(instances.get(0)) : scala.Option.apply((XFormsInstance) null);
     }
 
     /**

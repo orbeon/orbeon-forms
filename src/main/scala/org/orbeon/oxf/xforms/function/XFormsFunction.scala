@@ -232,7 +232,7 @@ object XFormsFunction {
     container         : XBLContainer,
     bindingContext    : BindingContext,
     sourceEffectiveId : String,
-    model             : XFormsModel,
+    modelOpt          : Option[XFormsModel],
     data              : Any
   ) extends XPath.FunctionContext {
 

@@ -43,7 +43,7 @@ class Instance extends XFormsFunction {
 
     // NOTE: Model can be null when there is no model in scope at all
     val iterator =
-      Option(XFormsFunction.context.model) match {
+      XFormsFunction.context.modelOpt match {
         case Some(model) ⇒
 
           // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
@@ -53,18 +53,18 @@ class Instance extends XFormsFunction {
           // this or other models might not yet have been constructed, however they might be referred to, for
           // example with model variables.
 
-          def dynamicInstance = instanceId match {
+          def dynamicInstanceOpt = instanceId match {
             case Some(instanceId) ⇒ Option(model.getInstance(instanceId))
-            case None             ⇒ Option(model.getDefaultInstance)
+            case None             ⇒ model.defaultInstanceOpt
           }
 
-          def staticInstance = instanceId match {
+          def staticInstanceOpt = instanceId match {
             case Some(instanceId) ⇒ model.staticModel.instances.get(instanceId)
-            case None             ⇒ model.staticModel.defaultInstance
+            case None             ⇒ model.staticModel.defaultInstanceOpt
           }
 
-          def findDynamic = dynamicInstance map (instance ⇒ SingletonIterator.makeIterator(instance.rootElement))
-          def findStatic  = staticInstance.isDefined option EmptyIterator.getInstance
+          def findDynamic = dynamicInstanceOpt map (instance ⇒ SingletonIterator.makeIterator(instance.rootElement))
+          def findStatic  = staticInstanceOpt.isDefined option EmptyIterator.getInstance
 
           findDynamic orElse findStatic
         case _ ⇒ None

@@ -13,17 +13,16 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.value.StringValue
+import org.orbeon.saxon.value.{AtomicValue, StringValue}
 
 
 class XXFormsComponentParam extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+  override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
 
     val paramName = getQNameFromExpression(argument.head)(xpathContext)
 
@@ -40,7 +39,7 @@ class XXFormsComponentParam extends XFormsFunction {
       // level.
 
       def fromElemAlsoTryAvt =
-        concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt
+        concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt map StringValue.makeStringValue
 
       def propertyName =
         concreteBinding.abstractBinding.directName map { name ⇒
@@ -48,9 +47,9 @@ class XXFormsComponentParam extends XFormsFunction {
         }
 
       def fromProperties =
-        propertyName flatMap Properties.instance.getPropertySet.getNonBlankString
+        propertyName flatMap XXFormsProperty.property
 
       fromElemAlsoTryAvt orElse fromProperties
-    }
+    } orNull
   }
 }

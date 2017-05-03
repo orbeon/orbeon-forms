@@ -130,7 +130,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Fun("component-context", classOf[XXFormsComponentContext], op = 0, min = 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
 
-    Fun("component-param-value", classOf[XXFormsComponentParam], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+    Fun("component-param-value", classOf[XXFormsComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
         Arg(STRING, EXACTLY_ONE)
     )
 

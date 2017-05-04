@@ -1029,6 +1029,7 @@
                 </xsd:sequence>
             </xsd:sequence>
             <xsd:attribute name="selected" type="xsd:boolean" use="optional"/>
+            <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
         </xsd:complexType>
     </xsd:element>

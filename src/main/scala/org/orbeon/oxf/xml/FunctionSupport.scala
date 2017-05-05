@@ -41,46 +41,46 @@ abstract class FunctionSupport extends SystemFunction {
   def arguments: Seq[Expression] = argument
   def functionOperation: Int = operation
 
-  def stringArgument(i: Int)(implicit xpathContext: XPathContext) =
+  def stringArgument(i: Int)(implicit xpathContext: XPathContext): String =
     arguments(i).evaluateAsString(xpathContext).toString
 
-  def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
 
-  def stringValueArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def stringValueArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     itemsArgumentOpt(i) map (_.getStringValue)
 
-  def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))
 
-  def longArgument(i: Int, default: Long)(implicit xpathContext: XPathContext) =
+  def longArgument(i: Int, default: Long)(implicit xpathContext: XPathContext): Long =
     longArgumentOpt(i) getOrElse default
 
-  def longArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def longArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[Long] =
     arguments.lift(i) flatMap evaluateAsLong
 
-  def booleanArgument(i: Int, default: Boolean)(implicit xpathContext: XPathContext) =
+  def booleanArgument(i: Int, default: Boolean)(implicit xpathContext: XPathContext): Boolean =
     booleanArgumentOpt(i) getOrElse default
 
-  def booleanArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def booleanArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[Boolean] =
     arguments.lift(i) map effectiveBooleanValue
 
-  def itemsArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def itemsArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[SequenceIterator] =
     arguments.lift(i) map (_.iterate(xpathContext))
 
-  def itemArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def itemArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[Item] =
     itemsArgumentOpt(i) map (_.next())
 
-  def itemArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def itemArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext): Option[Item] =
     Option(itemArgumentOpt(i) getOrElse xpathContext.getContextItem)
 
-  def itemsArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+  def itemsArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext): SequenceIterator =
     itemsArgumentOpt(i) getOrElse SingletonIterator.makeIterator(xpathContext.getContextItem)
 
-  def effectiveBooleanValue(e: Expression)(implicit xpathContext: XPathContext) =
+  def effectiveBooleanValue(e: Expression)(implicit xpathContext: XPathContext): Boolean =
     ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
 
-  def evaluateAsLong(e: Expression)(implicit xpathContext: XPathContext) =
+  def evaluateAsLong(e: Expression)(implicit xpathContext: XPathContext): Option[Long] =
     Option(e.evaluateItem(xpathContext)) flatMap {
       case v: Int64Value   ⇒ Some(v.longValue)
       case v: IntegerValue ⇒ throw new IllegalArgumentException("integer value out of range for Long")

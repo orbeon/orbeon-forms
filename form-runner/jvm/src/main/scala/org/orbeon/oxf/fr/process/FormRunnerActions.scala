@@ -60,7 +60,8 @@ trait FormRunnerActions {
     "result-dialog"          → tryShowResultDialog,
     "captcha"                → tryCaptcha,
     "set-data-status"        → trySetDataStatus,
-    "wizard-update-validity" → tryUpdateCurrentWizardPageValidity
+    "wizard-update-validity" → tryUpdateCurrentWizardPageValidity,
+    "new-to-edit"            → tryNewToEdit
   )
 
   private val SupportedRenderFormatsMediatypes = List("pdf" → "application/pdf", "tiff" → "image/tiff").toMap
@@ -134,19 +135,10 @@ trait FormRunnerActions {
         formVersion       = Some(formVersion.toString)
       )
 
-      // If we were in new mode, now we must be in edit mode
-      if (isNew && ! isDraft && canUpdate)
-        setvalue(modeElement, "edit")
-
       // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
       // before calling the submission
       recalculate(PersistenceModel)
       refresh    (PersistenceModel)
-
-      if (isNew) {
-        // Manual dependency HACK: RR fr-form-model as we have changed mode
-        recalculate(FormModel)
-      }
 
       (beforeURLs, afterURLs, isDraft)
     } map {
@@ -165,6 +157,18 @@ trait FormRunnerActions {
       case _ ⇒
         dispatch(name = "fr-data-save-error", targetId = FormModel)
     }
+
+  def tryNewToEdit(params: ActionParams): Try[Any] = Try {
+
+    val modeElement = parametersInstance.rootElement / "mode"
+    val isNew       = modeElement.stringValue == "new"
+
+    if (isNew && canUpdate) {
+      setvalue(modeElement, "edit")
+      // Manual dependency HACK: RR fr-form-model as we have changed mode
+      recalculate(FormModel)
+    }
+  }
 
   def trySetDataStatus(params: ActionParams): Try[Any] = Try {
     val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true

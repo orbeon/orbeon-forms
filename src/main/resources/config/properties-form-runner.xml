@@ -254,11 +254,13 @@
         require-uploads
         then validate-all
         then save
+        then new-to-edit
         then success-message("save-success")
         recover error-message("database-error")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*">
         save
+        then new-to-edit
         then success-message("save-draft-success")
         recover error-message("database-error")
     </property>
@@ -285,6 +287,7 @@
         require-uploads
         then validate-all
         then save
+        then new-to-edit
         then success-message("save-success")
         then result-dialog
         recover error-message("database-error")

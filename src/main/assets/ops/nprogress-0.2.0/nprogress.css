@@ -1,9 +1,9 @@
 /* Make clicks pass-through */
-#nprogress {
+[id = "nprogress"] {
   pointer-events: none;
 }
 
-#nprogress .bar {
+[id = "nprogress"] .bar {
   background: #29d;
 
   position: fixed;
@@ -16,7 +16,7 @@
 }
 
 /* Fancy blur effect */
-#nprogress .peg {
+[id = "nprogress"] .peg {
   display: block;
   position: absolute;
   right: 0px;
@@ -31,7 +31,7 @@
 }
 
 /* Remove these to get rid of the spinner */
-#nprogress .spinner {
+[id = "nprogress"] .spinner {
   display: block;
   position: fixed;
   z-index: 1031;
@@ -39,7 +39,7 @@
   right: 15px;
 }
 
-#nprogress .spinner-icon {
+[id = "nprogress"] .spinner-icon {
   width: 18px;
   height: 18px;
   box-sizing: border-box;
@@ -58,8 +58,8 @@
   position: relative;
 }
 
-.nprogress-custom-parent #nprogress .spinner,
-.nprogress-custom-parent #nprogress .bar {
+.nprogress-custom-parent [id = "nprogress"] .spinner,
+.nprogress-custom-parent [id = "nprogress"] .bar {
   position: absolute;
 }
 

@@ -884,13 +884,14 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-autocomplete≡component-inner-group" class="fr-autocomplete-container"/>
-                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button"
-                                     label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
+                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
                         <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
                         <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden">
                             <xxf:value>true</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-autocomplete≡xf-72" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden"/>
+                        <xxf:control id="my-autocomplete≡xf-72" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
+                            <xxf:value>10</xxf:value>
+                        </xxf:control>
                         <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1 xforms-hidden">
                             <xxf:itemset>[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
                             <xxf:value>One</xxf:value>

@@ -387,8 +387,47 @@ div.orbeon.orbeon-portlet-div {
             display: table;
             width: 100%;
 
+            // A reorderable line
             .fb-action-iteration {
                 display: table-row;
+
+                // On the left, taking most of the space, all for the fields for one line
+                .fb-action-options {
+
+                    input, textarea, select {
+                        width: 100%;
+                    }
+
+                    // `N-col-span-M` means that the option take M/N of the available space
+                    // E.g. `3-col-span-2` takes 2/3 of the available space for options
+
+                    .fb-action-option-2-col-span-1,
+                    .fb-action-option-3-col-span-1,
+                    .fb-action-option-3-col-span-2 {
+                        display: inline-block;
+                        vertical-align: top;
+                        margin: 0;
+                        padding-right: 10px;
+                        box-sizing: border-box;
+                    }
+
+                    @optionsWidth : 705px;
+                    @2colWidth    : @optionsWidth/2;
+                    @3colWidth    : @optionsWidth/3;
+                    .fb-action-option-2-col-span-1 { width: @2colWidth }
+                    .fb-action-option-3-col-span-1 { width: @3colWidth }
+                    .fb-action-option-3-col-span-2 { width: @3colWidth*2 }
+                }
+
+                // On the right, the buttons to reorder, remove, and add rows
+                .fb-action-buttons {
+                    // Use a minimal amount of horizontal space, leaving space for the "options"
+                    width: 1%;
+                    padding-top: 3px;
+                    text-align: right;
+                    white-space: nowrap;
+                    vertical-align: top;
+                }
 
                 // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
                 &.gu-mirror {
@@ -397,39 +436,10 @@ div.orbeon.orbeon-portlet-div {
                     }
                 }
 
-                .fb-action-options, .fb-action-buttons {
+                .fb-action-options,
+                .fb-action-buttons {
                     display: table-cell;
                     padding-bottom: 5px;
-                }
-
-                .fb-action-options > * {
-                    .flex();
-                }
-
-                .fb-action-select1, .fb-action-col {
-                    .flex-flow(column);
-                    display: inline-block;
-                    vertical-align: top;
-                    margin-right: 4px;
-                    flex-grow: 1;
-                    -webkit-flex-grow: 1;
-
-                    input, textarea {
-                        width: 100%;
-                    }
-                }
-
-                .xforms-case-selected {
-                    width: auto;
-                }
-
-                .fb-action-col-3 {
-                    width: 245px;
-                }
-
-                .fb-action-buttons {
-                    text-align: right;
-                    white-space: nowrap;
                 }
 
                 .fb-action-grab {

@@ -79,7 +79,12 @@ trait CalculateBindOps {
     }
   }
 
-  protected def evaluateBooleanMIP(bindNode: BindNode, mipType: BooleanMIP, defaultForMIP: Boolean, collector: XFormsEvent ⇒ Unit): Option[Boolean] = {
+  protected def evaluateBooleanMIP(
+    bindNode      : BindNode,
+    mipType       : BooleanMIP,
+    defaultForMIP : Boolean,
+    collector     : XFormsEvent ⇒ Unit
+  ): Option[Boolean] = {
     bindNode.staticBind.firstXPathMIP(mipType) map { mip ⇒
       try {
         evaluateBooleanExpression(model, bindNode, mip)
@@ -91,7 +96,11 @@ trait CalculateBindOps {
     }
   }
 
-  protected def evaluateCalculatedBind(bindNode: BindNode, mip: StringMIP, collector: XFormsEvent ⇒ Unit): Option[String] =
+  protected def evaluateCalculatedBind(
+    bindNode  : BindNode,
+    mip       : StringMIP,
+    collector : XFormsEvent ⇒ Unit
+  ): Option[String] =
     bindNode.staticBind.firstXPathMIP(mip) flatMap { xpathMIP ⇒
       try Option(evaluateStringExpression(model, bindNode, xpathMIP))
       catch {

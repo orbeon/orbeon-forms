@@ -610,7 +610,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         // Form Builder only handles a subset of the allowed XForms mappings for now
         def isDefault           = forValidations.isEmpty && forLevels.isEmpty
         def hasSingleValidation = forValidations.size == 1 && forLevels.isEmpty
-        def canHandle           = isDefault || hasSingleValidation
+        def canHandle           = (isDefault || hasSingleValidation) && alertsByLang.nonEmpty
 
         canHandle option AlertDetails(forValidations.headOption, alertsByLang, isGlobal)
       }

@@ -59,12 +59,12 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
   private var _customMips = Map.empty[String, String]
 
-  // Since there are only 3 levels we should always get an optimized immutable Map
-  // For a given level, an empty List is not allowed.
+  // Since there are only 3 levels we should always get an optimized immutable `Map`
+  // For a given level, an empty `List` is not allowed.
   var failedConstraints = EmptyValidations
 
   // Failed validations for the given level, including type/required
-  def failedValidations(level: ValidationLevel) = level match {
+  def failedValidations(level: ValidationLevel): List[StaticBind#MIP] = level match {
     case level @ ErrorLevel if ! typeValid || ! requiredValid ⇒
       // Add type/required if needed
       (! typeValid     list invalidTypeValidation)     :::

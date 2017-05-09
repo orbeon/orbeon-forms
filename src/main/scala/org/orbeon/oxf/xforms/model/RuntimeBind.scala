@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.util
-
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.saxon.om.Item
@@ -54,7 +52,8 @@ class RuntimeBind(
         if (contextItem eq null) ju.Collections.emptyList() else ju.Collections.singletonList(contextItem)
       }
 
-    val binds = model.getBinds
+    // We know we have binds since we are passed a `StaticBind`
+    val binds = model.modelBindsOpt getOrElse (throw new IllegalStateException)
 
     // "4.7.2 References to Elements within a bind Element [...] If a target bind element is outermost, or if
     // all of its ancestor bind elements have nodeset attributes that select only one node, then the target bind

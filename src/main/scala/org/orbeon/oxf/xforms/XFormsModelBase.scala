@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.StructuredQName
+import org.orbeon.saxon.om.{StructuredQName, ValueRepresentation}
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
@@ -34,8 +34,10 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
   extends Logging
   with ListenersTrait {
 
-  val containingDocument = container.getContainingDocument
-  val sequenceNumber = containingDocument.nextModelSequenceNumber()
+  import Private._
+
+  val containingDocument  = container.getContainingDocument
+  val sequenceNumber: Int = containingDocument.nextModelSequenceNumber()
 
   implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
 
@@ -44,13 +46,10 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
   // TEMP: implemented in Java subclass until we move everything to Scala
   def selfModel: XFormsModel
   def resetAndEvaluateVariables(): Unit
-  def getBinds: XFormsModelBinds
+  def modelBindsOpt: Option[XFormsModelBinds]
   def getInstances: ju.List[XFormsInstance]
   def getInstance(instanceStaticId: String): XFormsInstance
-  def mustBindValidate: Boolean
-
-  private lazy val _schemaValidator =
-    new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
+  def getDefaultEvaluationContext: BindingContext
 
   def schemaValidator = _schemaValidator
   def hasSchema = _schemaValidator.hasSchema
@@ -71,9 +70,9 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     if (deferredActionContext.rebuild) {
       try {
         resetAndEvaluateVariables()
-        if (hasInstancesAndBinds) {
+        bindsIfInstance foreach { binds ⇒
           // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
-          getBinds.rebuild()
+          binds.rebuild()
 
           // Controls may have @bind or bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
           // TODO: Handle XPathDependencies
@@ -107,7 +106,7 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
 
           // Validate only if needed, including checking the flags, because if validation state is clean, validation
           // being idempotent, revalidating is not needed.
-          val mustRevalidate = instances.nonEmpty && (mustBindValidate || hasSchema)
+          val mustRevalidate = bindsIfInstance.isDefined || hasSchema
 
           mustRevalidate option {
             val invalidInstances = doRevalidate(collector)
@@ -161,57 +160,6 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
       Dispatch.dispatchEvent(event)
   }
 
-  private def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit =
-    withDebug("performing recalculate", List("model" → effectiveId)) {
-
-      val hasVariables = staticModel.variablesSeq.nonEmpty
-
-      // Re-evaluate top-level variables if needed
-      if (hasInstancesAndBinds || hasVariables)
-        resetAndEvaluateVariables()
-
-      // Apply calculate binds
-      if (hasInstancesAndBinds)
-        getBinds.applyDefaultAndCalculateBinds(defaultsStrategy, collector)
-    }
-
-  private def doRevalidate(collector: XFormsEvent ⇒ Unit): collection.Set[String] =
-    withDebug("performing revalidate", List("model" → effectiveId)) {
-
-      val instances = getInstances.asScala
-      val invalidInstancesIds = m.LinkedHashSet[String]()
-
-      // Clear schema validation state
-      // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
-      for {
-        instance ← instances
-        instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
-        if instanceMightBeSchemaValidated
-      } locally {
-        DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
-      }
-
-      // Validate using schemas if needed
-      if (hasSchema)
-        for {
-          instance ← instances
-          if instance.isSchemaValidation                   // we don't support validating read-only instances
-          if ! _schemaValidator.validateInstance(instance) // apply schema
-        } locally {
-          // Remember that instance is invalid
-          invalidInstancesIds += instance.getEffectiveId
-        }
-
-      // Validate using binds if needed
-      if (mustBindValidate)
-        getBinds.applyValidationBinds(invalidInstancesIds, collector)
-
-      invalidInstancesIds
-    }
-
-  private def hasInstancesAndBinds: Boolean =
-    ! getInstances.isEmpty && (getBinds ne null)
-
   def needRebuildRecalculateRevalidate =
     deferredActionContext.rebuild || deferredActionContext.recalculateRevalidate
 
@@ -226,15 +174,13 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
     if (containingDocument.getControls.isRequireRefresh)
       container.synchronizeAndRefresh()
 
-  def getDefaultEvaluationContext: BindingContext
-
-  val variableResolver =
+  val variableResolver: (StructuredQName, XPathContext) ⇒ ValueRepresentation =
     (variableQName: StructuredQName, xpathContext: XPathContext) ⇒
       staticModel.bindsByName.get(variableQName.getLocalName) match {
         case Some(targetStaticBind) ⇒
           // Variable value is a bind nodeset to resolve
           BindVariableResolver.resolveClosestBind(
-            modelBinds          = getBinds,
+            modelBinds          = modelBindsOpt.get, // TODO XXX
             contextBindNodeOpt  = XFormsFunction.context.data.asInstanceOf[Option[BindNode]],
             targetStaticBind    = targetStaticBind
           ) getOrElse
@@ -246,4 +192,66 @@ abstract class XFormsModelBase(val container: XBLContainer, val effectiveId: Str
           Option(modelVariables.get(variableQName.getLocalName)) getOrElse
             (throw new ValidationException("Undeclared variable in XPath expression: $" + variableQName.getClarkName, staticModel.locationData))
       }
+
+  private object Private {
+
+    lazy val _schemaValidator =
+      new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
+
+    def doRecalculate(defaultsStrategy: DefaultsStrategy, collector: XFormsEvent ⇒ Unit): Unit =
+      withDebug("performing recalculate", List("model" → effectiveId)) {
+
+        val hasVariables = staticModel.variablesSeq.nonEmpty
+
+        // Re-evaluate top-level variables if needed
+        if (bindsIfInstance.isDefined || hasVariables)
+          resetAndEvaluateVariables()
+
+        // Apply calculate binds
+        bindsIfInstance foreach { binds ⇒
+          binds.applyDefaultAndCalculateBinds(defaultsStrategy, collector)
+        }
+      }
+
+    def doRevalidate(collector: XFormsEvent ⇒ Unit): collection.Set[String] =
+      withDebug("performing revalidate", List("model" → effectiveId)) {
+
+        val instances = getInstances.asScala
+        val invalidInstancesIds = m.LinkedHashSet[String]()
+
+        // Clear schema validation state
+        // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
+        for {
+          instance ← instances
+          instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation
+          if instanceMightBeSchemaValidated
+        } locally {
+          DataModel.visitElement(instance.rootElement, InstanceData.clearSchemaState)
+        }
+
+        // Validate using schemas if needed
+        if (hasSchema)
+          for {
+            instance ← instances
+            if instance.isSchemaValidation                   // we don't support validating read-only instances
+            if ! _schemaValidator.validateInstance(instance) // apply schema
+          } locally {
+            // Remember that instance is invalid
+            invalidInstancesIds += instance.getEffectiveId
+          }
+
+        // Validate using binds if needed
+        modelBindsOpt foreach { binds ⇒
+          binds.applyValidationBinds(invalidInstancesIds, collector)
+        }
+
+        invalidInstancesIds
+      }
+
+    def bindsIfInstance: Option[XFormsModelBinds] =
+      if (getInstances.isEmpty)
+        None
+      else
+        modelBindsOpt
+  }
 }

@@ -765,8 +765,8 @@ object XFormsModelBinds {
   type StaticTypeMIP  = StaticBind#TypeMIP
 
   // Create an instance of XFormsModelBinds if the given model has xf:bind elements.
-  def apply(model: XFormsModel) =
-    if (model.getStaticModel.hasBinds) new XFormsModelBinds(model) else null
+  def apply(model: XFormsModel): Option[XFormsModelBinds] =
+    model.getStaticModel.hasBinds option new XFormsModelBinds(model)
 
   // Modified email validator which:
   //

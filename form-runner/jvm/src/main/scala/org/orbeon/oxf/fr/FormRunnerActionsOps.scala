@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.RuntimeBind
@@ -88,31 +87,29 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       boundNodes.nonEmpty option new SequenceExtent(boundNodes.toArray[Item])
     }
 
-    def fromBind: Option[ValueRepresentation] =
-      XFormsFunction.context.modelOpt flatMap { model ⇒
+    def fromBind: Option[ValueRepresentation] = {
 
-        val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
+      val sourceEffectiveId = XFormsFunction.context.sourceEffectiveId
 
-        val modelBinds        = model.getBinds
-        val staticModel       = model.staticModel
+      def findBindForSource =
+        container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
+          case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
+          case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
+        } flatten
 
-        def findBindForSource =
-          container.resolveObjectByIdInScope(sourceEffectiveId, actionSourceAbsoluteId) collect {
-            case control: XFormsSingleNodeControl if control.isRelevant ⇒ control.bind
-            case runtimeBind: RuntimeBind                               ⇒ Some(runtimeBind)
-          } flatten
+      def findBindNodeForSource =
+        for (sourceRuntimeBind ← findBindForSource)
+        yield
+          sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
 
-        def findBindNodeForSource =
-          for (sourceRuntimeBind ← findBindForSource)
-          yield
-            sourceRuntimeBind.getOrCreateBindNode(1) // a control bound via `bind` always binds to the first item
-
-        for {
-          targetStaticBind  ← staticModel.bindsById.get(bindId(targetControlName))
-          value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
-        } yield
-          value
-      }
+      for {
+        model             ← XFormsFunction.context.modelOpt
+        modelBinds        ← model.modelBindsOpt
+        targetStaticBind  ← model.staticModel.bindsById.get(bindId(targetControlName))
+        value             ← BindVariableResolver.resolveClosestBind(modelBinds, findBindNodeForSource, targetStaticBind)
+      } yield
+        value
+    }
 
     fromControl orElse fromBind orNull
   }

@@ -42,7 +42,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Value;
-import scala.None$;
 import scala.Option;
 
 import java.io.InputStream;
@@ -77,10 +76,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     private Map<String, ValueRepresentation> topLevelVariables = new LinkedHashMap<String, ValueRepresentation>();
 
     // Binds
-    private final XFormsModelBinds _binds;
-    private final boolean _mustBindValidate;
-
-    public boolean mustBindValidate() { return _mustBindValidate; }
+    private final Option<XFormsModelBinds> _modelBindsOpt;
 
     // Container
     private final XBLContainer container;
@@ -144,8 +140,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
 
         // Create binds object
-        _binds = XFormsModelBinds.apply(this);
-        _mustBindValidate = _binds != null;
+        _modelBindsOpt = XFormsModelBinds.apply(this);
 
         // Create context stack
         this.contextStack = new XFormsContextStack(container());
@@ -250,8 +245,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         }
 
         // Search binds
-        if (_binds != null) {
-            final RuntimeBind bind = _binds.resolveBind(targetStaticId, contextItem);
+        if (_modelBindsOpt.isDefined()) {
+            final RuntimeBind bind = _modelBindsOpt.get().resolveBind(targetStaticId, contextItem);
             if (bind != null)
                 return bind;
         }
@@ -339,7 +334,11 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     }
 
     public XFormsModelBinds getBinds() {
-        return _binds;
+        return _modelBindsOpt.isDefined() ? _modelBindsOpt.get() : null;
+    }
+
+    public Option<XFormsModelBinds> modelBindsOpt() {
+        return _modelBindsOpt;
     }
 
     /**

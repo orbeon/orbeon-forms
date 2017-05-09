@@ -23,14 +23,12 @@ trait RebuildBindOps {
 
   self: XFormsModelBinds ⇒
 
-  private var _topLevelBinds: List[RuntimeBind] = Nil
+  import Private._
+
   final def topLevelBinds = _topLevelBinds
 
   final val singleNodeContextBinds   = m.HashMap[String, RuntimeBind]()
   final val iterationsForContextItem = m.HashMap[Item, List[BindIteration]]()
-
-  // Whether this is the first rebuild for the associated XForms model
-  private var isFirstRebuild = model.containingDocument.isInitializing
 
   // Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
   def rebuild(): Unit =
@@ -40,7 +38,7 @@ trait RebuildBindOps {
 
       // Clear all instances that might have InstanceData
       // Only need to do this after the first rebuild
-      if (! isFirstRebuild)
+      if (! _isFirstRebuildForModel)
         for (instance ← model.getInstances.asScala) {
           // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to
           // figure out the dependencies.
@@ -67,7 +65,7 @@ trait RebuildBindOps {
         for (staticBind ← staticModel.topLevelBinds)
           yield new RuntimeBind(model, staticBind, null, isSingleNodeContext = true)
 
-      isFirstRebuild = false
+      _isFirstRebuildForModel = false
     }
 
   // Implement "4.7.2 References to Elements within a bind Element":
@@ -108,4 +106,9 @@ trait RebuildBindOps {
 
         it.nextOption().orNull
     }
+
+  private object Private {
+    var _topLevelBinds          : List[RuntimeBind] = Nil
+    var _isFirstRebuildForModel : Boolean           = model.containingDocument.isInitializing
+  }
 }

@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis.model.Instance
-import org.orbeon.oxf.cache.InternalCacheKey
-import org.orbeon.oxf.cache.ObjectCache
+import org.orbeon.oxf.cache.{InternalCacheKey, ObjectCache}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.saxon.om.{VirtualNode, DocumentInfo}
-import XFormsInstance._
+import org.orbeon.oxf.xforms.analysis.model.Instance
+import org.orbeon.oxf.xforms.model.InstanceCaching
+import org.orbeon.oxf.xforms.model.XFormsInstance._
+import org.orbeon.saxon.om.{DocumentInfo, VirtualNode}
 
 /**
  * Cache for shared and immutable XForms instances.

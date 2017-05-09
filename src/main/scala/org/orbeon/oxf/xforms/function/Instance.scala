@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsModel
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 

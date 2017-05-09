@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.dom.{Attribute, Document, Element, Node}
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xml.Dom4j
 
 object InstanceDataOps {

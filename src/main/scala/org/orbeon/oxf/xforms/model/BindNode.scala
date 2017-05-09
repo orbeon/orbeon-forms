@@ -17,11 +17,9 @@ import java.{util ⇒ ju}
 
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.XML
 import org.w3c.dom.Node.ELEMENT_NODE

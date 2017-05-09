@@ -15,11 +15,10 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.events.{XFormsRebuildEvent, XFormsRecalculateEvent, XFormsRevalidateEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy}
+import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, NoDefaultsStrategy, XFormsModel}
 
 trait RRRFunctions {
   def setFlag(model: XFormsModel, applyDefaults: Boolean)

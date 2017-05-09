@@ -26,9 +26,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}

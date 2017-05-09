@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsCo
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
-import org.orbeon.oxf.xforms.model.NoDefaultsStrategy
+import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml._

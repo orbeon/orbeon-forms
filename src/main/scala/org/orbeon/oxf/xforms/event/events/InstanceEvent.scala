@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.model.XFormsInstance
 
 trait InstanceEvent extends XFormsEvent {
   def targetInstance = targetObject.asInstanceOf[XFormsInstance]

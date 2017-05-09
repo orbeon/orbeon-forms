@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms
+package org.orbeon.oxf.xforms.model
 
 import javax.xml.transform.stream.StreamResult
 
@@ -21,11 +21,11 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xforms.model.{DataModel, FlaggedDefaultsStrategy, NoDefaultsStrategy}
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}

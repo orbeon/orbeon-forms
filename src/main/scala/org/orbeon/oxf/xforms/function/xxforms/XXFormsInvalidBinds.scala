@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._

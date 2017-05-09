@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms;
+package org.orbeon.oxf.xforms.model;
 
 import org.apache.log4j.Logger;
 import org.orbeon.dom.Attribute;
@@ -48,6 +48,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
 import org.orbeon.oxf.xforms.schema.SchemaDependencies;

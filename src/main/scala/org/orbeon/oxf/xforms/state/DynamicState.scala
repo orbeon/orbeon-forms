@@ -23,6 +23,7 @@ import control.Controls.ControlsIterator
 import org.orbeon.oxf.xml.{SAXStore, TransformerUtils}
 import org.orbeon.dom.{DocumentFactory, Element}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 
 // Immutable representation of the dynamic state
 case class DynamicState(

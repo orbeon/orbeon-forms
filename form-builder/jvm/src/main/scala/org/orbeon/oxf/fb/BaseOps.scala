@@ -19,13 +19,14 @@ import org.orbeon.oxf.util.{Logging, NetUtils, UserAgent}
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty
-import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import spray.json._
 import DefaultJsonProtocol._
+import org.orbeon.oxf.xforms.model.XFormsModel
 
 trait BaseOps extends Logging {
 

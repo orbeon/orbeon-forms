@@ -23,10 +23,10 @@ import org.orbeon.oxf.xforms.control.controls.{InstanceMirror, XXFormsComponentR
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent, XFormsReadyEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
-import org.orbeon.oxf.xforms.model.AllDefaultsStrategy
+import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, XFormsInstance}
+import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.VirtualNode
 import org.orbeon.scaxon.XML.unsafeUnwrapElement

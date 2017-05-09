@@ -20,16 +20,14 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.orbeon.dom.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 

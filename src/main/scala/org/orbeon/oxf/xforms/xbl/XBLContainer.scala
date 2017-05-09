@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsContainerCon
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
+import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
 

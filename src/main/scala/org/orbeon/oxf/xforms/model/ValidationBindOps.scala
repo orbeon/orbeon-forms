@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model.{Constraint, Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
-import org.orbeon.oxf.xforms.{InstanceData, XFormsConstants, XFormsModelSchemaValidator}
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, XMLParsing}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, ValidationFailure}

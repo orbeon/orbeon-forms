@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.model.BindNode
+import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.FunctionSupport

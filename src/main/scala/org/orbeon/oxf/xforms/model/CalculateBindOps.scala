@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.analysis.model.Model._
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
-import org.orbeon.oxf.xforms.{BindVariableResolver, InstanceData}
 import org.orbeon.saxon.om.NodeInfo
 
 import scala.util.control.NonFatal

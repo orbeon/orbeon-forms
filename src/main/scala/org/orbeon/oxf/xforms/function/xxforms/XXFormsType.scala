@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.InstanceData
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.`type`.BuiltInAtomicType
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{NodeInfo, StandardNames}

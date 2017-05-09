@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.EmptyIterator
 

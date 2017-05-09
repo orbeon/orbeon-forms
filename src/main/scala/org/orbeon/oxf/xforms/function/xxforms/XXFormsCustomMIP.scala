@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.model.InstanceData
 
 /**
  * xxf:custom-mip($item as item()*, $mip-name as xs:string) as xs:string

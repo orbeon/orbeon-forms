@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.model.DataModel;
+import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.state.WhitelistObjectInputStream;
 import org.orbeon.oxf.xforms.xbl.Scope;

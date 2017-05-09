@@ -23,7 +23,8 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{Connection, ContentTypes, XPath}
-import org.orbeon.oxf.xforms.{InstanceData, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 
 case class SerializationParameters(

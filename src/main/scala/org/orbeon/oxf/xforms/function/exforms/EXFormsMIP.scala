@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.exforms
 
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo

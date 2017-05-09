@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsReplaceEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.FlaggedDefaultsStrategy$;
 import org.orbeon.oxf.xforms.model.InstanceDataOps;
+import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.dom.saxon.DocumentWrapper;

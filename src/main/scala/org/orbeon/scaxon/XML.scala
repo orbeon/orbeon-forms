@@ -21,7 +21,8 @@ import org.orbeon.oxf.util.XPath._
 import org.orbeon.oxf.util.XPathCache._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.{XFormsInstance, XFormsUtils}
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.saxon.`type`.Type

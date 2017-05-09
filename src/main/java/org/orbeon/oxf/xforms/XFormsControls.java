@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.saxon.om.Item;
 

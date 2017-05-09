@@ -11,18 +11,18 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms
+package org.orbeon.oxf.xforms.model
 
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.event.events.{XXFormsInvalidEvent, XXFormsValidEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{StructuredQName, ValueRepresentation}

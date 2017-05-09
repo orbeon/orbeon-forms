@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.analysis.XFormsAnnotator;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractor;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
+import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;

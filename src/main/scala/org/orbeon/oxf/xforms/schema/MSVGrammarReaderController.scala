@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.schema
 
 import java.net.URL
+
 import org.orbeon.msv.grammar.Grammar
 import org.orbeon.msv.reader.GrammarReaderController
 import org.orbeon.oxf.cache.CacheKey
@@ -21,10 +22,12 @@ import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.{XFormsModelSchemaValidator, XFormsUtils, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.{InputSource, Locator}
+
 import scala.util.control.NonFatal
 
 case class SchemaInfo(grammar: Grammar, dependencies: SchemaDependencies)

@@ -20,8 +20,8 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.RuntimeBind
-import org.orbeon.oxf.xforms.{BindVariableResolver, XFormsUtils}
+import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent

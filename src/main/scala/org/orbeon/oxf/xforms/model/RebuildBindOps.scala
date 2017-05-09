@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.saxon.om.Item
 
 import scala.collection.JavaConverters._

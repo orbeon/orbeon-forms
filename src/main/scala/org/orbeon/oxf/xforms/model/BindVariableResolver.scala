@@ -11,10 +11,9 @@
 *
 * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
-package org.orbeon.oxf.xforms
+package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, RuntimeBind, XFormsModelBinds}
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 

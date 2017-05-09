@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms;
+package org.orbeon.oxf.xforms.model;
 
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
@@ -27,10 +28,6 @@ import org.orbeon.oxf.xforms.analysis.model.Submission;
 import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.model.DeferredActionContext;
-import org.orbeon.oxf.xforms.model.RuntimeBind;
-import org.orbeon.oxf.xforms.model.XFormsModelAction;
-import org.orbeon.oxf.xforms.model.XFormsModelBinds;
 import org.orbeon.oxf.xforms.state.InstanceState;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;
 import org.orbeon.oxf.xforms.submission.SubmissionUtils;

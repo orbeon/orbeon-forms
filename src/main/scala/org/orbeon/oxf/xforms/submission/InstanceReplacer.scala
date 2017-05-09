@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPat
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
-import org.orbeon.oxf.xforms.model.{DataModel, InstanceDataOps}
+import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
 import org.orbeon.saxon.om.{DocumentInfo, Item, VirtualNode}

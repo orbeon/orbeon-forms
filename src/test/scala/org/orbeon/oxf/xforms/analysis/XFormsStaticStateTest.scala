@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.scalatest.junit.AssertionsForJUnit
 
 object XFormsStaticStateTest {

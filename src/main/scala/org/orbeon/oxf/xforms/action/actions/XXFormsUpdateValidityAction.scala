@@ -15,10 +15,9 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.model.BindNode
+import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 
 class XXFormsUpdateValidityAction extends XFormsAction {
 

@@ -26,9 +26,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, Dispatch, XFormsCustomEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.itemset.Itemset
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance, XFormsObject}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.mockito.MockitoSugar
 

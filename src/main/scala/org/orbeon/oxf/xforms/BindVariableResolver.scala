@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, RuntimeBind}
+import org.orbeon.oxf.xforms.model.{BindIteration, BindNode, RuntimeBind, XFormsModelBinds}
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 

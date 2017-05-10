@@ -151,8 +151,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     val transform =
       handleRelevantOpt(request, formOrData) match {
         case Some(r @ Keep)  ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
-        case Some(Prune)     ⇒ Some(parsePruneAndSerializeXmlData _)
-        case Some(r @ Blank) ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
+        case Some(Remove)     ⇒ Some(parsePruneAndSerializeXmlData _)
+        case Some(r @ Empty) ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
         case None            ⇒ None
       }
 

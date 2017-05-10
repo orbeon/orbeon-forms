@@ -236,7 +236,7 @@ trait FormRunnerActions {
   // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
     "method"              → "post",
-    "relevant"            → RelevanceHandling.Prune.entryName.toLowerCase,
+    "nonrelevant"         → RelevanceHandling.Remove.entryName.toLowerCase,
     "annotate"            → "",
     "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
     "content"             → "xml",
@@ -330,17 +330,17 @@ trait FormRunnerActions {
           evaluatedPropertiesAsMap.get(PruneMetadataName).flatten orElse
             (evaluatedPropertiesAsMap.get(DataFormatVersionName).flatten map findDefaultPruneMetadata)
 
-        // Allow `prune` to override `relevant` for backward compatibility
-        val effectiveRelevant =
+        // Allow `prune` to override `nonrelevant` for backward compatibility
+        val effectiveNonRelevant =
           evaluatedPropertiesAsMap.get("prune").flatten orElse
-            evaluatedPropertiesAsMap.get("relevant").flatten
+            evaluatedPropertiesAsMap.get("nonrelevant").flatten
 
         evaluatedPropertiesAsMap +
           ("serialization"  → effectiveSerialization)  +
           ("mediatype"      → effectiveContentType  )  + // `<xf:submission>` uses `mediatype`
           (PruneMetadataName → effectivePruneMetadata) +
           ("prune-metadata" → effectivePruneMetadata)  +
-          ("relevant"       → effectiveRelevant)
+          ("nonrelevant"    → effectiveNonRelevant)
       }
 
       // Create PDF and/or TIFF if needed
@@ -416,7 +416,7 @@ trait FormRunnerActions {
       Map[Option[String], String](
         Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false)),
         Some("method")              → "post",
-        Some("relevant")            → "keep",
+        Some("nonrelevant")         → "keep",
         Some("replace")             → replace,
         Some("content")             → "xml",
         Some(DataFormatVersionName) → "edge",

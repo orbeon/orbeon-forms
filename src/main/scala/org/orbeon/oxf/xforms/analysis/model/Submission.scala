@@ -38,25 +38,27 @@ class Submission(
   // `resource` has precedence over `action`
   val avtActionOrResource =
     element.attributeValueOpt(RESOURCE_QNAME) orElse
-      element.attributeValueOpt("action")                     getOrElse
-      (throw new ValidationException("xf:submission: `action` attribute or `resource` attribute is missing.", locationData))
+      element.attributeValueOpt("action")     getOrElse (
+        throw new ValidationException(
+          "xf:submission: `action` attribute or `resource` attribute is missing.",
+          locationData
+        )
+      )
 
   val avtMethod                  = element.attributeValueOpt("method")
 
   val avtValidateOpt             = element.attributeValueOpt("validate")
-  val avtRelevantOpt             = element.attributeValueOpt("relevant")
+  val avtRelevantOpt             = element.attributeValueOpt("relevant") // backward compatibility
+  val avtNonRelevantOpt          = element.attributeValueOpt("nonrelevant")
   val avtXxfCalculateOpt         = element.attributeValueOpt(XXFORMS_CALCULATE_QNAME)
   val avtXxfUploadsOpt           = element.attributeValueOpt(XXFORMS_UPLOADS_QNAME)
   val avtXxfAnnotateOpt          = element.attributeValueOpt(XXFORMS_ANNOTATE_QNAME)
 
   val avtSerializationOpt        = element.attributeValueOpt("serialization")
   val serializeOpt               = element.attributeValueOpt("serialize")
-
-  // `targetref` is the new name as of May 2009, and `target` is still supported for backward compatibility.
-  // This is an XPath expression when used with `replace="instance|text"` (other meaning possible post-XForms 1.1 for `replace="all"`).
-  val targetrefOpt               = element.attributeValueOpt("targetref") orElse element.attributeValueOpt(TARGET_QNAME)
-
+  val targetrefOpt               = element.attributeValueOpt("targetref") orElse element.attributeValueOpt(TARGET_QNAME) // `target`: backward compatibility
   val avtModeOpt                 = element.attributeValueOpt("mode")
+
   val avtVersionOpt              = element.attributeValueOpt("version")
   val avtIndentOpt               = element.attributeValueOpt("indent")
   val avtMediatypeOpt            = element.attributeValueOpt("mediatype")
@@ -64,14 +66,13 @@ class Submission(
   val avtOmitXmlDeclarationOpt   = element.attributeValueOpt("omit-xml-declaration")
   val avtStandalone              = element.attributeValueOpt("standalone")
 
-  val avtReplace                 = element.attributeValueOpt("replace") getOrElse XFORMS_SUBMIT_REPLACE_ALL
-
+  val avtReplaceOpt              = element.attributeValueOpt("replace")
   val replaceInstanceIdOrNull    = element.attributeValue("instance")
   val xxfReplaceInstanceIdOrNull = element.attributeValue(XXFORMS_INSTANCE_QNAME)
 
   val avtSeparatorOpt            = element.attributeValueOpt("separator")
 
-  // Extension attributes
+  // Extension: credentials
   val avtXxfUsernameOpt          = element.attributeValueOpt(XXFORMS_USERNAME_QNAME)
   val avtXxfPasswordOpt          = element.attributeValueOpt(XXFORMS_PASSWORD_QNAME)
   val avtXxfPreemptiveAuthOpt    = element.attributeValueOpt(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)

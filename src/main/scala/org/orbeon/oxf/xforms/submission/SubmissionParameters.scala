@@ -6,6 +6,7 @@ import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.submission.RelevanceHandling.{Keep, Remove}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
@@ -73,7 +74,7 @@ object SubmissionParameters {
         )
       )
 
-    val resolvedReplace = stringAvtTrimmedOpt(staticSubmission.avtReplace) getOrElse XFORMS_SUBMIT_REPLACE_ALL
+    val resolvedReplace = staticSubmission.avtReplaceOpt flatMap stringAvtTrimmedOpt getOrElse XFORMS_SUBMIT_REPLACE_ALL
     val isReplaceAll    = resolvedReplace == XFORMS_SUBMIT_REPLACE_ALL
 
     val resolvedMethod = {
@@ -103,8 +104,24 @@ object SubmissionParameters {
     // "The default value is `false` if the value of serialization is "none" and "true" otherwise"
     val resolvedValidate = serialize && ! (resolvedValidateStringOpt contains false)
 
+    def withNameAdjustForTrueAndFalse(name: String): RelevanceHandling =
+      RelevanceHandling.withNameLowercaseOnlyOption(name) getOrElse {
+        if (name == "false")
+          Keep
+        else
+          Remove
+      }
+
+    // Use `nonrelevant` first and then `relevant` for backward compatibility
     val resolvedRelevanceHandling =
-      RelevanceHandling.withNameAdjustForTrueAndFalse(staticSubmission.avtRelevantOpt flatMap stringAvtTrimmedOpt getOrElse true.toString)
+      staticSubmission.avtNonRelevantOpt              flatMap
+        stringAvtTrimmedOpt                           flatMap
+        RelevanceHandling.withNameLowercaseOnlyOption getOrElse
+        withNameAdjustForTrueAndFalse(
+          staticSubmission.avtRelevantOpt             flatMap
+            stringAvtTrimmedOpt                       getOrElse
+            true.toString
+        )
 
     val resolvedXxfCalculate =
       serialize && ! (staticSubmission.avtXxfCalculateOpt flatMap booleanAvtOpt contains false)
@@ -114,7 +131,10 @@ object SubmissionParameters {
 
     val resolvedXxfAnnotate: Set[String] =
       if (serialize)
-        staticSubmission.avtXxfAnnotateOpt flatMap stringAvtTrimmedOpt map stringToSet getOrElse Set.empty
+        staticSubmission.avtXxfAnnotateOpt flatMap
+          stringAvtTrimmedOpt              map
+          stringToSet                      getOrElse
+          Set.empty
       else
         Set.empty
 

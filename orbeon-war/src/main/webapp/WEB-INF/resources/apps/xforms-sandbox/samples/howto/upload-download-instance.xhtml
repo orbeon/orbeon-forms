@@ -41,7 +41,7 @@
             <xf:bind ref="instance('download')" type="xs:base64Binary"/>
             <xf:bind ref="instance('upload')" type="xs:base64Binary"/>
             <xf:submission id="upload-submission" ref="instance('upload')" validate="false"
-                               relevant="keep" method="post" replace="none" resource="echo:">
+                               nonrelevant="keep" method="post" replace="none" resource="echo:">
                 <xf:insert ev:event="xforms-submit-done" ref="instance('main-instance')"
                                origin="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary(instance('upload')), 'UTF-8'))"/>
             </xf:submission>

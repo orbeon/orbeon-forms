@@ -1910,7 +1910,7 @@ az4K</document>
                             action="echo:"
                             replace="instance"
                             instance="blank-result-instance"
-                            relevant="blank"
+                            nonrelevant="empty"
                             />
 
                         <xf:submission
@@ -1920,7 +1920,7 @@ az4K</document>
                             action="echo:"
                             replace="instance"
                             instance="annotate-result-instance"
-                            relevant="keep"
+                            nonrelevant="keep"
                             xxf:annotate="relevant"
                             />
 
@@ -1931,7 +1931,7 @@ az4K</document>
                             action="echo:"
                             replace="instance"
                             instance="blank-annotate-result-instance"
-                            relevant="blank"
+                            nonrelevant="empty"
                             xxf:annotate="relevant"
                             />
 

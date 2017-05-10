@@ -42,18 +42,9 @@ object RelevanceHandling extends Enum[RelevanceHandling] {
 
   val values = findValues
 
-  case object Keep  extends RelevanceHandling
-  case object Prune extends RelevanceHandling
-  case object Blank extends RelevanceHandling
-
-  // For backward compatibility, the tokens `false` and `true` are still supported
-  def withNameAdjustForTrueAndFalse(name: String): RelevanceHandling =
-    super.withNameLowercaseOnlyOption(name) getOrElse {
-      if (name == "false")
-        Keep
-      else
-        Prune
-    }
+  case object Keep   extends RelevanceHandling
+  case object Remove extends RelevanceHandling
+  case object Empty  extends RelevanceHandling
 }
 
 abstract class XFormsModelSubmissionBase
@@ -203,9 +194,9 @@ object XFormsModelSubmissionBase {
           case RelevanceHandling.Keep  ⇒
             attributeNamesForTokens.get("relevant") foreach
               (annotateNonRelevantElements(copy, _))
-          case RelevanceHandling.Prune ⇒
+          case RelevanceHandling.Remove ⇒
             pruneNonRelevantNodes(copy)
-          case RelevanceHandling.Blank ⇒
+          case RelevanceHandling.Empty ⇒
             blankNonRelevantNodes(copy)
             attributeNamesForTokens.get("relevant") foreach
               (annotateNonRelevantElements(copy, _))
@@ -347,8 +338,8 @@ object XFormsModelSubmissionBase {
     findFirstElementOrAttributeWith(
       startNode,
       relevantHandling match {
-        case Keep | Prune ⇒ node ⇒ ! InstanceData.getValid(node)
-        case Blank        ⇒ node ⇒ ! InstanceData.getValid(node) && InstanceData.getInheritedRelevant(node)
+        case Keep | Remove ⇒ node ⇒ ! InstanceData.getValid(node)
+        case Empty         ⇒ node ⇒ ! InstanceData.getValid(node) && InstanceData.getInheritedRelevant(node)
       }
     ) match {
       case Some(e: Element) ⇒

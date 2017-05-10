@@ -123,6 +123,9 @@ trait Element extends Branch {
    */
   def attributeValue(name: String): String
 
+  def attributeValueOpt(name: String): Option[String] =
+    Option(attributeValue(name))
+
   /**
    *
    * This returns the attribute value for the attribute with the given name
@@ -138,6 +141,9 @@ trait Element extends Branch {
    * if the attribute value is empty.
    */
   def attributeValue(qName: QName): String
+
+  def attributeValueOpt(qName: QName): Option[String] =
+    Option(attributeValue(qName))
 
   /**
    *

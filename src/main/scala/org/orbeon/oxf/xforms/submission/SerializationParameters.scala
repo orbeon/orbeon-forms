@@ -37,7 +37,7 @@ object SerializationParameters {
 
   def apply(
     submission               : XFormsModelSubmission,
-    p                        : XFormsModelSubmission#SubmissionParameters,
+    p                        : SubmissionParameters,
     p2                       : XFormsModelSubmission#SecondPassParameters,
     requestedSerialization   : String,
     documentToSubmit         : Document,

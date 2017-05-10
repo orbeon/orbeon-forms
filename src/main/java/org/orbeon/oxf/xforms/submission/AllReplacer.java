@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -32,11 +32,11 @@ public class AllReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(ConnectionResult cxr, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void deserialize(ConnectionResult cxr, SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // NOP
     }
 
-    public Runnable replace(ConnectionResult cxr, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(ConnectionResult cxr, SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
 
@@ -50,7 +50,7 @@ public class AllReplacer extends BaseReplacer {
         // Error: "either the document is replaced with an implementation-specific indication of an error or submission
         // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
         // error-type of resource-error"
-        if (! p.isDeferredSubmissionSecondPass) {
+        if (! p.isDeferredSubmissionSecondPass()) {
             if (NetUtils.isSuccessCode(cxr.statusCode()))
                 return submission.sendSubmitDone(cxr);
             else

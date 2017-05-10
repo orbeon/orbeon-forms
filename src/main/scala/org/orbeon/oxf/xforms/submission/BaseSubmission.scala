@@ -69,7 +69,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
    * @return ConnectionResult or null if asynchronous
    */
   protected def submitCallable(
-    p        : XFormsModelSubmission#SubmissionParameters,
+    p        : SubmissionParameters,
     p2       : XFormsModelSubmission#SecondPassParameters,
     callable : Callable[SubmissionResult]
   ): SubmissionResult =
@@ -89,12 +89,12 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     }
 
   protected def getDetailsLogger(
-    p  : XFormsModelSubmission#SubmissionParameters,
+    p  : SubmissionParameters,
     p2 : XFormsModelSubmission#SecondPassParameters
   ) = submission.getDetailsLogger(p, p2)
 
   protected def getTimingLogger(
-    p  : XFormsModelSubmission#SubmissionParameters,
+    p  : SubmissionParameters,
     p2 : XFormsModelSubmission#SecondPassParameters
   ) = submission.getTimingLogger(p, p2)
 
@@ -106,7 +106,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     response               : ExternalContext.Response,
     indentedLogger         : IndentedLogger,
     resource               : String,
-    p                      : XFormsModelSubmission#SubmissionParameters,
+    p                      : SubmissionParameters,
     actualRequestMediatype : String,
     encoding               : String,
     messageBodyOrNull      : Array[Byte],

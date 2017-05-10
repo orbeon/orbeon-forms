@@ -32,7 +32,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
 
   def deserialize(
     connectionResult : ConnectionResult,
-    p                : XFormsModelSubmission#SubmissionParameters,
+    p                : SubmissionParameters,
     p2               : XFormsModelSubmission#SecondPassParameters
   ): Unit =
     connectionResult.readTextResponseBody match {
@@ -69,7 +69,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
 
   def replace(
     connectionResult : ConnectionResult,
-    p                : XFormsModelSubmission#SubmissionParameters,
+    p                : SubmissionParameters,
     p2               : XFormsModelSubmission#SecondPassParameters
   ): Runnable = {
     // XForms 1.1: "If the replace attribute contains the value "text" and the submission response conforms to an
@@ -93,20 +93,21 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
 
     // Find target location
     val destinationNodeInfo =
-      if (submission.getTargetref ne null) {
-        // Evaluate destination node
-        XPathCache.evaluateSingleWithContext(
-          xpathContext = p.xpathContext,
-          contextItem  = p.refNodeInfo,
-          xpathString  = submission.getTargetref,
-          reporter     = containingDocument.getRequestStats.addXPathStat
-        ) match {
-          case n: NodeInfo ⇒ n
-          case _           ⇒ throwSubmissionException("""targetref attribute doesn't point to a node for replace="text".""")
-        }
-      } else {
-        // Use default destination
-        submission.findReplaceInstanceNoTargetref(p.refInstanceOpt).rootElement
+      submission.staticSubmission.targetref match {
+        case Some(targetRef) ⇒
+          // Evaluate destination node
+          XPathCache.evaluateSingleWithContext(
+            xpathContext = p.xpathContext,
+            contextItem  = p.refNodeInfo,
+            xpathString  = targetRef,
+            reporter     = containingDocument.getRequestStats.addXPathStat
+          ) match {
+            case n: NodeInfo ⇒ n
+            case _           ⇒ throwSubmissionException("""targetref attribute doesn't point to a node for replace="text".""")
+          }
+        case None ⇒
+          // Use default destination
+          submission.findReplaceInstanceNoTargetref(p.refInstanceOpt).rootElement
       }
 
     def handleSetValueSuccess(oldValue: String) =

@@ -28,10 +28,10 @@ import org.orbeon.oxf.util.{Connection, ConnectionResult}
 class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmission(submission) {
 
   def getType = "regular"
-  def isMatch(p: XFormsModelSubmission#SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters, sp: SerializationParameters) = true
+  def isMatch(p: SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters, sp: SerializationParameters) = true
 
   def connect(
-    p  : XFormsModelSubmission#SubmissionParameters,
+    p  : SubmissionParameters,
     p2 : XFormsModelSubmission#SecondPassParameters,
     sp : SerializationParameters
   ): SubmissionResult = {
@@ -111,7 +111,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
           connected = true
 
           // TODO: This refers to Submission.
-          val replacer = submission.getReplacer(connectionResult, p.asInstanceOf[submission.SubmissionParameters])
+          val replacer = submission.getReplacer(connectionResult, p)
 
           if (replacer ne null) {
             // Deserialize here so it can run in parallel

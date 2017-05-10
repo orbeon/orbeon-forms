@@ -28,12 +28,12 @@ public class ClientGetAllSubmission extends BaseSubmission {
         return "get all";
     }
 
-    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
-        return p.isHandlingClientGetAll;
+        return p.isHandlingClientGetAll();
     }
 
-    public SubmissionResult connect(XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
 
         final String actionString = (sp.queryString() == null) ? p2.actionOrResource : p2.actionOrResource + ((p2.actionOrResource.indexOf('?') == -1) ? "?" : "") + sp.queryString();

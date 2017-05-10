@@ -18,11 +18,11 @@ import org.orbeon.oxf.http.StreamedContent;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.xforms.model.InstanceCaching;
-import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.model.InstanceCaching;
+import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
@@ -44,14 +44,14 @@ public class CacheableSubmission extends BaseSubmission {
         return "cacheable";
     }
 
-    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
 
         // Match if the submission has replace="instance" and xxf:cache="true"
-        return p.isReplaceInstance && p2.isCache;
+        return p.isReplaceInstance() && p2.isCache;
     }
 
-    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxf:cache="true"
@@ -226,10 +226,10 @@ public class CacheableSubmission extends BaseSubmission {
         }
     }
 
-    private XFormsInstance checkInstanceToUpdate(IndentedLogger indentedLogger, XFormsModelSubmission.SubmissionParameters p) {
+    private XFormsInstance checkInstanceToUpdate(IndentedLogger indentedLogger, SubmissionParameters p) {
         XFormsInstance updatedInstance;
-        final NodeInfo destinationNodeInfo = submission().evaluateTargetRef(p.xpathContext,
-                submission().findReplaceInstanceNoTargetref(p.refInstanceOpt), p.submissionElementContextItem);
+        final NodeInfo destinationNodeInfo = submission().evaluateTargetRef(p.xpathContext(),
+                submission().findReplaceInstanceNoTargetref(p.refInstanceOpt()), p.submissionElementContextItem());
 
         if (destinationNodeInfo == null) {
             // Throw target-error

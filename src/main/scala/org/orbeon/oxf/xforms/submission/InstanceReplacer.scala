@@ -49,7 +49,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
   def deserialize(
     connectionResult : ConnectionResult,
-    p                : XFormsModelSubmission#SubmissionParameters,
+    p                : SubmissionParameters,
     p2               : XFormsModelSubmission#SecondPassParameters
   ): Unit = {
     // Deserialize here so it can run in parallel
@@ -140,7 +140,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
   def replace(
     connectionResult : ConnectionResult,
-    p                : XFormsModelSubmission#SubmissionParameters,
+    p                : SubmissionParameters,
     p2               : XFormsModelSubmission#SecondPassParameters
   ): Runnable = {
 

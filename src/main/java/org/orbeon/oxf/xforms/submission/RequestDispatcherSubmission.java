@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -42,7 +42,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     /**
      * Check whether submission is allowed.
      */
-    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
 
         final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
@@ -54,7 +54,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
                 "resource",                 p2.actionOrResource,
-                "noscript",                 Boolean.toString(p.isNoscript),
+                "noscript",                 Boolean.toString(p.isNoscript()),
                 "is asynchronous",          Boolean.toString(p2.isAsynchronous),
                 "container type",           request.getContainerType(),
                 "norewrite",                Boolean.toString(submission().isURLNorewrite()),
@@ -89,7 +89,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         }
 
         // TODO: why is this condition here?
-        if (p.isNoscript) {
+        if (p.isNoscript()) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "noscript mode enabled");
@@ -104,7 +104,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             return false;
         }
 
-        if (p.isReplaceAll) {
+        if (p.isReplaceAll()) {
             // replace="all"
             if (! containingDocument().isLocalSubmissionForward()) {
                 if (isDebugEnabled)
@@ -128,7 +128,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
 
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
@@ -147,7 +147,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // in that case
 
         // Headers
-        final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll);
+        final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll());
 
         final String submissionEffectiveId = submission().getEffectiveId();
 
@@ -207,7 +207,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         XFormsContainingDocument containingDocument,
         IndentedLogger indentedLogger,
         final String resource,
-        final XFormsModelSubmission.SubmissionParameters p,
+        final SubmissionParameters p,
         boolean isNorewrite,
         String actualRequestMediatype,
         String encoding,
@@ -256,7 +256,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             customHeaderNameValues,
             new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
-                  if (p.isReplaceAll)
+                  if (p.isReplaceAll())
                       requestDispatcher.forward(request, response);
                   else
                       requestDispatcher.include(request, response);

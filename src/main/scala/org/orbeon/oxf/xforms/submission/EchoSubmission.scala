@@ -26,7 +26,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
   def getType = "echo"
 
   def isMatch(
-    p : XFormsModelSubmission#SubmissionParameters,
+    p : SubmissionParameters,
     p2: XFormsModelSubmission#SecondPassParameters,
     sp: SerializationParameters
   ) = {
@@ -34,7 +34,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
   }
 
   def connect(
-    p : XFormsModelSubmission#SubmissionParameters,
+    p : SubmissionParameters,
     p2: XFormsModelSubmission#SecondPassParameters,
     sp: SerializationParameters
   ) = {
@@ -75,7 +75,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         title           = None
       )
     )
-    val replacer = submission.getReplacer(connectionResult, p.asInstanceOf[submission.SubmissionParameters])
+    val replacer = submission.getReplacer(connectionResult, p)
 
     // Deserialize here so it can run in parallel
     replacer.deserialize(connectionResult, p, p2)

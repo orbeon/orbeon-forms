@@ -29,11 +29,11 @@ public class RedirectReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void deserialize(ConnectionResult connectionResult, SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
        // NOP
     }
 
-    public Runnable replace(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(ConnectionResult connectionResult, SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         final ExternalContext.Response response = NetUtils.getExternalContext().getResponse();
         containingDocument.setGotSubmissionRedirect();

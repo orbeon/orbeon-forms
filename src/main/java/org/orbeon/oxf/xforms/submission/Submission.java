@@ -22,13 +22,13 @@ public interface Submission {
     String getType();
 
     boolean isMatch(
-        XFormsModelSubmission.SubmissionParameters p,
+        SubmissionParameters p,
         XFormsModelSubmission.SecondPassParameters p2,
         SerializationParameters sp
     );
 
     SubmissionResult connect(
-        XFormsModelSubmission.SubmissionParameters p,
+        SubmissionParameters p,
         XFormsModelSubmission.SecondPassParameters p2,
         SerializationParameters sp
     ) throws Exception;

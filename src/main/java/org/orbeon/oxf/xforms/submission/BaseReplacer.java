@@ -26,7 +26,7 @@ public abstract class BaseReplacer implements Replacer {
         this.containingDocument = containingDocument;
     }
 
-    protected IndentedLogger getDetailsLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+    protected IndentedLogger getDetailsLogger(final SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
         return submission.getDetailsLogger(p, p2);
     }
 }

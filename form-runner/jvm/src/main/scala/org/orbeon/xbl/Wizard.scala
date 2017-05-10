@@ -37,7 +37,7 @@ object Wizard {
 
   private def findWizardState =
     for {
-      component ← XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-wizard")
+      component ← XFormsAPI.resolveAs[XFormsComponentControl]("fr-view-component")
       model     ← component.nestedContainer.defaultModel
       instance  ← model.defaultInstanceOpt
     } yield

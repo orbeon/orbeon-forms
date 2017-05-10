@@ -31,10 +31,18 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-prev" phase="target">
-                <xf:dispatch name="DOMActivate" targetid="fr-wizard-prev" xxbl:scope="outer"/>
+                <!-- NOTE: The target shouldn't be in the outer scope ideally. -->
+                <xf:dispatch
+                    name="DOMActivate"
+                    targetid="fr-wizard-prev"
+                    xxbl:scope="outer"/>
             </xbl:handler>
             <xbl:handler event="fr-next" phase="target">
-                <xf:dispatch name="DOMActivate" targetid="fr-wizard-next" xxbl:scope="outer"/>
+                <!-- NOTE: The target shouldn't be in the outer scope ideally. -->
+                <xf:dispatch
+                    name="DOMActivate"
+                    targetid="fr-wizard-next"
+                    xxbl:scope="outer"/>
             </xbl:handler>
             <xbl:handler event="fr-show-toc" phase="target">
                 <xf:action if="$local/separate-toc/data(.)">
@@ -47,7 +55,27 @@
                 </xf:action>
             </xbl:handler>
             <xbl:handler event="fr-update-validity" phase="target">
-                <xf:dispatch name="DOMActivate" targetid="fr-wizard-update-validity" xxbl:scope="outer"/>
+                <!-- NOTE: The target shouldn't be in the outer scope ideally. -->
+                <xf:dispatch
+                    name="DOMActivate"
+                    targetid="fr-wizard-update-validity"
+                    xxbl:scope="outer"/>
+            </xbl:handler>
+            <xbl:handler event="fr-visit-all" phase="target">
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
+                <!-- NOTE: The target shouldn't be in the outer scope ideally. -->
+
+                <xf:dispatch
+                    if="xxf:instance('local')/validate/data(.) = 'free'"
+                    name="fr-wizard-visit-all"
+                    targetid="fr-wizard-visit-all"
+                    xxbl:scope="outer"/>
+
+                <xf:dispatch
+                    if="xxf:instance('local')/validate/data(.) != 'free'"
+                    name="fr-wizard-visit-all-to-current"
+                    targetid="fr-wizard-visit-all-to-current"
+                    xxbl:scope="outer"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -95,7 +123,9 @@
                                 <!-- Do action immediately -->
                             </xsl:otherwise>
                         </xsl:choose>
-                        <xf:dispatch name="fr-do-next" targetid="{{event('xxf:targetid')}}"/>
+                        <xf:dispatch
+                            name="fr-do-next"
+                            targetid="{{event('xxf:targetid')}}"/>
                     </xf:action>
                 </xsl:variable>
 
@@ -178,6 +208,7 @@
                                 <xf:dispatch
                                     event="xforms-enabled"
                                     target="#observer"
+
                                     name="fr-section-shown"
                                     targetid="fr-wizard">
                                     <xf:property name="section-name" value="frf:controlNameFromIdOpt(replace(case('switch'), '-case$', ''))" xxbl:scope="outer" />
@@ -227,6 +258,7 @@
                                         <xf:dispatch
                                             event="xforms-invalid"
                                             if="xxf:instance('local')/validate/data(.) = 'strict'"
+
                                             name="fr-wizard-unvisit-following"
                                             targetid="fr-wizard-unvisit-following"/>
 
@@ -305,6 +337,7 @@
                                 <xf:dispatch
                                     event="xforms-enabled"
                                     target="#observer"
+
                                     name="fr-toc-shown"
                                     targetid="fr-wizard">
                                     <xf:property name="validate"     value="$local/validate/data(.)"/>
@@ -535,13 +568,9 @@
                                                     <!-- DOMActivate handler which depends on `$static-validation-mode` -->
                                                     <xsl:copy-of select="$do-next-handler"/>
                                                     <xf:action event="fr-do-next">
-                                                        <!-- NOTE: We visit the current page upon xforms-deselect too. -->
-                                                        <xxf:setvisited
-                                                            if="$validated-mode"
-                                                            iterate="$prev-nav-case-ids, $current-nav-case-id"
-                                                            control="{{.}}"
-                                                            visited="true"
-                                                            recurse="true"/>
+                                                        <xf:dispatch
+                                                            name="fr-wizard-visit-all-to-current"
+                                                            targetid="fr-wizard-visit-all-to-current"/>
                                                         <xf:action if="$allow-next">
                                                             <xf:setvalue
                                                                 ref="xxf:instance('local')/current-case-id"
@@ -564,12 +593,33 @@
                                             </xh:li>
                                         </xh:ul>
                                         <!-- We put these here so that `$do-next-handler` has the right variables in scope -->
+                                        <!-- NOTE: This shouldn't be in the outer scope ideally. -->
                                         <xf:group id="fr-wizard-update-validity" appearance="xxf:internal">
                                             <xsl:copy-of select="$do-next-handler"/>
+                                        </xf:group>
+                                        <xf:group id="fr-wizard-visit-all" appearance="xxf:internal">
+                                            <xxf:setvisited
+                                                event="fr-wizard-visit-all"
+
+                                                control="switch"
+                                                visited="true"
+                                                recurse="true"/>
+                                        </xf:group>
+                                        <xf:group id="fr-wizard-visit-all-to-current" appearance="xxf:internal">
+                                            <!-- NOTE: We visit the current page upon xforms-deselect too. -->
+                                            <xxf:setvisited
+                                                event="fr-wizard-visit-all-to-current"
+                                                if="$validated-mode"
+
+                                                iterate="$prev-nav-case-ids, $current-nav-case-id"
+                                                control="{{.}}"
+                                                visited="true"
+                                                recurse="true"/>
                                         </xf:group>
                                         <xf:group id="fr-wizard-unvisit-following" appearance="xxf:internal">
                                             <xxf:setvisited
                                                 event="fr-wizard-unvisit-following"
+
                                                 iterate="$next-nav-case-ids"
                                                 control="{{.}}"
                                                 visited="false"

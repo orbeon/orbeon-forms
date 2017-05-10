@@ -36,15 +36,11 @@
                 <!-- Mark all controls as visited -->
                 <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="true" recurse="true" xxbl:scope="outer"/>
-                <!-- There is no dependency handling with the xxf:visited() function. -->
-                <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
                 <xf:var name="observers" xxbl:scope="outer"><xxf:value value="xxf:split($state/observers)" xxbl:scope="inner"/></xf:var>
                 <xxf:setvisited iterate="$observers" control="{xxf:absolute-id(.)}" visited="false" recurse="true" xxbl:scope="outer"/>
-                <!-- There is no dependency handling with the xxf:visited() function. -->
-                <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-update" phase="target">
                 <!-- Update errors in non-incremental mode -->

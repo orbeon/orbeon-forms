@@ -168,7 +168,7 @@
         select="
             (
                 'wizard'[$fr-form-metadata/wizard = 'true'],
-                p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')),
+                p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.'))[normalize-space()],
                 'full'
             )[1]"/>
 
@@ -533,22 +533,24 @@
 
             <!-- Mark all controls as unvisited -->
             <xf:action ev:event="fr-unvisit-all">
-                <!-- Dispatch to the appropriate error summaries -->
-                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
-                <xsl:if test="$error-summary-top">
-                    <xf:dispatch name="fr-unvisit-all" targetid="error-summary-control-top"/>
-                </xsl:if>
                 <xf:dispatch name="fr-unvisit-all" targetid="error-summary-control-bottom"/>
             </xf:action>
+
             <!-- Mark all controls as visited -->
             <xf:action ev:event="fr-visit-all">
-                <!-- Dispatch to the appropriate error summaries -->
-                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
-                <xsl:if test="$error-summary-top">
-                    <xf:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>
-                </xsl:if>
-                <xf:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
+
+                <!-- When the wizard is in use, we don't want to visit *all* controls. -->
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
+                <xxf:setvisited
+                    control="fr-captcha-group"
+                    visited="true"
+                    recurse="true"/>
+
+                <xf:dispatch
+                    name="fr-visit-all"
+                    targetid="fr-view-component"/>
             </xf:action>
+
             <!-- The error summary must be notified when the language changes so that alerts/errors can be updated -->
             <xf:action observer="fr-language-selector" event="xforms-value-changed">
                 <!-- Dispatch to the appropriate error summaries -->
@@ -559,14 +561,14 @@
                 <xf:dispatch name="fr-update-lang" targetid="error-summary-control-bottom"/>
             </xf:action>
 
-            <xf:action observer="fr-form-group" event="fr-toc-shown" if="event('separate-toc')">
+            <xf:action observer="fr-view-component" event="fr-toc-shown" if="event('separate-toc')">
                 <xsl:if test="$error-summary-top">
                     <xf:dispatch name="fr-hide" targetid="error-summary-control-top"/>
                 </xsl:if>
                 <xf:dispatch name="fr-hide" targetid="error-summary-control-bottom"/>
             </xf:action>
 
-            <xf:action observer="fr-form-group" event="fr-section-shown">
+            <xf:action observer="fr-view-component" event="fr-section-shown">
                 <xsl:if test="$error-summary-top">
                     <xf:dispatch name="fr-show" targetid="error-summary-control-top">
                         <xf:property name="section-name" value="event('section-name')[event('separate-toc')]"/>
@@ -631,7 +633,7 @@
                 <xf:setfocus
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                     event="xforms-ready"
-                    control="fr-form-group"
+                    control="fr-view-component"
                     includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
                     excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
             </xsl:if>

@@ -103,16 +103,29 @@
             <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
             <xh:a name="fr-form"/>
             <xsl:choose>
-                <xsl:when test="not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = ('full', '')">
-                    <!-- Just place the content as is -->
-                    <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+                <xsl:when test="not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = 'full'">
+                    <xf:group id="fr-view-component" class="fr-view-appearance-full">
+
+                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+
+                        <!-- Keep markup even in `view` mode for form caching. -->
+                        <xxf:setvisited
+                            event="fr-visit-all"
+                            target="#observer"
+
+                            control="fr-view-component"
+                            visited="true"
+                            recurse="true"/>
+                    </xf:group>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- Insert appropriate XBL component -->
                     <!-- NOTE: Once we support XBL matching on @appearance, use instead
                          <fr:view appearance="{$view-appearance}">. -->
                     <xsl:element name="fr:{$view-appearance}">
-                        <xsl:attribute name="id"              select="concat('fr-view-', $view-appearance)"/>
+                        <xsl:attribute name="id"              select="'fr-view-component'"/>
+                        <xsl:attribute name="class"           select="concat('fr-view-appearance-', $view-appearance)"/>
+
                         <xsl:attribute name="app"             select="$app"/>
                         <xsl:attribute name="form"            select="$form"/>
 

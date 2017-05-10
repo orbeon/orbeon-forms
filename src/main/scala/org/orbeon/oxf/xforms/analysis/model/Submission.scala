@@ -81,6 +81,7 @@ class Submission(
   val avtXxfDefaultsOpt          = element.attributeValueOpt(XXFORMS_DEFAULTS_QNAME)
   val avtXxfSharedOpt            = element.attributeValueOpt(XXFORMS_SHARED_QNAME)
   val avtXxfCacheOpt             = element.attributeValueOpt(XXFORMS_CACHE_QNAME)
+  val timeToLive                 = Instance.timeToLiveOrDefault(element)
 
   val avtXxfTargetOpt            = element.attributeValueOpt(XXFORMS_TARGET_QNAME)
   val avtXxfHandleXInclude       = element.attributeValueOpt(XXFORMS_XINCLUDE)

@@ -385,7 +385,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     /*
      * Process the response of an asynchronous submission.
      */
-    public void doSubmitReplace(SubmissionResult submissionResult) {
+    void doSubmitReplace(SubmissionResult submissionResult) {
 
         assert submissionResult != null;
 

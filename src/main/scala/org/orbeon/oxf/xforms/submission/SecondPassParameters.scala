@@ -2,9 +2,7 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.http.Credentials
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.analysis.model._
+import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 
 case class SecondPassParameters(
   actionOrResource   : String,
@@ -36,24 +34,10 @@ object SecondPassParameters {
 
   def apply(dynamicSubmission: XFormsModelSubmission, p: SubmissionParameters): SecondPassParameters = {
 
-    val staticSubmission   = dynamicSubmission.staticSubmission
-    val containingDocument = dynamicSubmission.containingDocument
+    val staticSubmission = dynamicSubmission.staticSubmission
 
-    val refContext = p.refContext
-
-    // Result of `resolveAttributeValueTemplates` can be `None` if, e.g. you have an AVT like `resource="{()}"`!
-    def stringAvtTrimmedOpt(value: String) =
-      Option(
-        XFormsUtils.resolveAttributeValueTemplates(
-          containingDocument,
-          refContext.xpathContext,
-          refContext.refNodeInfo,
-          value
-        )
-      ) flatMap (_.trimAllToOpt)
-
-    def booleanAvtOpt(value: String) =
-      stringAvtTrimmedOpt(value) map (_.toBoolean)
+    implicit val containingDocument = dynamicSubmission.containingDocument
+    implicit val refContext         = p.refContext
 
     // Maybe: See if we can resolve `xml:base` early to detect absolute URLs early as well.
     // actionOrResource = XFormsUtils.resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString();
@@ -116,7 +100,6 @@ object SecondPassParameters {
         "checking read-only and shared hints"
       )
 
-    // Get async/sync
     // NOTE: XForms 1.1 default to async, but we don't fully support async so we default to sync instead
     val isAsynchronous = {
 
@@ -146,7 +129,7 @@ object SecondPassParameters {
       isReadonly         = isReadonly,
       applyDefaults      = staticSubmission.avtXxfDefaultsOpt        flatMap booleanAvtOpt       getOrElse false,
       isCache            = isCache           ,
-      timeToLive         = Instance.timeToLiveOrDefault(staticSubmission.element),
+      timeToLive         = staticSubmission.timeToLive,
       isHandleXInclude   = staticSubmission.avtXxfHandleXInclude     flatMap booleanAvtOpt       getOrElse false,
       isAsynchronous     = isAsynchronous
     )

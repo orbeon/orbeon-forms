@@ -183,10 +183,8 @@ trait InstanceMetadata {
 
 object Instance {
 
-  def timeToLiveOrDefault(element: Element) = {
-    val timeToLiveValue = element.attributeValue(XXFORMS_TIME_TO_LIVE_QNAME)
-    Option(timeToLiveValue) map (_.toLong) getOrElse -1L
-  }
+  def timeToLiveOrDefault(element: Element): Long =
+    element.attributeValueOpt(XXFORMS_TIME_TO_LIVE_QNAME) flatMap (_.trimAllToOpt) map (_.toLong) getOrElse -1L
 
   // Extract the document starting at the given root element
   // This always creates a copy of the original sub-tree

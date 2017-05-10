@@ -4,19 +4,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
-import org.orbeon.oxf.xforms.model.XFormsInstance
+import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
-
-case class RefContext(
-  refNodeInfo                  : NodeInfo,
-  refInstanceOpt               : Option[XFormsInstance],
-  submissionElementContextItem : Item,
-  xpathContext                 : XPathContext
-)
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML
 
 // TODO: use enum for resolvedReplace, actualHttpMethod
 case class SubmissionParameters(
@@ -50,24 +43,10 @@ object SubmissionParameters {
 
   def apply(dynamicSubmission: XFormsModelSubmission, eventName: String): SubmissionParameters = {
 
-    val staticSubmission   = dynamicSubmission.staticSubmission
-    val containingDocument = dynamicSubmission.containingDocument
+    val staticSubmission = dynamicSubmission.staticSubmission
 
-    val refContext = createRefContext(dynamicSubmission)
-
-    // Result of `resolveAttributeValueTemplates` can be `None` if, e.g. you have an AVT like `resource="{()}"`!
-    def stringAvtTrimmedOpt(value: String) =
-      Option(
-        XFormsUtils.resolveAttributeValueTemplates(
-          containingDocument,
-          refContext.xpathContext,
-          refContext.refNodeInfo,
-          value
-        )
-      ) flatMap (_.trimAllToOpt)
-
-    def booleanAvtOpt(value: String) =
-      stringAvtTrimmedOpt(value) map (_.toBoolean)
+    implicit val containingDocument = dynamicSubmission.containingDocument
+    implicit val refContext         = createRefContext(dynamicSubmission)
 
     // Check that we have a current node and that it is pointing to a document or an element
     if (refContext.refNodeInfo eq null)
@@ -82,7 +61,7 @@ object SubmissionParameters {
         )
       )
 
-    if (! (refContext.refNodeInfo.isInstanceOf[DocumentInfo] || refContext.refNodeInfo.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE))
+    if (! XML.isDocument(refContext.refNodeInfo) && ! XML.isElement(refContext.refNodeInfo))
       throw new XFormsSubmissionException(
         dynamicSubmission,
         "xf:submission: single-node binding must refer to a document node or an element.",
@@ -95,10 +74,7 @@ object SubmissionParameters {
       )
 
     val resolvedReplace = stringAvtTrimmedOpt(staticSubmission.avtReplace) getOrElse XFORMS_SUBMIT_REPLACE_ALL
-    val isReplaceAll       = resolvedReplace == XFORMS_SUBMIT_REPLACE_ALL
-    val isReplaceInstance  = resolvedReplace == XFORMS_SUBMIT_REPLACE_INSTANCE
-    val isReplaceText      = resolvedReplace == XFORMS_SUBMIT_REPLACE_TEXT
-    val isReplaceNone      = resolvedReplace == XFORMS_SUBMIT_REPLACE_NONE
+    val isReplaceAll    = resolvedReplace == XFORMS_SUBMIT_REPLACE_ALL
 
     val resolvedMethod = {
       val resolvedMethodQName =
@@ -152,7 +128,7 @@ object SubmissionParameters {
         )                                                                           && // can't let SOAP requests be handled by the browser
         staticSubmission.avtXxfUsernameOpt.isEmpty                                  && // can't optimize if there are authentication credentials
         staticSubmission.avtXxfTargetOpt.isEmpty                                    && // can't optimize if there is a target
-        staticSubmission.element.elements(XFORMS_HEADER_QNAME).size == 0 // can't optimize if there are headers specified
+        staticSubmission.element.elements(XFORMS_HEADER_QNAME).size == 0               // can't optimize if there are headers specified
 
     // TODO: use static for headers
     // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
@@ -166,15 +142,15 @@ object SubmissionParameters {
     val isPossibleDeferredSubmission   = isReplaceAll && ! isHandlingClientGetAll && ! containingDocument.isInitializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
     val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventName
-    val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // here we get XXFORMS_SUBMIT
+    val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // XXFORMS_SUBMIT
 
     SubmissionParameters(
       refContext                     = refContext,
       resolvedReplace                = resolvedReplace,
       isReplaceAll                   = isReplaceAll,
-      isReplaceInstance              = isReplaceInstance,
-      isReplaceText                  = isReplaceText,
-      isReplaceNone                  = isReplaceNone,
+      isReplaceInstance              = resolvedReplace == XFORMS_SUBMIT_REPLACE_INSTANCE,
+      isReplaceText                  = resolvedReplace == XFORMS_SUBMIT_REPLACE_TEXT,
+      isReplaceNone                  = resolvedReplace == XFORMS_SUBMIT_REPLACE_NONE,
       resolvedMethod                 = resolvedMethod,
       actualHttpMethod               = actualHttpMethod,
       resolvedMediatypeOpt           = resolvedMediatypeOpt,
@@ -208,7 +184,7 @@ object SubmissionParameters {
 
     RefContext(
       refNodeInfo                  = bindingContext.getSingleItem.asInstanceOf[NodeInfo],
-      refInstanceOpt               = bindingContext.instance, // may be `None` if the document submitted is not part of an instance,
+      refInstanceOpt               = bindingContext.instance, // `None` if the document submitted is not part of an instance
       submissionElementContextItem = bindingContext.contextItem,
       xpathContext =
         new XPathContext(

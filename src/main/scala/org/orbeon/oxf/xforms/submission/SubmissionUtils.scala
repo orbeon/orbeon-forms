@@ -20,16 +20,47 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
+
+case class RefContext(
+  refNodeInfo                  : NodeInfo,
+  refInstanceOpt               : Option[XFormsInstance],
+  submissionElementContextItem : Item,
+  xpathContext                 : XPathContext
+)
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
 
-  def dataNodeHash(node: NodeInfo) =
+  // Result of `resolveAttributeValueTemplates` can be `None` if, e.g. you have an AVT like `resource="{()}"`!
+  def stringAvtTrimmedOpt(
+    value              : String)(implicit
+    refContext         : RefContext,
+    containingDocument : XFormsContainingDocument
+  ): Option[String] =
+    Option(
+      XFormsUtils.resolveAttributeValueTemplates(
+        containingDocument,
+        refContext.xpathContext,
+        refContext.refNodeInfo,
+        value
+      )
+    ) flatMap (_.trimAllToOpt)
+
+  def booleanAvtOpt(
+    value              : String)(implicit
+    refContext         : RefContext,
+    containingDocument : XFormsContainingDocument
+  ): Option[Boolean] =
+    stringAvtTrimmedOpt(value) map (_.toBoolean)
+
+  def dataNodeHash(node: NodeInfo): String =
     SecureUtils.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
   def readByteArray(model: XFormsModel, resolvedURL: String): Array[Byte] =
@@ -51,7 +82,7 @@ object SubmissionUtils {
   def processGETConnection[T](model: XFormsModel, resolvedURL: String)(body: InputStream ⇒ T): T =
     ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedURL), closeOnSuccess = true)(body)
 
-  def openGETConnection(model: XFormsModel, resolvedURL: String) = {
+  def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
 
     implicit val _logger = model.indentedLogger
     val url = new URI(resolvedURL)
@@ -94,7 +125,7 @@ object SubmissionUtils {
     }
   }
 
-  def clientHeadersToForward(allHeaders: Map[String, List[String]], forwardClientHeaders: Boolean) = {
+  def clientHeadersToForward(allHeaders: Map[String, List[String]], forwardClientHeaders: Boolean): Map[String, List[String]] = {
     if (forwardClientHeaders) {
       // Forwarding the user agent and accept headers makes sense when dealing with resources that
       // typically would come from the client browser, including:

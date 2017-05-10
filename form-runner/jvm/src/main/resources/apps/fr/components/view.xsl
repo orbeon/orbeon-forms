@@ -100,6 +100,7 @@
                 <xsl:attribute name="xxf:update">full</xsl:attribute>
             </xsl:if>
 
+            <!-- FIXME: `<a name>` is deprecated in favor of `id`. -->
             <xh:a name="fr-form"/>
             <xsl:choose>
                 <xsl:when test="not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = ('full', '')">

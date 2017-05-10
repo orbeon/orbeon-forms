@@ -331,8 +331,12 @@ trait FormRunnerActions {
             (evaluatedPropertiesAsMap.get(DataFormatVersionName).flatten map findDefaultPruneMetadata)
 
         // Allow `prune` to override `nonrelevant` for backward compatibility
+
         val effectiveNonRelevant =
-          evaluatedPropertiesAsMap.get("prune").flatten orElse
+          evaluatedPropertiesAsMap.get("prune").flatten collect {
+            case "false" ⇒ "keep"
+            case _       ⇒ "remove"
+          } orElse
             evaluatedPropertiesAsMap.get("nonrelevant").flatten
 
         evaluatedPropertiesAsMap +

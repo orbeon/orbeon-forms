@@ -88,15 +88,21 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
         Dom4jUtils.createDocumentCopyElement(formInstance.getRootElement)
       }
 
-      def copyAndAnnotate(tokens: String) =
-        XFormsModelSubmissionBase.prepareXML(document, instance("fr-form-instance").get.root, RelevanceHandling.Keep, Map.empty, tokens)
+      def copyAndAnnotate(tokens: Set[String]) =
+        XFormsModelSubmissionBase.prepareXML(
+          document,
+          instance("fr-form-instance").get.root,
+          RelevanceHandling.Keep,
+          Map.empty,
+          tokens
+        )
 
       // Cause warnings and info
       setControlValue(NumberControlId, "1001")
       setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
 
       // No annotation
-      assertXMLDocumentsIgnoreNamespacesInScope(copyFormInstance, copyAndAnnotate(""))
+      assertXMLDocumentsIgnoreNamespacesInScope(copyFormInstance, copyAndAnnotate(Set.empty))
 
       locally {
         val expected: JDocument =
@@ -107,7 +113,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
             </my-section>
           </form>
 
-        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning"))
+        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate(Set("warning")))
       }
 
       locally {
@@ -119,7 +125,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
             </my-section>
           </form>
 
-        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("info"))
+        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate(Set("info")))
       }
 
       locally {
@@ -133,7 +139,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
             </my-section>
           </form>
 
-        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate("warning info"))
+        assertXMLDocumentsIgnoreNamespacesInScope(expected, copyAndAnnotate(Set("warning", "info")))
       }
     }
 }

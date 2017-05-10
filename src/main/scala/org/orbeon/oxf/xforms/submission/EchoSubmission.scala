@@ -27,7 +27,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
   def isMatch(
     p : SubmissionParameters,
-    p2: XFormsModelSubmission#SecondPassParameters,
+    p2: SecondPassParameters,
     sp: SerializationParameters
   ) = {
     p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:")
@@ -35,7 +35,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
   def connect(
     p : SubmissionParameters,
-    p2: XFormsModelSubmission#SecondPassParameters,
+    p2: SecondPassParameters,
     sp: SerializationParameters
   ) = {
 
@@ -54,7 +54,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
       scheme           = "http",
       method           = HttpMethod.withNameInsensitive(p.actualHttpMethod),
-      hasCredentials   = p2.credentials != null,
+      hasCredentials   = p2.credentials.isDefined,
       mediatype        = sp.actualRequestMediatype,
       encodingForSOAP  = p2.encoding,
       customHeaders    = customHeaderNameValues,

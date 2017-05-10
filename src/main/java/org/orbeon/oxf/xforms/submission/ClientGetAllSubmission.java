@@ -29,14 +29,14 @@ public class ClientGetAllSubmission extends BaseSubmission {
     }
 
     public boolean isMatch(SubmissionParameters p,
-                           XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
+                           SecondPassParameters p2, SerializationParameters sp) {
         return p.isHandlingClientGetAll();
     }
 
     public SubmissionResult connect(SubmissionParameters p,
-                                    XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
+                                    SecondPassParameters p2, SerializationParameters sp) {
 
-        final String actionString = (sp.queryString() == null) ? p2.actionOrResource : p2.actionOrResource + ((p2.actionOrResource.indexOf('?') == -1) ? "?" : "") + sp.queryString();
+        final String actionString = (sp.queryString() == null) ? p2.actionOrResource() : p2.actionOrResource() + ((p2.actionOrResource().indexOf('?') == -1) ? "?" : "") + sp.queryString();
         XFormsLoadAction.resolveStoreLoadValue(containingDocument(), submission().getSubmissionElement(), true, actionString, null, null, submission().isURLNorewrite(), submission().isShowProgress());
 
         return null;

@@ -15,81 +15,80 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.{ChildrenActionsTrait, ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants
 
 class Submission(
-  staticStateContext: StaticStateContext,
-  element: Element,
-  parent: Option[ElementAnalysis],
-  preceding: Option[ElementAnalysis],
-  scope: Scope
-) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-    with ChildrenActionsTrait {
+  staticStateContext : StaticStateContext,
+  element            : Element,
+  parent             : Option[ElementAnalysis],
+  preceding          : Option[ElementAnalysis],
+  scope              : Scope
+) extends SimpleElementAnalysis(
+  staticStateContext,
+  element,
+  parent,
+  preceding,
+  scope
+) with ChildrenActionsTrait {
 
   // `resource` has precedence over `action`
   val avtActionOrResource =
-    element.attributeValueOpt(XFormsConstants.RESOURCE_QNAME) orElse
+    element.attributeValueOpt(RESOURCE_QNAME) orElse
       element.attributeValueOpt("action")                     getOrElse
-      (throw new ValidationException("xf:submission: action attribute or resource attribute is missing.", locationData))
+      (throw new ValidationException("xf:submission: `action` attribute or `resource` attribute is missing.", locationData))
 
-  val avtMethod =
-    element.attributeValueOpt("method") getOrElse
-    (throw new ValidationException("xf:submission: method attribute is missing.", locationData))
+  val avtMethod                  = element.attributeValueOpt("method")
 
-  val avtValidate         = element.attributeValue("validate")
-  val avtRelevant         = element.attributeValue("relevant")
-  val avtXXFormsCalculate = element.attributeValue(XFormsConstants.XXFORMS_CALCULATE_QNAME)
-  val avtXXFormsUploads   = element.attributeValue(XFormsConstants.XXFORMS_UPLOADS_QNAME)
-  val avtXXFormsAnnotate  = element.attributeValue(XFormsConstants.XXFORMS_ANNOTATE_QNAME)
+  val avtValidateOpt             = element.attributeValueOpt("validate")
+  val avtRelevantOpt             = element.attributeValueOpt("relevant")
+  val avtXxfCalculateOpt         = element.attributeValueOpt(XXFORMS_CALCULATE_QNAME)
+  val avtXxfUploadsOpt           = element.attributeValueOpt(XXFORMS_UPLOADS_QNAME)
+  val avtXxfAnnotateOpt          = element.attributeValueOpt(XXFORMS_ANNOTATE_QNAME)
 
-  val avtSerialization    = element.attributeValue("serialization")
+  val avtSerializationOpt        = element.attributeValueOpt("serialization")
+  val serializeOpt               = element.attributeValueOpt("serialize")
 
   // `targetref` is the new name as of May 2009, and `target` is still supported for backward compatibility.
   // This is an XPath expression when used with `replace="instance|text"` (other meaning possible post-XForms 1.1 for `replace="all"`).
-  val targetref =
-    element.attributeValueOpt("targetref") orElse
-      element.attributeValueOpt(XFormsConstants.TARGET_QNAME)
+  val targetrefOpt               = element.attributeValueOpt("targetref") orElse element.attributeValueOpt(TARGET_QNAME)
 
-  val avtMode               = element.attributeValue("mode")
-  val avtVersion            = element.attributeValue("version")
-  val avtIndent             = element.attributeValue("indent")
-  val avtMediatype          = element.attributeValue("mediatype")
-  val avtEncoding           = element.attributeValue("encoding")
-  val avtOmitxmldeclaration = element.attributeValue("omit-xml-declaration")
-  val avtStandalone         = element.attributeValue("standalone")
+  val avtModeOpt                 = element.attributeValueOpt("mode")
+  val avtVersionOpt              = element.attributeValueOpt("version")
+  val avtIndentOpt               = element.attributeValueOpt("indent")
+  val avtMediatypeOpt            = element.attributeValueOpt("mediatype")
+  val avtEncodingOpt             = element.attributeValueOpt("encoding")
+  val avtOmitXmlDeclarationOpt   = element.attributeValueOpt("omit-xml-declaration")
+  val avtStandalone              = element.attributeValueOpt("standalone")
 
-  val avtReplace =
-    element.attributeValueOpt("replace") getOrElse
-      XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL
+  val avtReplace                 = element.attributeValueOpt("replace") getOrElse XFORMS_SUBMIT_REPLACE_ALL
 
-  val replaceInstanceId     = element.attributeValue("instance")
-  val xxfReplaceInstanceId  = element.attributeValue(XFormsConstants.XXFORMS_INSTANCE_QNAME)
+  val replaceInstanceIdOrNull    = element.attributeValue("instance")
+  val xxfReplaceInstanceIdOrNull = element.attributeValue(XXFORMS_INSTANCE_QNAME)
 
-  // XForms 1.1 changes back the default to the ampersand as of February 2009
-  val avtSeparator =
-    element.attributeValueOpt("separator") getOrElse "&"
+  val avtSeparatorOpt            = element.attributeValueOpt("separator")
 
   // Extension attributes
-  val avtXXFormsUsername       = element.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME)
-  val avtXXFormsPassword       = element.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME)
-  val avtXXFormsPreemptiveAuth = element.attributeValue(XFormsConstants.XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
-  val avtXXFormsDomain         = element.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME)
+  val avtXxfUsernameOpt          = element.attributeValueOpt(XXFORMS_USERNAME_QNAME)
+  val avtXxfPasswordOpt          = element.attributeValueOpt(XXFORMS_PASSWORD_QNAME)
+  val avtXxfPreemptiveAuthOpt    = element.attributeValueOpt(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
+  val avtXxfDomainOpt            = element.attributeValueOpt(XXFORMS_DOMAIN_QNAME)
 
-  val avtXXFormsReadonly       = element.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME)
-  val avtXXFormsDefaults       = element.attributeValue(XFormsConstants.XXFORMS_DEFAULTS_QNAME)
-  val avtXXFormsShared         = element.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME)
-  val avtXXFormsCache          = element.attributeValue(XFormsConstants.XXFORMS_CACHE_QNAME)
+  val avtXxfReadonlyOpt          = element.attributeValueOpt(XXFORMS_READONLY_ATTRIBUTE_QNAME)
+  val avtXxfDefaultsOpt          = element.attributeValueOpt(XXFORMS_DEFAULTS_QNAME)
+  val avtXxfSharedOpt            = element.attributeValueOpt(XXFORMS_SHARED_QNAME)
+  val avtXxfCacheOpt             = element.attributeValueOpt(XXFORMS_CACHE_QNAME)
 
-  val avtXXFormsTarget         = element.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME) // TODO: `Option`.
-  val avtXXFormsHandleXInclude = element.attributeValue(XFormsConstants.XXFORMS_XINCLUDE)
+  val avtXxfTargetOpt            = element.attributeValueOpt(XXFORMS_TARGET_QNAME)
+  val avtXxfHandleXInclude       = element.attributeValueOpt(XXFORMS_XINCLUDE)
 
-  val xxfShowProgress          = ! ("false" == element.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME))
+  val xxfShowProgress            = ! (element.attributeValueOpt(XXFORMS_SHOW_PROGRESS_QNAME) contains "false")
 
-  val fURLNorewrite = XFormsUtils.resolveUrlNorewrite(element)
-  val urlType       = element.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME)
+  val urlNorewrite               = XFormsUtils.resolveUrlNorewrite(element)
+  val urlTypeOrNull              = element.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME)
 
   // `cdata-section-elements`
   // `includenamespaceprefixes`

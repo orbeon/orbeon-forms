@@ -50,7 +50,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   def deserialize(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
-    p2               : XFormsModelSubmission#SecondPassParameters
+    p2               : SecondPassParameters
   ): Unit = {
     // Deserialize here so it can run in parallel
     val contentType = connectionResult.mediatypeOrDefault(ProcessorUtils.DEFAULT_CONTENT_TYPE)
@@ -141,12 +141,12 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   def replace(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
-    p2               : XFormsModelSubmission#SecondPassParameters
+    p2               : SecondPassParameters
   ): Runnable = {
 
     // Set new instance document to replace the one submitted
 
-    val replaceInstanceNoTargetref = submission.findReplaceInstanceNoTargetref(p.refInstanceOpt)
+    val replaceInstanceNoTargetref = submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt)
     if (replaceInstanceNoTargetref eq null) {
 
       // Replacement instance or node was specified but not found
@@ -171,9 +171,9 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     } else {
       val destinationNodeInfo =
         submission.evaluateTargetRef(
-          p.xpathContext,
+          p.refContext.xpathContext,
           replaceInstanceNoTargetref,
-          p.submissionElementContextItem
+          p.refContext.submissionElementContextItem
         )
 
       if (destinationNodeInfo eq null) {

@@ -21,11 +21,11 @@ public interface Replacer {
 
     void deserialize(ConnectionResult connectionResult,
                      SubmissionParameters p,
-                     XFormsModelSubmission.SecondPassParameters p2) throws Exception;
+                     SecondPassParameters p2) throws Exception;
 
     // NOTE: replace() is allowed to throw exceptions, including XFormsSubmissionException
     // NOTE: Can return null. Ouch!
     Runnable replace(ConnectionResult connectionResult,
                      SubmissionParameters p,
-                     XFormsModelSubmission.SecondPassParameters p2) throws IOException;
+                     SecondPassParameters p2) throws IOException;
 }

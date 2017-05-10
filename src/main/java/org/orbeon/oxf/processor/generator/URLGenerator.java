@@ -959,7 +959,12 @@ public class URLGenerator extends ProcessorImpl {
 
                 final Credentials credentials = config.getUsername() == null ?
                     null :
-                    Credentials.apply(config.getUsername(), config.getPassword(), config.isPreemptiveAuth() ? "true" : "false", config.getDomain());
+                    Credentials.apply(
+                        config.getUsername(),
+                        config.getPassword(),
+                        config.isPreemptiveAuth() ? "true" : "false",
+                        config.getDomain()
+                    );
 
                 final URI url;
                 try {

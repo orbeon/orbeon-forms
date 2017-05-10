@@ -28,11 +28,11 @@ import org.orbeon.oxf.util.{Connection, ConnectionResult}
 class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmission(submission) {
 
   def getType = "regular"
-  def isMatch(p: SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters, sp: SerializationParameters) = true
+  def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters) = true
 
   def connect(
     p  : SubmissionParameters,
-    p2 : XFormsModelSubmission#SecondPassParameters,
+    p2 : SecondPassParameters,
     sp : SerializationParameters
   ): SubmissionResult = {
 
@@ -45,7 +45,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         absoluteResolvedURL.getScheme,
         HttpMethod.withNameInsensitive(p.actualHttpMethod),
-        p2.credentials ne null,
+        p2.credentials.isDefined,
         sp.actualRequestMediatype,
         p2.encoding,
         SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll),
@@ -69,7 +69,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
       Connection(
         method      = httpMethod,
         url         = absoluteResolvedURL,
-        credentials = Option(p2.credentials),
+        credentials = p2.credentials,
         content     = content,
         headers     = headers,
         loadState   = true,

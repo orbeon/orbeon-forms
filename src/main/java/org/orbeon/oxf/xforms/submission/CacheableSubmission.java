@@ -45,19 +45,19 @@ public class CacheableSubmission extends BaseSubmission {
     }
 
     public boolean isMatch(SubmissionParameters p,
-                           XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
+                           SecondPassParameters p2, SerializationParameters sp) {
 
         // Match if the submission has replace="instance" and xxf:cache="true"
-        return p.isReplaceInstance() && p2.isCache;
+        return p.isReplaceInstance() && p2.isCache();
     }
 
     public SubmissionResult connect(final SubmissionParameters p,
-                                    final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
+                                    final SecondPassParameters p2, final SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxf:cache="true"
 
         // Convert URL to string
-        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString(), submission().isURLNorewrite());
+        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource(), sp.queryString(), submission().isURLNorewrite());
 
         // Compute a hash of the body if needed
         final String requestBodyHash;
@@ -75,7 +75,7 @@ public class CacheableSubmission extends BaseSubmission {
         // Find and check replacement location
         final XFormsInstance instanceToUpdate = checkInstanceToUpdate(detailsLogger, p);
         final Instance staticInstance = instanceToUpdate.instance();
-        final InstanceCaching instanceCaching = InstanceCaching.fromValues(p2.timeToLive, p2.isHandleXInclude, absoluteResolvedURLString, requestBodyHash);
+        final InstanceCaching instanceCaching = InstanceCaching.fromValues(p2.timeToLive(), p2.isHandleXInclude(), absoluteResolvedURLString, requestBodyHash);
         final String instanceStaticId = staticInstance.staticId();
 
         // Obtain replacer
@@ -89,7 +89,7 @@ public class CacheableSubmission extends BaseSubmission {
         final DocumentInfo cachedDocumentInfo = XFormsServerSharedInstancesCache.findContentOrNull(
                 staticInstance,
                 instanceCaching,
-                p2.isReadonly,
+                p2.isReadonly(),
                 detailsLogger);
 
         if (cachedDocumentInfo != null) {
@@ -109,13 +109,13 @@ public class CacheableSubmission extends BaseSubmission {
             final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
                 public SubmissionResult call() {
 
-                    if (p2.isAsynchronous && timingLogger.isDebugEnabled())
+                    if (p2.isAsynchronous() && timingLogger.isDebugEnabled())
                         timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission().getEffectiveId(), "cacheable", "true");
 
                     final boolean[] status = { false , false};
                     try {
                         final DocumentInfo newDocumentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(
-                                staticInstance, instanceCaching, p2.isReadonly,
+                                staticInstance, instanceCaching, p2.isReadonly(),
                                 new XFormsServerSharedInstancesCache.Loader() {
                                     public DocumentInfo load(String instanceSourceURI, boolean handleXInclude) {
 
@@ -128,7 +128,7 @@ public class CacheableSubmission extends BaseSubmission {
                                             // Run regular submission but force:
                                             // - synchronous execution
                                             // - readonly result
-                                            final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
+                                            final SecondPassParameters updatedP2 = SecondPassParameters.amendForJava(p2, false, true);
 
                                             // For now support caching local portlet, request dispatcher, and regular submissions
                                             final Submission[] submissions = new Submission[] {
@@ -195,8 +195,8 @@ public class CacheableSubmission extends BaseSubmission {
                         // Any other throwable
                         return new SubmissionResult(submissionEffectiveId, throwable, null);
                     } finally {
-                        if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                            timingLogger.endHandleOperation("id", submission().getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous),
+                        if (p2.isAsynchronous() && timingLogger.isDebugEnabled())
+                            timingLogger.endHandleOperation("id", submission().getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous()),
                                     "loading attempted", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
                     }
                 }
@@ -228,8 +228,8 @@ public class CacheableSubmission extends BaseSubmission {
 
     private XFormsInstance checkInstanceToUpdate(IndentedLogger indentedLogger, SubmissionParameters p) {
         XFormsInstance updatedInstance;
-        final NodeInfo destinationNodeInfo = submission().evaluateTargetRef(p.xpathContext(),
-                submission().findReplaceInstanceNoTargetref(p.refInstanceOpt()), p.submissionElementContextItem());
+        final NodeInfo destinationNodeInfo = submission().evaluateTargetRef(p.refContext().xpathContext(),
+                submission().findReplaceInstanceNoTargetref(p.refContext().refInstanceOpt()), p.refContext().submissionElementContextItem());
 
         if (destinationNodeInfo == null) {
             // Throw target-error

@@ -131,10 +131,10 @@ trait InstanceMetadata {
 
   val credentialsOrNull = {
     // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
-    def username = element.attributeValue(XXFORMS_USERNAME_QNAME)
-    def password = element.attributeValue(XXFORMS_PASSWORD_QNAME)
+    def username       = element.attributeValue(XXFORMS_USERNAME_QNAME)
+    def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
     def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
-    def domain = element.attributeValue(XXFORMS_DOMAIN_QNAME)
+    def domain         = element.attributeValue(XXFORMS_DOMAIN_QNAME)
 
     Option(username) map (Credentials(_, password, preemptiveAuth, domain)) orNull
   }

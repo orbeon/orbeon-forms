@@ -98,7 +98,7 @@ abstract class XFormsModelSubmissionBase
     currentInstance   : Option[XFormsInstance],
     validate          : Boolean,
     relevanceHandling : RelevanceHandling,
-    annotateWith      : String)(implicit
+    annotateWith      : Set[String])(implicit
     indentedLogger    : IndentedLogger
   ): Document = {
 
@@ -166,7 +166,7 @@ object XFormsModelSubmissionBase {
     ref               : NodeInfo,
     relevanceHandling : RelevanceHandling,
     namespaceContext  : Map[String, String],
-    annotateWith      : String
+    annotateWith      : Set[String]
   ): Document =
     ref match {
       case virtualNode: VirtualNode ⇒
@@ -182,7 +182,7 @@ object XFormsModelSubmissionBase {
           }
 
         val attributeNamesForTokens =
-          stringToSet(annotateWith).iterator map { token ⇒
+          annotateWith.iterator map { token ⇒
             decodeSimpleQuery(token).headOption match {
               case Some((name, value)) ⇒
                 name → {
@@ -395,10 +395,10 @@ object XFormsModelSubmissionBase {
       case method if isGet(method)  || isDelete(method) ⇒ "application/x-www-form-urlencoded"
     }
 
-  def requestedSerialization(xformsSerialization: String, xformsMethod: String): Option[String] =
-    xformsSerialization.trimAllToOpt orElse defaultSerialization(xformsMethod)
+  def requestedSerialization(xformsSerialization: Option[String], xformsMethod: String): Option[String] =
+    xformsSerialization flatMap  (_.trimAllToOpt) orElse defaultSerialization(xformsMethod)
 
-  def getRequestedSerializationOrNull(xformsSerialization: String, xformsMethod: String): String =
+  def getRequestedSerializationOrNull(xformsSerialization: Option[String], xformsMethod: String): String =
     requestedSerialization(xformsSerialization, xformsMethod).orNull
 
   private object Private {

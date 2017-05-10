@@ -33,7 +33,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
   def deserialize(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
-    p2               : XFormsModelSubmission#SecondPassParameters
+    p2               : SecondPassParameters
   ): Unit =
     connectionResult.readTextResponseBody match {
       case Some(responseBody) ⇒
@@ -70,7 +70,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
   def replace(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
-    p2               : XFormsModelSubmission#SecondPassParameters
+    p2               : SecondPassParameters
   ): Runnable = {
     // XForms 1.1: "If the replace attribute contains the value "text" and the submission response conforms to an
     // XML mediatype (as defined by the content type specifiers in [RFC 3023]) or a text media type (as defined by
@@ -93,12 +93,12 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
 
     // Find target location
     val destinationNodeInfo =
-      submission.staticSubmission.targetref match {
+      submission.staticSubmission.targetrefOpt match {
         case Some(targetRef) ⇒
           // Evaluate destination node
           XPathCache.evaluateSingleWithContext(
-            xpathContext = p.xpathContext,
-            contextItem  = p.refNodeInfo,
+            xpathContext = p.refContext.xpathContext,
+            contextItem  = p.refContext.refNodeInfo,
             xpathString  = targetRef,
             reporter     = containingDocument.getRequestStats.addXPathStat
           ) match {
@@ -107,7 +107,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           }
         case None ⇒
           // Use default destination
-          submission.findReplaceInstanceNoTargetref(p.refInstanceOpt).rootElement
+          submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).rootElement
       }
 
     def handleSetValueSuccess(oldValue: String) =

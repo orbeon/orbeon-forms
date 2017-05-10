@@ -70,7 +70,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
    */
   protected def submitCallable(
     p        : SubmissionParameters,
-    p2       : XFormsModelSubmission#SecondPassParameters,
+    p2       : SecondPassParameters,
     callable : Callable[SubmissionResult]
   ): SubmissionResult =
     if (p2.isAsynchronous) {
@@ -90,12 +90,12 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
   protected def getDetailsLogger(
     p  : SubmissionParameters,
-    p2 : XFormsModelSubmission#SecondPassParameters
+    p2 : SecondPassParameters
   ) = submission.getDetailsLogger(p, p2)
 
   protected def getTimingLogger(
     p  : SubmissionParameters,
-    p2 : XFormsModelSubmission#SecondPassParameters
+    p2 : SecondPassParameters
   ) = submission.getTimingLogger(p, p2)
 
   /**

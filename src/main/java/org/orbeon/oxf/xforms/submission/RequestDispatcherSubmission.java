@@ -43,7 +43,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
      * Check whether submission is allowed.
      */
     public boolean isMatch(SubmissionParameters p,
-                           XFormsModelSubmission.SecondPassParameters p2, SerializationParameters sp) {
+                           SecondPassParameters p2, SerializationParameters sp) {
 
         final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
         final IndentedLogger indentedLogger   = getDetailsLogger(p, p2);
@@ -53,9 +53,9 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
-                "resource",                 p2.actionOrResource,
+                "resource",                 p2.actionOrResource(),
                 "noscript",                 Boolean.toString(p.isNoscript()),
-                "is asynchronous",          Boolean.toString(p2.isAsynchronous),
+                "is asynchronous",          Boolean.toString(p2.isAsynchronous()),
                 "container type",           request.getContainerType(),
                 "norewrite",                Boolean.toString(submission().isURLNorewrite()),
                 "url type",                 submission().getUrlType(),
@@ -81,10 +81,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         }
 
         // Absolute URL implies a regular submission
-        if (NetUtils.urlHasProtocol(p2.actionOrResource)) {
+        if (NetUtils.urlHasProtocol(p2.actionOrResource())) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
-                        "reason", "resource URL has protocol", "resource", p2.actionOrResource);
+                        "reason", "resource URL has protocol", "resource", p2.actionOrResource());
             return false;
         }
 
@@ -97,7 +97,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         }
 
         // For now, we don't handle async (could be handled in the future)
-        if (p2.isAsynchronous) {
+        if (p2.isAsynchronous()) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "asynchronous mode is not supported yet");
@@ -129,7 +129,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     }
 
     public SubmissionResult connect(final SubmissionParameters p,
-                                    final XFormsModelSubmission.SecondPassParameters p2, final SerializationParameters sp) throws Exception {
+                                    final SecondPassParameters p2, final SerializationParameters sp) throws Exception {
 
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -140,7 +140,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // f:url-norewrite="true" with an absolute path allows accessing other servlet contexts.
 
         // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument(), submission().getSubmissionElement(), p2.actionOrResource);
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument(), submission().getSubmissionElement(), p2.actionOrResource());
 
         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
@@ -166,7 +166,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
                         containingDocument(), detailsLogger, resolvedURI.toString(), p,
-                        submission().isURLNorewrite(), sp.actualRequestMediatype(), p2.encoding, sp.messageBody(),
+                        submission().isURLNorewrite(), sp.actualRequestMediatype(), p2.encoding(), sp.messageBody(),
                         sp.queryString(), customHeaderNameValues);
 
                     // Update status
@@ -187,8 +187,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                     // Exceptions are handled further down
                     return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);
                 } finally {
-                    if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                        timingLogger.endHandleOperation("id", submissionEffectiveId, "asynchronous", Boolean.toString(p2.isAsynchronous),
+                    if (p2.isAsynchronous() && timingLogger.isDebugEnabled())
+                        timingLogger.endHandleOperation("id", submissionEffectiveId, "asynchronous", Boolean.toString(p2.isAsynchronous()),
                                 "connected", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
                 }
             }

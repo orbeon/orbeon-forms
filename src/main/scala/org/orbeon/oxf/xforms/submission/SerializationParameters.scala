@@ -38,7 +38,7 @@ object SerializationParameters {
   def apply(
     submission               : XFormsModelSubmission,
     p                        : SubmissionParameters,
-    p2                       : XFormsModelSubmission#SecondPassParameters,
+    p2                       : SecondPassParameters,
     requestedSerialization   : String,
     documentToSubmit         : Document,
     overriddenSerializedData : String
@@ -46,7 +46,7 @@ object SerializationParameters {
 
     // Actual request mediatype: the one specified by @mediatype, or the default mediatype for the serialization otherwise
     def actualRequestMediatype(default: String) =
-      Option(p.resolvedMediatype) getOrElse default
+      p.resolvedMediatypeOpt getOrElse default
 
     if (p.serialize) {
       requestedSerialization match {
@@ -85,12 +85,12 @@ object SerializationParameters {
             TransformerUtils.applyOutputProperties(
               identity,
               "xml",
-              p2.version,
+              p2.versionOpt.orNull,
               null,
               null,
               p2.encoding,
-              p2.omitxmldeclaration,
-              p2.standalone,
+              p2.omitXmlDeclaration,
+              p2.standaloneOpt map java.lang.Boolean.valueOf orNull,
               p2.indent,
               4
             )
@@ -191,12 +191,12 @@ object SerializationParameters {
             TransformerUtils.applyOutputProperties(
               identity,
               if (serialization == "text/html") "html" else "xhtml",
-              p2.version,
+              p2.versionOpt.orNull,
               null,
               null,
               p2.encoding,
-              p2.omitxmldeclaration,
-              p2.standalone,
+              p2.omitXmlDeclaration,
+              p2.standaloneOpt map java.lang.Boolean.valueOf orNull,
               p2.indent,
               4
             )

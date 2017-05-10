@@ -23,13 +23,13 @@ public interface Submission {
 
     boolean isMatch(
         SubmissionParameters p,
-        XFormsModelSubmission.SecondPassParameters p2,
+        SecondPassParameters p2,
         SerializationParameters sp
     );
 
     SubmissionResult connect(
         SubmissionParameters p,
-        XFormsModelSubmission.SecondPassParameters p2,
+        SecondPassParameters p2,
         SerializationParameters sp
     ) throws Exception;
 }

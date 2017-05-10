@@ -32,11 +32,11 @@ public class AllReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(ConnectionResult cxr, SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void deserialize(ConnectionResult cxr, SubmissionParameters p, SecondPassParameters p2) {
         // NOP
     }
 
-    public Runnable replace(ConnectionResult cxr, SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(ConnectionResult cxr, SubmissionParameters p, SecondPassParameters p2) throws IOException {
 
         // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
 

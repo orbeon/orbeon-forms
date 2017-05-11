@@ -27,10 +27,7 @@ import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.model.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -171,7 +168,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         try {
             try {
                 // Big bag of initial runtime parameters
-                p = SubmissionParameters.apply(this, event.name());
+                p = SubmissionParameters.apply(event.name(), this);
 
                 if (indentedLogger.isDebugEnabled()) {
                     final String message = p.isDeferredSubmissionFirstPass() ? "submission first pass" : p.isDeferredSubmissionSecondPass() ? "submission second pass" : "submission";
@@ -194,15 +191,15 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
-                if (p.serialize() && p.resolvedXxfUploads() && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext().refInstanceOpt())) {
+                if (p.serialize() && p.xxfUploads() && SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext().refInstanceOpt())) {
                     throw new XFormsSubmissionException(this, "xf:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
-                        new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.XXFORMS_PENDING_UPLOADS(), null));
+                        new XFormsSubmitErrorEvent(XFormsModelSubmission.this, ErrorType$.MODULE$.XXFORMS_PENDING_UPLOADS(), null));
                 }
 
                 /* ***** Update data model ****************************************************************************** */
 
-                final RelevanceHandling relevanceHandling = p.resolvedRelevanceHandling();
+                final RelevanceHandling relevanceHandling = p.relevanceHandling();
 
                 // "The data model is updated"
                 if (p.refContext().refInstanceOpt().isDefined()) {
@@ -214,11 +211,11 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
                     // the instance is not serialized and if no instance data is otherwise used for the submission,
                     // this seems however unneeded so we optimize out.
-                    if (p.resolvedValidate() || ! relevanceHandling.equals(RelevanceHandling.Keep$.MODULE$)  || p.resolvedXxfCalculate()) {
+                    if (p.validate() || ! relevanceHandling.equals(RelevanceHandling.Keep$.MODULE$) || p.xxfCalculate()) {
                         // Rebuild impacts validation, relevance and calculated values (set by recalculate)
                         modelForInstance.doRebuild();
                     }
-                    if (! relevanceHandling.equals(RelevanceHandling.Keep$.MODULE$) || p.resolvedXxfCalculate()) {
+                    if (! relevanceHandling.equals(RelevanceHandling.Keep$.MODULE$) || p.xxfCalculate()) {
                         // Recalculate impacts relevance and calculated values
                         modelForInstance.doRecalculateRevalidate();
                     }
@@ -235,9 +232,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         createDocumentToSubmit(
                             p.refContext().refNodeInfo(),
                             p.refContext().refInstanceOpt(),
-                            p.resolvedValidate(),
+                            p.validate(),
                             relevanceHandling,
-                            p.resolvedXxfAnnotate(),
+                            p.xxfAnnotate(),
                             indentedLogger
                         );
                     }
@@ -265,9 +262,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 /* ***** Serialization ********************************************************************************** */
 
                 // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerializationOrNull(p.serializationOpt(), p.resolvedMethod());
+                final String requestedSerialization = getRequestedSerializationOrNull(p.serializationOpt(), p.xformsMethod(), p.httpMethod());
                 if (requestedSerialization == null)
-                    throw new XFormsSubmissionException(this, "xf:submission: invalid submission method requested: " + p.resolvedMethod(), "serializing instance");
+                    throw new XFormsSubmissionException(this, "xf:submission: invalid submission method requested: " + p.xformsMethod(), "serializing instance");
 
                 final Document documentToSubmit;
                 if (p.serialize()) {
@@ -282,9 +279,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     documentToSubmit = createDocumentToSubmit(
                         p.refContext().refNodeInfo(),
                         p.refContext().refInstanceOpt(),
-                        p.resolvedValidate(),
+                        p.validate(),
                         relevanceHandling,
-                        p.resolvedXxfAnnotate(),
+                        p.xxfAnnotate(),
                         indentedLogger
                     );
 
@@ -390,7 +387,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         assert submissionResult != null;
 
         // Big bag of initial runtime parameters
-        final SubmissionParameters p = SubmissionParameters.apply(this, null);
+        final SubmissionParameters p = SubmissionParameters.apply(null, this);
         final SecondPassParameters p2 = SecondPassParameters.apply(this, p);
 
         final Runnable submitDoneRunnable = handleSubmissionResult(p, p2, submissionResult, false);
@@ -520,21 +517,21 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                     // There is a body
 
                     // Get replacer
-                    if (p.isReplaceAll()) {
+                    if (ReplaceType.isReplaceAll(p.replaceType())) {
                         replacer = new AllReplacer(this, containingDocument);
-                    } else if (p.isReplaceInstance()) {
+                    } else if (ReplaceType.isReplaceInstance(p.replaceType())) {
                         replacer = new InstanceReplacer(this, containingDocument);
-                    } else if (p.isReplaceText()) {
+                    } else if (ReplaceType.isReplaceText(p.replaceType())) {
                         replacer = new TextReplacer(this, containingDocument);
-                    } else if (p.isReplaceNone()) {
+                    } else if (ReplaceType.isReplaceNone(p.replaceType())) {
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
-                        throw new XFormsSubmissionException(this, "xf:submission: invalid replace attribute: " + p.resolvedReplace(), "processing instance replacement",
-                                new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), connectionResult));
+                        throw new XFormsSubmissionException(this, "xf:submission: invalid replace attribute: " + p.replaceType(), "processing instance replacement",
+                                new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.XXFORMS_INTERNAL_ERROR(), connectionResult));
                     }
                 } else {
                     // There is no body, notify that processing is terminated
-                    if (p.isReplaceInstance() || p.isReplaceText()) {
+                    if (ReplaceType.isReplaceInstance(p.replaceType()) || ReplaceType.isReplaceText(p.replaceType())) {
                         // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
                         // no instance replacement took place
                         final IndentedLogger indentedLogger = getIndentedLogger();
@@ -550,16 +547,16 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                 // Got a redirect
 
                 // Currently we don't know how to handle a redirect for replace != "all"
-                if (!p.isReplaceAll())
-                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", redirect code received with replace=\"" + p.resolvedReplace() + "\"", "processing submission response",
-                            new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
+                if (! ReplaceType.isReplaceAll(p.replaceType()))
+                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", redirect code received with replace=\"" + p.replaceType() + "\"", "processing submission response",
+                            new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult));
 
                 replacer = new RedirectReplacer(this, containingDocument);
 
             } else {
                 // Error code received
                 throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
-                        new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
+                        new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult));
             }
 
             return replacer;
@@ -631,7 +628,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     private static IndentedLogger getNewLogger(final SubmissionParameters p, final SecondPassParameters p2,
                                         IndentedLogger indentedLogger, boolean newDebugEnabled) {
-        if (p2.isAsynchronous() && !p.isReplaceNone()) {
+        if (p2.isAsynchronous() && ! ReplaceType.isReplaceNone(p.replaceType())) {
             // Background asynchronous submission creates a new logger with its own independent indentation
             final IndentedLogger.Indentation newIndentation = new IndentedLogger.Indentation(indentedLogger.getIndentation().indentation);
             return new IndentedLogger(indentedLogger, newIndentation, newDebugEnabled);

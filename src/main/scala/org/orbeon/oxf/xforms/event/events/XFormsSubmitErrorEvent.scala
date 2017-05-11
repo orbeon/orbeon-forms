@@ -13,21 +13,20 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
+import enumeratum._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
-
 
 class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_SUBMIT_ERROR, target, properties, bubbles = true, cancelable = false)
     with SubmitResponseEvent {
 
   def this(target: XFormsEventTarget) = {
-    this(target, Map("error-type" → Some(XXFORMS_INTERNAL_ERROR.name)))
-    _errorType = XXFORMS_INTERNAL_ERROR
+    this(target, Map("error-type" → Some(ErrorType.XXFormsInternalError.entryName)))
+    _errorType = ErrorType.XXFormsInternalError
   }
 
   // Event can be dispatched before the resource URI is resolved so the resource URI is optional
@@ -35,7 +34,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     this(
       target     = target,
       properties = Map(
-        "error-type"           → Some(errorType.name),
+        "error-type"           → Some(errorType.entryName),
         "resource-uri"         → resourceURI,
         "response-status-code" → Some(statusCode)
       )
@@ -46,7 +45,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: ConnectionResult) = {
     this(
       target     = target,
-      properties = Map("error-type" → Some(errorType.name))
+      properties = Map("error-type" → Some(errorType.entryName))
     )
     _errorType = errorType
     _connectionResult = Option(connectionResult)
@@ -59,32 +58,41 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   def connectionResult = _connectionResult
 
   def logThrowable(throwable: Throwable): Unit =
-    if (errorType != VALIDATION_ERROR)
+    if (errorType != ErrorType.ValidationError)
       indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable))
 
   def logMessage(throwable: Throwable): Unit =
-    if (errorType != VALIDATION_ERROR)
+    if (errorType != ErrorType.ValidationError)
       indentedLogger.logError("xforms-submit-error", OrbeonFormatter.message(throwable))
 }
 
-object XFormsSubmitErrorEvent {
+sealed abstract class ErrorType(override val entryName: String) extends EnumEntry
 
-  sealed abstract class ErrorType(val name: String)
-  object SubmissionInProgress  extends ErrorType("submission-in-progress")
-  object NoData                extends ErrorType("no-data")
-  object ValidationError       extends ErrorType("validation-error")
-  object ResourceError         extends ErrorType("resource-error")
-  object ParseError            extends ErrorType("parse-error")
-  object TargetError           extends ErrorType("target-error")
-  object XXFormsPendingUploads extends ErrorType("xxforms-pending-uploads")
-  object XXFormsInternalError  extends ErrorType("xxforms-internal-error")
+object ErrorType  extends Enum[ErrorType] {
+
+  val values = findValues
+
+  case object SubmissionInProgress  extends ErrorType("submission-in-progress")  // TODO: use
+  case object NoData                extends ErrorType("no-data")
+  case object NoRelevantData        extends ErrorType("no-relevant-data")        // TODO: use
+  case object ValidationError       extends ErrorType("validation-error")
+  case object ParseError            extends ErrorType("parse-error")
+  case object ResourceError         extends ErrorType("resource-error")
+  case object ResultMediaType       extends ErrorType("result-media-type")       // TODO: use
+  case object ResultTextMediaType   extends ErrorType("result-text-media-type")  // TODO: use
+  case object ResultErrorResponse   extends ErrorType("result-error-response")   // TODO: use
+  case object TargetModelError      extends ErrorType("target-model-error")      // TODO: use
+  case object TargetEmpty           extends ErrorType("target-empty")            // TODO: use
+  case object TargetReadonly        extends ErrorType("target-readonly")         // TODO: use
+  case object TargetNonElement      extends ErrorType("target-non-element")      // TODO: use
+  case object TargetError           extends ErrorType("target-error")
+
+  case object XXFormsPendingUploads extends ErrorType("xxforms-pending-uploads") // CHECK: doc
+  case object XXFormsInternalError  extends ErrorType("xxforms-internal-error")  // CHECK: doc
+  case object XXFormsMethodError    extends ErrorType("xxforms-method-error")    // CHECK: doc
 
   // For Java callers
-  def SUBMISSION_IN_PROGRESS  = SubmissionInProgress
-  def NO_DATA                 = NoData
-  def VALIDATION_ERROR        = ValidationError
   def RESOURCE_ERROR          = ResourceError
-  def PARSE_ERROR             = ParseError
   def TARGET_ERROR            = TargetError
   def XXFORMS_PENDING_UPLOADS = XXFormsPendingUploads
   def XXFORMS_INTERNAL_ERROR  = XXFormsInternalError

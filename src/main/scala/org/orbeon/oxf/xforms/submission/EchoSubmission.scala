@@ -49,12 +49,12 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         Connection.logRequestBody(sp.actualRequestMediatype, sp.messageBody)(indentedLogger)
     }
 
-    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll)
+    val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
       scheme           = "http",
-      method           = HttpMethod.withNameInsensitive(p.actualHttpMethod),
-      hasCredentials   = p2.credentials.isDefined,
+      method           = p.httpMethod,
+      hasCredentials   = p2.credentialsOpt.isDefined,
       mediatype        = sp.actualRequestMediatype,
       encodingForSOAP  = p2.encoding,
       customHeaders    = customHeaderNameValues,

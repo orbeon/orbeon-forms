@@ -17,16 +17,19 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.orbeon.dom.*;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.QName;
+import org.orbeon.dom.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xforms.model.InstanceData;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.model.InstanceData;
+import org.orbeon.oxf.xforms.model.XFormsInstance;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -43,39 +46,6 @@ import java.util.List;
  * Utilities for XForms submission processing.
  */
 public class XFormsSubmissionUtils {
-
-    public static String getActualHttpMethod(String methodAttribute) {
-        final String actualMethod;
-        if (isPost(methodAttribute)) {
-            actualMethod = "POST";
-        } else if (isGet(methodAttribute)) {
-            actualMethod = "GET";
-        } else if (isPut(methodAttribute)) {
-            actualMethod = "PUT";
-        } else if (isDelete(methodAttribute)) {
-            actualMethod = "DELETE";
-        } else {
-            actualMethod = methodAttribute.toUpperCase();
-        }
-        return actualMethod;
-    }
-
-    public static boolean isGet(String method) {
-        return method.equals("get");
-    }
-
-    // This is to support XForms's multipart-post, form-data-post and urlencoded-post
-    public static boolean isPost(String method) {
-        return method.equals("post") || method.endsWith("-post");
-    }
-
-    public static boolean isPut(String method) {
-        return method.equals("put");
-    }
-
-    public static boolean isDelete(String method) {
-        return method.equals("delete");
-    }
 
     /**
      * Create an application/x-www-form-urlencoded string, encoded in UTF-8, based on the elements and text content

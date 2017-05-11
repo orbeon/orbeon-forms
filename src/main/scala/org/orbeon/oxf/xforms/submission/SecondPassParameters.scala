@@ -1,24 +1,31 @@
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.http.Credentials
+import org.orbeon.oxf.http.{Credentials, HttpMethod}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 
 case class SecondPassParameters(
+
   actionOrResource   : String,
-  versionOpt         : Option[String],
+  isAsynchronous     : Boolean,
+  credentialsOpt     : Option[Credentials],
+
+  // Serialization
   separator          : String,
   encoding           : String,
+
+  // XML serialization
+  versionOpt         : Option[String],
   indent             : Boolean,
   omitXmlDeclaration : Boolean,
   standaloneOpt      : Option[Boolean],
-  credentials        : Option[Credentials],
+
+  // Response
+  isHandleXInclude   : Boolean,
   isReadonly         : Boolean,
   applyDefaults      : Boolean,
   isCache            : Boolean,
-  timeToLive         : Long,
-  isHandleXInclude   : Boolean,
-  isAsynchronous     : Boolean
+  timeToLive         : Long
 )
 
 object SecondPassParameters {
@@ -27,7 +34,7 @@ object SecondPassParameters {
   private val DefaultEncoding  = "UTF-8"
   private val Asynchronous     = "asynchronous"
   private val Application      = "application"
-  private val CacheableMethods = Set("GET", "POST", "PUT")
+  private val CacheableMethods = Set(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT): Set[HttpMethod]
 
   def amendForJava(p: SecondPassParameters, isAsynchronous: Boolean, isReadonly: Boolean): SecondPassParameters =
     p.copy(isAsynchronous = isAsynchronous, isReadonly = isReadonly)
@@ -53,19 +60,17 @@ object SecondPassParameters {
           )
       }
 
-    val credentials = {
+    val credentialsOpt =
+      staticSubmission.avtXxfUsernameOpt flatMap
+        stringAvtTrimmedOpt              map { username ⇒
 
-      val usernameOpt = staticSubmission.avtXxfUsernameOpt flatMap stringAvtTrimmedOpt
-
-      usernameOpt map { username ⇒
         Credentials(
           username       = username,
-          password       = staticSubmission.avtXxfPasswordOpt flatMap stringAvtTrimmedOpt,
+          password       =    staticSubmission.avtXxfPasswordOpt       flatMap stringAvtTrimmedOpt,
           preemptiveAuth = ! (staticSubmission.avtXxfPreemptiveAuthOpt flatMap stringAvtTrimmedOpt contains false.toString),
-          domain         = staticSubmission.avtXxfDomainOpt flatMap stringAvtTrimmedOpt
+          domain         =    staticSubmission.avtXxfDomainOpt         flatMap stringAvtTrimmedOpt
         )
       }
-    }
 
     val isReadonly =
       staticSubmission.avtXxfReadonlyOpt flatMap booleanAvtOpt getOrElse false
@@ -79,21 +84,21 @@ object SecondPassParameters {
     // Check read-only and cache hints
     if (isCache) {
 
-      if (! CacheableMethods(p.actualHttpMethod))
+      if (! CacheableMethods(p.httpMethod))
         throw new XFormsSubmissionException(
           dynamicSubmission,
           """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `method="get|post|put"`.""",
           "checking read-only and shared hints"
         )
 
-      if (! p.isReplaceInstance)
+      if (p.replaceType != ReplaceType.Instance)
         throw new XFormsSubmissionException(
           dynamicSubmission,
           """xf:submission: `xxf:cache="true"` or `xxf:shared="application"` can be set only with `replace="instance"`.""",
           "checking read-only and shared hints"
         )
 
-    } else if (isReadonly && ! p.isReplaceInstance)
+    } else if (isReadonly && p.replaceType != ReplaceType.Instance)
       throw new XFormsSubmissionException(
         dynamicSubmission,
         """xf:submission: `xxf:readonly="true"` can be `true` only with `replace="instance"`.""",
@@ -107,32 +112,35 @@ object SecondPassParameters {
         staticSubmission.avtModeOpt flatMap stringAvtTrimmedOpt contains Asynchronous
 
       // For now we don't support replace="all"
-      if (isRequestedAsynchronousMode && p.isReplaceAll)
+      if (isRequestedAsynchronousMode && p.replaceType == ReplaceType.All)
         throw new XFormsSubmissionException(
           dynamicSubmission,
           """xf:submission: `mode="asynchronous"` cannot be `true` with `replace="all"`.""",
           "checking asynchronous mode"
         )
 
-      ! p.isReplaceAll && isRequestedAsynchronousMode
+      p.replaceType != ReplaceType.All && isRequestedAsynchronousMode
     }
 
     SecondPassParameters(
+
       actionOrResource   = actionOrResource,
-      versionOpt         = staticSubmission.avtVersionOpt            flatMap stringAvtTrimmedOpt,
+      isAsynchronous     = isAsynchronous,
+      credentialsOpt     = credentialsOpt,
+
       separator          = staticSubmission.avtSeparatorOpt          flatMap stringAvtTrimmedOpt getOrElse DefaultSeparator,
       encoding           = staticSubmission.avtEncodingOpt           flatMap stringAvtTrimmedOpt getOrElse DefaultEncoding,
+
+      versionOpt         = staticSubmission.avtVersionOpt            flatMap stringAvtTrimmedOpt,
       indent             = staticSubmission.avtIndentOpt             flatMap booleanAvtOpt       getOrElse false,
       omitXmlDeclaration = staticSubmission.avtOmitXmlDeclarationOpt flatMap booleanAvtOpt       getOrElse false,
       standaloneOpt      = staticSubmission.avtStandalone            flatMap booleanAvtOpt,
-      credentials        = credentials,
+
+      isHandleXInclude   = staticSubmission.avtXxfHandleXInclude     flatMap booleanAvtOpt       getOrElse false,
       isReadonly         = isReadonly,
       applyDefaults      = staticSubmission.avtXxfDefaultsOpt        flatMap booleanAvtOpt       getOrElse false,
-      isCache            = isCache           ,
-      timeToLive         = staticSubmission.timeToLive,
-      isHandleXInclude   = staticSubmission.avtXxfHandleXInclude     flatMap booleanAvtOpt       getOrElse false,
-      isAsynchronous     = isAsynchronous
+      isCache            = isCache,
+      timeToLive         = staticSubmission.timeToLive
     )
   }
-
 }

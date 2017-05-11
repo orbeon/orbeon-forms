@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler
@@ -73,7 +73,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         "processing instance replacement",
         new XFormsSubmitErrorEvent(
           submission,
-          XFormsSubmitErrorEvent.RESOURCE_ERROR,
+          ErrorType.ResourceError,
           connectionResult
         )
       )
@@ -131,7 +131,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           "processing instance replacement",
           new XFormsSubmitErrorEvent(
             submission,
-            XFormsSubmitErrorEvent.PARSE_ERROR,
+            ErrorType.ParseError,
             connectionResult
           )
         )
@@ -164,7 +164,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         "processing instance attribute",
         new XFormsSubmitErrorEvent(
           submission,
-          XFormsSubmitErrorEvent.TARGET_ERROR,
+          ErrorType.TargetError,
           connectionResult
         )
       )
@@ -189,7 +189,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           "processing targetref attribute",
           new XFormsSubmitErrorEvent(
             submission,
-            XFormsSubmitErrorEvent.TARGET_ERROR,
+            ErrorType.TargetError,
             connectionResult
           )
         )
@@ -204,7 +204,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           "processing targetref attribute",
           new XFormsSubmitErrorEvent(
             submission,
-            XFormsSubmitErrorEvent.TARGET_ERROR,
+            ErrorType.TargetError,
             connectionResult
           )
         )
@@ -220,7 +220,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           "processing targetref attribute",
           new XFormsSubmitErrorEvent(
             submission,
-            XFormsSubmitErrorEvent.TARGET_ERROR,
+            ErrorType.TargetError,
             connectionResult
           )
         )

@@ -19,7 +19,7 @@ import java.net.URI
 import java.util.concurrent.Callable
 
 import org.orbeon.oxf.http.Headers.{ContentType, firstHeaderIgnoreCase}
-import org.orbeon.oxf.http.{HttpMethod, StreamedContent}
+import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.{Connection, ConnectionResult}
 
 /**
@@ -44,22 +44,20 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     val headers =
       Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
         absoluteResolvedURL.getScheme,
-        HttpMethod.withNameInsensitive(p.actualHttpMethod),
-        p2.credentials.isDefined,
+        p.httpMethod,
+        p2.credentialsOpt.isDefined,
         sp.actualRequestMediatype,
         p2.encoding,
-        SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll),
+        SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All),
         Connection.headersToForwardFromProperty,
         containingDocument.headersGetter)(
         detailsLogger
       )
 
-    val httpMethod = HttpMethod.withNameInsensitive(p.actualHttpMethod)
-
     val submissionEffectiveId = submission.getEffectiveId
 
     val messageBody: Option[Array[Byte]] =
-      if (Connection.requiresRequestBody(httpMethod)) Option(sp.messageBody) orElse Some(Array()) else None
+      if (Connection.requiresRequestBody(p.httpMethod)) Option(sp.messageBody) orElse Some(Array()) else None
 
     val content = messageBody map
       (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
@@ -67,9 +65,9 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     // Prepare Connection in this thread as async submission can't access the request object
     val connection =
       Connection(
-        method      = httpMethod,
+        method      = p.httpMethod,
         url         = absoluteResolvedURL,
-        credentials = p2.credentials,
+        credentials = p2.credentialsOpt,
         content     = content,
         headers     = headers,
         loadState   = true,

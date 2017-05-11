@@ -18,6 +18,7 @@ import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.event.events.ErrorType$;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class AllReplacer extends BaseReplacer {
                 // already been written out. This gives the form author a chance to do something in cases the response is
                 // buffered, for example do a sendError().
                 throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + cxr.statusCode(), "processing submission response",
-                        new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), cxr));
+                        new XFormsSubmitErrorEvent(submission, ErrorType$.MODULE$.RESOURCE_ERROR(), cxr));
         } else {
             // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document
             // lock, see XFormsServer.

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import enumeratum._
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
@@ -25,8 +26,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR
+import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventObserver, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
@@ -61,13 +61,13 @@ abstract class XFormsModelSubmissionBase
   protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
     sendSubmitErrorWithDefault(
       throwable,
-      new XFormsSubmitErrorEvent(thisSubmission, XXFORMS_INTERNAL_ERROR, submissionResult.getConnectionResult)
+      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.getConnectionResult)
     )
 
   protected def sendSubmitError(throwable: Throwable, resolvedActionOrResource: String): Unit =
     sendSubmitErrorWithDefault(
       throwable,
-      new XFormsSubmitErrorEvent(thisSubmission, Option(resolvedActionOrResource), XXFORMS_INTERNAL_ERROR, 0)
+      new XFormsSubmitErrorEvent(thisSubmission, Option(resolvedActionOrResource), ErrorType.XXFormsInternalError, 0)
     )
 
   private def sendSubmitErrorWithDefault(throwable: Throwable, default: ⇒ XFormsSubmitErrorEvent): Unit = {
@@ -131,7 +131,7 @@ abstract class XFormsModelSubmissionBase
         thisSubmission,
         "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
         "checking instance validity",
-        new XFormsSubmitErrorEvent(thisSubmission, XFormsSubmitErrorEvent.VALIDATION_ERROR, null)
+        new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, null)
       )
     }
 
@@ -144,7 +144,6 @@ object XFormsModelSubmissionBase {
 
   import Private._
   import RelevanceHandling._
-  import XFormsSubmissionUtils._
 
   // Prepare XML for submission
   //
@@ -377,22 +376,30 @@ object XFormsModelSubmissionBase {
           throw new IllegalArgumentException
       }
 
-  def defaultSerialization(xformsMethod: String): Option[String] =
-    xformsMethod.trimAllToOpt collect {
-      case "multipart-post"                             ⇒ "multipart/related"
-      case "form-data-post"                             ⇒ "multipart/form-data"
-      case "urlencoded-post"                            ⇒ "application/x-www-form-urlencoded"
-      case method if isPost(method) || isPut(method)    ⇒ "application/xml"
-      case method if isGet(method)  || isDelete(method) ⇒ "application/x-www-form-urlencoded"
-    }
+  def requestedSerialization(
+    xformsSerialization : Option[String],
+    xformsMethod        : String,
+    httpMethod          : HttpMethod
+  ): Option[String] =
+      xformsSerialization flatMap  (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
 
-  def requestedSerialization(xformsSerialization: Option[String], xformsMethod: String): Option[String] =
-    xformsSerialization flatMap  (_.trimAllToOpt) orElse defaultSerialization(xformsMethod)
-
-  def getRequestedSerializationOrNull(xformsSerialization: Option[String], xformsMethod: String): String =
-    requestedSerialization(xformsSerialization, xformsMethod).orNull
+  def getRequestedSerializationOrNull(
+    xformsSerialization : Option[String],
+    xformsMethod        : String,
+    httpMethod          : HttpMethod
+  ): String =
+    requestedSerialization(xformsSerialization, xformsMethod, httpMethod).orNull
 
   private object Private {
+
+    def defaultSerialization(xformsMethod: String, httpMethod: HttpMethod): Option[String] =
+      xformsMethod.trimAllToOpt collect {
+        case "multipart-post"                                                      ⇒ "multipart/related"
+        case "form-data-post"                                                      ⇒ "multipart/form-data"
+        case "urlencoded-post"                                                     ⇒ "application/x-www-form-urlencoded"
+        case _ if httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT    ⇒ "application/xml"
+        case _ if httpMethod == HttpMethod.GET  || httpMethod == HttpMethod.DELETE ⇒ "application/x-www-form-urlencoded"
+      }
 
     def annotateNonRelevantElements(doc: Document, attQname: QName): Unit = {
 

@@ -19,10 +19,11 @@ import java.util.concurrent.Callable
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, LocalResponse, URLRewriter}
-import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpMethod, StreamedContent}
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils}
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
+import org.orbeon.oxf.util.CoreUtils._
 
 trait SubmissionProcess {
   def process(request: ExternalContext.Request, response: ExternalContext.Response)
@@ -117,11 +118,13 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     isDefaultContext       : Boolean
   ): ConnectionResult = {
 
+    require(response ne null) // see comment at call site
+
     // Action must be an absolute path
     if (! resource.startsWith("/"))
       throw new OXFException("Action does not start with a '/': " + resource)
 
-    val httpMethod = HttpMethod.withNameInsensitive(p.actualHttpMethod)
+    val httpMethod = p.httpMethod
 
     // handle case of empty body
     val messageBody = Option(messageBodyOrNull)
@@ -199,11 +202,8 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
         "effective resource URI (relative to servlet root)", rootAdjustedResourceURI
       )
 
-    // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
-    val effectiveResponse = if (! p.isReplaceAll) null else response
-
-    if (p.isReplaceAll) {
-      val replaceAllResponse = new AllReplacer.ReplaceAllResponse(effectiveResponse)
+    if (p.replaceType == ReplaceType.All) {
+      val replaceAllResponse = new AllReplacer.ReplaceAllResponse(response)
       submissionProcess.process(localRequest, replaceAllResponse)
 
       val dummyContent = new StreamedContent(
@@ -216,20 +216,16 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
           super.close()
           // Try to obtain, flush and close the stream to work around WebSphere issue
           try {
-            if (effectiveResponse ne null) {
-              val os = effectiveResponse.getOutputStream
-              os.flush()
-              os.close()
-            }
-          }  catch {
+            val os = response.getOutputStream
+            os.flush()
+            os.close()
+          } catch {
             case e: IllegalStateException ⇒
               indentedLogger.logDebug("", "IllegalStateException caught while closing OutputStream after forward")
               try {
-                if (effectiveResponse ne null) {
-                  val writer = effectiveResponse.getWriter
-                  writer.flush()
-                  writer.close()
-                }
+                val writer = response.getWriter
+                writer.flush()
+                writer.close()
               }  catch {
                 case f: IllegalStateException ⇒
                   indentedLogger.logDebug("", "IllegalStateException caught while closing Writer after forward")
@@ -260,7 +256,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
             submission,
             s"xf:submission for submission id: ${submission.getId}, error code received: ${cxr.statusCode}",
             "processing submission response",
-            new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR, cxr)
+            new XFormsSubmitErrorEvent(submission, ErrorType.ResourceError, cxr)
           )
       }  else {
         // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document

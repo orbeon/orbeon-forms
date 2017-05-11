@@ -1,35 +1,31 @@
 package org.orbeon.oxf.xforms.submission
 
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvents
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.RelevanceHandling.{Keep, Remove}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
 
-// TODO: use enum for resolvedReplace, actualHttpMethod
 case class SubmissionParameters(
   refContext                     : RefContext,
-  resolvedReplace                : String,
-  isReplaceAll                   : Boolean,
-  isReplaceInstance              : Boolean,
-  isReplaceText                  : Boolean,
-  isReplaceNone                  : Boolean,
-  resolvedMethod                 : String,
-  actualHttpMethod               : String,
-  resolvedMediatypeOpt           : Option[String],
+  replaceType                    : ReplaceType,
+  xformsMethod                   : String,
+  httpMethod                     : HttpMethod,
+  mediatypeOpt                   : Option[String],
   serializationOpt               : Option[String],
   serialize                      : Boolean,
-  resolvedValidate               : Boolean,
-  resolvedRelevanceHandling      : RelevanceHandling,
-  resolvedXxfCalculate           : Boolean,
-  resolvedXxfUploads             : Boolean,
-  resolvedXxfAnnotate            : Set[String],
+  validate                       : Boolean,
+  relevanceHandling              : RelevanceHandling,
+  xxfCalculate                   : Boolean,
+  xxfUploads                     : Boolean,
+  xxfAnnotate                    : Set[String],
   isHandlingClientGetAll         : Boolean,
   isNoscript                     : Boolean,
   isDeferredSubmission           : Boolean,
@@ -39,10 +35,16 @@ case class SubmissionParameters(
 
 object SubmissionParameters {
 
-  def withUpdatedRefContext(p: SubmissionParameters, dynamicSubmission: XFormsModelSubmission): SubmissionParameters =
+  def withUpdatedRefContext(
+    p                 : SubmissionParameters)(implicit
+    dynamicSubmission : XFormsModelSubmission
+  ): SubmissionParameters =
     p.copy(refContext = createRefContext(dynamicSubmission))
 
-  def apply(dynamicSubmission: XFormsModelSubmission, eventName: String): SubmissionParameters = {
+  def apply(
+    eventNameOrNull   : String)(implicit
+    dynamicSubmission : XFormsModelSubmission
+  ): SubmissionParameters = {
 
     val staticSubmission = dynamicSubmission.staticSubmission
 
@@ -57,7 +59,7 @@ object SubmissionParameters {
         "getting submission single-node binding",
         new XFormsSubmitErrorEvent(
           dynamicSubmission,
-          XFormsSubmitErrorEvent.NO_DATA,
+          ErrorType.NoData,
           null
         )
       )
@@ -69,13 +71,16 @@ object SubmissionParameters {
         "getting submission single-node binding",
         new XFormsSubmitErrorEvent(
           dynamicSubmission,
-          XFormsSubmitErrorEvent.NO_DATA,
+          ErrorType.NoData,
           null
         )
       )
 
-    val resolvedReplace = staticSubmission.avtReplaceOpt flatMap stringAvtTrimmedOpt getOrElse XFORMS_SUBMIT_REPLACE_ALL
-    val isReplaceAll    = resolvedReplace == XFORMS_SUBMIT_REPLACE_ALL
+    val resolvedReplace =
+      staticSubmission.avtReplaceOpt    flatMap
+        stringAvtTrimmedOpt             map
+        ReplaceType.withNameInsensitive getOrElse
+        ReplaceType.All
 
     val resolvedMethod = {
       val resolvedMethodQName =
@@ -89,7 +94,7 @@ object SubmissionParameters {
         )
       )
     }
-    val actualHttpMethod     = XFormsSubmissionUtils.getActualHttpMethod(resolvedMethod)
+    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethod)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
@@ -140,8 +145,8 @@ object SubmissionParameters {
 
     val isHandlingClientGetAll =
       containingDocument.isOptimizeGetAllSubmission                                 &&
-        actualHttpMethod == "GET"                                                   &&
-        isReplaceAll                                                                &&
+        actualHttpMethod == HttpMethod.GET                                          &&
+        resolvedReplace == ReplaceType.All                                          &&
         (
           resolvedMediatypeOpt.isEmpty ||
           ! (resolvedMediatypeOpt exists (_.startsWith(ContentTypes.SoapContentType)))
@@ -154,33 +159,29 @@ object SubmissionParameters {
     // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
     // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
     // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
-    // NOTE: Method can be null e.g. in a portlet render request
-    val incomingMethod   = NetUtils.getExternalContext.getRequest.getMethod
+    // NOTE: Method can be `null` e.g. in a portlet render request.
+    val incomingMethod = NetUtils.getExternalContext.getRequest.getMethod
 
     val isNoscript                     = containingDocument.noscript
-    val isAllowDeferredSubmission      = ! isNoscript && incomingMethod != "GET"
-    val isPossibleDeferredSubmission   = isReplaceAll && ! isHandlingClientGetAll && ! containingDocument.isInitializing
+    val isAllowDeferredSubmission      = ! isNoscript && incomingMethod != HttpMethod.GET.entryName
+    val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.isInitializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
-    val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventName
+    val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventNameOrNull
     val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // XXFORMS_SUBMIT
 
     SubmissionParameters(
       refContext                     = refContext,
-      resolvedReplace                = resolvedReplace,
-      isReplaceAll                   = isReplaceAll,
-      isReplaceInstance              = resolvedReplace == XFORMS_SUBMIT_REPLACE_INSTANCE,
-      isReplaceText                  = resolvedReplace == XFORMS_SUBMIT_REPLACE_TEXT,
-      isReplaceNone                  = resolvedReplace == XFORMS_SUBMIT_REPLACE_NONE,
-      resolvedMethod                 = resolvedMethod,
-      actualHttpMethod               = actualHttpMethod,
-      resolvedMediatypeOpt           = resolvedMediatypeOpt,
+      replaceType                    = resolvedReplace,
+      xformsMethod                   = resolvedMethod,
+      httpMethod                     = actualHttpMethod,
+      mediatypeOpt                   = resolvedMediatypeOpt,
       serializationOpt               = serializationOpt,
       serialize                      = serialize,
-      resolvedValidate               = resolvedValidate,
-      resolvedRelevanceHandling      = resolvedRelevanceHandling,
-      resolvedXxfCalculate           = resolvedXxfCalculate,
-      resolvedXxfUploads             = resolvedXxfUploads,
-      resolvedXxfAnnotate            = resolvedXxfAnnotate,
+      validate                       = resolvedValidate,
+      relevanceHandling              = resolvedRelevanceHandling,
+      xxfCalculate                   = resolvedXxfCalculate,
+      xxfUploads                     = resolvedXxfUploads,
+      xxfAnnotate                    = resolvedXxfAnnotate,
       isHandlingClientGetAll         = isHandlingClientGetAll,
       isNoscript                     = isNoscript,
       isDeferredSubmission           = isDeferredSubmission,
@@ -188,6 +189,26 @@ object SubmissionParameters {
       isDeferredSubmissionSecondPass = isDeferredSubmissionSecondPass
     )
   }
+
+  def actualHttpMethodFromXFormsMethodName(
+    methodName        : String)(implicit
+    dynamicSubmission : XFormsModelSubmission
+  ): HttpMethod =
+    HttpMethod.withNameInsensitiveOption(methodName) getOrElse {
+      if (methodName.endsWith("-post"))
+        HttpMethod.POST
+      else
+        throw new XFormsSubmissionException(
+          dynamicSubmission,
+          s"Invalid method name: `$methodName`",
+          "getting submission method",
+          new XFormsSubmitErrorEvent(
+            dynamicSubmission,
+            ErrorType.XXFormsMethodError,
+            null
+          )
+        )
+    }
 
   private def createRefContext(dynamicSubmission: XFormsModelSubmission): RefContext = {
 
@@ -217,5 +238,4 @@ object SubmissionParameters {
         )
     )
   }
-
 }

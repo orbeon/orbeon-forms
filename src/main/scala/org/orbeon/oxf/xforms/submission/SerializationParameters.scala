@@ -46,13 +46,13 @@ object SerializationParameters {
 
     // Actual request mediatype: the one specified by @mediatype, or the default mediatype for the serialization otherwise
     def actualRequestMediatype(default: String) =
-      p.resolvedMediatypeOpt getOrElse default
+      p.mediatypeOpt getOrElse default
 
     if (p.serialize) {
       requestedSerialization match {
         case _ if (overriddenSerializedData ne null) && overriddenSerializedData != "" ⇒
           // Form author set data to serialize
-          if (Connection.requiresRequestBody(p.actualHttpMethod)) {
+          if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
               messageBody            = overriddenSerializedData.getBytes("UTF-8"),
               queryString            = null,
@@ -66,7 +66,7 @@ object SerializationParameters {
             )
           }
         case serialization @ "application/x-www-form-urlencoded" ⇒
-          if (Connection.requiresRequestBody(p.actualHttpMethod)) {
+          if (Connection.requiresRequestBody(p.httpMethod)) {
             SerializationParameters(
               messageBody            = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes("UTF-8"),
               queryString            = null,

@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
+import org.orbeon.oxf.xforms.event.events.ErrorType$;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.model.InstanceCaching;
 import org.orbeon.oxf.xforms.model.XFormsInstance;
@@ -48,7 +49,7 @@ public class CacheableSubmission extends BaseSubmission {
                            SecondPassParameters p2, SerializationParameters sp) {
 
         // Match if the submission has replace="instance" and xxf:cache="true"
-        return p.isReplaceInstance() && p2.isCache();
+        return ReplaceType.isReplaceInstance(p.replaceType()) && p2.isCache();
     }
 
     public SubmissionResult connect(final SubmissionParameters p,
@@ -239,7 +240,7 @@ public class CacheableSubmission extends BaseSubmission {
             // xforms-submit-error with an error-type of target-error."
 
             throw new XFormsSubmissionException(submission(), "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(submission(), XFormsSubmitErrorEvent.TARGET_ERROR(), null));
+                    new XFormsSubmitErrorEvent(submission(), ErrorType$.MODULE$.TARGET_ERROR(), null));
         }
 
         updatedInstance = submission().containingDocument().getInstanceForNode(destinationNodeInfo);
@@ -247,7 +248,7 @@ public class CacheableSubmission extends BaseSubmission {
             // Only support replacing the root element of an instance
             // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
             throw new XFormsSubmissionException(submission(), "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(submission(), XFormsSubmitErrorEvent.TARGET_ERROR(), null));
+                    new XFormsSubmitErrorEvent(submission(), ErrorType$.MODULE$.TARGET_ERROR(), null));
         }
 
         if (indentedLogger.isDebugEnabled())

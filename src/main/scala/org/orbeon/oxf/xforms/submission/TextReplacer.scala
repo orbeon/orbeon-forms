@@ -17,7 +17,7 @@ import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
+import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.model.DataModel._
 import org.orbeon.saxon.om.NodeInfo
@@ -61,7 +61,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           "reading response body",
           new XFormsSubmitErrorEvent(
             submission,
-            XFormsSubmitErrorEvent.RESOURCE_ERROR,
+            ErrorType.ResourceError,
             connectionResult
           )
         )
@@ -86,7 +86,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         "processing targetref attribute",
         new XFormsSubmitErrorEvent(
           submission,
-          XFormsSubmitErrorEvent.TARGET_ERROR,
+          ErrorType.TargetError,
           connectionResult
         )
       )

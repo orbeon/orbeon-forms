@@ -104,7 +104,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             return false;
         }
 
-        if (p.isReplaceAll()) {
+        if (ReplaceType.isReplaceAll(p.replaceType())) {
             // replace="all"
             if (! containingDocument().isLocalSubmissionForward()) {
                 if (isDebugEnabled)
@@ -147,7 +147,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // in that case
 
         // Headers
-        final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission(), p.isReplaceAll());
+        final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> customHeaderNameValues =
+                SubmissionUtils.evaluateHeaders(submission(), ReplaceType.isReplaceAll(p.replaceType()));
 
         final String submissionEffectiveId = submission().getEffectiveId();
 
@@ -241,7 +242,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(effectiveResource, isContextRelative);
         final boolean isDefaultContext = requestDispatcher.isDefaultContext();
 
-        final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
+        // 2017-05-11: Checked that only `WebAppExternalContext.getResponse` can return `null`. So we probably don't
+        // need to support `null` response in `openLocalConnection`.
+        final ExternalContext.Response response =
+            containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
 
         return openLocalConnection(
             externalContext.getRequest(),
@@ -256,7 +260,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             customHeaderNameValues,
             new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
-                  if (p.isReplaceAll())
+                  if (ReplaceType.isReplaceAll(p.replaceType()))
                       requestDispatcher.forward(request, response);
                   else
                       requestDispatcher.include(request, response);

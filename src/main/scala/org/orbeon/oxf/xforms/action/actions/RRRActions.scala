@@ -42,7 +42,7 @@ trait XFormsRecalculateFunctions extends RRRFunctions {
 trait XFormsRevalidateFunctions extends RRRFunctions {
   // With recalculate and revalidate unified, make revalidate no longer eager by not setting the flag anymore
   // See https://github.com/orbeon/orbeon-forms/issues/1650
-  def setFlag(model: XFormsModel, applyDefaults: Boolean)     = ()
+  def setFlag(model: XFormsModel, applyDefaults: Boolean) = ()
   def createEvent(model: XFormsModel) = new XFormsRevalidateEvent(model)
 }
 

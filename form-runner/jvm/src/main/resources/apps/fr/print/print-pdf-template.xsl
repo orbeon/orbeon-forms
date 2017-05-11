@@ -73,7 +73,12 @@
                 <substitution-font font-family="{.}" embed="true"/>
             </xsl:for-each>
 
-            <xsl:for-each select="//*[@id = 'fr-view-component']//*[p:classes(.) = ($control-classes, 'xbl-component') and not(p:classes(.) = $is-not-a-control-classes)]">
+            <xsl:for-each
+                select="
+                    //*[@id = 'fr-view-component']//*[
+                            p:classes(.) = ($control-classes, 'xbl-component') and
+                        not(p:classes(.) = $is-not-a-control-classes)
+                    ]">
 
                 <xsl:variable name="control" select="."/>
 

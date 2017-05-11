@@ -151,7 +151,7 @@
                         </xsl:if>
 
                         <!-- Selection controls: also produce export values -->
-                        <xsl:if test="$classes = ('xforms-select', 'xforms-select1')">
+                        <xsl:if test="$classes = ('xforms-select', 'xforms-select1') or $component-name = 'fr-yesno-input'">
                             <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
                             <xsl:if test="$expression">
                                 <xsl:for-each select="$control/saxon:evaluate(string($expression))">

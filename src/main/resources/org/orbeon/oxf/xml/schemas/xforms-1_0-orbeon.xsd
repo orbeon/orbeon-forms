@@ -138,27 +138,8 @@
             <xsd:attribute name="serialization" type="xsd:string" use="optional"/>
             <xsd:attribute name="target" type="xsd:string" use="optional"/>
             <xsd:attribute name="targetref" type="xsd:string" use="optional"/>
-            <xsd:attribute name="relevant" use="optional">
-                <xsd:simpleType>
-                    <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="false"/>
-                        <xsd:enumeration value="true"/>
-                        <!-- Orbeon extension -->
-                        <xsd:enumeration value="keep"/>
-                        <xsd:enumeration value="prune"/>
-                        <xsd:enumeration value="blank"/>
-                    </xsd:restriction>
-                </xsd:simpleType>
-            </xsd:attribute>
-            <xsd:attribute name="nonrelevant" use="optional">
-                <xsd:simpleType>
-                    <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="keep"/>
-                        <xsd:enumeration value="remove"/>
-                        <xsd:enumeration value="empty"/>
-                    </xsd:restriction>
-                </xsd:simpleType>
-            </xsd:attribute>
+            <xsd:attribute name="relevant"    type="xsd:string" use="optional"/>
+            <xsd:attribute name="nonrelevant" type="xsd:string" use="optional"/>
             <xsd:attribute name="validate" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="mode" use="optional">
                 <xsd:simpleType>

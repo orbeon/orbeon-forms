@@ -418,24 +418,23 @@ trait FormRunnerActions {
 
   private def tryChangeMode(
     replace      : String,
-    targetOpt  : Option[String] = None,
+    targetOpt    : Option[String] = None,
     showProgress : Boolean        = true)(
     path         : String
   ): Try[Any] =
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(                Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
-          Some(                Some("method")              → "post"),
-          Some(                Some("nonrelevant")         → "keep"),
-          Some(                Some("replace")             → replace),
-          Some(                Some(ShowProgressName)      → showProgress.toString),
-          Some(                Some(TargetName)            → showProgress.toString),
-          Some(                Some("content")             → "xml"),
-          Some(                Some(DataFormatVersionName) → "edge"),
-          Some(                Some(PruneMetadataName)     → "false"),
-          Some(                Some("parameters")          → s"form-version $DataFormatVersionName"),
-          targetOpt.map(target ⇒ Some(TargetName)          → target)
+          Some(                  Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
+          Some(                  Some("method")              → "post"),
+          Some(                  Some("nonrelevant")         → "keep"),
+          Some(                  Some("replace")             → replace),
+          Some(                  Some(ShowProgressName)      → showProgress.toString),
+          Some(                  Some("content")             → "xml"),
+          Some(                  Some(DataFormatVersionName) → "edge"),
+          Some(                  Some(PruneMetadataName)     → "false"),
+          Some(                  Some("parameters")          → s"form-version $DataFormatVersionName"),
+          targetOpt.map(target ⇒ Some(TargetName)            → target)
         )
       params.flatten.toMap
     } flatMap

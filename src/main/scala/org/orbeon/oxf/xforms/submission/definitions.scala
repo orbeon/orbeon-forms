@@ -14,6 +14,9 @@
 package org.orbeon.oxf.xforms.submission
 
 import enumeratum._
+import org.orbeon.oxf.util.XPathCache.XPathContext
+import org.orbeon.oxf.xforms.model.XFormsInstance
+import org.orbeon.saxon.om.{Item, NodeInfo}
 
 sealed abstract class ReplaceType extends EnumEntry
 
@@ -32,3 +35,21 @@ object ReplaceType extends Enum[ReplaceType] {
   def isReplaceText    (replaceType: ReplaceType) = replaceType == Text
   def isReplaceNone    (replaceType: ReplaceType) = replaceType == None
 }
+
+sealed abstract class RelevanceHandling extends EnumEntry
+
+object RelevanceHandling extends Enum[RelevanceHandling] {
+
+  val values = findValues
+
+  case object Keep   extends RelevanceHandling
+  case object Remove extends RelevanceHandling
+  case object Empty  extends RelevanceHandling
+}
+
+case class RefContext(
+  refNodeInfo                  : NodeInfo,
+  refInstanceOpt               : Option[XFormsInstance],
+  submissionElementContextItem : Item,
+  xpathContext                 : XPathContext
+)

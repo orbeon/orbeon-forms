@@ -36,17 +36,6 @@ import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-sealed abstract class RelevanceHandling extends EnumEntry
-
-object RelevanceHandling extends Enum[RelevanceHandling] {
-
-  val values = findValues
-
-  case object Keep   extends RelevanceHandling
-  case object Remove extends RelevanceHandling
-  case object Empty  extends RelevanceHandling
-}
-
 abstract class XFormsModelSubmissionBase
   extends ListenersTrait
      with XFormsEventTarget

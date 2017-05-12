@@ -21,19 +21,11 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
-import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
-
-case class RefContext(
-  refNodeInfo                  : NodeInfo,
-  refInstanceOpt               : Option[XFormsInstance],
-  submissionElementContextItem : Item,
-  xpathContext                 : XPathContext
-)
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {

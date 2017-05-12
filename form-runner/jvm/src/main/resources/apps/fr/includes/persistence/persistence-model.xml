@@ -84,7 +84,10 @@
             <xf:setvalue if="$is-new-id" ref="$document-element" value="secure:randomHexId()"/>
 
             <!-- Case of 'new' mode where we load the initial data via a service -->
-            <xf:var name="new-from-service" value="$mode = ('new', 'test') and xxf:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
+            <xf:var
+                name="new-from-service"
+                value="$mode = ('new', 'test') and xxf:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
+
             <xf:action if="$new-from-service">
                 <xf:message level="xxf:log-debug">Loading new data from service</xf:message>
                 <xf:send submission="fr-get-instance-from-service"/>

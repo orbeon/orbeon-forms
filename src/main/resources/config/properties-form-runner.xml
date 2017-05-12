@@ -281,10 +281,10 @@
         then success-message("email-success")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.pdf.*.*">
-        open-pdf(format = "pdf")
+        open-rendered-format(format = "pdf")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.tiff.*.*">
-        open-pdf(format = "tiff")
+        open-rendered-format(format = "tiff")
     </property>
 
     <!-- Legacy buttons and processes -->

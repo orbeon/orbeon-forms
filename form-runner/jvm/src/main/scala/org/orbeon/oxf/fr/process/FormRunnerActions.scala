@@ -51,7 +51,7 @@ trait FormRunnerActions {
     "navigate"               → tryNavigate,
     "review"                 → tryNavigateToReview,
     "edit"                   → tryNavigateToEdit,
-    "open-pdf"               → tryOpenPDF,
+    "open-rendered-format"   → tryOpenRenderedFormat,
     "toggle-noscript"        → tryToggleNoscript,
     "visit-all"              → tryVisitAll,
     "unvisit-all"            → tryUnvisitAll,
@@ -476,7 +476,7 @@ trait FormRunnerActions {
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
-  def tryOpenPDF(params: ActionParams): Try[Any] =
+  def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
     Try {
       val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
 

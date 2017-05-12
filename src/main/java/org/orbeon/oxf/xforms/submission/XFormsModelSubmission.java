@@ -52,8 +52,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
     public final org.orbeon.oxf.xforms.analysis.model.Submission staticSubmission;
-    private final String id;
-    private final Element submissionElement;
 
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
@@ -68,9 +66,6 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     public XFormsModelSubmission(XBLContainer container, org.orbeon.oxf.xforms.analysis.model.Submission staticSubmission, XFormsModel model) {
         this.staticSubmission = staticSubmission;
-
-        this.id = staticSubmission.staticId();
-        this.submissionElement = staticSubmission.element();
 
         this.container = container;
         this.containingDocument = container.getContainingDocument();
@@ -91,7 +86,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     }
 
     public Element getSubmissionElement() {
-        return submissionElement;
+        return staticSubmission.element();
     }
 
     public boolean isShowProgress() {
@@ -112,7 +107,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     }
 
     public String getId() {
-        return id;
+        return staticSubmission.staticId();
     }
 
     public String getPrefixedId() {
@@ -132,7 +127,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     }
 
     public LocationData getLocationData() {
-        return (LocationData) submissionElement.getData();
+        return staticSubmission.locationData();
     }
 
     public XFormsEventObserver parentEventObserver() {
@@ -563,14 +558,14 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
                 // Currently we don't know how to handle a redirect for replace != "all"
                 if (! ReplaceType.isReplaceAll(p.replaceType()))
-                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", redirect code received with replace=\"" + p.replaceType() + "\"", "processing submission response",
+                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + getId() + ", redirect code received with replace=\"" + p.replaceType() + "\"", "processing submission response",
                             new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult));
 
                 replacer = new RedirectReplacer(this, containingDocument);
 
             } else {
                 // Error code received
-                throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
+                throw new XFormsSubmissionException(this, "xf:submission for submission id: " + getId() + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
                         new XFormsSubmitErrorEvent(this, ErrorType$.MODULE$.RESOURCE_ERROR(), connectionResult));
             }
 

@@ -17,7 +17,7 @@ import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.http.HttpStatusCodeException
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -59,7 +59,7 @@ object Permissions {
     }
 
     val authorized = Operations.allows(authorizedOperations, requiredOperation)
-    if (!authorized) throw HttpStatusCodeException(403)
+    if (!authorized) throw HttpStatusCodeException(StatusCode.Forbidden)
     def httpResponse = NetUtils.getExternalContext.getResponse
     httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
   }

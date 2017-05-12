@@ -17,7 +17,7 @@ import java.sql.Connection
 
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http.HttpStatusCodeException
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 
@@ -80,7 +80,7 @@ trait Common extends RequestResponse with FormRunnerPersistence {
       case Next               ⇒ latest.map(_ + 1).getOrElse(1)
       case Specific(v)        ⇒ v
       case ForDocument(docId) ⇒ formVersion(connection, req.app, req.form, Some(docId))
-        .getOrElse(throw HttpStatusCodeException(404))
+        .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
   }
 

@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{ForDocument, Specific, _}
-import org.orbeon.oxf.http.HttpStatusCodeException
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
@@ -308,7 +308,7 @@ trait CreateUpdateDelete
           req.version.isInstanceOf[ForDocument] ||
           // Delete: no version can be specified
           req.forData && delete && ! (req.version == Unspecified)
-        if (badVersion) throw HttpStatusCodeException(400)
+        if (badVersion) throw HttpStatusCodeException(StatusCode.BadRequest)
       }
 
       def checkAuthorized(existing: Option[Row]): Unit = {
@@ -343,7 +343,7 @@ trait CreateUpdateDelete
             // Operations on deployed forms are always authorized
             true
           }
-        if (! authorized) throw HttpStatusCodeException(403)
+        if (! authorized) throw HttpStatusCodeException(StatusCode.Forbidden)
       }
 
       def checkVersionWithExisting(existing: Option[Row]): Unit = {
@@ -372,13 +372,13 @@ trait CreateUpdateDelete
           (req.forData && isCreate && ! isSpecificVersion)
 
         if (badVersion)
-          throw HttpStatusCodeException(400)
+          throw HttpStatusCodeException(StatusCode.BadRequest)
       }
 
       def checkDocExistsForDelete(existing: Option[Row]): Unit = {
         // We can't delete a document that doesn't exist
         val nothingToDelete = delete && existing.isEmpty
-        if (nothingToDelete) throw HttpStatusCodeException(404)
+        if (nothingToDelete) throw HttpStatusCodeException(StatusCode.NotFound)
       }
 
       // Checks

@@ -22,7 +22,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.{FormRunnerPersistence, permission}
-import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
+import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
@@ -46,7 +46,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         }))  ||
         // For form definition, everything is valid except Next
         (req.forForm && req.version == Next)
-      if (badVersion) throw HttpStatusCodeException(400)
+      if (badVersion) throw HttpStatusCodeException(StatusCode.BadRequest)
 
       val sql = {
         val table  = tableName(req)
@@ -87,14 +87,14 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             // users that the data exists or existed
             val deleted = resultSet.getString("deleted") == "Y"
             if (deleted)
-              throw HttpStatusCodeException(410)
+              throw HttpStatusCodeException(StatusCode.Gone)
 
             // Check version if specified
             val dbFormVersion = resultSet.getInt("form_version")
             req.version match {
               case Specific(reqFormVersion) ⇒
                 if (dbFormVersion != reqFormVersion)
-                  throw HttpStatusCodeException(400)
+                  throw HttpStatusCodeException(StatusCode.BadRequest)
               case _ ⇒ // NOP; we're all good
             }
 
@@ -111,7 +111,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 dataUser
               )
               if (! Operations.allows(authorizedOperations, permission.Read))
-                throw HttpStatusCodeException(403)
+                throw HttpStatusCodeException(StatusCode.Forbidden)
               httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
             }
 
@@ -145,7 +145,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             }
 
           } else {
-            throw HttpStatusCodeException(404)
+            throw HttpStatusCodeException(StatusCode.NotFound)
           }
         }
       }

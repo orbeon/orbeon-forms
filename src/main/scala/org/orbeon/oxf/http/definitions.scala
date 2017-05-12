@@ -201,7 +201,9 @@ object StatusCode {
   val Ok                    = 200
   val NotModified           = 304
   val Forbidden             = 403
+  val BadRequest            = 400
   val NotFound              = 404
+  val Gone                  = 410
   val RequestEntityTooLarge = 413
   val InternalServerError   = 500
   val ServiceUnavailable    = 503

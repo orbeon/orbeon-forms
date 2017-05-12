@@ -153,7 +153,7 @@ private object FormRunnerPersistenceProxy {
       // We can remove this once we are able to perform conversions here, see:
       // https://github.com/orbeon/orbeon-forms/issues/3110
       if (! Set(RawDataFormatVersion, providerVersion)(incomingVersion))
-        throw HttpStatusCodeException(400)
+        throw HttpStatusCodeException(StatusCode.BadRequest)
     }
 
   def parsePruneAndSerializeXmlData(is: InputStream, os: OutputStream): Unit = {

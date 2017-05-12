@@ -21,7 +21,7 @@ import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.http.{HttpRedirectException, HttpStatusCodeException}
+import org.orbeon.oxf.http.{HttpRedirectException, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor._
@@ -139,7 +139,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         case None ⇒
           // We don't have a not found route so try the error route instead
           // Don't log because we already logged above
-          runErrorRoute(t getOrElse HttpStatusCodeException(404), log = false)
+          runErrorRoute(t getOrElse HttpStatusCodeException(StatusCode.NotFound), log = false)
       }
     }
 
@@ -593,7 +593,7 @@ object PageFlowControllerProcessor {
         unauthorized()
   }
 
-  def unauthorized() = throw HttpStatusCodeException(403)
+  def unauthorized() = throw HttpStatusCodeException(StatusCode.Forbidden)
 
   case class PageFlow(
     routes            : Seq[Route],

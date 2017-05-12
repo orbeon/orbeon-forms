@@ -18,7 +18,7 @@ import java.lang.{Long ⇒ JLong}
 
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.Defaults
-import org.orbeon.oxf.http.{HttpStatusCodeException, StreamedContent, Headers ⇒ HttpHeaders}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode, StreamedContent, Headers ⇒ HttpHeaders}
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.xml.XMLParsing
 
@@ -166,7 +166,7 @@ object ConnectionResult {
             cxr.close() // this eventually calls InputStream.close()
           result
         case ConnectionResult(_, statusCode, _, _, _, _) ⇒
-          throw HttpStatusCodeException(if (statusCode != 200) statusCode else 500)
+          throw HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError)
       }
     } catch {
       case NonFatal(t) ⇒

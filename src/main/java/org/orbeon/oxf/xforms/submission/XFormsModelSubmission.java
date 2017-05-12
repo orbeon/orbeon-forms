@@ -60,7 +60,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     private final XFormsModel model;
 
-    private String resolvedXXFormsTarget;
+    private String  resolvedXXFormsTarget;
+    private boolean resolvedXXFormsShowProgress;
 
     // All the submission types in the order they must be checked
     private final Submission[] submissions;
@@ -94,7 +95,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     }
 
     public boolean isShowProgress() {
-        return staticSubmission.xxfShowProgress();
+        return resolvedXXFormsShowProgress;
     }
 
     public boolean isURLNorewrite() {
@@ -239,7 +240,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         );
                     }
 
-                    // Resolve the target AVT because XFormsServer requires it for deferred submission
+                    // Resolve the target and show-progress AVTs because XFormsServer requires them for deferred submission
                     resolvedXXFormsTarget =
                         XFormsUtils.resolveAttributeValueTemplates(
                             containingDocument,
@@ -247,8 +248,19 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                             p.refContext().refNodeInfo(),
                             staticSubmission.avtXxfTargetOpt() == null ? null : staticSubmission.avtXxfTargetOpt().get()
                         );
+                    resolvedXXFormsShowProgress =
+                        !"false".equals(
+                            XFormsUtils.resolveAttributeValueTemplates(
+                                containingDocument,
+                                p.refContext().xpathContext(),
+                                p.refContext().refNodeInfo(),
+                                staticSubmission.avtXxfTargetOpt() == null ? null : staticSubmission.avtXxfShowProgressOpt().get()
+
+                            )
+                        );
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
+
                     containingDocument.setActiveSubmissionFirstPass(this);
                     return;
                 }

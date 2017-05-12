@@ -22,28 +22,18 @@
          xmlns:f="http://orbeon.org/oxf/xml/formatting"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <xbl:script type="text/javascript" src="/xbl/orbeon/href-button/href-button.js"/>
-
     <xbl:binding id="fr-href-button" element="fr|href-button" xxbl:mode="binding" xxbl:container="span">
         <xbl:template xxbl:transform="oxf:xslt">
             <xf:group xsl:version="2.0">
-                <!-- Create the link so that the URL gets rewritten -->
-                <xh:a class="fr-href-button-anchor xforms-hidden" target="_blank"
-                         xbl:attr="href" f:url-type="resource" xxbl:scope="outer"/>
 
-                <!-- In script mode, intercept client-side click and open window directly -->
-                <xf:action
-                    type="javascript"
-                    ev:event="xforms-enabled xxforms-iteration-moved"
-                    ev:target="#observer">YAHOO.xbl.fr.HrefButton.instance(this);</xf:action>
-
-                <!-- Only load directly in noscript mode -->
-                <xf:load
-                    ev:event="DOMActivate"
-                    if="property('xxf:noscript')"
-                    xbl:attr="resource=href"
-                    xxf:show-progress="false"
-                    f:url-type="resource"/>
+                <xf:action ev:event="DOMActivate">
+                    <xf:load
+                        xbl:attr="resource=href"
+                        xxbl:scope="outer"
+                        xxf:show-progress="false"
+                        xxf:target="_blank"
+                        f:url-type="resource"/>
+                </xf:action>
 
                 <!-- Trigger and its content -->
                 <xf:trigger xbl:attr="appearance">

@@ -85,9 +85,8 @@ class Submission(
   val timeToLive                 = Instance.timeToLiveOrDefault(element)
 
   val avtXxfTargetOpt            = element.attributeValueOpt(XXFORMS_TARGET_QNAME)
+  val avtXxfShowProgressOpt      = element.attributeValueOpt(XXFORMS_SHOW_PROGRESS_QNAME)
   val avtXxfHandleXInclude       = element.attributeValueOpt(XXFORMS_XINCLUDE)
-
-  val xxfShowProgress            = ! (element.attributeValueOpt(XXFORMS_SHOW_PROGRESS_QNAME) contains "false")
 
   val urlNorewrite               = XFormsUtils.resolveUrlNorewrite(element)
   val urlTypeOrNull              = element.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME)

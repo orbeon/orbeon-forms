@@ -111,11 +111,6 @@
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(email)(/([^/^.]+))?"
              view="email/email-form.xpl"/>
 
-    <!-- Create PDF directly from an XForms engine live document -->
-    <page path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf|tiff)/([^/^.]+)/([0-9A-Za-z\-]+)(?:/[^/]+)?\.(?:pdf|tiff)"
-          view="print/pdf-instant-view.xpl">
-    </page>
-
     <!-- Create PDF from a stored document and return the URL of the PDF as <url>/xforms-server/...</url> -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf|tiff)(/([^/^.]+))?"
              view="print/print-form.xpl"/>

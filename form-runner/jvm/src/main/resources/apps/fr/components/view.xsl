@@ -785,8 +785,6 @@
                         <xf:var name="position"    value="position()"/>
                         <xf:var name="button-name" value="."/>
                         <xf:var name="ref"         value="$names-and-refs-if-relevant[$position * 2]"/>
-
-                        <xf:var name="pdf-or-tiff" value="$button-name = ('pdf', 'tiff')"/>
                         <xf:var name="primary"     value="$highlight-primary and position() = last()"/>
 
                         <xf:var
@@ -809,34 +807,8 @@
                              Bootstrap rules apply. -->
                         <fr:process-button
                             name="{{$button-name}}"
-                            ref="$ref[not($pdf-or-tiff)]"
+                            ref="$ref"
                             class="{{$class}}"/>
-                        <fr:href-button
-                            model="fr-persistence-model"
-                            ref="$ref[$pdf-or-tiff]"
-                            class="{{$class}}"
-                            href=
-                                "/fr/service/{
-                                    $app
-                                }/{
-                                    $form
-                                }/{{
-                                    $button-name
-                                }}/{{
-                                    string-join(
-                                        (
-                                            fr:document-id(),
-                                            xxf:document-id(),
-                                            frf:filenameOrNull($button-name)[. != '']
-                                        ),
-                                        '/'
-                                    )
-                                }}.{{
-                                    $button-name
-                                }}">
-                            <xf:label mediatype="text/html" model="fr-form-model" value="$fr-resources/buttons/*[name() = $button-name]"/>
-                        </fr:href-button>
-
                     </xf:repeat>
 
                 </xf:group>

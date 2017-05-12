@@ -426,7 +426,7 @@
                         'false'
             }}"
             xxf:noscript-support="{$is-noscript-support}"
-            xxf:external-events="{@xxf:external-events} fr-open-pdf"
+            xxf:external-events="{@xxf:external-events}"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xforms11-switch="false"
             xxf:xpath-analysis="true"
@@ -579,22 +579,6 @@
                 </xf:dispatch>
             </xf:action>
 
-        </xf:model>
-
-        <xf:model id="fr-pdf-model">
-            <!-- Open PDF for the current form data (dispatch of the event done from pdf-instant-view.xpl) -->
-            <xf:action event="fr-open-pdf" type="xpath">
-                xxf:instance('fr-form-instance')/fr:run-process(
-                    'oxf.fr.detail.process',
-                    concat(
-                        'open-pdf(lang = "',
-                        event('fr-language')[not(contains(., '"'))],
-                        '", format = "',
-                        event('fr-format')[not(contains(., '"'))],
-                        '")'
-                    )
-                )
-            </xf:action>
         </xf:model>
 
         <!-- Common actions implementation -->

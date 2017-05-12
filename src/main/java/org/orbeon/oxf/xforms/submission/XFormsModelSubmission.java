@@ -61,7 +61,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     private final XFormsModel model;
 
     private String  resolvedXXFormsTarget;
-    private boolean resolvedXXFormsShowProgress;
+    private boolean resolvedXXFormsShowProgress = true;
 
     // All the submission types in the order they must be checked
     private final Submission[] submissions;
@@ -246,7 +246,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                             containingDocument,
                             p.refContext().xpathContext(),
                             p.refContext().refNodeInfo(),
-                            staticSubmission.avtXxfTargetOpt() == null ? null : staticSubmission.avtXxfTargetOpt().get()
+                            staticSubmission.avtXxfTargetOpt().isDefined() ?
+                            staticSubmission.avtXxfTargetOpt().get() :
+                            null
                         );
                     resolvedXXFormsShowProgress =
                         !"false".equals(
@@ -254,8 +256,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                                 containingDocument,
                                 p.refContext().xpathContext(),
                                 p.refContext().refNodeInfo(),
-                                staticSubmission.avtXxfTargetOpt() == null ? null : staticSubmission.avtXxfShowProgressOpt().get()
-
+                                staticSubmission.avtXxfShowProgressOpt().isDefined() ?
+                                staticSubmission.avtXxfShowProgressOpt().get() :
+                                null
                             )
                         );
 

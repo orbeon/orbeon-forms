@@ -236,7 +236,7 @@ trait FormRunnerActions {
   // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
     "method"              → "post",
-    "nonrelevant"         → RelevanceHandling.Remove.entryName.toLowerCase,
+    NonRelevantName       → RelevanceHandling.Remove.entryName.toLowerCase,
     "annotate"            → "",
     "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
     "content"             → "xml",

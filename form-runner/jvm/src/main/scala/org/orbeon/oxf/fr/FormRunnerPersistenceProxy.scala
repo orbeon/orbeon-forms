@@ -26,8 +26,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod._
-import org.orbeon.oxf.http._
+import org.orbeon.oxf.http.{HttpMethod, _}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -44,18 +43,6 @@ import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
 
-private object FormRunnerPersistenceProxy {
-  val FormPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
-  val DataPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
-  val DataCollectionPath         = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
-  val SearchPath                 = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
-  val PublishedFormsMetadataPath = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
-  val ReindexPath                =   "/fr/service/persistence/reindex"
-
-  val RawDataFormatVersion = "raw"
-
-  val AllowedDataFormatVersionParams = AllowedDataFormatVersions + RawDataFormatVersion
-}
 
 /**
  * The persistence proxy processor:
@@ -68,13 +55,29 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
   import FormRunnerPersistenceProxy._
 
-  private val FRRelevantQName = QName.get("relevant", XMLNames.FRNamespace)
-
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
     val ec = NetUtils.getExternalContext
     proxyRequest(ec.getRequest, ec.getResponse)
   }
+}
+
+private object FormRunnerPersistenceProxy {
+
+  val FormPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
+  val DataPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
+  val DataCollectionPath             = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
+  val SearchPath                     = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
+  val PublishedFormsMetadataPath     = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
+  val ReindexPath                    =   "/fr/service/persistence/reindex"
+
+  val RawDataFormatVersion           = "raw"
+  val AllowedDataFormatVersionParams = AllowedDataFormatVersions + RawDataFormatVersion
+
+  val FRRelevantQName                = QName.get("relevant", XMLNames.FRNamespace)
+
+  val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST)
+  val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
   // Proxy the request to the appropriate persistence implementation
   def proxyRequest(request: Request, response: Response): Unit = {
@@ -90,40 +93,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     }
   }
 
-  private def checkDataFormatVersions(
-    request    : Request,
-    app        : String,
-    form       : String,
-    formOrData : FormOrData
-  ): Unit =
-    if (formOrData == FormOrData.Data && Set[HttpMethod](GET, PUT)(HttpMethod.withNameInsensitive(request.getMethod))) {
-
-      val incomingVersion =
-        request.getFirstParamAsString(DataFormatVersionName) getOrElse
-          DefaultDataFormatVersion
-
-      val providerVersion =
-        providerDataFormatVersion(app, form)
-
-      require(
-        AllowedDataFormatVersionParams(incomingVersion),
-        s"`$FormRunnerPersistence.DataFormatVersionName` parameter must be one of ${AllowedDataFormatVersionParams mkString ", "}"
-      )
-
-      // We can remove this once we are able to perform conversions here, see:
-      // https://github.com/orbeon/orbeon-forms/issues/3110
-      if (! Set(RawDataFormatVersion, providerVersion)(incomingVersion))
-        throw HttpStatusCodeException(400)
-    }
-
-  def handleRelevantOpt(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
-    if (formOrData == FormOrData.Data && HttpMethod.withNameInsensitive(request.getMethod) == GET)
-      request.getFirstParamAsString("relevant") flatMap RelevanceHandling.withNameLowercaseOnlyOption
-    else
-      None
-
   // Proxy the request depending on app/form name and whether we are accessing form or data
-  private def proxyRequest(
+  def proxyRequest(
     request    : Request,
     response   : Response,
     app        : String,
@@ -149,9 +120,9 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     )
 
     val transform =
-      handleRelevantOpt(request, formOrData) match {
+      findRequestedRelevanceHandling(request, formOrData) match {
         case Some(r @ Keep)  ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
-        case Some(Remove)     ⇒ Some(parsePruneAndSerializeXmlData _)
+        case Some(Remove)    ⇒ Some(parsePruneAndSerializeXmlData _)
         case Some(r @ Empty) ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
         case None            ⇒ None
       }
@@ -159,7 +130,33 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     proxyRequest(request, serviceURI, headers, response, transform)
   }
 
-  private def parsePruneAndSerializeXmlData(is: InputStream, os: OutputStream) = {
+  def checkDataFormatVersions(
+    request    : Request,
+    app        : String,
+    form       : String,
+    formOrData : FormOrData
+  ): Unit =
+    if (formOrData == FormOrData.Data && GetOrPutMethods(HttpMethod.withNameInsensitive(request.getMethod))) {
+
+      val incomingVersion =
+        request.getFirstParamAsString(DataFormatVersionName) getOrElse
+          DefaultDataFormatVersion
+
+      val providerVersion =
+        providerDataFormatVersion(app, form)
+
+      require(
+        AllowedDataFormatVersionParams(incomingVersion),
+        s"`$FormRunnerPersistence.DataFormatVersionName` parameter must be one of ${AllowedDataFormatVersionParams mkString ", "}"
+      )
+
+      // We can remove this once we are able to perform conversions here, see:
+      // https://github.com/orbeon/orbeon-forms/issues/3110
+      if (! Set(RawDataFormatVersion, providerVersion)(incomingVersion))
+        throw HttpStatusCodeException(400)
+    }
+
+  def parsePruneAndSerializeXmlData(is: InputStream, os: OutputStream): Unit = {
 
     val receiver = TransformerUtils.getIdentityTransformerHandler
     receiver.setResult(new StreamResult(os))
@@ -181,7 +178,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     }
   }
 
-  private def proxyRequest(
+  def proxyRequest(
     request    : Request,
     serviceURI : String,
     headers    : Map[String, String],
@@ -201,7 +198,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       )
     }
 
-  private def proxyEstablishConnection(
+  def proxyEstablishConnection(
     request : Request,
     uri     : String,
     headers : Map[String, String]
@@ -232,7 +229,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
     val method = HttpMethod.withNameInsensitive(request.getMethod)
 
-    if (! Set[HttpMethod](GET, DELETE, PUT, POST)(method))
+    if (! SupportedMethods(method))
       throw new OXFException(s"Unsupported method: $method")
 
     val requestContent =
@@ -269,7 +266,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
    * Proxies the request to every configured persistence layer to get the list of the forms, and aggregates the
    * results. So the response is not simply proxied, unlike for other persistence layer calls.
    */
-  private def proxyPublishedFormsMetadata(
+  def proxyPublishedFormsMetadata(
     request  : Request,
     response : Response,
     app      : Option[String],
@@ -316,7 +313,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
   }
 
-  private def proxyReindex(
+  def proxyReindex(
     request  : Request,
     response : Response
   ): Unit = {
@@ -336,7 +333,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
   }
 
   // Get all providers that can be used either for form data or for form definitions
-  private def getProviders(usableFor: FormOrData): List[String] = {
+  def getProviders(usableFor: FormOrData): List[String] = {
     val propertySet = Properties.instance.getPropertySet
     propertySet.propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
       .filter (propName ⇒ propName.endsWith(".*") ||
@@ -345,4 +342,10 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
       .distinct
       .filter(FormRunner.isActiveProvider)
   }
+
+  def findRequestedRelevanceHandling(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
+    if (formOrData == FormOrData.Data && HttpMethod.withNameInsensitive(request.getMethod) == HttpMethod.GET)
+      request.getFirstParamAsString(NonRelevantName) flatMap RelevanceHandling.withNameLowercaseOnlyOption
+    else
+      None
 }

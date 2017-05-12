@@ -60,6 +60,7 @@ object FormRunnerPersistence {
   val PruneMetadataName                          = "prune-metadata"
   val ShowProgressName                           = "show-progress"
   val TargetName                                 = "target"
+  val NonRelevantName                            = "nonrelevant"
 
   val DefaultDataFormatVersion                   = DataFormatVersion400
   val FormRunnerCurrentInternalDataFormatVersion = DataFormatVersion480

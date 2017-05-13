@@ -86,6 +86,7 @@
                     <xsl:attribute name="ref"         select="'$binding'"/>
                     <xsl:attribute name="incremental" select="'true'"/>
                     <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'character-counter']"/>
+                    <xsl:copy-of select="/*/@mediatype"/>
                 </xsl:element>
 
                 <!-- Will appear below field for IE < 11 -->

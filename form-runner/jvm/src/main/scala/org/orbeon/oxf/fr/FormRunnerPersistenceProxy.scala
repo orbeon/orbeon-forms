@@ -120,7 +120,7 @@ private object FormRunnerPersistenceProxy {
     )
 
     val transform =
-      findRequestedRelevanceHandling(request, formOrData) match {
+      findRequestedRelevanceHandlingForGet(request, formOrData) match {
         case Some(r @ Keep)  ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
         case Some(Remove)    ⇒ Some(parsePruneAndSerializeXmlData _)
         case Some(r @ Empty) ⇒ throw new UnsupportedOperationException(s"${r.entryName}")
@@ -343,7 +343,7 @@ private object FormRunnerPersistenceProxy {
       .filter(FormRunner.isActiveProvider)
   }
 
-  def findRequestedRelevanceHandling(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
+  def findRequestedRelevanceHandlingForGet(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
     if (formOrData == FormOrData.Data && HttpMethod.withNameInsensitive(request.getMethod) == HttpMethod.GET)
       request.getFirstParamAsString(NonRelevantName) flatMap RelevanceHandling.withNameLowercaseOnlyOption
     else

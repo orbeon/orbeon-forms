@@ -992,7 +992,10 @@
     <xsd:element name="switch">
         <xsd:complexType>
             <xsd:sequence maxOccurs="unbounded">
-                <xsd:element ref="xforms:case"/>
+                <xsd:choice>
+                    <xsd:element ref="xforms:case"/>
+                    <xsd:group ref="xforms:Action"/>
+                </xsd:choice>
             </xsd:sequence>
             <xsd:attribute name="caseref" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
@@ -1007,6 +1010,7 @@
                 <xsd:element ref="xforms:label" minOccurs="0"/>
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:choice>
+                        <xsd:group ref="xforms:Action"/>
                         <xsd:group ref="xforms:Form.Controls"/>
                         <xsd:element ref="xforms:group"/>
                         <xsd:element ref="xforms:switch"/>

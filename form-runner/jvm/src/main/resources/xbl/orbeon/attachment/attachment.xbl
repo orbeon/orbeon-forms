@@ -77,10 +77,15 @@
             <xf:var
                 name="binding"
                 value="xxf:binding('fr-attachment')"/>
+
             <xf:upload
                 ref="$binding"
-                accept="{xxf:custom-mip($binding, 'upload-mediatypes')}"
-                xbl:attr="accept"
+                accept="{
+                    (
+                        xxf:custom-mip($binding, 'upload-mediatypes'), (: 1st from common constraint :)
+                        xxf:component-param-value('accept')            (: 2nd because there might be a property always defined :)
+                    )[xxf:non-blank()][1]
+                }"
                 xxf:title="{xxf:label('fr-attachment')}">
 
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>

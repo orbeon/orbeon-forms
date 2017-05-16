@@ -72,7 +72,7 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
     def getContentLength     = -1 // this won't be used anyway
   }
 
-  def newRead(session: Session, maxSize: Long) = {
+  def newRead(session: Session, maxSize: Long): (List[(String, AnyRef)], Option[String]) = {
 
     val uploadContext = newTrustedUploadContext(body)
 

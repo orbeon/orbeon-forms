@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import enumeratum._
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod

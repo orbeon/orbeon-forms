@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms
 import org.orbeon.xforms.{$, AjaxServer, XBL, XBLCompanion}
 import org.scalajs.dom.html.Element
@@ -41,8 +42,8 @@ object DndRepeat {
         excludedTargets          : List[Element]
       )
 
-      private var dragState: Option[DragState]     = None
-      private var drake    : Option[Drake] = None
+      private var dragState : Option[DragState]     = None
+      private var drake     : Option[Drake]         = None
 
       override def init(): Unit = {
 
@@ -68,9 +69,8 @@ object DndRepeat {
           )
 
         newDrake.onDrag((el: Element, source: Element) ⇒ {
-          val jEl   = $(el)
 
-          import org.orbeon.oxf.util.StringUtils._
+          val jEl = $(el)
 
           def findElemLevel(el: Element) =
             el.className.splitTo[List]() collectFirst { case FindDndLevelRe(level) ⇒ level.toInt }

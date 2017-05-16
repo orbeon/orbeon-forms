@@ -289,7 +289,7 @@
                 <hint>Applies to all attachment controls in this form</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label>Allowed file types</label>
+                <label>Allowed File Types</label>
                 <hint>For example "image/* application/pdf"</hint>
             </attachment-mediatypes>
             <labels>
@@ -2277,7 +2277,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -3300,7 +3300,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -4323,7 +4323,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -5338,7 +5338,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -6356,7 +6356,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -7372,7 +7372,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -8388,7 +8388,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>
@@ -9410,7 +9410,7 @@
                 <hint todo="true">[Applies to all attachment controls in this form]</hint>
             </attachment-max-size-aggregate>
             <attachment-mediatypes>
-                <label todo="true">[Allowed mediatypes]</label>
+                <label todo="true">[Allowed File Types]</label>
                 <hint todo="true">[For example "image/* application/pdf"]</hint>
             </attachment-mediatypes>
             <labels>

@@ -255,12 +255,15 @@
                                             recurse="true"/>
 
                                         <!-- Un-visit all subsequent sections upon error in current section in `strict` mode -->
+                                        <!-- Use `delay="0"`, so we dispatch all the `fr-wizard-unvisit-following` after all the
+                                             `xforms-invalid`, avoiding a `StackOverflowError` on large forms -->
                                         <xf:dispatch
                                             event="xforms-invalid"
                                             if="xxf:instance('local')/validate/data(.) = 'strict'"
 
                                             name="fr-wizard-unvisit-following"
-                                            targetid="fr-wizard-unvisit-following"/>
+                                            targetid="fr-wizard-unvisit-following"
+                                            delay="0"/>
 
                                         <xf:action event="xforms-select" target="#observer">
                                             <xf:dispatch name="fr-section-scroll" targetid="switch"/>

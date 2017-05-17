@@ -507,10 +507,6 @@ div.orbeon.orbeon-portlet-div {
             }
         }
 
-        // Narrower columns
-        .fr-grid-validations .fr-grid-col-1 { width: 200px }
-        .fr-grid-validations .fr-grid-col-3 { width: 110px }
-
         .fr-grid-help .xforms-textarea textarea { height: @baseLineHeight * 5 + 8px; }
 
         .fb-base-tab-div {
@@ -518,27 +514,6 @@ div.orbeon.orbeon-portlet-div {
             .fb-base-tab-left, .fb-base-tab-right {
                 .flex-flow(column);
                 width: 50%;
-            }
-        }
-
-        .fr-grid-validations {
-
-            td:nth-of-type(5) .fr-grid-content {
-                .flex();
-
-                .xforms-textarea, .xforms-input:not(.xforms-type-boolean) {
-                    .flex-flow(column);
-                    width: 100%;
-                }
-
-                .xforms-input.xforms-type-boolean {
-                    .flex-flow(column);
-                    input {
-                        margin-top: 0;
-                        margin-left: 4px;
-                        padding-top: 0;
-                    }
-                }
             }
         }
     }

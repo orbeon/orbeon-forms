@@ -229,8 +229,6 @@ object Multipart {
               throw t
           }
 
-          println()
-
           lifecycleOpt foreach (_.fileItemState(UploadState.Completed))
           fieldName → fileItem
         } catch {

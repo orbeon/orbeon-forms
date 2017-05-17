@@ -102,7 +102,9 @@
 
                         <xf:var
                             name="view"
-                            value="xxf:is-control-readonly('fr-number') and property('xxf:readonly-appearance') = 'static'"/>
+                            value="
+                                xxf:is-control-readonly('{if ($is-currency) then 'fr-currency' else 'fr-number'}') and
+                                property('xxf:readonly-appearance') = 'static'"/>
 
                         <xf:var
                             name="property-fraction-digits-opt"

@@ -335,7 +335,7 @@
 
         margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
 
-        .fr-grid .fr-grid-tr .fr-grid-content {
+        .fr-grid .fr-grid-tr .fr-grid-td {
 
             // Custom control widths
             .fr-width-2em     input.xforms-input-input, .fr-width-2em select      { width: 2em }
@@ -374,10 +374,16 @@
 
     .xforms-form { // make rule a bit stronger to make sure hints are hidden
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-            .xforms-hint, .xforms-help, .xforms-alert { display: none }
+            .xforms-hint, .xforms-help, .xforms-alert {
+                display: none;
+            }
 
             // For those controls that still have a display: block in view mode, make sure there is no top margin
-            .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
+            .fr-grid-td .xforms-control,
+                .fr-grid-td .fr-component-group {
+                margin-top: 0;
+            }
+
             .fr-repeat-multiple-rows {
                 .fr-grid-master-row { display: none }       // Hide the top header row, as we don't need the space for the *add* icon in view mode
                 border-top: none;                           // Avoid double border at the top

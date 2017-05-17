@@ -74,15 +74,15 @@
                     <xf:label ref="$resources/dialog-help/label"/>
 
                     <xh:div>
-                        <xh:div class="fr-grid">
-                            <xh:div class="fr-grid-content">
-                                <xf:group class="fb-hide-alert">
+                        <fr:grid class="fb-hide-alert">
+                            <xh:tr>
+                                <xh:td>
                                     <xf:textarea ref="$i/help" id="fb-edit-help-dialog-text">
                                         <xf:label ref="$resources/dialog-help/help-message/label"/>
                                     </xf:textarea>
-                                </xf:group>
-                            </xh:div>
-                        </xh:div>
+                                </xh:td>
+                            </xh:tr>
+                        </fr:grid>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
                                 <xf:trigger id="save-trigger" appearance="xxf:primary">

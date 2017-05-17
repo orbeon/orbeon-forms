@@ -162,10 +162,7 @@
                         *:tbody/
                         *:tr[
                             empty(
-                                *:td/
-                                *:div[
-                                    p:has-class('fr-grid-content')
-                                ]/*[
+                                *:td/*[
                                     (p:has-class('xforms-control') or p:has-class('xbl-component')) and
                                     not(p:has-class('xforms-disabled'))
                                 ]

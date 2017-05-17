@@ -52,9 +52,17 @@
             .fr-grid-tr {
                 display: table-row;
 
+                // Don't put padding in the cell content, see https://github.com/orbeon/orbeon-forms/issues/2414
                 &> .fr-grid-td {
                     display: table-cell;
                     vertical-align: top;
+                    padding: 0;
+
+                    // Instead add some space around the control, and if it is non-relevant its margin won't show
+                    &> .xforms-control, &> .xbl-component {
+                        margin: @frGridCellPadding;
+                        display: block;
+                    }
                 }
             }
 
@@ -93,7 +101,7 @@
             // NOTE: This should be extended to repeated grids as well, but they interleave `<tr>`s which makes it harder.
             &:not(.fr-repeat) {
                 .fr-grid-body .fr-grid-tr {
-                    height: 1px;
+                    height: 0;
                 }
                 .fr-grid-body tr:last-of-type {
                     height: auto;
@@ -110,7 +118,7 @@
 
             .xforms-label {
                 margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
-                margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
+                margin-bottom: @frGridCellPadding;          // Insert some space between the label / help and the control (we add spacing below the label rather
                                                             // than above the control to make the CSS more generally applicable to XBL components)
                 overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
                 display: table;                             // Instead of block, so:
@@ -181,23 +189,19 @@
                 .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
                 .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
             }
-
-            // Cell content
-            .fr-grid-content {
-                padding: @frGridCellPadding;                                        // Add some space around control
-            }
         }
 
         .fr-grid.fr-repeat {
 
-            .fr-grid-content {
-                // No top/bottom padding in repeated grid cells
-                padding-top: 0;
-                padding-bottom: 0.1px;                                              // should be 0, but that causes https://github.com/orbeon/orbeon-forms/issues/2690
+            .fr-grid-tr > .fr-grid-td {
+                &> .xforms-control, &> .xbl-component {
+                    padding-top: 0;                                                 // No top/bottom padding in repeated grid cells
+                    padding-bottom: 0.1px;                                          // 0 causes https://github.com/orbeon/orbeon-forms/issues/2690
+                }
             }
 
             &.fr-repeat-single-row {
-                .fr-grid-tr > .fr-grid-td, .fr-grid-tr > .fr-grid-td > .fb-hover {                    // Don't show label, help, hint for controls inside a repeat-table
+                .fr-grid-tr > .fr-grid-td, .fr-grid-tr > .fr-grid-td > .fb-hover {  // Don't show label, help, hint for controls inside a repeat-table
                     &> .fr-grid-content > * {                                       // which repeats over a single row only (they are shown in the
                         &> .xforms-label,                                           // column header). But only do this for the top-level control within
                         &> .xforms-help,                                            // a cell.
@@ -206,14 +210,14 @@
                         }
                     }
                 }
-                .fr-grid-master-row > .fr-grid-th span.xforms-group                         // So the group that contains the control label is sized, to allow
+                .fr-grid-master-row > .fr-grid-th span.xforms-group                 // So the group that contains the control label is sized, to allow
                     { display: block }                                              // the help popover to be correctly positioned
             }
 
             // But if there is a nested table, show those in the label in the column header of that table
             .fr-grid-master-row > .fr-grid-th {
                 .xforms-label { display: block }                                    // Label in repeat table header is block so yellow background in FB takes the whole width
-                .xforms-help { margin-top: 4px }
+                .xforms-help { margin-top: @frGridCellPadding }
             }
 
             .fr-repeat-column-left, .fr-repeat-column-right {
@@ -244,11 +248,11 @@
                 }
 
                 .xforms-label {
-                    margin: 0 4px;
+                    margin: 0 @frGridCellPadding;
                 }
 
                 .xforms-hint {
-                    margin-left: 4px;
+                    margin-left: @frGridCellPadding;
                 }
             }
 
@@ -274,13 +278,17 @@
     // Changes for view mode only
     .fr-mode-view {
 
-        .fr-grid-content {
-            margin-bottom: 1em;
+        .fr-grid .fr-grid-tr > .fr-grid-td {
+            &> .xforms-control, &> .xbl-component {
+                margin-bottom: 3 * @frGridCellPadding;
+            }
         }
 
-        .fr-repeat .fr-grid-content {
-            background-color: transparent;
-            margin-bottom: 0;
+        .fr-grid.fr-repeat .fr-grid-tr > .fr-grid-td {
+            &> .xforms-control, &> .xbl-component {
+                background-color: transparent;
+                margin-bottom: 0;
+            }
         }
     }
 
@@ -296,7 +304,7 @@
             .fr-grid {
                 .xforms-field, .xforms-textarea > pre {
 
-                    padding: 4px 6px;
+                    padding: @frGridCellPadding @frGridCellPadding+2px;
                     display: block;
 
                     // Flying Saucer: missing box-sizing support :(

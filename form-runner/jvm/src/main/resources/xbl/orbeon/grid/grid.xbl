@@ -790,31 +790,30 @@
 
                         <xsl:choose>
                             <xsl:when test="not($is-editable)">
-                                <xh:div class="fr-grid-content">
 
-                                    <xsl:variable name="content">
-                                        <xsl:for-each select="$controls">
-                                            <xsl:copy>
-                                                <xsl:attribute
-                                                    name="class"
-                                                    select="@class, concat('fr-grid-', $static-row-pos, '-', $static-col-pos)"
-                                                />
-                                                <xsl:copy-of select="@* except @class | node()"/>
-                                            </xsl:copy>
-                                        </xsl:for-each>
-                                    </xsl:variable>
+                                <xsl:variable name="content">
+                                    <xsl:for-each select="$controls">
+                                        <xsl:copy>
+                                            <xsl:attribute
+                                                name="class"
+                                                select="@class, concat('fr-grid-', $static-row-pos, '-', $static-col-pos)"
+                                            />
+                                            <xsl:copy-of select="@* except @class | node()"/>
+                                        </xsl:copy>
+                                    </xsl:for-each>
+                                </xsl:variable>
 
-                                    <xsl:choose>
-                                        <xsl:when test="$is-repeat">
-                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                <xsl:copy-of select="$content"/>
-                                            </xf:group>
-                                        </xsl:when>
-                                        <xsl:otherwise>
+                                <xsl:choose>
+                                    <xsl:when test="$is-repeat">
+                                        <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                             <xsl:copy-of select="$content"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xh:div>
+                                        </xf:group>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:copy-of select="$content"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:attribute name="xxf:control">true</xsl:attribute>

@@ -11,6 +11,21 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.xbl-fr-california-plate { background-image: url(images/platetahoe_small.jpg); width: 100px; height: 51px; display: block; padding: 0; border: none; text-align: center; vertical-align: top }
-.xbl-fr-california-plate .fr-component-group { width: 100%; }/* for IE8 bug, see #705 */
-.xbl-fr-california-plate .fr-plate-characters { position: relative; top: 19px; background: none }
+.xbl-fr-california-plate {
+    background-image: url(images/platetahoe_small.jpg);
+    width: 100px;
+    height: 51px;
+    display: block;
+    padding: 0;
+    border: none;
+    text-align: center;
+    vertical-align: top;
+}
+.xbl-fr-california-plate .fr-component-group {
+    width: 100%; /* for IE8 bug, see #705 */
+}
+.xbl-fr-california-plate .fr-plate-characters {
+    position: relative;
+    top: 19px;
+    background: none;
+}

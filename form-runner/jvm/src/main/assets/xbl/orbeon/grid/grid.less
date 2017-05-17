@@ -201,17 +201,21 @@
             }
 
             &.fr-repeat-single-row {
-                .fr-grid-tr > .fr-grid-td, .fr-grid-tr > .fr-grid-td > .fb-hover {  // Don't show label, help, hint for controls inside a repeat-table
-                    &> .fr-grid-content > * {                                       // which repeats over a single row only (they are shown in the
-                        &> .xforms-label,                                           // column header). But only do this for the top-level control within
-                        &> .xforms-help,                                            // a cell.
+
+                .fr-grid-tr > .fr-grid-td {
+                    // Don't show label, help, hint for controls inside a repeat-table which repeats over a single row only (they are shown in the
+                    // column header). But only do this for the top-level control within a cell.
+                    &> .xforms-control, &> .xbl-component {
+                        &> .xforms-label,
+                        &> .xforms-help,
                         &> .xforms-hint {
                             display: none;
                         }
                     }
                 }
-                .fr-grid-master-row > .fr-grid-th span.xforms-group                 // So the group that contains the control label is sized, to allow
-                    { display: block }                                              // the help popover to be correctly positioned
+                .fr-grid-master-row > .fr-grid-th span.xforms-group {               // So the group that contains the control label is sized, to allow
+                    display: block;                                                 // the help popover to be correctly positioned
+                }
             }
 
             // But if there is a nested table, show those in the label in the column header of that table

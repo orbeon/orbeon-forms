@@ -720,6 +720,16 @@ div.orbeon.orbeon-portlet-div {
     // Editable grids
     .fr-view .xbl-fr-grid .fr-grid.fr-editable {
 
+        // Until #3198 is fixed
+        &.fr-repeat.fr-repeat-single-row .fr-grid-tr > .fr-grid-td > .fb-hover > .fr-grid-content > * {
+            &> .xforms-label,
+            &> .xforms-help,
+            &> .xforms-hint {
+                display: none;
+            }
+        }
+
+
         &.fr-norepeat {                                                                                             // For non-repeat grid (`table` to override collapse in FR.less)
             border-collapse: collapse;
             &:hover .fr-grid-td { border: 1px solid @lightBlue }

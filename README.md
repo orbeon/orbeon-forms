@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 2016.3 December 2016
+Last updated for Orbeon Forms 2017.1 May 2017
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -20,29 +20,30 @@ For more information about Orbeon Forms, please visit [orbeon.com](http://www.or
 What's new
 ----------
 
+- [Orbeon Forms 2016.3.1 PE](http://blog.orbeon.com/2017/05/orbeon-forms-201631.html)
 - [Orbeon Forms 2016.3](http://blog.orbeon.com/2016/12/orbeon-forms-20163.html)
-- [Orbeon Forms 2016.2.2](http://blog.orbeon.com/2016/11/orbeon-forms-201622-pe.html)
-- [Orbeon Forms 2016.2.1](http://blog.orbeon.com/2016/09/orbeon-forms-201621.html)
+- [Orbeon Forms 2016.2.2 PE](http://blog.orbeon.com/2016/11/orbeon-forms-201622-pe.html)
+- [Orbeon Forms 2016.2.1 PE](http://blog.orbeon.com/2016/09/orbeon-forms-201621.html)
 - [Orbeon Forms 2016.2](http://blog.orbeon.com/2016/08/orbeon-forms-20162.html)
-- [Orbeon Forms 2016.1.1](http://blog.orbeon.com/2016/10/orbeon-forms-201611-pe.html)
-- [Orbeon Forms 2016.1](http://blog.orbeon.com/2016/04/orbeon-forms-20161.html)
-- [Orbeon Forms 4.10.2](http://blog.orbeon.com/2015/12/orbeon-forms-4102.html)
-- [Orbeon Forms 4.10.1](http://blog.orbeon.com/2015/11/orbeon-forms-4101.html)
+- [Orbeon Forms 2016.1.1 PE](http://blog.orbeon.com/2016/10/orbeon-forms-201611-pe.html)
+- [Orbeon Forms 2016.1 PE](http://blog.orbeon.com/2016/04/orbeon-forms-20161.html)
+- [Orbeon Forms 4.10.2 PE](http://blog.orbeon.com/2015/12/orbeon-forms-4102.html)
+- [Orbeon Forms 4.10.1 PE](http://blog.orbeon.com/2015/11/orbeon-forms-4101.html)
 - [Orbeon Forms 4.10](http://blog.orbeon.com/2015/08/orbeon-forms-410.html)
 - [Orbeon Forms 4.9](http://blog.orbeon.com/2015/05/orbeon-forms-49.html)
-- [Orbeon Forms 4.8.2](http://blog.orbeon.com/2015/03/orbeon-forms-482.html)
-- [Orbeon Forms 4.8.1](http://blog.orbeon.com/2015/02/orbeon-forms-481.html)
+- [Orbeon Forms 4.8.2 PE](http://blog.orbeon.com/2015/03/orbeon-forms-482.html)
+- [Orbeon Forms 4.8.1 PE](http://blog.orbeon.com/2015/02/orbeon-forms-481.html)
 - [Orbeon Forms 4.8](http://blog.orbeon.com/2015/01/orbeon-forms-48.html)
-- [Orbeon Forms 4.7.1](http://blog.orbeon.com/2014/12/orbeon-forms-471.html)
+- [Orbeon Forms 4.7.1 PE](http://blog.orbeon.com/2014/12/orbeon-forms-471.html)
 - [Orbeon Forms 4.7](http://blog.orbeon.com/2014/09/orbeon-forms-47.html)
-- [Orbeon Forms 4.6.2](http://blog.orbeon.com/2014/08/orbeon-forms-462.html)
-- [Orbeon Forms 4.6.1](http://blog.orbeon.com/2014/07/orbeon-forms-461.html)
+- [Orbeon Forms 4.6.2 PE](http://blog.orbeon.com/2014/08/orbeon-forms-462.html)
+- [Orbeon Forms 4.6.1 PE](http://blog.orbeon.com/2014/07/orbeon-forms-461.html)
 - [Orbeon Forms 4.6](http://blog.orbeon.com/2014/06/orbeon-forms-46.html)
-- [Orbeon Forms 4.5.1](http://blog.orbeon.com/2014/05/orbeon-forms-451.html)
+- [Orbeon Forms 4.5.1 PE](http://blog.orbeon.com/2014/05/orbeon-forms-451.html)
 - [Orbeon Forms 4.5](http://blog.orbeon.com/2014/04/orbeon-forms-45.html)
-- [Orbeon Forms 4.4.1](http://blog.orbeon.com/2014/01/orbeon-forms-441-pe.html)
+- [Orbeon Forms 4.4.1 PE](http://blog.orbeon.com/2014/01/orbeon-forms-441-pe.html)
 - [Orbeon Forms 4.4](http://blog.orbeon.com/2013/11/orbeon-forms-44.html)
-- [Orbeon Forms 4.3.1](http://blog.orbeon.com/2013/08/orbeon-forms-431-pe.html)
+- [Orbeon Forms 4.3.1 PE](http://blog.orbeon.com/2013/08/orbeon-forms-431-pe.html)
 - [Orbeon Forms 4.3](http://blog.orbeon.com/2013/08/orbeon-forms-43.html)
 - [Orbeon Forms 4.2](http://blog.orbeon.com/2013/05/orbeon-forms-42.html)
 - [Orbeon Forms 4.1](http://blog.orbeon.com/2013/04/orbeon-forms-41.html)

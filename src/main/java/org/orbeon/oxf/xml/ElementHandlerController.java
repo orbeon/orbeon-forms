@@ -21,8 +21,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import scala.Tuple2;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
@@ -57,7 +57,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
     private int level = 0;
 
     // Class.forName is expensive, so we cache mappings
-    private static Map<String, Class<ElementHandler>> classNameToHandlerClass = new HashMap<String, Class<ElementHandler>>();
+    private static Map<String, Constructor<ElementHandler>> classNameToHandlerClass = new HashMap<String, Constructor<ElementHandler>>();
 
     /**
      * Register a handler. The handler can match on a URI + localname + custom matcher, URI + localname, or on URI only
@@ -135,14 +135,11 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 // Just ignore content
             } else {
                 // Look for a new handler
-                final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
-
-                final HandlerInfo handlerInfo = getHandler(uri, explodedQName, attributes);
+                final HandlerInfo handlerInfo = getHandler(uri, localname, qName, attributes, elementHandlerContext);
 
                 if (handlerInfo != null) {
                     // New handler found
                     final ElementHandler elementHandler = handlerInfo.elementHandler;
-                    elementHandler.setContext(elementHandlerContext);
 
                     // Push current handler
                     currentHandlerInfo = handlerInfo;
@@ -154,8 +151,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                     } else {
                         // Non-repeating handler processes its body immediately
                         // Signal init/start to current handler
-                        elementHandler.init(uri, localname, qName, attributes, handlerInfo.matched);
-                        elementHandler.start(uri, localname, qName, attributes);
+                        elementHandler.start();
                     }
                 } else {
                     // New handler not found, send to output
@@ -169,7 +165,6 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
         try {
-
             if (currentHandlerInfo != null && currentHandlerInfo.level == level) {
                 // End of current handler
 
@@ -177,12 +172,11 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                     // Was filling-up SAXStore
                     isFillingUpSAXStore = false;
                     // Process body once
-                    currentHandlerInfo.elementHandler.init(uri, localname, qName, currentHandlerInfo.attributes, currentHandlerInfo.matched);
-                    currentHandlerInfo.elementHandler.start(uri, localname, qName, currentHandlerInfo.attributes);
-                    currentHandlerInfo.elementHandler.end(uri, localname, qName);
+                    currentHandlerInfo.elementHandler.start();
+                    currentHandlerInfo.elementHandler.end();
                 } else {
                     // Signal end to current handler
-                    currentHandlerInfo.elementHandler.end(uri, localname, qName);
+                    currentHandlerInfo.elementHandler.end();
                 }
 
                 // Pop current handler
@@ -498,24 +492,26 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
      * @param element   element
      * @return          handler if found
      */
-    public Tuple2<ElementHandler, Object> getHandler(Element element) {
+    public ElementHandler getHandler(Element element, Object handlerContext) {
         final HandlerInfo handlerInfo =
             getHandler(
                 element.getNamespaceURI(),
-                XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
-                Dom4jUtils.getSAXAttributes(element)
+                element.getName(),
+                element.getQualifiedName(),
+                Dom4jUtils.getSAXAttributes(element),
+                handlerContext
             );
 
-        return (handlerInfo != null)
-            ? new scala.Tuple2<ElementHandler, Object>(handlerInfo.elementHandler, handlerInfo.matched)
-            : null;
+        return (handlerInfo != null) ? handlerInfo.elementHandler : null;
     }
 
-    private HandlerInfo getHandler(String uri, String explodedQName, Attributes attributes) {
+    private HandlerInfo getHandler(String uri, String localname, String qName, Attributes attributes, Object handlerContext) {
+
+        final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
 
         // 1: Try custom matchers
         {
-            final HandlerInfo handlerInfo = runMatchers(customMatchers, explodedQName, attributes);
+            final HandlerInfo handlerInfo = runMatchers(customMatchers, uri, localname, qName, attributes, explodedQName, handlerContext);
             if (handlerInfo != null)
                 return handlerInfo;
         }
@@ -523,7 +519,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         // 2: Try full matchers
         final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(explodedQName);
         if (handlerMatchers != null) {
-            final HandlerInfo handlerInfo = runMatchers(handlerMatchers, explodedQName, attributes);
+            final HandlerInfo handlerInfo = runMatchers(handlerMatchers, uri, localname, qName, attributes, explodedQName, handlerContext);
             if (handlerInfo != null)
                 return handlerInfo;
         }
@@ -531,37 +527,45 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         // 3: Try URI-based handler
         final String uriHandlerClassName = uriHandlers.get(uri);
         if (uriHandlerClassName != null) {
-            final ElementHandler elementHandler = getHandlerByClassName(uriHandlerClassName);
-            return new HandlerInfo(level, explodedQName, elementHandler, attributes, null, this.locator);
+            final ElementHandler elementHandler = getHandlerByClassName(uriHandlerClassName, uri, localname, qName, attributes, null, handlerContext);
+            return new HandlerInfo(level, explodedQName, elementHandler, this.locator);
         }
 
         return null;
     }
 
-    private HandlerInfo runMatchers(List<HandlerMatcher> matchers, String explodedQName, Attributes attributes) {
+    private HandlerInfo runMatchers(List<HandlerMatcher> matchers, String uri, String localname, String qName, Attributes attributes, String explodedQName, Object handlerContext) {
         for (HandlerMatcher handlerMatcher: matchers) {
             final Object matched = handlerMatcher.matcher.match(attributes, elementHandlerContext);
             if (matched != null) {
-                final ElementHandler elementHandler = getHandlerByClassName(handlerMatcher.handlerClassName);
-                return new HandlerInfo(level, explodedQName, elementHandler, attributes, matched, this.locator);
+                final ElementHandler elementHandler = getHandlerByClassName(handlerMatcher.handlerClassName, uri, localname, qName, attributes, matched, handlerContext);
+                return new HandlerInfo(level, explodedQName, elementHandler, this.locator);
             }
         }
         return null;
     }
 
     @SuppressWarnings("unchecked")
-    private ElementHandler getHandlerByClassName(String handlerClassName) {
-        Class<ElementHandler> handlerClass = classNameToHandlerClass.get(handlerClassName);
-        if (handlerClass == null) {
+    private ElementHandler getHandlerByClassName(String handlerClassName, String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        Constructor<ElementHandler> constructor = classNameToHandlerClass.get(handlerClassName);
+        if (constructor == null) {
             try {
-                handlerClass = (Class<ElementHandler>) Class.forName(handlerClassName);
-                classNameToHandlerClass.put(handlerClassName, handlerClass);
+                final Class<ElementHandler> handlerClass = (Class<ElementHandler>) Class.forName(handlerClassName);
+
+                // uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef
+                constructor =
+                    handlerClass.getConstructor(String.class, String.class, String.class, Attributes.class, Object.class, Object.class);
+
+                classNameToHandlerClass.put(handlerClassName, constructor);
             } catch (ClassNotFoundException e) {
+                throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
+            } catch (NoSuchMethodException e) {
                 throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
             }
         }
+
         try {
-            return handlerClass.newInstance();
+            return constructor.newInstance(uri, localname, qName, attributes, matched, handlerContext);
         } catch (Exception e) {
             throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator));
         }
@@ -571,17 +575,13 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         public final int level;
         public final String explodedQName;
         public final ElementHandler elementHandler;
-        public final Attributes attributes;
-        public final Object matched;
 
         public final SAXStore saxStore;
 
-        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Attributes attributes, Object matched, Locator locator) {
+        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Locator locator) {
             this.level = level;
             this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
-            this.attributes = elementHandler.isRepeating() ? new AttributesImpl(attributes) : null; // NOTE: could keep attributes if needed
-            this.matched = matched;
 
             this.saxStore = elementHandler.isRepeating() ? new SAXStore() : null;
 

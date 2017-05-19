@@ -16,14 +16,15 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.xml.sax.Attributes;
 
 /**
  * Handle xf:group.
  */
 public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
-    public XFormsGroupHandler() {
-        super(false, true);
+    public XFormsGroupHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, true);
     }
 
     protected String getLabelClasses(XFormsSingleNodeControl xformsControl) {
@@ -32,7 +33,7 @@ public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             final StringBuilder labelClasses = new StringBuilder("xforms-label");
 
             // Handle relevance on label
-            if ((xformsControl == null && !handlerContext.isTemplate()) || (xformsControl != null && !xformsControl.isRelevant())) {
+            if ((xformsControl == null && ! xformsHandlerContext.isTemplate()) || (xformsControl != null && !xformsControl.isRelevant())) {
                 labelClasses.append(" xforms-disabled");
             }
 
@@ -50,7 +51,7 @@ public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
     }
 
     protected String getLabelValue(XFormsSingleNodeControl xformsControl) {
-        if (handlerContext.isTemplate() || xformsControl == null) {
+        if (xformsHandlerContext.isTemplate() || xformsControl == null) {
             return null;
         } else {
             return xformsControl.getLabel();

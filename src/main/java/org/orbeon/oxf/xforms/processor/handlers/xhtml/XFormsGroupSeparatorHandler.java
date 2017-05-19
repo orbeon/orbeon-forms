@@ -25,31 +25,35 @@ import org.xml.sax.SAXException;
  */
 public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
+    public XFormsGroupSeparatorHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
+    }
+
     private DeferredXMLReceiver currentSavedOutput;
     private OutputInterceptor outputInterceptor;
 
     @Override
-    protected boolean isMustOutputContainerElement() {
+    public boolean isMustOutputContainerElement() {
         // If we are the top-level of a full update, output a delimiter anyway
-        return handlerContext.isFullUpdateTopLevelControl(getEffectiveId());
+        return xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId());
     }
 
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
 
-        final String xhtmlPrefix       = handlerContext.findXHTMLPrefix();
+        final String xhtmlPrefix       = xformsHandlerContext.findXHTMLPrefix();
         final String groupElementName  = getContainingElementName();
         final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
 
-        final ElementHandlerController controller = handlerContext.getController();
+        final ElementHandlerController controller = xformsHandlerContext.getController();
 
         // Place interceptor on output
 
         // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
         // automatically handles ids and element names
         currentSavedOutput = controller.getOutput();
-        if (!handlerContext.isNoScript()) {
+        if (!xformsHandlerContext.isNoScript()) {
 
-            final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
+            final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId);
 
             // Classes on top-level elements and characters and on the first delimiter
             final String elementClasses;
@@ -99,15 +103,15 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
     @Override
     public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
-        final ElementHandlerController controller = handlerContext.getController();
-        if (!handlerContext.isNoScript()) {
+        final ElementHandlerController controller = xformsHandlerContext.getController();
+        if (! xformsHandlerContext.isNoScript()) {
             // Restore output
             controller.setOutput(currentSavedOutput);
 
             // Delimiter: end repeat
             outputInterceptor.flushCharacters(true, true);
 
-            final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
+            final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId);
             if (isMustGenerateBeginEndDelimiters) {
                 outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end",
                         "group-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
@@ -121,22 +125,22 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
     }
 
     @Override
-    protected void handleLabel() throws SAXException {
+    public void handleLabel() throws SAXException {
         // Don't output
     }
 
     @Override
-    protected void handleHint() throws SAXException {
+    public void handleHint() throws SAXException {
         // Don't output
     }
 
     @Override
-    protected void handleAlert() throws SAXException {
+    public void handleAlert() throws SAXException {
         // Don't output
     }
 
     @Override
-    protected void handleHelp() throws SAXException {
+    public void handleHelp() throws SAXException {
         // Don't output
     }
 }

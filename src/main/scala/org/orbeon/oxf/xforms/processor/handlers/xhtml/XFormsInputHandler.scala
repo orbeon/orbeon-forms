@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
-import org.orbeon.oxf.xforms.control.controls.XFormsInputControl.PlaceHolderInfo
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
@@ -33,20 +32,19 @@ import org.xml.sax.Attributes
  *
  * TODO: Subclasses per appearance.
  */
-class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with HandlerSupport { // repeating = false
+class XFormsInputHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+     with HandlerSupport {
 
-  private var placeHolderInfo: Option[PlaceHolderInfo] = None
+  private val placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
 
-  override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
-    super.init(uri, localname, qName, attributes, matched)
-    this.placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
-  }
-
-  // TODO: Use type member instead
-  protected override def currentControlOrNull = super.currentControlOrNull.asInstanceOf[XFormsInputControl]
-  protected override def currentControlOpt    = super.currentControlOpt.asInstanceOf[Option[XFormsInputControl]]
-
-  private def controlHas(predicate: XFormsInputControl ⇒ Boolean) = currentControlOpt exists predicate
+  private def controlHas(predicate: XFormsInputControl ⇒ Boolean) = currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate
 
   private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
   private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
@@ -54,7 +52,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
 
   protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
     val inputControl = control.asInstanceOf[XFormsInputControl]
-    implicit val xmlReceiver = handlerContext.getController.getOutput
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
     val isRelevantControl = ! isNonRelevant(inputControl)
     val isConcreteControl = inputControl ne null
     if (isBoolean) {
@@ -80,18 +78,16 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with Handle
       )
 
       // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
-      val select1Handler = new XFormsSelect1Handler {
-        override def getPrefixedId        = XFormsInputHandler.this.getPrefixedId
-        override def getEffectiveId       = XFormsInputHandler.this.getEffectiveId
-        override def currentControlOrNull = XFormsInputHandler.this.currentControlOrNull
-        override def currentControlOpt    = XFormsInputHandler.this.currentControlOpt
+      val select1Handler = new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext) {
+        override val getPrefixedId        = XFormsInputHandler.this.getPrefixedId
+        override val getEffectiveId       = XFormsInputHandler.this.getEffectiveId
+        override val currentControlOrNull = XFormsInputHandler.this.currentControlOrNull
+        override val currentControlOpt    = XFormsInputHandler.this.currentControlOpt
       }
-      select1Handler.setContext(getContext)
-      select1Handler.init(uri, localname, qName, attributes, elementAnalysis)
       select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
     } else {
 
-      val xhtmlPrefix = handlerContext.findXHTMLPrefix
+      val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
       // Create xh:input
       if (! isStaticReadonly(inputControl)) {

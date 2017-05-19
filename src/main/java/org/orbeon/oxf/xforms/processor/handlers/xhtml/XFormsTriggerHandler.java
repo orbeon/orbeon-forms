@@ -25,39 +25,39 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 
-    public XFormsTriggerHandler() {
-        super(false);
+    public XFormsTriggerHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, false);
     }
 
     protected String getTriggerLabel(XFormsSingleNodeControl xformsControl) {
-        return ! handlerContext.isTemplate() && xformsControl != null && xformsControl.getLabel() != null
+        return ! xformsHandlerContext.isTemplate() && xformsControl != null && xformsControl.getLabel() != null
             ? xformsControl.getLabel()
             : "";
     }
 
     @Override
-    protected boolean isMustOutputControl(XFormsControl control) {
+    public boolean isMustOutputControl(XFormsControl control) {
         // Don't output anything in static readonly mode
         return ! isStaticReadonly(control);
     }
 
     @Override
-    protected void handleLabel() throws SAXException {
+    public void handleLabel() throws SAXException {
         // Label is handled differently
     }
 
     @Override
-    protected void handleHint() throws SAXException {
+    public void handleHint() throws SAXException {
         // Hint is handled differently
     }
 
     @Override
-    protected void handleAlert() throws SAXException {
+    public void handleAlert() throws SAXException {
         // Triggers don't need an alert (in theory, they could have one)
     }
 
     @Override
-    protected AttributesImpl getEmptyNestedControlAttributesMaybeWithId(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
+    public AttributesImpl getEmptyNestedControlAttributesMaybeWithId(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
         // Get standard attributes
         final AttributesImpl containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, addId);
 

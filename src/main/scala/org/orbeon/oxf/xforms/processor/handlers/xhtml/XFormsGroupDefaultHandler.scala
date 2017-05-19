@@ -20,29 +20,28 @@ import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 
 // Default group handler
-class XFormsGroupDefaultHandler extends XFormsGroupHandler {
+class XFormsGroupDefaultHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsGroupHandler(uri, localname, qName, attributes, matched, handlerContext) {
 
-  private var elementName: String  = null
-  private var elementQName: String = null
-
-  override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: Any): Unit = {
-    super.init(uri, localname, qName, attributes, matched)
-
-    // Use explicit container element name if present, otherwise use default
+  // Use explicit container element name if present, otherwise use default
+  override val (getContainingElementName, getContainingElementQName) =
     matched match {
       case control: ContainerControl if control.elementQName ne null ⇒
         val explicitQName = control.elementQName
 
-        elementName  = explicitQName.getName
-        elementQName = explicitQName.getQualifiedName
+        explicitQName.getName → explicitQName.getQualifiedName
       case _ ⇒
-        elementName  = super.getContainingElementName
-        elementQName = super.getContainingElementQName // NOTE: this calls back getContainingElementName()
+        super.getContainingElementName → super.getContainingElementQName // NOTE: this calls back getContainingElementName()
     }
-  }
 
-  override protected def getContainingElementName  = elementName
-  override protected def getContainingElementQName = elementQName
+//  override protected def getContainingElementName  = elementName
+//  override protected def getContainingElementQName = elementQName
 
   def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) = ()
 
@@ -56,12 +55,12 @@ class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl))
 
     XFormsBaseHandlerXHTML.outputLabelFor(
-      handlerContext,
+      xformsHandlerContext,
       reusableAttributes,
       effectiveId,
       effectiveId,
       LHHAC.LABEL,
-      handlerContext.getLabelElementName,
+      xformsHandlerContext.getLabelElementName,
       getLabelValue(groupControl),
       (groupControl ne null) && groupControl.isHTMLLabel,
       false

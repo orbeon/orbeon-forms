@@ -27,7 +27,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.XFormsInputControl.PlaceHolderInfo
 import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
@@ -36,14 +35,16 @@ import org.xml.sax.Attributes
 /**
   * Handle xf:textarea.
   */
-class XFormsTextareaHandler extends XFormsControlLifecyleHandler(false) {
+class XFormsTextareaHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
-  private var placeHolderInfo: Option[PlaceHolderInfo] = None
-
-  override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
-    super.init(uri, localname, qName, attributes, matched)
-    this.placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
-  }
+  private val placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
 
   protected def handleControlStart(
     uri         : String,
@@ -55,12 +56,12 @@ class XFormsTextareaHandler extends XFormsControlLifecyleHandler(false) {
   ): Unit = {
 
     val textareaControl        = control.asInstanceOf[XFormsTextareaControl]
-    val xmlReceiver            = handlerContext.getController.getOutput
+    val xmlReceiver            = xformsHandlerContext.getController.getOutput
     val isConcreteControl      = textareaControl ne null
-    val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true)
+    val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, addId = true)
 
     // Create xhtml:textarea
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
     if (! XFormsBaseHandler.isStaticReadonly(textareaControl)) {
 

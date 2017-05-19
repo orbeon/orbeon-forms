@@ -13,37 +13,43 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import XFormsBaseHandlerXHTML._
-import XFormsTriggerFullHandler._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
-import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler._
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.xml.{XMLUtils, SAXUtils}
+import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
+import org.orbeon.oxf.xml.{SAXUtils, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import collection.breakOut
 
 /**
  * Default full appearance (button).
  *
  * This can also be the "pseudo-minimal" appearance for noscript mode.
  */
-class XFormsTriggerFullHandler extends XFormsTriggerHandler {
+class XFormsTriggerFullHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsTriggerHandler(uri, localname, qName, attributes, matched, handlerContext) {
 
   protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
     val triggerControl = control.asInstanceOf[XFormsTriggerControl]
-    val xmlReceiver = handlerContext.getController.getOutput
+    val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true)
 
     val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
-    if (handlerContext.isNoScript) {
+    if (xformsHandlerContext.isNoScript) {
       // Noscript mode: we need a name to detect activation
       addAttribute(containerAttributes, "name", effectiveId)
 
@@ -66,7 +72,7 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
     // Determine bootstrap classes, which go on the <button> element
     // NOTE: It seems we don't need the .disabled class (if (disabled) List("disabled") else Nil).
     def isNoscriptMinimal =
-      handlerContext.isNoScript && XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
+      xformsHandlerContext.isNoScript && XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
 
     val bootstrapClasses = "btn" :: (
       if (isNoscriptMinimal)

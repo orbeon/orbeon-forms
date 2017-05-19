@@ -20,16 +20,17 @@ import org.xml.sax.SAXException;
 
 public class XXFormsTextHandler extends XFormsBaseHandlerXHTML {
 
-    public XXFormsTextHandler() {
-        super(false, false);
+    public XXFormsTextHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, false);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    @Override
+    public void start() throws SAXException {
 
-        final String effectiveId = handlerContext.getEffectiveId(attributes);
+        final String effectiveId = xformsHandlerContext.getEffectiveId(attributes);
         final XXFormsTextControl textControl = (XXFormsTextControl) containingDocument.getControlByEffectiveId(effectiveId);
 
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
         final boolean isConcreteControl = textControl != null;
 
         if (isConcreteControl) {

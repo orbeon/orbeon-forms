@@ -40,12 +40,12 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
-    protected XFormsBaseHandlerXHTML(boolean repeating, boolean forwarding) {
-       super(repeating, forwarding);
+    protected XFormsBaseHandlerXHTML(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext, boolean repeating, boolean forwarding) {
+        super(uri, localname, qName, attributes, matched, handlerContext, repeating, forwarding);
     }
 
     protected HandlerContext getHandlerContext() {
-    	return this.handlerContext;
+    	return this.xformsHandlerContext;
     }
 
     private void addConstraintClasses(StringBuilder sb, scala.Option<ValidationLevel> constraintLevel) {
@@ -68,7 +68,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         // NOTE: We used to not output this class if the control existed and didn't have a binding. That looked either
         // like an inconsistent optimization (not done for controls with bindings), or like an oversight (likely).
         final boolean isRelevant = control != null && control.isRelevant();
-        if (! isRelevant && ! handlerContext.isTemplate()) { // don't output class within a template
+        if (! isRelevant && ! xformsHandlerContext.isTemplate()) { // don't output class within a template
             if (sb.length() > 0)
                 sb.append(' ');
             sb.append("xforms-disabled");
@@ -166,7 +166,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
                     final int slashIndex = mediatypeValue.indexOf('/');
                     if (slashIndex == -1)
-                        throw new ValidationException("Invalid mediatype attribute value: " + mediatypeValue, handlerContext.getLocationData());
+                        throw new ValidationException("Invalid mediatype attribute value: " + mediatypeValue, xformsHandlerContext.getLocationData());
 
                     if (sb.length() > 0)
                         sb.append(' ');
@@ -247,11 +247,11 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         if (staticLHHAAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
 
-            if (handlerContext.isNoScript() && isHelp) {
+            if (xformsHandlerContext.isNoScript() && isHelp) {
                 if (control != null) {
 
-                    final ContentHandler contentHandler = handlerContext.getController().getOutput();
-                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                    final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
+                    final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
 
                     // <a href="#my-control-id-help">
 
@@ -297,13 +297,13 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     if (requestedElementName != null) {
                         elementName = requestedElementName;
                     } else if (isLabel) {
-                        elementName = handlerContext.getLabelElementName();
+                        elementName = xformsHandlerContext.getLabelElementName();
                     } else if (isHelp) {
-                        elementName = handlerContext.getHelpElementName();
+                        elementName = xformsHandlerContext.getHelpElementName();
                     } else if (isHint) {
-                        elementName = handlerContext.getHintElementName();
+                        elementName = xformsHandlerContext.getHintElementName();
                     } else if (isAlert) {
-                        elementName = handlerContext.getAlertElementName();
+                        elementName = xformsHandlerContext.getAlertElementName();
                     } else {
                         throw new IllegalStateException("Illegal type requested");
                     }
@@ -363,7 +363,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 lhhaAnalysis.encodeAndAppendAppearances(classes);
 
                 outputLabelFor(
-                    handlerContext,
+                    xformsHandlerContext,
                     getIdClassXHTMLAttributes(newAttributes, classes.toString(), null),
                     targetControlEffectiveId,
                     forEffectiveId,

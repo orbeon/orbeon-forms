@@ -17,15 +17,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
+    public XFormsGroupFieldsetHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
+    }
+
     @Override
-    protected String getContainingElementName() {
+    public String getContainingElementName() {
         return "fieldset";
     }
 
@@ -33,8 +40,8 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsGroupControl groupControl = (XFormsGroupControl) control;
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final ElementHandlerController controller = handlerContext.getController();
+        final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
+        final ElementHandlerController controller = xformsHandlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();
 
         // Output an xhtml:legend element if and only if there is an xf:label element. This help with
@@ -60,7 +67,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     }
 
     @Override
-    protected void handleLabel() throws SAXException {
+    public void handleLabel() throws SAXException {
         // NOP because we handle the label in a custom way
     }
 }

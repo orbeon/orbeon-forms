@@ -38,18 +38,25 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 // Handler for <xh:head>
-class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
+class XHTMLHeadHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, true) {
 
   import XHTMLHeadHandler._
 
   private var formattingPrefix: String = null
 
-  override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+  override def start(): Unit = {
 
-    val xmlReceiver = handlerContext.getController.getOutput
+    val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     // Register control handlers on controller
-    handlerContext.getController.registerHandler(
+    xformsHandlerContext.getController.registerHandler(
       classOf[XXFormsTextHandler].getName,
       XFormsConstants.XXFORMS_NAMESPACE_URI,
       "text",
@@ -57,7 +64,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     )
 
     // Declare xmlns:f
-    formattingPrefix = handlerContext.findFormattingPrefixDeclare
+    formattingPrefix = xformsHandlerContext.findFormattingPrefixDeclare
 
     // Open head element
     xmlReceiver.startElement(uri, localname, qName, attributes)
@@ -70,7 +77,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     val isVersionedResources = URLRewriterUtils.isResourcesVersioned
 
     // Include static XForms CSS and JS
-    val requestPath = handlerContext.getExternalContext.getRequest.getRequestPath
+    val requestPath = xformsHandlerContext.getExternalContext.getRequest.getRequestPath
 
     helper.element("", XMLNames.XIncludeURI, "include",
       Array(
@@ -92,7 +99,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     outputCSSResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, styles, baselineStyles)
 
     // Scripts
-    if (! handlerContext.isNoScript) {
+    if (! xformsHandlerContext.isNoScript) {
 
       // Main JavaScript resources
       outputJavaScriptResources(xhtmlPrefix, isMinimal, attributesImpl, containingDocument.getStaticState.assets, scripts, baselineScripts)
@@ -109,10 +116,10 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
     }
   }
 
-  override def end(uri: String, localname: String, qName: String): Unit = {
-    val xmlReceiver = handlerContext.getController.getOutput
+  override def end(): Unit = {
+    val xmlReceiver = xformsHandlerContext.getController.getOutput
     xmlReceiver.endElement(uri, localname, qName)
-    handlerContext.findFormattingPrefixUndeclare(formattingPrefix)
+    xformsHandlerContext.findFormattingPrefixUndeclare(formattingPrefix)
   }
 
   // Output an element
@@ -217,7 +224,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
           getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
 
         val heartbeatDelay =
-          XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
+          XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
 
         dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[jl.Integer],
           SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
@@ -412,7 +419,7 @@ class XHTMLHeadHandler extends XFormsBaseHandlerXHTML(false, true) {
       sb.append("\"] = {")
 
       val rewriteResource =
-        handlerContext.getExternalContext.getResponse.rewriteResourceURL(
+        xformsHandlerContext.getExternalContext.getResponse.rewriteResourceURL(
           _: String,
           REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
         )

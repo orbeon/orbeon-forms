@@ -23,13 +23,20 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
 import org.xml.sax.{Attributes, Locator}
 
-class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
+class XXFormsComponentHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
-  private var elementName: String = _
-  private var elementQName: String = _
 
-  protected override def getContainingElementName = elementName
-  protected override def getContainingElementQName = elementQName
+  protected override val (getContainingElementName, getContainingElementQName) = {
+    val elementName  = binding.abstractBinding.containerElementName
+    elementName → XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, elementName)
+  }
 
   private lazy val binding =
     containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
@@ -39,13 +46,6 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
   private def hasLabelFor =
     binding.abstractBinding.labelFor.isDefined
-
-  override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
-    super.init(uri, localname, qName, attributes, matched)
-
-    elementName  = binding.abstractBinding.containerElementName
-    elementQName = XMLUtils.buildQName(handlerContext.findXHTMLPrefix, elementName)
-  }
 
   protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl): Unit = {
     if (classes.length != 0)
@@ -64,9 +64,9 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
   ): Unit = {
 
     val prefixedId = getPrefixedId
-    val controller = handlerContext.getController
+    val controller = xformsHandlerContext.getController
 
-    handlerContext.pushComponentContext(prefixedId)
+    xformsHandlerContext.pushComponentContext(prefixedId)
 
     // Process shadow content
     XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
@@ -79,7 +79,7 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     attributes  : Attributes,
     effectiveId : String,
     control     : XFormsControl
-  ) = handlerContext.popComponentContext()
+  ) = xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
     if (handleLHHA && ! LHHAAnalysis.hasLHHAPlaceholder(containingDocument.getStaticOps.findControlAnalysis(getPrefixedId).get, "label")) {
@@ -128,9 +128,9 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
             val labelForEffectiveId = labelForPrefixedId + suffix
 
             // Push/pop component context so that handler resolution works
-            handlerContext.pushComponentContext(getPrefixedId)
-            try XFormsLHHAHandler.findTargetControlForEffectiveId(handlerContext, staticTarget, labelForEffectiveId)
-            finally handlerContext.popComponentContext()
+            xformsHandlerContext.pushComponentContext(getPrefixedId)
+            try XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, staticTarget, labelForEffectiveId)
+            finally xformsHandlerContext.popComponentContext()
           }
         } yield
           targetControlFor

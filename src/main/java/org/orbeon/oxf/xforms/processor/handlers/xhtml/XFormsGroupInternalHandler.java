@@ -18,14 +18,18 @@ import org.xml.sax.Attributes;
 
 public class XFormsGroupInternalHandler extends XFormsGroupHandler {
 
+    public XFormsGroupInternalHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
+    }
+
     @Override
-    protected boolean isMustOutputControl(XFormsControl control) {
+    public boolean isMustOutputControl(XFormsControl control) {
         // Do not output start, end, or LHHA
         return false;
     }
 
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) {
         // NOP
     }
 }

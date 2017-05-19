@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
+import org.xml.sax.Attributes;
+
 /**
  * Handler which just swallows xxf:attribute content.
  */
 public class XXFormsAttributeHandler extends XFormsBaseHandlerXHTML {
-    public XXFormsAttributeHandler() {
-        super(false, false);
+    public XXFormsAttributeHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, false);
     }
 }

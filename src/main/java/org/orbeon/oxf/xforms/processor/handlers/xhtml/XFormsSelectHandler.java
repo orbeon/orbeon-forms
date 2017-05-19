@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
+import org.xml.sax.Attributes;
+
 /**
  * xf:select.
  *
  * TODO: Subclasses per appearance.
  */
 public class XFormsSelectHandler extends XFormsSelect1Handler {
-    public XFormsSelectHandler() {
-        super();
+    public XFormsSelectHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
     }
 }

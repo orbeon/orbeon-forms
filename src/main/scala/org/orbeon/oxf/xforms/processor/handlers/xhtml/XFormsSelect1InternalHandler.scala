@@ -17,7 +17,14 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.xml.sax.Attributes
 
 // Internal appearance handler: do not output control or LHHA
-class XFormsSelect1InternalHandler extends XFormsControlLifecyleHandler(false, true) {
+class XFormsSelect1InternalHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = true) {
   override protected def isMustOutputControl(control: XFormsControl) = false
   protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) = ()
 }

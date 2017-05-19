@@ -35,6 +35,8 @@
     <property as="xs:string"  name="oxf.http.forward-headers"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.forward-submission-headers"           value=""/>
     <property as="xs:string"  name="oxf.http.forward-cookies"                        value=""/>
+    <property as="xs:string"  name="oxf.http.forward-cookies.session.prefix"         value=""/>
+    <property as="xs:string"  name="oxf.http.forward-cookies.session.suffix"         value=""/>
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>
     <property as="xs:integer" name="oxf.http.so-timeout"                             value="0"/>
     <property as="xs:boolean" name="oxf.http.chunk-requests"                         value="false"/>

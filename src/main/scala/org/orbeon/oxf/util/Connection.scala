@@ -306,10 +306,12 @@ object Connection extends Logging {
 
   private val SupportedNonHttpReadonlySchemes = Set("file", "oxf", "data")
 
-  private val HttpInternalPathsProperty              = "oxf.http.internal-paths"
-  private val HttpForwardCookiesProperty             = "oxf.http.forward-cookies"
-  private val HttpForwardHeadersProperty             = "oxf.http.forward-headers"
-  private val LegacyXFormsHttpForwardHeadersProperty = "oxf.xforms.forward-submission-headers"
+  private val HttpInternalPathsProperty               = "oxf.http.internal-paths"
+  private val HttpForwardCookiesProperty              = "oxf.http.forward-cookies"
+  private val HttpForwardCookiesSessionPrefixProperty = "oxf.http.forward-cookies.session.prefix"
+  private val HttpForwardCookiesSessionSuffixProperty = "oxf.http.forward-cookies.session.suffix"
+  private val HttpForwardHeadersProperty              = "oxf.http.forward-headers"
+  private val LegacyXFormsHttpForwardHeadersProperty  = "oxf.xforms.forward-submission-headers"
 
   // Create a new Connection
   def apply(
@@ -636,8 +638,17 @@ object Connection extends Logging {
         nativeRequestOption flatMap
         (sessionCookieFromIncomingCapitalized(externalContext, _, cookiesToForward, sessionCookieName))
 
-      // 2. If there is no incoming session cookie, try to make our own cookie. This may fail with e.g. WebSphere.
-      def fromSession = sessionCookieFromGuessCapitalized(externalContext, sessionCookieName)
+      // 2. If there is no incoming session cookie, try to make our own cookie. For this to work on WebSphere,
+      // users will have the define the prefix and suffix properties.
+      def fromSession =
+        externalContext.getSessionOpt(false).map(session ⇒ {
+          val propertySet   = Properties.instance.getPropertySet
+          val prefix        = propertySet.getString(HttpForwardCookiesSessionPrefixProperty)
+          val suffix        = propertySet.getString(HttpForwardCookiesSessionSuffixProperty)
+          val sessionId     = session.getId
+          val sessionCookie = s"$sessionCookieName=$prefix$sessionId$suffix"
+          Headers.Cookie    → List(sessionCookie)
+        })
 
       // Logging
       ifDebug {
@@ -719,13 +730,6 @@ object Connection extends Logging {
     } else
       None
   }
-
-  private def sessionCookieFromGuessCapitalized(
-    externalContext   : ExternalContext,
-    sessionCookieName : String
-  ): Option[(String, List[String])] =
-    externalContext.getSessionOpt(false) map
-      { session ⇒ Headers.Cookie →  List(sessionCookieName + "=" + session.getId) }
 
   private def buildSOAPHeadersCapitalizedIfNeeded(
     method                    : HttpMethod,

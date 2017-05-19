@@ -315,8 +315,6 @@ public class XFormsProperties {
     public static final boolean GZIP_STATE_DEFAULT = true;
 
     public static final String HOST_LANGUAGE_AVTS_PROPERTY = XFORMS_PROPERTY_PREFIX + "host-language-avts"; // global but should be per document
-    public static final String ADDITIONAL_AVT_ELEMENT_NAMESPACES = XFORMS_PROPERTY_PREFIX + "additional-avt-element-namespaces"; // global but should be per document
-    public static final String ADDITIONAL_REF_ID_ATTRIBUTE_NAMES = XFORMS_PROPERTY_PREFIX + "additional-ref-id-attribute-names"; // global but should be per document
     public static final boolean HOST_LANGUAGE_AVTS_DEFAULT = false;
 
     public static final String MINIMAL_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "minimal-resources";
@@ -376,19 +374,6 @@ public class XFormsProperties {
     public static boolean isHostLanguageAVTs() {
         return Properties.instance().getPropertySet().getBoolean
                 (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT);
-    }
-
-    public static String[] getAdditionalAvtElementNamespaces() {
-        final String additionalElementNamespacesStr = Properties.instance().getPropertySet().getString
-                (ADDITIONAL_AVT_ELEMENT_NAMESPACES);
-
-        return additionalElementNamespacesStr != null ? additionalElementNamespacesStr.split("\\s+") : EMPTY_STRING_ARRAY;
-    }
-
-    public static String[] getAdditionalRefIdAttributeNames() {
-        String additionalRefIdAttributeNames = Properties.instance().getPropertySet().getString
-                (ADDITIONAL_REF_ID_ATTRIBUTE_NAMES);
-        return additionalRefIdAttributeNames != null ? additionalRefIdAttributeNames.split("\\s+") : EMPTY_STRING_ARRAY;
     }
 
     public static boolean isMinimalResources() {

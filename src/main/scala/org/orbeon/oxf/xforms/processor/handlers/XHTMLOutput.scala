@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.{XHTMLBodyHandler, XHTMLElementHandler, XHTMLHeadHandler, XXFormsAttributeHandler}
-import org.orbeon.oxf.xforms.processor.handlers.xml._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 import org.orbeon.oxf.xml._
@@ -42,18 +41,7 @@ object XHTMLOutput {
         register(classOf[XHTMLHeadHandler], XH, "head")
         register(classOf[XHTMLBodyHandler], XH, "body")
       } else {
-        register(classOf[XFormsDefaultControlHandler], XF, "input",    any = true)
-        register(classOf[XFormsDefaultControlHandler], XF, "secret",   any = true)
-        register(classOf[XFormsDefaultControlHandler], XF, "range",    any = true)
-        register(classOf[XFormsDefaultControlHandler], XF, "textarea", any = true)
-        register(classOf[XFormsDefaultControlHandler], XF, "output",   any = true)
-        register(classOf[XFormsDefaultControlHandler], XF, "trigger",  any = true)
-        register(classOf[XFormsDefaultControlHandler], XF, "submit",   any = true)
-        register(classOf[XFormsSelectHandler],         XF, "select",   any = true)
-        register(classOf[XFormsSelectHandler],         XF, "select1",  any = true)
-        register(classOf[XFormsGroupHandler],          XF, "group",    any = true)
-        register(classOf[XFormsCaseHandler],           XF, "case",     any = true)
-        register(classOf[XFormsRepeatHandler],         XF, "repeat",   any = true)
+        throw new NotImplementedError("XML handlers are not implemented yet")
       }
 
       // Register a handler for AVTs on HTML elements
@@ -62,9 +50,6 @@ object XHTMLOutput {
 
         if (isHTMLDocument)
           register(classOf[XHTMLElementHandler], XH)
-
-        for (additionalAvtElementNamespace ← XFormsProperties.getAdditionalAvtElementNamespaces)
-          register(classOf[ElementHandlerXML], additionalAvtElementNamespace)
       }
 
       // Swallow XForms elements that are unknown

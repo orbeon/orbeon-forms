@@ -28,7 +28,15 @@ import org.xml.sax._
 /**
  * Handle xf:upload.
  */
-class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with HandlerSupport {
+class XFormsUploadHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+  with HandlerSupport {
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     val uploadControl = control.asInstanceOf[XFormsUploadControl]
@@ -38,11 +46,11 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with Handl
 
   protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
-    implicit val receiver   = handlerContext.getController.getOutput
+    implicit val receiver   = xformsHandlerContext.getController.getOutput
 
     val uploadControl       = Option(control.asInstanceOf[XFormsUploadControl])
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true)
-    val xhtmlPrefix         = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix         = xformsHandlerContext.findXHTMLPrefix
 
     // Enclosing xhtml:span
     withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {

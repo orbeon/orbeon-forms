@@ -27,7 +27,14 @@ import java.{lang ⇒ jl}
  *
  * TODO: This currently is based on delimiters. This is wrong: should be the case, like group, only around <tr>, etc.
  */
-class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
+class XFormsCaseHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = true) {
 
   private var currentSavedOutput: DeferredXMLReceiver = _
   private var currentOutputInterceptor: OutputInterceptor = _
@@ -36,11 +43,11 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
 
   // If we are the top-level of a full update, output a delimiter anyway
   protected override def isMustOutputContainerElement =
-    handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
 
     // Determine whether this case is visible
@@ -48,19 +55,19 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
 
     // This case is visible if it is selected or if the switch is read-only and we display read-only as static
     isVisible =
-      if (! handlerContext.isTemplate && (caseControl ne null))
+      if (! xformsHandlerContext.isTemplate && (caseControl ne null))
         caseControl.isVisible
       else
         false
 
     val selectedClasses = if (isVisible) "xforms-case-selected" else "xforms-case-deselected"
 
-    val controller = handlerContext.getController
+    val controller = xformsHandlerContext.getController
     currentSavedOutput = controller.getOutput
 
     // Place interceptor if needed
-    if (! handlerContext.isNoScript) {
-      isMustGenerateBeginEndDelimiters = ! handlerContext.isFullUpdateTopLevelControl(effectiveId)
+    if (! xformsHandlerContext.isNoScript) {
+      isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId)
 
       // Classes on top-level elements and characters and on the first delimiter
       val elementClasses = {
@@ -113,13 +120,13 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
       // Case not visible, set output to a black hole
       controller.setOutput(new DeferredXMLReceiverAdapter)
 
-    handlerContext.pushCaseContext(isVisible)
+    xformsHandlerContext.pushCaseContext(isVisible)
   }
 
   protected override def handleControlEnd(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
-    handlerContext.popCaseContext()
+    xformsHandlerContext.popCaseContext()
 
-    if (! handlerContext.isNoScript) {
+    if (! xformsHandlerContext.isNoScript) {
       currentOutputInterceptor.flushCharacters(true, true)
       if (isMustGenerateBeginEndDelimiters) {
         // Make sure first delimiter was output
@@ -130,7 +137,7 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
       }
     }
 
-    handlerContext.getController.setOutput(currentSavedOutput)
+    xformsHandlerContext.getController.setOutput(currentSavedOutput)
   }
 
   // Don't output any LHHA

@@ -29,30 +29,37 @@ import scala.util.control.NonFatal
 /**
  * Handle xf:repeat.
  */
-class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // This is a repeating element
+class XFormsRepeatHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = true, forwarding = true) {
 
-  override def isMustOutputContainerElement = handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+  override def isMustOutputContainerElement = xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
-    val isTopLevelRepeat = handlerContext.countParentRepeats == 0
-    val isRepeatSelected = handlerContext.isRepeatSelected || isTopLevelRepeat
-    val isMustGenerateTemplate = (handlerContext.isTemplate || isTopLevelRepeat) && ! handlerContext.isNoScript // don't generate templates in noscript mode as they won't be used
-    val isMustGenerateDelimiters = ! handlerContext.isNoScript
-    val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && ! handlerContext.isFullUpdateTopLevelControl(effectiveId)
+    val isTopLevelRepeat = xformsHandlerContext.countParentRepeats == 0
+    val isRepeatSelected = xformsHandlerContext.isRepeatSelected || isTopLevelRepeat
+    val isMustGenerateTemplate = (xformsHandlerContext.isTemplate || isTopLevelRepeat) && ! xformsHandlerContext.isNoScript // don't generate templates in noscript mode as they won't be used
+    val isMustGenerateDelimiters = ! xformsHandlerContext.isNoScript
+    val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId)
     val namespacedId = XFormsUtils.namespaceId(containingDocument, effectiveId)
 
-    val repeatControl = if (handlerContext.isTemplate) null else containingDocument.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsRepeatControl]
+    val repeatControl = if (xformsHandlerContext.isTemplate) null else containingDocument.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsRepeatControl]
     val isConcreteControl = repeatControl != null
 
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
 
     // Compute user classes only once for all iterations
     val userClasses = appendControlUserClasses(attributes, control, new JStringBuilder).toString
 
     // Place interceptor on output
-    val savedOutput = handlerContext.getController.getOutput
+    val savedOutput = xformsHandlerContext.getController.getOutput
 
     var mustOutputFirstDelimiter = isMustGenerateDelimiters
     var outputDelimiter: (String, String) ⇒ Unit = null // initialized further below
@@ -116,9 +123,9 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         outputInterceptor.setAddedClasses(classes.toString)
       }
 
-      handlerContext.pushRepeatContext(generateTemplate, iteration, repeatSelected)
+      xformsHandlerContext.pushRepeatContext(generateTemplate, iteration, repeatSelected)
       try {
-        handlerContext.getController.repeatBody()
+        xformsHandlerContext.getController.repeatBody()
         if (isMustGenerateDelimiters)
           outputInterceptor.flushCharacters(true, true)
       } catch {
@@ -128,19 +135,19 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element)
           )
       }
-      handlerContext.popRepeatContext()
+      xformsHandlerContext.popRepeatContext()
 
       bodyRepeated = true
     }
 
     if (isMustGenerateDelimiters)
-      handlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
+      xformsHandlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
 
     // 1. Unroll repeat if needed
     if (isConcreteControl) {
 
       val repeatIndex = repeatControl.getIndex
-      val selectedClass = "xforms-repeat-selected-item-" + ((handlerContext.countParentRepeats % 4) + 1)
+      val selectedClass = "xforms-repeat-selected-item-" + ((xformsHandlerContext.countParentRepeats % 4) + 1)
       val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
 
       val addedClasses = new StringBuilder(200)
@@ -191,7 +198,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
     }
 
     // Restore output
-    handlerContext.getController.setOutput(savedOutput)
+    xformsHandlerContext.getController.setOutput(savedOutput)
 
     // 4. Delimiter: end repeat
     if (isMustGenerateBeginEndDelimiters)

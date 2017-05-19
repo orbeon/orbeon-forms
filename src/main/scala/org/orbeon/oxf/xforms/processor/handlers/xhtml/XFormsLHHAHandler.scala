@@ -14,25 +14,30 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.XMLUtils
-import org.xml.sax.Attributes
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
+import org.xml.sax.Attributes
 
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
  */
-class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
+class XFormsLHHAHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsBaseHandlerXHTML(uri, localname, qName, attributes, matched, handlerContext, false, false) {
 
-  override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+  override def start(): Unit = {
 
     // Find control ids based on @for attribute
-    val lhhaPrefixedId = handlerContext.getPrefixedId(attributes)
-    val lhhaEffectiveId = handlerContext.getEffectiveId(attributes)
+    val lhhaPrefixedId = xformsHandlerContext.getPrefixedId(attributes)
+    val lhhaEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
     containingDocument.getStaticOps.getControlAnalysis(lhhaPrefixedId) match {
       case lhhaAnalysis: LHHAAnalysis if ! lhhaAnalysis.isLocal ⇒
@@ -40,7 +45,7 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
         lhhaAnalysis.targetControl match {
           case Some(targetControl) ⇒
 
-            val isTemplate = handlerContext.isTemplate
+            val isTemplate = xformsHandlerContext.isTemplate
 
             // Find concrete control if possible, to retrieve the concrete LHHA values
             val xformsControlOpt =
@@ -72,7 +77,7 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
 
             val forEffectiveIdOpt =
               if (lhhaType == LHHAC.LABEL)
-                XFormsLHHAHandler.findTargetControlForEffectiveId(handlerContext, targetControl, targetControlEffectiveId)
+                XFormsLHHAHandler.findTargetControlForEffectiveId(xformsHandlerContext, targetControl, targetControlEffectiveId)
               else
                 None
 
@@ -114,28 +119,11 @@ object XFormsLHHAHandler {
     // - instantiate that handler
     // - so we can call `getForEffectiveId` on it
     //
-    // NOTE: A possibly simpler better solution would be to always use the foo$bar$$c.1-2-3 scheme for the @for id
+    // NOTE: A possibly simpler better solution would be to always use the `foo$bar$$c.1-2-3` scheme for the `@for` id
     // of a control.
-
-    val controlElement = targetControl.element
-
-    handlerContext.getController.getHandler(controlElement) match {
-      case (handler: XFormsControlLifecyleHandler, matched: AnyRef) ⇒
-
-        // Perform minimal handler initialization because we just want to use it to get the effective id
-        handler.setContext(handlerContext)
-
-        handler.init(
-          controlElement.getNamespaceURI,
-          controlElement.getName,
-          XMLUtils.buildQName(controlElement.getNamespacePrefix, controlElement.getName),
-          Dom4jUtils.getSAXAttributes(controlElement),
-          matched
-        )
-
-        Option(handler.getForEffectiveId(targetControlEffectiveId))
-      case _ ⇒
-        None
+    handlerContext.getController.getHandler(targetControl.element, handlerContext) match {
+      case handler: XFormsControlLifecyleHandler ⇒ Option(handler.getForEffectiveId(targetControlEffectiveId))
+      case _                                     ⇒ None
     }
   }
 }

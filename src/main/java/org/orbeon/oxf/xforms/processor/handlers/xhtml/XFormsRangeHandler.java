@@ -28,26 +28,26 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
-    public XFormsRangeHandler() {
-        super(false);
+    public XFormsRangeHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, false);
     }
 
     private static final String RANGE_BACKGROUND_CLASS = "xforms-range-background";
     private static final String RANGE_THUMB_CLASS      = "xforms-range-thumb";
 
     @Override
-    protected String getContainingElementName() {
+    public String getContainingElementName() {
         return "div";
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsRangeControl rangeControl = (XFormsRangeControl) control;
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
 
         // Create nested xhtml:div elements
         {
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
             final String divName     = "div";
             final String divQName    = XMLUtils.buildQName(xhtmlPrefix, divName);
 
@@ -68,7 +68,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         return reusableAttributes;
     }
 
-    protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
+    private AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
         // Add custom class
         final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, true);
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, RANGE_BACKGROUND_CLASS);

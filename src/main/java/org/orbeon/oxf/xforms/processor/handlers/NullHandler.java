@@ -14,11 +14,16 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xml.ElementHandler;
+import org.xml.sax.Attributes;
 
 /**
  * Handler that simply swallows its content and does nothing.
  */
 public class NullHandler extends ElementHandler {
+
+    public NullHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
+    }
 
     public boolean isRepeating() {
         return false;

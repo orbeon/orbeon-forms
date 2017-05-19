@@ -21,43 +21,28 @@ import org.xml.sax.SAXException;
  */
 public abstract class ElementHandler {
 
-    private Object context;
+    public String uri;
+    public String localname;
+    public String qName;
+    public Attributes attributes;
+    public Object matched;
+    private Object handlerContext;
 
-    /**
-     * Override this to detect that the element is being initialized.
-     *
-     *
-     * @param uri           element namespace URI
-     * @param localname     element local name
-     * @param qName         element qualified name
-     * @param attributes    element attributes
-     * @param matched       object returned by the matcher
-     * @throws SAXException
-     */
-    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+    public ElementHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        this.uri            = uri;
+        this.localname      = localname;
+        this.qName          = qName;
+        this.attributes     = attributes;
+        this.matched        = matched;
+        this.handlerContext = handlerContext;
     }
 
-    /**
-     * Override this to detect that the element has started.
-     *
-     * @param uri           element namespace URI
-     * @param localname     element local name
-     * @param qName         element qualified name
-     * @param attributes    element attributes
-     * @throws SAXException
-     */
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    // Override this to detect that the element has started.
+    public void start() throws SAXException {
     }
 
-    /**
-     * Override this to detect that the element has ended.
-     *
-     * @param uri           element namespace URI
-     * @param localname     element local name
-     * @param qName         element qualified name
-     * @throws SAXException
-     */
-    public void end(String uri, String localname, String qName) throws SAXException {
+    // Override this to detect that the element has ended.
+    public void end() throws SAXException {
     }
 
     /**
@@ -75,20 +60,11 @@ public abstract class ElementHandler {
     public abstract boolean isForwarding();
 
     /**
-     * Set a context object for this handler.
-     *
-     * @param context context object
-     */
-    public void setContext(Object context) {
-        this.context = context;
-    }
-
-    /**
      * Return a context object for this handler.
      *
      * @return context object
      */
     public Object getContext() {
-        return context;
+        return handlerContext;
     }
 }

@@ -21,14 +21,15 @@ import org.xml.sax.SAXException;
  */
 public class XHTMLElementHandler extends XFormsBaseHandlerXHTML {
 
-	public static final String[] REF_ID_ATTRIBUTE_NAMES = new String[] { "for" };
+	static final String[] REF_ID_ATTRIBUTE_NAMES = new String[] { "for" };
 
-	public XHTMLElementHandler() {
-        super(false, true);
+	public XHTMLElementHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, true);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        handlerContext.getController().getOutput().startElement(
+    @Override
+    public void start() throws SAXException {
+        xformsHandlerContext.getController().getOutput().startElement(
             uri,
             localname,
             qName,
@@ -36,7 +37,8 @@ public class XHTMLElementHandler extends XFormsBaseHandlerXHTML {
         );
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-        handlerContext.getController().getOutput().endElement(uri, localname, qName);
+    @Override
+    public void end() throws SAXException {
+        xformsHandlerContext.getController().getOutput().endElement(uri, localname, qName);
     }
 }

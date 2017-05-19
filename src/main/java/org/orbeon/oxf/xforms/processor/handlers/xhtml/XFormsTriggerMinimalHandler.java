@@ -29,12 +29,16 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
-    protected static final String ENCLOSING_ELEMENT_NAME = "a";
+    public XFormsTriggerMinimalHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
+    }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    private static final String ENCLOSING_ELEMENT_NAME = "a";
+
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
-        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
 
         final AttributesImpl htmlAnchorAttributes =
             getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true);
@@ -48,7 +52,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         }
 
         // xhtml:a
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String aQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
         xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, htmlAnchorAttributes);
         {

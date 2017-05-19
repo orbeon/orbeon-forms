@@ -18,29 +18,36 @@ import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 
-class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
+class XXFormsDynamicHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsBaseHandler(uri, localname, qName, attributes, matched, handlerContext, false, false) {
 
   private var elementName: String = _
   private var elementQName: String = _
 
-  override def start(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
+  override def start(): Unit = {
 
-    val controller = handlerContext.getController
+    val controller = xformsHandlerContext.getController
     val contentHandler = controller.getOutput
 
-    val prefixedId = handlerContext.getPrefixedId(attributes)
-    val effectiveId = handlerContext.getEffectiveId(attributes)
+    val prefixedId = xformsHandlerContext.getPrefixedId(attributes)
+    val effectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
     this.elementName = "div"
     this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
 
     val classes = "xxforms-dynamic-control"
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getIdClassXHTMLAttributes(attributes, classes, effectiveId))
-    handlerContext.pushComponentContext(prefixedId)
+    xformsHandlerContext.pushComponentContext(prefixedId)
 
-    if (! handlerContext.isTemplate) {
+    if (! xformsHandlerContext.isTemplate) {
       containingDocument.getControlByEffectiveId(effectiveId) match {
         case control: XXFormsDynamicControl ⇒
           // Output new scripts upon update if any
@@ -54,16 +61,16 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
           }
           // Output new markup
           control.nested foreach { nested ⇒
-            handlerContext.pushPartAnalysis(nested.partAnalysis)
+            xformsHandlerContext.pushPartAnalysis(nested.partAnalysis)
             processShadowTree(controller, nested.template)
 
             // Add part globals for top-level part only (see comments in PartAnalysisImpl)
             if (nested.partAnalysis.isTopLevel)
               nested.partAnalysis.getGlobals foreach { global ⇒
-                XXFormsComponentHandler.processShadowTree(handlerContext.getController, global.templateTree)
+                XXFormsComponentHandler.processShadowTree(xformsHandlerContext.getController, global.templateTree)
               }
 
-            handlerContext.popPartAnalysis()
+            xformsHandlerContext.popPartAnalysis()
           }
 
         case _ ⇒
@@ -115,9 +122,9 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
     controller.endBody()
   }
 
-  override def end(uri: String, localname: String, qName: String): Unit = {
-    handlerContext.popComponentContext()
-    val controller = handlerContext.getController
+  override def end(): Unit = {
+    xformsHandlerContext.popComponentContext()
+    val controller = xformsHandlerContext.getController
     val contentHandler = controller.getOutput
     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName)
   }

@@ -49,17 +49,17 @@ import java.util.List;
  */
 public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
-    public XFormsSelect1Handler() {
-        super(false);
+    public XFormsSelect1Handler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, false);
     }
 
     @Override
-    protected boolean isDefaultIncremental() {
+    public boolean isDefaultIncremental() {
         // Incremental mode is the default
         return true;
     }
 
-    protected SelectAppearanceTrait getAppearanceTrait() {
+    private SelectAppearanceTrait getAppearanceTrait() {
         if (elementAnalysis instanceof SelectAppearanceTrait) {
             return (SelectAppearanceTrait) elementAnalysis;
         } else {
@@ -67,7 +67,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    protected void handleControlStart(
+    public void handleControlStart(
         String uri,
         String localname,
         String qName,
@@ -109,14 +109,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         boolean isBooleanInput
     ) throws SAXException {
 
-        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
 
         final XFormsControl xformsControl = (XFormsControl) control; // cast because Java is not aware that XFormsValueControl extends XFormsControl
         final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control; // same as above
 
         final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, !isFull);
 
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
 
         final boolean isStaticReadonly = isStaticReadonly(xformsControl);
@@ -213,7 +213,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field");
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
-            if (!handlerContext.isTemplate()) {
+            if (!xformsHandlerContext.isTemplate()) {
                 final String value = (control == null || control.getValue() == null) ? "" : control.getValue();
                 if (itemset != null) {
                     boolean selectedFound = false;
@@ -245,7 +245,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         boolean encode
     ) throws SAXException {
 
-        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         final XFormsControl xformsControl = (XFormsControl) control; // cast because Java is not aware that XFormsValueControl extends XFormsControl
 
@@ -267,7 +267,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, role);
         final String labelId = getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.LABEL));
         containerAttributes.addAttribute("", "aria-labelledby", "aria-labelledby", XMLReceiverHelper.CDATA, labelId);
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";
 
@@ -275,7 +275,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         // TODO: This really hasn't much to do with noscript; should we always use fieldset, or make this an
         // option? Benefit of limiting to noscript is that then no JS change is needed
-        final String containingElementName = handlerContext.isNoScript() ? "fieldset" : "span";
+        final String containingElementName = xformsHandlerContext.isNoScript() ? "fieldset" : "span";
         final String containingElementQName = XMLUtils.buildQName(xhtmlPrefix, containingElementName);
 
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
@@ -286,7 +286,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             if (outputContainerElement)
                 xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
             {
-                if (handlerContext.isNoScript()) {
+                if (xformsHandlerContext.isNoScript()) {
                     // Output <legend>
                     final String legendName = "legend";
                     final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
@@ -390,9 +390,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         boolean encode,
         ContentHandler contentHandler
     ) throws SAXException {
-        if (control != null && ! handlerContext.isTemplate()) {
+        if (control != null && ! xformsHandlerContext.isTemplate()) {
             // Produce a JSON fragment with hierarchical information
-            final String result = itemset.asJSON(control.getValue(), encode, handlerContext.getLocationData());
+            final String result = itemset.asJSON(control.getValue(), encode, xformsHandlerContext.getLocationData());
             contentHandler.characters(result.toCharArray(), 0, result.length());
         } else {
             // Don't produce any content when generating a template
@@ -419,10 +419,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         boolean encode
     ) throws SAXException {
 
-        final HandlerContext handlerContext = baseHandler.getHandlerContext();
+        final HandlerContext xformsHandlerContextForItem = baseHandler.getHandlerContext();
 
         // Whether this is selected
-        boolean isSelected = isSelected(handlerContext, control, isMultiple, item);
+        boolean isSelected = isSelected(xformsHandlerContextForItem, control, isMultiple, item);
 
         // xhtml:span enclosing input and label
         final String itemClasses = getItemClasses(item, isSelected ? "xforms-selected" : "xforms-deselected");
@@ -433,7 +433,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         {
             final LHHAValue itemLabel = item.label();
-            final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
+            final String itemNamespacedId = XFormsUtils.namespaceId(xformsHandlerContextForItem.getContainingDocument(), itemEffectiveId);
 
             final String labelName = ! isStaticReadonly ? "label" : "span";
 
@@ -443,7 +443,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, isMultiple ? "checkbox" : "radio");
 
                 // No need for @for as the input, if any, is nested
-                outputLabelForStart(handlerContext, reusableAttributes, null, null, LHHAC.LABEL, labelName, false);
+                outputLabelForStart(xformsHandlerContextForItem, reusableAttributes, null, null, LHHAC.LABEL, labelName, false);
             }
 
             {
@@ -464,7 +464,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode));
 
-                    if (!handlerContext.isTemplate() && control != null) {
+                    if (!xformsHandlerContextForItem.isTemplate() && control != null) {
 
                         if (isSelected)
                             reusableAttributes.addAttribute("", "checked", "checked", XMLReceiverHelper.CDATA, "checked");
@@ -487,7 +487,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     if (item.hint().isDefined())
                         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint-region");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    outputLabelText(handlerContext.getController().getOutput(), null, itemLabel.label(), xhtmlPrefix, itemLabel.isHTML());
+                    outputLabelText(xformsHandlerContextForItem.getController().getOutput(), null, itemLabel.label(), xhtmlPrefix, itemLabel.isHTML());
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                     // <span class="xforms-help">
@@ -498,7 +498,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help");
-                            outputLabelFor(handlerContext, reusableAttributes, null, null, LHHAC.HELP, "span", help.label(), help.isHTML(), false);
+                            outputLabelFor(xformsHandlerContextForItem, reusableAttributes, null, null, LHHAC.HELP, "span", help.label(), help.isHTML(), false);
                         }
                     }
 
@@ -510,14 +510,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint");
-                            outputLabelFor(handlerContext, reusableAttributes, null, null, LHHAC.HINT, "span", hint.label(), hint.isHTML(), false);
+                            outputLabelFor(xformsHandlerContextForItem, reusableAttributes, null, null, LHHAC.HINT, "span", hint.label(), hint.isHTML(), false);
                         }
                     }
                 }
             }
 
             if (! isBooleanInput)
-                outputLabelForEnd(handlerContext, labelName);
+                outputLabelForEnd(xformsHandlerContextForItem, labelName);
         }
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -554,7 +554,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // Figure out whether what items are selected
         // Don't output more than one `selected` in the case of single-selection, see:
         // https://github.com/orbeon/orbeon-forms/issues/2901
-        boolean mustSelect = (isMultiple || ! gotSelected) && isSelected(handlerContext, xformsControl, isMultiple, item);
+        boolean mustSelect = (isMultiple || ! gotSelected) && isSelected(xformsHandlerContext, xformsControl, isMultiple, item);
         if (mustSelect)
             optionAttributes.addAttribute("", "selected", "selected", XMLReceiverHelper.CDATA, "selected");
 
@@ -610,10 +610,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void handleLabel() throws SAXException {
+    public void handleLabel() throws SAXException {
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         final boolean isFull = appearanceTrait != null && appearanceTrait.isFull();
-        if (!isStaticReadonly(currentControlOrNull()) && handlerContext.isNoScript() && isFull) {
+        if (!isStaticReadonly(currentControlOrNull()) && xformsHandlerContext.isNoScript() && isFull) {
             // NOP: in noscript mode for full items, this is handled by fieldset/legend
         } else if (isFull) {
             // For radio and checkboxes, produce span with an id

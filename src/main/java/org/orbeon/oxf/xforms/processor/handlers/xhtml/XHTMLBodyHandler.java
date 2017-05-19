@@ -40,25 +40,26 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
     private XMLReceiverHelper helper;
 
-//    private String formattingPrefix;
+    public XHTMLBodyHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, true);
 
-    public XHTMLBodyHandler() {
-        super(false, true);
-    }
-
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
-        // Register control handlers on controller
-        registerHandlers(handlerContext.getController(), containingDocument);
+        // TODO: pass attributes to constructor above
 
         // Add class for YUI skin
         attributes = SAXUtils.appendToClassAttribute(attributes, "yui-skin-sam");
 
         // Handle AVTs
         attributes = handleAVTsAndIDs(attributes, XHTMLElementHandler.REF_ID_ATTRIBUTE_NAMES);
+    }
+
+    @Override
+    public void start() throws SAXException {
+
+        // Register control handlers on controller
+        registerHandlers(xformsHandlerContext.getController(), containingDocument);
 
         // Start xhtml:body
-        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
         xmlReceiver.startElement(uri, localname, qName, attributes);
         helper = new XMLReceiverHelper(xmlReceiver);
 
@@ -84,7 +85,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
 
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
-        if (!handlerContext.isNoScript()) {
+        if (!xformsHandlerContext.isNoScript()) {
             helper.element("", XMLNames.XIncludeURI(), "include", new String[] {
                     "href", getIncludedResourceURL(requestPath, "noscript-panel.xml"),
                     "fixup-xml-base", "false"
@@ -92,7 +93,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
 
         final StringBuilder sb = new StringBuilder("xforms-form");
-        sb.append(handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
+        sb.append(xformsHandlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
 
         // LHHA appearance classes
         //
@@ -125,7 +126,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 // Submission parameters
                 "action", xformsSubmissionPath, "method", "POST",
                 // In noscript mode, don't add event handler
-                "onsubmit", handlerContext.isNoScript() ? null : "return false",
+                "onsubmit", xformsHandlerContext.isNoScript() ? null : "return false",
                 doMultipartPOST ? "enctype" : null, doMultipartPOST ? "multipart/form-data" : null});
 
         {
@@ -156,7 +157,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 //            }
         }
 
-        if (!handlerContext.isNoScript()) {
+        if (!xformsHandlerContext.isNoScript()) {
             // Other fields used by JavaScript
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
@@ -384,18 +385,19 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic", ANY_MATCHER);
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
+    @Override
+    public void end() throws SAXException {
 
         // Add global top-level XBL markup
         final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.getStaticOps().getGlobals().iterator();
         while (i.hasNext())
-            XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().templateTree());
+            XXFormsComponentHandler.processShadowTree(xformsHandlerContext.getController(), i.next().templateTree());
 
         // Close xhtml:form
         helper.endElement();
 
         // Close xhtml:body
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
         contentHandler.endElement(uri, localname, qName);
     }
 

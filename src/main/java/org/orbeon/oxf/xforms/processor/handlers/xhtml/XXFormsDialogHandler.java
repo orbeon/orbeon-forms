@@ -31,13 +31,13 @@ import org.xml.sax.SAXException;
  */
 public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
-    public XXFormsDialogHandler() {
-        super(false, true);
+    public XXFormsDialogHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, true);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    public void start() throws SAXException {
 
-        final String effectiveDialogId = handlerContext.getEffectiveId(attributes);
+        final String effectiveDialogId = xformsHandlerContext.getEffectiveId(attributes);
         final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getControlByEffectiveId(effectiveDialogId));
 
         // Find classes to add
@@ -68,9 +68,9 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
         }
 
         // Start main xhtml:div
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getIdClassXHTMLAttributes(attributes, classes.toString(), effectiveDialogId));
 
         // Child xhtml:div for label
@@ -91,12 +91,13 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
+    @Override
+    public void end() throws SAXException {
 
         // Close xhtml:div's
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
     }

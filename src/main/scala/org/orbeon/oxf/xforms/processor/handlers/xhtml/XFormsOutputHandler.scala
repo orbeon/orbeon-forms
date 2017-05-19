@@ -35,14 +35,22 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
     outputControl : XFormsSingleNodeControl
   ) = {
     // Add custom class
-    val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, outputControl, true)
+    val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, outputControl, addId = true)
     containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-output-output")
     containerAttributes
   }
 }
 
 // Default xf:output handler
-class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
+class XFormsOutputDefaultHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+     with XFormsOutputHandler {
 
   protected def handleControlStart(
     uri         : String,
@@ -53,11 +61,11 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
     control     : XFormsControl
   ): Unit = {
 
-    implicit val xmlReceiver = handlerContext.getController.getOutput
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val outputControl = control.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
-    val contentHandler = handlerContext.getController.getOutput
+    val contentHandler = xformsHandlerContext.getController.getOutput
 
     val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
 
@@ -66,7 +74,7 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
 
     val elementName = if (getStaticLHHA(getPrefixedId, LHHAC.LABEL) ne null) "output" else "span"
 
-    withElement(elementName, prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+    withElement(elementName, prefix = xformsHandlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       if (isConcreteControl) {
         val mediatypeValue = attributes.getValue("mediatype")
         val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
@@ -78,7 +86,15 @@ class XFormsOutputDefaultHandler extends XFormsControlLifecyleHandler(false) wit
 }
 
 // xf:output[@mediatype = 'text/html']
-class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
+class XFormsOutputHTMLHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+     with XFormsOutputHandler {
 
   protected def handleControlStart(
     uri         : String,
@@ -89,11 +105,11 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
     control     : XFormsControl
   ): Unit = {
 
-    implicit val xmlReceiver = handlerContext.getController.getOutput
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val outputControl = control.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
     val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
 
@@ -116,7 +132,15 @@ class XFormsOutputHTMLHandler extends XFormsControlLifecyleHandler(false) with X
 }
 
 // xf:output[starts-with(@appearance, 'image/')]
-class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
+class XFormsOutputImageHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+     with XFormsOutputHandler {
 
   protected def handleControlStart(
     uri         : String,
@@ -127,10 +151,10 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
     control     : XFormsControl
   ): Unit = {
 
-    implicit val xmlReceiver = handlerContext.getController.getOutput
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val outputControl = control.asInstanceOf[XFormsOutputControl]
-    val xhtmlPrefix = handlerContext.findXHTMLPrefix
+    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val mediatypeValue = attributes.getValue("mediatype")
 
     val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
@@ -152,7 +176,15 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
 }
 
 // xf:output[@appearance = 'xxf:text']
-class XFormsOutputTextHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
+class XFormsOutputTextHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+     with XFormsOutputHandler {
 
   protected def handleControlStart(
     uri         : String,
@@ -165,7 +197,7 @@ class XFormsOutputTextHandler extends XFormsControlLifecyleHandler(false) with X
 
     val outputControl = control.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
-    val contentHandler = handlerContext.getController.getOutput
+    val contentHandler = xformsHandlerContext.getController.getOutput
 
     if (isConcreteControl) {
       val externalValue = outputControl.getExternalValue
@@ -179,7 +211,15 @@ class XFormsOutputTextHandler extends XFormsControlLifecyleHandler(false) with X
 }
 
 // xf:output[@appearance = 'xxf:download']
-class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) with XFormsOutputHandler {
+class XFormsOutputDownloadHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  attributes     : Attributes,
+  matched        : AnyRef,
+  handlerContext : AnyRef
+) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
+     with XFormsOutputHandler {
 
   // NOP because the label is output as the text within <a>
   protected override def handleLabel() = ()
@@ -193,12 +233,12 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
     control     : XFormsControl
   ): Unit = {
 
-    implicit val context     = handlerContext
-    implicit val xmlReceiver = context.getController.getOutput
+    implicit val context     = xformsHandlerContext
+    implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
     val outputControl        = control.asInstanceOf[XFormsOutputControl]
     val containerAttributes  = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
-    val xhtmlPrefix          = context.findXHTMLPrefix
+    val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
 
     // For f:url-type="resource"
     withFormattingPrefix { formattingPrefix ⇒

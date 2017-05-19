@@ -27,27 +27,27 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
     private static final String HIDDEN_PASSWORD = "••••••••";
 
-    public XFormsSecretHandler() {
-        super(false);
+    public XFormsSecretHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
+        super(uri, localname, qName, attributes, matched, handlerContext, false, false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsSecretControl secretControl = (XFormsSecretControl) control;
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
         final boolean isConcreteControl = secretControl != null;
 
         final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, secretControl, true);
 
         // Create xhtml:input
         {
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
             if (!isStaticReadonly(secretControl)) {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
                 containerAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "password");
                 containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);
                 containerAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA,
-                        handlerContext.isTemplate() || secretControl == null || secretControl.getExternalValue() == null ? "" : secretControl.getExternalValue());
+                        xformsHandlerContext.isTemplate() || secretControl == null || secretControl.getExternalValue() == null ? "" : secretControl.getExternalValue());
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, containerAttributes);

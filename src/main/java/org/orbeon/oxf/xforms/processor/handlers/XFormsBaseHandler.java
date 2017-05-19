@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.StaticStateGlobalOps;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
@@ -22,7 +25,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
@@ -39,48 +41,39 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     public static final Map<LHHAC, String> LHHAC_CODES = new HashMap<LHHAC, String>();
     static {
-        LHHAC_CODES.put(LHHAC.LABEL, "l");
-        LHHAC_CODES.put(LHHAC.HELP, "p");
-        LHHAC_CODES.put(LHHAC.HINT, "t");
-        LHHAC_CODES.put(LHHAC.ALERT, "a");
+        LHHAC_CODES.put(LHHAC.LABEL,   "l");
+        LHHAC_CODES.put(LHHAC.HELP,    "p");
+        LHHAC_CODES.put(LHHAC.HINT,    "t");
+        LHHAC_CODES.put(LHHAC.ALERT,   "a");
         LHHAC_CODES.put(LHHAC.CONTROL, "c");
-        // "i" is also used for help image
     }
 
     private final boolean repeating;
     private final boolean forwarding;
 
-    protected HandlerContext handlerContext;
+    protected HandlerContext xformsHandlerContext;
 
     protected ElementAnalysis elementAnalysis;
     protected XFormsContainingDocument containingDocument;
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
 
-    protected XFormsBaseHandler(boolean repeating, boolean forwarding) {
-        this.repeating = repeating;
+    protected XFormsBaseHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext, boolean repeating, boolean forwarding) {
+        super(uri, localname, qName, attributes, matched, handlerContext);
+        this.repeating  = repeating;
         this.forwarding = forwarding;
-    }
 
-    @Override
-    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
         // All elements corresponding to XForms controls must cause elementAnalysis to be available
         if (matched instanceof ElementAnalysis)
             this.elementAnalysis = (ElementAnalysis) matched;
-    }
 
-    public void setContext(Object context) {
-        this.handlerContext = (HandlerContext) context;
-
-        this.containingDocument = handlerContext.getContainingDocument();
-
-        super.setContext(context);
+        this.xformsHandlerContext = (HandlerContext) handlerContext;
+        this.containingDocument = xformsHandlerContext.getContainingDocument();
     }
 
     public boolean isRepeating() {
         return repeating;
     }
-
     public boolean isForwarding() {
         return forwarding;
     }
@@ -177,11 +170,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     protected Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames) {
-        final String prefixedId = handlerContext.getPrefixedId(attributes);
+        final String prefixedId = xformsHandlerContext.getPrefixedId(attributes);
 
         if (prefixedId != null) {
             final boolean hasAVT = containingDocument.getStaticOps().hasAttributeControl(prefixedId);
-            final String effectiveId = handlerContext.getEffectiveId(attributes);
+            final String effectiveId = xformsHandlerContext.getEffectiveId(attributes);
             boolean found = false;
             if (hasAVT) {
                 // This element has at least one AVT so process its attributes
@@ -204,7 +197,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
                         // Find concrete control if possible
                         final XXFormsAttributeControl attributeControl;
-                        if (handlerContext.isTemplate()) {
+                        if (xformsHandlerContext.isTemplate()) {
                             attributeControl = null;
                         } else if (attributeControlStaticId != null) {
                             final String attributeControlEffectiveId = XFormsUtils.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
@@ -243,7 +236,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         {
             final String forAttribute = attributes.getValue(refIdAttributeName);
             if (forAttribute != null) {
-                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, handlerContext.getIdPrefix() + forAttribute + handlerContext.getIdPostfix());
+                attributes = SAXUtils.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, xformsHandlerContext.getIdPrefix() + forAttribute + xformsHandlerContext.getIdPostfix());
             }
         }
 		return attributes;

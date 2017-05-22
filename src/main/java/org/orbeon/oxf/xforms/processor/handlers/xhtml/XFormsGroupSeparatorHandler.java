@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
@@ -38,7 +37,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
         return xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId());
     }
 
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart() throws SAXException {
 
         final String xhtmlPrefix       = xformsHandlerContext.findXHTMLPrefix();
         final String groupElementName  = getContainingElementName();
@@ -53,16 +52,16 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
         currentSavedOutput = controller.getOutput();
         if (!xformsHandlerContext.isNoScript()) {
 
-            final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId);
+            final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId());
 
             // Classes on top-level elements and characters and on the first delimiter
             final String elementClasses;
             {
                 final StringBuilder classes = new StringBuilder();
-                appendControlUserClasses(attributes, control, classes);
+                appendControlUserClasses(getAttributes(), currentControlOrNull(), classes);
                 // NOTE: Could also use getInitialClasses(uri, localname, attributes, control), but then we get the
                 // xforms-group-appearance-xxforms-separator class. Is that desirable?
-                handleMIPClasses(classes, getPrefixedId(), control); // as of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
+                handleMIPClasses(classes, getPrefixedId(), currentControlOrNull()); // as of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
                 elementClasses = classes.toString();
             }
 
@@ -83,7 +82,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                     // Delimiter: begin group
                     if (isMustGenerateBeginEndDelimiters) {
                         outputInterceptor.outputDelimiter(currentSavedOutput, firstDelimiterClasses,
-                                "group-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
+                                "group-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId()));
                     }
                 }
             }, true);
@@ -92,7 +91,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);
-        } else if (isNonRelevant(control)) {
+        } else if (isNonRelevant(currentControlOrNull())) {
             // In noscript, if the group not visible, set output to a black hole
             controller.setOutput(new DeferredXMLReceiverAdapter());
         }
@@ -101,7 +100,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlEnd() throws SAXException {
 
         final ElementHandlerController controller = xformsHandlerContext.getController();
         if (! xformsHandlerContext.isNoScript()) {
@@ -111,12 +110,12 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
             // Delimiter: end repeat
             outputInterceptor.flushCharacters(true, true);
 
-            final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId);
+            final boolean isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId());
             if (isMustGenerateBeginEndDelimiters) {
                 outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end",
-                        "group-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
+                        "group-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId()));
             }
-        } else if (isNonRelevant(control)) {
+        } else if (isNonRelevant(currentControlOrNull())) {
             // In noscript, group was not visible, restore output
             controller.setOutput(currentSavedOutput);
         }

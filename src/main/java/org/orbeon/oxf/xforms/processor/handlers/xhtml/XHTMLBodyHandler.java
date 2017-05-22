@@ -38,18 +38,18 @@ import scala.Option;
  */
 public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
+    private static Attributes prepareAttributes(Attributes attributes, HandlerContext xformsHandlerContext) {
+        // Add class for YUI skin
+        Attributes newAttributes = SAXUtils.appendToClassAttribute(attributes, "yui-skin-sam");
+
+        // Handle AVTs
+        return handleAVTsAndIDs(newAttributes, XHTMLElementHandler.REF_ID_ATTRIBUTE_NAMES(), xformsHandlerContext);
+    }
+
     private XMLReceiverHelper helper;
 
     public XHTMLBodyHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
-        super(uri, localname, qName, attributes, matched, handlerContext, false, true);
-
-        // TODO: pass attributes to constructor above
-
-        // Add class for YUI skin
-        attributes = SAXUtils.appendToClassAttribute(attributes, "yui-skin-sam");
-
-        // Handle AVTs
-        attributes = handleAVTsAndIDs(attributes, XHTMLElementHandler.REF_ID_ATTRIBUTE_NAMES);
+        super(uri, localname, qName, prepareAttributes(attributes, (HandlerContext) handlerContext), matched, handlerContext, false, true);
     }
 
     @Override

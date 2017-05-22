@@ -60,6 +60,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     protected XFormsBaseHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext, boolean repeating, boolean forwarding) {
         super(uri, localname, qName, attributes, matched, handlerContext);
+
         this.repeating  = repeating;
         this.forwarding = forwarding;
 
@@ -169,10 +170,13 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
     }
 
-    protected Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames) {
+    protected static Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames, HandlerContext xformsHandlerContext) {
         final String prefixedId = xformsHandlerContext.getPrefixedId(attributes);
 
         if (prefixedId != null) {
+
+            final XFormsContainingDocument containingDocument = xformsHandlerContext.getContainingDocument();
+
             final boolean hasAVT = containingDocument.getStaticOps().hasAttributeControl(prefixedId);
             final String effectiveId = xformsHandlerContext.getEffectiveId(attributes);
             boolean found = false;

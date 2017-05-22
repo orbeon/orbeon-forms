@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLReceiver;
@@ -35,13 +34,13 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
     private static final String ENCLOSING_ELEMENT_NAME = "a";
 
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart() throws SAXException {
 
-        final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
+        final XFormsTriggerControl triggerControl = (XFormsTriggerControl) currentControlOrNull();
         final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
 
         final AttributesImpl htmlAnchorAttributes =
-            getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true);
+            getEmptyNestedControlAttributesMaybeWithId(getEffectiveId(), triggerControl, true);
 
         htmlAnchorAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0"   );
         htmlAnchorAttributes.addAttribute("", "role"    , "role"    , XMLReceiverHelper.CDATA, "link");

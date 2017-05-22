@@ -39,19 +39,19 @@ class XFormsTriggerFullHandler(
   handlerContext : AnyRef
 ) extends XFormsTriggerHandler(uri, localname, qName, attributes, matched, handlerContext) {
 
-  protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+  override protected def handleControlStart(): Unit = {
 
-    val triggerControl = control.asInstanceOf[XFormsTriggerControl]
+    val triggerControl = currentControlOrNull.asInstanceOf[XFormsTriggerControl]
     val xmlReceiver = xformsHandlerContext.getController.getOutput
 
-    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true)
+    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, true)
 
     val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
     if (xformsHandlerContext.isNoScript) {
       // Noscript mode: we need a name to detect activation
-      addAttribute(containerAttributes, "name", effectiveId)
+      addAttribute(containerAttributes, "name", getEffectiveId)
 
       // We need a value so we can detect an activated button with IE 7
       // NOTE: IE 6/7 sends the <button> content as value instead of the value attribute!

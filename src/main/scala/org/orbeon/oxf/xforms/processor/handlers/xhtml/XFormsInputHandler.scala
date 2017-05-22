@@ -50,8 +50,8 @@ class XFormsInputHandler(
   private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
   private def isBoolean     = controlHas(c ⇒ c.getBuiltinTypeName == "boolean")
 
-  protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
-    val inputControl = control.asInstanceOf[XFormsInputControl]
+  override protected def handleControlStart(): Unit = {
+    val inputControl = currentControlOrNull.asInstanceOf[XFormsInputControl]
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
     val isRelevantControl = ! isNonRelevant(inputControl)
     val isConcreteControl = inputControl ne null
@@ -81,10 +81,10 @@ class XFormsInputHandler(
       val select1Handler = new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext) {
         override val getPrefixedId        = XFormsInputHandler.this.getPrefixedId
         override val getEffectiveId       = XFormsInputHandler.this.getEffectiveId
-        override val currentControlOrNull = XFormsInputHandler.this.currentControlOrNull
+        override def currentControlOrNull = XFormsInputHandler.this.currentControlOrNull
         override val currentControlOpt    = XFormsInputHandler.this.currentControlOpt
       }
-      select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
+      select1Handler.outputContent(uri, localname, attributes, getEffectiveId, inputControl, itemset, isMultiple, true, true)
     } else {
 
       val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
@@ -97,7 +97,7 @@ class XFormsInputHandler(
 
         // Main input field
         {
-          val inputIdName = getFirstInputEffectiveId(effectiveId)
+          val inputIdName = getFirstInputEffectiveId(getEffectiveId)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
           if (! isDateMinimal)
@@ -163,7 +163,7 @@ class XFormsInputHandler(
         // Add second field for dateTime's time part
         // NOTE: In the future, we probably want to do this as an XBL component
         if (isDateTime) {
-          val inputIdName = getSecondInputEffectiveId(effectiveId)
+          val inputIdName = getSecondInputEffectiveId(getEffectiveId)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
           reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")

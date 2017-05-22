@@ -70,16 +70,14 @@ abstract class XFormsControlLifecyleHandler(
     else
       Option(containingDocument.getControlByEffectiveId(getEffectiveId))
 
-  val currentControlOrNull = currentControlOpt.orNull
+  def currentControlOrNull = currentControlOpt.orNull
 
-  private var afterTokens            : Array[String]                         = Array.empty
+  private var afterTokens: Array[String] = Array.empty
 
   // By default, controls are enclosed with a <span>
-  @throws[SAXException]
   protected def getContainingElementName = "span"
 
-  @throws[SAXException]
-  protected val getContainingElementQName: String =
+  protected def getContainingElementQName: String =
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, getContainingElementName)
 
   @throws[SAXException]
@@ -125,7 +123,7 @@ abstract class XFormsControlLifecyleHandler(
       // Process everything up to and including the control
       for (current ← beforeTokens)
         current match {
-          case "control" ⇒ handleControlStart(uri, localname, qName, attributes, getEffectiveId, currentControlOrNull)
+          case "control" ⇒ handleControlStart()
           case "label"   ⇒ if (hasLocalLabel) handleLabel()
           case "alert"   ⇒ if (hasLocalAlert) handleAlert()
           case "hint"    ⇒ if (hasLocalHint)  handleHint()
@@ -144,7 +142,7 @@ abstract class XFormsControlLifecyleHandler(
       // Process everything after the control has been shown
       for (current ← afterTokens)
         current match {
-          case "control" ⇒ handleControlEnd(uri, localname, qName, attributes, getEffectiveId, currentControlOrNull)
+          case "control" ⇒ handleControlEnd()
           case "label"   ⇒ if (hasLocalLabel) handleLabel()
           case "alert"   ⇒ if (hasLocalAlert) handleAlert()
           case "hint"    ⇒ if (hasLocalHint)  handleHint()
@@ -235,33 +233,12 @@ abstract class XFormsControlLifecyleHandler(
 
   // Must be overridden by subclasses
   @throws[SAXException]
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  )
+  protected def handleControlStart(): Unit
 
   @throws[SAXException]
-  protected def handleControlEnd(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ) = ()
+  protected def handleControlEnd() = ()
 
-  protected def getEmptyNestedControlAttributesMaybeWithId(
-    uri         : String,
-    localname   : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl,
-    addId       : Boolean
-  ): AttributesImpl = {
+  protected def getEmptyNestedControlAttributesMaybeWithId(effectiveId: String, control: XFormsControl, addId: Boolean): AttributesImpl = {
     reusableAttributes.clear()
     val containerAttributes = reusableAttributes
     if (addId)
@@ -311,7 +288,7 @@ abstract class XFormsControlLifecyleHandler(
   }
 
   // Return the effective id of the element to which label/@for, etc. must point to.
+  // Default: point to `foo$bar$$c.1-2-3`
   def getForEffectiveId(effectiveId: String): String =
-    // Default: point to `foo$bar$$c.1-2-3`
     XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandler.LHHAC_CODES.get(LHHAC.CONTROL))
 }

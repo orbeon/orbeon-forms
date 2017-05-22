@@ -57,9 +57,9 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    public AttributesImpl getEmptyNestedControlAttributesMaybeWithId(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
+    public AttributesImpl getEmptyNestedControlAttributesMaybeWithId(String effectiveId, XFormsControl control, boolean addId) {
         // Get standard attributes
-        final AttributesImpl containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, addId);
+        final AttributesImpl containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, addId);
 
         // Add title attribute if not yet present and there is a hint
         if (containerAttributes.getValue("title") == null) {
@@ -69,7 +69,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
         }
 
         // Handle accessibility attributes on <a>, <input> or <button>
-        handleAccessibilityAttributes(attributes, containerAttributes);
+        handleAccessibilityAttributes(getAttributes(), containerAttributes);
 
         return containerAttributes;
     }

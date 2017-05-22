@@ -20,7 +20,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -507,19 +506,17 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     private HandlerInfo getHandler(String uri, String localname, String qName, Attributes attributes, Object handlerContext) {
 
-        final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
-
         // 1: Try custom matchers
         {
-            final HandlerInfo handlerInfo = runMatchers(customMatchers, uri, localname, qName, attributes, explodedQName, handlerContext);
+            final HandlerInfo handlerInfo = runMatchers(customMatchers, uri, localname, qName, attributes, handlerContext);
             if (handlerInfo != null)
                 return handlerInfo;
         }
 
         // 2: Try full matchers
-        final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(explodedQName);
+        final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(XMLUtils.buildExplodedQName(uri, localname));
         if (handlerMatchers != null) {
-            final HandlerInfo handlerInfo = runMatchers(handlerMatchers, uri, localname, qName, attributes, explodedQName, handlerContext);
+            final HandlerInfo handlerInfo = runMatchers(handlerMatchers, uri, localname, qName, attributes, handlerContext);
             if (handlerInfo != null)
                 return handlerInfo;
         }
@@ -528,18 +525,18 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         final String uriHandlerClassName = uriHandlers.get(uri);
         if (uriHandlerClassName != null) {
             final ElementHandler elementHandler = getHandlerByClassName(uriHandlerClassName, uri, localname, qName, attributes, null, handlerContext);
-            return new HandlerInfo(level, explodedQName, elementHandler, this.locator);
+            return new HandlerInfo(level, elementHandler, this.locator);
         }
 
         return null;
     }
 
-    private HandlerInfo runMatchers(List<HandlerMatcher> matchers, String uri, String localname, String qName, Attributes attributes, String explodedQName, Object handlerContext) {
+    private HandlerInfo runMatchers(List<HandlerMatcher> matchers, String uri, String localname, String qName, Attributes attributes, Object handlerContext) {
         for (HandlerMatcher handlerMatcher: matchers) {
             final Object matched = handlerMatcher.matcher.match(attributes, elementHandlerContext);
             if (matched != null) {
                 final ElementHandler elementHandler = getHandlerByClassName(handlerMatcher.handlerClassName, uri, localname, qName, attributes, matched, handlerContext);
-                return new HandlerInfo(level, explodedQName, elementHandler, this.locator);
+                return new HandlerInfo(level, elementHandler, this.locator);
             }
         }
         return null;
@@ -573,14 +570,11 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     private static class HandlerInfo {
         public final int level;
-        public final String explodedQName;
         public final ElementHandler elementHandler;
-
         public final SAXStore saxStore;
 
-        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Locator locator) {
+        public HandlerInfo(int level, ElementHandler elementHandler, Locator locator) {
             this.level = level;
-            this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
 
             this.saxStore = elementHandler.isRepeating() ? new SAXStore() : null;

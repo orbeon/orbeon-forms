@@ -26,5 +26,5 @@ class XFormsSelect1InternalHandler(
   handlerContext : AnyRef
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = true) {
   override protected def isMustOutputControl(control: XFormsControl) = false
-  protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) = ()
+  override protected def handleControlStart() = ()
 }

@@ -340,6 +340,12 @@ trait ContainingDocumentProperties {
       identity
     )
 
+  def staticReadonlyHint =
+    dynamicProperty(
+      STATIC_READONLY_HINT_PROPERTY,
+      _.toBoolean
+    )
+
   def hostLanguage =
     dynamicProperty(
       HOST_LANGUAGE,

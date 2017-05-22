@@ -60,6 +60,8 @@ public class XFormsProperties {
     public static final String HINT_APPEARANCE_PROPERTY  = "hint.appearance";
     public static final String HELP_APPEARANCE_PROPERTY  = "help.appearance";
 
+    public static final String STATIC_READONLY_HINT_PROPERTY = "static-readonly-hint";
+
     public static final String UPLOAD_MAX_SIZE_PROPERTY                      = "upload.max-size";
     public static final String UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY            = "upload.max-size-aggregate";
     public static final String UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY = "upload.max-size-aggregate-expression";
@@ -253,6 +255,7 @@ public class XFormsProperties {
             new PropertyDefinition(LABEL_APPEARANCE_PROPERTY                     , "full",                         false),
             new PropertyDefinition(HINT_APPEARANCE_PROPERTY                      , "full",                         false),
             new PropertyDefinition(HELP_APPEARANCE_PROPERTY                      , "dialog",                       false),
+            new PropertyDefinition(STATIC_READONLY_HINT_PROPERTY                 , false,                          false),
             new PropertyDefinition(UPLOAD_MAX_SIZE_PROPERTY                      , "",                             false), // blank default (see #2956)
             new PropertyDefinition(UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY            , "",                             false),
             new PropertyDefinition(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY , "",                             false),

@@ -15,7 +15,6 @@
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -68,17 +67,12 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
 
-                    <!-- Either number or currency -->
-                    <xsl:variable
-                        name="is-currency"
-                        as="xs:boolean"
-                        select="exists(/fr:currency)"/>
-
                     <!-- JavaScript code obtaining the JavaScript companion object -->
+                    <!-- Not great: can we have only one JavaScript object? -->
                     <xsl:variable
                         name="js-object"
                         as="xs:string"
-                        select="concat('YAHOO.xbl.fr.', if ($is-currency) then 'Currency' else 'Number', '.instance(this)')"/>
+                        select="concat('YAHOO.xbl.fr.', if (exists(/fr:currency)) then 'Currency' else 'Number', '.instance(this)')"/>
 
                     <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
                     <xf:group>
@@ -98,12 +92,12 @@
 
                         <xf:var
                             name="binding"
-                            value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
+                            value="xxf:binding('fr-number')"/>
 
                         <xf:var
                             name="view"
                             value="
-                                xxf:is-control-readonly('{if ($is-currency) then 'fr-currency' else 'fr-number'}') and
+                                xxf:is-control-readonly('fr-number') and
                                 property('xxf:readonly-appearance') = 'static'"/>
 
                         <xf:var

@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.control.LHHASupport;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -37,9 +36,9 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart() throws SAXException {
 
-        final XFormsGroupControl groupControl = (XFormsGroupControl) control;
+        final XFormsGroupControl groupControl = (XFormsGroupControl) currentControlOrNull();
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final ElementHandlerController controller = xformsHandlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();
@@ -52,7 +51,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
             // Handle label classes
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl));
-            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.LABEL)));
+            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getLHHACId(containingDocument, getEffectiveId(), LHHAC_CODES.get(LHHAC.LABEL)));
 
             // Output xhtml:legend with label content
             final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");

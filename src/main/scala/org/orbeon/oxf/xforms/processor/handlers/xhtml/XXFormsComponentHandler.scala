@@ -54,14 +54,7 @@ class XXFormsComponentHandler(
     classes.append(binding.abstractBinding.cssClasses)
   }
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     val prefixedId = getPrefixedId
     val controller = xformsHandlerContext.getController
@@ -72,14 +65,8 @@ class XXFormsComponentHandler(
     XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
   }
 
-  protected override def handleControlEnd(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ) = xformsHandlerContext.popComponentContext()
+  protected override def handleControlEnd(): Unit =
+    xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
     if (handleLHHA && ! LHHAAnalysis.hasLHHAPlaceholder(containingDocument.getStaticOps.findControlAnalysis(getPrefixedId).get, "label")) {

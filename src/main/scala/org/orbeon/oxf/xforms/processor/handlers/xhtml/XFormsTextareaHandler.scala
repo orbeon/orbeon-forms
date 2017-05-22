@@ -26,7 +26,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
@@ -46,19 +45,12 @@ class XFormsTextareaHandler(
 
   private val placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
-    val textareaControl        = control.asInstanceOf[XFormsTextareaControl]
+    val textareaControl        = currentControlOrNull.asInstanceOf[XFormsTextareaControl]
     val xmlReceiver            = xformsHandlerContext.getController.getOutput
     val isConcreteControl      = textareaControl ne null
-    val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, addId = true)
+    val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, textareaControl, addId = true)
 
     // Create xhtml:textarea
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
@@ -66,7 +58,7 @@ class XFormsTextareaHandler(
     if (! XFormsBaseHandler.isStaticReadonly(textareaControl)) {
 
       val textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea")
-      htmlTextareaAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId)
+      htmlTextareaAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
 
       // Handle accessibility attributes
       XFormsBaseHandler.handleAccessibilityAttributes(attributes, htmlTextareaAttributes)

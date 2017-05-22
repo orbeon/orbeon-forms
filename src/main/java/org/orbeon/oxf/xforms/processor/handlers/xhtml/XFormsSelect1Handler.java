@@ -67,16 +67,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    public void handleControlStart(
-        String uri,
-        String localname,
-        String qName,
-        Attributes attributes,
-        String effectiveId,
-        XFormsControl control
-    ) throws SAXException {
+    @Override
+    public void handleControlStart() throws SAXException {
         // Get items, dynamic or static, if possible
-        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) control;
+        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) currentControlOrNull();
 
         // Get items if:
         // 1. The itemset is static
@@ -85,10 +79,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         outputContent(
-            uri,
-            localname,
-            attributes,
-            effectiveId,
+            getUri(),
+            getLocalname(),
+            getAttributes(),
+            getEffectiveId(),
             xformsSelect1Control,
             itemset,
             appearanceTrait != null && appearanceTrait.isMultiple(),
@@ -114,7 +108,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final XFormsControl xformsControl = (XFormsControl) control; // cast because Java is not aware that XFormsValueControl extends XFormsControl
         final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control; // same as above
 
-        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, !isFull);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(effectiveId, xformsControl, !isFull);
 
         final String xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
@@ -251,10 +245,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         final AttributesImpl containerAttributes =
             getEmptyNestedControlAttributesMaybeWithId(
-                uri,
-                localname,
-                attributes,
-                effectiveId,
+                    effectiveId,
                 xformsControl,
                 !(appearanceTrait != null && appearanceTrait.isFull())
             );

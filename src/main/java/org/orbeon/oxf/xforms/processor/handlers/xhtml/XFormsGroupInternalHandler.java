@@ -29,7 +29,7 @@ public class XFormsGroupInternalHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) {
+    public void handleControlStart() {
         // NOP
     }
 }

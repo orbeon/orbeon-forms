@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import java.{lang ⇒ jl}
+
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes
-import java.lang.{StringBuilder ⇒ JStringBuilder}
-import org.orbeon.oxf.xforms.processor.handlers.{XFormsBaseHandler, OutputInterceptor}
-import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+
 import scala.util.control.NonFatal
 
 /**
@@ -38,25 +39,25 @@ class XFormsRepeatHandler(
   handlerContext : AnyRef
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = true, forwarding = true) {
 
+  // Compute user classes only once for all iterations
+  private val userClasses = appendControlUserClasses(attributes, currentControlOrNull, new jl.StringBuilder).toString
+
   override def isMustOutputContainerElement = xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
-  def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     val isTopLevelRepeat = xformsHandlerContext.countParentRepeats == 0
     val isRepeatSelected = xformsHandlerContext.isRepeatSelected || isTopLevelRepeat
     val isMustGenerateTemplate = (xformsHandlerContext.isTemplate || isTopLevelRepeat) && ! xformsHandlerContext.isNoScript // don't generate templates in noscript mode as they won't be used
     val isMustGenerateDelimiters = ! xformsHandlerContext.isNoScript
-    val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId)
-    val namespacedId = XFormsUtils.namespaceId(containingDocument, effectiveId)
+    val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    val namespacedId = XFormsUtils.namespaceId(containingDocument, getEffectiveId)
 
-    val repeatControl = if (xformsHandlerContext.isTemplate) null else containingDocument.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsRepeatControl]
+    val repeatControl = if (xformsHandlerContext.isTemplate) null else containingDocument.getObjectByEffectiveId(getEffectiveId).asInstanceOf[XFormsRepeatControl]
     val isConcreteControl = repeatControl != null
 
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
-
-    // Compute user classes only once for all iterations
-    val userClasses = appendControlUserClasses(attributes, control, new JStringBuilder).toString
 
     // Place interceptor on output
     val savedOutput = xformsHandlerContext.getController.getOutput

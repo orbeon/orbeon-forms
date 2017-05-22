@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsUtils
+import java.{lang ⇒ jl}
+
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
-import java.{lang ⇒ jl}
 
 /**
  * Handle xf:case.
@@ -45,13 +45,13 @@ class XFormsCaseHandler(
   protected override def isMustOutputContainerElement =
     xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
-  protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
 
     // Determine whether this case is visible
-    val caseControl = containingDocument.getControlByEffectiveId(effectiveId).asInstanceOf[XFormsCaseControl]
+    val caseControl = containingDocument.getControlByEffectiveId(getEffectiveId).asInstanceOf[XFormsCaseControl]
 
     // This case is visible if it is selected or if the switch is read-only and we display read-only as static
     isVisible =
@@ -67,12 +67,12 @@ class XFormsCaseHandler(
 
     // Place interceptor if needed
     if (! xformsHandlerContext.isNoScript) {
-      isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(effectiveId)
+      isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
       // Classes on top-level elements and characters and on the first delimiter
       val elementClasses = {
         val classes = new jl.StringBuilder
-        appendControlUserClasses(attributes, control, classes)
+        appendControlUserClasses(attributes, currentControlOrNull, classes)
         // Don't add MIP classes as they can conflict with classes of nested content if used outside <tr>, etc.
         classes.toString
       }
@@ -99,7 +99,7 @@ class XFormsCaseHandler(
                 outputInterceptor.outputDelimiter(
                   currentSavedOutput,
                   firstDelimiterClasses,
-                  "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId)
+                  "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId)
                 )
 
           },
@@ -123,7 +123,7 @@ class XFormsCaseHandler(
     xformsHandlerContext.pushCaseContext(isVisible)
   }
 
-  protected override def handleControlEnd(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+  protected override def handleControlEnd(): Unit = {
     xformsHandlerContext.popCaseContext()
 
     if (! xformsHandlerContext.isNoScript) {
@@ -133,7 +133,7 @@ class XFormsCaseHandler(
         currentOutputInterceptor.generateFirstDelimitersIfNeeded()
 
         // Output end delimiter
-        currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId))
+        currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
       }
     }
 

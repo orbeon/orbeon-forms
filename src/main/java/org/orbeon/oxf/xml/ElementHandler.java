@@ -28,6 +28,26 @@ public abstract class ElementHandler {
     public Object matched;
     private Object handlerContext;
 
+    public String getUri() {
+        return uri;
+    }
+
+    public String getLocalname() {
+        return localname;
+    }
+
+    public String getqName() {
+        return qName;
+    }
+
+    public Attributes getAttributes() {
+        return attributes;
+    }
+
+    public Object getMatched() {
+        return matched;
+    }
+
     public ElementHandler(String uri, String localname, String qName, Attributes attributes, Object matched, Object handlerContext) {
         this.uri            = uri;
         this.localname      = localname;

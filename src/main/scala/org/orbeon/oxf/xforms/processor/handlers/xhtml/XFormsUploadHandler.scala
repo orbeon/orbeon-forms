@@ -44,26 +44,26 @@ class XFormsUploadHandler(
     classes.append(" xforms-upload-state-" + state)
   }
 
-  protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     implicit val receiver   = xformsHandlerContext.getController.getOutput
 
-    val uploadControl       = Option(control.asInstanceOf[XFormsUploadControl])
-    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true)
+    val uploadControl       = Option(currentControlOrNull.asInstanceOf[XFormsUploadControl])
+    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, currentControlOrNull, addId = true)
     val xhtmlPrefix         = xformsHandlerContext.findXHTMLPrefix
 
     // Enclosing xhtml:span
     withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
 
       // xhtml:input unless static readonly
-      if (! XFormsBaseHandler.isStaticReadonly(control)) {
+      if (! XFormsBaseHandler.isStaticReadonly(currentControlOrNull)) {
         reusableAttributes.clear()
         reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-select")
         reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "file")
         // Generate an id, because JS event handlers are not attached to elements that don't have an id, and
         // this causes issues with IE where we register handlers directly on controls
         reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getForEffectiveId(getEffectiveId))
-        reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId)
+        reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
         // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
         // disable pasting in the file. See http://tinyurl.com/6dcd6a
         reusableAttributes.addAttribute("", "unselectable", "unselectable", XMLReceiverHelper.CDATA, "on")

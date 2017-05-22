@@ -40,9 +40,10 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         return "div";
     }
 
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
+    @Override
+    public void handleControlStart() throws SAXException {
 
-        final XFormsRangeControl rangeControl = (XFormsRangeControl) control;
+        final XFormsRangeControl rangeControl = (XFormsRangeControl) currentControlOrNull();
         final ContentHandler contentHandler = xformsHandlerContext.getController().getOutput();
 
         // Create nested xhtml:div elements
@@ -51,7 +52,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
             final String divName     = "div";
             final String divQName    = XMLUtils.buildQName(xhtmlPrefix, divName);
 
-            final AttributesImpl backgroundAttributes = getBackgroundAttributes(uri, localname, attributes, effectiveId, rangeControl);
+            final AttributesImpl backgroundAttributes = getBackgroundAttributes(getUri(), getLocalname(), getAttributes(), getEffectiveId(), rangeControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, backgroundAttributes);
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, getThumbAttributes());
@@ -70,7 +71,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
     private AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
         // Add custom class
-        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, true);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(effectiveId, xformsControl, true);
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, RANGE_BACKGROUND_CLASS);
         return containerAttributes;
     }

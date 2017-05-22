@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.analysis.controls.ContainerControl
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
@@ -34,16 +34,12 @@ class XFormsGroupDefaultHandler(
     matched match {
       case control: ContainerControl if control.elementQName ne null ⇒
         val explicitQName = control.elementQName
-
         explicitQName.getName → explicitQName.getQualifiedName
       case _ ⇒
         super.getContainingElementName → super.getContainingElementQName // NOTE: this calls back getContainingElementName()
     }
 
-//  override protected def getContainingElementName  = elementName
-//  override protected def getContainingElementQName = elementQName
-
-  def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) = ()
+  override protected def handleControlStart() = ()
 
   override protected def handleLabel(): Unit = {
     // TODO: check why we output our own label here

@@ -35,7 +35,7 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler with HandlerSuppo
     outputControl : XFormsSingleNodeControl
   ) = {
     // Add custom class
-    val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, outputControl, addId = true)
+    val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(effectiveId, outputControl, addId = true)
     containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-output-output")
     containerAttributes
   }
@@ -52,22 +52,15 @@ class XFormsOutputDefaultHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
-    val outputControl = control.asInstanceOf[XFormsOutputControl]
+    val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
     val contentHandler = xformsHandlerContext.getController.getOutput
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
+    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
@@ -96,22 +89,15 @@ class XFormsOutputHTMLHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
-    val outputControl = control.asInstanceOf[XFormsOutputControl]
+    val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
+    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
 
     // Handle accessibility attributes on <div>
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
@@ -142,22 +128,15 @@ class XFormsOutputImageHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
-    val outputControl = control.asInstanceOf[XFormsOutputControl]
+    val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
     val mediatypeValue = attributes.getValue("mediatype")
 
-    val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
+    val containerAttributes = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
 
     // @src="..."
     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
@@ -165,8 +144,8 @@ class XFormsOutputImageHandler(
     containerAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, if (srcValue ne null) srcValue else XFormsConstants.DUMMY_IMAGE_URI)
 
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
-    if (control != null)
-      control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
+    currentControlOpt foreach
+      (_.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI))
 
     element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
   }
@@ -186,16 +165,9 @@ class XFormsOutputTextHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
      with XFormsOutputHandler {
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
-    val outputControl = control.asInstanceOf[XFormsOutputControl]
+    val outputControl = currentControlOrNull.asInstanceOf[XFormsOutputControl]
     val isConcreteControl = outputControl ne null
     val contentHandler = xformsHandlerContext.getController.getOutput
 
@@ -224,20 +196,13 @@ class XFormsOutputDownloadHandler(
   // NOP because the label is output as the text within <a>
   protected override def handleLabel() = ()
 
-  protected def handleControlStart(
-    uri         : String,
-    localname   : String,
-    qName       : String,
-    attributes  : Attributes,
-    effectiveId : String,
-    control     : XFormsControl
-  ): Unit = {
+  override protected def handleControlStart(): Unit = {
 
     implicit val context     = xformsHandlerContext
     implicit val xmlReceiver = xformsHandlerContext.getController.getOutput
 
-    val outputControl        = control.asInstanceOf[XFormsOutputControl]
-    val containerAttributes  = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl)
+    val outputControl        = currentControlOrNull.asInstanceOf[XFormsOutputControl]
+    val containerAttributes  = getContainerAttributes(uri, localname, attributes, getEffectiveId, outputControl)
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
 
     // For f:url-type="resource"
@@ -280,9 +245,9 @@ class XFormsOutputDownloadHandler(
       XFormsBaseHandler.handleAccessibilityAttributes(attributes, aAttributes)
 
       withElement("a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
-        val labelValue             = Option(control) map (_.getLabel) orNull
-        val mustOutputHTMLFragment = Option(control) exists (_.isHTMLLabel)
-        XFormsBaseHandlerXHTML.outputLabelText(xmlReceiver, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment)
+        val labelValue             = currentControlOpt map (_.getLabel) orNull
+        val mustOutputHTMLFragment = currentControlOpt exists (_.isHTMLLabel)
+        XFormsBaseHandlerXHTML.outputLabelText(xmlReceiver, currentControlOrNull, labelValue, xhtmlPrefix, mustOutputHTMLFragment)
       }
     }
   }

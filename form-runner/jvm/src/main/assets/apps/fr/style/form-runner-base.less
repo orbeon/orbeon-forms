@@ -374,7 +374,7 @@
 
     .xforms-form { // make rule a bit stronger to make sure hints are hidden
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-            .xforms-hint, .xforms-help, .xforms-alert {
+            .xforms-help, .xforms-alert {                   // 2017-05-22: removed `.xforms-hint` for https://github.com/orbeon/orbeon-forms/issues/3118
                 display: none;
             }
 
@@ -410,7 +410,6 @@
         .xforms-upload-remove,                                         // upload remove button
         .xbl-fr-attachment .xforms-output-appearance-xxforms-download, // no download link
         .xforms-help,                                                  // no help
-        .xforms-hint,                                                  // no hints
         .fr-buttons                                                    // no buttons at bottom
         { display: none }
 

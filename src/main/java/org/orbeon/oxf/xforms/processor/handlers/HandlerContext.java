@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.PartAnalysis;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
@@ -26,9 +28,14 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import scala.Tuple2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * Context used when converting XHTML+XForms into XHTML.
@@ -42,7 +49,7 @@ public class HandlerContext {
     private final String topLevelControlEffectiveId;
 
     // Computed during construction
-    private final String[] documentOrder;
+    private final Tuple2<scala.collection.immutable.List<String>, scala.collection.immutable.List<String>> documentOrder;
     private final String labelElementName;
     private final String hintElementName;
     private final String helpElementName;
@@ -64,7 +71,7 @@ public class HandlerContext {
         this.externalContext = externalContext;
         this.topLevelControlEffectiveId = topLevelControlEffectiveId;
 
-        this.documentOrder = StringUtils.split(containingDocument.lhhacOrder());
+        this.documentOrder = containingDocument.lhhacOrder();
         this.labelElementName = containingDocument.getLabelElementName();
         this.hintElementName = containingDocument.getHintElementName();
         this.helpElementName = containingDocument.getHelpElementName();
@@ -101,7 +108,7 @@ public class HandlerContext {
         return externalContext;
     }
 
-    final public String[] getDocumentOrder() {
+    final public Tuple2<scala.collection.immutable.List<String>, scala.collection.immutable.List<String>> getDocumentOrder() {
         return documentOrder;
     }
 

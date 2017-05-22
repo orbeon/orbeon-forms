@@ -15,8 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang ⇒ jl}
 
-import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
@@ -72,7 +71,12 @@ abstract class XFormsControlLifecyleHandler(
 
   def currentControlOrNull = currentControlOpt.orNull
 
-  private var afterTokens: Array[String] = Array.empty
+  private val beforeAfterTokens =
+    currentControlOpt                                                         flatMap
+      (control ⇒ Option(control.staticControl))                               flatMap
+      (staticControl ⇒ collectByErasedType[StaticLHHASupport](staticControl)) flatMap
+      (_.beforeAfterTokensOpt)                                                getOrElse
+      xformsHandlerContext.getDocumentOrder
 
   // By default, controls are enclosed with a <span>
   protected def getContainingElementName = "span"
@@ -81,47 +85,24 @@ abstract class XFormsControlLifecyleHandler(
     XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, getContainingElementName)
 
   @throws[SAXException]
-  override final def start(): Unit = {
+  override final def start(): Unit =
     if (isMustOutputControl(currentControlOrNull)) {
-      val contentHandler = xformsHandlerContext.getController.getOutput
-      if (isMustOutputContainerElement) {
-        // Open control element, usually `<span>`
-        contentHandler.startElement(
+
+      // Open control element, usually `<span>`
+      if (isMustOutputContainerElement)
+        xformsHandlerContext.getController.getOutput.startElement(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName,
           getContainerAttributes(uri, localname, attributes)
         )
-      }
-
-      // Get local order for control
-      val localOrderString =
-        attributes.getValue(XFormsConstants.XXFORMS_ORDER_QNAME.getNamespaceURI, XFormsConstants.XXFORMS_ORDER_QNAME.getName)
-
-      // Use local or default config
-      // TODO: Store split tokens in static state.
-      val (beforeTokens, afterTokens) = {
-
-        val orderTokens =
-          if (localOrderString ne null)
-            StringUtils.split(localOrderString)
-          else
-            xformsHandlerContext.getDocumentOrder
-
-        val controlIndex = orderTokens.indexOf("control")
-
-        (
-          if (controlIndex == -1) orderTokens         else orderTokens.take(controlIndex + 1),
-          if (controlIndex == -1) Array.empty[String] else orderTokens.drop(controlIndex)
-        )
-      }
 
       // 2012-12-17: Removed nested `<a name="effective-id">` because the enclosing `<span`> for the control has the
       // same id and will be handled first by the browser as per HTML 5. This means the named anchor is actually
       // redundant.
 
       // Process everything up to and including the control
-      for (current ← beforeTokens)
+      for (current ← beforeAfterTokens._1)
         current match {
           case "control" ⇒ handleControlStart()
           case "label"   ⇒ if (hasLocalLabel) handleLabel()
@@ -129,18 +110,14 @@ abstract class XFormsControlLifecyleHandler(
           case "hint"    ⇒ if (hasLocalHint)  handleHint()
           case "help"    ⇒ if (hasLocalHelp)  handleHelp()
         }
-
-      if (afterTokens.nonEmpty) {
-        this.afterTokens   = afterTokens
-      }
     }
-  }
 
   @throws[SAXException]
   override final def end(): Unit =
     if (isMustOutputControl(currentControlOrNull)) {
+
       // Process everything after the control has been shown
-      for (current ← afterTokens)
+      for (current ← beforeAfterTokens._2)
         current match {
           case "control" ⇒ handleControlEnd()
           case "label"   ⇒ if (hasLocalLabel) handleLabel()
@@ -149,14 +126,13 @@ abstract class XFormsControlLifecyleHandler(
           case "help"    ⇒ if (hasLocalHelp)  handleHelp()
         }
 
-      if (isMustOutputContainerElement) {
-        // Close control element, usually `<span>`
+      // Close control element, usually `<span>`
+      if (isMustOutputContainerElement)
         xformsHandlerContext.getController.getOutput.endElement(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName
         )
-      }
     }
 
   private def hasLocalLabel = hasLocalLHHA("label")

@@ -22,38 +22,38 @@ import org.orbeon.saxon.functions.FunctionLibrary
 
 trait XFormsStaticState {
 
-  def getIndentedLogger: IndentedLogger
+  def getIndentedLogger                       : IndentedLogger
 
-  def digest: String
-  def encodedState: String
-  def allowedExternalEvents: Set[String]
-  def template: Option[AnnotatedTemplate]
+  def digest                                  : String
+  def encodedState                            : String
+  def allowedExternalEvents                   : Set[String]
+  def template                                : Option[AnnotatedTemplate]
 
-  def topLevelPart: PartAnalysis
+  def topLevelPart                            : PartAnalysis
 
-  def isCacheDocument: Boolean
-  def isClientStateHandling: Boolean
-  def isServerStateHandling: Boolean
-  def isHTMLDocument: Boolean
+  def isCacheDocument                         : Boolean
+  def isClientStateHandling                   : Boolean
+  def isServerStateHandling                   : Boolean
+  def isHTMLDocument                          : Boolean
 
-  def isXPathAnalysis: Boolean
-  def isCalculateDependencies: Boolean
+  def isXPathAnalysis                         : Boolean
+  def isCalculateDependencies                 : Boolean
 
-  def functionLibrary: FunctionLibrary
-  def sanitizeInput: String ⇒ String
-  def assets: XFormsAssets
-  def uploadMaxSize: MaximumSize
-  def uploadMaxSizeAggregate: MaximumSize
-  def uploadMaxSizeAggregateExpression: Option[CompiledExpression]
+  def functionLibrary                         : FunctionLibrary
+  def sanitizeInput                           : String ⇒ String
+  def assets                                  : XFormsAssets
+  def uploadMaxSize                           : MaximumSize
+  def uploadMaxSizeAggregate                  : MaximumSize
+  def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]
 
-  def staticProperty       (name: String): Any
-  def staticStringProperty (name: String): String
-  def staticBooleanProperty(name: String): Boolean
-  def staticIntProperty    (name: String): Int
+  def staticProperty       (name: String)     : Any
+  def staticStringProperty (name: String)     : String
+  def staticBooleanProperty(name: String)     : Boolean
+  def staticIntProperty    (name: String)     : Int
 
-  def propertyMaybeAsExpression(name: String): Either[Any, CompiledExpression]
-  def clientNonDefaultProperties: Map[String, AnyRef]
+  def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
+  def clientNonDefaultProperties              : Map[String, AnyRef]
 
-  def toXML(helper: XMLReceiverHelper)
-  def dumpAnalysis()
+  def toXML(helper: XMLReceiverHelper)        : Unit
+  def dumpAnalysis()                          : Unit
 }

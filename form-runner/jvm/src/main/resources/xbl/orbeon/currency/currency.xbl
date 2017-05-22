@@ -21,7 +21,7 @@
     <xbl:script src="/xbl/orbeon/number/number.js"/>
     <xbl:script src="/xbl/orbeon/currency/currency.js"/>
     <xbl:binding
-        id="fr-currency"
+        id="fr-number"
         element="
             fr|currency,
             xf|input[appearance = 'xxf:currency']:xxf-type('xs:decimal')"

@@ -443,6 +443,18 @@
                     0
                 )
             "
+            xxf:static-readonly-hint="{{
+                xxf:property(
+                    string-join(
+                        (
+                            'oxf.fr.detail.static-readonly-hint',
+                            fr:app-name(),
+                            fr:form-name()
+                        ),
+                        '.'
+                    )
+                )
+            }}"
         >
 
             <!-- Don't enable client events filtering for FB -->

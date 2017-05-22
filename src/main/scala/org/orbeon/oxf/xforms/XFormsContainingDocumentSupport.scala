@@ -115,19 +115,25 @@ object XFormsContainingDocumentSupport {
 case class Load(resource: String, target: Option[String], urlType: String, isReplace: Boolean, isShowProgress: Boolean)
 
 abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
-  extends XBLContainer(ContainingDocumentPseudoId, ContainingDocumentPseudoId, "", None, None, null)
-  with ContainingDocumentLogging
-  with ContainingDocumentMisc
-  with ContainingDocumentUpload
-  with ContainingDocumentEvent
-  with ContainingDocumentTemplate
-  with ContainingDocumentProperties
-  with ContainingDocumentRequestStats
-  with ContainingDocumentRequest
-  with ContainingDocumentDelayedEvents
-  with XFormsDocumentLifecycle
-  with Cacheable
-  with XFormsObject
+  extends XBLContainer(
+    _effectiveId         = ContainingDocumentPseudoId,
+    prefixedId           = ContainingDocumentPseudoId,
+    fullPrefix           = "",
+    parentXBLContainer   = None,
+    associatedControlOpt = None,
+    innerScope           = null
+  ) with ContainingDocumentLogging
+    with ContainingDocumentMisc
+    with ContainingDocumentUpload
+    with ContainingDocumentEvent
+    with ContainingDocumentTemplate
+    with ContainingDocumentProperties
+    with ContainingDocumentRequestStats
+    with ContainingDocumentRequest
+    with ContainingDocumentDelayedEvents
+    with XFormsDocumentLifecycle
+    with Cacheable
+    with XFormsObject
 
 trait ContainingDocumentUpload {
 

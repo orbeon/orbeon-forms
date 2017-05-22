@@ -146,6 +146,11 @@
                                         string-join(for $i in 1 to max(($validation-fraction-digits-opt, $fractional-digits-min)) return '#', '')
                                 )"/>
 
+                        <!-- Character used to represent a `.` entered by users, when that character isn't a valid decimal separator -->
+                        <xf:var
+                            name="period-encoded"
+                            value="'&#x2261;'"/>
+
                         <!--
                             TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this
                             leads to a bug when the prefix changes and the amount stays the same.
@@ -162,27 +167,31 @@
                         <xf:var
                             name="cleaned"
                             value="
-                                for $raw in string($binding)
+                                let $raw := string($binding)
                                 return
                                     translate(
-                                        string(
-                                            for $clean in
-                                                for $v in xxf:trim($raw)
+                                        translate(
+                                            string(
+                                                for $clean in
+                                                    for $v in xxf:trim($raw)
+                                                    return
+                                                        (: There shouldn't be a prefix because that's stored out of band,
+                                                           but we remove it for historical reasons :)
+                                                        if (starts-with($v, $prefix)) then
+                                                            xxf:trim(substring-after($v, $prefix))
+                                                        else
+                                                            $v
                                                 return
-                                                    (: There shouldn't be a prefix because that's stored out of band,
-                                                       but we remove it for historical reasons :)
-                                                    if (starts-with($v, $prefix)) then
-                                                        xxf:trim(substring-after($v, $prefix))
+                                                    if ($clean castable as xs:decimal) then
+                                                        xs:decimal($clean)
                                                     else
-                                                        $v
-                                            return
-                                                if ($clean castable as xs:decimal) then
-                                                    xs:decimal($clean)
-                                                else
-                                                    $raw
+                                                        $raw
+                                            ),
+                                            '.',
+                                            $decimal-separator
                                         ),
-                                        '.',
-                                        $decimal-separator
+                                        $period-encoded,
+                                        '.'
                                     )"/>
 
                         <xf:var
@@ -234,9 +243,12 @@
                                 class="xbl-fr-number-xforms-input xforms-hidden"
                                 xxf:format="$formatted"
                                 xxf:unformat="
-                                    for $raw in .
+                                    let $raw :=
+                                        if (($grouping-separator, $decimal-separator) = '.')
+                                        then .
+                                        else translate(., '.', $period-encoded)
                                     return
-                                        for $clean in
+                                        let $clean :=
                                             translate(
                                                 translate(
                                                     $raw,

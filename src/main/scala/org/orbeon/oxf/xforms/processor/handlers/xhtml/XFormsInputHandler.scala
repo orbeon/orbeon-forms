@@ -39,12 +39,23 @@ class XFormsInputHandler(
   attributes     : Attributes,
   matched        : AnyRef,
   handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false)
-     with HandlerSupport {
+) extends
+  XFormsControlLifecyleHandler(
+    uri,
+    localname,
+    qName,
+    attributes,
+    matched,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) with HandlerSupport {
 
-  private val placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
+  private val placeHolderInfo =
+    XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
 
-  private def controlHas(predicate: XFormsInputControl ⇒ Boolean) = currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate
+  private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
+    currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate
 
   private def isDateTime    = controlHas(c ⇒ c.getBuiltinTypeName == "dateTime")
   private def isDateMinimal = controlHas(c ⇒ c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
@@ -77,14 +88,20 @@ class XFormsInputHandler(
         )
       )
 
-      // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
-      val select1Handler = new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext) {
-        override val getPrefixedId        = XFormsInputHandler.this.getPrefixedId
-        override val getEffectiveId       = XFormsInputHandler.this.getEffectiveId
-        override def currentControlOrNull = XFormsInputHandler.this.currentControlOrNull
-        override val currentControlOpt    = XFormsInputHandler.this.currentControlOpt
-      }
-      select1Handler.outputContent(uri, localname, attributes, getEffectiveId, inputControl, itemset, isMultiple, true, true)
+      // TODO: Do not delegate but just share `outputContent` implementation.
+      new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext)
+        .outputContent(
+          uri,
+          localname,
+          attributes,
+          getEffectiveId,
+          inputControl,
+          itemset,
+          isMultiple,
+          true,
+          true,
+          xformsHandlerContext
+        )
     } else {
 
       val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix

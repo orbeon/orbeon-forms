@@ -32,6 +32,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ClientEvents._
@@ -343,7 +344,7 @@ trait ContainingDocumentProperties {
   def lhhacOrder =
     dynamicProperty(
       ORDER_PROPERTY,
-      identity
+      LHHA.getBeforeAfterOrderTokens
     )
 
   def staticReadonlyHint =

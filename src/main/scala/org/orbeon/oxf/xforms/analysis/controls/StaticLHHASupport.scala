@@ -13,23 +13,36 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.XFormsConstants._
-import collection.mutable
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.dom.Element
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+
+import scala.collection.mutable
 
 object LHHA {
   val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
   def isLHHA(e: Element) = LHHAQNames(e.getQName)
+
+  def getBeforeAfterOrderTokens(tokens: String): (List[String], List[String]) = {
+
+    val orderTokens =
+      tokens.splitTo[List]()
+
+    val controlIndex = orderTokens.indexOf("control")
+
+    (
+      if (controlIndex == -1) orderTokens else orderTokens.take(controlIndex + 1),
+      if (controlIndex == -1) Nil         else orderTokens.drop(controlIndex)
+    )
+  }
 }
 
 // Control support for nested or external LHHA elements
 trait StaticLHHASupport extends SimpleElementAnalysis {
 
-  // All LHHA, local or external
-  // There can only be multiple alerts for now, not multiple LHH, so store alerts separately
-  private val _lhh    = mutable.HashMap.empty[String, LHHAAnalysis]
-  private var _alerts = List.empty[LHHAAnalysis]
+  import Private._
 
   // Because an LHHA might follow a control in the document, attachment must be deferred
   def attachLHHA(lhhaAnalysis: LHHAAnalysis): Unit =
@@ -50,6 +63,9 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
   def lhhaValueAnalyses(lhhaType: String) =
     lhhaAsList(lhhaType) flatMap (_.getValueAnalysis)
 
+  val beforeAfterTokensOpt: Option[(List[String], List[String])] =
+    element.attributeValueOpt(XFormsConstants.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
+
   // analyzeXPath(): this is done as part of control analysis, see:
   // https://github.com/orbeon/orbeon-forms/issues/2185
 
@@ -58,8 +74,16 @@ trait StaticLHHASupport extends SimpleElementAnalysis {
     allLHHA foreach (_.freeTransientState())
   }
 
-  private def lhhaAsList(lhhaType: String) =
-    if (lhhaType == "alert") alerts else lhh(lhhaType).toList
+  private object Private {
 
-  private def allLHHA = _lhh.values ++ _alerts
+    // All LHHA, local or external
+    // There can only be multiple alerts for now, not multiple LHH, so store alerts separately
+    val _lhh    = mutable.HashMap.empty[String, LHHAAnalysis]
+    var _alerts = List.empty[LHHAAnalysis]
+
+    def lhhaAsList(lhhaType: String) =
+      if (lhhaType == "alert") alerts else lhh(lhhaType).toList
+
+    def allLHHA = _lhh.values ++ _alerts
+  }
 }

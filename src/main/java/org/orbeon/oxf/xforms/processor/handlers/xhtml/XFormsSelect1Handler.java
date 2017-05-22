@@ -87,7 +87,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             itemset,
             appearanceTrait != null && appearanceTrait.isMultiple(),
             appearanceTrait != null && appearanceTrait.isFull(),
-            false
+            false,
+            xformsHandlerContext
         );
     }
 
@@ -100,8 +101,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         Itemset itemset,
         final boolean isMultiple,
         final boolean isFull,
-        boolean isBooleanInput
+        boolean isBooleanInput,
+        HandlerContext xformsHandlerContext
     ) throws SAXException {
+
+        final XFormsContainingDocument containingDocument = xformsHandlerContext.getContainingDocument();
 
         final XMLReceiver xmlReceiver = xformsHandlerContext.getController().getOutput();
 

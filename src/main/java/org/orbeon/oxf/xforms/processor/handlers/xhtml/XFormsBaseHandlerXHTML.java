@@ -393,7 +393,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         outputLabelForEnd(handlerContext, elementName);
     }
 
-    final protected static void outputLabelForStart(
+    final static void outputLabelForStart(
         HandlerContext handlerContext,
         Attributes attributes,
         String targetControlEffectiveId,

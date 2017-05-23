@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.xml.SAXException
 
@@ -59,24 +60,20 @@ abstract class XFormsControlLifecyleHandler(
     forwarding
   ) {
 
+  import Private._
+
   val isTemplate     = xformsHandlerContext.isTemplate
   val getPrefixedId  = xformsHandlerContext.getPrefixedId(attributes)
   val getEffectiveId = xformsHandlerContext.getEffectiveId(attributes)
 
-  val currentControlOpt =
-    if (xformsHandlerContext.isTemplate)
-      None
-    else
-      Option(containingDocument.getControlByEffectiveId(getEffectiveId))
+  val currentControlOpt: Option[XFormsControl] =
+    ! xformsHandlerContext.isTemplate                            option
+      containingDocument.getControlByEffectiveId(getEffectiveId) ensuring
+      (! _.contains(null))
 
   def currentControlOrNull = currentControlOpt.orNull
 
-  private val beforeAfterTokens =
-    currentControlOpt                                                         flatMap
-      (control ⇒ Option(control.staticControl))                               flatMap
-      (staticControl ⇒ collectByErasedType[StaticLHHASupport](staticControl)) flatMap
-      (_.beforeAfterTokensOpt)                                                getOrElse
-      xformsHandlerContext.getDocumentOrder
+  def staticControlOpt = currentControlOpt map (_.staticControl)
 
   // By default, controls are enclosed with a <span>
   protected def getContainingElementName = "span"
@@ -133,17 +130,6 @@ abstract class XFormsControlLifecyleHandler(
           getContainingElementName,
           getContainingElementQName
         )
-    }
-
-  private def hasLocalLabel = hasLocalLHHA("label")
-  private def hasLocalHint  = hasLocalLHHA("hint")
-  private def hasLocalHelp  = hasLocalLHHA("help")
-  private def hasLocalAlert = hasLocalLHHA("alert")
-
-  private def hasLocalLHHA(lhhaType: String) =
-    containingDocument.getStaticOps.getControlAnalysis(getPrefixedId) match {
-      case support: StaticLHHASupport ⇒ support.hasLocal(lhhaType)
-      case _                          ⇒ false
     }
 
   // May be overridden by subclasses
@@ -214,7 +200,11 @@ abstract class XFormsControlLifecyleHandler(
   @throws[SAXException]
   protected def handleControlEnd() = ()
 
-  protected def getEmptyNestedControlAttributesMaybeWithId(effectiveId: String, control: XFormsControl, addId: Boolean): AttributesImpl = {
+  protected def getEmptyNestedControlAttributesMaybeWithId(
+    effectiveId : String,
+    control     : XFormsControl,
+    addId       : Boolean
+  ): AttributesImpl = {
     reusableAttributes.clear()
     val containerAttributes = reusableAttributes
     if (addId)
@@ -228,43 +218,63 @@ abstract class XFormsControlLifecyleHandler(
     containerAttributes
   }
 
-  private def getContainerAttributes(
-    uri        : String,
-    localname  : String,
-    attributes : Attributes
-  ) = {
-    // NOTE: Only reason we do not use the class members directly is to handle boolean xf:input, which delegates
-    // its output to xf:select1. Should be improved some day.
-    val prefixedId    = getPrefixedId
-    val effectiveId   = getEffectiveId
-    val xformsControl = currentControlOrNull
-
-    // Get classes
-    // Initial classes: xforms-control, xforms-[control name], incremental, appearance, mediatype, xforms-static
-    val classes =
-      getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental)
-
-    // All MIP-related classes
-    handleMIPClasses(classes, prefixedId, xformsControl)
-
-    // Static classes
-    containingDocument.getStaticOps.appendClasses(classes, prefixedId)
-
-    // Dynamic classes added by the control
-    addCustomClasses(classes, xformsControl)
-
-    // Get attributes
-    val newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString, effectiveId)
-
-    // Add extension attributes in no namespace if possible
-    if (xformsControl ne null)
-      xformsControl.addExtensionAttributesExceptClassAndAcceptForHandler(newAttributes, "")
-
-    newAttributes
-  }
-
   // Return the effective id of the element to which label/@for, etc. must point to.
   // Default: point to `foo$bar$$c.1-2-3`
   def getForEffectiveId(effectiveId: String): String =
     XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandler.LHHAC_CODES.get(LHHAC.CONTROL))
+
+  private object Private {
+
+    val beforeAfterTokens: (List[String], List[String]) =
+      staticControlOpt                       flatMap
+      collectByErasedType[StaticLHHASupport] flatMap
+      (_.beforeAfterTokensOpt)               getOrElse
+      xformsHandlerContext.getDocumentOrder
+
+    def hasLocalLabel = hasLocalLHHA("label")
+    def hasLocalHint  = hasLocalLHHA("hint")
+    def hasLocalHelp  = hasLocalLHHA("help")
+    def hasLocalAlert = hasLocalLHHA("alert")
+
+    def hasLocalLHHA(lhhaType: String) =
+      containingDocument.getStaticOps.getControlAnalysis(getPrefixedId) match {
+        case support: StaticLHHASupport ⇒ support.hasLocal(lhhaType)
+        case _                          ⇒ false
+      }
+
+    def getContainerAttributes(
+      uri        : String,
+      localname  : String,
+      attributes : Attributes
+    ): AttributesImpl = {
+      // NOTE: Only reason we do not use the class members directly is to handle boolean xf:input, which delegates
+      // its output to xf:select1. Should be improved some day.
+      val prefixedId    = getPrefixedId
+      val effectiveId   = getEffectiveId
+      val xformsControl = currentControlOrNull
+
+      // Get classes
+      // Initial classes: `xforms-control`, `xforms-[control name]`, `incremental`, `appearance`, `mediatype`, `xforms-static`
+      val classes =
+        getInitialClasses(uri, localname, attributes, xformsControl, isDefaultIncremental)
+
+      // All MIP-related classes
+      handleMIPClasses(classes, prefixedId, xformsControl)
+
+      // Static classes
+      containingDocument.getStaticOps.appendClasses(classes, prefixedId)
+
+      // Dynamic classes added by the control
+      addCustomClasses(classes, xformsControl)
+
+      // Get attributes
+      val newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString, effectiveId)
+
+      // Add extension attributes in no namespace if possible
+      if (xformsControl ne null)
+        xformsControl.addExtensionAttributesExceptClassAndAcceptForHandler(newAttributes, "")
+
+      newAttributes
+    }
+  }
 }

@@ -149,9 +149,9 @@ class ConcreteElement(var qname: QName)
     val uri = getNamespaceURI
     val result =
       if ((uri ne null) && (uri.length > 0)) {
-        super.toString + " [Element: <" + getQualifiedName + " uri: " + uri + " attributes: " + attributeList + "/>]"
+        super.toString + " [Element: <" + getQualifiedName + " uri: " + uri + " attributes: " + _attributes + "/>]"
       } else {
-        super.toString + " [Element: <" + getQualifiedName + " attributes: " + attributeList + "/>]"
+        super.toString + " [Element: <" + getQualifiedName + " attributes: " + _attributes + "/>]"
       }
      result + " userData: " + getData
   }
@@ -259,35 +259,45 @@ class ConcreteElement(var qname: QName)
   def elementIterator(qName: QName): ju.Iterator[Element] = elements(qName).iterator()
 
   def attributes: ju.List[Attribute] = {
-    new ContentListFacade[Attribute](this, attributeList)
+    new ContentListFacade[Attribute](this, _attributes)
   }
 
-  def attributeIterator: ju.Iterator[Attribute] = attributeList.iterator()
+  def attributeIterator: ju.Iterator[Attribute] = _attributes.iterator()
 
-  def attribute(index: Int): Attribute = attributeList.get(index)
-  def attributeCount: Int = attributeList.size
+  def attribute(index: Int): Attribute = _attributes.get(index)
+  def attributeCount: Int = _attributes.size
 
   def attribute(name: String): Attribute = {
-    val list = attributeList
-    val size = list.size
-    for (i ← 0 until size) {
+
+    val list = _attributes
+
+    var i = 0
+    val length = list.size()
+    while (i < length) {
       val attribute = list.get(i)
-      if (name == attribute.getName) {
+      if (name == attribute.getName)
         return attribute
-      }
+      else
+        i += 1
     }
+
     null
   }
 
   def attribute(qName: QName): Attribute = {
-    val list = attributeList
-    val size = list.size
-    for (i ← 0 until size) {
+
+    val list = _attributes
+
+    var i = 0
+    val length = list.size()
+    while (i < length) {
       val attribute = list.get(i)
-      if (qName == attribute.getQName) {
+      if (qName == attribute.getQName)
         return attribute
-      }
+      else
+        i += 1
     }
+
     null
   }
 
@@ -295,10 +305,6 @@ class ConcreteElement(var qname: QName)
     attribute(DocumentFactory.createQName(name, namespace))
   }
 
-  /**
-   * This method provides a more optimal way of setting all the attributes on
-   * an Element.
-   */
   def setAttributes(attributes: Attributes, namespaceStack: NamespaceStack, noNamespaceAttributes: Boolean): Unit = {
     val size = attributes.getLength
     if (size > 0) {
@@ -312,7 +318,7 @@ class ConcreteElement(var qname: QName)
           add(DocumentFactory.createAttribute(this, attributeQName, attributeValue))
         }
       } else {
-        val list = attributeList(size)
+        val list = _attributes
         list.clear()
         for (i ← 0 until size) {
           val attributeName = attributes.getQName(i)
@@ -369,13 +375,13 @@ class ConcreteElement(var qname: QName)
         remove(oldAttribute)
       }
     } else {
-      attributeList.add(att)
+      _attributes.add(att)
       childAdded(att)
     }
   }
 
   def remove(att: Attribute): Boolean = {
-    val list = attributeList
+    val list = _attributes
     var answer = list.remove(att)
     if (answer) {
       childRemoved(att)
@@ -840,7 +846,4 @@ class ConcreteElement(var qname: QName)
       node.setDocument(null)
     }
   }
-
-  private def attributeList: ju.List[Attribute] = _attributes
-  private def attributeList(size: Int): ju.List[Attribute] = _attributes
 }

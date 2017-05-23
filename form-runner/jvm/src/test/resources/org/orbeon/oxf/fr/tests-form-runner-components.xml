@@ -819,23 +819,23 @@
                         <xxf:control id="my-currency≡xf-8" class="xbl-fr-currency-decimal-separator xforms-hidden">
                             <xxf:value>.</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-currency≡xf-26" class="xbl-fr-number-xforms-output xforms-hidden">
+                        <xxf:control id="my-currency≡xf-27" class="xbl-fr-number-xforms-output xforms-hidden">
                             <xxf:value>12.34</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-currency≡xf-27" class="xbl-fr-number-xforms-input xforms-hidden">
+                        <xxf:control id="my-currency≡xf-28" class="xbl-fr-number-xforms-input xforms-hidden">
                             <xxf:value>12.34</xxf:value>
                         </xxf:control>
-                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-28"/>
-                        <xxf:control id="my-currency≡xf-30" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-31">
+                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-29"/>
+                        <xxf:control id="my-currency≡xf-31" class="add-on"/>
+                        <xxf:control id="my-currency≡xf-32">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-35" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-36" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-36" class="add-on" relevant="false"/>
                         <xxf:control id="my-currency≡xf-37" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-38" relevant="false"/>
                     </xxf:control-values>
                     <xxf:script name="xf_efdc0056b6438f9c969545432feab52728756c34" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:focus control-id="my-currency"/>

@@ -23,9 +23,7 @@ import scala.scalajs.js
 // Companion for `fr:dnd-repeat`
 object DndRepeat {
 
-  val RepeatDelimiterSelector  = ".xforms-repeat-delimiter"
   val RepeatBeginEndSelector   = ".xforms-repeat-begin-end"
-  val NotRepeatClassesSelector = s":not($RepeatDelimiterSelector):not($RepeatBeginEndSelector)"
   val NotGuSelector            = ":not(.gu-transit):not(.gu-mirror)"
   val DndItemSelector          = ".xforms-dnd-item"
   val DndMovesSelector         = ".xforms-dnd-moves"
@@ -42,8 +40,8 @@ object DndRepeat {
         excludedTargets          : List[Element]
       )
 
-      private var dragState : Option[DragState]     = None
-      private var drake     : Option[Drake]         = None
+      private var dragState : Option[DragState] = None
+      private var drake     : Option[Drake]     = None
 
       override def init(): Unit = {
 

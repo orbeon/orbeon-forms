@@ -26,9 +26,7 @@ import org.orbeon.saxon.om.Item
 
 import scala.util.Try
 
-/**
- * 10.1.2 The dispatch Element
- */
+
 class XFormsDispatchAction extends XFormsAction {
 
   override def execute(
@@ -60,12 +58,12 @@ class XFormsDispatchAction extends XFormsAction {
     // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
     // The event factory makes sure that those values are ignored for predefined events
     val newEventBubbles =
-      (Option(actionInterpreter.resolveAVT(actionElement, "bubbles")) getOrElse "true").toBoolean
+      (Option(actionInterpreter.resolveAVT(actionElement, "bubbles")) getOrElse true.toString).toBoolean
 
     // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
     // The event factory makes sure that those values are ignored for predefined events
     val newEventCancelable =
-      (Option(actionInterpreter.resolveAVT(actionElement, "cancelable")) getOrElse "true").toBoolean
+      (Option(actionInterpreter.resolveAVT(actionElement, "cancelable")) getOrElse true.toString).toBoolean
 
     val resolvedDelayOpt =
       Option(actionInterpreter.resolveAVT(actionElement, "delay")) filter
@@ -73,9 +71,14 @@ class XFormsDispatchAction extends XFormsAction {
       (s ⇒ Try(s.toInt).toOption) filter  // "if the given value does not conform to xsd:nonNegativeInteger, then the event…"
       (_ >= 0)                            // "…is dispatched immediately as the result of the dispatch action"
 
+    // Whether to allow duplicates by name/targetid if the event has a non-negative delay
+    // See https://github.com/orbeon/orbeon-forms/issues/3208.
+    val allowDuplicates =
+      actionInterpreter.resolveAVT(actionElement, XXFORMS_ALLOW_DUPLICATES_QNAME) == true.toString
+
     // Whether to tell the client to show a progress indicator when sending this event
     val showProgress =
-      actionInterpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != "false"
+      actionInterpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != false.toString
 
     // Find actual target
     actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
@@ -87,7 +90,9 @@ class XFormsDispatchAction extends XFormsAction {
           bubbles         = newEventBubbles,
           cancelable      = newEventCancelable,
           properties      = XFormsAction.eventProperties(actionInterpreter, actionElement),
-          delayOpt        = resolvedDelayOpt
+          delayOpt        = resolvedDelayOpt,
+          showProgress    = showProgress,
+          allowDuplicates = allowDuplicates
         )
       case _ ⇒
         // "If there is a null search result for the target object and the source object is an XForms action such as
@@ -104,11 +109,13 @@ object XFormsDispatchAction {
   def dispatch(
     eventName       : String,
     target          : XFormsEventTarget,
-    bubbles         : Boolean        = true,
-    cancelable      : Boolean        = true,
-    properties      : PropertyGetter = EmptyGetter,
-    delayOpt        : Option[Int]    = None,
-    showProgress    : Boolean        = true
+    bubbles         : Boolean,
+    cancelable      : Boolean,
+    properties      : PropertyGetter,
+    delayOpt        : Option[Int],
+    showProgress    : Boolean,
+    allowDuplicates : Boolean
+
   ): Unit =
     delayOpt match {
       case Some(delay) if delay >= 0 ⇒
@@ -132,7 +139,8 @@ object XFormsDispatchAction {
           cancelable        = cancelable,
           time              = System.currentTimeMillis + delay,
           discardable       = false,
-          showProgress      = showProgress
+          showProgress      = showProgress,
+          allowDuplicates   = allowDuplicates
         )
       case _ ⇒
         // Event is dispatched immediately

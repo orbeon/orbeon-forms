@@ -248,11 +248,12 @@ object XFormsAPI {
   def dispatch(
     name            : String,
     targetId        : String,
-    bubbles         : Boolean = true,
-    cancelable      : Boolean = true,
+    bubbles         : Boolean                    = true,
+    cancelable      : Boolean                    = true,
     properties      : XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
-    delay           : Option[Int] = None,
-    showProgress    : Boolean = true
+    delay           : Option[Int]                = None,
+    showProgress    : Boolean                    = true,
+    allowDuplicates : Boolean                    = false
   ): Unit =
     resolveAs[XFormsEventTarget](targetId) foreach {
       XFormsDispatchAction.dispatch(
@@ -262,7 +263,8 @@ object XFormsAPI {
         cancelable,
         properties,
         delay,
-        showProgress
+        showProgress,
+        allowDuplicates
       )
     }
 

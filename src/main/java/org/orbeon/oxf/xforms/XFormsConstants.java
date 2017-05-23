@@ -347,6 +347,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_INSTANCE_QNAME = QName.get("instance", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHOW_PROGRESS_QNAME = QName.get("show-progress", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_ALLOW_DUPLICATES_QNAME = QName.get("allow-duplicates", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_OPEN_QNAME = QName.get("open", XXFORMS_NAMESPACE);
 
     // XForms 2.0 standardizes the xf:property element

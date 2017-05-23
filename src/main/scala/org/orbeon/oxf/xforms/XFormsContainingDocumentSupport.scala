@@ -560,17 +560,23 @@ trait ContainingDocumentDelayedEvents {
     cancelable        : Boolean,
     time              : Long,
     discardable       : Boolean,
-    showProgress      : Boolean
+    showProgress      : Boolean,
+    allowDuplicates   : Boolean
   ): Unit = {
-    _delayedEvents += DelayedEvent(
-      eventName,
-      targetEffectiveId,
-      bubbles,
-      cancelable,
-      time,
-      discardable,
-      showProgress
-    )
+
+    def isDuplicate(e: DelayedEvent) =
+      e.eventName == eventName && e.targetEffectiveId == targetEffectiveId
+
+    if (allowDuplicates || ! (_delayedEvents exists isDuplicate))
+      _delayedEvents += DelayedEvent(
+        eventName,
+        targetEffectiveId,
+        bubbles,
+        cancelable,
+        time,
+        discardable,
+        showProgress
+      )
   }
 
   def delayedEvents =

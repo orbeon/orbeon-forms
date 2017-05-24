@@ -233,6 +233,7 @@
                                 class="xbl-fr-number-xforms-output xforms-hidden"/>
                             <!-- Hidden XForms input -->
                             <xf:input
+                                id="xforms-input"
                                 ref="."
                                 class="xbl-fr-number-xforms-input xforms-hidden"
                                 xxf:format="$formatted"

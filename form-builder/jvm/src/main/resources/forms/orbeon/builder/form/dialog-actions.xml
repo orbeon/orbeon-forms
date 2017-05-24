@@ -441,11 +441,25 @@
                         <xh:div class="fb-action-options">
 
                             <xf:select1 ref="@class" class="fb-action-option-3-col-span-1">
-                                <xf:item>
+                                <xf:itemset
+                                    ref=".[
+                                        context() = 'fr-set-control-value-action' or
+                                        not(
+                                            $event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data')
+                                        )
+                                    ]">
                                     <xf:label ref="$form-resources/dialog-actions/set-control-value"/>
                                     <xf:value>fr-set-control-value-action</xf:value>
-                                </xf:item>
-                                <xf:itemset ref=".[exists($controls-with-itemset)]">
+                                </xf:itemset>
+                                <xf:itemset
+                                    ref=".[
+                                        exists($controls-with-itemset) and (
+                                            context() = 'fr-itemset-action' or
+                                            not(
+                                                $event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data')
+                                            )
+                                        )
+                                    ]">
                                     <xf:label ref="$form-resources/dialog-actions/set-control-itemset"/>
                                     <xf:value>fr-itemset-action</xf:value>
                                 </xf:itemset>

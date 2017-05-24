@@ -59,7 +59,7 @@
                     padding: 0;
 
                     // Instead add some space around the control, and if it is non-relevant its margin won't show
-                    &> .xforms-control, &> .xbl-component {
+                    &> .xforms-control, &> .xbl-component, &> .xforms-group {
                         margin: @frGridCellPadding;
                         display: block;
                     }
@@ -194,7 +194,7 @@
         .fr-grid.fr-repeat {
 
             .fr-grid-tr > .fr-grid-td {
-                &> .xforms-control, &> .xbl-component {
+                &> .xforms-control, &> .xbl-component, &> .xforms-group {
                     padding-top: 0;                                                 // No top/bottom padding in repeated grid cells
                     padding-bottom: 0.1px;                                          // 0 causes https://github.com/orbeon/orbeon-forms/issues/2690
                 }
@@ -205,7 +205,7 @@
                 .fr-grid-tr > .fr-grid-td {
                     // Don't show label, help, hint for controls inside a repeat-table which repeats over a single row only (they are shown in the
                     // column header). But only do this for the top-level control within a cell.
-                    &> .xforms-control, &> .xbl-component {
+                    &> .xforms-control, &> .xbl-component, &> .xforms-group {
                         &> .xforms-label,
                         &> .xforms-help,
                         &> .xforms-hint {
@@ -283,13 +283,13 @@
     .fr-mode-view {
 
         .fr-grid .fr-grid-tr > .fr-grid-td {
-            &> .xforms-control, &> .xbl-component {
+            &> .xforms-control, &> .xbl-component, &> .xforms-group {
                 margin-bottom: 3 * @frGridCellPadding;
             }
         }
 
         .fr-grid.fr-repeat .fr-grid-tr > .fr-grid-td {
-            &> .xforms-control, &> .xbl-component {
+            &> .xforms-control, &> .xbl-component, &> .xforms-group {
                 background-color: transparent;
                 margin-bottom: 0;
             }

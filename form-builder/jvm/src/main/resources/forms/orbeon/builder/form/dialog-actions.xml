@@ -35,14 +35,22 @@
     <xf:var name="body"     value="$body" model="fr-form-model"/>
 
     <xf:var
-        name="all-services"
+        name="all-available-services"
         value="
             $model/fb:submission[
                 ends-with(@id, '-submission') and not(
-                    @id = ../fb:action[ends-with(@id, '-binding') and
-                    @id != concat($instance/initial-name, '-binding')]/xf:action[1]/xf:send/@submission
+                    @id = (
+                        ../fb:action[
+                            ends-with(@id, '-binding') and
+                            @id != concat($instance/initial-name, '-binding')
+                        ]/xf:action[1]/xf:send/@submission
+                    )
                 )
             ]"/>
+
+    <xf:var name="action1"  value="$instance/fb:action/xf:action[1]"/>
+    <xf:var name="observer" value="$action1/@ev:observer"/>
+    <xf:var name="event"    value="$action1/@fb:event"/>
 
     <!-- Initialize dialog -->
     <xf:action event="xxforms-dialog-open">
@@ -68,7 +76,10 @@
 
             <!-- Insert condition on action if missing -->
             <xf:var name="action1" value="$instance/fb:action/xf:action[1]"/>
-            <xf:insert if="not(exists($action1/@if))" context="$action1" origin="xf:attribute('if', 'true()')"/>
+            <xf:insert
+                if="not(exists($action1/@if))"
+                context="$action1"
+                origin="xf:attribute('if', 'true()')"/>
         </xf:action>
     </xf:action>
 
@@ -87,7 +98,7 @@
                     </xh:td>
                     <xh:td>
                         <!-- Condition -->
-                        <xf:select1 ref="$instance/fb:action/xf:action[1]/@if">
+                        <xf:select1 ref="$action1/@if">
                             <xf:label ref="$form-resources/dialog-actions/event-condition/label"/>
                             <xf:itemset ref="$form-resources/dialog-actions/event-condition/item">
                                 <xf:label ref="label"/>
@@ -98,10 +109,6 @@
                 </xh:tr>
                 <xh:tr>
                     <xh:td colspan="2">
-
-                        <xf:var name="observer" value="$instance/fb:action/xf:action[1]/@ev:observer"/>
-                        <xf:var name="event"    value="$instance/fb:action/xf:action[1]/@fb:event"/>
-
                         <xf:group ref="$observer" class="fb-action-phrase-outer">
                             <xf:label value="$form-resources/dialog-actions/observer-type/label"/>
 
@@ -151,7 +158,16 @@
                                 </fr:dropdown-select1>
 
                                 <xf:select1 ref="$event" appearance="dropdown" class="fb-action-event">
-                                    <xf:itemset ref="$form-resources/dialog-actions/event-type/item[@id = (if ($observer = 'fr-form-model') then (3 to 5) else (0 to 2))]">
+                                    <xf:itemset
+                                        ref="
+                                            $form-resources/dialog-actions/event-type/item[
+                                                @id = (
+                                                    if ($observer = 'fr-form-model') then
+                                                        (3 to 5)
+                                                    else
+                                                        (0 to 2)
+                                                )
+                                            ]">
                                         <xf:label ref="label"/>
                                         <xf:value
                                             ref="
@@ -179,21 +195,11 @@
                 <xh:tr>
                     <xh:td>
                         <!-- Service to Call -->
-                        <fr:dropdown-select1 ref="$instance/fb:action/xf:action[1]/xf:send/@submission" id="fb-bindings-submission-select">
+                        <fr:dropdown-select1 ref="$action1/xf:send/@submission" id="fb-bindings-submission-select">
                             <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                             <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
                             <!-- Show submissions that are NOT yet used by an action. See https://github.com/orbeon/orbeon-forms/issues/397 -->
-                            <xf:itemset
-                                ref="
-                                    $model/fb:submission[
-                                        ends-with(@id, '-submission') and
-                                        not(
-                                            @id = ../fb:action[
-                                                ends-with(@id, '-binding') and
-                                                @id != concat($instance/initial-name, '-binding')
-                                            ]/xf:action[1]/xf:send/@submission
-                                        )
-                                    ]">
+                            <xf:itemset ref="$all-available-services">
                                 <xf:label value="substring-before(@id, '-submission')"/>
                                 <xf:value value="@id"/>
                             </xf:itemset>
@@ -209,11 +215,16 @@
 
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
 
-                <!-- Set HTTP Service Request Values -->
+                <!-- Set Service Request Values -->
+
                 <xf:group ref="
-                    .[exists($all-services[xxf:has-class('fr-service')])]
-                    /xf:action[@fb:event = 'xforms-submit']
-                    /xf:action">
+                    .[
+                        exists(
+                            $all-available-services[xxf:has-class('fr-service')]
+                        )
+                    ]/xf:action[
+                        @fb:event = 'xforms-submit'
+                    ]/xf:action">
 
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
 
@@ -246,35 +257,35 @@
 
                             <xh:div class="fb-action-options">
 
-                                    <fr:dropdown-select1
-                                        ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
-                                        class="fb-action-option-2-col-span-1">
-                                        <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xf:label
-                                                value="
-                                                    utils:truncateWithEllipsis(
-                                                        for $id in substring-before(@id, '-control')
-                                                        return
-                                                            concat(
-                                                                $current-resources/*[name() = $id]/label,
-                                                                ' (',
-                                                                $id,
-                                                                ')'
-                                                            ),
-                                                        60,
-                                                        6
-                                                    )"/>
+                                <fr:dropdown-select1
+                                    ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
+                                    class="fb-action-option-2-col-span-1">
+                                    <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xf:label
+                                            value="
+                                                utils:truncateWithEllipsis(
+                                                    for $id in substring-before(@id, '-control')
+                                                    return
+                                                        concat(
+                                                            $current-resources/*[name() = $id]/label,
+                                                            ' (',
+                                                            $id,
+                                                            ')'
+                                                        ),
+                                                    60,
+                                                    6
+                                                )"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                        </xf:itemset>
-                                    </fr:dropdown-select1>
+                                    </xf:itemset>
+                                </fr:dropdown-select1>
 
-                                    <xf:input
-                                        ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"
-                                        incremental="true"
-                                        class="fb-action-option-2-col-span-1">
-                                        <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
-                                    </xf:input>
+                                <xf:input
+                                    ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"
+                                    incremental="true"
+                                    class="fb-action-option-2-col-span-1">
+                                    <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
+                                </xf:input>
 
                             </xh:div>
                             <xh:div class="fb-action-buttons">
@@ -305,9 +316,13 @@
 
                 <!-- Set Database Service Parameters -->
                 <xf:group ref="
-                    .[exists($all-services[xxf:has-class('fr-database-service')])]
-                    /xf:action[@fb:event = 'xforms-submit']
-                    /xf:action">
+                    .[
+                        exists(
+                            $all-available-services[xxf:has-class('fr-database-service')]
+                        )
+                    ]/xf:action[
+                        @fb:event = 'xforms-submit'
+                    ]/xf:action">
 
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
 
@@ -340,35 +355,35 @@
 
                             <xh:div class="fb-action-options">
 
-                                    <fr:dropdown-select1
-                                        ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
-                                        class="fb-action-option-2-col-span-1">
-                                        <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xf:label
-                                                value="
-                                                    utils:truncateWithEllipsis(
-                                                        for $id in substring-before(@id, '-control')
-                                                        return
-                                                            concat(
-                                                                $current-resources/*[name() = $id]/label,
-                                                                ' (',
-                                                                $id,
-                                                                ')'
-                                                            ),
-                                                        60,
-                                                        6
-                                                    )"/>
+                                <fr:dropdown-select1
+                                    ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
+                                    class="fb-action-option-2-col-span-1">
+                                    <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xf:label
+                                            value="
+                                                utils:truncateWithEllipsis(
+                                                    for $id in substring-before(@id, '-control')
+                                                    return
+                                                        concat(
+                                                            $current-resources/*[name() = $id]/label,
+                                                            ' (',
+                                                            $id,
+                                                            ')'
+                                                        ),
+                                                    60,
+                                                    6
+                                                )"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                        </xf:itemset>
-                                    </fr:dropdown-select1>
+                                    </xf:itemset>
+                                </fr:dropdown-select1>
 
-                                    <xf:input
-                                        ref="(*:variable | *:var)[@name = 'parameter']/(@value | @select)[1]"
-                                        incremental="true"
-                                        class="fb-action-option-2-col-span-1">
-                                        <xf:label ref="$form-resources/dialog-actions/parameter-number/label" appearance="minimal"/>
-                                    </xf:input>
+                                <xf:input
+                                    ref="(*:variable | *:var)[@name = 'parameter']/(@value | @select)[1]"
+                                    incremental="true"
+                                    class="fb-action-option-2-col-span-1">
+                                    <xf:label ref="$form-resources/dialog-actions/parameter-number/label" appearance="minimal"/>
+                                </xf:input>
 
                             </xh:div>
                             <xh:div class="fb-action-buttons">
@@ -467,6 +482,7 @@
                                     <xf:label ref="$form-resources/dialog-actions/save-to-dataset"/>
                                     <xf:value>fr-save-to-dataset-action</xf:value>
                                 </xf:item>
+
                                 <xf:action event="xforms-select">
                                     <xf:delete ref="$current-action/(@class, *)"/>
                                     <xf:insert

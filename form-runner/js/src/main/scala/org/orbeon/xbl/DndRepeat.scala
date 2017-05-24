@@ -23,11 +23,14 @@ import scala.scalajs.js
 // Companion for `fr:dnd-repeat`
 object DndRepeat {
 
-  val RepeatBeginEndSelector   = ".xforms-repeat-begin-end"
-  val NotGuSelector            = ":not(.gu-transit):not(.gu-mirror)"
-  val DndItemSelector          = ".xforms-dnd-item"
-  val DndMovesSelector         = ".xforms-dnd-moves"
-  val DndLevelPrefix           = "xforms-dnd-level-"
+  val IsRepeatBeginEndSelector   = ".xforms-repeat-begin-end"
+  val IsRepeatDelimiterSelector  = ".xforms-repeat-delimiter"
+  val IsRepeatTemplateSelector   = ".xforms-repeat-template"
+
+  val IsNotGuSelector            = ":not(.gu-transit):not(.gu-mirror)"
+  val IsDndItemSelector          = ".xforms-dnd-item"
+  val IsDndMovesSelector         = ".xforms-dnd-moves"
+  val IsDndLevelPrefix           = "xforms-dnd-level-"
 
   val FindDndLevelRe           = """^xforms-dnd-level-(\d+)$""".r
 
@@ -52,15 +55,18 @@ object DndRepeat {
 
               override def mirrorContainer                                                        = containerElem
               override def isContainer(el: Element)                                               = el eq containerElem
-              override def moves(el: Element, source: Element, handle: Element, sibling: Element) = $(el).is(DndMovesSelector)
+              override def moves(el: Element, source: Element, handle: Element, sibling: Element) = $(el).is(IsDndMovesSelector)
 
               override def accepts(el: Element, target: Element, source: Element, sibling: Element) = {
 
                 val jSibling = $(sibling)
 
-                (sibling ne null)              &&
-                  jSibling.is(NotGuSelector)   &&
-                  jSibling.is(DndItemSelector) &&
+                (sibling ne null)                &&
+                  jSibling.is(IsNotGuSelector)   && (
+                    jSibling.is(IsDndItemSelector)                || // regular case
+                    jSibling.is(IsRepeatTemplateSelector)         || // at the end of the repeat
+                    jSibling.next().is(IsRepeatDelimiterSelector)    // at the end of the repeat when there is an empty `<span>` (unclear, see Actions Editor)
+                  )                              &&
                   ! dragState.exists(_.excludedTargets.exists(_ eq sibling))
               }
             }
@@ -75,7 +81,7 @@ object DndRepeat {
 
           val startLevelOpt = findElemLevel(el)
 
-          val nextAllItems = jEl.nextAll(DndItemSelector)
+          val nextAllItems = jEl.nextAll(IsDndItemSelector)
 
           val nextDndItemIt =
             for (i ← 0 until nextAllItems.length iterator)
@@ -89,7 +95,7 @@ object DndRepeat {
           dragState = Some(
             DragState(
               currentDragStartPrev     = jEl.prev()(0),
-              currentDragStartPosition = jEl.prevAll(DndItemSelector).length,
+              currentDragStartPosition = jEl.prevAll(IsDndItemSelector).length,
               excludedTargets          = excludedTargets
             )
           )
@@ -102,8 +108,8 @@ object DndRepeat {
         newDrake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
           dragState foreach { dragState ⇒
 
-            val dndEnd     = $(el).prevAll(DndItemSelector).length
-            val repeatId   = $(el).prevAll(RepeatBeginEndSelector).attr("id").get.substring("repeat-begin-".length)
+            val dndEnd     = $(el).prevAll(IsDndItemSelector).length
+            val repeatId   = $(el).prevAll(IsRepeatBeginEndSelector).attr("id").get.substring("repeat-begin-".length)
 
             val beforeEl   = dragState.currentDragStartPrev
             val dndStart   = dragState.currentDragStartPosition

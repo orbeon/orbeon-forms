@@ -844,6 +844,51 @@
         </output>
     </test>
 
+    <test description="`fr:number`: `1.2` is invalid if grouping separator is `,`" name="oxf:pipeline" only="true">
+        <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <number/>
+                        </xf:instance>
+                        <xf:bind ref="." type="xs:decimal"/>
+                        <xf:submission
+                            id="return-instance"
+                            ref="instance()"
+                            action="echo:"
+                            method="post"
+                            replace="all"
+                            validate="false"
+                            xxf:annotate="error"/>
+                        <xf:action event="xforms-ready">
+                            <xf:dispatch name="xxforms-value"
+                                         target="|my-number≡xforms-input|">
+                                <xf:property name="value">1.2</xf:property>
+                            </xf:dispatch>
+                            <xf:send submission="return-instance"/>
+                        </xf:action>
+                    </xf:model>
+                    <xi:include href="oxf:/xbl/orbeon/number/number.xbl" xxi:omit-xml-base="true"/>
+                </xh:head>
+                <xh:body
+                    xxf:xbl.fr.number.decimal-separator=","
+                    xxf:xbl.fr.number.grouping-separator="">
+                    <fr:number id="my-number"
+                               ref="."
+                               decimal-separator=","
+                               grouping-separator="">
+                        <xf:alert>invalid</xf:alert>
+                    </fr:number>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <number xxf:error="invalid">1≡2</number>
+        </output>
+    </test>
+
     <test description="xf:setfocus on fr:autocomplete" name="oxf:pipeline">
         <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
         <input name="document">

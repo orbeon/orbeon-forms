@@ -68,9 +68,15 @@
         <!-- Initialize parameters to pass to "new" service -->
         <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
         <xf:action iterate="xxf:split($pass-request-parameters)">
-            <xf:var name="parameter-name" value="."/>
-            <xf:var name="parameter-value" value="xxf:get-request-parameter($parameter-name)"/>
-            <xf:insert context="instance('fr-service-parameters')" origin="xf:element($parameter-name, $parameter-value)"/>
+            <xf:var
+                name="parameter-name"
+                value="."/>
+            <xf:var
+                name="parameter-value"
+                value="xxf:get-request-parameter($parameter-name)"/>
+            <xf:insert
+                context="instance('fr-service-parameters')"
+                origin="xf:element($parameter-name, $parameter-value)"/>
         </xf:action>
 
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
@@ -382,7 +388,9 @@
             replace="instance"
             instance="fr-search-response">
         <!-- Remove documents we can't update (search might still return them if we can only ready them) -->
-        <xf:delete event="xforms-submit-done" ref="instance('fr-search-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
+        <xf:delete
+            event="xforms-submit-done"
+            ref="instance('fr-search-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
     </xf:submission>
     <xf:instance id="fr-search-request">
         <search>

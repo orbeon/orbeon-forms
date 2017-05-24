@@ -59,7 +59,7 @@
         xxf:show-progress="{instance('fr-send-submission-params')/@show-progress}"
         xxf:target="{instance('fr-send-submission-params')/@target}"/>
 
-    <!-- Instance to store the result of fr-send-submission if any -->
+    <!-- Instance to store the result of `fr-send-submission` if any -->
     <xf:instance id="fr-send-submission-response">
         <response xmlns=""/>
     </xf:instance>

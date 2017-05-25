@@ -53,9 +53,10 @@ object ServerAPI {
     }
 
     js.eval(functionName).asInstanceOf[js.Function].call(
-      getElementOrNull(observerId),                                // `this`
-      new js.Object { val target = getElementOrNull(targetId) } +: // `event`
+      thisArg = getElementOrNull(observerId),
+      new js.Object { val target = getElementOrNull(targetId) } +: // `event.target`
       rest                                                         // custom arguments passed with `<xxf:param>` in `<xf:action>`
+      : _*                                                         // pass as individual arguments (#3205)
     )
   }
 }

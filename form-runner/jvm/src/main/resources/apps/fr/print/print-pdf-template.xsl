@@ -43,7 +43,7 @@
 
     <xsl:variable
         name="image-attachment-classes"
-        select="('xbl-fr-image-attachment')"
+        select="'xbl-fr-image-attachment', 'xbl-fr-wpaint'"
         as="xs:string*"/>
 
     <xsl:variable

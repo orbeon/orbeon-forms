@@ -31,7 +31,6 @@ trait XFormsStaticState {
 
   def topLevelPart                            : PartAnalysis
 
-  def isCacheDocument                         : Boolean
   def isClientStateHandling                   : Boolean
   def isServerStateHandling                   : Boolean
   def isHTMLDocument                          : Boolean

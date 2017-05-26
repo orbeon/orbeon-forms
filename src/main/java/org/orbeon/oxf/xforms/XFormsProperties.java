@@ -129,10 +129,6 @@ public class XFormsProperties {
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
     public static final String CALCULATE_ANALYSIS_PROPERTY = "analysis.calculate";
 
-    // TODO: Make this a global property: right now it is used 1/2 global, 1/2 document
-    public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
-    public static final boolean CACHE_DOCUMENT_DEFAULT = true;
-
     public static final String SANITIZE_PROPERTY = "sanitize";
 
     public static final String ASSETS_BASELINE_EXCLUDES_PROPERTY = "assets.baseline.excludes";
@@ -269,20 +265,17 @@ public class XFormsProperties {
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY                      , false,                          false),
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY                       , false,                          false),
             new PropertyDefinition(CALCULATE_ANALYSIS_PROPERTY                   , false,                          false),
-            new PropertyDefinition(CACHE_DOCUMENT_PROPERTY                       , CACHE_DOCUMENT_DEFAULT,         false),
             new PropertyDefinition(SANITIZE_PROPERTY                             , "",                             false),
             new PropertyDefinition(ASSETS_BASELINE_EXCLUDES_PROPERTY             , "",                             false),
 
             // Properties to propagate to the client
             new PropertyDefinition(USE_ARIA                                      , false,                          true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY                    , true,                           true),
-            new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY              , 12 * 60 * 60 * 800,             true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY     , 500,                            true),
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY                 , 10,                             true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY         , 500,                            true),
             new PropertyDefinition(DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY , 2000,                           true),
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY                     , REVISIT_HANDLING_RESTORE_VALUE, true),
-            new PropertyDefinition(HELP_HANDLER_PROPERTY                         , false,                          true), // dynamic
             new PropertyDefinition(HELP_TOOLTIP_PROPERTY                         , false,                          true),
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY                    , "[M]/[D]/[Y]",                  true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY                    , "[h]:[m]:[s] [P]",              true),
@@ -335,6 +328,8 @@ public class XFormsProperties {
 
     public static final String UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY  = "upload.delay-before-xforms-timeout";
 
+    public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
+
     public static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY           = "delay-before-ajax-timeout";
     public static final String RETRY_DELAY_INCREMENT                        = "retry.delay-increment";
     public static final String RETRY_MAX_DELAY                              = "retry.max-delay";
@@ -362,7 +357,7 @@ public class XFormsProperties {
 
     public static boolean isCacheDocument() {
         return Properties.instance().getPropertySet().getBoolean
-                (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT);
+                (CACHE_DOCUMENT_PROPERTY, true);
     }
 
     public static boolean isGZIPState() {

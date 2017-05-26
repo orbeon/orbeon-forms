@@ -21,10 +21,10 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.{Loggers, XFormsConstants, XFormsContainingDocument, XFormsProperties}
-import org.orbeon.oxf.util.CoreUtils._
 
 object XFormsStateManager extends XFormsStateLifecycle {
 
@@ -328,7 +328,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     def cacheOrStore(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
 
-      if (containingDocument.getStaticState.isCacheDocument) {
+      if (XFormsProperties.isCacheDocument) {
         // Cache the document
         Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
         XFormsDocumentCache.put(containingDocument)

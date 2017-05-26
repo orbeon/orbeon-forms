@@ -155,7 +155,6 @@ class XFormsStaticStateImpl(
     }
   }
 
-  def isCacheDocument       = staticBooleanProperty(P.CACHE_DOCUMENT_PROPERTY)
   def isClientStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
   def isServerStateHandling = staticStringProperty(P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
 

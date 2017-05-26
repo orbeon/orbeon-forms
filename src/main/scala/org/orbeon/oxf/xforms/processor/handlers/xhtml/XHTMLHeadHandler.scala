@@ -220,44 +220,36 @@ class XHTMLHeadHandler(
         p option (name → value)
 
       // Heartbeat delay is dynamic because it depends on session duration
-      def heartbeat = {
-        val propertyDefinition =
-          getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
-
-        val heartbeatDelay =
-          XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
-
-        dynamicProperty(
-          heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[jl.Integer],
-          SESSION_HEARTBEAT_DELAY_PROPERTY,
-          heartbeatDelay
+      def heartbeatOpt =
+        Some(
+          SESSION_HEARTBEAT_DELAY_PROPERTY →
+            XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
         )
-      }
 
       // Help events are dynamic because they depend on whether the xforms-help event is used
       // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
-      def help = dynamicProperty(
+      def helpOpt = dynamicProperty(
         containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
         HELP_HANDLER_PROPERTY,
         true
       )
 
       // Whether resources are versioned
-      def resourcesVersioned = dynamicProperty(
+      def resourcesVersionedOpt = dynamicProperty(
         versionedResources != RESOURCES_VERSIONED_DEFAULT,
         RESOURCES_VERSIONED_PROPERTY,
         versionedResources
       )
 
       // Application version is not an XForms property but we want to expose it on the client
-      def resourcesVersion = dynamicProperty(
+      def resourcesVersionOpt = dynamicProperty(
         versionedResources && (getApplicationResourceVersion ne null),
         RESOURCES_VERSION_NUMBER_PROPERTY,
         getApplicationResourceVersion
       )
 
       // Gather all dynamic properties that are defined
-      List(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
+      List(heartbeatOpt, helpOpt, resourcesVersionedOpt, resourcesVersionOpt).flatten
     }
 
     val globalProperties = List(

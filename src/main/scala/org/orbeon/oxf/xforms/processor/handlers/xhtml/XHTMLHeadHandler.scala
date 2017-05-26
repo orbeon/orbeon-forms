@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
@@ -216,7 +217,7 @@ class XHTMLHeadHandler(
     val dynamicProperties = {
 
       def dynamicProperty(p: ⇒ Boolean, name: String, value: Any) =
-        if (p) Some(name → value) else None
+        p option (name → value)
 
       // Heartbeat delay is dynamic because it depends on session duration
       def heartbeat = {
@@ -226,8 +227,11 @@ class XHTMLHeadHandler(
         val heartbeatDelay =
           XFormsStateManager.getHeartbeatDelay(containingDocument, xformsHandlerContext.getExternalContext)
 
-        dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[jl.Integer],
-          SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
+        dynamicProperty(
+          heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[jl.Integer],
+          SESSION_HEARTBEAT_DELAY_PROPERTY,
+          heartbeatDelay
+        )
       }
 
       // Help events are dynamic because they depend on whether the xforms-help event is used
@@ -256,8 +260,14 @@ class XHTMLHeadHandler(
       List(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
     }
 
+    val globalProperties = List(
+      DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY → getAjaxTimeout,
+      RETRY_DELAY_INCREMENT              → getRetryDelayIncrement,
+      RETRY_MAX_DELAY                    → getRetryMaxDelay
+    )
+
     // combine all static and dynamic properties
-    val clientProperties = staticProperties ++ dynamicProperties
+    val clientProperties = staticProperties ++ dynamicProperties ++ globalProperties
 
     if (clientProperties.nonEmpty) {
 

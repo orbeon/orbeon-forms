@@ -121,12 +121,6 @@ public class XFormsProperties {
 
     public static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
-    // TODO: Make these global properties, see https://github.com/orbeon/orbeon-forms/issues/1391
-    public static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY           = "delay-before-ajax-timeout";
-    public static final String UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY  = "upload.delay-before-xforms-timeout";
-    public static final String RETRY_DELAY_INCREMENT                        = "retry.delay-increment";
-    public static final String RETRY_MAX_DELAY                              = "retry.max-delay";
-
     public static final String USE_ARIA = "use-aria";
 
     public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
@@ -260,7 +254,6 @@ public class XFormsProperties {
             new PropertyDefinition(UPLOAD_MAX_SIZE_AGGREGATE_PROPERTY            , "",                             false),
             new PropertyDefinition(UPLOAD_MAX_SIZE_AGGREGATE_EXPRESSION_PROPERTY , "",                             false),
             new PropertyDefinition(UPLOAD_MEDIATYPES_PROPERTY                    , "*/*",                          false),
-            new PropertyDefinition(UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY   , 45000,                          false),
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY                      , "",                             false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY                     , true,                           false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY, true,                           false),
@@ -281,13 +274,10 @@ public class XFormsProperties {
             new PropertyDefinition(ASSETS_BASELINE_EXCLUDES_PROPERTY             , "",                             false),
 
             // Properties to propagate to the client
-            new PropertyDefinition(RETRY_DELAY_INCREMENT                         , 5000,                           true),
-            new PropertyDefinition(RETRY_MAX_DELAY                               , 30000,                          true),
             new PropertyDefinition(USE_ARIA                                      , false,                          true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY                    , true,                           true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY              , 12 * 60 * 60 * 800,             true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY     , 500,                            true),
-            new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY            , 30000,                          true),
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY                 , 10,                             true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY         , 500,                            true),
             new PropertyDefinition(DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY , 2000,                           true),
@@ -342,6 +332,12 @@ public class XFormsProperties {
     public static final String DEBUG_REQUEST_STATS_PROPERTY      = XFORMS_PROPERTY_PREFIX + "debug.log-request-stats";
 
     public static final String LOCATION_MODE_PROPERTY = XFORMS_PROPERTY_PREFIX + "location-mode";
+
+    public static final String UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY  = "upload.delay-before-xforms-timeout";
+
+    public static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY           = "delay-before-ajax-timeout";
+    public static final String RETRY_DELAY_INCREMENT                        = "retry.delay-increment";
+    public static final String RETRY_MAX_DELAY                              = "retry.max-delay";
 
     // == Global properties ============================================================================================
     /**
@@ -413,16 +409,22 @@ public class XFormsProperties {
     }
 
     public static long getAjaxTimeout() {
-        return (long) Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, ((Integer) getPropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY).defaultValue).intValue());
+        return (long) Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, 30000);
     }
 
     public static long uploadXFormsAccessTimeout() {
-        return (long) Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY, ((Integer) getPropertyDefinition(UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY).defaultValue).intValue());
+        return (long) Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + UPLOAD_DELAY_BEFORE_XFORMS_TIMEOUT_PROPERTY, 45000);
     }
 
     public static int getRetryDelayIncrement() {
-        return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_DELAY_INCREMENT, ((Integer) getPropertyDefinition(RETRY_DELAY_INCREMENT).defaultValue).intValue());
+        return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_DELAY_INCREMENT, 5000);
     }
+
+    public static int getRetryMaxDelay() {
+        return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_MAX_DELAY, 30000);
+    }
+
+
 
     public static boolean isKeepLocation() {
         return ! Properties.instance().getPropertySet().getString(LOCATION_MODE_PROPERTY, "none").equals("none");

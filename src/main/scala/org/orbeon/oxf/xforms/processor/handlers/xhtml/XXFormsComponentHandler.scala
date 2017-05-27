@@ -33,10 +33,11 @@ class XXFormsComponentHandler(
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
 
-  protected override val (getContainingElementName, getContainingElementQName) = {
-    val elementName  = binding.abstractBinding.containerElementName
-    elementName → XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, elementName)
-  }
+  protected override def getContainingElementName =
+    binding.abstractBinding.containerElementName
+
+  protected override def getContainingElementQName =
+    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, binding.abstractBinding.containerElementName)
 
   private lazy val binding =
     containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)

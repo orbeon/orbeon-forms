@@ -30,13 +30,20 @@ class XFormsGroupDefaultHandler(
 ) extends XFormsGroupHandler(uri, localname, qName, attributes, matched, handlerContext) {
 
   // Use explicit container element name if present, otherwise use default
-  override val (getContainingElementName, getContainingElementQName) =
+  override def getContainingElementName =
     matched match {
       case control: ContainerControl if control.elementQName ne null ⇒
-        val explicitQName = control.elementQName
-        explicitQName.getName → explicitQName.getQualifiedName
+        control.elementQName.getName
       case _ ⇒
-        super.getContainingElementName → super.getContainingElementQName // NOTE: this calls back getContainingElementName()
+        super.getContainingElementName
+    }
+
+  override def getContainingElementQName =
+    matched match {
+      case control: ContainerControl if control.elementQName ne null ⇒
+        control.elementQName.getQualifiedName
+      case _ ⇒
+        super.getContainingElementQName
     }
 
   override protected def handleControlStart() = ()

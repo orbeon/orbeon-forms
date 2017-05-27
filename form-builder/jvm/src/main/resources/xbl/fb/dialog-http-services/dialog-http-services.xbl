@@ -485,7 +485,8 @@
                     id="dialog"
                     level="modal"
                     close="true"
-                    draggable="true">
+                    draggable="true"
+                    class="fb-dialog-http-services">
 
                     <xf:label ref="$resources/dialog-http-services/label"/>
 

@@ -557,10 +557,10 @@
                                                 <xf:label>HTML Form</xf:label>
                                                 <xf:value>application/x-www-form-urlencoded</xf:value>
                                             </xf:item>
-                                            <!--<xf:item>-->
-                                                <!--<xf:label>JSON</xf:label>-->
-                                                <!--<xf:value>application/json</xf:value>-->
-                                            <!--</xf:item>-->
+                                            <xf:item>
+                                                <xf:label>JSON</xf:label>
+                                                <xf:value>application/json</xf:value>
+                                            </xf:item>
                                         </xf:select1>
                                     </xh:td>
                                 </xh:tr>

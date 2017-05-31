@@ -362,15 +362,15 @@
 
     // ***** View, PDF, email ******************************************************************************************
 
-    .xforms-form { // make rule a bit stronger to make sure hints are hidden
+    .xforms-form {
+        // Make rule a bit stronger to make sure help/alert are hidden (hint are now not output at all)
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
             .xforms-help, .xforms-alert {                   // 2017-05-22: removed `.xforms-hint` for https://github.com/orbeon/orbeon-forms/issues/3118
                 display: none;
             }
 
             // For those controls that still have a display: block in view mode, make sure there is no top margin
-            .fr-grid-td .xforms-control,
-                .fr-grid-td .fr-component-group {
+            .fr-grid-td .xforms-control, .fr-grid-td .fr-component-group {
                 margin-top: 0;
             }
 

@@ -139,8 +139,8 @@
     }
 
     // Allow output to wrap (like .xforms-field)
-    .xforms-output output {
-        word-wrap: break-word;
+    .xforms-output output, .xforms-output .xforms-output-output {
+        word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
         white-space: normal;
     }
 
@@ -365,7 +365,6 @@
     // Textarea in output mode can contain line breaks so try to keep them
     .xforms-textarea pre {
         font-family: @sansFontFamily;   // use regular font, not monospaced font
-        white-space: -moz-pre-wrap;
         white-space: pre-wrap;
 
         word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
@@ -396,7 +395,7 @@
     .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
         .xforms-field {
             white-space: normal;
-            word-wrap: break-word;
+            word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
             min-height: @controlsHeight;
             height: auto;
         }

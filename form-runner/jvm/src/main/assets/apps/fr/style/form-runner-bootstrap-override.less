@@ -236,8 +236,8 @@ body.orbeon {
     .fr-grid .xforms-mediatype-text-html.xforms-static {
         color: @grayDark;
         display: block;
-        padding: (@baseLineHeight - 1) / 2;
-        margin: 0 0 @baseLineHeight / 2;
+        padding: (@baseLineHeight - 1) / 2;             // We override these in form-runner-base.less, do we need this here?
+        margin: 0 0 @baseLineHeight / 2;                // We override these in form-runner-base.less, do we need this here?
         font-size: @baseFontSize - 1; // 14px to 13px
         line-height: @baseLineHeight;
         background-color: darken(@inputBackground, 5%);

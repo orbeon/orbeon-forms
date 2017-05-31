@@ -362,15 +362,6 @@
 
     // ***** View, PDF, email ******************************************************************************************
 
-    // Textarea in output mode can contain line breaks so try to keep them
-    .xforms-textarea pre {
-        font-family: @sansFontFamily;   // use regular font, not monospaced font
-        white-space: pre-wrap;
-
-        word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
-        word-break: normal;    // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
-    }
-
     .xforms-form { // make rule a bit stronger to make sure hints are hidden
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
             .xforms-help, .xforms-alert {                   // 2017-05-22: removed `.xforms-hint` for https://github.com/orbeon/orbeon-forms/issues/3118
@@ -400,9 +391,15 @@
             height: auto;
         }
 
-        .xforms-textarea.xforms-static pre, .xforms-mediatype-text-html.xforms-static {
+        // Textarea in output mode and `fr:tinymce` can contain line breaks so try to keep them
+        .xforms-textarea.xforms-static > pre, .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
 
+            font-family: @sansFontFamily;   // use regular font, not monospaced font
             cursor: not-allowed;
+
+            white-space: pre-wrap;
+            word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
+            word-break: normal;    // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
 
             min-height: @controlsHeight;
             box-sizing: border-box;

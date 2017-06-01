@@ -1,0 +1,195 @@
+/* --------------------------------------------------------------------------------- Main layout, containers */
+
+/* Change pixel widths to percentage widths */
+.orbeon .container { 
+	width: 100%; }
+
+.orbeon .row { margin-left: 0; }
+
+/* --------------------------------------------------------------------------------- Wizard containers */
+
+.orbeon .xbl-fr-wizard { width: 100%; }
+
+.orbeon .xbl-fr-wizard .fr-wizard-body {
+	width: 70%;
+	left: 0;
+	border: 0;
+	float: right; }
+
+/* Sidebar */
+.orbeon .xbl-fr-wizard .fr-wizard-toc { 
+	width: 30%;
+	left: 0;
+	padding-right: 20px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;	}
+
+/* Page number */
+.orbeon .xbl-fr-wizard .fr-wizard-navigation .pagination .fr-page-number { width: auto; }
+	
+/* --------------------------------------------------------------------------------- General form styles */
+
+/* Force tables to not act like tables */
+.orbeon .fr-grid { 
+	display: block;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;	}
+
+/* Force table cells to not act like table cells */	
+.orbeon .fr-view .fr-grid tbody tr td {
+	display: inline-block;
+	float: left; }
+
+/* --------------------------------------------------------------------------------- WYSIWYG editor */
+
+/* Override set width */
+.thebigreasonSkin table.mceLayout { width: 100% !important; }
+
+.orbeon .fr-view .fr-grid tbody tr .mceToolbar { 
+	width: 100%;
+	padding: 0;	}
+
+/* Make text container take up full width */
+.orbeon .fr-grid tbody tr .mceIframeContainer { width: 100%; }
+
+/* --------------------------------------------------------------------------------- Notes */
+
+/* Reapply table and table-cell display to maintain layout */
+.orbeon .fr-view .fr-grid.fr-grid-note { display: table; }
+
+.orbeon .fr-view .fr-grid.fr-grid-note tbody tr { display: table-row; }
+
+.orbeon .fr-view .fr-grid.fr-grid-note tbody tr td {
+	float: none;
+	display: table-cell; }
+
+/* --------------------------------------------------------------------------------- Mini calendar datepicker */	
+
+/* Reapply table-cell display to maintain layout */
+.orbeon .fr-view .fr-grid .yui-calcontainer tbody tr td {
+	display: table-cell;
+	float: none; }
+
+/* --------------------------------------------------------------------------------- Form editor */
+
+/* Add min-width and min-height to cells within editor so new cells are easier to select */
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content {
+	min-height: 40px;
+	min-width: 40px; }
+
+/* ------------------------------------------------------------------------------------------------------------------- Responsive styles */
+
+@media (max-width: 979px) {
+	
+	/* ----------------------------------------------------------------------------- Wizard containers */
+	
+	.orbeon .xbl-fr-wizard .fr-wizard-body {
+		width: 100%;
+		float: none; }
+	
+	/* Sidebar */
+	.orbeon .xbl-fr-wizard .fr-wizard-toc { 
+		width: 100%;
+		padding: 0;
+		margin-top: 30px; }
+	
+	/* ----------------------------------------------------------------------------- General form styles */
+	
+	/* Force each field onto its own line */
+	.orbeon .fr-grid,
+	.orbeon .fr-grid > tbody,
+	.orbeon .fr-grid > tbody > tr { 
+		display: block; }
+
+	.orbeon .fr-grid > tbody > tr > td {
+		display: block;
+		width: 100%; }
+	
+	/* Make fields take up full width, but add max-widths so they're not too wide */
+	.orbeon select,
+	.orbeon textarea,
+	.orbeon input[type="text"],
+	.orbeon input[type="password"],
+	.orbeon input[type="datetime"],
+	.orbeon input[type="datetime-local"],
+	.orbeon input[type="date"],
+	.orbeon input[type="month"],
+	.orbeon input[type="time"],
+	.orbeon input[type="week"],
+	.orbeon input[type="number"],
+	.orbeon input[type="email"],
+	.orbeon input[type="url"],
+	.orbeon input[type="search"],
+	.orbeon input[type="tel"],
+	.orbeon input[type="color"],
+	.orbeon .uneditable-input,
+	.orbeon .fr-width-5em input.xforms-input-input,
+	.orbeon .fr-width-5em select,
+	.orbeon .fr-width-10em input.xforms-input-input,
+	.orbeon .fr-width-10em select,
+	.orbeon .fr-width-12em input.xforms-input-input,
+	.orbeon .fr-width-12em select,
+	.xbl-fr-us-state .xforms-select1-appearance-minimal,
+	.xbl-fr-us-state span.xforms-select1-appearance-minimal select,
+	.orbeon .fr-grid .xforms-input input.xforms-type-date,
+	.orbeon .fr-grid .xforms-input input.xforms-type-time,
+	.orbeon .fr-grid .xbl-fr-autocomplete .xforms-input input {
+		width: 100%;
+		max-width: 400px; }
+	
+	/* ----------------------------------------------------------------------------- Tooltips */
+	
+	.orbeon .fr-grid .fr-grid-content { position: relative; }
+	
+	/* Force tooltips to appear under field labels */
+	.orbeon .popover.xforms-help-popover {
+		top: 24px !important;
+		left: 0 !important;
+		margin-top: 12px;
+		margin-left: 0;
+		max-width: 100%;
+		border: 1px solid #BDBDBD; }
+	
+	/* Force tooltip arrow to point up */
+	.orbeon .popover.xforms-help-popover .arrow {
+		top: -12px !important;
+		left: 12px;
+		margin-top: 0;
+		border-bottom-color: #BDBDBD;
+		border-top-width: 0;
+		border-left-width: 11px;
+		border-right-color: transparent; }
+	
+	.orbeon .popover.xforms-help-popover .arrow:after {
+		top: 0;
+		left: 0;
+		border: 0px solid transparent; }
+}
+
+@media (max-width: 767px) {
+	/* Make action buttons take up full width */
+	.orbeon .fr-buttons { float: none; }
+	
+	.orbeon .fr-buttons .xforms-trigger button,
+	.orbeon .fr-buttons .xforms-trigger input {
+		display: block;
+		width: 100%;
+		margin: 10px 0; }
+}
+
+@media (max-width: 550px) {
+	/* Make dropdown dates MDY each display on their own lines */
+	.orbeon .xbl-fr-dropdown-date .fr-component-group select.xforms-select1-appearance-minimal,
+	.orbeon .xbl-fr-dropdown-date .fr-component-group span.xforms-select1-appearance-minimal select {
+		width: 100%;
+		margin-top: 6px; }
+
+	/* Make sure autocomplete input and button fit in container */
+	.orbeon .fr-autocomplete-container input[type="text"] { width: 85%}
+	
+	.orbeon .fr-grid .fr-grid-content .fr-autocomplete-container .xforms-trigger button { 
+		width: 15%;
+		padding: 0;	}
+}

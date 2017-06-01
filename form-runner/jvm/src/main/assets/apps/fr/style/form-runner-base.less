@@ -391,20 +391,26 @@
             height: auto;
         }
 
-        // Textarea in output mode and `fr:tinymce` can contain line breaks so try to keep them
-        .xforms-textarea.xforms-static > pre, .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
-
+        .xforms-textarea.xforms-static > pre, .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
+            
             font-family: @sansFontFamily;   // use regular font, not monospaced font
             cursor: not-allowed;
 
-            white-space: pre-wrap;
-            word-wrap: break-word; // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
-            word-break: normal;    // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
+            word-wrap: break-word;          // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
+            word-break: normal;             // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
 
             min-height: @controlsHeight;
             box-sizing: border-box;
             padding: 4px 6px;
             margin: 0;
+        }
+
+        .xforms-textarea.xforms-static > pre {
+            white-space: pre-wrap;
+        }
+
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html {
+            padding: 0; // reset padding added in form-runner-bootstrap-override.less
         }
     }
 }

@@ -85,7 +85,7 @@ object XFormsContainingDocumentSupport {
           )
 
           val containingDocument =
-            XFormsStateManager.beforeUpdate(params)
+            XFormsStateManager.beforeUpdate(params, disableDocumentCache = false)
 
           var keepDocument = false
           try {
@@ -93,7 +93,7 @@ object XFormsContainingDocumentSupport {
             keepDocument = true
             result
           } finally {
-            XFormsStateManager.afterUpdate(containingDocument, keepDocument)
+            XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
           }
 
         } finally {

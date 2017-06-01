@@ -140,8 +140,9 @@ object XFormsServer {
               // #54: "Browser back causes server exception" https://github.com/orbeon/orbeon-forms/issues/54
               XFormsStateManager.findOrRestoreDocument(
                 extractParameters(requestDocument, isInitialState = true),
-                isInitialState = true,
-                disableUpdates = true
+                isInitialState       = true,
+                disableUpdates       = true,
+                disableDocumentCache = false
               )
             }
 

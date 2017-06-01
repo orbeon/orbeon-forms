@@ -83,11 +83,15 @@ object XFormsStateManager extends XFormsStateLifecycle {
     *
     * Implementation: cache the document and/or store its initial state.
     */
-  def afterInitialResponse(containingDocument: XFormsContainingDocument, template: AnnotatedTemplate): Unit =
+  def afterInitialResponse(
+    containingDocument   : XFormsContainingDocument,
+    template             : AnnotatedTemplate,
+    disableDocumentCache : Boolean
+  ): Unit =
     if (! containingDocument.isNoUpdates) {
       containingDocument.setTemplateIfNeeded(template)
       addDocumentToSession(containingDocument.getUUID)
-      cacheOrStore(containingDocument, isInitialState = true)
+      cacheOrStore(containingDocument, isInitialState = true, disableDocumentCache = disableDocumentCache)
     }
 
   /**
@@ -168,19 +172,22 @@ object XFormsStateManager extends XFormsStateLifecycle {
     *
     * @return document, either from cache or from state information
     */
-  def beforeUpdate(parameters: RequestParameters): XFormsContainingDocument =
-    findOrRestoreDocument(parameters, isInitialState = false, disableUpdates = false)
+  def beforeUpdate(parameters: RequestParameters, disableDocumentCache : Boolean): XFormsContainingDocument =
+    findOrRestoreDocument(parameters, isInitialState = false, disableUpdates = false, disableDocumentCache = disableDocumentCache)
 
   /**
     * Called after an update.
     *
     * @param keepDocument whether to keep the document around
     */
-  def afterUpdate(containingDocument: XFormsContainingDocument, keepDocument: Boolean): Unit = {
+  def afterUpdate(
+    containingDocument   : XFormsContainingDocument,
+    keepDocument         : Boolean,
+    disableDocumentCache : Boolean): Unit = {
     if (keepDocument) {
       // Re-add document to the cache
       Logger.logDebug(LogType, "Keeping document in cache.")
-      cacheOrStore(containingDocument, isInitialState = false)
+      cacheOrStore(containingDocument, isInitialState = false, disableDocumentCache = disableDocumentCache)
     } else {
       // Don't re-add document to the cache
       Logger.logDebug(LogType, "Not keeping document in cache following error.")
@@ -203,13 +210,14 @@ object XFormsStateManager extends XFormsStateLifecycle {
     * @return document, either from cache or from state information
     */
   def findOrRestoreDocument(
-    parameters     : RequestParameters,
-    isInitialState : Boolean,
-    disableUpdates : Boolean
+    parameters           : RequestParameters,
+    isInitialState       : Boolean,
+    disableUpdates       : Boolean,
+    disableDocumentCache : Boolean // for testing only
   ): XFormsContainingDocument =
     if (! isInitialState) {
       // Try cache first unless the initial state is requested
-      if (XFormsProperties.isCacheDocument) {
+      if (XFormsProperties.isCacheDocument && ! disableDocumentCache) {
         // Try to find the document in cache using the UUID
         // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
         // we can't know that the property is set to false before trying.
@@ -326,9 +334,13 @@ object XFormsStateManager extends XFormsStateLifecycle {
       }
     }
 
-    def cacheOrStore(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
+    def cacheOrStore(
+      containingDocument   : XFormsContainingDocument,
+      isInitialState       : Boolean,
+      disableDocumentCache : Boolean // for testing only
+    ): Unit = {
 
-      if (XFormsProperties.isCacheDocument) {
+      if (XFormsProperties.isCacheDocument && ! disableDocumentCache) {
         // Cache the document
         Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
         XFormsDocumentCache.put(containingDocument)

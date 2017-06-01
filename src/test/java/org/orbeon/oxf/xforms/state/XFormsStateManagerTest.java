@@ -68,7 +68,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml");
         final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null, true);
 
-        stateManager.afterInitialResponse(document, null);
+        stateManager.afterInitialResponse(document, null, false);
 
         // Check there is a state manager session listener for this document
         assertNotNull(session.javaGetAttribute(XFormsStateManager.getListenerSessionKey(document.getUUID())));
@@ -98,6 +98,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile);
 
+
+
         // Initialize document and get initial document state
         final State state1 = new State();
         {
@@ -114,7 +116,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             // Initial response sent
             state1.document.afterInitialResponse();
-            stateManager.afterInitialResponse(state1.document, null);
+            stateManager.afterInitialResponse(state1.document, null, ! isCache);
         }
 
         assertEquals(1, getSequenceNumber(state1.dynamicStateString));
@@ -147,7 +149,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertEquals(stripSequenceNumber(state2.dynamicStateString), stripSequenceNumber(state3.dynamicStateString));
 
         // Get back to initial state
-        final State state4 = getInitialState(state1);
+        final State state4 = getInitialState(state1, isCache);
 
         // UUID and static state can't change
         assertEquals(state1.uuid, state4.uuid);
@@ -179,7 +181,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             // Initial response sent
             state1.document.afterInitialResponse();
-            stateManager.afterInitialResponse(state1.document, null);
+            stateManager.afterInitialResponse(state1.document, null, ! isCache);
 
             initialDynamicStateString = DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState(), false);
         }
@@ -214,7 +216,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertNull(StringUtils.trimAllToNull(state3.dynamicStateString));
 
         // Get back to initial state
-        final State state4 = getInitialState(state1);
+        final State state4 = getInitialState(state1, isCache);
 
         // UUID can't change
         assertEquals(state1.uuid, state4.uuid);
@@ -248,7 +250,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         if (lock.isEmpty())
             fail("Ajax update lock timeout exceeded");
         try {
-            state2.document = stateManager.beforeUpdate(parameters);
+            state2.document = stateManager.beforeUpdate(parameters, ! isCache);
 
             if (isCache)
                 assertSame(state1.document, state2.document);// must be the same because cache is enabled and cache has room
@@ -273,7 +275,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             stateManager.afterUpdateResponse(state2.document);
 
-            stateManager.afterUpdate(state2.document, true);
+            stateManager.afterUpdate(state2.document, true, ! isCache);
         } finally {
             stateManager.releaseDocumentLock(lock.get());
         }
@@ -281,7 +283,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         return state2;
     }
 
-    private State getInitialState(final State state1) {
+    private State getInitialState(final State state1, final boolean isCache) {
 
         final RequestParameters parameters =
             RequestParameters.apply(
@@ -295,7 +297,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state2 = new State();
 
         // Find document
-        state2.document = XFormsStateManager.instance().findOrRestoreDocument(parameters, true, false);
+        state2.document = XFormsStateManager.instance().findOrRestoreDocument(parameters, true, false, ! isCache);
 
         assertNotSame(state1.document, state2.document);// can't be the same because either cache is disabled OR we create a duplicate document (could be same if state1 is initial state)
 

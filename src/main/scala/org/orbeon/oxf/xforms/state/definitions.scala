@@ -52,15 +52,20 @@ trait XFormsStateLifecycle {
 
   def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): String
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String]
-  def afterInitialResponse(containingDocument: XFormsContainingDocument, template: AnnotatedTemplate): Unit
+  def afterInitialResponse(containingDocument: XFormsContainingDocument, template: AnnotatedTemplate, disableDocumentCache: Boolean): Unit
 
-  def findOrRestoreDocument(parameters: RequestParameters, isInitialState: Boolean, updates: Boolean): XFormsContainingDocument
+  def findOrRestoreDocument(
+    parameters           : RequestParameters,
+    isInitialState       : Boolean,
+    updates              : Boolean,
+    disableDocumentCache : Boolean
+  ): XFormsContainingDocument
 
   def acquireDocumentLock(uuid: String, timeout: Long): Option[Lock]
-  def beforeUpdate(parameters: RequestParameters): XFormsContainingDocument
+  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument
   def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit
   def afterUpdateResponse(containingDocument: XFormsContainingDocument): Unit
-  def afterUpdate(containingDocument: XFormsContainingDocument, keepDocument: Boolean): Unit
+  def afterUpdate(containingDocument: XFormsContainingDocument, keepDocument: Boolean, disableDocumentCache: Boolean): Unit
   def releaseDocumentLock(lock: Lock): Unit
 
   def onAddedToCache(uuid: String): Unit

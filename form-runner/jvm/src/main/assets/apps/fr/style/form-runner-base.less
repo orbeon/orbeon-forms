@@ -111,14 +111,15 @@
     // Show hints inline (they are hidden by default in xforms.less)...
     // NOTE: `.xforms-hint-appearance-inline` is for backward compatibility only and replaced with `.xforms-hint-appearance-full`.
     .xforms-hint-appearance-full, .xforms-hint-appearance-inline {
+
         .xforms-hint {
             display: block;
             width: 100%;
             clear: both;
         }
 
-        // ...except for grid headings for input fields if there is a local `minimal` appearance
-        .fr-grid-lhh-for-xforms-input .xforms-hint.xforms-hint-appearance-minimal {
+        // ...except if there is a local `minimal` appearance
+        .xforms-hint.xforms-hint-appearance-minimal {
             display: none;
         }
 
@@ -128,8 +129,8 @@
         }
     }
 
-    // ...and except for grid headings for input fields if there is a global `minimal` appearance but no `full` local appearance
-    .xforms-hint-appearance-minimal .fr-grid-lhh-for-xforms-input .xforms-hint:not(.xforms-hint-appearance-full) {
+    // ...and except if there is a global `minimal` appearance but no `full` local appearance
+    .xforms-hint-appearance-minimal .xforms-hint:not(.xforms-hint-appearance-full) {
         display: none;
     }
 
@@ -392,7 +393,7 @@
         }
 
         .xforms-textarea.xforms-static > pre, .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
-            
+
             font-family: @sansFontFamily;   // use regular font, not monospaced font
             cursor: not-allowed;
 

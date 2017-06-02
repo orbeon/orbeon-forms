@@ -212,15 +212,19 @@ object LHHAAnalysis {
   def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String): Boolean =
     elementAnalysis match {
       case lhhaTrait: StaticLHHASupport ⇒
-        val labelOrHintOpt = lhhaTrait.lhh(lhhaType)
-        (labelOrHintOpt exists (_.hasLocalMinimalAppearance)) || (
-          ! (labelOrHintOpt exists (_.hasLocalFullAppearance)) &&
-          stringToSet(
-            elementAnalysis.part.staticState.staticStringProperty(
-              if (lhhaType == "hint") HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
-            )
-          )(XFORMS_MINIMAL_APPEARANCE_QNAME.getName)
-        )
+        lhhaTrait.lhh(lhhaType) match {
+          case Some(labelOrHint) ⇒
+            labelOrHint.hasLocalMinimalAppearance || (
+              ! labelOrHint.hasLocalFullAppearance &&
+              stringToSet(
+                elementAnalysis.part.staticState.staticStringProperty(
+                  if (lhhaType == "hint") HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
+                )
+              )(XFORMS_MINIMAL_APPEARANCE_QNAME.getName)
+          )
+          case None ⇒
+            false
+        }
       case _ ⇒
         false
     }

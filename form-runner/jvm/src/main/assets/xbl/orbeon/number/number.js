@@ -51,7 +51,7 @@
             // Register listeners
 
             // Switch the input type after cleaning up the value for edition
-            $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
+            $(this.visibleInputElement).on('touchstart focusin', _.bind(function(e) {
 
                 // Don't set value if not needed, so not to unnecessarily disturb the cursor position
                 var editString = this.getEditString();

@@ -54,31 +54,17 @@
             $(this.visibleInputElement).on('touchstart focus', _.bind(function(e) {
 
                 // Don't set value if not needed, so not to unnecessarily disturb the cursor position
-                if (this.visibleInputElement.value != this.getEditString())
-                    this.visibleInputElement.value = this.getEditString();
+                var editString = this.getEditString();
+                if (this.visibleInputElement.value != editString)
+                    this.visibleInputElement.value = editString;
 
-                // See https://github.com/orbeon/orbeon-forms/issues/2545
-                function hasNativeDecimalSeparator(separator) {
-                    return ! _.isUndefined(Number.toLocaleString) &&
-                        1.1.toLocaleString().substring(1, 2) == separator;
-                }
-
-                if ($('body').is('.xforms-mobile') && hasNativeDecimalSeparator(this.decimalSeparator)) {
-                    // With Firefox, changing the type synchronously interferes with the focus
-                    window.setTimeout(_.bind(function() {
-                        $(this.visibleInputElement).attr('type', 'number');
-                    }, this), 0);
-                }
+                this._setType('number');
             }, this));
 
             // Restore input type, send the value to the server, and updates value after server response
             $(this.visibleInputElement).on('focusout', _.bind(function(e) {
 
-                // With Firefox, changing the type synchronously interferes with the focus
-                window.setTimeout(_.bind(function() {
-                    $(this.visibleInputElement).attr('type', 'text');
-                }, this), 0);
-
+                this._setType('text');
                 this.sendValueToServer();
                 var formId = $(this.container).parents('form').attr('id');
 
@@ -136,6 +122,26 @@
         parameterDecimalSeparatorChanged: function() {
             this.decimalSeparator = ORBEON.xforms.Document.getValue(this.decimalSeparatorElement);
             this.updateWithServerValue();
+        },
+
+        _setType: function(typeValue) {
+
+            // See https://github.com/orbeon/orbeon-forms/issues/2545
+            function hasNativeDecimalSeparator(separator) {
+                return ! _.isUndefined(Number.toLocaleString) &&
+                    1.1.toLocaleString().substring(1, 2) == separator;
+            }
+
+            var changeType =
+                $('body').is('.xforms-mobile') &&
+                hasNativeDecimalSeparator(this.decimalSeparator);
+
+            if (changeType) {
+                // With Firefox, changing the type synchronously interferes with the focus
+                window.setTimeout(_.bind(function() {
+                    $(this.visibleInputElement).attr('type', typeValue);
+                }, this), 0);
+            }
         }
     };
 })();

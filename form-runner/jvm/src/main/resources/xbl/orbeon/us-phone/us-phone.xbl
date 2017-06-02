@@ -14,14 +14,17 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
-    <xbl:binding id="fr-phone-binding" element="fr|us-phone" xxbl:container="span" xxbl:mode="lhha binding value" xxbl:label-for="input">
+
+    <xbl:binding
+        id="fr-phone-binding"
+        element="fr|us-phone"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -52,9 +55,11 @@
                 </view>
             </templates>
         </metadata>
+
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/us-phone/us-phone.css"/>
         </xbl:resources>
+
         <xbl:template>
             <xf:var name="binding"
                     value="xxf:binding('fr-phone-binding')"/>
@@ -62,11 +67,22 @@
                     value="xxf:is-control-readonly('fr-phone-binding') and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="formatted"
                     ref="$binding"
-                    value="for $v in string(.)
-                           return
-                               if (matches($v, '^\d+$'))
-                               then concat('(', substring($v, 1, 3), ') ', substring($v, 4, 3), if (string-length($v) gt 6) then '-' else '', substring($v, 7))
-                               else $v"/>
+                    value="
+                        for $v in string(.) return
+                            if (matches($v, '^\d+$')) then
+                                concat(
+                                    '(',
+                                    substring($v, 1, 3),
+                                    ') ',
+                                    substring($v, 4, 3),
+                                    if (string-length($v) gt 6) then
+                                        '-'
+                                    else
+                                        '',
+                                    substring($v, 7)
+                                )
+                            else
+                                $v"/>
             <!-- Edit mode -->
             <xf:group ref="$binding[not($view)]">
                 <xh:span class="input-append">
@@ -78,8 +94,11 @@
                         xxf:maxlength="14"
                         xxf:format="$formatted"
                         xxf:unformat="
-                            for $t in translate(xxf:trim(), '()*-[].#/'': ', '')
-                            return if (matches($t, '^\d+$')) then $t else .">
+                            for $t in translate(xxf:trim(), '()*-[].#/'': ', '') return
+                                if (matches($t, '^\d+$')) then
+                                    $t
+                                else
+                                    .">
                         <xf:hint appearance="minimal">(555) 555-5555</xf:hint>
                     </xf:input>
                     <xh:span class="add-on"/>

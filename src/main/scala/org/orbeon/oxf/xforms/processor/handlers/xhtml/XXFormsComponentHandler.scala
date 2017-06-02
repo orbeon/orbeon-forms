@@ -17,7 +17,6 @@ import java.lang.StringBuilder
 
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
@@ -31,7 +30,6 @@ class XXFormsComponentHandler(
   matched        : AnyRef,
   handlerContext : AnyRef
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
-
 
   protected override def getContainingElementName =
     binding.abstractBinding.containerElementName
@@ -70,7 +68,7 @@ class XXFormsComponentHandler(
     xformsHandlerContext.popComponentContext()
 
   protected override def handleLabel() =
-    if (handleLHHA && ! LHHAAnalysis.hasLHHAPlaceholder(containingDocument.getStaticOps.findControlAnalysis(getPrefixedId).get, "label")) {
+    if (handleLHHA) {
       if (hasLabelFor) {
         super.handleLabel()
       } else {

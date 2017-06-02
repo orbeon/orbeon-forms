@@ -26,7 +26,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.control.controls.{XFormsInputControl, XFormsTextareaControl}
+import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
@@ -43,7 +43,8 @@ class XFormsTextareaHandler(
   handlerContext : AnyRef
 ) extends XFormsControlLifecyleHandler(uri, localname, qName, attributes, matched, handlerContext, repeating = false, forwarding = false) {
 
-  private val placeHolderInfo = XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
+  private val placeHolderInfo: Option[PlaceHolderInfo] =
+    currentControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(containingDocument, _))
 
   override protected def handleControlStart(): Unit = {
 

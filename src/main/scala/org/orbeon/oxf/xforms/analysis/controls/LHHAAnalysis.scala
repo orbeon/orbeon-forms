@@ -208,6 +208,7 @@ object LHHAAnalysis {
   }
 
   // Whether the control has a placeholder for the given LHHA type
+  // TODO: This should be computed statically.
   def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String): Boolean =
     elementAnalysis match {
       case lhhaTrait: StaticLHHASupport ⇒

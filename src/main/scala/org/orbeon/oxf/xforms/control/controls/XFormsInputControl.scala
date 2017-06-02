@@ -18,13 +18,9 @@ import java.util.{Calendar, GregorianCalendar}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -238,8 +234,6 @@ object XFormsInputControl {
 
   val StringQNames = Set(XS_STRING_EXPLODED_QNAME, XFORMS_STRING_EXPLODED_QNAME)
 
-  case class PlaceHolderInfo(isLabelPlaceholder: Boolean, value: String)
-
   // Anything but "true" is "false"
   private def normalizeBooleanString(s: String) = (s == "true").toString
 
@@ -270,27 +264,6 @@ object XFormsInputControl {
 
   def testParseTimeForNoscript(value: String) = parseForNoscript(TimeParsePatterns, value, dayMonth = false)
   def testParseDateForNoscript(value: String, dayMonth: Boolean) = parseForNoscript(DateParsePatterns, value, dayMonth)
-
-  def placeholderInfo(
-    containingDocument : XFormsContainingDocument,
-    elementAnalysis    : ElementAnalysis,
-    control            : XFormsControl
-  ): Option[PlaceHolderInfo] = {
-
-    val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "label")
-    val isHintPlaceholder  = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "hint")
-
-    (isLabelPlaceholder || isHintPlaceholder) option {
-      // null if no placeholder, "" if placeholder and non-concrete control, placeholder value otherwise
-      val placeholderValue =
-        if ((control ne null) && control.isRelevant) {
-          if (isLabelPlaceholder) control.getLabel else control.getHint
-        } else
-          ""
-
-      PlaceHolderInfo(isLabelPlaceholder, placeholderValue)
-    }
-  }
 
   private val DateComponentSeparators = "[./\\-\\s]"
 

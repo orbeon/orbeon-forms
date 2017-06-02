@@ -18,12 +18,13 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang ⇒ jl}
 
 import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsUtils.{escapeJavaScript, namespaceId}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
+import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.state.XFormsStateManager
@@ -33,7 +34,6 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util.CoreUtils._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
@@ -576,8 +576,8 @@ object XHTMLHeadHandler {
 
     Controls.ControlsIterator(startControl, includeSelf = false) foreach {
       case c: XFormsInputControl ⇒
-        // Special case of placeholders (useful only for IE8 and IE9)
-        XFormsInputControl.placeholderInfo(c.containingDocument, c.staticControl, c) foreach { placeHolderInfo ⇒
+        // Special case of placeholders (useful only for IE9 as of 2017-06-02)
+        PlaceHolderInfo.placeHolderValueOpt(c.containingDocument, c) foreach { _ ⇒
           placeholders += c.getEffectiveId
         }
       case c: XFormsValueComponentControl ⇒

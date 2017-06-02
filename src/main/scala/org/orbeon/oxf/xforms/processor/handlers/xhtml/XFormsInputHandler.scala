@@ -17,8 +17,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
+import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
@@ -51,8 +50,8 @@ class XFormsInputHandler(
     forwarding = false
   ) with HandlerSupport {
 
-  private val placeHolderInfo =
-    XFormsInputControl.placeholderInfo(containingDocument, elementAnalysis, currentControlOrNull)
+  private val placeHolderInfo: Option[PlaceHolderInfo] =
+    currentControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(containingDocument, _))
 
   private def controlHas(predicate: XFormsInputControl ⇒ Boolean) =
     currentControlOpt.asInstanceOf[Option[XFormsInputControl]] exists predicate

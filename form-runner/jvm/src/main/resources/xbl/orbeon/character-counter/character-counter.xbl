@@ -94,11 +94,13 @@
                     <xf:output
                         value="if (empty($remaining)) then $current else abs($remaining)"
                         class="label fr-charcounter-{{
-                            if (empty($remaining))
-                            then 'current'
-                            else if ($remaining ge 0)
-                            then 'remaining'
-                            else 'over label-important'}}">
+                            if (empty($remaining)) then
+                                'current'
+                            else if ($remaining ge 0) then
+                                'remaining'
+                            else
+                                'over label-important'
+                        }}">
                     </xf:output>
                 </xh:span>
 

@@ -1004,7 +1004,7 @@
 
                         var recreatedInputs = {};
 
-                        function handleItemset(elem, controlId, isReadonly) {
+                        function handleItemset(elem, controlId) {
 
                             var itemsetTree = JSON.parse(ORBEON.util.Dom.getStringValue(elem));
 
@@ -1163,6 +1163,8 @@
 
                                     // Set or remove `disabled` depending on whether the control is readonly.
                                     // NOTE: jQuery went back and forth on using `attr()` vs. `prop()` but this seems to work.
+                                    var controlEl = document.getElementById(controlId);
+                                    var isReadonly = ORBEON.xforms.Controls.isReadonly(controlEl);
                                     if (isReadonly)
                                         $(inputCheckboxOrRadio).attr('disabled', true);
                                     else
@@ -1688,7 +1690,7 @@
                             _.each(elem.childNodes, function(childNode) {
                                 switch (ORBEON.util.Utils.getLocalName(childNode)) {
                                     case 'itemset':
-                                        handleItemset(childNode, controlId, readonly == "true");
+                                        handleItemset(childNode, controlId);
                                         break;
                                     case 'case':
                                         handleSwitchCase(childNode);

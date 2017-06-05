@@ -250,7 +250,7 @@ trait FormRunnerActions {
     "content-type",
     PruneMetadataName,
     ShowProgressName,
-    TargetName,
+    FormTargetName,
     "prune" // for backward compatibility
   ) ++ DefaultSendParameters.keys
 
@@ -417,10 +417,10 @@ trait FormRunnerActions {
     Try(load(prependCommonFormRunnerParameters(path, optimize = true), progress = false))
 
   private def tryChangeMode(
-    replace      : String,
-    targetOpt    : Option[String] = None,
-    showProgress : Boolean        = true)(
-    path         : String
+    replace       : String,
+    formTargetOpt : Option[String] = None,
+    showProgress  : Boolean        = true)(
+    path          : String
   ): Try[Any] =
     Try {
       val params: List[Option[(Option[String], String)]] =
@@ -434,7 +434,7 @@ trait FormRunnerActions {
           Some(                  Some(DataFormatVersionName) → "edge"),
           Some(                  Some(PruneMetadataName)     → "false"),
           Some(                  Some("parameters")          → s"form-version $DataFormatVersionName"),
-          targetOpt.map(target ⇒ Some(TargetName)            → target)
+          formTargetOpt.map(target ⇒ Some(FormTargetName)            → target)
         )
       params.flatten.toMap
     } flatMap
@@ -492,7 +492,7 @@ trait FormRunnerActions {
       tryChangeMode(
         replace      = XFORMS_SUBMIT_REPLACE_ALL,
         showProgress = false,
-        targetOpt    = Some("_blank")
+        formTargetOpt    = Some("_blank")
       )
 
   def tryToggleNoscript(params: ActionParams): Try[Any] =

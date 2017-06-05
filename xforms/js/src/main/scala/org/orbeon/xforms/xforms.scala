@@ -77,6 +77,7 @@ object Controls extends js.Object {
   def setCurrentValue(control: html.Element, newControlValue: String) : Unit               = js.native
   def getCurrentValue(elem: html.Element)                             : js.UndefOr[String] = js.native
   def isInRepeatTemplate(elem: html.Element)                          : Boolean            = js.native
+  def setFocus(controlId: String)                                     : Unit               = js.native
 }
 
 @ScalaJSDefined

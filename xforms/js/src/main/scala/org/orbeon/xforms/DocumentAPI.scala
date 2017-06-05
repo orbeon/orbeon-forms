@@ -84,7 +84,7 @@ object DocumentAPI {
     controlIdOrElem : String | html.Element,
     formElem        : js.UndefOr[html.Element] = js.undefined
   ): js.UndefOr[String] =
-      Controls.getCurrentValue(findControl(controlIdOrElem, formElem))
+      Controls.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
 
   // Set the value of an XForms control
   def setValue(
@@ -95,7 +95,7 @@ object DocumentAPI {
 
     val newStringValue = newValue.toString
 
-    val control = findControl(controlIdOrElem, form)
+    val control = findControlOrThrow(controlIdOrElem, form)
 
     require(
       ! $(control).is(".xforms-output, .xforms-upload"),
@@ -115,6 +115,17 @@ object DocumentAPI {
     )
 
     AjaxServer.fireEvents(js.Array(event), incremental = false)
+  }
+
+  def focus(
+    controlIdOrElem : String | html.Element,
+    form            : js.UndefOr[html.Element] = js.undefined
+  ): Unit = {
+
+    val control = findControlOrThrow(controlIdOrElem, form)
+
+    Controls.setFocus(control.id)
+    dispatchEvent(targetId = control.id, eventName = "xforms-focus")
   }
 
   // Whether the document is being reloaded
@@ -152,7 +163,7 @@ object DocumentAPI {
       )
     }
 
-    def findControl(
+    def findControlOrThrow(
       controlIdOrElem : String | html.Element,
       formElem        : js.UndefOr[html.Element]
     ): html.Element = {

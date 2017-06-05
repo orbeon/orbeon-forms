@@ -434,7 +434,7 @@ trait FormRunnerActions {
           Some(                  Some(DataFormatVersionName) → "edge"),
           Some(                  Some(PruneMetadataName)     → "false"),
           Some(                  Some("parameters")          → s"form-version $DataFormatVersionName"),
-          formTargetOpt.map(target ⇒ Some(FormTargetName)            → target)
+          formTargetOpt.map(target ⇒ Some(FormTargetName)   → target)
         )
       params.flatten.toMap
     } flatMap
@@ -490,9 +490,9 @@ trait FormRunnerActions {
       recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangParams(params))
     } flatMap
       tryChangeMode(
-        replace      = XFORMS_SUBMIT_REPLACE_ALL,
-        showProgress = false,
-        formTargetOpt    = Some("_blank")
+        replace       = XFORMS_SUBMIT_REPLACE_ALL,
+        showProgress  = false,
+        formTargetOpt = Some("_blank")
       )
 
   def tryToggleNoscript(params: ActionParams): Try[Any] =

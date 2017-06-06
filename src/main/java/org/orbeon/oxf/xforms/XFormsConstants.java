@@ -328,6 +328,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_TARGET_QNAME = QName.get("target", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_UPLOADS_QNAME = QName.get("uploads", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_XINCLUDE = QName.get("xinclude", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_RESPONSE_URL_TYPE = QName.get("response-url-type", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ORDER_QNAME = QName.get("order", XXFORMS_NAMESPACE);
 

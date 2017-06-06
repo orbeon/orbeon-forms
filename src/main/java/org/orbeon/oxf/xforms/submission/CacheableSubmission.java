@@ -58,7 +58,7 @@ public class CacheableSubmission extends BaseSubmission {
         // This can only happen is method="get" and replace="instance" and xxf:cache="true"
 
         // Convert URL to string
-        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource(), sp.queryString(), submission().isURLNorewrite());
+        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource(), sp.queryString(), p.urlNorewrite(), p.urlType());
 
         // Compute a hash of the body if needed
         final String requestBodyHash;

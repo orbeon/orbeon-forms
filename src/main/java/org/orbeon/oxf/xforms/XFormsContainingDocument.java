@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
@@ -408,7 +407,11 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         assert response == null;
         assert uriResolver == null;
 
-        this.activeSubmissionFirstPass = null;
+        if (this.activeSubmissionFirstPass != null) {
+            this.activeSubmissionFirstPass.clearActiveSubmissionParameters();
+            this.activeSubmissionFirstPass = null;
+        }
+
         this.replaceAllCallable = null;
         this.gotSubmissionReplaceAll = false;
         this.gotSubmissionRedirect = false;
@@ -512,7 +515,10 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
     }
 
     public void addScriptToRun(ScriptInvocation scriptInvocation) {
-        if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
+        if (activeSubmissionFirstPass != null &&
+                activeSubmissionFirstPass.getActiveSubmissionParameters() != null &&
+                activeSubmissionFirstPass.getActiveSubmissionParameters().xxfTargetOpt().isEmpty()) {
+
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
             indentedLogger().logWarning(

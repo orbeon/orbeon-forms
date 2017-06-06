@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.{ChildrenActionsTrait, ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.XMLConstants
@@ -88,8 +87,10 @@ class Submission(
   val avtXxfShowProgressOpt      = element.attributeValueOpt(XXFORMS_SHOW_PROGRESS_QNAME)
   val avtXxfHandleXInclude       = element.attributeValueOpt(XXFORMS_XINCLUDE)
 
-  val urlNorewrite               = XFormsUtils.resolveUrlNorewrite(element)
-  val urlTypeOrNull              = element.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME)
+  val avtUrlNorewrite            = element.attributeValueOpt(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME)
+  val avtUrlType                 = element.attributeValueOpt(XMLConstants.FORMATTING_URL_TYPE_QNAME)
+
+  val avtResponseUrlType         = element.attributeValueOpt(XXFORMS_RESPONSE_URL_TYPE)
 
   // `cdata-section-elements`
   // `includenamespaceprefixes`

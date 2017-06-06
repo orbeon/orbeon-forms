@@ -57,7 +57,8 @@
         replace="{instance('fr-send-submission-params')/@replace}"
         instance="fr-send-submission-response"
         xxf:show-progress="{instance('fr-send-submission-params')/@show-progress}"
-        xxf:target="{instance('fr-send-submission-params')/@formtarget}"/>
+        xxf:target="{instance('fr-send-submission-params')/@formtarget}"
+        xxf:response-url-type="{'resource'[event('response-is-resource') = 'true']}"/>
 
     <!-- Instance to store the result of `fr-send-submission` if any -->
     <xf:instance id="fr-send-submission-response">
@@ -78,7 +79,8 @@
             data-format-version=""
             prune-metadata=""
             show-progress=""
-            formtarget=""/>
+            formtarget=""
+            response-is-resource=""/>
     </xf:instance>
     <xf:action event="xforms-submit" observer="fr-send-submission">
         <xf:setvalue

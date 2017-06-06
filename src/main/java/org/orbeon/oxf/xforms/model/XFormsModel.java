@@ -584,7 +584,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 // the proper split between servlet path and path info is not done.
 
                 // TODO: Temporary. Use XFormsModelSubmission to load instances instead
-                if (!NetUtils.urlHasProtocol(instanceResource) && containingDocument().getContainerType().equals("portlet"))
+                if (!NetUtils.urlHasProtocol(instanceResource) && containingDocument().isPortletContainer())
                     throw new UnsupportedOperationException("<xf:instance src=\"\"> with relative path within a portlet");
 
                 // Use full resolved resource URL

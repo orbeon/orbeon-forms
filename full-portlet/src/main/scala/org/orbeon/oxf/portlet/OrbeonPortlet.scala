@@ -99,7 +99,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     }
 
   // Portlet resource
-  override def serveResource(request: ResourceRequest, response: ResourceResponse) =
+  override def serveResource(request: ResourceRequest, response: ResourceResponse): Unit =
     ProcessorService.withProcessorService(processorService) {
       withRootException("resource", new PortletException(_)) {
         implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null, useShortNamespaces = true)

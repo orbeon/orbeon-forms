@@ -36,7 +36,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     sp : SerializationParameters
   ): SubmissionResult = {
 
-    val absoluteResolvedURL = new URI(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission.isURLNorewrite))
+    val absoluteResolvedURL = new URI(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, p.urlNorewrite, p.urlType))
 
     val timingLogger  = getTimingLogger(p, p2)
     val detailsLogger = getDetailsLogger(p, p2)

@@ -276,6 +276,8 @@ object APISupport {
               /upload
               |
               /dynamic/[^/^.]+
+              |
+              -submit
             )
             |
             (?:

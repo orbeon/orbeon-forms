@@ -251,7 +251,8 @@ trait FormRunnerActions {
     PruneMetadataName,
     ShowProgressName,
     FormTargetName,
-    "prune" // for backward compatibility
+    "prune", // for backward compatibility,
+    "response-is-resource"
   ) ++ DefaultSendParameters.keys
 
   def trySend(params: ActionParams): Try[Any] =
@@ -417,24 +418,26 @@ trait FormRunnerActions {
     Try(load(prependCommonFormRunnerParameters(path, optimize = true), progress = false))
 
   private def tryChangeMode(
-    replace       : String,
-    formTargetOpt : Option[String] = None,
-    showProgress  : Boolean        = true)(
-    path          : String
+    replace            : String,
+    formTargetOpt      : Option[String] = None,
+    showProgress       : Boolean        = true,
+    responseIsResource : Boolean        = false)(
+    path               : String
   ): Try[Any] =
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(                  Some("uri")                 → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
-          Some(                  Some("method")              → "post"),
-          Some(                  Some("nonrelevant")         → "keep"),
-          Some(                  Some("replace")             → replace),
-          Some(                  Some(ShowProgressName)      → showProgress.toString),
-          Some(                  Some("content")             → "xml"),
-          Some(                  Some(DataFormatVersionName) → "edge"),
-          Some(                  Some(PruneMetadataName)     → "false"),
-          Some(                  Some("parameters")          → s"form-version $DataFormatVersionName"),
-          formTargetOpt.map(target ⇒ Some(FormTargetName)   → target)
+          Some(             Some("uri")                   → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
+          Some(             Some("method")                → "post"),
+          Some(             Some("nonrelevant")           → "keep"),
+          Some(             Some("replace")               → replace),
+          Some(             Some(ShowProgressName)        → showProgress.toString),
+          Some(             Some("content")               → "xml"),
+          Some(             Some(DataFormatVersionName)   → "edge"),
+          Some(             Some(PruneMetadataName)       → "false"),
+          Some(             Some("parameters")            → s"form-version $DataFormatVersionName"),
+          formTargetOpt.map(Some(FormTargetName)          → _),
+          Some(             Some("response-is-resource")  → responseIsResource.toString)
         )
       params.flatten.toMap
     } flatMap
@@ -490,9 +493,10 @@ trait FormRunnerActions {
       recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangParams(params))
     } flatMap
       tryChangeMode(
-        replace       = XFORMS_SUBMIT_REPLACE_ALL,
-        showProgress  = false,
-        formTargetOpt = Some("_blank")
+        replace            = XFORMS_SUBMIT_REPLACE_ALL,
+        showProgress       = false,
+        formTargetOpt      = Some("_blank"),
+        responseIsResource = true
       )
 
   def tryToggleNoscript(params: ActionParams): Try[Any] =

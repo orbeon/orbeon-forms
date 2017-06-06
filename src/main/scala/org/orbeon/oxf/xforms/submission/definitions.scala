@@ -53,3 +53,14 @@ case class RefContext(
   submissionElementContextItem : Item,
   xpathContext                 : XPathContext
 )
+
+sealed abstract class UrlType extends EnumEntry
+
+object UrlType extends Enum[UrlType] {
+
+  val values = findValues
+
+  case object Action   extends UrlType
+  case object Render   extends UrlType
+  case object Resource extends UrlType
+}

@@ -75,7 +75,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         final String xformsSubmissionPath;
         {
             if (! containingDocument.getDeploymentType().equals(XFormsConstants.DeploymentType.standalone)
-                    || containingDocument.getContainerType().equals("portlet") || isEmbeddedClient) {
+                    || containingDocument.isPortletContainer() || isEmbeddedClient) {
                 // Integrated or separate deployment mode or portlet
                 xformsSubmissionPath =  "/xforms-server-submit";
             } else {

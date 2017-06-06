@@ -58,8 +58,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
 
     private final XFormsModel model;
 
-    private String  resolvedXXFormsTarget;
-    private boolean resolvedXXFormsShowProgress = true;
+    private SubmissionParameters activeSubmissionParameters = null;
 
     // All the submission types in the order they must be checked
     private final Submission[] submissions;
@@ -89,21 +88,12 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
         return staticSubmission.element();
     }
 
-    public boolean isShowProgress() {
-        return resolvedXXFormsShowProgress;
+    public SubmissionParameters getActiveSubmissionParameters() {
+        return activeSubmissionParameters;
     }
 
-    public boolean isURLNorewrite() {
-        return staticSubmission.urlNorewrite();
-    }
-
-    public String getUrlType() {
-        return staticSubmission.urlTypeOrNull();
-    }
-
-    // Only set for replace="all" at the end of he first pass of the submission
-    public String getResolvedXXFormsTarget() {
-        return resolvedXXFormsTarget;
+    public void clearActiveSubmissionParameters() {
+        activeSubmissionParameters = null;
     }
 
     public String getId() {
@@ -235,30 +225,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
                         );
                     }
 
-                    // Resolve the target and show-progress AVTs because XFormsServer requires them for deferred submission
-                    resolvedXXFormsTarget =
-                        XFormsUtils.resolveAttributeValueTemplates(
-                            containingDocument,
-                            p.refContext().xpathContext(),
-                            p.refContext().refNodeInfo(),
-                            staticSubmission.avtXxfTargetOpt().isDefined() ?
-                            staticSubmission.avtXxfTargetOpt().get() :
-                            null
-                        );
-                    resolvedXXFormsShowProgress =
-                        !"false".equals(
-                            XFormsUtils.resolveAttributeValueTemplates(
-                                containingDocument,
-                                p.refContext().xpathContext(),
-                                p.refContext().refNodeInfo(),
-                                staticSubmission.avtXxfShowProgressOpt().isDefined() ?
-                                staticSubmission.avtXxfShowProgressOpt().get() :
-                                null
-                            )
-                        );
-
-                    // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
-
+                    this.activeSubmissionParameters = p;
                     containingDocument.setActiveSubmissionFirstPass(this);
                     return;
                 }

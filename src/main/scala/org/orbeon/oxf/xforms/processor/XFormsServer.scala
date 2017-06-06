@@ -20,7 +20,8 @@ import org.orbeon.dom.{Document, DocumentFactory}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -100,7 +101,7 @@ object XFormsServer {
               requireClientSubmission = true
             }
 
-            // Check for xxforms-load event (for portlet mode only!)
+            // Check for `xxforms-load` event (for portlet mode only!)
             loads find (isPortletLoadMatch(containingDocument, _)) foreach { load ⇒
               // We need to submit the event so that the portlet can load the new path
               val eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME)
@@ -238,7 +239,11 @@ object XFormsServer {
 
             // Check if we need to tell the client to perform a form submission
             if (requireClientSubmission)
-              outputSubmissionInfo(Option(containingDocument.getClientActiveSubmissionFirstPass))
+              outputSubmissionInfo(
+                Option(containingDocument.getClientActiveSubmissionFirstPass),
+                containingDocument.isPortletContainer || containingDocument.isEmbedded,
+                NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
+              )
 
             // TODO: the following should be ordered in the order they were requested
             // Output messages to display
@@ -431,24 +436,40 @@ object XFormsServer {
       }
 
     def outputSubmissionInfo(
-      activeSubmissionOpt : Option[XFormsModelSubmission])(implicit
+      activeSubmissionOpt : Option[XFormsModelSubmission],
+      isPortletContainer  : Boolean,
+      response            : Response)(implicit
       receiver            : XMLReceiver
     ): Unit = {
       // `activeSubmissionOpt` can be `None` when we are running as a portlet and handling an `<xf:load>`, which
       // when executed from within a portlet is ran as very much like the `replace="all"` submissions.
 
       val showProgressAtt =
-        activeSubmissionOpt exists (!_.isShowProgress) list ("show-progress" → "false")
+        activeSubmissionOpt exists (!_.getActiveSubmissionParameters.xxfShowProgress) list ("show-progress" → "false")
 
       val targetAtt =
-        activeSubmissionOpt map (_.getResolvedXXFormsTarget) map ("target" → _) toList
+        activeSubmissionOpt flatMap (_.getActiveSubmissionParameters.xxfTargetOpt) map ("target" → _) toList
+
+      val actionAtt =
+        isPortletContainer list {
+
+          val SubmitUrl = "/xforms-server-submit"
+
+          val actionUrl =
+            if (activeSubmissionOpt exists (_.getActiveSubmissionParameters.resolvedIsResponseResourceType))
+              response.rewriteResourceURL(SubmitUrl, URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT) // NOTE: mode ignored in portlet mode
+            else
+              response.rewriteActionURL(SubmitUrl)
+
+          "action" → actionUrl
+        }
 
       // Signal that we want a POST to the XForms server
       element(
         localName = "submission",
         prefix    = "xxf",
         uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
-        atts      = ("method" → "POST") :: showProgressAtt ::: targetAtt
+        atts      = ("method" → "POST") :: showProgressAtt ::: targetAtt ::: actionAtt
       )
     }
 

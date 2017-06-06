@@ -37,7 +37,17 @@ public class ClientGetAllSubmission extends BaseSubmission {
                                     SecondPassParameters p2, SerializationParameters sp) {
 
         final String actionString = (sp.queryString() == null) ? p2.actionOrResource() : p2.actionOrResource() + ((p2.actionOrResource().indexOf('?') == -1) ? "?" : "") + sp.queryString();
-        XFormsLoadAction.resolveStoreLoadValue(containingDocument(), submission().getSubmissionElement(), true, actionString, null, null, submission().isURLNorewrite(), submission().isShowProgress());
+
+        XFormsLoadAction.resolveStoreLoadValue(
+            containingDocument(),
+            submission().getSubmissionElement(),
+            true,
+            actionString,
+            null,
+            null,
+            p.urlNorewrite(),
+            submission().getActiveSubmissionParameters() != null ? submission().getActiveSubmissionParameters().xxfShowProgress() : true
+        );
 
         return null;
     }

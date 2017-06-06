@@ -30,7 +30,12 @@ case class SubmissionParameters(
   isNoscript                     : Boolean,
   isDeferredSubmission           : Boolean,
   isDeferredSubmissionFirstPass  : Boolean,
-  isDeferredSubmissionSecondPass : Boolean
+  isDeferredSubmissionSecondPass : Boolean,
+  urlNorewrite                   : Boolean,
+  urlType                        : UrlType,
+  resolvedIsResponseResourceType : Boolean,
+  xxfTargetOpt                   : Option[String],
+  xxfShowProgress                : Boolean
 )
 
 object SubmissionParameters {
@@ -143,6 +148,30 @@ object SubmissionParameters {
       else
         Set.empty
 
+    val resolvedUrlNorewrite =
+      staticSubmission.avtUrlNorewrite flatMap booleanAvtOpt getOrElse false
+
+    val resolvedUrlType =
+      staticSubmission.avtUrlType         flatMap
+        stringAvtTrimmedOpt               flatMap
+        UrlType.withNameInsensitiveOption getOrElse
+        UrlType.Render
+
+    val resolvedIsResponseResourceType =
+      staticSubmission.avtResponseUrlType flatMap
+        stringAvtTrimmedOpt               flatMap
+        UrlType.withNameInsensitiveOption contains
+        UrlType.Resource
+
+    val resolvedXxfTargetOpt =
+      staticSubmission.avtXxfTargetOpt flatMap
+      stringAvtTrimmedOpt
+
+    val resolvedXxfShowProgress =
+      staticSubmission.avtXxfShowProgressOpt flatMap
+      booleanAvtOpt                          getOrElse
+      true
+
     val isHandlingClientGetAll =
       containingDocument.isOptimizeGetAllSubmission                                 &&
         actualHttpMethod == HttpMethod.GET                                          &&
@@ -186,7 +215,12 @@ object SubmissionParameters {
       isNoscript                     = isNoscript,
       isDeferredSubmission           = isDeferredSubmission,
       isDeferredSubmissionFirstPass  = isDeferredSubmissionFirstPass,
-      isDeferredSubmissionSecondPass = isDeferredSubmissionSecondPass
+      isDeferredSubmissionSecondPass = isDeferredSubmissionSecondPass,
+      urlNorewrite                   = resolvedUrlNorewrite,
+      urlType                        = resolvedUrlType,
+      resolvedIsResponseResourceType = resolvedIsResponseResourceType,
+      xxfTargetOpt                   = resolvedXxfTargetOpt,
+      xxfShowProgress                = resolvedXxfShowProgress
     )
   }
 

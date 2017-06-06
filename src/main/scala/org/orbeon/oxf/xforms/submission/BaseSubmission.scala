@@ -23,7 +23,6 @@ import org.orbeon.oxf.http.{EmptyInputStream, Headers, StreamedContent}
 import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
-import org.orbeon.oxf.util.CoreUtils._
 
 trait SubmissionProcess {
   def process(request: ExternalContext.Request, response: ExternalContext.Response)
@@ -36,9 +35,10 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
   val containingDocument = submission.containingDocument
 
   protected def getAbsoluteSubmissionURL(
-     resolvedActionOrResource : String,
-     queryString              : String,
-     isNorewrite              : Boolean
+    resolvedActionOrResource : String,
+    queryString              : String,
+    isNorewrite              : Boolean,
+    urlType                  : UrlType
   ): String = {
 
     // NOTE: For resolveServiceURL: If the resource or service URL does not start with a protocol or with '/', the
@@ -51,7 +51,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
     // - resulting service URL: http://services.com/myservices/myapp/my/service
 
     val resolve =
-      if (submission.getUrlType == "resource")
+      if (urlType == UrlType.Resource)
         XFormsUtils.resolveResourceURL _
       else
         XFormsUtils.resolveServiceURL _

@@ -57,8 +57,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 "noscript",                 Boolean.toString(p.isNoscript()),
                 "is asynchronous",          Boolean.toString(p2.isAsynchronous()),
                 "container type",           request.getContainerType(),
-                "norewrite",                Boolean.toString(submission().isURLNorewrite()),
-                "url type",                 submission().getUrlType(),
+                "norewrite",                Boolean.toString(p.urlNorewrite()),
+                "url type",                 p.urlType().toString(),
                 "local-submission-forward", Boolean.toString(containingDocument().isLocalSubmissionForward()),
                 "local-submission-include", Boolean.toString(containingDocument().isLocalSubmissionInclude())
             );
@@ -167,7 +167,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
                         containingDocument(), detailsLogger, resolvedURI.toString(), p,
-                        submission().isURLNorewrite(), sp.actualRequestMediatype(), p2.encoding(), sp.messageBody(),
+                        p.urlNorewrite(), sp.actualRequestMediatype(), p2.encoding(), sp.messageBody(),
                         sp.queryString(), customHeaderNameValues);
 
                     // Update status

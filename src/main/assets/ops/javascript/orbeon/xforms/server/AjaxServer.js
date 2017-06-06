@@ -1980,8 +1980,9 @@
                                 case "submission": {
                                     var submissionElement = childNode;
                                     var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                    var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
-                                    var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
+                                    var replace      = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
+                                    var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
+                                    var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
 
                                     ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsValue != null ? serverEventsValue : "";
                                     // Increment and send sequence number
@@ -2029,6 +2030,15 @@
                                         // Set the requested target
                                         requestForm.target = target;
                                     }
+
+                                    if (action == null) {
+                                        // Reset as this may have been changed before by asyncAjaxRequest
+                                        requestForm.removeAttribute("action");
+                                    } else {
+                                        // Set the requested target
+                                        requestForm.action = action;
+                                    }
+
                                     try {
                                         requestForm.submit();
                                     } catch (e) {

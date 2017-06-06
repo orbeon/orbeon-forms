@@ -326,6 +326,8 @@ object APISupport {
             ops
             |
             xbl
+            |
+            forms/orbeon/builder/images
           )
           /
           .+

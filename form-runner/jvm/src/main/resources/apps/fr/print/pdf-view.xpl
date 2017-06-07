@@ -99,16 +99,29 @@
 
                     </config>
                 </p:input>
-                <p:output name="data" ref="data"/>
+                <p:output name="data" id="rendered"/>
             </p:processor>
         </p:when>
         <p:otherwise>
             <!-- Just produce the PDF document -->
             <p:processor name="oxf:identity">
                 <p:input name="data" href="#pdf-data"/>
-                <p:output name="data" ref="data"/>
+                <p:output name="data" id="rendered"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#rendered"/>
+        <p:input name="config">
+            <document
+                xsl:version="2.0"
+                disposition-type="inline"
+                filename="{p:get-request-parameter('fr-rendered-filename')}">
+                <xsl:copy-of select="/document/(@* | node())"/>
+            </document>
+        </p:input>
+        <p:output name="data" ref="data" debug="data"/>
+    </p:processor>
 
 </p:config>

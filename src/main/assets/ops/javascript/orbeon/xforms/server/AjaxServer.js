@@ -2023,7 +2023,13 @@
                                         requestForm.action = a.prop('href');
                                     }
 
-                                    if (target == null) {
+                                    // Do we set a target on the form to open the page in another frame?
+                                    var noTarget =
+                                        // Don't if the server didn't give us a target
+                                        target == null ||
+                                        // Don't on iOS, where otherwise Safari popup blocker will prevent the submission
+                                        $(document.body).is('.xforms-ios');
+                                    if (noTarget) {
                                         // Reset as this may have been changed before by asyncAjaxRequest
                                         requestForm.removeAttribute("target");
                                     } else {

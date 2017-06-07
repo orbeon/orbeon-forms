@@ -2027,8 +2027,8 @@
                                     var noTarget =
                                         // Don't if the server didn't give us a target
                                         target == null ||
-                                        // Don't with Safari otherwise its popup blocker will prevent the submission
-                                        YAHOO.env.ua.webkit;
+                                        // Don't with Safari or Firefox, otherwise their popup blocker will prevent the submission
+                                        YAHOO.env.ua.webkit || YAHOO.env.ua.gecko;
                                     if (noTarget) {
                                         // Reset as this may have been changed before by asyncAjaxRequest
                                         requestForm.removeAttribute("target");

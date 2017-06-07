@@ -2027,8 +2027,8 @@
                                     var noTarget =
                                         // Don't if the server didn't give us a target
                                         target == null ||
-                                        // Don't on iOS, where otherwise Safari popup blocker will prevent the submission
-                                        $(document.body).is('.xforms-ios');
+                                        // Don't with Safari otherwise its popup blocker will prevent the submission
+                                        YAHOO.env.ua.webkit;
                                     if (noTarget) {
                                         // Reset as this may have been changed before by asyncAjaxRequest
                                         requestForm.removeAttribute("target");

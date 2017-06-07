@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
+import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.XML._
 
 import scala.language.postfixOps
@@ -489,8 +490,19 @@ trait FormRunnerActions {
         filter    SupportedRenderFormats
         getOrElse "pdf"
       )
+      val fullFilename = {
+        val filenameProperty            = s"oxf.fr.detail.$format.filename"
+        val filenamePropertyValue       = formRunnerProperty(filenameProperty)(FormRunnerParams()).flatMap(trimAllToOpt)
+        val filenameFromProperty        = filenamePropertyValue.map(evaluateString(_, xpathContext)).flatMap(trimAllToOpt)
+        val escapedFilenameFromProperty = filenameFromProperty.map(EscapeURI.escape(_, "-_.~").toString)
+        val filename                    = escapedFilenameFromProperty.getOrElse(currentXFormsDocumentId)
+        s"$filename.$format"
+      }
+      val requestParams =
+        ("fr-rendered-filename" → fullFilename) ::
+        requestedLangParams(params)
 
-      recombineQuery(s"/fr/$app/$form/$format/$document", requestedLangParams(params))
+      recombineQuery(s"/fr/$app/$form/$format/$document", requestParams)
     } flatMap
       tryChangeMode(
         replace            = XFORMS_SUBMIT_REPLACE_ALL,

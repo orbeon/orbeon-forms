@@ -99,15 +99,6 @@ trait FormRunnerPDF {
   def hyperlinkURLs(s: String, hyperlinks: Boolean): String =
     replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
 
-  // Custom filename (for PDF and TIFF output) for the detail page if specified and if evaluates to a non-empty name
-  //@XPathFunction
-  def filenameOrNull(format: String): String = (
-    formRunnerProperty(s"oxf.fr.detail.$format.filename")(FormRunnerParams())
-    flatMap trimAllToOpt
-    flatMap (expr ⇒ process.SimpleProcess.evaluateString(expr).trimAllToOpt)
-    map     (EscapeURI.escape(_, "-_.~").toString)
-    orNull
-  )
 }
 
 object FormRunnerPDF extends FormRunnerPDF

@@ -123,8 +123,11 @@ class BinaryTextXMLReceiver(
         attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
           (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
 
-        attributes.getValue("filename").trimAllToOpt foreach
-          (fileName ⇒ response.setHeader("Content-Disposition", "attachment; filename=" + fileName))
+        attributes.getValue("filename").trimAllToOpt.foreach { fileName ⇒
+          val isInline        = attributes.getValue("disposition-type").trimAllToOpt.contains("inline")
+          val dispositionType = if (isInline) "inline" else "attachment"
+          response.setHeader("Content-Disposition", s"$dispositionType; filename=$fileName")
+        }
 
         attributes.getValue("status-code").trimAllToOpt foreach
           (statusCode ⇒ response.setStatus(statusCode.toInt))

@@ -293,34 +293,36 @@
 
             <!-- XBL template -->
             <xbl:template>
-                <!-- Point to the context of the current element.
-                     NOTE: FB doesn't place a @ref. -->
-                <xf:var name="context" id="context" value="xxf:binding-context('{$binding-id}-component')"/>
+                <!-- Set `model`, see https://github.com/orbeon/orbeon-forms/issues/3243 -->
+                <xf:group appearance="xxf:internal" model="{$model-id}">
 
-                <!-- Propagate readonly of containing section -->
-                <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
-                    <xf:setvalue
-                        event="xforms-enabled xforms-value-changed"
-                        ref="instance('readonly')"
-                        value="exf:readonly($context)"
-                        class="fr-design-time-preserve"/>
-                </xf:var>
+                    <!-- Point to the context of the current element.
+                         NOTE: FB doesn't place a @ref. -->
+                    <xf:var name="context" id="context" value="xxf:binding-context('{$binding-id}-component')"/>
 
-                <!-- Expose internally a variable pointing to Form Runner resources -->
-                <xf:var name="fr-resources" as="element()?">
-                    <xxf:value value="$fr-resources" xxbl:scope="outer"/>
-                </xf:var>
+                    <!-- Propagate readonly of containing section -->
+                    <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
+                        <xf:setvalue
+                            event="xforms-enabled xforms-value-changed"
+                            ref="instance('readonly')"
+                            value="exf:readonly($context)"
+                            class="fr-design-time-preserve"/>
+                    </xf:var>
 
-                <!-- Try to match the current form language, or use the first language available if not found -->
-                <!-- NOTE: Put this in the view, as the variable doesn't update properly if in the model.
-                     See: https://github.com/orbeon/orbeon-forms/issues/738 -->
-                <!-- NOTE: This won't be needed once all code uses xxf:r(). -->
-                <xf:var
-                    name="form-resources"
-                    value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
-                    as="element(resource)"/>
+                    <!-- Expose internally a variable pointing to Form Runner resources -->
+                    <xf:var name="fr-resources" as="element()?">
+                        <xxf:value value="$fr-resources" xxbl:scope="outer"/>
+                    </xf:var>
 
-                <xf:group appearance="xxf:internal">
+                    <!-- Try to match the current form language, or use the first language available if not found -->
+                    <!-- NOTE: Put this in the view, as the variable doesn't update properly if in the model.
+                         See: https://github.com/orbeon/orbeon-forms/issues/738 -->
+                    <!-- NOTE: This won't be needed once all code uses xxf:r(). -->
+                    <xf:var
+                        name="form-resources"
+                        value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
+                        as="element(resource)"/>
+
                     <!-- Copy section content -->
                     <xsl:copy-of select="$fr-section/*"/>
                 </xf:group>

@@ -117,7 +117,7 @@
             <label>Customize XML</label>
         </custom-xml>
         <permissions>
-            <label>Set permissions</label>
+            <label>Permissions</label>
         </permissions>
         <reload-components>
             <label>Reload Toolbox</label>
@@ -1110,7 +1110,7 @@
             <label>Spécifier le XML</label>
         </custom-xml>
         <permissions>
-            <label>Définir les permissions</label>
+            <label>Permissions</label>
         </permissions>
         <reload-components>
             <label>Recharger la boîte à outils</label>
@@ -2105,7 +2105,7 @@
             <label>Customize XML</label>
         </custom-xml>
         <permissions>
-            <label>Set permissions</label>
+            <label>[Permissions]</label>
         </permissions>
         <reload-components>
             <label>Last skjemakomponenter på nytt</label>

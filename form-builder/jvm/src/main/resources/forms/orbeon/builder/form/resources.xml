@@ -113,9 +113,6 @@
         <edit-source>
             <label>Edit Source</label>
         </edit-source>
-        <custom-xml>
-            <label>Customize XML</label>
-        </custom-xml>
         <permissions>
             <label>Permissions</label>
         </permissions>
@@ -947,12 +944,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>Custom XML</label>
-            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
-            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
-            <mode-custom>I will provide a custom XML document</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
             <enable-permissions>Enable permissions for this form</enable-permissions>
@@ -1106,9 +1097,6 @@
         <edit-source>
             <label>Editer source</label>
         </edit-source>
-        <custom-xml>
-            <label>Spécifier le XML</label>
-        </custom-xml>
         <permissions>
             <label>Permissions</label>
         </permissions>
@@ -1941,12 +1929,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>XML spécifique</label>
-            <mode-label>Les informations saisies par les utilisateurs dans le formulaire sont stockées dans un document XML:</mode-label>
-            <mode-automatic>Laissez Form Builder génèrer le code XML</mode-automatic>
-            <mode-custom>Je vais fournir un document XML spécifique</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
             <enable-permissions>Activer les permissions pour ce formulaire</enable-permissions>
@@ -2101,9 +2083,6 @@
         <edit-source>
             <label>Rediger kildekode</label>
         </edit-source>
-        <custom-xml>
-            <label>Customize XML</label>
-        </custom-xml>
         <permissions>
             <label>[Permissions]</label>
         </permissions>
@@ -2964,12 +2943,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>Custom XML</label>
-            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
-            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
-            <mode-custom>I will provide a custom XML document</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
             <enable-permissions todo="true">[Enable permissions for this form]</enable-permissions>
@@ -3124,9 +3097,6 @@
         <edit-source>
             <label>Редактировать код</label>
         </edit-source>
-        <custom-xml>
-            <label>Редактировать XML</label>
-        </custom-xml>
         <permissions>
             <label>Настроить права</label>
         </permissions>
@@ -3986,12 +3956,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>Редактирование XML</label>
-            <mode-label>Данные, которые пользователи будут вводить в форму, хранятся в виде XML-документа. Настройка XML:</mode-label>
-            <mode-automatic>XML автоматически генерирует Мастер Форм</mode-automatic>
-            <mode-custom>Задать собственный XML</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Настройка прав</label>
             <enable-permissions>Включить для этой формы управление доступом</enable-permissions>
@@ -4147,9 +4111,6 @@
         <edit-source>
             <label>Modifica fonte</label>
         </edit-source>
-        <custom-xml>
-            <label>Personalizza XML</label>
-        </custom-xml>
         <permissions>
             <label>Imposta autorizzazioni</label>
         </permissions>
@@ -5001,12 +4962,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>XML personalizzato</label>
-            <mode-label>Le informazioni inserite dagli utenti nel modulo viene salvata in un documento XML:</mode-label>
-            <mode-automatic>Lascia From Builder generare il codice XML per me.</mode-automatic>
-            <mode-custom>Fornirò un documento XML personalizzato</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Autorizzazioni</label>
             <enable-permissions>Abilita autorizzazioni per questo modulo</enable-permissions>
@@ -5162,9 +5117,6 @@
         <edit-source>
             <label>Quelltext ändern</label>
         </edit-source>
-        <custom-xml>
-            <label>XML anpassen</label>
-        </custom-xml>
         <permissions>
             <label>Berechtigungen setzen</label>
         </permissions>
@@ -6017,12 +5969,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>Benutzerdefiniertes XML</label>
-            <mode-label>Die Informationen, die von den Benutzern in das Formular eingegeben werden, werden in einer XML-Datei gespeichert.</mode-label>
-            <mode-automatic>Form Builder XML für mich erstellen lassen</mode-automatic>
-            <mode-custom>Ich werde ein benutzerdefiniertes XML-Dokument zur Verfügung stellen</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Berechtigungen</label>
             <enable-permissions>Aktiviere Berechtigungen für dieses Formular</enable-permissions>
@@ -6180,9 +6126,6 @@
         <edit-source>
             <label>Muokkaa koodi</label>
         </edit-source>
-        <custom-xml>
-            <label>Sovita XML</label>
-        </custom-xml>
         <permissions>
             <label>Määritä käyttöoikeudet</label>
         </permissions>
@@ -7035,12 +6978,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>Mukauta XML</label>
-            <mode-label>Käyttäjien lisäämä informaatio säilötään XML-dokumentissa:</mode-label>
-            <mode-automatic>Anna Form Builderin generoida XML minua varten</mode-automatic>
-            <mode-custom>Hankin mukautetun XML-dokumentin</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Käyttöoikeudet</label>
             <enable-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</enable-permissions>
@@ -7196,9 +7133,6 @@
         <edit-source>
             <label>Editar Código Fuente</label>
         </edit-source>
-        <custom-xml>
-            <label>Customizar XML</label>
-        </custom-xml>
         <permissions>
             <label>Configurar Permisos</label>
         </permissions>
@@ -8051,12 +7985,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>XML Customizado</label>
-            <mode-label>La información ingresada por los usuarios se almacena en un documento XML:</mode-label>
-            <mode-automatic>Dejar que el Form Builder genere el XML por mí</mode-automatic>
-            <mode-custom>Proveeré un documento XML customizado</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Permisos</label>
             <enable-permissions>Habilitar permisos para este formulario</enable-permissions>
@@ -8212,9 +8140,6 @@
         <edit-source>
             <label>Alterar a fonte</label>
         </edit-source>
-        <custom-xml>
-            <label>Customizar o XML</label>
-        </custom-xml>
         <permissions>
             <label>Dar permissões</label>
         </permissions>
@@ -9073,12 +8998,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>XML Personalizado</label>
-            <mode-label>A informação introduzida pelos utilizadores neste formulário é guardada num documento XML.</mode-label>
-            <mode-automatic>Permitir que o Form Builder gere o XML por mim</mode-automatic>
-            <mode-custom>Vou providenciar um documento XML personalizado</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissões</label>
             <enable-permissions>Activar as permissões para este formulário</enable-permissions>
@@ -9234,9 +9153,6 @@
         <edit-source>
             <label>Ändra källkod</label>
         </edit-source>
-        <custom-xml>
-            <label>Koda XML</label>
-        </custom-xml>
         <permissions>
             <label>Rättigheter</label>
         </permissions>
@@ -10096,12 +10012,6 @@
                 </div>
             </message>
         </dialog-pe>
-        <dialog-custom-xml>
-            <label>XML-kod</label>
-            <mode-label>Information som fylls i av användare lagras i ett XML-dokument:</mode-label>
-            <mode-automatic>Låt Form Builder generera XML åt mig</mode-automatic>
-            <mode-custom>Jag tillhandahåller ett XML-dokument</mode-custom>
-        </dialog-custom-xml>
         <dialog-permissions>
             <label>Rättigheter</label>
             <enable-permissions>Tillämpa rättigheter för detta formulär</enable-permissions>

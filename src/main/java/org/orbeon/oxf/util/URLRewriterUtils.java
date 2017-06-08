@@ -41,17 +41,17 @@ public class URLRewriterUtils {
     public static final boolean RESOURCES_VERSIONED_DEFAULT = false;
     public static final boolean WSRP_ENCODE_RESOURCES_DEFAULT = false;
 
-    private static final String REWRITING_PLATFORM_PATHS_PROPERTY = "oxf.url-rewriting.platform-paths";
-    private static final String REWRITING_APP_PATHS_PROPERTY = "oxf.url-rewriting.app-paths";
-    private static final String REWRITING_APP_PREFIX_PROPERTY = "oxf.url-rewriting.app-prefix";
-    private static final String REWRITING_CONTEXT_PROPERTY_PREFIX = "oxf.url-rewriting.";
-    private static final String REWRITING_CONTEXT_PROPERTY_SUFFIX = ".context";
+    private static final String REWRITING_PLATFORM_PATHS_PROPERTY        = "oxf.url-rewriting.platform-paths";
+    private static final String REWRITING_APP_PATHS_PROPERTY             = "oxf.url-rewriting.app-paths";
+    private static final String REWRITING_APP_PREFIX_PROPERTY            = "oxf.url-rewriting.app-prefix";
+    private static final String REWRITING_CONTEXT_PROPERTY_PREFIX        = "oxf.url-rewriting.";
+    private static final String REWRITING_CONTEXT_PROPERTY_SUFFIX        = ".context";
     private static final String REWRITING_WSRP_ENCODE_RESOURCES_PROPERTY = "oxf.url-rewriting.wsrp.encode-resources";
 
-    public static final String RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number";
+    public static final String RESOURCES_VERSION_NUMBER_PROPERTY         = "oxf.resources.version-number";
 
-    public static final String REWRITING_SERVICE_BASE_URI_PROPERTY = "oxf.url-rewriting.service.base-uri";
-    public static final String REWRITING_SERVICE_BASE_URI_DEFAULT = "";
+    public static final String REWRITING_SERVICE_BASE_URI_PROPERTY       = "oxf.url-rewriting.service.base-uri";
+    public static final String REWRITING_SERVICE_BASE_URI_DEFAULT        = "";
 
     public static final List<PathMatcher> EMPTY_PATH_MATCHER_LIST = Collections.emptyList();
 

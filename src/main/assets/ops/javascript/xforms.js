@@ -2538,7 +2538,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
                     // Firefox doesn't support relatedTarget, so use the Firefox-only explicitOriginalTarget,
                     // see https://twitter.com/avernet/status/687392116193030144.
                     var relatedTarget = event.relatedTarget ||
-                        event.originalEvent.explicitOriginalTarget ||
+                        (event.originalEvent && event.originalEvent.explicitOriginalTarget) ||
                         document.activeElement;
                     var relatedControl = ORBEON.xforms.Events._findAncestorFocusableControl(relatedTarget);
                     if (relatedControl == null) {

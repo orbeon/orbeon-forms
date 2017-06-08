@@ -10,21 +10,22 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-$ = ORBEON.jQuery
-Builder = ORBEON.Builder
-Controls = ORBEON.xforms.Controls
-Document = ORBEON.xforms.Document
-Event = YAHOO.util.Event
-Events = ORBEON.xforms.Events
-FSM = ORBEON.util.FiniteStateMachine
-OD = ORBEON.util.Dom
-YD = YAHOO.util.Dom
 
 # For the generic label, generic hint, button's label, and link's label:
 #   Show/hide placeholders
 #   Handle editing of the label/hint
 
+$ = ORBEON.jQuery
 $ ->
+    Builder = ORBEON.Builder
+    Controls = ORBEON.xforms.Controls
+    Document = ORBEON.xforms.Document
+    Event = YAHOO.util.Event
+    Events = ORBEON.xforms.Events
+    FSM = ORBEON.util.FiniteStateMachine
+    OD = ORBEON.util.Dom
+    YD = YAHOO.util.Dom
+
     # Low-level operations on editables
     editables =
         button:

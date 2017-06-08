@@ -51,6 +51,13 @@
           & > .fr-grid-body > .fr-grid-tr > .fr-grid-td  {
               // The main thing this CSS does: change table cells into blocks
               display: block;
+              // For the `td` to take all the space taken by the control, and avoid part of the border missing
+              overflow: auto;
+          }
+
+          &.fr-repeat-multiple-rows {
+              // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
+              .fr-grid-th:nth-child(n+3) { display: none }
           }
       }
 

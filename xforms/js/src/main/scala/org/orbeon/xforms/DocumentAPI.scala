@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import org.orbeon.oxf.util.StringUtils._
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 
 import scala.scalajs.js
 import scala.scalajs.js.JSStringOps._
@@ -34,7 +35,7 @@ object DocumentAPI {
   def dispatchEvent(
     targetId     : String,
     eventName    : String,
-    form         : js.UndefOr[html.Element] = js.undefined,
+    formElem     : js.UndefOr[html.Element] = js.undefined,
     bubbles      : js.UndefOr[Boolean]      = js.undefined,
     cancelable   : js.UndefOr[Boolean]      = js.undefined,
     incremental  : js.UndefOr[Boolean]      = js.undefined,
@@ -47,9 +48,8 @@ object DocumentAPI {
     eventDynamic.targetId  = targetId
     eventDynamic.eventName = eventName
 
-    form         foreach (eventDynamic.form         = _)
+    formElem     foreach (eventDynamic.form         = _)
     bubbles      foreach (eventDynamic.bubbles      = _)
-    form         foreach (eventDynamic.form         = _)
     cancelable   foreach (eventDynamic.cancelable   = _)
     incremental  foreach (eventDynamic.incremental  = _)
     ignoreErrors foreach (eventDynamic.ignoreErrors = _)
@@ -90,12 +90,12 @@ object DocumentAPI {
   def setValue(
     controlIdOrElem : String | html.Element,
     newValue        : String | Double | Boolean,
-    form            : js.UndefOr[html.Element] = js.undefined
+    formElem        : js.UndefOr[html.Element] = js.undefined
   ): Unit = {
 
     val newStringValue = newValue.toString
 
-    val control = findControlOrThrow(controlIdOrElem, form)
+    val control = findControlOrThrow(controlIdOrElem, formElem)
 
     require(
       ! $(control).is(".xforms-output, .xforms-upload"),
@@ -119,10 +119,10 @@ object DocumentAPI {
 
   def focus(
     controlIdOrElem : String | html.Element,
-    form            : js.UndefOr[html.Element] = js.undefined
+    formElem        : js.UndefOr[html.Element] = js.undefined
   ): Unit = {
 
-    val control = findControlOrThrow(controlIdOrElem, form)
+    val control = findControlOrThrow(controlIdOrElem, formElem)
 
     Controls.setFocus(control.id)
     dispatchEvent(targetId = control.id, eventName = "xforms-focus")
@@ -149,8 +149,8 @@ object DocumentAPI {
       targetId : String
     ): (html.Element, String) = {
 
-      val form   = formElem getOrElse $(dom.document.forms).filter(".xforms-form")(0)
-      val ns     = Globals.ns(form.id)
+      val form = Support.formElemOrDefaultForm(formElem)
+      val ns   = Globals.ns(form.id)
 
       // For backward compatibility, handle the case where the id is already prefixed.
       // This is not great as we don't know for sure whether the control starts with a namespace, e.g. `o0`,

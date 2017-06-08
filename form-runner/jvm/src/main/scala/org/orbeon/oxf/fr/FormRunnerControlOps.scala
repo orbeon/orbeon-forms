@@ -18,7 +18,6 @@ import org.orbeon.oxf.fr.DataMigration.PathElem
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.XML._
@@ -53,11 +52,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   // Get the control name based on the control, bind, grid, section or template id
   //@XPathFunction
-  def controlNameFromId(controlOrBindId: String) =
-    getStaticIdFromId(controlOrBindId) match {
-      case ControlName(name, _) ⇒ name
-      case _                    ⇒ null
-    }
+  def controlNameFromId(controlOrBindId: String): String =
+    ControlOps.controlNameFromIdOpt(controlOrBindId).orNull
 
   //@XPathFunction
   def controlNameFromIdOpt(controlOrBindId: String) =
@@ -215,7 +211,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   private object Private {
 
-    val ControlName             = """(.+)-(control|bind|grid|section|template|repeat)""".r // `repeat` is for legacy FB
     val FBLangPredicate         = "[@xml:lang = $fb-lang]"
     val PossibleControlSuffixes = List("control", "grid", "section", "repeat")
 

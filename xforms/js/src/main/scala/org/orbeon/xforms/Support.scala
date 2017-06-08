@@ -13,11 +13,15 @@
   */
 package org.orbeon.xforms
 
+import org.scalajs.dom
+import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
 
-object Constants {
-  val RepeatSeparator          : String = "\u2299" // ⊙ CIRCLED DOT OPERATOR
-  val RepeatIndexSeparator     : String = "-"      // - (just has to not be a digit)
-  val ComponentSeparator       : Char   = '\u2261' // ≡ IDENTICAL TO
-  val ComponentSeparatorString : String = ComponentSeparator.toString
-  val AbsoluteIdSeparator      : Char   = '|'      // | see https://github.com/orbeon/orbeon-forms/issues/551
+import scala.scalajs.js
+
+
+object Support {
+
+  def formElemOrDefaultForm(formElem : js.UndefOr[html.Element]): Element =
+    formElem getOrElse $(dom.document.forms).filter(".xforms-form")(0)
 }

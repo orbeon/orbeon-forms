@@ -403,6 +403,7 @@ lazy val formRunner = (crossProject.crossType(CrossType.Full) in file("form-runn
 
 lazy val formRunnerJVM = formRunner.jvm
   .dependsOn(
+    xformsJVM,
     core % "test->test;compile->compile",
     portletSupport
   )
@@ -531,6 +532,7 @@ lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
 
 
 lazy val xformsJVM = xforms.jvm
+  .dependsOn(commonJVM)
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
   .settings(commonSettings: _*)

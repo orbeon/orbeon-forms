@@ -11,13 +11,19 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.xforms
+package org.orbeon.oxf.fr
+
+import org.orbeon.xforms.XFormsId
 
 
-object Constants {
-  val RepeatSeparator          : String = "\u2299" // ⊙ CIRCLED DOT OPERATOR
-  val RepeatIndexSeparator     : String = "-"      // - (just has to not be a digit)
-  val ComponentSeparator       : Char   = '\u2261' // ≡ IDENTICAL TO
-  val ComponentSeparatorString : String = ComponentSeparator.toString
-  val AbsoluteIdSeparator      : Char   = '|'      // | see https://github.com/orbeon/orbeon-forms/issues/551
+object ControlOps {
+
+  // Get the control name based on the control, bind, grid, section or template id
+  def controlNameFromIdOpt(controlOrBindId: String): Option[String] =
+    XFormsId.getStaticIdFromId(controlOrBindId) match {
+      case ControlName(name, _) ⇒ Some(name)
+      case _                    ⇒ None
+    }
+
+  private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // `repeat` is for legacy FB
 }

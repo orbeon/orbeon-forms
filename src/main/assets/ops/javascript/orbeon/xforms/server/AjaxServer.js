@@ -2024,18 +2024,26 @@
                                     }
 
                                     // Do we set a target on the form to open the page in another frame?
-                                    var noTarget =
-                                        // Don't if the server didn't give us a target
-                                        target == null ||
-                                        // Don't with Safari or Firefox, otherwise their popup blocker will prevent the submission
-                                        YAHOO.env.ua.webkit || YAHOO.env.ua.gecko;
-                                    if (noTarget) {
-                                        // Reset as this may have been changed before by asyncAjaxRequest
+                                    var noTarget = (function() {
+                                        if (target == null) {
+                                            // Obviously, we won't try to set a target if the server didn't us one
+                                            return true;
+                                        } else {
+                                            var newWindow = window.open("about:blank", "_blank");
+                                            if (newWindow && newWindow.close) {
+                                                newWindow.close();
+                                                return false;
+                                            } else {
+                                                return true;
+                                            }
+                                        }
+                                    })();
+
+                                    // Set or reset `target` attribute
+                                    if (noTarget)
                                         requestForm.removeAttribute("target");
-                                    } else {
-                                        // Set the requested target
+                                    else
                                         requestForm.target = target;
-                                    }
 
                                     if (action == null) {
                                         // Reset as this may have been changed before by asyncAjaxRequest

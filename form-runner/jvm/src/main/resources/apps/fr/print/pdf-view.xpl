@@ -121,7 +121,7 @@
                 <xsl:copy-of select="/document/(@* | node())"/>
             </document>
         </p:input>
-        <p:output name="data" ref="data" debug="data"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

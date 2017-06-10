@@ -171,9 +171,11 @@ object XFormsResourceRewriter extends Logging {
     isMinimal  : Boolean)(implicit
     logger     : IndentedLogger
   ): Unit = {
+
+    val outputWriter = new OutputStreamWriter(os, "utf-8")
+
     // Output Orbeon Forms version if allowed
     Version.versionStringIfAllowed foreach { version ⇒
-      val outputWriter = new OutputStreamWriter(os, "utf-8")
       outputWriter.write(s"// This file was produced by $version\n")
       outputWriter.flush()
     }
@@ -188,10 +190,46 @@ object XFormsResourceRewriter extends Logging {
       assetPaths.iterator flatMap (r ⇒ tryInputStream(r.assetPath(isMinimal)).iterator)
 
     // Write all resources one after the other
+
+    outputWriter.write(
+      """
+        |(function() {
+        |    if (window.define || window.exports) {
+        |        window.ORBEON = window.ORBEON || {};
+        |        if (window.define) {
+        |            window.ORBEON.define = window.define;
+        |            window.define = null;
+        |        }
+        |        if (window.exports) {
+        |            window.ORBEON.exports = window.exports;
+        |            window.exports = null;
+        |        }
+        |    }
+        |})();
+      """.stripMargin)
+
+    outputWriter.flush()
+
     inputStreamIterator foreach { is ⇒
       useAndClose(is)(NetUtils.copyStream(_, os))
       os.write('\n')
     }
+
+    outputWriter.write(
+      """
+        |(function() {
+        |    if (window.ORBEON.define) {
+        |        window.define = window.ORBEON.define;
+        |        window.ORBEON.define = null;
+        |    }
+        |    if (window.ORBEON.exports) {
+        |        window.exports = window.ORBEON.exports;
+        |        window.ORBEON.exports = null;
+        |    }
+        |})();
+      """.stripMargin)
+
+    outputWriter.flush()
   }
 
   // Compute the last modification date of the given resources.

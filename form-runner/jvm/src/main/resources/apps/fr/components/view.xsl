@@ -330,16 +330,25 @@
 
     <!-- Description in chosen language or first one if not found -->
     <xsl:template match="fr:description" name="fr-description">
-        <xf:var
-            name="description"
-            value="({if (@paths) then concat(@paths, ', ') else ''}xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
-                        xxf:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
+        <xh:div class="row{if ($fluid) then '-fluid' else ''}">
+            <xh:div class="span12">
 
-        <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="alert fr-form-description">
-            <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
-                 xf:output, which will cause an error. -->
-            <xf:output value="$description"/>
-        </xf:group>
+                <xf:var
+                    name="description"
+                    value="
+                        (
+                            { if (@paths) then concat(@paths, ', ') else '' }
+                            xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
+                            xxf:instance('fr-form-metadata')/description
+                        )[normalize-space()][1]"/>
+
+                <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="alert fr-form-description">
+                    <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
+                         xf:output, which will cause an error. -->
+                    <xf:output value="$description"/>
+                </xf:group>
+            </xh:div>
+        </xh:div>
     </xsl:template>
 
     <xsl:template match="fr:logo">

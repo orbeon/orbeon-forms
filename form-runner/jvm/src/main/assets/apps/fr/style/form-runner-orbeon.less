@@ -18,27 +18,98 @@ body.orbeon { background-color: @frBackground }
 
 // Reset Liferay styles which impact ours
 // See https://github.com/orbeon/orbeon-forms/issues/2728
-.aui .orbeon {
+// 2017-06-09: We had `.aui .orbeon` but it seems like with Liferay 7/DXP at least, the `.aui` class is not present.
+.orbeon-portlet-div {
 
     // Remove icons as content
-    [class|=icon]:before {
+    [class |= icon]:before {
         content: "";
     }
 
     // Don't allow tall empty rows
-    .row [class*="span"] {
+    .row [class *= span] {
         min-height: 1px;
     }
 
-    // Make at least the large mode display ok
-    @media(min-width: 1200px) {
+    #xforms-form { // id because Liferay uses an id too
 
-        .row [class*="span"]:first-child {
-            margin-left: 20px;
+        .row {
+            margin-left: -20px;
+            margin-right: -20px;
+
+            // See https://github.com/orbeon/orbeon-forms/issues/3251
+            @media(max-width: 980px) {
+                margin-left: 0;
+                margin-right: 0;
+
+                .span12 {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+            }
         }
 
+        .container,
+            .input-append .add-on,
+            .input-prepend .add-on {
+            box-sizing: content-box; // Bootstrap 2 default (Liferay uses Bootstrap 3 which changes that)
+        }
+    }
+
+    .radio, .checkbox {
+        margin-top: 0;
+    }
+
+    label {
+        color: @textColor;
+    }
+
+    .table {
+        &> thead, &> tbody, &> tfoot {
+            &> tr {
+                &> td:first-child {
+                    padding-left: 5px;
+                }
+            }
+        }
+    }
+
+    .table-bordered {
+        &> thead, &> tbody, &> tfoot {
+            &> tr {
+                &> th, &> td {
+                    border-bottom: none;
+                    border-right: none;
+                }
+            }
+        }
+    }
+
+    @media(min-width: 1200px) {
+        // Not sure we need this rule anymore, seems fine with Liferay 7/DXP
         .span12 {
             width: 940px;
+        }
+    }
+
+    .navbar-inverse {
+        border: none;
+        background-color: transparent;
+    }
+}
+
+// See https://github.com/orbeon/orbeon-forms/issues/3251
+@media (max-width: 980px) {
+    #content {
+        .orbeon-portlet-div {
+            .row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .span12 {
+                margin-left: 0;
+                margin-right: 0;
+            }
         }
     }
 }

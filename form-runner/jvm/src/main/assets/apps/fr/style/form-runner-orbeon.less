@@ -18,28 +18,34 @@ body.orbeon { background-color: @frBackground }
 
 // Reset Liferay styles which impact ours
 // See https://github.com/orbeon/orbeon-forms/issues/2728
-.aui .orbeon {
+// 2017-06-09: We had `.aui .orbeon` but it seems like with Liferay 7/DXP at least, the `.aui` class is not present.
+.orbeon-portlet-div {
 
     // Remove icons as content
-    [class|=icon]:before {
+    [class |= icon]:before {
         content: "";
     }
 
     // Don't allow tall empty rows
-    .row [class*="span"] {
+    .row [class *= span] {
         min-height: 1px;
     }
 
     // Make at least the large mode display ok
     @media(min-width: 1200px) {
 
-        .row [class*="span"]:first-child {
+        .row [clas *= span ]:first-child {
             margin-left: 20px;
         }
 
         .span12 {
             width: 940px;
         }
+    }
+
+    .navbar-inverse {
+        border: none;
+        background-color: transparent;
     }
 }
 

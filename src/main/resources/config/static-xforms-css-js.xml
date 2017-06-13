@@ -1,8 +1,3 @@
 <style xmlns="http://www.w3.org/1999/xhtml" type="text/css" media="all">
 html body form.xforms-initially-hidden, html body .xforms-form .xforms-initially-hidden { display: none }
 </style>
-<!--[if lt IE 9]>
-    <script>
-        document.createElement('output');
-    </script>
-<![endif]-->

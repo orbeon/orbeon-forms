@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <liferay-portlet-app>
     <portlet>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
         <instanceable>true</instanceable>
         <requires-namespaced-parameters>false</requires-namespaced-parameters>
+        <single-page-application>false</single-page-application>
     </portlet>
 </liferay-portlet-app>

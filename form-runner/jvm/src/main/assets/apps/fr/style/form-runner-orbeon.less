@@ -21,6 +21,8 @@ body.orbeon { background-color: @frBackground }
 // 2017-06-09: We had `.aui .orbeon` but it seems like with Liferay 7/DXP at least, the `.aui` class is not present.
 .orbeon-portlet-div {
 
+    line-height: @baseLineHeight;
+
     // Remove icons as content
     [class |= icon]:before {
         content: "";
@@ -58,10 +60,10 @@ body.orbeon { background-color: @frBackground }
 
     .radio, .checkbox {
         margin-top: 0;
+        display: inline;
     }
 
     .checkbox input[type = checkbox], .radio input[type = radio] {
-        height: 20px;
         position: static;
     }
 

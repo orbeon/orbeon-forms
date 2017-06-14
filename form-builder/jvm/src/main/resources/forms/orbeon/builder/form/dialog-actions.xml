@@ -489,6 +489,7 @@
                                         context="$current-action"
                                         origin="instance('fb-binding-action-template')/xf:action[@class = event('xxf:item-value')]/(@class, *)"/>
                                 </xf:action>
+
                             </xf:select1>
 
                             <xf:switch caseref="@class">
@@ -710,7 +711,7 @@
                 <xf:bind ref="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
                 <xf:bind ref="xf:action[1]">
-                    <xf:bind ref="@fb:event"    required="true()"/>
+                    <xf:bind ref="@fb:event"    required="true()" name="event"/>
                     <xf:bind ref="@ev:observer" required="true()"/>
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>
                 </xf:bind>
@@ -732,6 +733,9 @@
                     <xf:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <!-- Setvalue actions -->
                     <xf:bind ref="xf:action[@class = 'fr-set-control-value-action']">
+                        <xf:bind
+                            ref="@class"
+                            constraint="not($event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data'))"/>
                         <xf:bind ref="(*:variable | *:var)/(@value | @select)[1]" required="true()">
                             <xf:bind
                                 ref=".[../@name = ('control-value')]"
@@ -742,6 +746,9 @@
                     </xf:bind>
                     <!-- Itemset actions -->
                     <xf:bind ref="xf:action[@class = 'fr-itemset-action']">
+                        <xf:bind
+                            ref="@class"
+                            constraint="not($event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data'))"/>
                         <xf:bind ref=".//(*:variable | *:var)/(@value | @select)[1]" required="true()">
                             <xf:bind
                                 ref=".[../@name = ('response-items', 'item-label', 'item-value')]"

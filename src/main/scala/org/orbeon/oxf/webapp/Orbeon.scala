@@ -47,7 +47,8 @@ object Orbeon {
   // - version check
   // - logger (based on properties)
   // - processor registry
-  def initialize(context: WebAppContext) = {
+  def initialize(context: WebAppContext): Unit = {
+
     // Check whether logging initialization is disabled
     val initializeLogging = ! context.initParameters.get(LoggingProperty).contains("false")
     if (initializeLogging)

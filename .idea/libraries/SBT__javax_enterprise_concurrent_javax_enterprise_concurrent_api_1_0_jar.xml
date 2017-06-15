@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: javax.enterprise.concurrent:javax.enterprise.concurrent-api:1.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/javax.enterprise.concurrent/javax.enterprise.concurrent-api/jars/javax.enterprise.concurrent-api-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/javax.enterprise.concurrent/javax.enterprise.concurrent-api/srcs/javax.enterprise.concurrent-api-1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

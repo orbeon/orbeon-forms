@@ -23,6 +23,9 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
+import javax.enterprise.concurrent.ManagedExecutorService;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.util.concurrent.*;
 
 /**
@@ -44,6 +47,17 @@ public class AsynchronousSubmissionManager {
 
     public AsynchronousSubmissionManager(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
+    }
+
+    private static ExecutorService getExecutorService() {
+        try {
+            // If the app server gives us an `ExecutorService` (e.g. with WildFly), use it
+            // (See §EE.5.21, page 146 of the Java EE 7 spec)
+            return InitialContext.<ManagedExecutorService>doLookup("java:comp/DefaultManagedExecutorService");
+        } catch (NamingException e) {
+            // If no `ExecutorService` is provided by the app server (e.g. with Tomcat), use our global thread pool
+            return threadPool;
+        }
     }
 
     /**
@@ -208,7 +222,8 @@ public class AsynchronousSubmissionManager {
     }
 
     private static class AsynchronousSubmissions {
-        private final CompletionService<SubmissionResult> completionService = new ExecutorCompletionService<SubmissionResult>(threadPool);
+        private final CompletionService<SubmissionResult> completionService =
+                new ExecutorCompletionService<SubmissionResult>(getExecutorService());
         private int pendingCount = 0;
 
         public Future<SubmissionResult> submit(Callable<SubmissionResult> task) {

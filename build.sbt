@@ -19,46 +19,47 @@ val CommonsIoVersion              = "2.0.1"  // 2.5
 val EnumeratumVersion             = "1.5.6"
 
 val CoreLibraryDependencies = Seq(
-  "com.beachape"              %% "enumeratum"          % EnumeratumVersion,
-  "org.parboiled"             %% "parboiled-scala"     % "1.1.7",
-  "io.spray"                  %% "spray-json"          % "1.3.2",
-  "org.scala-lang.modules"    %% "scala-xml"           % "1.0.6",
-  "joda-time"                 %  "joda-time"           % "2.1",
-  "org.joda"                  %  "joda-convert"        % JodaConvertVersion % Provided,
-  "org.apache.commons"        %  "commons-lang3"       % "3.1",    // 3.5
-  "net.sf.ehcache"            %  "ehcache-core"        % "2.6.3",  // 2.6.11
-  "commons-beanutils"         %  "commons-beanutils"   % "1.5",    // 1.9.3
-  "commons-codec"             %  "commons-codec"       % "1.6",    // 1.10
-  "commons-collections"       %  "commons-collections" % "3.2.2",
-  "commons-digester"          %  "commons-digester"    % "1.5",    // 2.1
-  "commons-cli"               %  "commons-cli"         % "1.0",    // 1.3.1
-  "commons-discovery"         %  "commons-discovery"   % "0.4",    // 0.5
-  "commons-fileupload"        %  "commons-fileupload"  % "1.3.2",
-  "commons-io"                %  "commons-io"          % CommonsIoVersion,
-  "commons-pool"              %  "commons-pool"        % "1.6",
-  "commons-validator"         %  "commons-validator"   % "1.4.0",  // 1.5.1
-  "javax.activation"          % "activation"           % "1.1.1",
-  "org.apache.httpcomponents" % "httpclient"           % HttpComponentsVersion,
-  "org.apache.httpcomponents" % "httpclient-cache"     % HttpComponentsVersion,
-  "org.apache.httpcomponents" % "httpmime"             % HttpComponentsVersion,
-  "org.apache.httpcomponents" % "fluent-hc"            % HttpComponentsVersion,
-  "org.apache.httpcomponents" % "httpcore"             % "4.3.2",
-  "org.slf4j"                 % "jcl-over-slf4j"       % Slf4jVersion,
-  "org.slf4j"                 % "slf4j-api"            % Slf4jVersion,
-  "org.slf4j"                 % "slf4j-log4j12"        % Slf4jVersion,
-  "log4j"                     % "log4j"                % Log4jVersion,
-  "com.jcraft"                % "jsch"                 % "0.1.42", // 0.1.54
-  "jcifs"                     % "jcifs"                % "1.3.17",
-  "bsf"                       % "bsf"                  % "2.4.0"           % Test,
-  "org.apache.commons"        % "commons-exec"         % "1.1"             % Test, // 1.3
-  "com.google.code.gson"      % "gson"                 % "2.3.1"           % Test, // 2.8.0
-  "com.google.guava"          % "guava"                % "13.0.1"          % Test, // 20.0
-  "org.mockito"               % "mockito-all"          % "1.8.5"           % Test, // 1.10.19
-  "mysql"                     % "mysql-connector-java" % "5.1.26"          % Test, // 6.0.5,
-  "org.postgresql"            % "postgresql"           % "9.3-1102-jdbc4"  % Test,
-  "org.seleniumhq.selenium"   % "selenium-java"        % "2.45.0"          % Test  // 3.0.1
-//  "javax.servlet"             %  "javax.servlet-api"   % ServletApiVersion % Provided,
-//  "javax.portlet"             %  "portlet-api"         % PortletApiVersion % Provided
+  "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
+  "org.parboiled"               %% "parboiled-scala"                % "1.1.7",
+  "io.spray"                    %% "spray-json"                     % "1.3.2",
+  "org.scala-lang.modules"      %% "scala-xml"                      % "1.0.6",
+  "joda-time"                   %  "joda-time"                      % "2.1",
+  "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
+  "org.apache.commons"          %  "commons-lang3"                  % "3.1",    // 3.5
+  "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.3",  // 2.6.11
+  "commons-beanutils"           %  "commons-beanutils"              % "1.5",    // 1.9.3
+  "commons-codec"               %  "commons-codec"                  % "1.6",    // 1.10
+  "commons-collections"         %  "commons-collections"            % "3.2.2",
+  "commons-digester"            %  "commons-digester"               % "1.5",    // 2.1
+  "commons-cli"                 %  "commons-cli"                    % "1.0",    // 1.3.1
+  "commons-discovery"           %  "commons-discovery"              % "0.4",    // 0.5
+  "commons-fileupload"          %  "commons-fileupload"             % "1.3.2",
+  "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
+  "commons-pool"                %  "commons-pool"                   % "1.6",
+  "commons-validator"           %  "commons-validator"              % "1.4.0",  // 1.5.1
+  "javax.activation"            % "activation"                      % "1.1.1",
+  "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.0",
+  "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
+  "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
+  "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
+  "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,
+  "org.apache.httpcomponents"   % "httpcore"                        % "4.3.2",
+  "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
+  "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
+  "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,
+  "log4j"                       % "log4j"                           % Log4jVersion,
+  "com.jcraft"                  % "jsch"                            % "0.1.42", // 0.1.54
+  "jcifs"                       % "jcifs"                           % "1.3.17",
+  "bsf"                         % "bsf"                             % "2.4.0"           % Test,
+  "org.apache.commons"          % "commons-exec"                    % "1.1"             % Test, // 1.3
+  "com.google.code.gson"        % "gson"                            % "2.3.1"           % Test, // 2.8.0
+  "com.google.guava"            % "guava"                           % "13.0.1"          % Test, // 20.0
+  "org.mockito"                 % "mockito-all"                     % "1.8.5"           % Test, // 1.10.19
+  "mysql"                       % "mysql-connector-java"            % "5.1.26"          % Test, // 6.0.5,
+  "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,
+  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test  // 3.0.1
+//  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
+//  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
 ) map
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
   (_.exclude("javax.servlet"  , "servlet-api"))         // because `jcifs` depends on this and we want it provided

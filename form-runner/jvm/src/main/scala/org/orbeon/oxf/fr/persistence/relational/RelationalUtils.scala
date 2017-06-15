@@ -75,8 +75,8 @@ object RelationalUtils extends Logging {
 
   private def getDataSource(name: String) =
     withDebug(s"getting datasource `$name`") {
-      val jndiContext = new InitialContext().lookup("java:comp/env/jdbc").asInstanceOf[Context]
-      jndiContext.lookup(name).asInstanceOf[DataSource]
+      val jdbcContext: Context = InitialContext.doLookup("java:comp/env/jdbc")
+      jdbcContext.lookup(name).asInstanceOf[DataSource]
     }
 
   def getConnection(dataSource: DataSource) =

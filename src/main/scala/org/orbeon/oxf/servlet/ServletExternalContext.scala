@@ -306,14 +306,6 @@ class ServletExternalContext(
     def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
       urlRewriter.rewriteRenderURL(urlString, portletMode, windowState)
 
-    def rewriteResourceURL(urlString: String, generateAbsoluteURL: Boolean): String =
-      rewriteResourceURL(
-        urlString, if (generateAbsoluteURL)
-          URLRewriter.REWRITE_MODE_ABSOLUTE
-        else
-          URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
-      )
-
     def rewriteResourceURL(urlString: String, rewriteMode: Int): String =
       urlRewriter.rewriteResourceURL(urlString, rewriteMode)
   }

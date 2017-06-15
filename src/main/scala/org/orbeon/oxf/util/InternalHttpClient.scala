@@ -74,7 +74,7 @@ object InternalHttpClient extends HttpClient {
       val urlRewriter =
         Headers.firstHeaderIgnoreCase(headers, Headers.OrbeonClient) match {
           case Some(client) if Headers.EmbeddedClientValues(client) ⇒
-            new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, true)
+            new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, wsrpEncodeResources = true)
           case Some(client) ⇒
             new ServletURLRewriter(request)
           case None ⇒

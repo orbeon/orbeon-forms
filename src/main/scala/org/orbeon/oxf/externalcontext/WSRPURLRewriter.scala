@@ -66,7 +66,7 @@ class WSRPURLRewriter(
     rewritePortletURL(urlString, URLTypeBlockingAction, portletMode, windowState)
 
   def rewriteResourceURL(urlString: String, rewriteMode: Int) =
-    rewriteResourceURL(urlString, wsrpEncodeResources) // the mode is ignored
+    rewriteResourceURL(urlString) // the mode is ignored
 
   def getNamespacePrefix = PrefixTag
 
@@ -105,7 +105,7 @@ class WSRPURLRewriter(
     encodeURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)
   }
 
-  def rewriteResourceURL(urlString: String, wsrpEncodeResources: Boolean): String = {
+  private def rewriteResourceURL(urlString: String): String = {
     // Always encode dynamic resources
     if (wsrpEncodeResources || urlString == "/xforms-server" || urlString.startsWith(DynamicResourcesPath)) {
       // First rewrite path to support versioned resources

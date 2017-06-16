@@ -2028,10 +2028,16 @@
                                         if (target == null) {
                                             // Obviously, we won't try to set a target if the server didn't us one
                                             return true;
+                                        } else if (! _.isUndefined(window.frames[target])) {
+                                            // Pointing to a frame, so this won't open a new new window
+                                            return false;
                                         } else {
-                                            var newWindow = window.open("about:blank", "_blank");
+                                            // See if we're able to open a new window
+                                            if (target == "_blank")
+                                                // Use target name that we can reuse, in case opening the window works
+                                                target = Math.random().toString().substring(2);
+                                            var newWindow = window.open("about:blank", target);
                                             if (newWindow && newWindow.close) {
-                                                newWindow.close();
                                                 return false;
                                             } else {
                                                 return true;

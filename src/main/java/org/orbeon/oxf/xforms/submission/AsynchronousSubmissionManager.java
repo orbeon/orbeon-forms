@@ -41,7 +41,7 @@ public class AsynchronousSubmissionManager {
     private static final String ASYNC_SUBMISSIONS_SESSION_KEY_PREFIX = "oxf.xforms.state.async-submissions.";
 
     // Global thread pool
-    private static final ExecutorService threadPool = Executors.newCachedThreadPool();
+    private static ExecutorService threadPool = null;
 
     private final XFormsContainingDocument containingDocument;
 
@@ -56,6 +56,10 @@ public class AsynchronousSubmissionManager {
             return InitialContext.<ManagedExecutorService>doLookup("java:comp/DefaultManagedExecutorService");
         } catch (NamingException e) {
             // If no `ExecutorService` is provided by the app server (e.g. with Tomcat), use our global thread pool
+            synchronized (AsynchronousSubmissions.class) {
+                if (threadPool == null)
+                    threadPool = Executors.newCachedThreadPool();
+            }
             return threadPool;
         }
     }

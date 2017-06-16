@@ -52,15 +52,14 @@
             .fr-grid-tr {
                 display: table-row;
 
-                // Don't put padding in the cell content, see https://github.com/orbeon/orbeon-forms/issues/2414
+                // Padding/margin in the cell content: see https://github.com/orbeon/orbeon-forms/issues/2414
                 &> .fr-grid-td {
                     display: table-cell;
                     vertical-align: top;
-                    padding: 0;
+                    padding: 0 @frGridCellPadding;
 
-                    // Instead add some space around the control, and if it is non-relevant its margin won't show
                     &> .xforms-control, &> .xbl-component, &> .xforms-group {
-                        margin: @frGridCellPadding;
+                        margin: @frGridCellPadding 0;
                         display: block;
                     }
                 }

@@ -139,7 +139,7 @@
                                 <xsl:choose>
                                     <xsl:when test="$classes = $image-attachment-classes">
                                         <!-- Handle URL rewriting for image attachments -->
-                                        <image acro-field-name="'{$pdf-field-name}'" href="{p:rewrite-resource-uri($value, true())}">
+                                        <image acro-field-name="'{$pdf-field-name}'" href="{p:rewrite-service-uri($value, true())}">
                                             <xsl:if test="$form-version">
                                                 <header>
                                                     <name>Orbeon-Form-Definition-Version</name>

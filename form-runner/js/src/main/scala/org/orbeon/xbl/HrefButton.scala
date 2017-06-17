@@ -11,26 +11,30 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.fr
+package org.orbeon.xbl
 
-import org.orbeon.xbl.{DndRepeat, HrefButton, TreeSelect1, WPaint}
-import org.orbeon.xforms.{$, XFormsApp}
+import org.orbeon.xforms
+import org.orbeon.xforms.$
 
-import scala.scalajs.js.JSApp
+object HrefButton {
 
-// Scala.js starting point for Form Runner
-object FormRunnerApp extends JSApp {
+  xforms.XBL.declareCompanion(
+    "fr|href-button",
+    new xforms.XBLCompanion {
+      override def init(): Unit = {
+        $(containerElem).find("button").on("click", onClick _)
+      }
 
-  override def main(): Unit = {
+      def enabled  () = ()
 
-    def initializeOnDomReady(): Unit = {
-      DndRepeat
-      TreeSelect1
-      WPaint
-      HrefButton
-      XFormsApp.main()
+      private def onClick(): Unit = {
+        val a = $(containerElem).find(".fr-href-button-anchor")
+        org.scalajs.dom.window.open(
+          url    = a.attr("href"  ).toString,
+          target = a.attr("target").toString
+        )
+      }
     }
+  )
 
-    $(initializeOnDomReady _)
-  }
 }

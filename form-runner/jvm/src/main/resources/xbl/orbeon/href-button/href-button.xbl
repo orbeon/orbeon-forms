@@ -23,17 +23,26 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xbl:binding id="fr-href-button" element="fr|href-button" xxbl:mode="binding" xxbl:container="span">
+
+        <xbl:handlers>
+            <!-- Intercept client-side click and open window directly -->
+            <xbl:handler
+                event="xforms-enabled xxforms-iteration-moved"
+                type="javascript">
+                ORBEON.xforms.XBL.instanceForControl(this).enabled();
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template xxbl:transform="oxf:xslt">
             <xf:group xsl:version="2.0">
 
-                <xf:action ev:event="DOMActivate">
-                    <xf:load
-                        xbl:attr="resource=href"
-                        xxbl:scope="outer"
-                        xxf:show-progress="false"
-                        xxf:target="_blank"
-                        f:url-type="resource"/>
-                </xf:action>
+                <!-- Create the link so that the URL gets rewritten -->
+                <xh:a
+                    class="fr-href-button-anchor xforms-hidden"
+                    target="_blank"
+                    xbl:attr="href"
+                    f:url-type="resource"
+                    xxbl:scope="outer"/>
 
                 <!-- Trigger and its content -->
                 <xf:trigger xbl:attr="appearance">

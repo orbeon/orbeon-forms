@@ -17,6 +17,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang ⇒ jl}
 
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
@@ -288,7 +289,7 @@ class XHTMLHeadHandler(
       }
 
       sb append "};"
-      helper.text(sb.toString)
+      helper.text(escapeJavaScriptInsideScript(sb.toString))
       helper.endElement()
     }
   }
@@ -391,7 +392,7 @@ class XHTMLHeadHandler(
 
         sb append " }"
 
-        helper.text(sb.toString)
+        helper.text(escapeJavaScriptInsideScript(sb.toString))
       }
       helper.endElement()
     }
@@ -496,7 +497,7 @@ class XHTMLHeadHandler(
         sb.append(']')
       }
       sb.append("};")
-      helper.text(sb.toString)
+      helper.text(escapeJavaScriptInsideScript(sb.toString))
     }
     helper.endElement()
   }
@@ -507,6 +508,10 @@ object XHTMLHeadHandler {
   def quoteString(s: String) =
     s""""${escapeJavaScript(s)}""""
 
+  def escapeJavaScriptInsideScript (js: String): String =
+    // Method from https://stackoverflow.com/a/23983448/5295
+    StringUtils.replace(js, "</script", "</scr\\ipt")
+
   def outputScripts(shareableScripts: Iterable[ShareableScript])(implicit helper: XMLReceiverHelper) =
     for (shareableScript ← shareableScripts) {
 
@@ -516,9 +521,9 @@ object XHTMLHeadHandler {
         else
           ""
 
-      helper.text(s"\nfunction ${shareableScript.clientName}(event$paramsString) {\n")
-      helper.text(shareableScript.body)
-      helper.text("}\n")
+      helper.text(escapeJavaScriptInsideScript(s"\nfunction ${shareableScript.clientName}(event$paramsString) {\n"))
+      helper.text(escapeJavaScriptInsideScript(shareableScript.body))
+      helper.text(escapeJavaScriptInsideScript("}\n"))
     }
 
   def buildJavaScriptInitializations(

@@ -888,7 +888,10 @@ public class XFormsUtils {
     }
 
     public static String escapeJavaScript(String value) {
-        return StringUtils.replace(StringUtils.replace(StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\""), "\n", "\\n");
+        value = StringUtils.replace(value, "\\", "\\\\");
+        value = StringUtils.replace(value, "\"", "\\\"");
+        value = StringUtils.replace(value, "\n", "\\n");
+        return value;
     }
 
     public static boolean maybeAVT(String attributeValue) {

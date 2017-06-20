@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
 
 object URLGeneratorBase {
 
-  def extractHeaders(configElement: Element): Map[String, Array[String]] = {
+  def extractHeaders(configElement: Element): Map[String, List[String]] = {
 
     val headerPairs =
       for {
@@ -34,15 +34,20 @@ object URLGeneratorBase {
       } yield
         headerName → headerValue
 
-    CollectionUtils.combineValues[String, String, Array](headerPairs).toMap
+    CollectionUtils.combineValues[String, String, List](headerPairs).toMap
+  }
+
+  def headersToString(headersOrNull: Map[String, List[String]]): String = {
+    val headers = Option(headersOrNull) getOrElse Map.empty
+    headers map (_.toString) mkString ("Map(", ",", ")")
   }
 
   def setIfModifiedIfNeeded(
-    headersOrNull      : Map[String, Array[String]],
+    headersOrNull      : Map[String, List[String]],
     lastModifiedOrNull : jl.Long
   ): ju.Map[String, Array[String]] = {
 
-    val headersOrEmpty  = Option(headersOrNull) getOrElse Map.empty[String, Array[String]]
+    val headersOrEmpty  = Option(headersOrNull) map { _ map { case (k, v) ⇒ (k, v.to[Array]) }} getOrElse Map.empty[String, Array[String]]
     val newHeaderAsList = Option(lastModifiedOrNull).map(lastModified ⇒ "If-Modified-Since" → Array(DateUtils.RFC1123Date.print(lastModified))).to[List]
 
     headersOrEmpty ++ newHeaderAsList

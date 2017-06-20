@@ -326,10 +326,6 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
           val url = new URI(hrefAttribute)
 
-          val headerNameValues =
-            URLGeneratorBase.extractHeaders(context.element) map
-              { case (key, value) ⇒ key -> value.to[List] }
-
           val cxr =
             Connection(
               method          = GET,
@@ -339,7 +335,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
               headers         = Connection.buildConnectionHeadersLowerIfNeeded(
                 scheme           = url.getScheme,
                 hasCredentials   = false,
-                customHeaders    = headerNameValues,
+                customHeaders    = URLGeneratorBase.extractHeaders(context.element),
                 headersToForward = Connection.headersToForwardFromProperty,
                 cookiesToForward = Connection.cookiesToForwardFromProperty,
                 getHeader        = Connection.getHeaderFromRequest(NetUtils.getExternalContext.getRequest))(

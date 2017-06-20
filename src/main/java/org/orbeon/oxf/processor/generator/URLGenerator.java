@@ -123,7 +123,7 @@ public class URLGenerator extends ProcessorImpl {
         XMLParsing.ParserConfiguration parserConfiguration,
         boolean handleLexical,
         String mode,
-        scala.collection.immutable.Map<String, String[]> headerNameValues,
+        scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues,
         String forwardHeaders,
         List<String> readHeaders,
         boolean cacheUseLocalCache,
@@ -163,7 +163,7 @@ public class URLGenerator extends ProcessorImpl {
         private String encoding;
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
-        private scala.collection.immutable.Map<String, String[]> headerNameValues;
+        private scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues;
         private String forwardHeaders;
         private List<String> readHeaders;
         private XMLParsing.ParserConfiguration parserConfiguration = null;
@@ -210,7 +210,7 @@ public class URLGenerator extends ProcessorImpl {
               XMLParsing.ParserConfiguration parserConfiguration,
               boolean handleLexical,
               String mode,
-              scala.collection.immutable.Map<String, String[]> headerNameValues,
+              scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues,
               String forwardHeaders,
               List<String> readHeaders,
               boolean cacheUseLocalCache,
@@ -294,7 +294,7 @@ public class URLGenerator extends ProcessorImpl {
             return mode;
         }
 
-        public scala.collection.immutable.Map<String, String[]> getHeaderNameValues() {
+        public scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> getHeaderNameValues() {
             return headerNameValues;
         }
 
@@ -332,9 +332,23 @@ public class URLGenerator extends ProcessorImpl {
 
         @Override
         public String toString() {
-            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + parserConfiguration.getKey() + "|" + isHandleLexical() + "|" + isForceContentType()
-                    + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + getUsername() + "|" + getPassword() + "|" + isPreemptiveAuth() + "|" + getDomain()
-                    + "|" + tidyConfig + "]";
+            return
+                "["                                                    +
+                    getURL().toExternalForm()                          + "|" +
+                    getContentType()                                   + "|" +
+                    getEncoding()                                      + "|" +
+                    parserConfiguration.getKey()                       + "|" +
+                    isHandleLexical()                                  + "|" +
+                    isForceContentType()                               + "|" +
+                    isForceEncoding()                                  + "|" +
+                    isIgnoreConnectionEncoding()                       + "|" +
+                    getUsername()                                      + "|" +
+                    getPassword()                                      + "|" +
+                    isPreemptiveAuth()                                 + "|" +
+                    getDomain()                                        + "|" +
+                    URLGeneratorBase.headersToString(headerNameValues) + "|" +
+                    tidyConfig                                         +
+                "]";
         }
     }
 
@@ -392,7 +406,7 @@ public class URLGenerator extends ProcessorImpl {
                                 throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
 
                             // Get headers
-                            final scala.collection.immutable.Map<String, String[]> headerNameValues =
+                            final scala.collection.immutable.Map<String, scala.collection.immutable.List<String>> headerNameValues =
                                 URLGeneratorBase.extractHeaders(configElement);
 
                             final String forwardHeaders; {

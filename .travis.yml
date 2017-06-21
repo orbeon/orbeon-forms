@@ -46,7 +46,7 @@ install:
 - npm install
 before_script:
 - mkdir /home/travis/.orbeon
-# Create `orbeon` user for MySQL and PostgreSQL, and grant priviledges
+# Create `orbeon` user for MySQL and PostgreSQL, and grant privileges
 - mysql --protocol=TCP --host=localhost --user root -e "CREATE USER 'orbeon'@'localhost' IDENTIFIED BY '$RDS_PASSWORD'"
 - mysql --protocol=TCP --host=localhost --user root -e "GRANT ALL PRIVILEGES ON *.* TO 'orbeon'@'localhost' WITH GRANT OPTION"
 - createuser --superuser orbeon

@@ -165,7 +165,9 @@ div.orbeon.orbeon-portlet-div {
 
             .fb-tools {
                 .fr-border();
-                padding: 2px 8px 8px;               // 2px at top or legend has too much space above
+                padding: 2px 8px 8px 8px;           // 2px at top or legend has too much space above
+                &.fb-xvc { padding-top: 8px }       // Except for the cut/copy/paste/reload, so they are centered in their box
+
                 margin-bottom: @fbGutter;
                 &:last-child { margin-bottom: 0 }
 

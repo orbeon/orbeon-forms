@@ -53,7 +53,8 @@ Builder.beforeAddingEditorCallbacks = $.Callbacks()
 
 $ ->
 
-    # Save reference to last operation that positioned the triggers
+    # Save reference to last groups of triggers and to operation that positioned the triggers
+    lastTriggerGroups = null
     lastPositionTriggers = null
 
     # Create a div.fb-hover inside the td, if there isn't one already
@@ -70,10 +71,10 @@ $ ->
     tidyTriggerGroups = (triggerGroups) ->
         $(triggerGroups).hide()
         $('.fb-cell-editor').append(triggerGroups)
-        lastPositionTriggers = null
 
     Builder.mouseEntersGridTdEvent.subscribe ({triggers, triggerGroups, gridTd}) ->
         gridTdId = gridTd.id
+        lastTriggerGroups = triggerGroups
         lastPositionTriggers = ->
             # Move cell editor controls under this td
             gridTd = YD.get gridTdId
@@ -95,6 +96,7 @@ $ ->
                     trigger.style.display = if triggerRelevant then '' else 'none'
             else
                 tidyTriggerGroups(triggerGroups)
+                lastPositionTriggers = null
         lastPositionTriggers()
 
     # Normally, we add the div.fb-hover when the mouse first enters the .fr-grid-td, but for the TinyMCE, if we do
@@ -112,6 +114,7 @@ $ ->
     # See: https://github.com/orbeon/orbeon-forms/issues/44
     Builder.mouseExitsGridTdEvent.subscribe ({triggerGroups, gridTd}) ->
         tidyTriggerGroups(triggerGroups)
+        lastPositionTriggers = null
 
     # Change current cell on click on trigger
     Builder.triggerClickEvent.subscribe ({trigger}) ->
@@ -121,6 +124,10 @@ $ ->
         event = new AjaxServer.Event form, activable.id, null, "DOMActivate"
         AjaxServer.fireEvents [event]
 
+    # Before we process a response from the server, move trigger move out of harm's way
+    AjaxServer.ajaxResponseReceived.add ->
+        tidyTriggerGroups(lastTriggerGroups)
     # Reposition triggers after an Ajax request
     Events.ajaxResponseProcessedEvent.subscribe ->
         lastPositionTriggers() if lastPositionTriggers?
+

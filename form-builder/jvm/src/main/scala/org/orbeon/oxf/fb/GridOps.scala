@@ -448,8 +448,21 @@ trait GridOps extends ContainerOps {
   def tdCoordinates(td: NodeInfo): (Int, Int) =
     tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
 
+  private def canExpandCell(td: NodeInfo): Boolean = {
+    val allRowCells = getAllRowCells(getContainingGrid(td))
+    val (x, y) = tdCoordinates(td, allRowCells)
+    val cell = allRowCells(y)(x)
+
+    (y + cell.rowspan) < allRowCells.size
+  }
+
   // Whether there will be controls to delete if the cell is expanded
-  def expandCellTouchesControl(td: NodeInfo): Boolean = {
+  // @XPathFunction
+  def expandCellTouchesControl(td: NodeInfo): Boolean =
+    canExpandCell(td) && { // https://github.com/orbeon/orbeon-forms/issues/3282
+
+    debugDumpDocumentForGrids("expandCellTouchesControl", td)
+
     val allRowCells = getAllRowCells(getContainingGrid(td))
     val (x, y) = tdCoordinates(td, allRowCells)
 
@@ -458,23 +471,34 @@ trait GridOps extends ContainerOps {
     hasChildren(allRowCells(y + cell.rowspan)(x).td)
   }
 
+
   // Vertically expand the given cell
-  def expandCell(td: NodeInfo): Unit = {
-    val allRowCells  = getAllRowCells(getContainingGrid(td))
-    val (x, y) = tdCoordinates(td, allRowCells)
+  //@XPathFunction
+  def expandCell(td: NodeInfo): Unit =
+    if (canExpandCell(td)) {
 
-    val cell = allRowCells(y)(x)
-    val cellBelow = allRowCells(y + cell.rowspan)(x)
+      debugDumpDocumentForGrids("expandCell before", td)
 
-    // Increment rowspan
-    cell.originalRowspan += cellBelow.originalRowspan
+      val allRowCells = getAllRowCells(getContainingGrid(td))
+      val (x, y) = tdCoordinates(td, allRowCells)
 
-    // Delete cell below
-    delete(cellBelow.td)
-  }
+      val cell = allRowCells(y)(x)
+      val cellBelow = allRowCells(y + cell.rowspan)(x)
+
+      // Increment rowspan
+      cell.originalRowspan += cellBelow.originalRowspan
+
+      // Delete cell below
+      delete(cellBelow.td)
+
+      debugDumpDocumentForGrids("expandCell after", td)
+    }
 
   // Vertically shrink the given cell
+  //@XPathFunction
   def shrinkCell(td: NodeInfo): Unit = {
+
+    debugDumpDocumentForGrids("shrinkCell before", td)
 
     val grid = getContainingGrid(td)
     val allRowCells  = getAllRowCells(grid)
@@ -494,6 +518,8 @@ trait GridOps extends ContainerOps {
     val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
 
     insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
+
+    debugDumpDocumentForGrids("shrinkCell after", td)
   }
 
   def initializeGrids(doc: NodeInfo): Unit = {

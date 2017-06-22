@@ -129,7 +129,7 @@ object DocumentAPI {
   }
 
   // Whether the document is being reloaded
-  def isReloading: Boolean = Globals.isReloading
+  def isReloading(): Boolean = Globals.isReloading
 
   // Return the current index of the repeat (equivalent to `index($repeatId)`)
   def getRepeatIndex(repeatId: String): String = Globals.repeatIndexes(repeatId)

@@ -210,16 +210,24 @@ trait GridOps extends ContainerOps {
   // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
   def isLastGridInSection(grid: NodeInfo) = childrenGrids(findAncestorContainers(grid).head).size == 1
 
-  private def tdAtColPos(gridId: String, colPos: Int): NodeInfo = {
-    val grid = containerById(gridId)
-    val firstRow = (grid \ "*:tr").head
-    (firstRow \ "*:td")(colPos)
+  private def tdAtColPosOpt(gridId: String, colPos: Int): Option[NodeInfo] = {
+
+    require(colPos >= 0)
+
+    val grid        = containerById(gridId)
+    val firstRowOpt = (grid / "*:tr").headOption
+    val tds         = firstRowOpt.toList / "*:td"
+
+    colPos < tds.size option tds(colPos)
   }
 
   def maxGridColumns = Properties.instance.getPropertySet.getInteger("oxf.fb.grid.max-columns", 4)
 
-  // Insert a column to the right
-  def insertColRight(gridId: String, colPos: Int): Unit = insertColRight(tdAtColPos(gridId, colPos))
+  // Insert a column to the right if possible
+  //@XPathFunction
+  def insertColRight(gridId: String, colPos: Int): Unit =
+    tdAtColPosOpt(gridId, colPos) foreach insertColRight
+
   def insertColRight(firstRowTd: NodeInfo): Unit = {
     val grid = getContainingGrid(firstRowTd)
     if (getGridSize(grid) < maxGridColumns) {
@@ -242,8 +250,11 @@ trait GridOps extends ContainerOps {
     }
   }
 
-  // Insert a column to the left
-  def insertColLeft(gridId: String, colPos: Int): Unit = insertColLeft(tdAtColPos(gridId, colPos))
+  // Insert a column to the left if possible
+  //@XPathFunction
+  def insertColLeft(gridId: String, colPos: Int): Unit =
+    tdAtColPosOpt(gridId, colPos) foreach insertColLeft
+
   def insertColLeft(firstRowTd: NodeInfo): Unit = {
     val grid = getContainingGrid(firstRowTd)
     if (getGridSize(grid) < maxGridColumns) {
@@ -275,9 +286,10 @@ trait GridOps extends ContainerOps {
     rows map (row ⇒ (row \ "*:td")(x))
   }
 
-  // Insert a column and contained controls
+  // Delete a column and contained controls if possible
+  //@XPathFunction
   def deleteCol(gridId: String, colPos: Int): Unit =
-    deleteCol(tdAtColPos(gridId, colPos))
+    tdAtColPosOpt(gridId, colPos) foreach deleteCol
 
   def deleteCol(firstRowTd: NodeInfo): Unit = {
 
@@ -308,7 +320,10 @@ trait GridOps extends ContainerOps {
     debugDumpDocumentForGrids("delete col", grid)
   }
 
-  def controlsInCol(gridId: String, colPos: Int): Int = controlsInCol(tdAtColPos(gridId, colPos))
+  //@XPathFunction
+  def controlsInCol(gridId: String, colPos: Int): Int =
+    tdAtColPosOpt(gridId, colPos) map controlsInCol getOrElse 0
+
   def controlsInCol(firstRowTd: NodeInfo): Int = {
     val grid = getContainingGrid(firstRowTd)
     val allRowCells = getAllRowCells(grid)

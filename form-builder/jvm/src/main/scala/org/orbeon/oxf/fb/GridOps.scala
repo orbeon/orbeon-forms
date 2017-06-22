@@ -30,7 +30,7 @@ trait GridOps extends ContainerOps {
 
   case class Cell(td: NodeInfo, rowspan: Int, missing: Boolean) {
     def originalRowspan = getNormalizedRowspan(td)
-    def originalRowspan_= (newRowSpan: Int): Unit = ensureAttribute(td, "rowspan", newRowSpan.toString)
+    def originalRowspan_= (newRowSpan: Int): Unit = toggleAttribute(td, "rowspan", newRowSpan.toString, newRowSpan > 1)
   }
 
   // Get the first enclosing repeated grid or legacy repeat

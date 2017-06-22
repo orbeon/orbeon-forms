@@ -133,6 +133,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     rootBind descendantOrSelf "*:bind" iterator
 
   // Delete the controls in the given grid cell, if any
+  // @XPathFunction
   def deleteCellContent(td: NodeInfo, updateTemplates: Boolean = false): Unit = {
     td \ * flatMap controlElementsToDelete foreach (delete(_))
     if (updateTemplates)

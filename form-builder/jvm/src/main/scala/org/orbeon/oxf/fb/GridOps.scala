@@ -471,6 +471,14 @@ trait GridOps extends ContainerOps {
     (y + cell.rowspan) < allRowCells.size
   }
 
+  private def canShrinkCell(td: NodeInfo): Boolean = {
+    val allRowCells = getAllRowCells(getContainingGrid(td))
+    val (x, y) = tdCoordinates(td, allRowCells)
+    val cell = allRowCells(y)(x)
+
+    cell.rowspan > 1
+  }
+
   // Whether there will be controls to delete if the cell is expanded
   // @XPathFunction
   def expandCellTouchesControl(td: NodeInfo): Boolean =
@@ -511,31 +519,32 @@ trait GridOps extends ContainerOps {
 
   // Vertically shrink the given cell
   //@XPathFunction
-  def shrinkCell(td: NodeInfo): Unit = {
+  def shrinkCell(td: NodeInfo): Unit =
+    if (canShrinkCell(td)) {
+  
+      debugDumpDocumentForGrids("shrinkCell before", td)
 
-    debugDumpDocumentForGrids("shrinkCell before", td)
+      val grid = getContainingGrid(td)
+      val allRowCells  = getAllRowCells(grid)
 
-    val grid = getContainingGrid(td)
-    val allRowCells  = getAllRowCells(grid)
+      val (x, y) = tdCoordinates(td, allRowCells)
 
-    val (x, y) = tdCoordinates(td, allRowCells)
+      val cell = allRowCells(y)(x)
 
-    val cell = allRowCells(y)(x)
+      // Decrement rowspan attribute
+      cell.originalRowspan -= 1
 
-    // Decrement rowspan attribute
-    cell.originalRowspan -= 1
+      // Insert new td
+      val posyToInsertInto = y + cell.rowspan - 1
+      val rowBelow = allRowCells(posyToInsertInto)
 
-    // Insert new td
-    val posyToInsertInto = y + cell.rowspan - 1
-    val rowBelow = allRowCells(posyToInsertInto)
+      val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
+      val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
 
-    val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
-    val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
+      insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
 
-    insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
-
-    debugDumpDocumentForGrids("shrinkCell after", td)
-  }
+      debugDumpDocumentForGrids("shrinkCell after", td)
+    }
 
   def initializeGrids(doc: NodeInfo): Unit = {
     // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already

@@ -98,7 +98,7 @@
             // case `rowspan`s are used. This is usually the intended layout, as opposed to rows taking proportionally more
             // or less vertical space.
             // NOTE: This should be extended to repeated grids as well, but they interleave `<tr>`s which makes it harder.
-            &:not(.fr-repeat) {
+            &:not(.fr-repeat):not(.fr-editable) { // see also https://github.com/orbeon/orbeon-forms/issues/3283
                 .fr-grid-body .fr-grid-tr {
                     height: 0;
                 }

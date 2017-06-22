@@ -29,8 +29,8 @@ import scala.collection.mutable
 trait GridOps extends ContainerOps {
 
   case class Cell(td: NodeInfo, rowspan: Int, missing: Boolean) {
-    def originalRowspan = getNormalizedRowspan(td)
-    def originalRowspan_= (newRowSpan: Int): Unit = toggleAttribute(td, "rowspan", newRowSpan.toString, newRowSpan > 1)
+    def underlyingRowspan = getNormalizedRowspan(td)
+    def underlyingRowspan_= (newRowSpan: Int): Unit = toggleAttribute(td, "rowspan", newRowSpan.toString, newRowSpan > 1)
   }
 
   // Get the first enclosing repeated grid or legacy repeat
@@ -41,8 +41,8 @@ trait GridOps extends ContainerOps {
   private def getNormalizedRowspan(td: NodeInfo) =  td attValueOpt "rowspan" map (_.toInt) getOrElse 1
 
   // For the previous row of prepared cells, and a new row of tds, return the new row of prepared cells
-  private def newCellsRow(previousRow: Seq[Cell], tds: Seq[NodeInfo]): Seq[Cell] = previousRow match {
-    case Seq() ⇒
+  private def newCellsRow(previousRow: List[Cell], tds: List[NodeInfo]): List[Cell] = previousRow match {
+    case Nil ⇒
       // First row: start with initial rowspans
       tds map (td ⇒ Cell(td, getNormalizedRowspan(td), missing = false))
     case _ ⇒
@@ -61,32 +61,32 @@ trait GridOps extends ContainerOps {
   def getRowCells(tr: NodeInfo): Seq[Cell] = {
 
     // All trs up to and including the current tr
-    val trs = (tr precedingSibling "*:tr").reverse :+ tr
+    val trs = (tr precedingSibling "*:tr").reverse.to[List] ::: tr :: Nil
     // For each row, the Seq of tds
-    val rows = trs map (_ \ "*:td")
+    val rows = trs map (_ / "*:td" toList)
 
     // Return the final row of prepared cells
-    rows.foldLeft(Seq[Cell]())(newCellsRow)
+    rows.foldLeft(List[Cell]())(newCellsRow)
   }
 
   // Get cell/rowspan information for all the rows in the grid
-  def getAllRowCells(grid: NodeInfo): Seq[Seq[Cell]] = {
+  def getAllRowCells(grid: NodeInfo): List[List[Cell]] = {
 
     // All trs up to and including the current tr
-    val trs = grid \ "*:tr"
+    val trs = grid / "*:tr" toList
     // For each row, the Seq of tds
-    val rows = trs map (_ \ "*:td")
+    val rows = trs map (_ / "*:td" toList)
 
     // Accumulate the result for each row as we go
-    val result = mutable.Buffer[Seq[Cell]]()
+    val result = mutable.ListBuffer[List[Cell]]()
 
-    rows.foldLeft(Seq[Cell]()) { (previousRow, tds) ⇒
+    rows.foldLeft(List[Cell]()) { (previousRow, tds) ⇒
       val newRow = newCellsRow(previousRow, tds)
       result += newRow
       newRow
     }
 
-    result
+    result.result()
   }
 
   // Width of the grid in columns
@@ -122,7 +122,7 @@ trait GridOps extends ContainerOps {
     // Increment rowspan of cells that don't end at the current row
     rowCells foreach { cell ⇒
       if (cell.rowspan > 1)
-        cell.originalRowspan += 1
+        cell.underlyingRowspan += 1
     }
 
     // Insert the new row
@@ -180,10 +180,10 @@ trait GridOps extends ContainerOps {
     // Decrement rowspans if needed
     rowCells.zipWithIndex foreach {
       case (cell, posx) ⇒
-        if (cell.originalRowspan > 1) {
+        if (cell.underlyingRowspan > 1) {
           if (cell.missing) {
             // This cell is part of a rowspan that starts in a previous row, so decrement
-            cell.originalRowspan -= 1
+            cell.underlyingRowspan -= 1
           } else if (nextRowCells.isDefined) {
             // This cell is the start of a rowspan, and we are deleting it, so add a td in the next row
             // TODO XXX: issue: as we insert tds, we can't rely on Cell info unless it is updated ⇒
@@ -509,7 +509,7 @@ trait GridOps extends ContainerOps {
       val cellBelow = allRowCells(y + cell.rowspan)(x)
 
       // Increment rowspan
-      cell.originalRowspan += cellBelow.originalRowspan
+      cell.underlyingRowspan += cellBelow.underlyingRowspan
 
       // Delete cell below
       delete(cellBelow.td)
@@ -521,7 +521,6 @@ trait GridOps extends ContainerOps {
   //@XPathFunction
   def shrinkCell(td: NodeInfo): Unit =
     if (canShrinkCell(td)) {
-  
       debugDumpDocumentForGrids("shrinkCell before", td)
 
       val grid = getContainingGrid(td)
@@ -532,7 +531,7 @@ trait GridOps extends ContainerOps {
       val cell = allRowCells(y)(x)
 
       // Decrement rowspan attribute
-      cell.originalRowspan -= 1
+      cell.underlyingRowspan -= 1
 
       // Insert new td
       val posyToInsertInto = y + cell.rowspan - 1

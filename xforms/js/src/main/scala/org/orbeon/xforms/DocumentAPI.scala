@@ -128,7 +128,15 @@ object DocumentAPI {
     dispatchEvent(targetId = control.id, eventName = "xforms-focus")
   }
 
-  // Whether the document is being reloaded
+  //noinspection AccessorLikeMethodIsEmptyParen
+  // https://github.com/orbeon/orbeon-forms/issues/3279
+  // Whether the form is being reloaded from the server
+  //
+  // This is used in two cases:
+  //
+  // - browser back/reload with `revisit-handling == 'reload'`
+  // - click reload on error panel
+  //
   def isReloading(): Boolean = Globals.isReloading
 
   // Return the current index of the repeat (equivalent to `index($repeatId)`)

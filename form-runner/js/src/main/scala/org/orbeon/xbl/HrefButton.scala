@@ -25,7 +25,7 @@ object HrefButton {
         $(containerElem).find("button").on("click", onClick _)
       }
 
-      def enabled  () = ()
+      def enabled() = ()
 
       private def onClick(): Unit = {
         val a = $(containerElem).find(".fr-href-button-anchor")

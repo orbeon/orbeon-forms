@@ -109,11 +109,6 @@ private object FormRunnerPersistenceProxy {
     // Get persistence implementation target URL and configuration headers
     val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
-    assert(
-      persistenceBaseURL ne null,
-      s"no base URL specified for requested persistence provider `${findProvider(app, form, formOrData).get}` (check properties)"
-    )
-
     val serviceURI = NetUtils.appendQueryString(
       dropTrailingSlash(persistenceBaseURL) + path,
       NetUtils.encodeQueryString(request.getParameterMap)

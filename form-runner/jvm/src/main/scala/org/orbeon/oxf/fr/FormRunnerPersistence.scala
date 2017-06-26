@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import java.net.URI
 
 import enumeratum._
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version._
@@ -106,7 +107,10 @@ object FormRunnerPersistence {
       } yield
         headerName → headerValue) toMap
 
-    (providerPropertyAsURL(provider, "uri"), headers)
+    val uri = Option(providerPropertyAsURL(provider, "uri")) getOrElse
+      (throw new OXFException(s"no base URL specified for requested persistence provider `$provider` (check properties)"))
+
+    (uri, headers)
   }
 
   def getPersistenceHeadersAsXML(app: String, form: String, formOrData: FormOrData): DocumentInfo = {

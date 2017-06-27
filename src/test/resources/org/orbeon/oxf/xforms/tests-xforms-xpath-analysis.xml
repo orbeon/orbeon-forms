@@ -7562,4 +7562,48 @@
         </output>
     </test>
 
+    <!-- Map functions don't support PathMap yet so this test is disabled as of 2017-06-28. -->
+    <test description="#3293: Map functions" name="oxf:java" exclude="true">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="main">
+                            <form>
+                                <number>42</number>
+                                <string>forty-two</string>
+                                <node>text</node>
+                                <sequence/>
+                            </form>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:var
+                        name="map"
+                        value="
+                            map:merge(
+                                (
+                                    map:entry('number',   number/xs:integer(.)),
+                                    map:entry('string',   string/string()),
+                                    map:entry('node',     node),
+                                    map:entry('sequence', 1 to 10)
+                                )
+                            )"/>
+
+                    <xf:var name="number"    value="map:get($map, 'number')"/>
+                    <xf:var name="string"    value="map:get($map, 'string')"/>
+                    <xf:var name="node-text" value="map:get($map, 'node')/string()"/>
+                    <xf:var name="sequence"  value="string-join(for $v in map:get($map, 'sequence') return string($v), ' ')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root/>
+        </output>
+    </test>
+
 </group>

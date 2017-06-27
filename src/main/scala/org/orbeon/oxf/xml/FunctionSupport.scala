@@ -65,8 +65,14 @@ abstract class FunctionSupport extends SystemFunction {
   def booleanArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[Boolean] =
     arguments.lift(i) map effectiveBooleanValue
 
+  def itemsArgument(i: Int)(implicit xpathContext: XPathContext): SequenceIterator =
+    arguments(i).iterate(xpathContext)
+
   def itemsArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[SequenceIterator] =
     arguments.lift(i) map (_.iterate(xpathContext))
+
+  def itemArgument(i: Int)(implicit xpathContext: XPathContext): Item =
+    itemsArgument(i).next()
 
   def itemArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[Item] =
     itemsArgumentOpt(i) map (_.next())

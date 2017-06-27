@@ -2922,4 +2922,65 @@
         </output>
     </test>
 
+    <test description="Map functions" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="results">
+                            <results>
+                                <number/>
+                                <string/>
+                                <node-name/>
+                                <sequence/>
+                            </results>
+                        </xf:instance>
+
+                        <xf:var
+                            name="map"
+                            value="
+                                map:merge(
+                                    (
+                                        map:entry('number',   42),
+                                        map:entry('string',   'forty-two'),
+                                        map:entry('node',     instance()),
+                                        map:entry('sequence', 1 to 10)
+                                    )
+                                )"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:setvalue ref="number"    value="map:get($map, 'number')"/>
+                            <xf:setvalue ref="string"    value="map:get($map, 'string')"/>
+                            <xf:setvalue ref="node-name" value="name(map:get($map, 'node'))"/>
+                            <xf:setvalue ref="sequence"  value="string-join(for $v in map:get($map, 'sequence') return string($v), ' ')"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="results" model-id="model">
+                                <results>
+                                    <number>42</number>
+                                    <string>forty-two</string>
+                                    <node-name>results</node-name>
+                                    <sequence>1 2 3 4 5 6 7 8 9 10</sequence>
+                                </results>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, XMLConstants}
 import org.orbeon.oxf.xforms.function.Last
 import org.orbeon.saxon.functions._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
@@ -35,6 +35,7 @@ object XFormsFunctionLibrary extends {
   val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
   val XXFormsIndependentFunctionsNS = Seq(XXFORMS_NAMESPACE_URI)
   val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
+  val MapFunctionsNS                = Seq(XMLConstants.XPATH_MAP_FUNCTIONS_NAMESPACE_URI)
   val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
   val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
   val tryXFormsDocument             = true
@@ -47,6 +48,7 @@ object XFormsFunctionLibrary extends {
   with XFormsDeprecatedFunctions
   with XXFormsIndependentFunctions
   with XXFormsEnvFunctions
+  with MapFunctions
   with EXFormsFunctions
   with XSLTFunctions {
 

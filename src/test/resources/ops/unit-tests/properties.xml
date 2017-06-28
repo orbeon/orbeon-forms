@@ -41,6 +41,7 @@
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                  value="orbeon admin user"/>
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.cities.*.form"              value="provider1"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider1.uri"                       value="/fr/service/provider1"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.provider1.city-uri"                  value="http://en.wikipedia.org/wiki/Mexico_City"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider1.city-name"                 value="Mexico City"/>
     <property as="xs:integer" name="oxf.fr.persistence.provider1.population"                value="8851080"/>

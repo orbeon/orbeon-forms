@@ -46,6 +46,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider1.city-name"                 value="Mexico City"/>
     <property as="xs:integer" name="oxf.fr.persistence.provider1.population"                value="8851080"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.cities.*.data"              value="provider2"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider2.uri"                       value="/fr/service/provider2"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.provider2.city-uri"                  value="http://en.wikipedia.org/wiki/S%C3%A3o_Paulo"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider2.city-name"                 value="São Paulo"/>
     <property as="xs:integer" name="oxf.fr.persistence.provider2.population"                value="11244369"/>

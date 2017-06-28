@@ -7311,8 +7311,8 @@
                         </xf:instance>
                         <xf:instance id="orbeon-resources" xxf:readonly="true">
                             <resources>
-                                <resource xml:lang="en"><buttons><download>Download</download></buttons></resource>
-                                <resource xml:lang="fr"><buttons><download>Télécharger</download></buttons></resource>
+                                <resource xml:lang="en"/>
+                                <resource xml:lang="fr"/>
                             </resources>
                         </xf:instance>
                     </xf:model>
@@ -7322,20 +7322,22 @@
                                 <xf:model id="model">
                                     <xf:instance id="fr-form-resources" xxf:readonly="true">
                                         <resources>
-                                            <resource xml:lang="en"><message>Hello!</message></resource>
-                                            <resource xml:lang="fr"><message>Bonjour!</message></resource>
+                                            <resource xml:lang="en"/>
+                                            <resource xml:lang="fr"/>
                                         </resources>
                                     </xf:instance>
                                 </xf:model>
                             </xbl:implementation>
                             <xbl:template>
-                                <xf:output id="my-output" value="xxf:r('message')"/>
+                                <xf:output id="my-output-1" value="xxf:r('foo.message')"/>
+                                <xf:output id="my-output-2" value="xxf:r('foo.42.alert.0')"/>
                             </xbl:template>
                         </xbl:binding>
                     </xbl:xbl>
                 </xh:head>
                 <xh:body>
-                    <xf:output id="my-output" value="xxf:r('buttons.download')"/>
+                    <xf:output id="my-output-1" value="xxf:r('bar.message')"/>
+                    <xf:output id="my-output-2" value="xxf:r('bar.10.alert.0')"/>
                     <fr:foo id="my-foo"/>
                 </xh:body>
             </xh:html>
@@ -7361,12 +7363,29 @@
                     <instance scope="" prefixed-id="fr-language-instance" model-prefixed-id="model" binding="false" value="false"/>
                     <instance scope="" prefixed-id="orbeon-resources" model-prefixed-id="model" binding="false" value="false"/>
                 </model>
-                <output scope="" prefixed-id="my-output" model-prefixed-id="model" binding="false" value="true">
+                <output scope="" prefixed-id="my-output-1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string((xxf:r('buttons.download'))[1])" analyzed="true">
+                        <analysis expression="string((xxf:r('bar.message'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('fr-language-instance')</path>
-                                <path>instance('orbeon-resources')/resource/buttons/download</path>
+                                <path>instance('orbeon-resources')/resource/bar/message</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-language-instance</instance>
+                                <instance>orbeon-resources</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-output-2" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:r('bar.10.alert.0'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-language-instance')</path>
+                                <path>instance('orbeon-resources')/resource/bar/alert</path>
                             </value-dependent>
                             <dependent-models>
                                 <model>model</model>
@@ -7383,12 +7402,12 @@
                         <instance scope="my-foo" prefixed-id="my-foo≡fr-form-resources" model-prefixed-id="my-foo≡model" binding="false" value="false"/>
                     </model>
                     <template scope="my-foo" prefixed-id="my-foo≡xf-4" model-prefixed-id="my-foo≡model" binding="false" value="false">
-                        <output scope="my-foo" prefixed-id="my-foo≡my-output" model-prefixed-id="my-foo≡model" binding="false" value="true">
+                        <output scope="my-foo" prefixed-id="my-foo≡my-output-1" model-prefixed-id="my-foo≡model" binding="false" value="true">
                             <value>
-                                <analysis expression="string((xxf:r('message'))[1])" analyzed="true">
+                                <analysis expression="string((xxf:r('foo.message'))[1])" analyzed="true">
                                     <value-dependent>
                                         <path>instance('fr-language-instance')</path>
-                                        <path>instance('my-foo≡fr-form-resources')/resource/message</path>
+                                        <path>instance('my-foo≡fr-form-resources')/resource/foo/message</path>
                                     </value-dependent>
                                     <dependent-models>
                                         <model>model</model>
@@ -7401,6 +7420,25 @@
                                 </analysis>
                             </value>
                         </output>
+                        <output scope="my-foo" prefixed-id="my-foo≡my-output-2" model-prefixed-id="my-foo≡model" binding="false" value="true">
+                           <value>
+                               <analysis expression="string((xxf:r('foo.42.alert.0'))[1])" analyzed="true">
+                                   <value-dependent>
+                                       <path>instance('fr-language-instance')</path>
+                                       <path>instance('my-foo≡fr-form-resources')/resource/foo/alert</path>
+                                   </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                        <model>my-foo≡model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>fr-language-instance</instance>
+                                        <instance>my-foo≡fr-form-resources</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
+                        </output>
+
                     </template>
                 </foo>
             </root>

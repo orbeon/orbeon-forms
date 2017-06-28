@@ -20,8 +20,8 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.util.XPath._
 import org.orbeon.oxf.util.XPathCache._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
-import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLParsing, XMLReceiver}
@@ -34,7 +34,6 @@ import org.orbeon.saxon.tinytree.TinyTree
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 
-import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection._
 import scala.xml.Elem
@@ -555,26 +554,6 @@ object XML {
       case Seq() ⇒ ""
       case Seq(nodeInfo, _*) ⇒ nodeInfo.getStringValue
     }
-  }
-
-  // Hand-made simple path search
-  // - path *must* have the form "foo/bar/baz"
-  // - each path element must be a NCName (non-qualified)
-  // - as in XPath, non-qualified names mean "in no namespace"
-  def path(context: NodeInfo, path: String) = {
-
-    @tailrec def findChild(parent: Option[NodeInfo], tokens: List[String]): Option[NodeInfo] =
-      if (tokens.isEmpty)
-        parent
-      else
-        parent match {
-          case Some(p) ⇒ findChild(p child ("" → tokens.head) headOption, tokens.tail)
-          case None    ⇒ None
-        }
-
-    val tokens = path.splitTo[List]("/")
-
-    findChild(Some(context), tokens)
   }
 
   // Convert a Java object to a Saxon Item using the Saxon API

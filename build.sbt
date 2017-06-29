@@ -533,10 +533,9 @@ lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
 
 
 lazy val xformsJVM = xforms.jvm
-  .dependsOn(commonJVM)
+  .dependsOn(commonJVM, core % "test->test;compile->compile")
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
-  .settings(commonSettings: _*)
   .settings(
 
     // Because `Assets` doesn't check the `shared` directory

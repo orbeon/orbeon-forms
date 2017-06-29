@@ -30,7 +30,7 @@ class XFormsIdTest extends FunSpec {
     )
 
     for ((s, xformsId) ← expected)
-      it(s"must pass for $s") {
+      it(s"must pass for `$s`") {
         assert(xformsId === XFormsId.fromEffectiveId(s))
       }
 

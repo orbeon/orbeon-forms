@@ -22,8 +22,8 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.js.uri.orbeon.builder">
-        /forms/orbeon/builder/resources/cell/events.js
-        /forms/orbeon/builder/resources/cell/action-icons.js
+        /forms/orbeon/builder/resources/cell/events.min.js
+        /forms/orbeon/builder/resources/cell/action-icons.min.js
         /forms/orbeon/builder/resources/cell/placeholders.min.js
 
         /forms/orbeon/builder/resources/cell/control-resources-editor/actions.min.js

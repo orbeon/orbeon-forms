@@ -492,6 +492,16 @@
                                             fbf:deleteCellContent($td, true())
                                         </xf:action>
                                     </xf:trigger>
+                                    <!-- Copy/move -->
+                                    <!-- draggable: for accessibility, and also used to add to add this ot the list of "triggers" -->
+                                    <!-- class/id: we would only want to have a `class`, but `action-icons.coffee` uses the `id` -->
+                                    <xh:img
+                                        id="fb-control-handle"
+                                        class="fb-control-handle"
+                                        draggable="true"
+                                        src="/apps/fr/style/images/silk/anchor.png"
+                                        alt="{$fb-resources/delete-control-icon/label}"
+                                        title="{$fb-resources/delete-control-icon/label}"/>
                                 </xh:span>
                                 <xh:span class="fb-grid-control-icons">
                                     <!-- Edit details for any control -->

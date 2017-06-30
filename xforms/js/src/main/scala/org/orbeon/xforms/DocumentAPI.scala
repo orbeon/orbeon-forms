@@ -39,7 +39,8 @@ object DocumentAPI {
     bubbles      : js.UndefOr[Boolean]      = js.undefined,
     cancelable   : js.UndefOr[Boolean]      = js.undefined,
     incremental  : js.UndefOr[Boolean]      = js.undefined,
-    ignoreErrors : js.UndefOr[Boolean]      = js.undefined
+    ignoreErrors : js.UndefOr[Boolean]      = js.undefined,
+    properties   : js.UndefOr[js.Object]    = js.undefined
   ): Unit = {
 
     val eventObject  = new js.Object
@@ -53,6 +54,7 @@ object DocumentAPI {
     cancelable   foreach (eventDynamic.cancelable   = _)
     incremental  foreach (eventDynamic.incremental  = _)
     ignoreErrors foreach (eventDynamic.ignoreErrors = _)
+    properties   foreach (eventDynamic.properties   = _)
 
     dispatchEvent(eventObject)
   }

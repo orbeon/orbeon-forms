@@ -27,6 +27,7 @@ object FormBuilderApp extends JSApp {
       FormRunnerApp.main()
       StaticUpload
       DialogItemset
+      ControlDnD
     }
 
     $(initializeOnDomReady _)

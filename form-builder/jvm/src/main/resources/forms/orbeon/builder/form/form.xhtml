@@ -487,7 +487,11 @@
                                     </xf:trigger>
                                     <!-- Delete control -->
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-delete-trigger">
-                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
+                                        <xf:label>
+                                            <xh:i
+                                                class="icon-minus-sign"
+                                                title="{$fb-resources/delete-control-icon/label}"/>
+                                        </xf:label>
                                         <xf:action ev:event="DOMActivate" type="xpath">
                                             fbf:deleteCellContent($td, true())
                                         </xf:action>
@@ -495,12 +499,10 @@
                                     <!-- Copy/move -->
                                     <!-- draggable: for accessibility, and also used to add to add this ot the list of "triggers" -->
                                     <!-- class/id: we would only want to have a `class`, but `action-icons.coffee` uses the `id` -->
-                                    <xh:img
+                                    <xh:i
                                         id="fb-control-handle"
-                                        class="fb-control-handle"
+                                        class="fb-control-handle icon-move"
                                         draggable="true"
-                                        src="/apps/fr/style/images/silk/anchor.png"
-                                        alt="{$fb-resources/delete-control-icon/label}"
                                         title="{$fb-resources/delete-control-icon/label}"/>
                                 </xh:span>
                                 <xh:span class="fb-grid-control-icons">

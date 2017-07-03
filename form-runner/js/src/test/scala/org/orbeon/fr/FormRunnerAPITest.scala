@@ -18,7 +18,7 @@ import org.scalajs.dom
 import org.scalatest.FunSpec
 
 
-class APITest extends FunSpec {
+class FormRunnerAPITest extends FunSpec {
 
   describe("the `findControlsByName` function") {
 
@@ -183,14 +183,14 @@ class APITest extends FunSpec {
 
     for (control ← controls)
       it(s"must find the `$control` control in the first form but not the second form") {
-        assert(API.findControlsByName(control).nonEmpty)
-        assert(API.findControlsByName(control, form1).nonEmpty)
-        assert(API.findControlsByName(control, form2).isEmpty)
+        assert(FormRunnerAPI.findControlsByName(control).nonEmpty)
+        assert(FormRunnerAPI.findControlsByName(control, form1).nonEmpty)
+        assert(FormRunnerAPI.findControlsByName(control, form2).isEmpty)
       }
 
     it("must find the correct iterations for the `name` controls") {
       assert(
-        List(List(1), List(2)) === (API.findControlsByName("name").to[List] map (e ⇒ XFormsId.fromEffectiveId(e.id).iterations))
+        List(List(1), List(2)) === (FormRunnerAPI.findControlsByName("name").to[List] map (e ⇒ XFormsId.fromEffectiveId(e.id).iterations))
       )
     }
   }

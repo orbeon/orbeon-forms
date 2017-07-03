@@ -23,7 +23,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.fr.API")
 @JSExportAll
-object API {
+object FormRunnerAPI {
 
   def findControlsByName(
     name     : String,

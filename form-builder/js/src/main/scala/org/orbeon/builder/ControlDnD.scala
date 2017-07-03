@@ -15,11 +15,12 @@ package org.orbeon.builder
 
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms.{$, DocumentAPI}
+import org.scalajs.dom.document
 import org.scalajs.dom.html.Element
+import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
-import org.scalajs.dom.document
-import org.scalajs.jquery.JQueryEventObject
 
 object ControlDnD {
 
@@ -40,6 +41,9 @@ object ControlDnD {
         // Can only drop into an empty cell
         ! $(target).is(":has(.fr-grid-content > *)")
       }
+      override def mirrorContainer: HTMLElement =
+        // Create the mirror inside the first container, so the proper CSS applies to the mirror
+        $(".fr-body .fr-grid-td").get(0).asInstanceOf[HTMLElement]
     }
   )
 

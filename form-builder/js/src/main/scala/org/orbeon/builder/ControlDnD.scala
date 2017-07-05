@@ -39,7 +39,10 @@ object ControlDnD {
         handle.classList.contains("fb-control-handle")
       override def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean = {
         // Can only drop into an empty cell
-        ! $(target).is(":has(.fr-grid-content > *)")
+        $(target)
+          .find("> .fb-hover:not(.gu-mirror) > .fr-grid-content > *, " +
+                "> .fr-grid-content > *")
+          .length == 0
       }
       override def mirrorContainer: HTMLElement =
         // Create the mirror inside the first container, so the proper CSS applies to the mirror

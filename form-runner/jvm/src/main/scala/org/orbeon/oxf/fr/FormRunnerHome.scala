@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringReplacer._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._

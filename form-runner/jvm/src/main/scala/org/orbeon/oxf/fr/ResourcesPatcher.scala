@@ -18,11 +18,11 @@ import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{Dom4j, TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.util.StringUtils._
 
 // Processor to replace or add resources based on properties
 //

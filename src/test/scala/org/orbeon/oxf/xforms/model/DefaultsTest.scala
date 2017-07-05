@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.dom.QName
 import org.junit.Test
+import org.orbeon.dom.QName
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.scaxon.XML._
@@ -64,7 +65,7 @@ class DefaultsTest extends DocumentTestBase with XFormsSupport with AssertionsFo
       def insertOne(requireDefaultValues: Boolean) =
         insert(
           after                = instance.rootElement / "value",
-          origin               = elementInfo(QName.get("value")),
+          origin               = NodeInfoFactory.elementInfo(QName.get("value")),
           requireDefaultValues = requireDefaultValues
         )
 

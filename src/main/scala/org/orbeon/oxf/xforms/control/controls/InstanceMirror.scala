@@ -107,7 +107,7 @@ object InstanceMirror {
 
     val findInstanceExpr = "(" + axis + "::xf:instance)[1]"
 
-    Option(evalOne(outerNode, findInstanceExpr)) collect {
+    Option(evalOne(outerNode, findInstanceExpr, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING)) collect {
       case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
 
         val element = instanceWrapper.getUnderlyingNode.asInstanceOf[Element]
@@ -183,7 +183,7 @@ object InstanceMirror {
                 innerPathElems mkString ("/", "/", "")
               }
 
-              evalOne(innerInstance.documentInfo, innerPath, NamespaceMapping.EMPTY_MAPPING) match {
+              evalOne(innerInstance.documentInfo, innerPath) match {
                 case newNode: VirtualNode ⇒ Some(innerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
               }
@@ -215,8 +215,12 @@ object InstanceMirror {
 
       // Find instance in original doc
       // could write:(id($sourceId)[self::xf:instance], //xf:instance[@id = $sourceId])[1]
-      evalOne(outerDoc, "//xf:instance[@id = $sourceId]",
-          variables = Map("sourceId" → StringValue.makeStringValue(innerInstance.getId))) match {
+      evalOne(
+        item       = outerDoc,
+        expr       = "//xf:instance[@id = $sourceId]",
+        namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+        variables  = Map("sourceId" → StringValue.makeStringValue(innerInstance.getId))
+      ) match {
         case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
           // Outer xf:instance found
           innerNode match {
@@ -229,7 +233,7 @@ object InstanceMirror {
               val path = getNodePath(innerNode, siblingIndexOpt) mkString "/"
 
               // Find destination node in inline instance in original doc
-              evalOne(instanceWrapper, path, NamespaceMapping.EMPTY_MAPPING) match {
+              evalOne(instanceWrapper, path) match {
                 case newNode: VirtualNode ⇒ Some(outerInstance, newNode)
                 case _                    ⇒ throw new IllegalStateException
               }
@@ -256,7 +260,7 @@ object InstanceMirror {
         Some(outerInstance, outerNode)
       else {
         // Apply path to find node in outer instance
-        Option(evalOne(outerNode, relativePath, NamespaceMapping.EMPTY_MAPPING)) collect {
+        Option(evalOne(outerNode, relativePath)) collect {
           case newNode: NodeInfo ⇒ outerInstance → newNode
         }
       }

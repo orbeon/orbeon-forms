@@ -19,12 +19,13 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
 import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
+import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMediatypesValidation, ValidationFunction}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
@@ -254,7 +255,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // Insert validation attribute as needed
     newAlertElements zip alertsWithResources foreach {
       case (e, AlertDetails(Some(forValidationId), _, _)) ⇒
-        insert(into = e, origin = attributeInfo(VALIDATION_QNAME, forValidationId))
+        insert(into = e, origin = NodeInfoFactory.attributeInfo(VALIDATION_QNAME, forValidationId))
       case _ ⇒ // no attributes to insert if this is not an alert linked to a validation
     }
 

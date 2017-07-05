@@ -35,6 +35,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.oxf.xforms.submission.RelevanceHandling._
@@ -42,7 +43,6 @@ import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsin
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
-
 
 /**
  * The persistence proxy processor:

@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind}
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
@@ -212,7 +212,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       } foreach { e ⇒
         XFormsAPI.insert(
           into   = e,
-          origin = attributeInfo(ItemsetIdQName, map(e.localname))
+          origin = NodeInfoFactory.attributeInfo(ItemsetIdQName, map(e.localname))
         )
       }
 

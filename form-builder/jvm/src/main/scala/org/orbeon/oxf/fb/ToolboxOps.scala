@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunnerLang, FormRunnerResourcesOps}
+import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo

@@ -14,6 +14,7 @@
 package org.orbeon.scaxon
 
 import org.junit.Test
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
@@ -41,9 +42,9 @@ class XMLTest extends AssertionsForJUnit {
   @Test def implicitStringToQName(): Unit = { // NOTE: This was called stringToQName and started failing with 2.10 (https://issues.scala-lang.org/browse/SI-4270)
     // stringToQName must not accept a qualified name
     intercept[AssertionError] {
-      attributeInfo("foo:bar", "")
+      NodeInfoFactory.attributeInfo("foo:bar", "")
     }
 
-    attributeInfo("bar", "")
+    NodeInfoFactory.attributeInfo("bar", "")
   }
 }

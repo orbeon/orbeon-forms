@@ -16,9 +16,11 @@ package org.orbeon.oxf.xforms.action
 import java.util.{List ⇒ JList}
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{DynamicVariable, NetUtils}
+import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.actions._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
@@ -28,7 +30,6 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
@@ -173,7 +174,7 @@ object XFormsAPI {
       val newNodeInfo = nodeInfo.getNodeKind match {
         case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
         case ATTRIBUTE_NODE ⇒ attributeInfo(newName, nodeInfo.stringValue)
-        case _ ⇒ throw new IllegalArgumentException
+        case _              ⇒ throw new IllegalArgumentException
       }
 
       val result = insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo).head

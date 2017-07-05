@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.xforms.NodeInfoFactory.attributeInfo
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
-import org.orbeon.scaxon.XML
-
 /**
  * xf:attribute()
  */
@@ -28,6 +27,6 @@ class XFormsAttribute extends XFormsFunction {
     val value = argument.lift(1) flatMap (e ⇒ Option(e.evaluateItem(xpathContext))) map (_.getStringValue) getOrElse ""
 
     // Create and wrap the attribute
-    XML.attributeInfo(qName, value)
+    attributeInfo(qName, value)
   }
 }

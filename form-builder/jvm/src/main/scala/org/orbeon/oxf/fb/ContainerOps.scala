@@ -17,10 +17,11 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
@@ -32,7 +33,7 @@ trait ContainerOps extends ControlOps {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
     // XFormsUtils.getStaticIdFromId every time)
     val staticId = XFormsUtils.getStaticIdFromId(containerId)
-    findInViewTryIndex(fbFormInstance, staticId) filter IsContainer head
+    findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer head
   }
 
   def controlsInContainer(containerId: String): Int = (containerById(containerId) \\ "*:td" \ *).length
@@ -361,7 +362,7 @@ trait ContainerOps extends ControlOps {
       // Handle non-standard cases, see https://github.com/orbeon/orbeon-forms/issues/2470
       def fromNonStandardRef =
         bind attValueOpt "ref" match {
-          case Some(AttributeRe(att)) ⇒ Some(Some(attributeInfo(att)))
+          case Some(AttributeRe(att)) ⇒ Some(Some(NodeInfoFactory.attributeInfo(att)))
           case Some(".")              ⇒ Some(None)
           case _                      ⇒ None
         }

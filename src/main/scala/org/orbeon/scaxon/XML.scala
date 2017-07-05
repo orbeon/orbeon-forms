@@ -19,10 +19,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.util.XPath._
 import org.orbeon.oxf.util.XPathCache._
-import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.saxon.`type`.Type
@@ -44,16 +40,11 @@ object XML {
     require(Name10Checker.getInstance.isValidNCName(localName))
   }
 
-  // This should ideally not be global. Tried 2013-11-14 to use DocumentWrapper.makeWrapper instead, see
-  // 2263a3f7b9565fa2102a7cc56ecb007a5c881312 and 0d7bc1fda0a121b2c107adc15a92cba67a09984f, but this is not good
-  // enough as NodeWrapper does need a Configuration to operate properly. So for now we keep this wrapper.
-  private val Wrapper = new DocumentWrapper(DocumentFactory.createDocument, null, XPath.GlobalConfiguration)
-
   // Convenience methods for the XPath API
   def evalOne(
       item            : Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = BASIC_NAMESPACE_MAPPING,
+      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
       variables       : Map[String, ValueRepresentation] = null,
       reporter        : Reporter                         = null,
       functionContext : FunctionContext                  = null)(
@@ -77,7 +68,7 @@ object XML {
   def eval(
       item            : Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = BASIC_NAMESPACE_MAPPING,
+      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
       variables       : Map[String, ValueRepresentation] = null,
       reporter        : Reporter                         = null,
       functionContext : FunctionContext                  = null)(
@@ -97,7 +88,7 @@ object XML {
   def evalValueTemplate(
       item            : Item,
       expr            : String,
-      namespaces      : NamespaceMapping                 = BASIC_NAMESPACE_MAPPING,
+      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
       variables       : Map[String, ValueRepresentation] = null,
       reporter        : Reporter                         = null,
       functionContext : FunctionContext                  = null)(
@@ -132,17 +123,8 @@ object XML {
 
   // Element and attribute creation
   def element(name: QName): Element = DocumentFactory.createElement(name)
-  def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
-    val newElement = Wrapper.wrap(element(qName))
-    insert(into = Seq(newElement), origin = content)
-    newElement
-  }
-
   def attribute(name: QName, value: String = ""): Attribute = DocumentFactory.createAttribute(null, name, value)
-  def attributeInfo(name: QName, value: String = ""): NodeInfo = Wrapper.wrap(attribute(name, value))
-
   def namespace(prefix: String, uri: String): Namespace = Namespace(prefix, uri)
-  def namespaceInfo(prefix: String, uri: String): NodeInfo = Wrapper.wrap(namespace(prefix, uri))
 
   // Parse the given qualified name and return the separated prefix and local name
   def parseQName(lexicalQName: String): (String, String) = {
@@ -475,12 +457,6 @@ object XML {
 
     def stringValue = nodeInfo.getStringValue
 
-    // Intended to be used for debugging
-    def serializeToString: String = {
-      val dom4jNode = XFormsUtils.getNodeFromNodeInfoConvert(nodeInfo)
-      Dom4jUtils.nodeToString(dom4jNode)
-    }
-
     def hasIdValue(id: String) = nodeInfo /@ "id" === id
 
     private def find(axisNumber: Byte, test: Test): Seq[NodeInfo] = {
@@ -570,8 +546,6 @@ object XML {
   // Other implicits
   implicit def itemToItemSeq(item: Item): Seq[Item] = Seq(item)
   implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = if (node ne null) Seq(node) else Seq()// TODO: don't take null
-
-  implicit def instanceToNodeInfo(instance: XFormsInstance): NodeInfo = instance.rootElement
 
   implicit def itemSeqToString(items: Seq[Item]): String = itemSeqToStringOption(items).orNull // TODO: don't return null
   implicit def itemSeqToItemOption(items: Seq[Item]): Option[Item] = items.headOption

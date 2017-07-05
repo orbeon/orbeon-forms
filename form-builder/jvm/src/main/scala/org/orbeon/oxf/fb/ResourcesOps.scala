@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._

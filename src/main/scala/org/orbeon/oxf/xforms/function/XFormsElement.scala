@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, Item}
-import org.orbeon.scaxon.XML
 import org.orbeon.scaxon.XML._
 
 /**
@@ -29,6 +29,6 @@ class XFormsElement extends XFormsFunction {
     val qName   = argument.lift(0) map (getQNameFromExpression(_)(xpathContext)) get
     val content = argument.lift(1) map (_.iterate(xpathContext)) getOrElse EmptyIterator.getInstance
 
-    XML.elementInfo(qName, asScalaIterator(content).toList)
+    elementInfo(qName, asScalaIterator(content).toList)
   }
 }

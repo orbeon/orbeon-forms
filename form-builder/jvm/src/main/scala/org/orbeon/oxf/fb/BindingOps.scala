@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._

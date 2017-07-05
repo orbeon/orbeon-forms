@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging, SecureUtils}
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsUtils}
 import org.orbeon.oxf.{util ⇒ u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
@@ -308,6 +308,7 @@ trait ProcessInterpreter extends Logging {
     evalOne(
       item            = item,
       expr            = expr,
+      namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
       functionContext = xpathFunctionContext
     )
 
@@ -318,6 +319,7 @@ trait ProcessInterpreter extends Logging {
       evalValueTemplate(
         item            = xpathContext,
         expr            = valueTemplate,
+        namespaces      = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
         functionContext = xpathFunctionContext
       )
 }

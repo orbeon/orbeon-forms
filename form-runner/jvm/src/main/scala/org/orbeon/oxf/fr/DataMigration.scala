@@ -17,6 +17,8 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{DocumentInfo, Name10Checker, NodeInfo, VirtualNode}
@@ -105,7 +107,7 @@ object DataMigration {
     // Add data format version attribute on root element
     insert(
       into       = databaseData / *,
-      origin     = attributeInfo(XMLNames.DataFormatVersionQName, dstDataFormatVersion),
+      origin     = NodeInfoFactory.attributeInfo(XMLNames.DataFormatVersionQName, dstDataFormatVersion),
       doDispatch = false
     )
 
@@ -241,7 +243,7 @@ object DataMigration {
             (path.init map (_.value) mkString "/", path.last.value)
 
           // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
-          val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes) collect {
+          val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
             case node: NodeInfo ⇒ node
           }
 

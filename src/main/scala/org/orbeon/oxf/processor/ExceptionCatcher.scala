@@ -17,10 +17,11 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.ExceptionGenerator
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, SAXStore}
 import org.orbeon.oxf.util.XPath
-import org.orbeon.scaxon.XML
+import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.scaxon.XML
+
 import scala.util.control.NonFatal
 
 /**

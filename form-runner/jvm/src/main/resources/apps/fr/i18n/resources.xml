@@ -1960,7 +1960,7 @@
                 <section-name>Abschnittsname</section-name>
                 <yes>Ja</yes>
                 <no>Nein</no>
-                <other todo="true">[Other]</other>
+                <other>Andere</other>
             </labels>
             <grid>
                 <insert-above>Darüber einfügen</insert-above>

@@ -36,7 +36,13 @@ trait FormRunnerHome {
 
   private case class AvailableAndTime(available: Boolean, time: Long)
 
-  private case class Form(app: String, form: String, local: Option[AvailableAndTime], remote: Option[AvailableAndTime], ops: Set[String]) {
+  private case class Form(
+    app    : String,
+    form   : String,
+    local  : Option[AvailableAndTime],
+    remote : Option[AvailableAndTime],
+    ops    : Set[String]
+  ) {
 
     import Form._
 
@@ -72,7 +78,7 @@ trait FormRunnerHome {
         form elemValue "form-name",
         localTime  map (v ⇒ AvailableAndTime((form elemValue "available")        != "false", DateUtils.parseISODateOrDateTime(v))),
         remoteTime map (v ⇒ AvailableAndTime((form elemValue "remote-available") != "false", DateUtils.parseISODateOrDateTime(v))),
-        stringToSet(form /@ "operations")
+        form attTokens "operations"
       )
     }
   }
@@ -227,7 +233,7 @@ trait FormRunnerHome {
       def remoteElements(remoteNode: NodeInfo) = {
 
         def remoteElement(name: String) =
-          elementInfo("remote-" + name, stringToStringValue(remoteNode elemValue name))
+          elementInfo("remote-" + name, List(stringToStringValue(remoteNode elemValue name)))
 
         List(
           remoteElement("title"),

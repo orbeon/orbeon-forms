@@ -312,8 +312,8 @@ object XML {
     def child(test: Test) = /(test)
     def descendant(test: Test) = \\(test)
 
-    def attValue(attName: String) = /@(attName).stringValue
-    def attValue(attName: QName)  = /@(attName).stringValue
+    def attValue(attName: String)  = /@(attName).stringValue
+    def attValue(attName: QName)   = /@(attName).stringValue
     def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
     def attTokens(attName: QName)  = stringOptionToSet(Some(attValue(attName)))
     def attClasses = attTokens("class")
@@ -524,6 +524,9 @@ object XML {
       case Seq() ⇒ ""
       case Seq(nodeInfo, _*) ⇒ nodeInfo.getStringValue
     }
+
+    def effectiveBooleanValue: Boolean =
+      XML.effectiveBooleanValue(new ListIterator(seq.asJava))
   }
 
   // Convert a Java object to a Saxon Item using the Saxon API
@@ -536,21 +539,6 @@ object XML {
     case i: Item ⇒ i
     case a       ⇒ anyToItem(a)
   }
-
-  // Other implicits
-  implicit def itemToItemSeq(item: Item): Seq[Item] = Seq(item)
-  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = if (node ne null) Seq(node) else Seq()// TODO: don't take null
-
-  implicit def itemSeqToString(items: Seq[Item]): String = itemSeqToStringOption(items).orNull // TODO: don't return null
-  implicit def itemSeqToItemOption(items: Seq[Item]): Option[Item] = items.headOption
-
-  implicit def itemSeqToStringOption(items: Seq[Item]): Option[String] =
-    items.headOption map (_.getStringValue)
-
-  implicit def itemSeqToBoolean(items: Seq[Item]): Boolean =
-    effectiveBooleanValue(new ListIterator(items.asJava))
-
-  implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 
   def unsafeUnwrapElement(nodeInfo: NodeInfo): Element =
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
@@ -576,6 +564,10 @@ object XML {
   def nodeInfoToElem(nodeInfo: NodeInfo): Elem =
     scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))
 
+  // Other implicit conversions
+  // 2017-07-06: This is in use.
+  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = List(node ensuring (node ne null))
+
   implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) / * head
   implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) / *
   implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToDocumentInfo(e) / * head
@@ -589,7 +581,8 @@ object XML {
   implicit def stringToQName(s: String): QName = QName.get(s ensuring ! s.contains(':'))
   implicit def tupleToQName(name: (String, String)): QName = QName.get(name._2, "", name._1)
   implicit def uriQualifiedNameToQName(uriQualifiedName: URIQualifiedName): QName = QName.get(uriQualifiedName.localName, "", uriQualifiedName.uri)
-  def stringToStringValue(s: String) = StringValue.makeStringValue(s)
+
+  def stringToStringValue(s: String): StringValue = StringValue.makeStringValue(s)
 
   implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
 

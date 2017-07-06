@@ -25,14 +25,15 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   import Private._
 
-  def isFBBody(node: NodeInfo) = (node self XFGroupTest) && node.attClasses("fb-body")
+  def isFBBody(node: NodeInfo): Boolean =
+    (node self XFGroupTest effectiveBooleanValue) && node.attClasses("fb-body")
 
   val RepeatContentToken       = "content"
   val LegacyRepeatContentToken = "true"
 
   // Predicates
-  val IsGrid:    NodeInfo ⇒ Boolean = _ self FRGridTest
-  val IsSection: NodeInfo ⇒ Boolean = _ self FRSectionTest
+  val IsGrid:    NodeInfo ⇒ Boolean = _ self FRGridTest    effectiveBooleanValue
+  val IsSection: NodeInfo ⇒ Boolean = _ self FRSectionTest effectiveBooleanValue
 
   def isRepeatable(node: NodeInfo) =
     IsGrid(node) || IsSection(node)
@@ -58,7 +59,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     IsSection(node) || isRepeat(node)
 
   val IsContainer: NodeInfo ⇒ Boolean =
-    node ⇒ (node self FRContainerTest) || isFBBody(node)
+    node ⇒ (node self FRContainerTest effectiveBooleanValue) || isFBBody(node)
 
   def controlRequiresNestedIterationElement(node: NodeInfo) =
     isRepeat(node)

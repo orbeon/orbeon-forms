@@ -51,7 +51,7 @@ object ResourcesPatcher {
 
   def transform(resourcesDocument: Document, app: String, form: String)(implicit properties: PropertySet): Unit = {
 
-    val resourcesElement = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration) \ *
+    val resourcesElement = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement
 
     val propertyNames = properties.propertiesStartsWith("oxf.fr.resource" :: app :: form :: Nil mkString ".")
 

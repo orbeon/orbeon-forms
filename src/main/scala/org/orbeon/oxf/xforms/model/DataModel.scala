@@ -53,7 +53,7 @@ object DataModel {
   def isAllowedValueBoundItem(item: Item) = item match {
     case _: AtomicValue                                                                     ⇒ true
     case node: NodeInfo if node.isAttribute || node.isElement && node.supportsSimpleContent ⇒ true
-    case node: NodeInfo if node self (Text || PI || Comment)                                ⇒ true
+    case node: NodeInfo if node self (Text || PI || Comment) effectiveBooleanValue          ⇒ true
     case _                                                                                  ⇒ false
   }
 

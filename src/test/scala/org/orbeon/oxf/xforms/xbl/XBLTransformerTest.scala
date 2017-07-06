@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.junit.Test
 import org.orbeon.oxf.test.XMLSupport
+import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.junit.AssertionsForJUnit
 
 class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
@@ -41,8 +42,6 @@ class XBLTransformerTest extends AssertionsForJUnit with XMLSupport {
   }
 
   @Test def testIssue2519(): Unit = {
-
-    import org.orbeon.scaxon.XML._
 
     val data = List(
       (<bound bar="baz"/>, <root><elem xbl:attr="bar"     bar="default" xmlns:xbl="http://www.w3.org/ns/xbl"/></root>, <root><elem bar="baz"/></root>),

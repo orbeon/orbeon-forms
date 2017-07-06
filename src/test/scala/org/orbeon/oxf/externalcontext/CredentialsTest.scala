@@ -16,9 +16,9 @@ package org.orbeon.oxf.externalcontext
 import org.orbeon.oxf.externalcontext.Credentials._
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.FunSpec
 import spray.json.DeserializationException
-
 
 class CredentialsTest extends FunSpec with XMLSupport {
 

@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.function.xxforms.{UploadMediatypesValidation, Valid
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 import scala.{xml ⇒ sx}

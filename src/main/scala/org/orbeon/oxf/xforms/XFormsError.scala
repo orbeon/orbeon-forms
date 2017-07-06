@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.trans.XPathException
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._

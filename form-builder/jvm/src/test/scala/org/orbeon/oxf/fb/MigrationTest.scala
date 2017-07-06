@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 import org.scalatest.FunSpecLike
 

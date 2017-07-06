@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 import scala.annotation.tailrec

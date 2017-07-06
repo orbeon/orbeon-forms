@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.XPath
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 trait FormBuilderPermissionsOps {

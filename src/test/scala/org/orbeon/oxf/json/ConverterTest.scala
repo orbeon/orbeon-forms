@@ -28,7 +28,7 @@ import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.oxf.xml.{Dom4j, SAXStore, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.FunSpecLike
 import spray.json._
 
@@ -36,8 +36,6 @@ import scala.language.postfixOps
 import scala.xml.Elem
 
 object ConverterTest {
-
-  import XML._
 
   // Examples from the XForms 2.0 spec
   val XFormsJsonToXml = List[(String, Elem)](

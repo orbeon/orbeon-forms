@@ -549,42 +549,26 @@ object XML {
   def unsafeUnwrapAttribute(nodeInfo: NodeInfo): Attribute =
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Attribute]
 
-  def elemToSAX(e: Elem, xmlReceiver: XMLReceiver) =
-    XMLParsing.stringToSAX(e.toString, "", xmlReceiver, XMLParsing.ParserConfiguration.PLAIN, true)
-
-  def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
-  def elemToDom4jElem(e: Elem): Element = Dom4jUtils.readDom4j(e.toString).getRootElement
-
-  def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
-    if (readonly)
-      TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, e.toString, false, false)
-    else
-      new DocumentWrapper(elemToDom4j(e), null, XPath.GlobalConfiguration)
-
-  def nodeInfoToElem(nodeInfo: NodeInfo): Elem =
-    scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))
+  def stringToStringValue(s: String): StringValue = StringValue.makeStringValue(s)
 
   // Other implicit conversions
   // 2017-07-06: This is in use.
   implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = List(node ensuring (node ne null))
 
-  implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) / * head
-  implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) / *
-  implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToDocumentInfo(e) / * head
-  implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) / *
-
+  // 2017-07-06: This is in use.
   implicit def stringSeqToSequenceIterator(seq: Seq[String]): SequenceIterator =
     new ListIterator(seq map stringToStringValue asJava)
 
-  implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
+  // 2017-07-06: This is in use.
+  implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator =
+    new ListIterator(seq.asJava)
 
+  // 2017-07-06: This is in use.
   implicit def stringToQName(s: String): QName = QName.get(s ensuring ! s.contains(':'))
   implicit def tupleToQName(name: (String, String)): QName = QName.get(name._2, "", name._1)
   implicit def uriQualifiedNameToQName(uriQualifiedName: URIQualifiedName): QName = QName.get(uriQualifiedName.localName, "", uriQualifiedName.uri)
 
-  def stringToStringValue(s: String): StringValue = StringValue.makeStringValue(s)
-
-  implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
+//  implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
 
   implicit def asStringSequenceIterator(i: Iterator[String]): SequenceIterator =
     asSequenceIterator(i map stringToStringValue)

@@ -3,9 +3,8 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexedControl
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.FunSpecLike
-
 
 class IndexTest
   extends DocumentTestBase

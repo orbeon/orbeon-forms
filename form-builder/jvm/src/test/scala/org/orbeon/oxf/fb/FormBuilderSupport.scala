@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.NodeConversions
 
 trait FormBuilderSupport extends XFormsSupport {
 
@@ -48,8 +49,8 @@ trait FormBuilderSupport extends XFormsSupport {
   def prettyPrintElem(elem: NodeInfo): Unit =
     println(Dom4jUtils.domToPrettyString(TransformerUtils.tinyTreeToDom4j(elem)))
 
-  private def formBuilderDoc(url: String) =
-    elemToDom4j(
+  private def formBuilderDoc(url: String): Document =
+    NodeConversions.elemToDom4j(
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"

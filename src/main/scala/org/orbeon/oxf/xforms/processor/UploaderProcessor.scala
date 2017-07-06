@@ -23,7 +23,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.NodeConversions
 
 class UploaderProcessor extends ProcessorImpl {
   override def createOutput(name: String) =
@@ -67,12 +67,12 @@ class UploaderProcessor extends ProcessorImpl {
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                   <xxf:action>
                     <xxf:server-events delay="0">{
-                      XFormsUtils.encodeXML(XML.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)
+                      XFormsUtils.encodeXML(NodeConversions.elemToDom4j(serverEvents), XFormsProperties.isGZIPState, true, false)
                     }</xxf:server-events>
                   </xxf:action>
                 </xxf:event-response>
 
-              XML.elemToSAX(response, xmlReceiver)
+              NodeConversions.elemToSAX(response, xmlReceiver)
 
             case (nameValues, someThrowable @ Some(_)) ⇒
               // NOTE: There is no point sending a response, see:

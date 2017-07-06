@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 import org.scalatest.FunSpecLike
 

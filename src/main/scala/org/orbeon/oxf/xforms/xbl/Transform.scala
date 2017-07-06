@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor, Pip
 import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.NodeConversions
 
 object Transform {
 
@@ -29,7 +29,7 @@ object Transform {
   def createTransformConfig(transformQName: QName, transform: Element, lastModified: Long) = {
     // Create reusable pipeline config
     val pipelineConfig = {
-      val pipeline = XML.elemToDom4j(
+      val pipeline = NodeConversions.elemToDom4j(
         <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
               xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -92,7 +92,7 @@ object Transform {
   private def createXSLTPipeline(path: String, transform: Document, lastModified: Long) = {
     // Create pipeline config
     val pipelineConfig = {
-      val pipeline = XML.elemToDom4j(
+      val pipeline = NodeConversions.elemToDom4j(
         <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
               xmlns:oxf="http://www.orbeon.com/oxf/processors">
 

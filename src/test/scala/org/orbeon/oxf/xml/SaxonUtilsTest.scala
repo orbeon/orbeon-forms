@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xml
 
+import org.junit.Test
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
 
 class SaxonUtilsTest extends AssertionsForJUnit {
 

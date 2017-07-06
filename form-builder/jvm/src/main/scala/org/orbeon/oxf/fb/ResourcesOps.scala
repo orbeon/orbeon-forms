@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 trait ResourcesOps extends BaseOps {

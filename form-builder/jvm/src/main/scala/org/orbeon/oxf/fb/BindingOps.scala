@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 trait BindingOps {

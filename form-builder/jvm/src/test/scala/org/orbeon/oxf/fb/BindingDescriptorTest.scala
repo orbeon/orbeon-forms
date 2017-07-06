@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 

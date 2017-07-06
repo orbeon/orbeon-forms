@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.util.DateUtils._
-import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.scaxon.XML
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, Request}
+import org.orbeon.oxf.util.DateUtils._
+import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.scaxon.NodeConversions
 
 
 trait SearchResult extends SearchRequest {
@@ -62,7 +62,7 @@ trait SearchResult extends SearchRequest {
     if (Logger.isDebugEnabled)
       Logger.logDebug("search result", documentsElem.toString)
 
-    XML.elemToSAX(documentsElem, receiver)
+    NodeConversions.elemToSAX(documentsElem, receiver)
   }
 
 }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 

@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{DataMigration, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 trait FormDefinition {

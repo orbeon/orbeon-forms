@@ -14,10 +14,13 @@
 package org.orbeon.scaxon
 
 
-import collection.mutable.ListBuffer
 import javax.xml.namespace.QName
-import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverAdapter}
+
+import org.orbeon.oxf.xml.SaxonUtils.parseQName
+import org.orbeon.oxf.xml.{XMLReceiverAdapter, XMLUtils}
 import org.xml.sax.{Attributes, Locator}
+
+import scala.collection.mutable.ListBuffer
 
 // Representation of all SAX events that are useful
 // We skip: ignorableWhitespace, skippedEntity, startDTD/endDTD, startEntity/endEntity, and startCDATA/endCDATA.
@@ -49,7 +52,7 @@ object SAXEvents {
       atts indexWhere { case (qName, _) ⇒ qName.getNamespaceURI == uri && qName.getLocalPart == localName }
 
     def getIndex(qName: String) = {
-      val (prefix, localName) = XML.parseQName(qName)
+      val (prefix, localName) = parseQName(qName)
       atts indexWhere { case (qName, _) ⇒ qName.getPrefix == prefix && qName.getLocalPart == localName }
     }
 

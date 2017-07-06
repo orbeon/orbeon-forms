@@ -17,13 +17,12 @@ import java.{util ⇒ ju}
 
 import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xml.RuntimeDependentFunction
+import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.XML
 
 import scala.collection.JavaConverters._
 
@@ -35,8 +34,8 @@ import scala.collection.JavaConverters._
  * property('xxf:noscript')
  */
 private object Property {
-  val Version                  = StringValue.makeStringValue("1.1")
-  val ConformanceLevel         = StringValue.makeStringValue("full")
+  val Version                  = SaxonUtils.stringToStringValue("1.1")
+  val ConformanceLevel         = SaxonUtils.stringToStringValue("full")
   val VersionProperty          = "version"
   val ConformanceLevelProperty = "conformance-level"
 }
@@ -85,7 +84,7 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
       arg = arguments.head match {
         case sl: StringLiteral ⇒
           // This is the most common case where the parameter value is known at expression compilation time
-          val (prefix, local) = XML.parseQName(sl.getStringValue)
+          val (prefix, local) = parseQName(sl.getStringValue)
           Left(namespaceResolver.getURIForPrefix(prefix, false) → local)
         case _ ⇒
           // NOTE: Event.java has the exact same code in Java

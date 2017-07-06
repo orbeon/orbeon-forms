@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.model.InstanceData
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.value.StringValue
 
 /**
  * xxf:custom-mip($item as item()*, $mip-name as xs:string) as xs:string
@@ -34,11 +34,9 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
         val name  = Model.buildCustomMIPName(qName.getQualifiedName)
 
         // Return the value or null
-        Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap
-          (m ⇒ m get name) map
-          StringValue.makeStringValue orNull
+        Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap (_ get name)
       case _ ⇒
         // $item is empty or its first item is not a node
-        null
+        None
     }
 }

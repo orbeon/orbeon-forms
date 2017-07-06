@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.DataMigration
 import org.orbeon.oxf.fr.DataMigration.{Migration, PathElem}
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 object MigrationOps {

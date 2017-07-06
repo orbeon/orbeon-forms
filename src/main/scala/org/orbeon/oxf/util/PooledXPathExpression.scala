@@ -14,23 +14,19 @@
 package org.orbeon.oxf.util
 
 import java.{util ⇒ ju}
+
 import org.apache.commons.pool.ObjectPool
-import org.orbeon.saxon.expr.Expression
-import org.orbeon.saxon.expr.XPathContextMajor
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.saxon.om.ValueRepresentation
-import org.orbeon.saxon.sxpath.XPathExpression
-import org.orbeon.saxon.sxpath.XPathVariable
-import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.saxon.value.SequenceExtent
-import org.orbeon.saxon.value.Value
-import org.orbeon.scaxon.XML._
-import collection.JavaConverters._
-import scala.collection.mutable
-import XPath._
-import scala.util.control.NonFatal
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.XPath._
+import org.orbeon.saxon.expr.{Expression, XPathContextMajor}
+import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation}
+import org.orbeon.saxon.sxpath.{XPathExpression, XPathVariable}
+import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
+import org.orbeon.scaxon.Implicits._
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+import scala.util.control.NonFatal
 
 class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[PooledXPathExpression], variables: List[(String, XPathVariable)]) {
 

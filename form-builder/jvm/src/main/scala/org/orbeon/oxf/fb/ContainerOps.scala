@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
@@ -316,7 +317,7 @@ trait ContainerOps extends ControlOps {
 
     val templateInstanceId = templateId(controlName)
     val modelElement = findModelElement(inDoc)
-    modelElement \ "*:instance" find (hasIdValue(_, templateInstanceId)) match {
+    modelElement \ "*:instance" find (_.hasIdValue(templateInstanceId)) match {
       case Some(templateInstance) ⇒
         // clear existing template instance content
         delete(templateInstance \ *)

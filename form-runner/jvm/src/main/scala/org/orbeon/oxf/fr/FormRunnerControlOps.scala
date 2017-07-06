@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.XPath._
 
 import scala.collection.JavaConverters._
 
@@ -107,7 +108,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name
   def isBindForName(bind: NodeInfo, name: String) =
-    hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind).contains(name) // also check ref/nodeset in case id is not present
+    bind.hasIdValue(bindId(name)) || bindRefOrNodeset(bind).contains(name) // also check ref/nodeset in case id is not present
 
   // Canonical way: use the `name` attribute
   def getBindNameOrEmpty(bind: NodeInfo) =

@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
@@ -331,7 +332,7 @@ trait GridOps extends ContainerOps {
 
     val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
 
-    allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ hasChildren(cell.td))
+    allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ cell.td.hasChildElement)
   }
 
   def controlsInRow(gridId: String, rowPos: Int): Int = {
@@ -340,7 +341,7 @@ trait GridOps extends ContainerOps {
   }
 
   private def selectedCellVar =
-    asNodeInfo(topLevelModel("fr-form-model").get.getVariable("selected-cell"))
+    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("selected-cell")
 
   // Find the currently selected grid td if any
   def findSelectedTd(inDoc: NodeInfo) =
@@ -492,7 +493,7 @@ trait GridOps extends ContainerOps {
 
     val cell = allRowCells(y)(x)
 
-    hasChildren(allRowCells(y + cell.rowspan)(x).td)
+    allRowCells(y + cell.rowspan)(x).td.hasChildElement
   }
 
 
@@ -561,8 +562,8 @@ trait GridOps extends ContainerOps {
 
     // All grids and grid tds with no existing id
     val bodyElement = findFRBodyElement(doc)
-    annotate("tmp", bodyElement \\ "*:grid" \\ "*:td" filterNot hasId)
-    annotate("tmp", bodyElement \\ "*:grid" filterNot hasId)
+    annotate("tmp", bodyElement \\ "*:grid" \\ "*:td" filterNot (_.hasId))
+    annotate("tmp", bodyElement \\ "*:grid" filterNot (_.hasId))
 
     // 2. Select the first td if any
     bodyElement \\ "*:grid" \\ "*:td" take 1 foreach selectTd

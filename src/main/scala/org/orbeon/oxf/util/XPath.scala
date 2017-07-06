@@ -19,7 +19,7 @@ import javax.xml.transform.{Result, Source, TransformerException, URIResolver}
 
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
-import org.orbeon.oxf.common.OrbeonLocationException
+import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
@@ -33,7 +33,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.style.AttributeValueTemplate
 import org.orbeon.saxon.sxpath.{XPathEvaluator, XPathExpression, XPathStaticContext}
 import org.orbeon.saxon.value.{AtomicValue, SequenceExtent, Value}
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.Implicits
 import org.xml.sax.InputSource
 
 import scala.util.Try
@@ -121,14 +121,14 @@ object XPath {
         if (targetClass.isAssignableFrom(classOf[List[_]])) {
 
           val values =
-            for (item ← XML.asScalaIterator(Value.asIterator(value)))
+            for (item ← Implicits.asScalaIterator(Value.asIterator(value)))
             yield itemToAny(item, context)
 
           values.toList
         } else if (targetClass.isAssignableFrom(classOf[Option[_]])) {
-          XML.asScalaIterator(Value.asIterator(value)).nextOption() map (itemToAny(_, context))
+          Implicits.asScalaIterator(Value.asIterator(value)).nextOption() map (itemToAny(_, context))
         } else if (targetClass.isAssignableFrom(classOf[Iterator[_]])) {
-          XML.asScalaIterator(Value.asIterator(value)) map (itemToAny(_, context))
+          Implicits.asScalaIterator(Value.asIterator(value)) map (itemToAny(_, context))
         } else {
           throw new IllegalStateException(targetClass.getName)
         }
@@ -269,10 +269,10 @@ object XPath {
   }
 
   // Return the currently scoped function context if any
-  def functionContext = xpathContextDyn.value
+  def functionContext: Option[FunctionContext] = xpathContextDyn.value
 
   // Return either a NodeInfo for nodes, a native Java value for atomic values, or null
-  // 2 callers
+  // 4 callers
   def evaluateSingle(
     contextItems        : JList[Item],
     contextPosition     : Int,
@@ -280,7 +280,7 @@ object XPath {
     functionContext     : FunctionContext,
     variableResolver    : VariableResolver)(implicit
     reporter            : Reporter
-  ) = {
+  ): AnyRef = {
 
     withEvaluation(compiledExpression) { xpathExpression ⇒
 
@@ -315,6 +315,7 @@ object XPath {
   // TODO: Should always return a string!
   // TODO: Check what we do upon NodeInfo
   // NOTE: callers tend to use string(foo), so issue of null/NodeInfo should not occur
+  // 2 usages
   def evaluateAsString(
     contextItems        : JList[Item],
     contextPosition     : Int,
@@ -322,7 +323,7 @@ object XPath {
     functionContext     : FunctionContext,
     variableResolver    : VariableResolver)(implicit
     reporter            : Reporter
-  ) =
+  ): String =
     Option(
       evaluateSingle(
         contextItems,
@@ -350,7 +351,7 @@ object XPath {
         throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
     }
 
-  def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData) = {
+  def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData): ValidationException = {
 
     val validationException =
       OrbeonLocationException.wrapException(

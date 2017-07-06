@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.{StringValue, Value}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsFormatMessage extends XFormsFunction {
 

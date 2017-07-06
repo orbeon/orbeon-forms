@@ -14,12 +14,14 @@
 package org.orbeon.oxf.xml
 
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.util
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.Expression
+import org.orbeon.saxon.expr.{Expression, ExpressionTool}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
 import org.orbeon.saxon.value.{AtomicValue, StringValue, Value}
-import org.orbeon.scaxon.XML
+import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+import org.orbeon.scaxon.Implicits
 
 import scala.collection.JavaConverters._
 
@@ -37,9 +39,34 @@ object SaxonUtils {
     }
   }
 
+  // Convert a Java object to a Saxon Item using the Saxon API
+  val anyToItem: (Any) ⇒ Item = new StandardObjectConverter(new SaxonXQDataFactory {
+    def getConfiguration = util.XPath.GlobalConfiguration
+  }).convertToItem(_: Any)
+
+  // Convert a Java object to a Saxon Item but keep unchanged if already an Item
+  val anyToItemIfNeeded: Any ⇒ Item = {
+    case i: Item ⇒ i
+    case a       ⇒ anyToItem(a)
+  }
+
+  def stringToStringValue(s: String): StringValue = StringValue.makeStringValue(s)
+
+  // Effective boolean value of the iterator
+  def effectiveBooleanValue(iterator: SequenceIterator): Boolean =
+    ExpressionTool.effectiveBooleanValue(iterator)
+
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
     Iterator(e) ++
       (e.iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] flatMap iterateExpressionTree)
+
+  // Parse the given qualified name and return the separated prefix and local name
+  def parseQName(lexicalQName: String): (String, String) = {
+    val checker = Name10Checker.getInstance
+    val parts   = checker.getQNameParts(lexicalQName)
+
+    (parts(0), parts(1))
+  }
 
   // Make an NCName out of a non-blank string
   // Any characters that do not belong in an NCName are converted to `_`.
@@ -86,8 +113,8 @@ object SaxonUtils {
     }
 
   def compareValues(value1: Value, value2: Value): Boolean = {
-    val iter1 = XML.asScalaIterator(value1.iterate)
-    val iter2 = XML.asScalaIterator(value2.iterate)
+    val iter1 = Implicits.asScalaIterator(value1.iterate)
+    val iter2 = Implicits.asScalaIterator(value2.iterate)
 
     iter1.zipAll(iter2, null, null) forall (compareItems _).tupled
   }

@@ -25,9 +25,9 @@ import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver._
 import org.orbeon.oxf.util.ContentTypes.{getContentTypeCharset, getContentTypeMediaType}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Base64XMLReceiver, ContentTypes, DateUtils, TextXMLReceiver}
+import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter}
-import org.orbeon.scaxon.XML
 import org.xml.sax.Attributes
 
 import scala.collection.mutable
@@ -105,7 +105,7 @@ class BinaryTextXMLReceiver(
       val xsiType = Option(attributes.getValue(XSI_TYPE_QNAME.getNamespaceURI, XSI_TYPE_QNAME.getName)) getOrElse
         (throw new OXFException("Root element must contain an xsi:type attribute"))
 
-      val (typePrefix, typeLocalName) = XML.parseQName(xsiType)
+      val (typePrefix, typeLocalName) = parseQName(xsiType)
 
       val typeNamespaceURI =
         prefixMappings.getOrElse(typePrefix, throw new OXFException(s"Undeclared prefix in xsi:type: $typePrefix"))

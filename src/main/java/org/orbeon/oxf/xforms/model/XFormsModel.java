@@ -164,6 +164,10 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
         return Value.asIterator(topLevelVariables.get(variableName));
     }
 
+    public NodeInfo unsafeGetVariableAsNodeInfo(String variableName) throws XPathException {
+        return (NodeInfo) getVariable(variableName).next();
+    }
+
     public void updateEffectiveId(String effectiveId) {
         this.effectiveId = effectiveId;
     }

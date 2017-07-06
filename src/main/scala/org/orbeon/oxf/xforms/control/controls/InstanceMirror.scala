@@ -29,8 +29,10 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.XPath._
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE, TEXT_NODE}
 
 // Logic to mirror mutations between an outer and an inner instance
@@ -219,7 +221,7 @@ object InstanceMirror {
         item       = outerDoc,
         expr       = "//xf:instance[@id = $sourceId]",
         namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
-        variables  = Map("sourceId" → StringValue.makeStringValue(innerInstance.getId))
+        variables  = Map("sourceId" → SaxonUtils.stringToStringValue(innerInstance.getId))
       ) match {
         case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
           // Outer xf:instance found

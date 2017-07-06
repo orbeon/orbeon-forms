@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om.EmptyIterator
+import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 
 class XXFormsGetVariable extends XFormsFunction {
 
-  override def iterate(xpathContext: XPathContext) = {
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     val containingDocument = getContainingDocument(xpathContext)
     val modelEffectiveId   = stringArgument(0)(xpathContext)
@@ -28,7 +28,7 @@ class XXFormsGetVariable extends XFormsFunction {
 
     containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
       case model: XFormsModel ⇒ model.getVariable(variableName)
-      case _ ⇒ EmptyIterator.getInstance
+      case _                  ⇒ EmptyIterator.getInstance
     }
   }
 }

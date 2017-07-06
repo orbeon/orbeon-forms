@@ -28,8 +28,10 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMediatypesValidation, ValidationFunction}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
+import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
@@ -175,8 +177,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
               case Some(nonEmptyValue) ⇒
 
                 val prefix = mipElemQName.getNamespaceURI match {
-                  case FB ⇒ "fb" // also covers the case of `xxf:default` (Form Builder names here)
-                  case XF ⇒ "xf" // case of `xf:type`, `xf:required`
+                  case Names.FB ⇒ "fb" // also covers the case of `xxf:default` (Form Builder names here)
+                  case XF       ⇒ "xf" // case of `xf:type`, `xf:required`
                 }
 
                 val dummyMIPElem =
@@ -185,7 +187,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     level={if (level != ErrorLevel) level.entryName else null}
                     value={if (mip != Type) nonEmptyValue else null}
                     xmlns:xf={XF}
-                    xmlns:fb={FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
+                    xmlns:fb={Names.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
 
                 List(dummyMIPElem.copy(prefix = prefix, label = mipElemQName.getName): NodeInfo)
               case None ⇒

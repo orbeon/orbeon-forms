@@ -40,6 +40,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.oxf.xforms.submission.RelevanceHandling._
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, TransformerUtils, XMLParsing}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._

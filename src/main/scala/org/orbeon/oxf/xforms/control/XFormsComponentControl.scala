@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.Element
+import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
@@ -26,10 +27,9 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.model.{AllDefaultsStrategy, XFormsInstance}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.VirtualNode
-import org.orbeon.scaxon.XML.unsafeUnwrapElement
+import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node.ELEMENT_NODE
 import org.xml.sax.helpers.AttributesImpl
 

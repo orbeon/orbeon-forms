@@ -25,9 +25,10 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
-import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{Dom4j, SaxonUtils}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.XML._
 import org.scalatest.{FunSpec, FunSpecLike}
 
@@ -137,7 +138,7 @@ abstract class ProcessorTestBase(testsDocUrl: String)
                 ]
       """
 
-    implicit val ctx = XPathContext(vars = Map("edition" → stringToStringValue(Version.Edition.toLowerCase)))
+    implicit val ctx = XPathContext(vars = Map("edition" → SaxonUtils.stringToStringValue(Version.Edition.toLowerCase)))
 
     val testDescriptors =
       for {

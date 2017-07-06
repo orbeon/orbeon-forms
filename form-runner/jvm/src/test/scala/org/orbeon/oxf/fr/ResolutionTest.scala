@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom
 import org.junit.Test
+import org.orbeon.dom
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.Value
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.Implicits._
 import org.scalatest.junit.AssertionsForJUnit
 
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {

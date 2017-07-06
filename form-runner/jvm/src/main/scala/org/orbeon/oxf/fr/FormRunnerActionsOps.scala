@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 trait FormRunnerActionsOps extends FormRunnerBaseOps {

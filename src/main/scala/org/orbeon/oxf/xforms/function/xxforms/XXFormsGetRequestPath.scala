@@ -28,9 +28,9 @@ import org.orbeon.saxon.value.StringValue
   */
 class XXFormsGetRequestPath extends XFormsFunction with RuntimeDependentFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): Item =
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
     functionOperation == 1 option getContainingDocument(xpathContext) match {
-      case Some(containingDocument) ⇒ StringValue.makeStringValue(containingDocument.getRequestPath)
-      case None                     ⇒ StringValue.makeStringValue(NetUtils.getExternalContext.getRequest.getRequestPath)
+      case Some(containingDocument) ⇒ containingDocument.getRequestPath
+      case None                     ⇒ NetUtils.getExternalContext.getRequest.getRequestPath
     }
 }

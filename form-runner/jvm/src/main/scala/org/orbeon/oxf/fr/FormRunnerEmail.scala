@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.Implicits._
 
 trait FormRunnerEmail {
 

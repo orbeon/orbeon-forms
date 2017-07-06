@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
@@ -181,7 +182,7 @@ trait FormRunnerPermissionsOps {
 
       // If kept, rewrite <form> to add operations="…" attribute
       keepForm list {
-        val newFormEl      = wrapper.wrap(element("form"))
+        val newFormEl      = wrapper.wrap(DocumentFactory.createElement("form"))
         val operationsAttr = NodeInfoFactory.attributeInfo("operations", operations mkString " ")
         val newFormContent = operationsAttr +: formEl.child(*)
 

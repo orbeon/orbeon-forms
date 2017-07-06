@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.{DateUtils, XPath}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.Name10Checker
+import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._

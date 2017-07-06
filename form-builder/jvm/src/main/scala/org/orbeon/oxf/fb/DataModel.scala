@@ -20,14 +20,16 @@ import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om._
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.XPath._
 
 import scala.util.control.NonFatal
 
 object DataModel {
 
   private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
-    { case bind if exists(bind \@ "name") ⇒ bind }
+    { case bind if (bind \@ "name").nonEmpty ⇒ bind }
 
   private def childrenBindsWithNames(bind: NodeInfo) =
     bind \ (XF → "bind") collect bindWithName

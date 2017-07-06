@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
@@ -23,9 +24,11 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
@@ -39,10 +42,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   self: GridOps ⇒ // funky dependency, to resolve at some point
 
-  val FB = Names.FB
-
   private val MIPsToRewrite = Model.AllMIPs - Model.Type - Model.Required - Model.Whitespace
-  private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → toQName(FB → ("fb:" + mip.name))) toMap
+  private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip → QName.get(mip.name, Names.FBPrefix, Names.FB)) toMap
 
   private val topLevelBindTemplate: NodeInfo =
     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
@@ -100,7 +101,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       case None ⇒
         insert(
           into   = model,
-          after  = model \ "*:instance" filter (hasIdValue(_, "fr-form-instance")),
+          after  = model \ "*:instance" filter (_.hasIdValue("fr-form-instance")),
           origin = topLevelBindTemplate
         ).head
     }
@@ -423,7 +424,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // For XForms callers
   def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator =
-    getAllControlNames(inDoc).iterator map StringValue.makeStringValue
+    getAllControlNames(inDoc).iterator map SaxonUtils.stringToStringValue
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo) =

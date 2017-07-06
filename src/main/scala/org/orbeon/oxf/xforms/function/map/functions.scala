@@ -21,7 +21,7 @@ import org.orbeon.saxon.`type`.{ExternalObjectType, ItemType, TypeHierarchy}
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.Implicits
 
 trait MapFunction extends XFormsFunction {
 
@@ -115,7 +115,7 @@ private object MapFunctions {
     val config  = xpathContext.getConfiguration
     val mapType = saxonTypeForMap(config)
 
-    XML.asScalaIterator(it) collect {
+    Implicits.asScalaIterator(it) collect {
       case v: ObjectValue if v.getItemType(config.getTypeHierarchy) == mapType ⇒
         v.getObject.asInstanceOf[Map[AtomicValue, ValueRepresentation]]
     }

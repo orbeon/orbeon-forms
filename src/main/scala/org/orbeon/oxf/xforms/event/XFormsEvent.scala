@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
-import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
 
@@ -102,8 +102,8 @@ abstract class XFormsEvent(
     // empty node-set is returned."
 
     allProperties.applyOrElse(name, { name: String ⇒ warnUnsupportedIfNeeded(name); None }) map {
-      case s: Seq[_] ⇒ listIterator(s map anyToItemIfNeeded)
-      case other     ⇒ itemIterator(anyToItemIfNeeded(other))
+      case s: Seq[_] ⇒ listIterator(s map SaxonUtils.anyToItemIfNeeded)
+      case other     ⇒ itemIterator(SaxonUtils.anyToItemIfNeeded(other))
     } getOrElse emptyIterator
   }
 

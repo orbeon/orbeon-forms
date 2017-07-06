@@ -20,14 +20,14 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, StatusStore, Stopping}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon
 import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.util.IOUtils._
 
 trait Reindex extends FormDefinition {
 
@@ -252,7 +252,7 @@ trait Reindex extends FormDefinition {
             // Extract and insert value for each indexed control
             for (control ← indexedControls) {
 
-              val nodes = XML.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
+              val nodes = scaxon.XPath.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
               for ((node, pos) ← nodes.zipWithIndex) {
                 val nodeValue = truncateValue(provider, node.getStringValue)
                 // For indexing, we are not interested in empty values

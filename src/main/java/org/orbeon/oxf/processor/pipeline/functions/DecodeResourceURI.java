@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.pipeline.functions;
 
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.xml.SaxonUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionTool;
 import org.orbeon.saxon.expr.ExpressionVisitor;
@@ -21,7 +22,6 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.StringValue;
 
 public class DecodeResourceURI extends SystemFunction {
 
@@ -42,6 +42,6 @@ public class DecodeResourceURI extends SystemFunction {
 
         // Get property value
         final String rewrittenURI = URLRewriterUtils.decodeResourceURI(uri, isVersioned);
-        return StringValue.makeStringValue(rewrittenURI);
+        return SaxonUtils.stringToStringValue(rewrittenURI);
     }
 }

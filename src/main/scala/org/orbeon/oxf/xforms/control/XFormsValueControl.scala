@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModelBinds}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiver, XMLReceiverHelper}
+import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
 import org.xml.sax.helpers.AttributesImpl
@@ -138,7 +138,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     assert(isRelevant)
     assert(getValue ne null)
 
-    evaluateAsString(format, Seq(StringValue.makeStringValue(getValue)), 1)
+    evaluateAsString(format, Seq(SaxonUtils.stringToStringValue(getValue)), 1)
   }
 
   // Try default format for known types
@@ -149,7 +149,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     def evaluateFormat(format: String) =
       evaluateAsString(
          format,
-         Option(StringValue.makeStringValue(getValue)),
+         Some(SaxonUtils.stringToStringValue(getValue)),
          FormatNamespaceMapping,
          bindingContext.getInScopeVariables
        )

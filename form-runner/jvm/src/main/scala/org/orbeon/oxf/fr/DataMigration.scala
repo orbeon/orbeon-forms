@@ -22,7 +22,8 @@ import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{DocumentInfo, Name10Checker, NodeInfo, VirtualNode}
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 object DataMigration {
@@ -243,13 +244,13 @@ object DataMigration {
             (path.init map (_.value) mkString "/", path.last.value)
 
           // NOTE: Use collect, but we know they are nodes if the JSON is correct and contains paths
-          val parentNodes = XML.eval(mutableData.rootElement, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
+          val parentNodes = scaxon.XPath.eval(mutableData.rootElement, pathToParentNodes, XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING) collect {
             case node: NodeInfo ⇒ node
           }
 
           parentNodes map { parentNode ⇒
 
-            val nodes = XML.eval(parentNode, pathToChildNodes) collect {
+            val nodes = scaxon.XPath.eval(parentNode, pathToChildNodes) collect {
               case node: NodeInfo ⇒ node
             }
 

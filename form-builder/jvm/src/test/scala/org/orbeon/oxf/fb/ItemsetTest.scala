@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit

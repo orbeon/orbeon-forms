@@ -21,7 +21,9 @@ import org.orbeon.oxf.util.StringReplacer._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 import scala.collection.{immutable ⇒ i}
@@ -233,7 +235,7 @@ trait FormRunnerHome {
       def remoteElements(remoteNode: NodeInfo) = {
 
         def remoteElement(name: String) =
-          elementInfo("remote-" + name, List(stringToStringValue(remoteNode elemValue name)))
+          elementInfo("remote-" + name, List(SaxonUtils.stringToStringValue(remoteNode elemValue name)))
 
         List(
           remoteElement("title"),

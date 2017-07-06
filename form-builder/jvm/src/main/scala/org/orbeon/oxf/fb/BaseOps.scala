@@ -22,7 +22,8 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.TransformerUtils._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 import spray.json._
 import DefaultJsonProtocol._
@@ -39,7 +40,7 @@ trait BaseOps extends Logging {
   val DynamicControlId = "fb"
 
   // Find the form document being edited
-  def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
+  def getFormDoc = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("model").getDocumentRoot
 
   // All xbl:binding elements available
   def componentBindings =
@@ -51,7 +52,7 @@ trait BaseOps extends Logging {
   // Find the top-level form model of the form being edited
   def getFormModel = inScopeContainingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
-  def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
+  def formResourcesRoot = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("resources")
 
   def templateRoot(inDoc: NodeInfo, repeatName: String) =
     inlineInstanceRootElement(inDoc, templateId(repeatName))

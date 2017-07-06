@@ -28,7 +28,7 @@ import org.orbeon.saxon.expr.XPathContextMajor
 import org.orbeon.saxon.om.{NodeInfo, StandardNames}
 import org.orbeon.saxon.sxpath.{IndependentContext, XPathEvaluator}
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.NodeConversions.unsafeUnwrapElement
 import org.w3c.dom.Node
 
 import scala.collection.JavaConverters._
@@ -255,7 +255,7 @@ trait ValidationBindOps extends Logging {
 
           if ((namespaceNodeInfo ne null) && namespaceNodeInfo.getNodeKind == Node.ELEMENT_NODE) {
             // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
-            val namespaceElement = XML.unsafeUnwrapElement(namespaceNodeInfo)
+            val namespaceElement = unsafeUnwrapElement(namespaceNodeInfo)
             val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement))
             isOptionalAndEmpty || XPath.isXPath2Expression(
               nodeValue,

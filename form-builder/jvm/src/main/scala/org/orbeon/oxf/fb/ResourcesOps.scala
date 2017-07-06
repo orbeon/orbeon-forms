@@ -13,18 +13,19 @@
  */
 package org.orbeon.oxf.fb
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
 trait ResourcesOps extends BaseOps {
 
-  def currentResources      = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("current-resources"))
+  def currentResources      = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("current-resources")
   def currentLang           = currentResources attValue "*:lang"
   def resourcesRoot         = currentResources parent * head
 
@@ -221,7 +222,7 @@ trait ResourcesOps extends BaseOps {
       (lang ⇒ lang → ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
   def findResourceHolderForLang(controlName: String, lang: String, resources: NodeInfo): Option[NodeInfo] =
-    findResourceHoldersWithLang(controlName ensuring (StringUtils.isNotBlank(_)), resources) collectFirst
+    findResourceHoldersWithLang(controlName ensuring (_.nonBlank), resources) collectFirst
       { case (`lang`, holder) ⇒ holder }
 
   // Find control resource holders
@@ -250,5 +251,5 @@ trait ResourcesOps extends BaseOps {
 
   def hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc: NodeInfo, controlName: String, lhha: String): Boolean =
     findResourceHoldersWithLangUseDoc(inDoc, controlName) forall
-    { case (_, holder) ⇒ StringUtils.isBlank(holder child lhha stringValue) }
+    { case (_, holder) ⇒ (holder child lhha stringValue).isBlank }
 }

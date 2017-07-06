@@ -28,8 +28,9 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.saxon.value.{AtomicValue, BooleanValue, QNameValue, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, BooleanValue, QNameValue}
 
 import scala.collection.{mutable ⇒ m}
 import scala.language.postfixOps
@@ -84,9 +85,9 @@ class XFormsModelBinds(protected val model: XFormsModel)
         case READONLY_QNAME        ⇒ evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map BooleanValue.get
         case REQUIRED_QNAME        ⇒ evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map BooleanValue.get
         case CONSTRAINT_QNAME      ⇒ hasSuccessfulErrorConstraints                                       map BooleanValue.get
-        case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate, collector)              map StringValue.makeStringValue
-        case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default, collector)                map StringValue.makeStringValue
-        case mipType               ⇒ evaluateCustomMIPByName(mipType)                                    map StringValue.makeStringValue
+        case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate, collector)              map SaxonUtils.stringToStringValue
+        case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default, collector)                map SaxonUtils.stringToStringValue
+        case mipType               ⇒ evaluateCustomMIPByName(mipType)                                    map SaxonUtils.stringToStringValue
       }
 
     // Dispatch all events

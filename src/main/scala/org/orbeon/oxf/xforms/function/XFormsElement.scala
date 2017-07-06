@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, Item}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.Implicits._
 
 /**
  * xf:element()

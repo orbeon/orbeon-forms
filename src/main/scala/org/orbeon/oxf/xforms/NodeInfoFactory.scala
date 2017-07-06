@@ -13,12 +13,11 @@
   */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.dom.{DocumentFactory, QName}
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.dom.{DocumentFactory, Namespace, QName}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.scaxon.XML.{attribute, element, namespace}
 
 import scala.collection.Seq
 
@@ -31,14 +30,14 @@ object NodeInfoFactory {
   private val Wrapper = new DocumentWrapper(DocumentFactory.createDocument, null, XPath.GlobalConfiguration)
 
   def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
-    val newElement = Wrapper.wrap(element(qName))
+    val newElement = Wrapper.wrap(DocumentFactory.createElement(qName))
     XFormsAPI.insert(into = Seq(newElement), origin = content)
     newElement
   }
 
   def attributeInfo(name: QName, value: String = ""): NodeInfo =
-    Wrapper.wrap(attribute(name, value))
+    Wrapper.wrap(DocumentFactory.createAttribute(null, name, value))
 
   def namespaceInfo(prefix: String, uri: String): NodeInfo =
-    Wrapper.wrap(namespace(prefix, uri))
+    Wrapper.wrap(Namespace(prefix, uri))
 }

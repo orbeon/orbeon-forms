@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.AttributesAndElementsIterator
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 /**

@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.xml.SaxonUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.StringValue;
 
 public class XXFormsRewriteServiceURI extends SystemFunction {
 
@@ -49,7 +49,7 @@ public class XXFormsRewriteServiceURI extends SystemFunction {
         // Get property value
         final String rewrittenURI = rewriteServiceURI(uri, absolute);
 
-        return StringValue.makeStringValue(rewrittenURI);
+        return SaxonUtils.stringToStringValue(rewrittenURI);
     }
 
     public static String rewriteServiceURI(String uri, boolean absolute) {

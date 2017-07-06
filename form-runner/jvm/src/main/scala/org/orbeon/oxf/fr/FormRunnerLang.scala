@@ -41,11 +41,11 @@ trait FormRunnerLang {
   def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
   def getAppForm(app: String, form: String) = hasAppForm(app, form) option AppForm(app, form)
 
-  def currentLang          = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("lang"))
-  def currentFRLang        = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-lang"))
-  def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
+  def currentLang          = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("lang")
+  def currentFRLang        = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-lang")
+  def currentFRResources   = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-fr-resources")
   //@XPathFunction
-  def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
+  def currentFormResources = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-form-resources")
 
   def formResourcesInLang(lang: String): NodeInfo = {
     val formResources = topLevelModel(FormModel).get.getInstance(FormResources).documentInfo.rootElement

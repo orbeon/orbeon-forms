@@ -24,13 +24,13 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xml.FunctionSupport
+import org.orbeon.oxf.xml.{FunctionSupport, SaxonUtils}
+import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
-import org.orbeon.scaxon.XML
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
@@ -262,20 +262,20 @@ object XFormsFunction {
   case   class UnprefixedName(local: String) extends QNameType
   case   class PrefixedName(prefix: String, local: String) extends QNameType
 
-  def parseQName(lexicalQName: String): QNameType =
-    XML.parseQName(lexicalQName) match {
+  def parseQNameToQNameType(lexicalQName: String): QNameType =
+    SaxonUtils.parseQName(lexicalQName) match {
       case ("", local)     ⇒ UnprefixedName(local)
       case (prefix, local) ⇒ PrefixedName(prefix, local)
     }
 
   def qNameFromQNameValue(value: QNameValue): dom.QName =
-    parseQName(value.getStringValue) match {
+    parseQNameToQNameType(value.getStringValue) match {
       case PrefixedName(prefix, local) ⇒ new dom.QName(local, Namespace(prefix, value.getNamespaceURI))
       case UnprefixedName(local)       ⇒ new dom.QName(local)
     }
 
   def qNameFromStringValue(value: String, bindingContext: BindingContext): dom.QName =
-    parseQName(value) match {
+    parseQNameToQNameType(value) match {
       case PrefixedName(prefix, local) ⇒
 
         def prefixNotInScope() =

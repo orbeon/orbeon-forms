@@ -20,12 +20,12 @@ import org.orbeon.saxon.value.StringValue
 
 class XXFormsLHHA extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext) = {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
     implicit val ctx = xpathContext
 
     def evaluateControlItem(f: XFormsControl ⇒ String) =
-      relevantControl(0) map (control ⇒ StringValue.makeStringValue(f(control))) orNull
+      relevantControl(0) map f
 
     evaluateControlItem(operation match {
       case 0 ⇒ _.getLabel

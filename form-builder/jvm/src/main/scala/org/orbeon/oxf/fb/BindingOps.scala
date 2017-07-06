@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
@@ -180,7 +181,7 @@ trait BindingOps {
     allAttributes collect {
       case (_, qname, value) if BindTemplateAttributesToNamespace(qname) ⇒
         // Some attributes must be prefixed before being inserted into the edited form
-        QName.get(qname.getName, "fb", FormBuilder.FB) → value
+        QName.get(qname.getName, "fb", Names.FB) → value
       case (elem, qname, value) if !(qname.getName == "type" && elem.resolveQName(value).getName == "string") ⇒
         // Exclude `type="*:string"`
         qname → value

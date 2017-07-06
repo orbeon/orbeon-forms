@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+import org.orbeon.scaxon.NodeConversions._
 
 import scala.collection.JavaConverters._
 

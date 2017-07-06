@@ -17,7 +17,8 @@ import org.orbeon.dom.QName
 
 object Names {
 
-  val FB = "http://orbeon.org/oxf/xml/form-builder"
+  val FBPrefix = "fb"
+  val FB       = "http://orbeon.org/oxf/xml/form-builder"
 
-  val InitialIterations: QName = QName.get("initial-iterations", "fb", FB)
+  val InitialIterations: QName = QName.get("initial-iterations", FBPrefix, FB)
 }

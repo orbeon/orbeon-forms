@@ -21,8 +21,8 @@ import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
 import org.orbeon.oxf.util.IOUtils._
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
-import org.orbeon.scaxon.XML._
 
 import scala.collection.JavaConverters._
 
@@ -31,7 +31,7 @@ object ImageMetadata {
 
   // Given a name in KnownNames, try to extract its value and return it as a Saxon Item
   def findKnownMetadata(content: InputStream, name: String): Option[Item] =
-    KnownNamesToMetadataExtractorNames.get(name) flatMap (findMetadata(content, _)) map anyToItem
+    KnownNamesToMetadataExtractorNames.get(name) flatMap (findMetadata(content, _)) map SaxonUtils.anyToItem
 
   // Try to find the type of the image
   def findImageMediatype(content: InputStream) = {

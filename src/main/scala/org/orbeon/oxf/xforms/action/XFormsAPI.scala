@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.saxon.om._
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.NodeConversions._
 
 import scala.collection.JavaConverters._
 
@@ -116,7 +116,7 @@ object XBLTransformer {
                 // Clone all the resulting elements
                 contentToInsert = new ju.ArrayList[Node](elements.size)
                 for (currentNodeInfo ← elements) {
-                  val currentElement = XML.unsafeUnwrapElement(currentNodeInfo)
+                  val currentElement = unsafeUnwrapElement(currentNodeInfo)
                   if (! mustFilterOut(currentElement))
                     contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement))
                 }
@@ -250,7 +250,7 @@ object XBLTransformer {
               for (nodeInfo ← nodeInfos.asScala) {
                 val currentNodeInfo = nodeInfo.asInstanceOf[NodeInfo]
                 if (currentNodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE) {
-                  val currentAttribute = XML.unsafeUnwrapAttribute(currentNodeInfo)
+                  val currentAttribute = unsafeUnwrapAttribute(currentNodeInfo)
                   setAttribute(resultingNodes, currentAttribute.getQName, currentAttribute.getValue, currentAttribute.getParent)
                 }
               }

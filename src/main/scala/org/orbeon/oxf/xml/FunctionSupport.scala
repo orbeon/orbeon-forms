@@ -17,7 +17,7 @@ import org.orbeon.saxon.expr.{ExpressionVisitor, _}
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{BooleanValue, Int64Value, IntegerValue, StringValue}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 
@@ -93,15 +93,15 @@ abstract class FunctionSupport extends SystemFunction {
       case v               ⇒ None
     }
 
-  def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
-  def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)
+  def asIterator(v: Array[String]) = new ArrayIterator(v map stringToStringValue)
+  def asIterator(v: Seq[String])   = new ListIterator (v map stringToStringValue asJava)
 
   implicit def stringIteratorToSequenceIterator(i: Iterator[String]) : SequenceIterator = i map stringToStringValue
 
   implicit def itemSeqOptToSequenceIterator(v: Option[Seq[Item]])    : SequenceIterator = v map (s ⇒ new ListIterator(s.asJava)) getOrElse EmptyIterator.getInstance
   implicit def stringSeqOptToSequenceIterator(v: Option[Seq[String]]): SequenceIterator = v map asIterator getOrElse EmptyIterator.getInstance
 
-  implicit def stringToStringValue(v: String)                        : StringValue      = StringValue.makeStringValue(v)
+  implicit def stringToStringValue(v: String)                        : StringValue      = SaxonUtils.stringToStringValue(v)
   implicit def booleanToBooleanValue(v: Boolean)                     : BooleanValue     = BooleanValue.get(v)
   implicit def intToIntegerValue(v: Int)                             : IntegerValue     = Int64Value.makeIntegerValue(v)
 

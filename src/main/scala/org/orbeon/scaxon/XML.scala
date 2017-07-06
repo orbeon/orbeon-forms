@@ -14,131 +14,33 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom._
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.util.XPath._
-import org.orbeon.oxf.util.XPathCache._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{NamespaceMapping, TransformerUtils, XMLParsing, XMLReceiver}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.{ExpressionTool, Token}
-import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.expr.Token
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.tinytree.TinyTree
-import org.orbeon.saxon.value.StringValue
-import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 
 import scala.collection.JavaConverters._
 import scala.collection._
-import scala.xml.Elem
 
 object XML {
+
+  import Private._
 
   case class URIQualifiedName(uri: String, localName: String) {
     require(Name10Checker.getInstance.isValidNCName(localName))
   }
 
-  // Convenience methods for the XPath API
-  def evalOne(
-      item            : Item,
-      expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
-      variables       : Map[String, ValueRepresentation] = null,
-      reporter        : Reporter                         = null,
-      functionContext : FunctionContext                  = null)(
-      implicit library: FunctionLibrary                  = null
-  ): Item =
-    evaluateSingleKeepItems(
-      Seq(item).asJava,
-      1,
-      expr,
-      namespaces,
-      if (variables eq null) null else variables.asJava,
-      library,
-      functionContext,
-      null,
-      null,
-      reporter
-    )
+  // Passing a string as test means to test on the local name of an element or attribute
+  implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
 
-  // Evaluate an XPath expression and return a Seq of native Java objects (String, Boolean, etc.), but NodeInfo
-  // wrappers are preserved.
-  def eval(
-      item            : Item,
-      expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
-      variables       : Map[String, ValueRepresentation] = null,
-      reporter        : Reporter                         = null,
-      functionContext : FunctionContext                  = null)(
-      implicit library: FunctionLibrary                  = null
-  ): Seq[AnyRef] =
-    evaluate(item,
-      expr,
-      namespaces,
-      if (variables eq null) null else variables.asJava,
-      library, functionContext,
-      null,
-      null,
-      reporter
-    ).asScala
+  // Passing a QName as test means to test on the qualified name of an element or attribute
+  implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.getNamespaceURI, attName.getName))
 
-  // Evaluate an XPath expression as a value template
-  def evalValueTemplate(
-      item            : Item,
-      expr            : String,
-      namespaces      : NamespaceMapping                 = NamespaceMapping.EMPTY_MAPPING,
-      variables       : Map[String, ValueRepresentation] = null,
-      reporter        : Reporter                         = null,
-      functionContext : FunctionContext                  = null)(
-      implicit library: FunctionLibrary                  = null
-  ): String =
-    evaluateAsAvt(
-      item,
-      expr,
-      namespaces,
-      if (variables eq null) null else variables.asJava,
-      library,
-      functionContext,
-      null,
-      null,
-      reporter
-    )
-
-  // Runtime conversion to NodeInfo (can fail!)
-  def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]
-  def asNodeInfoSeq(item: Item) = item.asInstanceOf[NodeInfo]
-
-  // Convert a ns → name tuple to a QName, including separating prefix/local if needed
-  // TODO: Confusing that the name can be a local name?
-  def toQName(qName: (String, String)) = {
-    val prefixLocal = parseQName(qName._2)
-    QName.get(prefixLocal._2, prefixLocal._1, qName._1)
-  }
-
-  // Effective boolean value of the iterator
-  def effectiveBooleanValue(iterator: SequenceIterator) =
-    ExpressionTool.effectiveBooleanValue(iterator)
-
-  // Element and attribute creation
-  def element(name: QName): Element = DocumentFactory.createElement(name)
-  def attribute(name: QName, value: String = ""): Attribute = DocumentFactory.createAttribute(null, name, value)
-  def namespace(prefix: String, uri: String): Namespace = Namespace(prefix, uri)
-
-  // Parse the given qualified name and return the separated prefix and local name
-  def parseQName(lexicalQName: String): (String, String) = {
-    val checker = Name10Checker.getInstance
-    val parts   = checker.getQNameParts(lexicalQName)
-
-    (parts(0), parts(1))
-  }
-
-  // Useful predicates
-  val hasChildren : NodeInfo           ⇒ Boolean = element ⇒ element / * nonEmpty
-  val hasId       : NodeInfo           ⇒ Boolean = (element) ⇒ element /@ "id" nonEmpty
-  val hasIdValue  : (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element /@ "id" === id
-  val exists      : Seq[Item]          ⇒ Boolean = (items) ⇒ items.nonEmpty
+  // Qualified name can also be passed as a pair of strings
+  implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
 
   // Node test
   abstract class Test {
@@ -155,53 +57,6 @@ object XML {
     def -(that: Test) = except(that)
   }
 
-  private val ElementOrAttribute = Set(Type.ELEMENT, Type.ATTRIBUTE)
-
-  private class LocalNameOnlyTest(pool: NamePool, localName: String) extends NodeTest {
-
-    // Matches the name only, but not the node kind
-    def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
-      fingerprint != -1 && ElementOrAttribute(nodeKind.toShort) && localName == pool.getLocalName(fingerprint)
-
-    override def matches(tree: TinyTree, nodeNr: Int) = {
-      val fingerprint = tree.getNameCode(nodeNr) & NamePool.FP_MASK
-      fingerprint != -1 && ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && localName == pool.getLocalName(fingerprint)
-    }
-
-    override def matches(node: NodeInfo) =
-      ElementOrAttribute(node.getNodeKind.toShort) && localName == node.getLocalPart
-
-    override def getNodeKindMask = 1 << Type.ELEMENT | 1 << Type.ATTRIBUTE
-    override def toString = "*:" + localName
-
-    def getDefaultPriority = -0.25 // probably not used right now
-  }
-
-  private class NameOnlyTest(pool: NamePool, uri: String, localName: String) extends NodeTest {
-
-    private val fingerprint = pool.allocate("", uri, localName) & NamePool.FP_MASK
-
-    // Matches the name only, but not the node kind
-    def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
-      ElementOrAttribute(nodeKind.toShort) && (fingerprint & NamePool.FP_MASK) == this.fingerprint
-
-    override def matches(tree: TinyTree, nodeNr: Int) =
-      ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && (tree.getNameCode(nodeNr) & NamePool.FP_MASK) == this.fingerprint
-
-    override def matches(node: NodeInfo) =
-      ElementOrAttribute(node.getNodeKind.toShort) && (
-        node match {
-          case _: FingerprintedNode ⇒ node.getFingerprint == fingerprint
-          case _                    ⇒ localName == node.getLocalPart && uri == node.getURI
-        }
-      )
-
-    override def getNodeKindMask = 1 << Type.ELEMENT | 1 << Type.ATTRIBUTE
-    override def toString = pool.getClarkName(fingerprint)
-
-    def getDefaultPriority = -0.25 // probably not used right now
-  }
-
   object AnyTest extends Test {
     def test(nodeInfo: NodeInfo) = AnyNodeTest.getInstance
   }
@@ -216,7 +71,7 @@ object XML {
 //                    val fingerprint = pool.getFingerprint(uri, qName._2)
 //                    val test = new NameTest(nodeKind, fingerprint, pool)
 
-      val qName = parseQName(name)
+      val qName = SaxonUtils.parseQName(name)
 
       // Warn in case the caller used "foo:bar". We don't warn for plain "foo" as that's a common use case for
       // attributes, even through it's actually wrong. However most attributes are unprefixed anyway so it will
@@ -247,11 +102,6 @@ object XML {
     def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.EXCEPT, s2.test(nodeInfo))
   }
 
-  private class NodeKindTestBase(nodeKind: Short) extends Test {
-    private val test = NodeKindTest.makeNodeKindTest(nodeKind)
-    def test(nodeInfo: NodeInfo) = test
-  }
-
   // Match node types, like the XPath * or element(), @* or attribute(), document-node(), processing-instruction(),
   // comment(), text() or node() tests.
   val Element   : Test = new NodeKindTestBase(Type.ELEMENT)
@@ -263,15 +113,6 @@ object XML {
   val Comment   : Test = new NodeKindTestBase(Type.COMMENT)
   val Text      : Test = new NodeKindTestBase(Type.TEXT)
   val Node      : Test = new NodeKindTestBase(Type.NODE)
-
-  // Passing a string as test means to test on the local name of an element or attribute
-  implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
-
-  // Passing a QName as test means to test on the qualified name of an element or attribute
-  implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.getNamespaceURI, attName.getName))
-
-  // Qualified name can also be passed as a pair of strings
-  implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
 
   // Operations on NodeInfo
   implicit class NodeInfoOps(val nodeInfo: NodeInfo) extends AnyVal {
@@ -423,7 +264,7 @@ object XML {
     def isDocument           : Boolean = nodeInfo.getNodeKind.toShort == Type.DOCUMENT
 
     // Whether the given node has at least one child element
-    def hasChildElement = nodeInfo child * nonEmpty
+    def hasChildElement      : Boolean = nodeInfo child * nonEmpty
 
     // True if the node is an element, doesn't have child elements, and has at least one non-empty child text node,
     // NOTE: This ignores PI and comment nodes
@@ -455,17 +296,11 @@ object XML {
 
     private def find(axisNumber: Byte, test: Test): Seq[NodeInfo] = {
       // We know the result contains only NodeInfo, but ouch, this is a cast!
-      val iterator = asScalaIterator(nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))).asInstanceOf[Iterator[NodeInfo]]
+      val iterator = Implicits.asScalaIterator(nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))).asInstanceOf[Iterator[NodeInfo]]
       // FIXME: We should instead return the Iterator. This means all callers need to be adjusted.
       iterator.toStream
     }
   }
-
-  // HACK because of compiler limitation:
-  // "implementation restriction: nested class is not allowed in value class
-  //  This restriction is planned to be removed in subsequent releases."
-  private def prefixesForURIImpl(uri: String, ops: NodeInfoOps) =
-    ops.namespaceMappings collect { case (prefix, `uri`) ⇒ prefix }
 
   // Operations on sequences of NodeInfo
   implicit class NodeInfoSeqOps(val seq: Seq[NodeInfo]) extends AnyVal {
@@ -526,89 +361,67 @@ object XML {
     }
 
     def effectiveBooleanValue: Boolean =
-      XML.effectiveBooleanValue(new ListIterator(seq.asJava))
+      SaxonUtils.effectiveBooleanValue(new ListIterator(seq.asJava))
   }
 
-  // Convert a Java object to a Saxon Item using the Saxon API
-  val anyToItem = new StandardObjectConverter(new SaxonXQDataFactory {
-    def getConfiguration = XPath.GlobalConfiguration
-  }).convertToItem(_: Any)
+  private object Private {
 
-  // Convert a Java object to a Saxon Item but keep unchanged if already an Item
-  val anyToItemIfNeeded: Any ⇒ Item = {
-    case i: Item ⇒ i
-    case a       ⇒ anyToItem(a)
-  }
+    val ElementOrAttribute = Set(Type.ELEMENT, Type.ATTRIBUTE)
 
-  def unsafeUnwrapElement(nodeInfo: NodeInfo): Element =
-    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
+    class LocalNameOnlyTest(pool: NamePool, localName: String) extends NodeTest {
 
-  def unsafeUnwrapDocument(nodeInfo: NodeInfo): Document =
-    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
+      // Matches the name only, but not the node kind
+      def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
+        fingerprint != -1 && ElementOrAttribute(nodeKind.toShort) && localName == pool.getLocalName(fingerprint)
 
-  def unsafeUnwrapAttribute(nodeInfo: NodeInfo): Attribute =
-    nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Attribute]
-
-  def stringToStringValue(s: String): StringValue = StringValue.makeStringValue(s)
-
-  // Other implicit conversions
-  // 2017-07-06: This is in use.
-  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = List(node ensuring (node ne null))
-
-  // 2017-07-06: This is in use.
-  implicit def stringSeqToSequenceIterator(seq: Seq[String]): SequenceIterator =
-    new ListIterator(seq map stringToStringValue asJava)
-
-  // 2017-07-06: This is in use.
-  implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator =
-    new ListIterator(seq.asJava)
-
-  // 2017-07-06: This is in use.
-  implicit def stringToQName(s: String): QName = QName.get(s ensuring ! s.contains(':'))
-  implicit def tupleToQName(name: (String, String)): QName = QName.get(name._2, "", name._1)
-  implicit def uriQualifiedNameToQName(uriQualifiedName: URIQualifiedName): QName = QName.get(uriQualifiedName.localName, "", uriQualifiedName.uri)
-
-//  implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
-
-  implicit def asStringSequenceIterator(i: Iterator[String]): SequenceIterator =
-    asSequenceIterator(i map stringToStringValue)
-
-  implicit def asSequenceIterator(i: Iterator[Item]): SequenceIterator = new SequenceIterator {
-
-    private var currentItem: Item = _
-    private var _position = 0
-
-    def next() = {
-      if (i.hasNext) {
-        currentItem = i.next()
-        _position += 1
-      } else {
-        currentItem = null
-        _position = -1
+      override def matches(tree: TinyTree, nodeNr: Int) = {
+        val fingerprint = tree.getNameCode(nodeNr) & NamePool.FP_MASK
+        fingerprint != -1 && ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && localName == pool.getLocalName(fingerprint)
       }
 
-      currentItem
+      override def matches(node: NodeInfo) =
+        ElementOrAttribute(node.getNodeKind.toShort) && localName == node.getLocalPart
+
+      override def getNodeKindMask = 1 << Type.ELEMENT | 1 << Type.ATTRIBUTE
+      override def toString = "*:" + localName
+
+      def getDefaultPriority = -0.25 // probably not used right now
     }
 
-    def current = currentItem
-    def position = _position
-    def close() = ()
-    def getAnother = null
-    def getProperties = 0
-  }
+    class NameOnlyTest(pool: NamePool, uri: String, localName: String) extends NodeTest {
 
-  implicit def asScalaIterator(i: SequenceIterator): Iterator[Item] = new Iterator[Item] {
+      private val fingerprint = pool.allocate("", uri, localName) & NamePool.FP_MASK
 
-    private var current = i.next()
+      // Matches the name only, but not the node kind
+      def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
+        ElementOrAttribute(nodeKind.toShort) && (fingerprint & NamePool.FP_MASK) == this.fingerprint
 
-    def next() = {
-      val result = current
-      current = i.next()
-      result
+      override def matches(tree: TinyTree, nodeNr: Int) =
+        ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && (tree.getNameCode(nodeNr) & NamePool.FP_MASK) == this.fingerprint
+
+      override def matches(node: NodeInfo) =
+        ElementOrAttribute(node.getNodeKind.toShort) && (
+          node match {
+            case _: FingerprintedNode ⇒ node.getFingerprint == fingerprint
+            case _                    ⇒ localName == node.getLocalPart && uri == node.getURI
+          }
+        )
+
+      override def getNodeKindMask = 1 << Type.ELEMENT | 1 << Type.ATTRIBUTE
+      override def toString = pool.getClarkName(fingerprint)
+
+      def getDefaultPriority = -0.25 // probably not used right now
     }
 
-    def hasNext = current ne null
-  }
+    class NodeKindTestBase(nodeKind: Short) extends Test {
+      private val test = NodeKindTest.makeNodeKindTest(nodeKind)
+      def test(nodeInfo: NodeInfo) = test
+    }
 
-  implicit def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).toSeq
+    // HACK because of compiler limitation:
+    // "implementation restriction: nested class is not allowed in value class
+    //  This restriction is planned to be removed in subsequent releases."
+    def prefixesForURIImpl(uri: String, ops: NodeInfoOps) =
+      ops.namespaceMappings collect { case (prefix, `uri`) ⇒ prefix }
+  }
 }

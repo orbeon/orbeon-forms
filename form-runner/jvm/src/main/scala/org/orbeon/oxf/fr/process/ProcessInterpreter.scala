@@ -26,7 +26,7 @@ import org.orbeon.oxf.{util ⇒ u}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.BooleanValue
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.XPath._
 
 import scala.annotation.tailrec
 import scala.util.control.{Breaks, ControlThrowable, NonFatal}
@@ -292,19 +292,19 @@ trait ProcessInterpreter extends Logging {
   def tryNop(params: ActionParams): Try[Any] =
     Success(())
 
-  def evaluateBoolean(expr: String, item: Item = xpathContext) =
+  def evaluateBoolean(expr: String, item: Item = xpathContext): Boolean =
     evaluateOne(
       expr = u.XPath.makeBooleanExpression(expr),
       item = item
     ).asInstanceOf[BooleanValue].getBooleanValue
 
-  def evaluateString(expr: String, item: Item = xpathContext) =
+  def evaluateString(expr: String, item: Item = xpathContext): String =
     evaluateOne(
       expr = u.XPath.makeStringExpression(expr),
       item = item
     ).getStringValue
 
-  def evaluateOne(expr: String, item: Item = xpathContext) =
+  def evaluateOne(expr: String, item: Item = xpathContext): Item =
     evalOne(
       item            = item,
       expr            = expr,
@@ -312,7 +312,7 @@ trait ProcessInterpreter extends Logging {
       functionContext = xpathFunctionContext
     )
 
-  def evaluateValueTemplate(valueTemplate: String) =
+  def evaluateValueTemplate(valueTemplate: String): String =
     if (! XFormsUtils.maybeAVT(valueTemplate))
       valueTemplate
     else

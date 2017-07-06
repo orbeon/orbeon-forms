@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.saxon.functions.EscapeURI
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.XML._
 
 import scala.language.postfixOps

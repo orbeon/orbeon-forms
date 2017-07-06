@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.XML._
 
@@ -323,7 +324,7 @@ object ToolboxOps {
     val doc = td.getDocumentRoot
 
     val name = getControlName(td \ * head)
-    val xvc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("xcv"))
+    val xvc = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
 
     findControlByName(doc, name) foreach { controlElement ⇒
 
@@ -360,7 +361,7 @@ object ToolboxOps {
   def pasteFromClipboard(td: NodeInfo): Unit = {
     ensureEmptyTd(td) foreach { gridTd ⇒
 
-      val xvc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("xcv"))
+      val xvc = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
 
       /* Example layout:
       <xcv>

@@ -13,11 +13,11 @@
   */
 package org.orbeon.scaxon
 
-import org.orbeon.dom.{Attribute, Document, Element}
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.{TransformerUtils, XMLParsing, XMLReceiver}
+import org.orbeon.dom.{Attribute, Document, Element}
+import org.orbeon.oxf.util
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.{TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.SimplePath._
 
@@ -37,9 +37,9 @@ object NodeConversions {
 
   def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
     if (readonly)
-      TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, e.toString, false, false)
+      TransformerUtils.stringToTinyTree(util.XPath.GlobalConfiguration, e.toString, false, false)
     else
-      new DocumentWrapper(elemToDom4j(e), null, XPath.GlobalConfiguration)
+      new DocumentWrapper(elemToDom4j(e), null, util.XPath.GlobalConfiguration)
 
   def nodeInfoToElem(nodeInfo: NodeInfo): Elem =
     scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))

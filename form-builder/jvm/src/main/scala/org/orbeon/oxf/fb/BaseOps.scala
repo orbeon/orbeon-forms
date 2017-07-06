@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import spray.json._
 import DefaultJsonProtocol._
 import org.orbeon.oxf.xforms.model.XFormsModel

@@ -18,7 +18,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.junit.AssertionsForJUnit
 
 class RepeatedSectionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {

@@ -22,7 +22,7 @@ import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 /*
  * Form Builder: toolbox operations.

@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.util.control.NonFatal
 

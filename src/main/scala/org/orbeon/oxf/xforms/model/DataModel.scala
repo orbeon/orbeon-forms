@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.w3c.dom.Node._
 
 /**

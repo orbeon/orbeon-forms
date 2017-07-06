@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.JavaConverters._

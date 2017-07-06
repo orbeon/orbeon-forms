@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.{immutable ⇒ i}
 import scala.util.Try

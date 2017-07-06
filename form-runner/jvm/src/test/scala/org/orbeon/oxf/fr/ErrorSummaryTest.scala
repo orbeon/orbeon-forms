@@ -18,7 +18,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.junit.AssertionsForJUnit
 
 class ErrorSummaryTest extends DocumentTestBase with AssertionsForJUnit {

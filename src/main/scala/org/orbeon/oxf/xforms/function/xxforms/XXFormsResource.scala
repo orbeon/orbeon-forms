@@ -22,7 +22,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.saxon.value.{StringValue, Value}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.annotation.tailrec
 

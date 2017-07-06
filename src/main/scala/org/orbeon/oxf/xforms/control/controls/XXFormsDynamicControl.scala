@@ -35,7 +35,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.generic.Growable

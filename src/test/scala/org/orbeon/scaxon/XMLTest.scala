@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.junit.AssertionsForJUnit
 
 class XMLTest extends AssertionsForJUnit {

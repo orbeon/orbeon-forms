@@ -25,7 +25,7 @@ package org.orbeon.oxf.json
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.xml.sax.helpers.AttributesImpl
 import spray.json._
 

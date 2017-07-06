@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.scaxon.XML.Test
+import org.orbeon.scaxon.SimplePath.Test
 
 object XMLNames {
 

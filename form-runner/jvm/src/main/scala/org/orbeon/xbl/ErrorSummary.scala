@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 object ErrorSummary {
 

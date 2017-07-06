@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Try

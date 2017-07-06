@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 
 import scala.util.control.NonFatal

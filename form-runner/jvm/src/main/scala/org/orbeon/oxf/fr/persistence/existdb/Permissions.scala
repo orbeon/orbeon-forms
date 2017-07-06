@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 object Permissions {
 

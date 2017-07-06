@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 object SearchOps {
 

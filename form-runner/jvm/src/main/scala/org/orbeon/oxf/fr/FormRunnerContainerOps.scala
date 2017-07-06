@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xml.TransformerUtils._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 

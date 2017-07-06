@@ -30,7 +30,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om.{Item, StructuredQName}
 import org.orbeon.saxon.value.{BooleanValue, DateTimeValue, IntegerValue, StringValue}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 
 // The Form Runner function library

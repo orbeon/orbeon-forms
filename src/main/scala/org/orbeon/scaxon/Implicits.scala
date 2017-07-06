@@ -16,7 +16,7 @@ package org.orbeon.scaxon
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, ListIterator, NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.XML.URIQualifiedName
+import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
 import scala.collection.JavaConverters._
 import scala.collection.{Iterator, Seq}

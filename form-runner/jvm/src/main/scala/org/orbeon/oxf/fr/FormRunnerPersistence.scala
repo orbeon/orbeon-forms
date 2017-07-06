@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal

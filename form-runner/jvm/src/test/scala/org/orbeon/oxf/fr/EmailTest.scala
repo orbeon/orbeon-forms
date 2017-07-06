@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpecLike
 
 class EmailTest

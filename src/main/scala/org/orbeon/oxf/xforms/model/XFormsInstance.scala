@@ -374,7 +374,7 @@ trait XFormsInstanceIndex {
 
   self: XFormsInstance ⇒
 
-  import org.orbeon.scaxon.XML._
+  import org.orbeon.scaxon.SimplePath._
   import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
   import collection.{mutable ⇒ m}

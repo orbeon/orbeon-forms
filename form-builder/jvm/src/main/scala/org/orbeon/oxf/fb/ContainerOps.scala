@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 trait ContainerOps extends ControlOps {
 

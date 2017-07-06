@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 trait SectionOps extends ContainerOps {
 

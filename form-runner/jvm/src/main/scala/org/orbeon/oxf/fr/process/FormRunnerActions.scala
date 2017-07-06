@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.submission.RelevanceHandling
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.language.postfixOps
 import scala.util.Try

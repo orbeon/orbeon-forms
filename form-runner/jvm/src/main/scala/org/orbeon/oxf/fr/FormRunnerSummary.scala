@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 trait FormRunnerSummary {
 

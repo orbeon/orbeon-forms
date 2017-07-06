@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.FunSpec
 
 class XXFormsResourceTest extends FunSpec {

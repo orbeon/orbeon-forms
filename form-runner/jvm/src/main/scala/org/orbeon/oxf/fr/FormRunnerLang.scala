@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.instruct.NumberInstruction
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
 

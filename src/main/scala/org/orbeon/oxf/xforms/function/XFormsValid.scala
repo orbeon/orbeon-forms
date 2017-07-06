@@ -19,7 +19,7 @@ import org.orbeon.oxf.xml.AttributesAndElementsIterator
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 /**
  * xf:valid() as xs:boolean

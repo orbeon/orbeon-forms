@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.JavaConverters._
 

@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 
 import scala.collection.JavaConverters._

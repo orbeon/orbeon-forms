@@ -25,7 +25,7 @@ import org.orbeon.saxon.tinytree.TinyTree
 import scala.collection.JavaConverters._
 import scala.collection._
 
-object XML {
+object SimplePath {
 
   import Private._
 

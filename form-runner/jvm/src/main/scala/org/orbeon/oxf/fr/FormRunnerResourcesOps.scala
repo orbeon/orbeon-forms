@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.IOUtils.useAndClose
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 
 trait FormRunnerResourcesOps {

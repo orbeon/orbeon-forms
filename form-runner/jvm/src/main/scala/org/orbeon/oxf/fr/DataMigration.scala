@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{DocumentInfo, Name10Checker, NodeInfo, VirtualNode}
 import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 object DataMigration {
 

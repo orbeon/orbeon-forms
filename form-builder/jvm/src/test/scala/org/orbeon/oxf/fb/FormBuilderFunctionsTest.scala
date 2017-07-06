@@ -28,7 +28,7 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.junit.AssertionsForJUnit
 
 class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {

@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 trait SearchRequest {
 

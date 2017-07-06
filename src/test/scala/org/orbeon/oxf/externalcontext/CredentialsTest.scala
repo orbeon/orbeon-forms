@@ -60,7 +60,7 @@ class CredentialsTest extends FunSpec with XMLSupport {
   describe("External JSON format") {
 
     import org.orbeon.oxf.json.Converter
-    import org.orbeon.scaxon.XML._
+    import org.orbeon.scaxon.SimplePath._
 
     val rootElem =
       Converter.jsonStringToXmlDoc(serializeCredentials(TestCredentials, encodeForHeader = false)).rootElement

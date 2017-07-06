@@ -11,8 +11,7 @@ import org.orbeon.oxf.xforms.submission.RelevanceHandling.{Keep, Remove}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 case class SubmissionParameters(
   refContext                     : RefContext,

@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.{NamespaceMapping, SaxonUtils}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE, TEXT_NODE}
 

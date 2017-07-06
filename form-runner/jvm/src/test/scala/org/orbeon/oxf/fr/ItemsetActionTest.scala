@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.junit.AssertionsForJUnit
 
 class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFormsSupport with AssertionsForJUnit {
@@ -81,8 +81,6 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
       }
 
       object Counts {
-
-        import XML._
 
         def attributesValues(name: String) =
           instance("fr-form-instance").get.rootElement descendantOrSelf * att s"*:$name" map (_.stringValue)

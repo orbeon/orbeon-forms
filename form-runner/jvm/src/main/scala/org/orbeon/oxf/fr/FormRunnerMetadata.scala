@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.ErrorSummary
 
 import scala.xml.Elem

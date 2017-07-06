@@ -182,7 +182,7 @@ object ConverterTest {
 class ConverterTest extends FunSpecLike with XMLSupport {
 
   import ConverterTest._
-  import org.orbeon.scaxon.XML.{Test ⇒ _, _}
+  import org.orbeon.scaxon.SimplePath.{Test ⇒ _, _}
 
   describe("Converting from JSON to XML") {
     it ("must match expectations") {

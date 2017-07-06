@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsVariableControl
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.saxon.value.Value
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 object Wizard {
 

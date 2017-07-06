@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
-import org.orbeon.scaxon.XML._
+import org.orbeon.scaxon.SimplePath._
 
 import scala.xml.Elem
 

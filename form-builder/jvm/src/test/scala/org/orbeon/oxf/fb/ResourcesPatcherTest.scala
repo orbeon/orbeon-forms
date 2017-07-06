@@ -101,7 +101,7 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
 
   @Test def testResourcesConsistency(): Unit = {
 
-    import org.orbeon.scaxon.XML._
+    import org.orbeon.scaxon.SimplePath._
 
     def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == "en"
 

@@ -12,6 +12,7 @@ import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.XML._
 
 case class SubmissionParameters(
   refContext                     : RefContext,
@@ -69,7 +70,7 @@ object SubmissionParameters {
         )
       )
 
-    if (! XML.isDocument(refContext.refNodeInfo) && ! XML.isElement(refContext.refNodeInfo))
+    if (! refContext.refNodeInfo.isDocument && ! refContext.refNodeInfo.isElement)
       throw new XFormsSubmissionException(
         dynamicSubmission,
         "xf:submission: single-node binding must refer to a document node or an element.",

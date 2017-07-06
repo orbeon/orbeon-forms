@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.scaxon.XML
+import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.JavaConverters._
@@ -38,7 +38,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
   val (node, hasChildrenElements) =
     item match {
       case node: NodeInfo ⇒
-        val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && XML.hasChildElement(node)
+        val hasChildrenElements = node.getNodeKind == ELEMENT_NODE && node.hasChildElement
         InstanceData.addBindNode(node, this)
         // The last type wins
         staticBind.dataType foreach (InstanceData.setBindType(node, _))

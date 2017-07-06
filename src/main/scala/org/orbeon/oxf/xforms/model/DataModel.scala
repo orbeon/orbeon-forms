@@ -51,10 +51,10 @@ object DataModel {
    * particular, writing an empty value to a text node causes the control to become non-relevant.
    */
   def isAllowedValueBoundItem(item: Item) = item match {
-    case _: AtomicValue                                                                        ⇒ true
-    case node: NodeInfo if isAttribute(node) || isElement(node) && supportsSimpleContent(node) ⇒ true
-    case node: NodeInfo if node self (Text || PI || Comment)                                   ⇒ true
-    case _                                                                                     ⇒ false
+    case _: AtomicValue                                                                     ⇒ true
+    case node: NodeInfo if node.isAttribute || node.isElement && node.supportsSimpleContent ⇒ true
+    case node: NodeInfo if node self (Text || PI || Comment)                                ⇒ true
+    case _                                                                                  ⇒ false
   }
 
   /**
@@ -68,11 +68,11 @@ object DataModel {
    * - items not backed by a mutable node (which are read-only)
    */
   def isWritableItem(item: Item): VirtualNode Either Reason = item match {
-    case _: AtomicValue                             ⇒ Right(ReadonlyNodeReason)
-    case _: DocumentInfo                            ⇒ Right(DisallowedNodeReason)
-    case node: VirtualNode if hasChildElement(node) ⇒ Right(DisallowedNodeReason)
-    case node: VirtualNode                          ⇒ Left(node)
-    case _                                          ⇒ Right(ReadonlyNodeReason)
+    case _: AtomicValue                            ⇒ Right(ReadonlyNodeReason)
+    case _: DocumentInfo                           ⇒ Right(DisallowedNodeReason)
+    case node: VirtualNode if node.hasChildElement ⇒ Right(DisallowedNodeReason)
+    case node: VirtualNode                         ⇒ Left(node)
+    case _                                         ⇒ Right(ReadonlyNodeReason)
   }
 
   /**

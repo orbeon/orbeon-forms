@@ -264,48 +264,6 @@ object XML {
   val Text      : Test = new NodeKindTestBase(Type.TEXT)
   val Node      : Test = new NodeKindTestBase(Type.NODE)
 
-  // Whether the node is an element and "supports" simple content, that is doesn't have child elements
-  // NOTE: This ignores PI and comment nodes
-  def supportsSimpleContent(nodeInfo: NodeInfo): Boolean =
-    isElement(nodeInfo) && ! hasChildElement(nodeInfo)
-
-  private def hasNonEmptyChildNode(nodeInfo: NodeInfo) =
-    nodeInfo child Text exists (_.stringValue.nonEmpty)
-
-  // TODO: Should be on NodeInfoOps!
-  def isAttribute(nodeInfo: NodeInfo)          = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
-  def isElement(nodeInfo: NodeInfo)            = nodeInfo.getNodeKind.toShort == Type.ELEMENT
-  def isElementOrAttribute(nodeInfo: NodeInfo) = ElementOrAttribute(nodeInfo.getNodeKind.toShort)
-  def isDocument(nodeInfo: NodeInfo)           = nodeInfo.getNodeKind.toShort == Type.DOCUMENT
-
-  // Whether the given node has at least one child element
-  // TODO: Should be on NodeInfoOps!
-  def hasChildElement(nodeInfo: NodeInfo) = nodeInfo child * nonEmpty
-
-  // True if the node is an element, doesn't have child elements, and has at least one non-empty child text node,
-  // NOTE: This ignores PI and comment nodes
-  // TODO: Should be on NodeInfoOps!
-  def hasSimpleContent(nodeInfo: NodeInfo): Boolean =
-    isElement(nodeInfo) && ! hasChildElement(nodeInfo) && hasNonEmptyChildNode(nodeInfo)
-
-  // True if the node is an element, has at least one child element, and has at least one non-empty child text node
-  // NOTE: This ignores PI and comment nodes
-  // TODO: Should be on NodeInfoOps!
-  def hasMixedContent(nodeInfo: NodeInfo): Boolean =
-    isElement(nodeInfo) && hasChildElement(nodeInfo) && hasNonEmptyChildNode(nodeInfo)
-
-  // True if the node is an element and has no children nodes
-  // NOTE: This ignores PI and comment nodes
-  // TODO: Should be on NodeInfoOps!
-  def hasEmptyContent(nodeInfo: NodeInfo): Boolean =
-    isElement(nodeInfo) && (nodeInfo child Node isEmpty)
-
-  // True if the node is an element, has at least one child element, and doesn't have non-empty child text nodes
-  // NOTE: This ignores PI and comment nodes
-  // TODO: Should be on NodeInfoOps!
-  def hasElementOnlyContent(nodeInfo: NodeInfo): Boolean =
-    isElement(nodeInfo) && hasChildElement(nodeInfo) && ! hasNonEmptyChildNode(nodeInfo)
-
   // Passing a string as test means to test on the local name of an element or attribute
   implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
 
@@ -458,6 +416,42 @@ object XML {
     def stringValue = nodeInfo.getStringValue
 
     def hasIdValue(id: String) = nodeInfo /@ "id" === id
+
+    def isAttribute          : Boolean = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
+    def isElement            : Boolean = nodeInfo.getNodeKind.toShort == Type.ELEMENT
+    def isElementOrAttribute : Boolean = ElementOrAttribute(nodeInfo.getNodeKind.toShort)
+    def isDocument           : Boolean = nodeInfo.getNodeKind.toShort == Type.DOCUMENT
+
+    // Whether the given node has at least one child element
+    def hasChildElement = nodeInfo child * nonEmpty
+
+    // True if the node is an element, doesn't have child elements, and has at least one non-empty child text node,
+    // NOTE: This ignores PI and comment nodes
+    def hasSimpleContent: Boolean =
+      nodeInfo.isElement && ! nodeInfo.hasChildElement && hasNonEmptyChildNode
+
+    // True if the node is an element, has at least one child element, and has at least one non-empty child text node
+    // NOTE: This ignores PI and comment nodes
+    def hasMixedContent: Boolean =
+      nodeInfo.isElement && nodeInfo.hasChildElement && hasNonEmptyChildNode
+
+    // True if the node is an element and has no children nodes
+    // NOTE: This ignores PI and comment nodes
+    def hasEmptyContent: Boolean =
+      nodeInfo.isElement && (nodeInfo child Node isEmpty)
+
+    // True if the node is an element, has at least one child element, and doesn't have non-empty child text nodes
+    // NOTE: This ignores PI and comment nodes
+    def hasElementOnlyContent(nodeInfo: NodeInfo): Boolean =
+      nodeInfo.isElement && nodeInfo.hasChildElement && ! hasNonEmptyChildNode
+
+    // Whether the node is an element and "supports" simple content, that is doesn't have child elements
+    // NOTE: This ignores PI and comment nodes
+    def supportsSimpleContent: Boolean =
+      nodeInfo.isElement && ! nodeInfo.hasChildElement
+
+    private def hasNonEmptyChildNode: Boolean =
+      nodeInfo child Text exists (_.stringValue.nonEmpty)
 
     private def find(axisNumber: Byte, test: Test): Seq[NodeInfo] = {
       // We know the result contains only NodeInfo, but ouch, this is a cast!

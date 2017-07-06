@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.oxf.xml.{AttributesAndElementsIterator, FunctionSupport}
+import org.orbeon.oxf.xml.AttributesAndElementsIterator
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
-import org.orbeon.scaxon.XML.{asScalaIterator, isElementOrAttribute}
+import org.orbeon.scaxon.XML._
 
 /**
  * xf:valid() as xs:boolean
@@ -72,7 +72,7 @@ trait ValidSupport extends XFormsFunction {
 
   // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
   def isItemValid(item: Item, pruneNonRelevant: Boolean) = item match {
-    case nodeInfo: NodeInfo if isElementOrAttribute(nodeInfo) ⇒
+    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute ⇒
       pruneNonRelevant && ! InstanceData.getInheritedRelevant(nodeInfo) || InstanceData.getValid(nodeInfo)
     case _ ⇒
       true
@@ -80,7 +80,7 @@ trait ValidSupport extends XFormsFunction {
 
   // Tree is valid unless one of its descendant-or-self nodes is invalid
   def isTreeValid(item: Item, pruneNonRelevant: Boolean) = item match {
-    case nodeInfo: NodeInfo if isElementOrAttribute(nodeInfo) ⇒
+    case nodeInfo: NodeInfo if nodeInfo.isElementOrAttribute ⇒
       ! (AttributesAndElementsIterator(nodeInfo) exists (! isItemValid(_, pruneNonRelevant)))
     case _ ⇒
       true

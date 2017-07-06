@@ -240,7 +240,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
       XFormsAPI.delete(metadataElem child "itemset" filterNot (uniqueIdsInUse contains _.id))
 
-      if (! hasChildElement(metadataElem))
+      if (! metadataElem.hasChildElement)
         XFormsAPI.delete(metadataElem)
     }
 }

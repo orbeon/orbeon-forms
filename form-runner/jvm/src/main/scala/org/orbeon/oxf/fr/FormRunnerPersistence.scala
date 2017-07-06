@@ -287,7 +287,7 @@ trait FormRunnerPersistence {
   ): (Seq[NodeInfo], Seq[String], Seq[String]) = (
     for {
       holder        ← data \\ Node
-      if isAttribute(holder) || isElement(holder) && ! hasChildElement(holder)
+      if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)
       if isUploaded ||

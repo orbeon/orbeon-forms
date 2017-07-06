@@ -95,9 +95,9 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
   // Convert an XML tree to a JSON AST
   def xmlToJson(root: XmlElem, strict: Boolean): JsValue =
     xmlToJsonImpl(
-      if (isDocument(root))
+      if (root.isDocument)
         root.rootElement
-      else if (isElement(root))
+      else if (root.isElement)
         root
       else
         throw new IllegalArgumentException("node must be an element or document"),

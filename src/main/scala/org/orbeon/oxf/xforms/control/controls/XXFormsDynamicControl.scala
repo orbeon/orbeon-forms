@@ -410,7 +410,7 @@ object XXFormsDynamicControl {
     else {
 
       val isNodeLHHA =
-        isElement(node) && org.orbeon.oxf.xforms.analysis.controls.LHHA.isLHHA(unsafeUnwrapElement(node))
+        node.isElement && org.orbeon.oxf.xforms.analysis.controls.LHHA.isLHHA(unsafeUnwrapElement(node))
 
       // Go from root to leaf
       val ancestorsFromRoot = node ancestor * reverse

@@ -130,7 +130,7 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
       def compareElements(left: NodeInfo, right: NodeInfo, lang: String): Boolean = (left, right) match {
         case (left: DocumentInfo, right: DocumentInfo) ⇒
           compareElements(left.rootElement, right.rootElement, lang)
-        case (left: NodeInfo, right: NodeInfo) if isElement(left) ⇒
+        case (left: NodeInfo, right: NodeInfo) if left.isElement ⇒
 
           def commonMessageSuffix = s" (url=$url and lang=$lang)"
 

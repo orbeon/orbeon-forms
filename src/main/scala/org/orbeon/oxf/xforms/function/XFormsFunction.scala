@@ -19,13 +19,12 @@ import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xml.{FunctionSupport, SaxonUtils}
-import org.orbeon.saxon.Configuration
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, SaxonUtils}
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
@@ -41,7 +40,7 @@ import scala.collection.{mutable ⇒ m}
  * TODO: context should contain PropertyContext directly
  * TODO: context should contain BindingContext directly if any
  */
-abstract class XFormsFunction extends FunctionSupport {
+abstract class XFormsFunction extends DefaultFunctionSupport {
 
   import XFormsFunction._
 
@@ -69,14 +68,6 @@ abstract class XFormsFunction extends FunctionSupport {
         resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
           (_.getEffectiveId)
     }
-
-  /**
-   * preEvaluate: this method suppresses compile-time evaluation by doing nothing
-   * (because the value of the expression depends on the runtime context)
-   *
-   * NOTE: A few functions would benefit from not having this, but it is always safe.
-   */
-  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
 
   def bindingContext = context.bindingContext
 
@@ -179,16 +170,6 @@ abstract class XFormsFunction extends FunctionSupport {
         staticContext.declareNamespace(prefix, uri)
       }
     }
-  }
-
-  // By default, all XForms function invalidate the map. Subclasses can override this behavior. This ensures that
-  // we do not, by default, produce invalid maps.
-  override def addToPathMap(
-    pathMap        : PathMap,
-    pathMapNodeSet : PathMapNodeSet
-  ): PathMapNodeSet = {
-    pathMap.setInvalidated(true)
-    null
   }
 
   // Default implementation which adds child expressions (here function arguments) to the pathmap

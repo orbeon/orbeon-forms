@@ -40,9 +40,10 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
-import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.value.*;
-import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -358,29 +359,6 @@ public class XFormsUtils {
                 return sb.toString();
             }
         }
-    }
-
-    public static ValueRepresentation convertJavaObjectToSaxonObject(Object object) {
-        final ValueRepresentation valueRepresentation;
-        if (object instanceof ValueRepresentation) {
-            // Native Saxon variable value
-            valueRepresentation = (ValueRepresentation) object;
-        } else if (object instanceof String) {
-            valueRepresentation = new StringValue((String) object);
-        } else if (object instanceof Boolean) {
-            valueRepresentation = BooleanValue.get((Boolean) object);
-        } else if (object instanceof Integer) {
-            valueRepresentation = new Int64Value((Integer) object);
-        } else if (object instanceof Float) {
-            valueRepresentation = new FloatValue((Float) object);
-        } else if (object instanceof Double) {
-            valueRepresentation = new DoubleValue((Double) object);
-        } else if (object instanceof URI) {
-            valueRepresentation = new AnyURIValue(object.toString());
-        } else {
-            throw new OXFException("Invalid variable type: " + object.getClass());
-        }
-        return valueRepresentation;
     }
 
     public static Document decodeXML(String encodedXML, boolean forceEncryption) {

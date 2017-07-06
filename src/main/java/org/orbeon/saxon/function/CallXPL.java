@@ -11,12 +11,13 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.saxon.function;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.QName;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -26,11 +27,10 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xml.FunctionSupportJava;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.*;
@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * xxf:call-xpl() function.
  */
-public class XXFormsCallXPL extends XFormsFunction {
+public class CallXPL extends FunctionSupportJava {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 

@@ -11,14 +11,13 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.xforms.function.xxforms
+package org.orbeon.saxon.function
 
 import java.io.StringReader
 
 import org.exolab.castor.mapping.Mapping
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.processor.scope.ScopeGenerator
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.expr.XPathContext
@@ -61,7 +60,7 @@ object ScopeFunctionSupport {
   ): SequenceIterator =
     valueOpt match {
       case Some(v: AtomicValue) ⇒
-        // NOTE: This can be a XXFormsSetScopeAttribute.StringValueWithEquals
+        // NOTE: This can be a `StringValueWithEquals`
         SingletonIterator.makeIterator(v)
       case Some(v) ⇒
         val saxStore =

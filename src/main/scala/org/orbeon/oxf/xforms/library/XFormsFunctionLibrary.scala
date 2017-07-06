@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, XMLConstants}
-import org.orbeon.oxf.xforms.function.Last
-import org.orbeon.saxon.functions._
-import org.orbeon.saxon.`type`.BuiltInAtomicType._
-import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.saxon.value._
-import org.orbeon.saxon.`type`.Type
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.function.Last
+import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, XMLConstants}
+import org.orbeon.saxon.{CryptoFunctions, IndependentFunctions}
+import org.orbeon.saxon.`type`.BuiltInAtomicType._
+import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.expr.StaticProperty._
+import org.orbeon.saxon.functions._
 import org.orbeon.saxon.om.NamespaceConstant
+import org.orbeon.saxon.value._
 
 /**
  * Function library for XPath expressions in XForms.
@@ -33,20 +34,20 @@ object XFormsFunctionLibrary extends {
   val XFormsEnvFunctionsNS          = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
   val XFormsXXFormsEnvFunctionsNS   = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
   val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
-  val XXFormsIndependentFunctionsNS = Seq(XXFORMS_NAMESPACE_URI)
+  val CryptoFunctionsNS             = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+  val IndependentFunctionsNS        = Seq(XXFORMS_NAMESPACE_URI)
   val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
   val MapFunctionsNS                = Seq(XMLConstants.XPATH_MAP_FUNCTIONS_NAMESPACE_URI)
   val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
   val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
-  val tryXFormsDocument             = true
 }
   with OrbeonFunctionLibrary
-  with XFormsIndependentFunctions
   with XFormsEnvFunctions
   with XFormsXXFormsEnvFunctions
   with XFormsFunnyFunctions
   with XFormsDeprecatedFunctions
-  with XXFormsIndependentFunctions
+  with CryptoFunctions
+  with IndependentFunctions
   with XXFormsEnvFunctions
   with MapFunctions
   with EXFormsFunctions

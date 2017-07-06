@@ -11,17 +11,17 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.saxon.function;
 
 import org.orbeon.oxf.util.ISO9075;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xml.FunctionSupportJava;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
-public class XXFormsEncodeISO9075 extends XFormsFunction {
+public class DecodeISO9075 extends FunctionSupportJava {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
@@ -30,6 +30,6 @@ public class XXFormsEncodeISO9075 extends XFormsFunction {
         final String value = valueExpression.evaluateAsString(xpathContext).toString();
 
         // Get property value
-        return new StringValue(ISO9075.encode(value));
+        return new StringValue(ISO9075.decode(value));
     }
 }

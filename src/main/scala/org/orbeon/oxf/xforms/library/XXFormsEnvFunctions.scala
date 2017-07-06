@@ -18,8 +18,9 @@ import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.oxf.xforms.function.xxforms._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.function.{Bind, XXFormsValid, Event, If}
+import org.orbeon.oxf.xforms.function.{Bind, Event, If, XXFormsValid}
 import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP
+import org.orbeon.saxon.`type`.Type.{ITEM_TYPE, NODE_TYPE}
 
 /*
  * Orbeon extension functions that depend on the XForms environment.
@@ -180,8 +181,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Fun("document-id", classOf[XXFormsDocumentId], op = 0, min = 0, STRING, EXACTLY_ONE)
 
-    Fun("create-document", classOf[XXFormsCreateDocument], op = 0, min = 0, Type.NODE_TYPE, EXACTLY_ONE)
-
+    // TODO: This is the only place where we use `op`. Should remove it and remove the `op` from `Fun`.
     Fun("label", classOf[XXFormsLHHA], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)
     )
@@ -274,6 +274,24 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Fun(UploadMediatypesValidation.PropertyName, classOf[UploadMediatypesValidation], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+
+    Fun("evaluate-avt", classOf[XXFormsEvaluateAVT], op = 0, min = 1, max = 10, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("form-urlencode", classOf[XXFormsFormURLEncode], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(NODE_TYPE, EXACTLY_ONE)
+    )
+
+    Fun("get-request-path", classOf[GetRequestPathTryXFormsDocument], op = 0, 0, STRING, ALLOWS_ONE)
+
+    Fun("get-request-header", classOf[GetRequestHeaderTryXFormsDocument], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("get-request-parameter", classOf[GetRequestParameterTryXFormsDocument], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
     )
   }
 }

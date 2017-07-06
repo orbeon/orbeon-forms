@@ -70,7 +70,7 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
       case (XXFORMS_NAMESPACE_URI, local) ⇒
         // Property in the xxforms namespace: return our properties
         Option(getContainingDocument(xpathContext).getProperty(local)) map
-          (v ⇒ XFormsUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
+          (v ⇒ SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
       case (uri, local) ⇒
         throw new XPathException(s"Unknown property: property('${stringArgument(0)}')")
     }

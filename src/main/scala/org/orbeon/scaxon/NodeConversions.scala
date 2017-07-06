@@ -19,7 +19,6 @@ import org.orbeon.oxf.util
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, XMLParsing, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
-import org.orbeon.scaxon.SimplePath._
 
 import scala.xml.Elem
 
@@ -52,6 +51,8 @@ object NodeConversions {
 
   def unsafeUnwrapAttribute(nodeInfo: NodeInfo): Attribute =
     nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Attribute]
+
+  import org.orbeon.scaxon.SimplePath._
 
   implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToNodeInfoSeq(e).head
   implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) / *

@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms
+package org.orbeon.saxon.function
 
 import java.io.{ByteArrayInputStream, InputStream}
 
@@ -20,11 +20,11 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ImageMetadata._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.DefaultFunctionSupport
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 
-class XXFormsImageMetadata extends XFormsFunction {
+class ImageMetadata extends DefaultFunctionSupport {
 
   override def evaluateItem(xpathContext: XPathContext): Item = {
 

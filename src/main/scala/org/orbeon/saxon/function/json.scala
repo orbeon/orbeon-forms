@@ -11,21 +11,20 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms
+package org.orbeon.saxon.function
 
 import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
+import org.orbeon.oxf.xml.{DependsOnContextItemIfSingleArgumentMissing, FunctionSupport}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
 
-class JsonStringToXml extends XFormsFunction with DependsOnContextItemIfSingleArgumentMissing {
+class JsonStringToXml extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): DocumentInfo =
     stringArgumentOrContextOpt(0)(xpathContext) map (Converter.jsonStringToXmlDoc(_)) orNull
 }
 
-class XmlToJsonString extends XFormsFunction with DependsOnContextItemIfSingleArgumentMissing {
+class XmlToJsonString extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     itemArgumentOrContextOpt(0)(xpathContext)  map (i ⇒ Converter.xmlToJsonString(i.asInstanceOf[NodeInfo], strict = false))
 }

@@ -15,12 +15,10 @@ package org.orbeon.oxf.fr
 
 import java.{util ⇒ ju}
 
-import org.orbeon.oxf.fr.FormRunner.{FormRunnerParams, _}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLFinder
 import org.orbeon.oxf.xforms.XFormsUtils._
-import org.orbeon.oxf.xforms.function.xxforms.{XXFormsPropertiesStartsWith, XXFormsProperty}
-import org.orbeon.saxon.functions.EscapeURI
+import org.orbeon.saxon.function.{PropertiesStartsWith, Property}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
@@ -33,12 +31,12 @@ trait FormRunnerPDF {
   def getPDFFormats: ju.Map[String, String] = {
 
     def propertiesStartingWithIt(prefix: String) =
-      XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).iterator map (_.getStringValue)
+      PropertiesStartsWith.propertiesStartsWith(prefix).iterator map (_.getStringValue)
 
     val formatPairsIt =
       for {
         formatPropertyName ← propertiesStartingWithIt("oxf.fr.pdf.format")
-        expression         ← XXFormsProperty.propertyAsString(formatPropertyName)
+        expression         ← Property.propertyAsString(formatPropertyName)
         formatName         = formatPropertyName split '.' last
       } yield
         formatName → expression
@@ -60,7 +58,7 @@ trait FormRunnerPDF {
 
     val expressionOpt =
       for {
-        format     ← XXFormsProperty.propertyAsString(propertyName)
+        format     ← Property.propertyAsString(propertyName)
         expression ← Option(pdfFormats.get(format))
       } yield
         expression

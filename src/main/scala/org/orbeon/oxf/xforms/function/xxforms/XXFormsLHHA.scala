@@ -15,10 +15,11 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 
-class XXFormsLHHA extends XFormsFunction {
+class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 

@@ -23,7 +23,8 @@ import scala.collection.{Iterator, Seq}
 
 object Implicits {
 
-  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] = List(node ensuring (node ne null))
+  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] =
+    List(node ensuring (node ne null))
 
   implicit def stringSeqToSequenceIterator(seq: Seq[String]): SequenceIterator =
     new ListIterator(seq map SaxonUtils.stringToStringValue asJava)
@@ -77,5 +78,5 @@ object Implicits {
     def hasNext = current ne null
   }
 
-  implicit def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).toSeq
+  implicit def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).to[List]
 }

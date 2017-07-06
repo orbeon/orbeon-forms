@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.value.AtomicValue
 
 
@@ -48,7 +49,7 @@ class XXFormsComponentParam extends XFormsFunction {
         }
 
       def fromProperties =
-        propertyName flatMap XXFormsProperty.property
+        propertyName flatMap Property.property
 
       fromElemAlsoTryAvt orElse fromProperties
     } orNull

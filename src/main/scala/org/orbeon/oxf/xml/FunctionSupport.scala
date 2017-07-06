@@ -13,20 +13,24 @@
  */
 package org.orbeon.oxf.xml
 
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.{ExpressionVisitor, _}
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.value.{BooleanValue, Int64Value, IntegerValue, StringValue}
+import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 
-trait RuntimeDependentFunction extends SystemFunction {
+
+trait DefaultFunctionSupport
+  extends FunctionSupport
+    with NoPathMapDependencies
+    with NoPreEvaluate
+
+trait RuntimeDependentFunction extends DefaultFunctionSupport {
   override def getIntrinsicDependencies =
     super.getIntrinsicDependencies | StaticProperty.DEPENDS_ON_RUNTIME_ENVIRONMENT
-
-  // Suppress compile-time evaluation by doing nothing
-  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
 }
 
 // Mix-in for functions which use the context if single optional argument is missing
@@ -35,11 +39,31 @@ trait DependsOnContextItemIfSingleArgumentMissing extends FunctionSupport {
     super.getIntrinsicDependencies | (if (arguments.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0)
 }
 
-abstract class FunctionSupport extends SystemFunction {
+trait NoPathMapDependencies extends SystemFunction {
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+    pathMap.setInvalidated(true)
+    null
+  }
+}
 
-  // Public accessor for Scala traits
-  def arguments: Seq[Expression] = argument
-  def functionOperation: Int = operation
+/**
+ * preEvaluate: this method suppresses compile-time evaluation by doing nothing
+ * (because the value of the expression depends on the runtime context)
+ *
+ * NOTE: A few functions would benefit from not having this, but it is always safe.
+ */
+trait NoPreEvaluate extends SystemFunction {
+  override def preEvaluate(visitor: ExpressionVisitor): Expression = this
+}
+
+abstract class FunctionSupportJava extends FunctionSupport
+
+trait FunctionSupport extends SystemFunction {
+
+  def arguments: Seq[Expression] = getArguments
 
   def stringArgument(i: Int)(implicit xpathContext: XPathContext): String =
     arguments(i).evaluateAsString(xpathContext).toString
@@ -104,6 +128,7 @@ abstract class FunctionSupport extends SystemFunction {
   implicit def stringToStringValue(v: String)                        : StringValue      = SaxonUtils.stringToStringValue(v)
   implicit def booleanToBooleanValue(v: Boolean)                     : BooleanValue     = BooleanValue.get(v)
   implicit def intToIntegerValue(v: Int)                             : IntegerValue     = Int64Value.makeIntegerValue(v)
+  implicit def doubleToDoubleValue(v: Double)                        : DoubleValue      = new DoubleValue(v)
 
   implicit def stringOptToStringValue(v: Option[String])             : StringValue      = v map stringToStringValue orNull
   implicit def booleanOptToBooleanValue(v: Option[Boolean])          : BooleanValue     = v map booleanToBooleanValue orNull

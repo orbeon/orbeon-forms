@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.saxon.function;
 
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
@@ -24,7 +24,7 @@ import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 
-public class XXFormsRewriteServiceURI extends SystemFunction {
+public class RewriteServiceURI extends SystemFunction {
 
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing

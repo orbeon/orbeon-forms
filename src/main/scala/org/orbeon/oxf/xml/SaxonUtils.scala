@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.xml
 
+import java.net.URI
+
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{Expression, ExpressionTool}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest}
-import org.orbeon.saxon.value.{AtomicValue, StringValue, Value}
+import org.orbeon.saxon.value._
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 import org.orbeon.scaxon.Implicits
 
@@ -213,4 +216,17 @@ object SaxonUtils {
 
     buildOne(node).reverse
   }
+
+  def convertJavaObjectToSaxonObject(o: Any): ValueRepresentation =
+    o match {
+      case v: ValueRepresentation ⇒ v
+      case v: String              ⇒ new StringValue(v)
+      case v: java.lang.Boolean   ⇒ BooleanValue.get(v)
+      case v: java.lang.Integer   ⇒ new Int64Value(v.toLong)
+      case v: java.lang.Float     ⇒ new FloatValue(v)
+      case v: java.lang.Double    ⇒ new DoubleValue(v)
+      case v: URI                 ⇒ new AnyURIValue(v.toString)
+      case _                      ⇒ throw new OXFException(s"Invalid variable type: ${o.getClass}")
+    }
+
 }

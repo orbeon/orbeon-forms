@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.state.DynamicState
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om.{NamespaceConstant, NodeInfo}
 import org.orbeon.saxon.sxpath.XPathEvaluator
+import org.orbeon.saxon.{CryptoFunctions, IndependentFunctions, IndependentRequestFunctions}
 import org.w3c.dom.Node
 
 // For backward compatibility
@@ -40,13 +41,14 @@ class PipelineFunctionLibrary extends {
   // Namespace the functions. We wish we had trait parameters, see:
   // http://docs.scala-lang.org/sips/pending/trait-parameters.html
   val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
-  val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
+  val CryptoFunctionsNS             = Seq(PIPELINE_NAMESPACE_URI)
+  val IndependentFunctionsNS        = Seq(PIPELINE_NAMESPACE_URI)
   val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
-  val tryXFormsDocument             = false
 }
   with OrbeonFunctionLibrary
-  with XFormsIndependentFunctions
-  with XXFormsIndependentFunctions
+  with CryptoFunctions
+  with IndependentFunctions
+  with IndependentRequestFunctions
   with XSLTFunctions {
 
   // === Functions made accessible to XSLT/XPL via Java calls

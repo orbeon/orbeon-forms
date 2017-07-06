@@ -11,22 +11,20 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.library
+package org.orbeon.saxon
 
+import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
-import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.function.{Random, Hmac, Digest}
+import org.orbeon.saxon.function._
 
-/**
- * XForms functions that don't depend on the XForms environment.
- */
-trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
+trait CryptoFunctions extends OrbeonFunctionLibrary {
 
   // Define in early definition of subclass
-  val XFormsIndependentFunctionsNS: Seq[String]
+  val CryptoFunctionsNS: Seq[String]
 
-  Namespace(XFormsIndependentFunctionsNS) {
+  Namespace(CryptoFunctionsNS) {
+
     Fun("digest", classOf[Digest], op = 0, min = 2, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE),

@@ -143,7 +143,7 @@ class PropertySet {
     result.toList
   }
 
-  // For Java callers
+  // 2017-07-06: 1 Java caller.
   def getPropertiesStartsWith(name: String): ju.List[String] = propertiesStartsWith(name).asJava
 
   private def getPropertyOptThrowIfTypeMismatch(name: String, typ: QName): Option[Property] = {

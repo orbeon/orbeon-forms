@@ -11,11 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms;
+package org.orbeon.saxon.function;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xml.FunctionSupportJava;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.saxon.expr.ExpressionVisitor;
@@ -33,7 +33,7 @@ import javax.xml.transform.sax.SAXSource;
 /*
  * NOTE: this class inspired by Saxon's UnparsedText.java.
  */
-public class XXFormsDocBase64 extends XFormsFunction {
+public class DocBase64 extends FunctionSupportJava {
 
     private String expressionBaseURI;
 

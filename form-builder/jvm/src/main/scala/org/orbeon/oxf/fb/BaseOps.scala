@@ -14,20 +14,18 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.{Logging, NetUtils, UserAgent}
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty
 import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.TransformerUtils._
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.function.Property
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import spray.json.DefaultJsonProtocol._
 import spray.json._
-import DefaultJsonProtocol._
-import org.orbeon.oxf.xforms.model.XFormsModel
 
 trait BaseOps extends Logging {
 
@@ -128,7 +126,7 @@ trait BaseOps extends Logging {
   }
 
   def alwaysShowRoles(): List[String] = {
-    val rolesJsonOpt = XXFormsProperty.propertyAsString("oxf.fb.permissions.role.always-show")
+    val rolesJsonOpt = Property.propertyAsString("oxf.fb.permissions.role.always-show")
     rolesJsonOpt.to[List].flatMap(_.parseJson.convertTo[List[String]])
   }
 }

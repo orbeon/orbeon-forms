@@ -11,9 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.xxforms
+package org.orbeon.saxon.function
 
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xml.FunctionSupport
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.functions.Evaluate.PreparedExpression
 import org.orbeon.saxon.trace.Location
@@ -22,17 +22,17 @@ import org.orbeon.saxon.value.{BooleanValue, ObjectValue}
 
 import scala.util.control.Breaks._
 
-class XXFormsForall extends XFormsFunction with ExistentialFunction  {
+class Forall extends ExistentialFunction  {
   def defaultValue = true
   def returnNonDefaultValue(b: Boolean) = ! b
 }
 
-class XXFormsExists extends XFormsFunction with ExistentialFunction  {
+class Exists extends ExistentialFunction  {
   def defaultValue = false
   def returnNonDefaultValue(b: Boolean) = b
 }
 
-trait ExistentialFunction extends XFormsFunction {
+trait ExistentialFunction extends FunctionSupport {
 
   def defaultValue: Boolean
   def returnNonDefaultValue(b: Boolean): Boolean
@@ -58,7 +58,7 @@ trait ExistentialFunction extends XFormsFunction {
     c.setCurrentIterator(items)
     c.openStackFrame(pexpr.stackFrameMap)
 
-    for (i ← 2 to arguments.length - 1) {
+    for (i ← 2 until arguments.length) {
       val slot = pexpr.variables(i - 2).getLocalSlotNumber
       c.setLocalVariable(slot, ExpressionTool.eagerEvaluate(arguments(i), c))
     }

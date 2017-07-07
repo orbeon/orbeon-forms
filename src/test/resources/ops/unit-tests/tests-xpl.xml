@@ -228,43 +228,6 @@
         </output>
     </test>
 
-    <test description="Element around result of delegation processor" name="oxf:pipeline">
-        <input name="call">
-            <root>
-                <delegation:execute service="string" operation="indexOf" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                    <str xsi:type="xs:string">dummy</str>
-                </delegation:execute>
-            </root>
-        </input>
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                <p:param name="call" type="input"/>
-                <p:param name="result" type="output"/>
-                <p:processor name="oxf:delegation">
-                    <p:input name="interface">
-                        <config>
-                            <service id="string" type="javabean" class="java.lang.String"/>
-                        </config>
-                    </p:input>
-                    <p:input name="call" href="#call"/>
-                    <p:output name="data" id="delegation-out"/>
-                </p:processor>
-                <p:processor name="oxf:xml-converter">
-                    <p:input name="config">
-                        <config>
-                            <omit-xml-declaration>true</omit-xml-declaration>
-                        </config>
-                    </p:input>
-                    <p:input name="data" href="#delegation-out"/>
-                    <p:output name="data" ref="result"/>
-                </p:processor>
-            </p:config>
-        </input>
-        <output name="result">
-            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string" content-type="application/xml; charset=utf-8">&lt;root xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:delegation="http://orbeon.org/oxf/xml/delegation" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt; -1 &lt;/root&gt;</document>
-        </output>
-    </test>
-
     <test description="Sleep processor" name="oxf:sleep">
         <input name="config">
             <sleep>5000</sleep>

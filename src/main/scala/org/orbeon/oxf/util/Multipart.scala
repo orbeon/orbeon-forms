@@ -27,10 +27,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.IOUtils._
-import org.orbeon.oxf.xforms.upload.DisallowedMediatypeException
 
 import scala.collection.{mutable ⇒ m}
 import scala.util.control.NonFatal
+
+case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype])
+  extends FileUploadException
 
 sealed trait Reason
 object Reason {

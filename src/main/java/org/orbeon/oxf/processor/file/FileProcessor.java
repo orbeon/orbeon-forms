@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -44,6 +43,8 @@ import java.util.Iterator;
  * etc.
  */
 public class FileProcessor extends ProcessorImpl {
+
+    public static final String DIRECTORY_PROPERTY = "directory";
 
     private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
 
@@ -206,7 +207,7 @@ public class FileProcessor extends ProcessorImpl {
 
     private String getDirectory(Element currentElement, String elementPath) {
         final String configDirectory = XPathUtils.selectStringValueNormalize(currentElement, elementPath);
-        return configDirectory != null ? configDirectory : getPropertySet().getString(FileSerializer.DIRECTORY_PROPERTY);
+        return configDirectory != null ? configDirectory : getPropertySet().getString(DIRECTORY_PROPERTY);
     }
 
     public static void copyFile(File sourceFile, File destFile)  {

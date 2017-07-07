@@ -21,7 +21,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -390,8 +389,13 @@ public class URLRewriterUtils {
 
     // Return the version string either in clear or encoded with HMAC depending on configuration
     public static String getOrbeonVersionForClient() {
-        final boolean isEncodeVersion = XFormsProperties.isEncodeVersion();
+        final boolean isEncodeVersion = isEncodeVersion();
         return isEncodeVersion ? getHmacVersion() : Version.VersionNumber();
+    }
+
+    // TODO: This property is in the `oxf.xforms` namespace. Should remove property or put in a non-XForms namespace.
+    private static boolean isEncodeVersion() {
+        return Properties.instance().getPropertySet().getBoolean("oxf.xforms.resources.encode-version", true);
     }
 
     private static String getHmacVersion() {

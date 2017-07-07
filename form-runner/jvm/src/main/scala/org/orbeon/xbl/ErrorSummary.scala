@@ -16,11 +16,11 @@ package org.orbeon.xbl
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._

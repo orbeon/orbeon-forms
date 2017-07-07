@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import URLRewriter._
 import java.net.{URL, URLDecoder, URLEncoder}
 import java.util.concurrent.Callable
 import java.{util ⇒ ju}
 
+import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.util.{NetUtils, StringConversions, URLRewriterUtils}
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DynamicResourcesPath
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
@@ -107,7 +106,8 @@ class WSRPURLRewriter(
 
   private def rewriteResourceURL(urlString: String): String = {
     // Always encode dynamic resources
-    if (wsrpEncodeResources || urlString == "/xforms-server" || urlString.startsWith(DynamicResourcesPath)) {
+    // NOTE: Not great to depend on XForms paths here.
+    if (wsrpEncodeResources || urlString == "/xforms-server" || urlString.startsWith("/xforms-server/dynamic/")) {
       // First rewrite path to support versioned resources
       val rewrittenPath =
         URLRewriterUtils.rewriteResourceURL(

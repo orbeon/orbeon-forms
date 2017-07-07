@@ -28,8 +28,6 @@ import org.orbeon.oxf.util.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.PipelineUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PathMapXPathDependencies}
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
@@ -87,11 +85,6 @@ class PEVersion extends Version {
   def requirePEFeature(featureName: String) = ()
 
   def isPEFeatureEnabled(featureRequested: Boolean, featureName: String) = featureRequested
-
-  def createUIDependencies(containingDocument: XFormsContainingDocument) = {
-    val requested = containingDocument.getStaticState.isXPathAnalysis
-    if (requested) new PathMapXPathDependencies(containingDocument) else new DumbXPathDependencies
-  }
 }
 
 private object PEVersion {

@@ -16,9 +16,6 @@ package org.orbeon.oxf.common
 import java.util.concurrent.ConcurrentHashMap
 import java.{util ⇒ ju}
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
-
 class CEVersion extends Version {
 
   import CEVersion._
@@ -36,8 +33,6 @@ class CEVersion extends Version {
     }
     false
   }
-
-  def createUIDependencies(containingDocument: XFormsContainingDocument) = new DumbXPathDependencies
 }
 
 private object CEVersion {

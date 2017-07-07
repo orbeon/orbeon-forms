@@ -13,22 +13,27 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.dom.*;
+import org.orbeon.dom.Attribute;
+import org.orbeon.dom.Document;
+import org.orbeon.dom.Element;
+import org.orbeon.dom.VisitorSupport;
+import org.orbeon.dom.saxon.DocumentWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.SAXUtils;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.EncodeDecode;
 import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.SAXUtils;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.dom.saxon.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Convert an XForms instance into a list of parameters.
@@ -113,9 +118,9 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     // Output as SAX
                     xmlReceiver.startDocument();
                     xmlReceiver.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
-                    if (!allMarked[0]) {
+                    if (! allMarked[0]) {
                         // If all the nodes of the instance map to parameters, we don't output the instance parameter
-                        outputParameter("$instance", XFormsUtils.encodeXML(instance, false), xmlReceiver);
+                        outputParameter("$instance", EncodeDecode.encodeXML(instance, true, true, false), xmlReceiver);
                     }
                     xmlReceiver.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
                     xmlReceiver.endDocument();

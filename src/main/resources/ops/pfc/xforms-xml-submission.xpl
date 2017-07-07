@@ -198,8 +198,8 @@
                         <xsl:template match="/">
                             <!-- $instance must be created by `InstanceToParametersProcessor`, which is always encrypted -->
                             <xsl:copy-of
-                                xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
-                                select="xpl:decodeXML(normalize-space(/*/parameters/parameter[name = '$instance']/value))"/>
+                                xmlns:XFormsUtils="java:org.orbeon.oxf.xml.EncodeDecode"
+                                select="EncodeDecode:decodeXML(normalize-space(/*/parameters/parameter[name = '$instance']/value), true())"/>
                         </xsl:template>
                     </xsl:stylesheet>
                 </p:input>

@@ -408,7 +408,9 @@
                                             </xxf:server-events>
                                         </xsl:document>
                                     </xsl:variable>
-                                    <xsl:value-of select="xpl:encodeXML($server-events)"/>
+                                    <xsl:value-of
+                                        xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
+                                        select="XFormsUtils:encodeXMLAsDOM($server-events)"/>
                                 </xxf:event>
                                 <xxf:event name="xxforms-value" source-control-id="input">4</xxf:event>
                                 <xxf:event name="DOMActivate" source-control-id="trigger3"/>
@@ -422,7 +424,9 @@
                                             </xxf:server-events>
                                         </xsl:document>
                                     </xsl:variable>
-                                    <xsl:value-of select="xpl:encodeXML($server-events)"/>
+                                    <xsl:value-of
+                                        xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
+                                        select="XFormsUtils:encodeXMLAsDOM($server-events)"/>
                                 </xxf:event>
                                 <xxf:event name="xxforms-value" source-control-id="input">7</xxf:event>
                                 <xxf:event name="DOMActivate" source-control-id="trigger5"/>

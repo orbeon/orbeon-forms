@@ -34,6 +34,7 @@
         <xsl:param name="namespaces" as="node()*"/>
 
         <!-- Use custom constructor instead of just new XPathEvaluator() so we can pass a Configuration -->
+        <!-- TODO: Probably remove this, only used in a test. -->
         <xsl:variable name="evaluator" select="xpl:newEvaluator($node)"/>
 
         <xsl:variable name="independent-context" select="evaluator:get-static-context($evaluator)"/>

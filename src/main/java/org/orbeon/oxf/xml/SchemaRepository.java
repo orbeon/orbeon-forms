@@ -28,7 +28,6 @@ import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
-import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.processor.serializer.HttpSerializer;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.transformer.TraxTransformer;
@@ -79,7 +78,7 @@ public class SchemaRepository {
         // Serializers schemas
         SCHEMAS.put(CachedSerializer.SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/legacy-serializer-config.rng");
         SCHEMAS.put(HttpSerializer.HTTP_SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/http-serializer-config.rng");
-        SCHEMAS.put(FileSerializer.FILE_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/file-serializer-config.rng");
+        SCHEMAS.put("http://orbeon.org/oxf/xml/file-serializer-config", "schemas/file-serializer-config.rng");
 
         // Converter schemas
         SCHEMAS.put(XMLConverter.STANDARD_TEXT_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/standard-text-converter-config.rng");

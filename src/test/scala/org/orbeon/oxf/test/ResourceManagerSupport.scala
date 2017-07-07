@@ -14,9 +14,6 @@
 package org.orbeon.oxf.test
 
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.webapp.ProcessorService
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI.withContainingDocument
 import org.scalatest.{BeforeAndAfter, Suite}
 
 

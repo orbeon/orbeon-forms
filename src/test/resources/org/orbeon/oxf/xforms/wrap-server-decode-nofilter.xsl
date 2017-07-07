@@ -19,7 +19,9 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:template match="xxf:dynamic-state">
         <xsl:copy>
-            <xsl:apply-templates select="xpl:decodeDynamicStateString(normalize-space(.))" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
+            <xsl:apply-templates
+                select="DynamicState:decodeDynamicStateString(normalize-space(.))"
+                xmlns:DynamicState="java:org.orbeon.oxf.xforms.state.DynamicState"/>
         </xsl:copy>
     </xsl:template>
     <!-- Don't output information about controls which only have visited="true" so we don't have to modify the unit

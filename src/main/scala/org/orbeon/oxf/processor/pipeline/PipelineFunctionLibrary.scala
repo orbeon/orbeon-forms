@@ -16,14 +16,10 @@ package org.orbeon.oxf.processor.pipeline
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor.PIPELINE_NAMESPACE_URI
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.library._
-import org.orbeon.oxf.xforms.state.DynamicState
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om.{NamespaceConstant, NodeInfo}
 import org.orbeon.saxon.sxpath.XPathEvaluator
-import org.orbeon.saxon.{CryptoFunctions, IndependentFunctions, IndependentRequestFunctions}
-import org.w3c.dom.Node
+import org.orbeon.saxon.{CryptoFunctions, IndependentFunctions, IndependentRequestFunctions, XSLTFunctions}
 
 // For backward compatibility
 object PipelineFunctionLibrary extends PipelineFunctionLibrary
@@ -53,11 +49,6 @@ class PipelineFunctionLibrary extends {
 
   // === Functions made accessible to XSLT/XPL via Java calls
 
-  // Add these to XXFormsIndependentFunctions?
-  def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML, true) // only used by `xforms-xml-submission.xpl`
-
-  def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)                                  // for unit tests only
-  def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML   // for unit tests only
   def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
 
   def isPE = Version.isPE

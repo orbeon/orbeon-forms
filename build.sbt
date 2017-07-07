@@ -405,7 +405,8 @@ lazy val formRunner = (crossProject.crossType(CrossType.Full) in file("form-runn
 lazy val formRunnerJVM = formRunner.jvm
   .dependsOn(
     xformsJVM,
-    core % "test->test;compile->compile",
+    core      % "test->test;compile->compile",
+    xformsJVM % "test->test;compile->compile",
     portletSupport
   )
   .enablePlugins(SbtWeb)
@@ -533,9 +534,13 @@ lazy val xforms = (crossProject.crossType(CrossType.Full) in file("xforms"))
 
 
 lazy val xformsJVM = xforms.jvm
-  .dependsOn(commonJVM, core % "test->test;compile->compile")
+  .dependsOn(
+    commonJVM,
+    core % "test->test;compile->compile"
+  )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
+  .settings(jUnitTestOptions: _*)
   .settings(
 
     // Because `Assets` doesn't check the `shared` directory

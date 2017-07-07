@@ -47,6 +47,11 @@
         as="xs:string*"/>
 
     <xsl:variable
+        name="select1-classes"
+        select="'xbl-fr-autocomplete'"
+        as="xs:string*"/>
+
+    <xsl:variable
         name="form-version"
         select="$parameters/form-version[normalize-space()]"
         as="xs:string?"/>
@@ -149,7 +154,15 @@
                                         </image>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
+                                        <field acro-field-name="'{$pdf-field-name}'">
+                                            <xsl:attribute
+                                                name="{
+                                                    if ($classes = $select1-classes)
+                                                    then 'export-value'
+                                                    else 'value'
+                                                }"
+                                                select="concat('''', replace($value, '''', ''''''), '''')"/>
+                                        </field>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:if>

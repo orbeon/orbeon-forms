@@ -19,11 +19,11 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.xbl.ErrorSummary
+import org.orbeon.xforms.XFormsId
 import org.scalatest.junit.AssertionsForJUnit
 
 import scala.collection.JavaConverters._
@@ -168,7 +168,7 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
       val effectiveAbsoluteIds =
         doc.getControls.getCurrentControlTree.effectiveIdsToControls map
-        { case (id, _) ⇒ effectiveIdToAbsoluteId(id) } toList
+        { case (id, _) ⇒ XFormsId.effectiveIdToAbsoluteId(id) } toList
 
       val sortStrings =
         effectiveAbsoluteIds map (ErrorSummary.controlSortString(_, 3))

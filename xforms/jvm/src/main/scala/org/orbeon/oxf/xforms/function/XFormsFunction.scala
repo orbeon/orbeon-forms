@@ -30,6 +30,7 @@ import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
@@ -75,7 +76,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
     context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
   def elementAnalysisForSource = {
-    val prefixedId = XFormsUtils.getPrefixedId(getSourceEffectiveId)
+    val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
     context.container.partAnalysis.getControlAnalysisOption(prefixedId)
   }
 
@@ -85,7 +86,7 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   }
 
   def sourceScope(implicit xpathContext: XPathContext): Scope =
-    context.container.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
+    context.container.partAnalysis.scopeForPrefixedId(XFormsId.getPrefixedId(getSourceEffectiveId))
 
   def getContainingDocument(implicit xpathContext: XPathContext): XFormsContainingDocument =
     Option(context) map (_.container.getContainingDocument) orNull

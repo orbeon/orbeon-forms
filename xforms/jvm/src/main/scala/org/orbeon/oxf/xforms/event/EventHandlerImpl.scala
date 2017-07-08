@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 
@@ -222,7 +223,7 @@ class EventHandlerImpl(
             val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 
             val handlerEffectiveId =
-              xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+              xblContainer.getFullPrefix + staticId + XFormsId.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
 
             (xblContainer, handlerEffectiveId, stack)
           } else {

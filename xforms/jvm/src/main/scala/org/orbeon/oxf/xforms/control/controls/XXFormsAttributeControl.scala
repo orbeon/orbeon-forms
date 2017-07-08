@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.xforms.XFormsId
 
 /**
  * xxf:attribute control
@@ -94,7 +95,7 @@ class XXFormsAttributeControl(
   def getAttributeName = attributeName
 
   def getEffectiveForAttribute =
-    getRelatedEffectiveId(getEffectiveId, attributeControl.forStaticId)
+    XFormsId.getRelatedEffectiveId(getEffectiveId, attributeControl.forStaticId)
 
   override def getNonRelevantEscapedExternalValue =
     attributeName match {

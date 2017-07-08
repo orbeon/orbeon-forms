@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.dom.{Document, DocumentFactory, Element}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
+import org.orbeon.xforms.XFormsId
 
 // Immutable representation of the dynamic state
 case class DynamicState(
@@ -122,7 +123,7 @@ case class DynamicState(
 
           def att(name: String,  value: String): Unit = instanceElement.addAttribute(name, value)
 
-          att("id", XFormsUtils.getStaticIdFromId(instanceState.effectiveId))
+          att("id", XFormsId.getStaticIdFromId(instanceState.effectiveId))
           att("model-id", instanceState.modelEffectiveId)
 
           if (instanceState.readonly) att("readonly", "true")

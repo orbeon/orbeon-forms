@@ -31,6 +31,7 @@ import org.orbeon.saxon.expr.PathMap.{PathMapArc, PathMapNode}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.trace.ExpressionPresenter
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.{LinkedHashSet, Stack}
@@ -368,7 +369,7 @@ object PathMapXPathAnalysis {
               // Rewrite expression to add/replace its argument with a prefixed instance id
               instanceExpression.setArguments(
                 Array(
-                  new PrefixedIdStringLiteral(XFormsUtils.getStaticIdFromId(defaultInstancePrefixedId), defaultInstancePrefixedId)
+                  new PrefixedIdStringLiteral(XFormsId.getStaticIdFromId(defaultInstancePrefixedId), defaultInstancePrefixedId)
                 )
               )
 

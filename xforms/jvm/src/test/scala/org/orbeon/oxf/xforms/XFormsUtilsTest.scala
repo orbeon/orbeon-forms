@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms
 
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-import XFormsUtils._
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.xforms.XFormsId
 
 class XFormsUtilsTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def effectiveAndAbsolute(): Unit = {
@@ -27,17 +27,17 @@ class XFormsUtilsTest extends DocumentTestBase with AssertionsForJUnit {
     )
 
     for ((effective, absolute) ← pairs) {
-      assert(isAbsoluteId(absolute))
-      assert(effective === absoluteIdToEffectiveId(absolute))
-      assert(absolute  === effectiveIdToAbsoluteId(effective))
+      assert(XFormsId.isAbsoluteId(absolute))
+      assert(effective === XFormsId.absoluteIdToEffectiveId(absolute))
+      assert(absolute  === XFormsId.effectiveIdToAbsoluteId(effective))
     }
   }
 
   @Test def absolute(): Unit = {
-    assert(isAbsoluteId("|foo|"))
-    assert(! isAbsoluteId("||"))
-    assert(! isAbsoluteId("|"))
-    assert(! isAbsoluteId(""))
-    assert(! isAbsoluteId("≡≡"))
+    assert(XFormsId.isAbsoluteId("|foo|"))
+    assert(! XFormsId.isAbsoluteId("||"))
+    assert(! XFormsId.isAbsoluteId("|"))
+    assert(! XFormsId.isAbsoluteId(""))
+    assert(! XFormsId.isAbsoluteId("≡≡"))
   }
 }

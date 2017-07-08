@@ -18,10 +18,11 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsObject, XFormsUtils}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 
@@ -185,7 +186,7 @@ object Dispatch extends Logging {
 
     // Repeat indexes in current scope
     val resolutionScopeContainer = container.findScopeRoot(sourcePrefixedId)
-    val containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId)
+    val containerParts = XFormsId.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId)
 
     // Append new indexes
     val newSuffix = appendSuffixes(containerParts, repeatIndexes)

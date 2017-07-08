@@ -23,6 +23,7 @@ import org.orbeon.saxon.expr.LastPositionFinder
 import org.orbeon.saxon.om.{Item, SequenceIterator, ValueRepresentation, VirtualNode}
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{EmptySequence, SequenceExtent, StringValue}
+import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 
@@ -44,7 +45,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
       val result =
         evaluate(
           contextStack,
-          XFormsUtils.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId),
+          XFormsId.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId),
           pushOuterContext,
           handleNonFatal
         )

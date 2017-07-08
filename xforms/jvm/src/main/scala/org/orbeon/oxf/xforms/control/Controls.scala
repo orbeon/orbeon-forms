@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 
@@ -56,7 +57,7 @@ object Controls {
     iterationIndex     : Int
   ) = {
 
-    val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(repeatControl.getEffectiveId).toSeq :+ iterationIndex
+    val idSuffix = XFormsId.getEffectiveIdSuffixParts(repeatControl.getEffectiveId).toSeq :+ iterationIndex
 
     // This is the context of the iteration
     // buildTree() does a pushBinding(), but that won't change the context (no @ref, etc. on the iteration itself)
@@ -94,7 +95,7 @@ object Controls {
     state            : Option[Map[String, ControlState]]
   ) = {
 
-    val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
+    val idSuffix = XFormsId.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
     val bindingContext = containerControl.bindingContextForChild
 
     buildTree(
@@ -190,7 +191,7 @@ object Controls {
     followIndexes            : Boolean
   ): List[XFormsControl] = {
 
-    val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId)
+    val sourcePrefixedId = XFormsId.getPrefixedId(sourceControlEffectiveId)
     val scope            = containingDocument.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
     val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
 
@@ -288,8 +289,8 @@ object Controls {
     // Check preconditions
     require(sourceEffectiveId ne null, "Source effective id is required.")
 
-    val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
-    val sourceParts      = XFormsUtils.getEffectiveIdSuffixParts(sourceEffectiveId)
+    val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
+    val sourceParts      = XFormsId.getEffectiveIdSuffixParts(sourceEffectiveId)
 
     val ancestorRepeatPrefixedIdOpt = ops.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId)
 

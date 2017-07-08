@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 
@@ -29,7 +29,7 @@ class XXFormsListInstances extends XFormsFunction {
         for {
           instance    ← model.getInstances.asScala
           effectiveId = instance.getEffectiveId
-          absoluteId  = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
+          absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
         } yield
           absoluteId
     }

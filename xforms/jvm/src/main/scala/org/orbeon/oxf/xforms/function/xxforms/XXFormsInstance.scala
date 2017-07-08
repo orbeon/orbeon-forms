@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
+import org.orbeon.xforms.XFormsId
 
 /**
  * xxf:instance() function. This function operates like the standard instance() function, except that it looks for
@@ -65,10 +66,10 @@ object XXFormsInstance {
     // example with model variables.
 
     def findObjectByAbsoluteId(id: String) =
-      startContainer.containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(id))
+      startContainer.containingDocument.getObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(id))
 
     def findAbsolute =
-      if (XFormsUtils.isAbsoluteId(instanceId))
+      if (XFormsId.isAbsoluteId(instanceId))
         collectByErasedType[XFormsInstance](findObjectByAbsoluteId(instanceId)) map (_.rootElement)
       else
         None

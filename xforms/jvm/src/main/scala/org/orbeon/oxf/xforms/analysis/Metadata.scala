@@ -17,10 +17,10 @@ import java.util.{Map ⇒ JMap}
 
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore, TransformerUtils}
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable, mutable}
@@ -68,7 +68,7 @@ trait Marks {
   def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
   def getMark(prefixedId: String) = marks.get(prefixedId)
 
-  private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsUtils.isTopLevelId(prefixedId) ⇒ mark }
+  private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsId.isTopLevelId(prefixedId) ⇒ mark }
   def hasTopLevelMarks = topLevelMarks.nonEmpty
 }
 

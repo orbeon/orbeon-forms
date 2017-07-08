@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.xforms.XFormsId
 
 class XXFormsAbsoluteId extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext) =
-    resolveStaticOrAbsoluteId(argument.headOption)(xpathContext) map XFormsUtils.effectiveIdToAbsoluteId
+    resolveStaticOrAbsoluteId(argument.headOption)(xpathContext) map XFormsId.effectiveIdToAbsoluteId
 }

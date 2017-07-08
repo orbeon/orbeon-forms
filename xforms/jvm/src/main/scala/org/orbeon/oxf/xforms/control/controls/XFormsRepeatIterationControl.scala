@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.xforms.XFormsId
 
 /**
  * Represents xf:repeat iteration information.
@@ -46,7 +46,7 @@ class XFormsRepeatIterationControl(
   override type Control <: RepeatIterationControl
 
   // Initialize based on the effective id
-  private var _iterationIndex = XFormsUtils.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
+  private var _iterationIndex = XFormsId.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
   def iterationIndex = _iterationIndex
 
   // Set a new iteration index. This will cause the nested effective ids to update.
@@ -74,7 +74,7 @@ class XFormsRepeatIterationControl(
   // Update this control's effective id and its descendants based on the parent's effective id.
   override def updateEffectiveId(): Unit = {
     // Update this iteration's effective id
-    setEffectiveId(XFormsUtils.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
+    setEffectiveId(XFormsId.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
     children foreach (_.updateEffectiveId())
   }
 

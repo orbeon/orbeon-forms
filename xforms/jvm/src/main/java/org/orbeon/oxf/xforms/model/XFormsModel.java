@@ -40,6 +40,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Value;
+import org.orbeon.xforms.XFormsId;
 import scala.Option;
 
 import java.io.InputStream;
@@ -200,13 +201,13 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     public XFormsObject getObjectByEffectiveId(String effectiveId) {
 
         // If prefixes or suffixes don't match, object can't be found here
-        if (!container().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
-                || !XFormsUtils.getEffectiveIdSuffix(container().getEffectiveId()).equals(XFormsUtils.getEffectiveIdSuffix(effectiveId))) {
+        if (!container().getFullPrefix().equals(XFormsId.getEffectiveIdPrefix(effectiveId))
+                || ! XFormsId.getEffectiveIdSuffix(container().getEffectiveId()).equals(XFormsId.getEffectiveIdSuffix(effectiveId))) {
             return null;
         }
 
         // Find by static id
-        return resolveObjectById(null, XFormsUtils.getStaticIdFromId(effectiveId), null);
+        return resolveObjectById(null, XFormsId.getStaticIdFromId(effectiveId), null);
     }
 
     /**
@@ -220,7 +221,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
      */
     public XFormsObject resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
-        if (XFormsUtils.isEffectiveId(targetStaticId) || XFormsUtils.isAbsoluteId(targetStaticId))
+        if (XFormsId.isEffectiveId(targetStaticId) || XFormsId.isAbsoluteId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
 
         // Check this id

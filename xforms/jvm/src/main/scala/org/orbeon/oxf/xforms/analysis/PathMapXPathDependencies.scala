@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.Model.MIP
@@ -24,6 +23,8 @@ import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
+import org.orbeon.xforms.XFormsId
+
 import org.w3c.dom.Node._
 
 import scala.collection.JavaConverters._
@@ -209,7 +210,7 @@ class PathMapXPathDependencies(
       secondWithInstanceKeys : MapSet[ModelOrInstanceKey, String]
     ) = {
 
-      val controlIndexes        = getEffectiveIdSuffixParts(controlEffectiveId)
+      val controlIndexes        = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
       val controlIsWithinRepeat = controlIndexes.nonEmpty
 
       compareWithPredicate(
@@ -219,7 +220,7 @@ class PathMapXPathDependencies(
 
           val matchesRepeatIterations =
             ! controlIsWithinRepeat ||
-            controlIndexes.startsWith(getEffectiveIdSuffixParts(instancesByKey(instanceKey).getEffectiveId))
+            controlIndexes.startsWith(XFormsId.getEffectiveIdSuffixParts(instancesByKey(instanceKey).getEffectiveId))
 
           matchesRepeatIterations &&
             setsHaveIntersection(
@@ -232,7 +233,7 @@ class PathMapXPathDependencies(
 
     def intersectsStructuralChangeModel(controlEffectiveId: String, analysis: XPathAnalysis) = {
 
-      val controlIndexes        = getEffectiveIdSuffixParts(controlEffectiveId)
+      val controlIndexes        = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
       val controlIsWithinRepeat = controlIndexes.nonEmpty
 
       val touchedModelsEffectiveIds = structuralChangeModelKeys
@@ -247,7 +248,7 @@ class PathMapXPathDependencies(
           // know that this means the control statically share the model's ancestor repeats,
           // because it's not possible to cross an XBL boundary as models are always in a shadow
           // tree's inner scope. So here we want the shared repeat ancestors' iterations to match.
-          controlIndexes.startsWith(getEffectiveIdSuffixParts(modelStates(modelKey).model.effectiveId))
+          controlIndexes.startsWith(XFormsId.getEffectiveIdSuffixParts(modelStates(modelKey).model.effectiveId))
         }
       )
     }
@@ -459,7 +460,7 @@ class PathMapXPathDependencies(
           Some(
             RepeatCacheKey(
               control.prefixedId,
-              getEffectiveIdSuffixParts(controlEffectiveId) take maxDependentModelDepth toList
+              XFormsId.getEffectiveIdSuffixParts(controlEffectiveId) take maxDependentModelDepth toList
             )
           )
         case _ ⇒

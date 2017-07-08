@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{BindingContext, XFormsUtils}
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.XFormsId
 
 /**
  * Represents an xf:switch container control.
@@ -239,7 +240,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     if (isRelevant) {
       val local = getCurrentLocal.asInstanceOf[XFormsSwitchControlLocal]
       require(local.selectedCaseControlId ne null, s"Selected case was not set for xf:switch: $effectiveId")
-      XFormsUtils.getRelatedEffectiveId(getEffectiveId, local.selectedCaseControlId)
+      XFormsId.getRelatedEffectiveId(getEffectiveId, local.selectedCaseControlId)
     } else
       null
 
@@ -269,7 +270,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
 
   // Serialize case id
   override def serializeLocal =
-    ju.Collections.singletonMap("case-id", XFormsUtils.getStaticIdFromId(getSelectedCaseEffectiveId))
+    ju.Collections.singletonMap("case-id", XFormsId.getStaticIdFromId(getSelectedCaseEffectiveId))
 
   override def focusableControls =
     if (isRelevant)
@@ -340,7 +341,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       case Some(control) if control.isRelevant ⇒
         val selectedCaseId = control.getInitialLocal.asInstanceOf[XFormsSwitchControlLocal].selectedCaseControlId
         assert(selectedCaseId ne null)
-        XFormsUtils.getRelatedEffectiveId(control.getEffectiveId, selectedCaseId)
+        XFormsId.getRelatedEffectiveId(control.getEffectiveId, selectedCaseId)
       case _ ⇒
         null
     }

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable
 import scala.util.control.Breaks
@@ -67,7 +68,7 @@ abstract class ElementAnalysis(
       Some(LiteralLangRef(lang))
     else {
       val staticId   = lang.substring(1)
-      val prefixedId = XFormsUtils.getRelatedEffectiveId(self.prefixedId, staticId)
+      val prefixedId = XFormsId.getRelatedEffectiveId(self.prefixedId, staticId)
       Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
     }
 

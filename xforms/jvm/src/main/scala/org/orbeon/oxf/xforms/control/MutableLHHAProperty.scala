@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{StaticLHHASupport, LHHAAnalysis}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
+import org.orbeon.xforms.XFormsId
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
@@ -190,8 +191,8 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConst
     val lhhaPrefixedId = lhhaScope.prefixedIdForStaticId(lhhaStaticId)
 
     // Assume that LHHA element is within same repeat iteration as its related control
-    val contextPrefixedId = XFormsUtils.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId)
-    val contextEffectiveId = contextPrefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(control.effectiveId)
+    val contextPrefixedId = XFormsId.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId)
+    val contextEffectiveId = contextPrefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(control.effectiveId)
 
     var ancestorObject = control.container.getContainingDocument.getObjectByEffectiveId(contextEffectiveId)
     while (ancestorObject.isInstanceOf[XFormsControl]) {

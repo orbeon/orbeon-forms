@@ -31,6 +31,8 @@ import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.xforms.XFormsId;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -591,7 +593,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     public static String getItemId(String effectiveId, String itemIndex) {
-        return XFormsUtils.appendToEffectiveId(
+        return XFormsId.appendToEffectiveId(
             effectiveId,
             "" + XFormsConstants.COMPONENT_SEPARATOR + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex
         );

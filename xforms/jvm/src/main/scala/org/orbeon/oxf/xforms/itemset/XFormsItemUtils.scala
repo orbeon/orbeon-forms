@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{LHHAValue, XFormsSingleNodeControl}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsId
 
 import scala.util.control.NonFatal
 
@@ -96,7 +97,7 @@ object XFormsItemUtils {
             private var currentContainer: ItemContainer = result
 
             private def getElementEffectiveId(elem: Element): String =
-              XFormsUtils.getRelatedEffectiveId(select1Control.getEffectiveId, XFormsUtils.getElementId(elem))
+              XFormsId.getRelatedEffectiveId(select1Control.getEffectiveId, XFormsUtils.getElementId(elem))
 
             def startElement(elem: Element): Unit = {
 

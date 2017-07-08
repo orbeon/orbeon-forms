@@ -28,6 +28,8 @@ import org.orbeon.oxf.xforms.{BindingContext, _}
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, XMLUtils}
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.XFormsId
+
 import org.xml.sax.Attributes
 
 import scala.collection.Seq
@@ -66,11 +68,11 @@ class XFormsControl(
 
   // Static information (never changes for the lifetime of the containing document)
   // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
-  final val staticControl: Control = part.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)).asInstanceOf[Control]
+  final val staticControl: Control = part.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)).asInstanceOf[Control]
   final def staticControlOpt = Option(staticControl)
 
-  final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
-  final def absoluteId = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
+  final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsId.getPrefixedId(effectiveId)
+  final def absoluteId = XFormsId.effectiveIdToAbsoluteId(effectiveId)
 
   // Whether the control has been visited
   def visited = false
@@ -103,8 +105,8 @@ class XFormsControl(
   def updateEffectiveId(): Unit = {
     if (staticControl.isWithinRepeat) {
       val parentEffectiveId = parent.getEffectiveId
-      val parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId)
-      effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_SEPARATOR + parentSuffix
+      val parentSuffix = XFormsId.getEffectiveIdSuffix(parentEffectiveId)
+      effectiveId = XFormsId.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_SEPARATOR + parentSuffix
       if (_childrenActions.nonEmpty)
         for (actionControl ← _childrenActions)
           actionControl.updateEffectiveId()

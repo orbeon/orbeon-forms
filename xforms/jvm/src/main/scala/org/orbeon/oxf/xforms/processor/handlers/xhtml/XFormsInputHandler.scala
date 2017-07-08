@@ -25,6 +25,8 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
+import org.orbeon.xforms.XFormsId
+
 
 /**
  * Handle xf:input.
@@ -230,11 +232,11 @@ class XFormsInputHandler(
 
   // Do as if this was in a component, noscript has to handle that
   private def getFirstInputEffectiveId(effectiveId: String): String =
-    ! isBoolean option namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-1")) orNull
+    ! isBoolean option namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-1")) orNull
 
   // Do as if this was in a component, noscript has to handle that
   private def getSecondInputEffectiveId(effectiveId: String): String =
-    isDateTime option namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-2")) orNull
+    isDateTime option namespaceId(containingDocument, XFormsId.appendToEffectiveId(effectiveId, COMPONENT_SEPARATOR + "xforms-input-2")) orNull
 
   override def getForEffectiveId(effectiveId: String): String =
     isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, "0") getOrElse getFirstInputEffectiveId(getEffectiveId)

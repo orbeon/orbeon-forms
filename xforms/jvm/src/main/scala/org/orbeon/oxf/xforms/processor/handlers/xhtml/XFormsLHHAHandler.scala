@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
+import org.orbeon.xforms.XFormsId
+
 import org.xml.sax.Attributes
 
 /**
@@ -71,7 +72,7 @@ class XFormsLHHAHandler(
             // don't cross repeat boundaries.
             // In the future, we want to be more flexible, see:
             // https://github.com/orbeon/orbeon-forms/issues/241
-            val targetControlEffectiveId = XFormsUtils.getRelatedEffectiveId(lhhaEffectiveId, targetControl.staticId)
+            val targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, targetControl.staticId)
 
             val lhhaType = LHHAC.valueOf(localname.toUpperCase)
 

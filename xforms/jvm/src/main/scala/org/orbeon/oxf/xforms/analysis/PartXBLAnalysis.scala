@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable
 
@@ -88,7 +88,7 @@ trait PartXBLAnalysis extends TransientState {
       case bind: StaticBind ⇒
         bind.iterateNestedIds foreach { mipId ⇒
           control.scope -= mipId
-          prefixedIdToXBLScopeMap -= XFormsUtils.getRelatedEffectiveId(control.prefixedId, mipId)
+          prefixedIdToXBLScopeMap -= XFormsId.getRelatedEffectiveId(control.prefixedId, mipId)
         }
       case _ ⇒
     }
@@ -97,7 +97,7 @@ trait PartXBLAnalysis extends TransientState {
   }
 
   def containingScope(prefixedId: String) = {
-    val prefix = XFormsUtils.getEffectiveIdPrefix(prefixedId)
+    val prefix = XFormsId.getEffectiveIdPrefix(prefixedId)
 
     val scopeId = if (prefix.length == 0) "" else prefix.init
     scopesById.get(scopeId).orNull

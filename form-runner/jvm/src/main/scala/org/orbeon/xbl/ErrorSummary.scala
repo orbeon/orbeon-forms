@@ -20,10 +20,10 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 object ErrorSummary {
 
@@ -43,7 +43,7 @@ object ErrorSummary {
 
   //@XPathFunction
   def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
-    Option(inScopeContainingDocument.getControlByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
+    Option(inScopeContainingDocument.getControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId))) flatMap {
       control ⇒
         val sectionsIt =
           new AncestorOrSelfIterator(control) collect {
@@ -94,18 +94,18 @@ object ErrorSummary {
   //@XPathFunction
   def updateIteration(absoluteId: String, repeatAbsoluteId: String, fromIterations: Array[Int], toIterations: Array[Int]): String = {
 
-    val effectiveId = absoluteIdToEffectiveId(absoluteId)
-    val prefixedId  = getPrefixedId(effectiveId)
+    val effectiveId = XFormsId.absoluteIdToEffectiveId(absoluteId)
+    val prefixedId  = XFormsId.getPrefixedId(effectiveId)
 
-    val repeatEffectiveId = absoluteIdToEffectiveId(repeatAbsoluteId)
-    val repeatPrefixedId  = getPrefixedId(repeatEffectiveId)
+    val repeatEffectiveId = XFormsId.absoluteIdToEffectiveId(repeatAbsoluteId)
+    val repeatPrefixedId  = XFormsId.getPrefixedId(repeatEffectiveId)
 
     val ancestorRepeats = inScopeContainingDocument.getStaticOps.getAncestorRepeatIds(prefixedId)
 
     if (ancestorRepeats contains repeatPrefixedId) {
       // Control is a descendant of the repeat so might be impacted
 
-      val idIterationPairs = getEffectiveIdSuffixParts(effectiveId) zip ancestorRepeats
+      val idIterationPairs = XFormsId.getEffectiveIdSuffixParts(effectiveId) zip ancestorRepeats
       val iterationsMap    = fromIterations zip toIterations toMap
 
       val newIterations = idIterationPairs map {
@@ -113,9 +113,9 @@ object ErrorSummary {
         case (iteration, _)                                                               ⇒ iteration.toString.asInstanceOf[AnyRef]
       }
 
-      val newEffectiveId = buildEffectiveId(prefixedId, newIterations)
+      val newEffectiveId = XFormsId.buildEffectiveId(prefixedId, newIterations)
 
-      effectiveIdToAbsoluteId(newEffectiveId)
+      XFormsId.effectiveIdToAbsoluteId(newEffectiveId)
 
     } else
       absoluteId // id is not impacted
@@ -127,8 +127,8 @@ object ErrorSummary {
   //@XPathFunction
   def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
 
-    val effectiveId = absoluteIdToEffectiveId(absoluteId)
-    val prefixedId  = getPrefixedId(effectiveId)
+    val effectiveId = XFormsId.absoluteIdToEffectiveId(absoluteId)
+    val prefixedId  = XFormsId.getPrefixedId(effectiveId)
 
     val controlPosition =
       inScopeContainingDocument.getStaticOps.getControlPosition(prefixedId).get // argument must be a view control
@@ -137,7 +137,7 @@ object ErrorSummary {
       inScopeContainingDocument.getStaticOps.getAncestorRepeats(prefixedId)
 
     def iterations =
-      getEffectiveIdSuffixParts(effectiveId)
+      XFormsId.getEffectiveIdSuffixParts(effectiveId)
 
     // Use arrays indexes to *attempt* to be more efficient
     // NOTE: Profiler shows that the 2 calls to ofDim take 50% of the method time

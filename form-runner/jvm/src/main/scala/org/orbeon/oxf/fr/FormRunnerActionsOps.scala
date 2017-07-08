@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -27,6 +26,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
@@ -75,7 +75,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       def findControls =
         Controls.resolveControlsById(
           containingDocument       = container.containingDocument,
-          sourceControlEffectiveId = absoluteIdToEffectiveId(actionSourceAbsoluteId),
+          sourceControlEffectiveId = XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId),
           targetStaticId           = controlId(targetControlName),
           followIndexes            = followIndexes
         )
@@ -130,8 +130,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val doc = XFormsFunction.context.containingDocument
 
-    val sourceEffectiveId = absoluteIdToEffectiveId(actionSourceAbsoluteId)
-    val sourcePrefixedId  = XFormsUtils.getPrefixedId(sourceEffectiveId)
+    val sourceEffectiveId = XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId)
+    val sourcePrefixedId  = XFormsId.getPrefixedId(sourceEffectiveId)
     val scope             = doc.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
     val targetPrefixedId  = scope.prefixedIdForStaticId(controlId(targetControlName))
 
@@ -172,11 +172,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     val controls =
       Controls.iterateAllRepeatedControlsForTarget(
         XFormsFunction.context.containingDocument,
-        XFormsUtils.absoluteIdToEffectiveId(actionSourceAbsoluteId),
+        XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId),
         controlId(targetControlName)
       )
 
-    controls map (_.getEffectiveId) map XFormsUtils.effectiveIdToAbsoluteId toList
+    controls map (_.getEffectiveId) map XFormsId.effectiveIdToAbsoluteId toList
   }
 
   //@XPathFunction

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventFactory}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable, mutable}
@@ -65,8 +66,8 @@ class XBLContainer(
     innerScope         : Scope
   ) = this(
       associatedControl.getEffectiveId,
-      XFormsUtils.getPrefixedId(associatedControl.getEffectiveId),
-      XFormsUtils.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR,
+      XFormsId.getPrefixedId(associatedControl.getEffectiveId),
+      XFormsId.getPrefixedId(associatedControl.getEffectiveId) + XFormsConstants.COMPONENT_SEPARATOR,
       Some(parentXBLContainer ensuring (_ ne null)),
       Some(associatedControl  ensuring (_ ne null)),
       innerScope
@@ -120,8 +121,8 @@ class XBLContainer(
     for (currentModel ← models) {
 
       val newModelEffectiveId =
-        XFormsUtils.getPrefixedId(currentModel.getEffectiveId) +
-          XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)
+        XFormsId.getPrefixedId(currentModel.getEffectiveId) +
+          XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
 
       currentModel.updateEffectiveId(newModelEffectiveId)
     }
@@ -176,7 +177,7 @@ trait ModelContainer {
     _models =
       for {
         model ← partAnalysis.getModelsForScope(innerScope)
-        modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)
+        modelEffectiveId = model.prefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
       } yield
         new XFormsModel(self, modelEffectiveId, model)
 
@@ -339,7 +340,7 @@ trait ContainerResolver {
 
     def fromStaticRepeat = {
       // Make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
-      val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
+      val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
       val scope = partAnalysis.scopeForPrefixedId(sourcePrefixedId)
       val repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId)
 
@@ -357,7 +358,7 @@ trait ContainerResolver {
     staticOrAbsoluteId : String,
     contextItem        : Option[Item] = None
   ): Option[XFormsObject] = {
-    val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
+    val sourcePrefixedId = XFormsId.getPrefixedId(sourceEffectiveId)
     val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
 
     Option(resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItem.orNull))
@@ -375,15 +376,15 @@ trait ContainerResolver {
   def resolveObjectById(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
 
     def isEffectiveIdResolvableByThisContainer(effectiveId: String) =
-      self eq findScopeRoot(XFormsUtils.getPrefixedId(effectiveId))
+      self eq findScopeRoot(XFormsId.getPrefixedId(effectiveId))
 
     // Handle "absolute ids"
     // NOTE: Experimental, definitive format TBD
-    if (XFormsUtils.isAbsoluteId(staticOrAbsoluteId))
-      return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(staticOrAbsoluteId))
+    if (XFormsId.isAbsoluteId(staticOrAbsoluteId))
+      return containingDocument.getObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(staticOrAbsoluteId))
 
     // Make sure the static id passed is actually a static id
-    require(XFormsUtils.isStaticId(staticOrAbsoluteId), "Target id must be static id: " + staticOrAbsoluteId)
+    require(XFormsId.isStaticId(staticOrAbsoluteId), "Target id must be static id: " + staticOrAbsoluteId)
 
     require(sourceEffectiveId ne null, "Source id must be specified.")
 
@@ -412,7 +413,7 @@ trait ContainerResolver {
     val sourceControlEffectiveId = {
 
       val tempModelObject =
-        searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId), contextItem)
+        searchContainedModels(null, XFormsId.getStaticIdFromId(sourceEffectiveId), contextItem)
 
       if (tempModelObject.isDefined) {
         // Source is a model object, so get first control instead

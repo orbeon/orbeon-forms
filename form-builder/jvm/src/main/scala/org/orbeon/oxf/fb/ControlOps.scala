@@ -20,7 +20,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
@@ -31,6 +30,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -560,7 +560,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // XForms callers: build an effective id for a given static id or return null (the empty sequence)
   def buildFormBuilderControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String) =
-    buildFormBuilderControlEffectiveId(inDoc, staticId) map effectiveIdToAbsoluteId orNull
+    buildFormBuilderControlEffectiveId(inDoc, staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
   def buildFormBuilderControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String) =
     buildFormBuilderControlEffectiveId(inDoc, staticId).orNull

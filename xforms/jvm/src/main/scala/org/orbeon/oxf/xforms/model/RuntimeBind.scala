@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.saxon.om.Item
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 import scala.collection.{mutable ⇒ m}
@@ -28,7 +29,7 @@ class RuntimeBind(
 ) extends XFormsObject {
 
   def containingDocument = model.containingDocument
-  def getEffectiveId     = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, staticId)
+  def getEffectiveId     = XFormsId.getRelatedEffectiveId(model.getEffectiveId, staticId)
   def staticId           = staticBind.staticId
 
   val (items, bindNodes) = {

@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.lang.StringBuilder
 
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.LHHAC
 import org.orbeon.oxf.xml._
 import org.xml.sax.{Attributes, Locator}
+import org.orbeon.xforms.XFormsId
 
 class XXFormsComponentHandler(
   uri            : String,
@@ -110,7 +110,7 @@ class XXFormsComponentHandler(
           currentControl   ← currentControlOpt // can be missing if we are in template
           targetControlFor ← {
             // Assume the target is within the same repeat iteration
-            val suffix              = getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
+            val suffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
             val labelForEffectiveId = labelForPrefixedId + suffix
 
             // Push/pop component context so that handler resolution works
@@ -126,7 +126,7 @@ class XXFormsComponentHandler(
           labelForStaticId ← labelForStaticIdOpt
           currentControl   ← currentControlOpt // can be missing if we are in template
         } yield
-          getRelatedEffectiveId(currentControl.getEffectiveId + COMPONENT_SEPARATOR, labelForStaticId)
+          XFormsId.getRelatedEffectiveId(currentControl.getEffectiveId + COMPONENT_SEPARATOR, labelForStaticId)
     }
   } orNull
 }

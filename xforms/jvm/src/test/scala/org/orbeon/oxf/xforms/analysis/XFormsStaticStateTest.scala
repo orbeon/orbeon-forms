@@ -21,6 +21,8 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
+import org.orbeon.xforms.XFormsId
+
 import org.scalatest.junit.AssertionsForJUnit
 
 object XFormsStaticStateTest {
@@ -113,7 +115,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
   private def mockModel(effectiveId: String, sequenceNumber: Int) = {
     val mockModel = Mockito.mock(classOf[XFormsModel])
-    Mockito.when(mockModel.getPrefixedId).thenReturn(XFormsUtils.getPrefixedId(effectiveId))
+    Mockito.when(mockModel.getPrefixedId).thenReturn(XFormsId.getPrefixedId(effectiveId))
     Mockito.when(mockModel.effectiveId).thenReturn(effectiveId)
     Mockito.when(mockModel.getEffectiveId).thenReturn(effectiveId)
     Mockito.when(mockModel.sequenceNumber).thenReturn(sequenceNumber)
@@ -122,17 +124,17 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
   private def mockInstance(effectiveId: String, model: XFormsModel) = {
     val mockInstance = Mockito.mock(classOf[XFormsInstance])
-    Mockito.when(mockInstance.getPrefixedId).thenReturn(XFormsUtils.getPrefixedId(effectiveId))
+    Mockito.when(mockInstance.getPrefixedId).thenReturn(XFormsId.getPrefixedId(effectiveId))
     Mockito.when(mockInstance.getEffectiveId).thenReturn(effectiveId)
     Mockito.when(mockInstance.model).thenReturn(model)
     mockInstance
   }
 
   private def requireBindingUpdate(effectiveId: String)(implicit dependencies: XPathDependencies, partAnalysis: PartAnalysis) =
-    dependencies.requireBindingUpdate(partAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)), effectiveId)
+    dependencies.requireBindingUpdate(partAnalysis.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)), effectiveId)
 
   private def requireValueUpdate(effectiveId: String)(implicit dependencies: XPathDependencies, partAnalysis: PartAnalysis) =
-    dependencies.requireValueUpdate(partAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)), effectiveId)
+    dependencies.requireValueUpdate(partAnalysis.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)), effectiveId)
 
   @Test def xpathAnalysis(): Unit = {
     Assume.assumeTrue(Version.isPE)

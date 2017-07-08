@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import org.orbeon.xforms.XFormsId
 
 /**
  * Representation of a common XForms element supporting optional context, binding and value.
@@ -127,7 +128,7 @@ class SimpleElementAnalysis(
   }
 
   def getChildElementScope(childElement: Element) = {
-    val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
+    val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
     part.scopeForPrefixedId(childPrefixedId)
   }
 

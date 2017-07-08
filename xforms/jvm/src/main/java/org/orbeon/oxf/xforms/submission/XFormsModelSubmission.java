@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsError;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -35,6 +34,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.xforms.XFormsId;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -101,7 +101,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     }
 
     public String getPrefixedId() {
-        return XFormsUtils.getPrefixedId(getEffectiveId());
+        return XFormsId.getPrefixedId(getEffectiveId());
     }
 
     public Scope scope() {
@@ -109,7 +109,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase {
     }
 
     public String getEffectiveId() {
-        return XFormsUtils.getRelatedEffectiveId(model.getEffectiveId(), getId());
+        return XFormsId.getRelatedEffectiveId(model.getEffectiveId(), getId());
     }
 
     public XBLContainer container() {

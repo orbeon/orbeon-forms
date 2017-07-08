@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.xforms.XFormsId;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -167,7 +168,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     public static String getLHHACId(XFormsContainingDocument containingDocument, String controlEffectiveId, String suffix) {
         // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
-        return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
+        return XFormsUtils.namespaceId(containingDocument, XFormsId.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
     }
 
     protected static Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames, HandlerContext xformsHandlerContext) {
@@ -204,7 +205,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         if (xformsHandlerContext.isTemplate()) {
                             attributeControl = null;
                         } else if (attributeControlStaticId != null) {
-                            final String attributeControlEffectiveId = XFormsUtils.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
+                            final String attributeControlEffectiveId = XFormsId.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
                             attributeControl = (XXFormsAttributeControl) containingDocument.getControlByEffectiveId(attributeControlEffectiveId);
                         } else {
                             // This should not happen

@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 
@@ -144,8 +145,8 @@ class XFormsInstance(
   def rootElement = DataModel.firstChildElement(_documentInfo)
 
   def getId = instance.staticId
-  def getPrefixedId = XFormsUtils.getPrefixedId(getEffectiveId)
-  def getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, instance.staticId)
+  def getPrefixedId = XFormsId.getPrefixedId(getEffectiveId)
+  def getEffectiveId = XFormsId.getRelatedEffectiveId(parent.getEffectiveId, instance.staticId)
 
   def scope = model.getStaticModel.scope
   def container = model.container
@@ -539,7 +540,7 @@ object XFormsInstance extends Logging {
 
     implicit val logger = model.indentedLogger
 
-    val instance = model.staticModel.instances(XFormsUtils.getStaticIdFromId(instanceState.effectiveId))
+    val instance = model.staticModel.instances(XFormsId.getStaticIdFromId(instanceState.effectiveId))
 
     val (caching, documentInfo) =
       instanceState.cachingOrContent match {

@@ -36,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.xforms.XFormsId;
 import scala.Option;
 
 import java.util.Collections;
@@ -288,7 +289,7 @@ public class XFormsActionInterpreter {
      * @return  effective id of source
      */
     public String getSourceEffectiveId(Element actionElement) {
-        return org.orbeon.oxf.xforms.XFormsUtils.getRelatedEffectiveId(handlerEffectiveId, getActionStaticId(actionElement));
+        return XFormsId.getRelatedEffectiveId(handlerEffectiveId, getActionStaticId(actionElement));
     }
 
     /**

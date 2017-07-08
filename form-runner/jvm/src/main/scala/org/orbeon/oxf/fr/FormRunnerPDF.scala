@@ -17,10 +17,10 @@ import java.{util ⇒ ju}
 
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.URLFinder
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.saxon.function.{PropertiesStartsWith, Property}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 
@@ -76,13 +76,13 @@ trait FormRunnerPDF {
     }
 
     def findControlName(e: NodeInfo) =
-      getStaticIdFromId(e.id).trimAllToOpt flatMap FormRunner.controlNameFromIdOpt
+      XFormsId.getStaticIdFromId(e.id).trimAllToOpt flatMap FormRunner.controlNameFromIdOpt
 
     def ancestorContainers(e: NodeInfo) =
       control ancestor * filter isContainer reverse
 
     def suffixAsList(id: String) =
-      getEffectiveIdSuffix(id).trimAllToOpt.toList
+      XFormsId.getEffectiveIdSuffix(id).trimAllToOpt.toList
 
     // This only makes sense if we are passed a control with a name
     findControlName(control) map { controlName ⇒

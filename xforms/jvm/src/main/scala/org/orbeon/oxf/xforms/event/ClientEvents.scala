@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationSAXContentHandler}
+import org.orbeon.xforms.XFormsId
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging with XMLReceiverSupport {
@@ -229,9 +230,9 @@ object ClientEvents extends Logging with XMLReceiverSupport {
   // in the future, but in the meanwhile we map this id to `my-repeat~iteration⊙1` based on static information.
   // NOTE: Leave public for unit tests
   def adjustIdForRepeatIteration(doc: XFormsContainingDocument, effectiveId: String) =
-    doc.getStaticOps.getControlAnalysis(getPrefixedId(effectiveId)) match {
-      case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == getEffectiveIdSuffixParts(effectiveId).size - 1 ⇒
-        getRelatedEffectiveId(effectiveId, repeat.iteration.get.staticId)
+    doc.getStaticOps.getControlAnalysis(XFormsId.getPrefixedId(effectiveId)) match {
+      case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == XFormsId.getEffectiveIdSuffixParts(effectiveId).size - 1 ⇒
+        XFormsId.getRelatedEffectiveId(effectiveId, repeat.iteration.get.staticId)
       case _ ⇒
         effectiveId
     }
@@ -478,7 +479,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
       doc.startOutermostActionHandler()
 
       // Handle repeat iteration if the event target is in a repeat
-      if (hasEffectiveIdSuffix(targetEffectiveId))
+      if (XFormsId.hasEffectiveIdSuffix(targetEffectiveId))
         dispatchEventCheckTarget(new XXFormsRepeatActivateEvent(target, EmptyGetter))
 
       // Interpret event

@@ -13,14 +13,13 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.value.AtomicValue
-
+import org.orbeon.xforms.XFormsId
 
 class XXFormsComponentParam extends XFormsFunction {
 
@@ -29,7 +28,7 @@ class XXFormsComponentParam extends XFormsFunction {
     val paramName = getQNameFromExpression(argument.head)(xpathContext)
 
     val containerForSourceScope =
-      XFormsFunction.context.container.findScopeRoot(XFormsUtils.getPrefixedId(getSourceEffectiveId))
+      XFormsFunction.context.container.findScopeRoot(XFormsId.getPrefixedId(getSourceEffectiveId))
 
     containerForSourceScope.associatedControlOpt collect
       { case c: XFormsComponentControl ⇒ c } flatMap { c ⇒

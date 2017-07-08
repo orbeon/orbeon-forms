@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xforms.xbl._
 import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 
@@ -82,7 +83,7 @@ trait PartGlobalOps {
   }
 
   def isValueControl(effectiveId: String) =
-    getControlAnalysisOption(XFormsUtils.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
+    getControlAnalysisOption(XFormsId.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
 
   def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
     getControlAnalysisOption(prefixedId) foreach { controlAnalysis ⇒

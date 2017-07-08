@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.xforms.XFormsId
 
 class AttributeControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends CoreControl(staticStateContext, element, parent, preceding, scope)
@@ -28,7 +28,7 @@ class AttributeControl(staticStateContext: StaticStateContext, element: Element,
   override def computeValueAnalysis = Some(analyzeXPath(getChildrenContext, attributeValue, avt = true))
 
   val forStaticId = element.attributeValue(FOR_QNAME)
-  val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, forStaticId)
+  val forPrefixedId = XFormsId.getRelatedEffectiveId(prefixedId, forStaticId)
 
   val attributeName = element.attributeValue(NAME_QNAME)
   val attributeValue = element.attributeValue(VALUE_QNAME)

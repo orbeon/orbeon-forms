@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
+import org.orbeon.xforms.XFormsId
 
 import scala.collection.JavaConverters._
 
@@ -163,14 +163,14 @@ object XFormsEvent {
     "target"                       → (e ⇒ Option(e.targetObject.getId)),
     xxfName("target")              → (e ⇒ Option(e.targetObject.getId)),
     xxfName("targetid")            → (e ⇒ Option(e.targetObject.getId)),
-    xxfName("absolute-targetid")   → (e ⇒ Option(effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
+    xxfName("absolute-targetid")   → (e ⇒ Option(XFormsId.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
     "event"                        → (e ⇒ Option(e.name)),
     xxfName("type")                → (e ⇒ Option(e.name)),
     xxfName("bubbles")             → (e ⇒ Option(e.bubbles)),
     xxfName("cancelable")          → (e ⇒ Option(e.cancelable)),
     xxfName("phase")               → (e ⇒ Option(e.currentPhase.name)),
     xxfName("observerid")          → (e ⇒ Option(e.currentObserver.getId)),
-    xxfName("absolute-observerid") → (e ⇒ Option(effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
+    xxfName("absolute-observerid") → (e ⇒ Option(XFormsId.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
     "repeat-indexes"               → repeatIndexes,
     xxfName("repeat-indexes")      → repeatIndexes,
     xxfName("repeat-ancestors")    → repeatAncestors,
@@ -179,21 +179,21 @@ object XFormsEvent {
 
   // NOTE: should ideally be Option[Seq[Int]]. At this time XForms callers assume Option[Seq[String]].
   private def repeatIndexes(e: XFormsEvent): Option[Seq[String]] = {
-    val result = Some(getEffectiveIdSuffixParts(e.targetObject.getEffectiveId).toList map (_.toString))
+    val result = Some(XFormsId.getEffectiveIdSuffixParts(e.targetObject.getEffectiveId).toList map (_.toString))
     result
   }
 
   private def repeatAncestors(e: XFormsEvent): Option[Seq[String]] =
-    if (hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
+    if (XFormsId.hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
       // There is a suffix so compute
       val ancestorRepeats =
-        e.containingDocument.getStaticOps.getAncestorRepeatIds(getPrefixedId(e.targetObject.getEffectiveId))
+        e.containingDocument.getStaticOps.getAncestorRepeatIds(XFormsId.getPrefixedId(e.targetObject.getEffectiveId))
 
-      Some(ancestorRepeats map getStaticIdFromId)
+      Some(ancestorRepeats map XFormsId.getStaticIdFromId)
     } else
       // No suffix
       None
 
   private def targetPrefixes(e: XFormsEvent): Option[Seq[String]] =
-    Some(getEffectiveIdPrefixParts(e.targetObject.getEffectiveId).toList)
+    Some(XFormsId.getEffectiveIdPrefixParts(e.targetObject.getEffectiveId).toList)
 }

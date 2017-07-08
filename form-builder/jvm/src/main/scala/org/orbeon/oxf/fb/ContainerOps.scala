@@ -22,11 +22,11 @@ import org.orbeon.oxf.xforms.XFormsConstants.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xforms.NodeInfoFactory
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsId
 
 trait ContainerOps extends ControlOps {
 
@@ -35,7 +35,7 @@ trait ContainerOps extends ControlOps {
   def containerById(containerId: String): NodeInfo = {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
     // XFormsUtils.getStaticIdFromId every time)
-    val staticId = XFormsUtils.getStaticIdFromId(containerId)
+    val staticId = XFormsId.getStaticIdFromId(containerId)
     findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer head
   }
 

@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
+import org.orbeon.xforms.XFormsId
 
 class XXFormsListModels extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     for {
       model       ← getContainingDocument(xpathContext).allModels
       effectiveId = model.getEffectiveId
-      absoluteId  = XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
+      absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
     } yield
       absoluteId
 }

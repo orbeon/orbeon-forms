@@ -149,10 +149,24 @@ div.orbeon.orbeon-portlet-div {
 
     // ***** D&D *******************************************************************************************************
 
+    // Change mouse pointer when over "move" icon, as an additional hint
+    .fb-control-handle {
+        cursor: grab;
+        cursor: -webkit-grab; // Chrome 49 and Safari 10 still don't support the un-prefixed `grab`
+    }
+
+    // Hide the icons while the control moved
     .gu-mirror, .gu-transit {
         .fb-grid-cell-icons, .fb-grid-control-icons {
-            display: none;
+            * { display: none }
         }
+    }
+
+    // While moving, just keep the "move" icon, and use the "closed hand" for the mouse pointer
+    .gu-mirror .fb-grid-cell-icons .fb-control-handle {
+        display: inline-block;
+        cursor: grabbing;
+        cursor: -webkit-grabbing; // See note above on `-webkit-grab;`
     }
 
     // ***** Toolbox ***************************************************************************************************

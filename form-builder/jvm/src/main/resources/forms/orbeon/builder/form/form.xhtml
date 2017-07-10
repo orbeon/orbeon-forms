@@ -455,6 +455,25 @@
                                 <xf:var name="fb-resources"  value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
 
                                 <xh:span class="fb-grid-cell-icons">
+                                    <!-- Copy/move -->
+                                    <!-- draggable: for accessibility, and also used to add to add this ot the list of "triggers" -->
+                                    <!-- class/id: we would only want to have a `class`, but `action-icons.coffee` uses the `id` -->
+                                    <xh:i
+                                        id="fb-control-handle"
+                                        class="fb-control-handle icon-move"
+                                        draggable="true"
+                                        title="{$fb-resources/move-icon/label}"/>
+                                    <!-- Delete control -->
+                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-delete-trigger">
+                                        <xf:label>
+                                            <xh:i
+                                                class="icon-minus-sign"
+                                                title="{$fb-resources/delete-control-icon/label}"/>
+                                        </xf:label>
+                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                            fbf:deleteCellContent($td, true())
+                                        </xf:action>
+                                    </xf:trigger>
                                     <!-- Expand cell down -->
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-expand-trigger">
                                         <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_down.png" alt="{$fb-resources/expand-icon/label}" title="{$fb-resources/expand-icon/label}"/></xf:label>
@@ -485,25 +504,6 @@
                                             fbf:shrinkCell($td)
                                         </xf:action>
                                     </xf:trigger>
-                                    <!-- Delete control -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-delete-trigger">
-                                        <xf:label>
-                                            <xh:i
-                                                class="icon-minus-sign"
-                                                title="{$fb-resources/delete-control-icon/label}"/>
-                                        </xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                            fbf:deleteCellContent($td, true())
-                                        </xf:action>
-                                    </xf:trigger>
-                                    <!-- Copy/move -->
-                                    <!-- draggable: for accessibility, and also used to add to add this ot the list of "triggers" -->
-                                    <!-- class/id: we would only want to have a `class`, but `action-icons.coffee` uses the `id` -->
-                                    <xh:i
-                                        id="fb-control-handle"
-                                        class="fb-control-handle icon-move"
-                                        draggable="true"
-                                        title="{$fb-resources/move-icon/label}"/>
                                 </xh:span>
                                 <xh:span class="fb-grid-control-icons">
                                     <!-- Edit details for any control -->

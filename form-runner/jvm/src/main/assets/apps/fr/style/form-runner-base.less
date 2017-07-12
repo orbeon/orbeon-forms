@@ -14,6 +14,12 @@
 
 .orbeon {
 
+    // RTL languages
+    html[lang=he] &,
+    html[lang=ar] & {
+        direction: rtl;
+    }
+
     -webkit-text-size-adjust: 100%; // Prevent font scaling in landscape while allowing user zoom
 
     .navbar .navbar-inner .container {

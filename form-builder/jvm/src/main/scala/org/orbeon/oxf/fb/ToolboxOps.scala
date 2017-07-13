@@ -13,11 +13,15 @@
  */
 package org.orbeon.oxf.fb
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunnerLang, FormRunnerResourcesOps}
+import org.orbeon.oxf.processor.scope.ScopeProcessorBase.Scope.findValues
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -317,11 +321,45 @@ object ToolboxOps {
         (template ⇒ insert(into = section, after = section \ *, origin = template))
     }
 
-  type ControlElements = Map[String, Seq[NodeInfo]]
+  /* Example layout:
+  <xcv>
+    <control>
+      <xf:input id="control-1-control" bind="control-1-bind">
+        <xf:label ref="$form-resources/control-1/label"/>
+        <xf:hint ref="$form-resources/control-1/hint"/>
+        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+      </xf:input>
+    </control>
+    <holder>
+      <control-1/>
+    </holder>
+    <resources>
+      <resource xml:lang="en">
+        <control-1>
+          <label>My label</label>
+          <hint/>
+          <alert/>
+        </control-1>
+      </resource>
+    </resources>
+    <bind>
+      <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+    </bind>
+  </xcv>
+  */
 
-  private def controlElementsInCell(td: NodeInfo): Option[ControlElements] = {
+  sealed abstract class XvcEntry extends EnumEntry with Lowercase
+  object XvcEntry extends Enum[XvcEntry] {
+    val values = findValues
+    case object Control   extends XvcEntry
+    case object Holder    extends XvcEntry
+    case object Resources extends XvcEntry
+    case object Bind      extends XvcEntry
+  }
 
-    val doc = td.getDocumentRoot
+  private def controlElementsInCellToXvc(td: NodeInfo): Option[NodeInfo] = {
+
+    val doc  = td.getDocumentRoot
     val name = getControlName(td \ * head)
 
     findControlByName(doc, name).map { controlElement ⇒
@@ -331,30 +369,24 @@ object ToolboxOps {
         case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
       }
 
-      // Clear and insert each clipboard element
-      Map(
-        "control"   → List(controlElement),
-        "holder"    → findDataHolders(doc, name),
-        "resources" → resourcesWithLang,
-        "bind"      → findBindByName(doc, name).toList
-      )
-    }
-  }
-
-  private def writeControlElementsToClipboard(controlElements: ControlElements) = {
-    val xvc = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
-    controlElements foreach {
-      case (elementName, content) ⇒
-        delete(xvc \ elementName \ *)
-        insert(into = xvc \ elementName, origin = content)
+      val xvcContent =
+        Map(
+          XvcEntry.Control   → List(controlElement),
+          XvcEntry.Holder    → findDataHolders(doc, name),
+          XvcEntry.Resources → resourcesWithLang,
+          XvcEntry.Bind      → findBindByName(doc, name).toList
+        ).map { case (xvcEntry, content) ⇒
+          elementInfo(xvcEntry.entryName, content)
+        }.toList
+      elementInfo("xvc", xvcContent)
     }
   }
 
   // Copy control to the clipboard
   //@XPathFunction
   def copyToClipboard(td: NodeInfo): Unit =
-    controlElementsInCell(td)
-      .foreach(writeControlElementsToClipboard)
+    controlElementsInCellToXvc(td)
+      .foreach(writeXvcToClipboard)
 
   // Cut control to the clipboard
   //@XPathFunction
@@ -363,16 +395,23 @@ object ToolboxOps {
     deleteCellContent(td, updateTemplates = true)
   }
 
-  def readControlElementsFromClipboard: Option[ControlElements] = {
-    val xvc = topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
-    (xvc \ "control" \ * headOption) map { control ⇒
-      Map(
-        "control"   → List(control),
-        "holder"    → (xvc \ "holder" \ *),
-        "resources" → (xvc \ "resources" \ *),
-        "bind"      → (xvc \ "bind" \ *)
-      )
-    }
+  private def clipboardXvc: NodeInfo =
+    topLevelModel("fr-form-model").get.unsafeGetVariableAsNodeInfo("xcv")
+
+  def readXvcFromClipboard: NodeInfo = {
+    val clipboard = clipboardXvc
+    val clone = elementInfo("xvc", Nil)
+    insert(into = clone, origin = clipboard \ *)
+    clone
+  }
+
+  def writeXvcToClipboard(xvc: NodeInfo): Unit = {
+    val clipboard = clipboardXvc
+    XvcEntry.values
+        .map(_.entryName)
+        .foreach(entryName ⇒ delete(clipboard \ entryName))
+    insert(into = clipboard, origin = xvc\ *)
+    System.out.println(TransformerUtils.tinyTreeToString(clipboard))
   }
 
   // Paste control from the clipboard
@@ -381,39 +420,12 @@ object ToolboxOps {
     try {
       ensureEmptyTd(td) foreach { gridTd ⇒
 
-        /* Example layout:
-        <xcv>
-          <control>
-            <xf:input id="control-1-control" bind="control-1-bind">
-              <xf:label ref="$form-resources/control-1/label"/>
-              <xf:hint ref="$form-resources/control-1/hint"/>
-              <xf:alert ref="$fr-resources/detail/labels/alert"/>
-            </xf:input>
-          </control>
-          <holder>
-            <control-1/>
-          </holder>
-          <resources>
-            <resource xml:lang="en">
-              <control-1>
-                <label>My label</label>
-                <hint/>
-                <alert/>
-              </control-1>
-            </resource>
-          </resources>
-          <bind>
-            <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
-          </bind>
-        </xcv>
-        */
+        val xvc = readXvcFromClipboard
 
-        readControlElementsFromClipboard.foreach { controlElements ⇒
+        (xvc \ "control" \ * headOption) foreach { control ⇒
 
-          val control   = controlElements("control").head
-          def holders   = controlElements("holder")
-          def resources = controlElements("resources")
-          def bind      = controlElements("bind").headOption
+          def holders   = xvc \ "holder" \ *
+          def resources = xvc \ "resources" \ "resource" \ *
 
           val name = {
             val requestedName = getControlName(control)
@@ -426,14 +438,13 @@ object ToolboxOps {
               // Rename everything
               // LATER: Don't rename in place as it would be better to keep the original name when possible,
               // e.g. copy, paste remove first control, paste again.
-              renameControlByElement(control, newName, resources \ * \ * map (_.localname) toSet)
+              renameControlByElement(control, newName, resources \ * map (_.localname) toSet)
 
-              holders ++ (resources \ *) foreach
+              holders ++ resources foreach
                 (rename(_, newName))
 
-              bind.foreach { xvcBind ⇒
-                renameBindElement(xvcBind , newName)
-              }
+              (xvc \ "bind" \ * headOption) foreach
+                (renameBindElement(_, newName))
 
               newName
             } else
@@ -445,14 +456,14 @@ object ToolboxOps {
           insertHolders(
             newControlElement,
             holders.head,
-            resources map (r ⇒ (r attValue "*:lang", r \ * head)),
+            xvc \ "resources" \ "resource" map (r ⇒ (r attValue "*:lang", r \ * head)),
             precedingControlNameInSectionForControl(newControlElement)
           )
 
           // Create the bind and copy all attributes and content
-          val newBind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
-          bind foreach { xvcBind ⇒
-            insert(into = newBind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
+          val bind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
+          (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
+            insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
           }
 
           import org.orbeon.oxf.fr.Names._
@@ -460,7 +471,7 @@ object ToolboxOps {
           // Rename nested element ids and alert ids
           val nestedElemsWithId =
             for {
-              nestedElem ← newBind descendant *
+              nestedElem ← bind descendant *
               id         ← nestedElem.idOpt
             } yield
               nestedElem → id

@@ -411,103 +411,104 @@ object ToolboxOps {
         .map(_.entryName)
         .foreach(entryName ⇒ delete(clipboard \ entryName))
     insert(into = clipboard, origin = xvc\ *)
-    System.out.println(TransformerUtils.tinyTreeToString(clipboard))
+  }
+
+  //@XPathFunction
+  def dndControl(source: NodeInfo, target: NodeInfo, copy: Boolean): Unit = {
+    controlElementsInCellToXvc(source)
+      .foreach(pasteFromXvc(target, _))
+    if (! copy)
+      deleteCellContent(source, updateTemplates = true)
   }
 
   // Paste control from the clipboard
   //@XPathFunction
-  def pasteFromClipboard(td: NodeInfo): Unit = {
-    try {
-      ensureEmptyTd(td) foreach { gridTd ⇒
+  def pasteFromClipboard(td: NodeInfo): Unit =
+    pasteFromXvc(td, readXvcFromClipboard)
 
-        val xvc = readXvcFromClipboard
+  private def pasteFromXvc(td: NodeInfo, xvc: NodeInfo): Unit = {
+    ensureEmptyTd(td) foreach { gridTd ⇒
 
-        (xvc \ "control" \ * headOption) foreach { control ⇒
+      (xvc \ "control" \ * headOption) foreach { control ⇒
 
-          def holders   = xvc \ "holder" \ *
-          def resources = xvc \ "resources" \ "resource" \ *
+        def holders   = xvc \ "holder" \ *
+        def resources = xvc \ "resources" \ "resource" \ *
 
-          val name = {
-            val requestedName = getControlName(control)
+        val name = {
+          val requestedName = getControlName(control)
 
-            // Check if id is already in use
-            if (findInViewTryIndex(td, controlId(requestedName)).isDefined) {
-              // If so create new id
-              val newName = controlNameFromId(nextId(td, "control"))
+          // Check if id is already in use
+          if (findInViewTryIndex(td, controlId(requestedName)).isDefined) {
+            // If so create new id
+            val newName = controlNameFromId(nextId(td, "control"))
 
-              // Rename everything
-              // LATER: Don't rename in place as it would be better to keep the original name when possible,
-              // e.g. copy, paste remove first control, paste again.
-              renameControlByElement(control, newName, resources \ * map (_.localname) toSet)
+            // Rename everything
+            renameControlByElement(control, newName, resources \ * map (_.localname) toSet)
 
-              holders ++ resources foreach
-                (rename(_, newName))
+            holders ++ resources foreach
+              (rename(_, newName))
 
-              (xvc \ "bind" \ * headOption) foreach
-                (renameBindElement(_, newName))
+            (xvc \ "bind" \ * headOption) foreach
+              (renameBindElement(_, newName))
 
-              newName
-            } else
-              requestedName
-          }
-
-          // Insert control and holders
-          val newControlElement = insert(into = gridTd, origin = control).head
-          insertHolders(
-            newControlElement,
-            holders.head,
-            xvc \ "resources" \ "resource" map (r ⇒ (r attValue "*:lang", r \ * head)),
-            precedingControlNameInSectionForControl(newControlElement)
-          )
-
-          // Create the bind and copy all attributes and content
-          val bind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
-          (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
-            insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
-          }
-
-          import org.orbeon.oxf.fr.Names._
-
-          // Rename nested element ids and alert ids
-          val nestedElemsWithId =
-            for {
-              nestedElem ← bind descendant *
-              id         ← nestedElem.idOpt
-            } yield
-              nestedElem → id
-
-          val oldIdToNewId =
-            nestedElemsWithId map (_._2) zip nextIds(td, Validation, nestedElemsWithId.size) toMap
-
-          // Update nested element ids, in particular xf:constraint/@id
-          nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
-            setvalue(nestedElem att "id", oldIdToNewId(oldId))
-          }
-
-          val alertsWithValidationId =
-            for {
-              alertElem    ← newControlElement / (XF → "alert")
-              validationId ← alertElem attValueOpt Validation
-            } yield
-              alertElem → validationId
-
-          // Update xf:alert/@validation and xf:constraint/@id
-          alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
-
-            val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
-
-            newValidationIdOpt foreach { newValidationId ⇒
-              setvalue(alertWithValidation att Validation, newValidationId)
-            }
-          }
-
-          // This can impact templates
-          updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
+            newName
+          } else
+            requestedName
         }
+
+        // Insert control and holders
+        val newControlElement = insert(into = gridTd, origin = control).head
+        insertHolders(
+          newControlElement,
+          holders.head,
+          xvc \ "resources" \ "resource" map (r ⇒ (r attValue "*:lang", r \ * head)),
+          precedingControlNameInSectionForControl(newControlElement)
+        )
+
+        // Create the bind and copy all attributes and content
+        val bind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
+        (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
+          insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
+        }
+
+        import org.orbeon.oxf.fr.Names._
+
+        // Rename nested element ids and alert ids
+        val nestedElemsWithId =
+          for {
+            nestedElem ← bind descendant *
+            id         ← nestedElem.idOpt
+          } yield
+            nestedElem → id
+
+        val oldIdToNewId =
+          nestedElemsWithId map (_._2) zip nextIds(td, Validation, nestedElemsWithId.size) toMap
+
+        // Update nested element ids, in particular xf:constraint/@id
+        nestedElemsWithId foreach { case (nestedElem, oldId) ⇒
+          setvalue(nestedElem att "id", oldIdToNewId(oldId))
+        }
+
+        val alertsWithValidationId =
+          for {
+            alertElem    ← newControlElement / (XF → "alert")
+            validationId ← alertElem attValueOpt Validation
+          } yield
+            alertElem → validationId
+
+        // Update xf:alert/@validation and xf:constraint/@id
+        alertsWithValidationId foreach { case (alertWithValidation, oldValidationId) ⇒
+
+          val newValidationIdOpt = oldIdToNewId.get(oldValidationId)
+
+          newValidationIdOpt foreach { newValidationId ⇒
+            setvalue(alertWithValidation att Validation, newValidationId)
+          }
+        }
+
+        // This can impact templates
+        updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
       }
-    } catch {
-      case e: Exception ⇒
-        e.printStackTrace()
     }
   }
 

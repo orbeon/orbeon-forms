@@ -533,10 +533,7 @@
         <xf:var name="source"  value="id(event('xxf:targetid'))"/>
         <xf:var name="target"  value="$current-td"/>
         <xf:action type="xpath">
-            if ($do-copy) then
-                toolboxOps:copyToClipboard($source) else
-                toolboxOps:cutToClipboard($source),
-            toolboxOps:pasteFromClipboard($target)
+            toolboxOps:dndControl($source, $target, $do-copy)
         </xf:action>
     </xf:action>
 

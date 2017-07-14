@@ -481,12 +481,20 @@ public class XFormsInsertAction extends XFormsAction {
 
         // Gather list of modified nodes
         final List<NodeInfo> insertedNodeInfos;
-        if (didInsertNodes && modifiedInstanceOrNull != null) {
+        if (didInsertNodes) {
             // Instance can be null if document into which delete is performed is not in an instance, e.g. in a variable
-            final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstanceOrNull.documentInfo();
+            final DocumentWrapper documentWrapper =
+                modifiedInstanceOrNull == null ?
+                null :
+                (DocumentWrapper) modifiedInstanceOrNull.documentInfo();
             insertedNodeInfos = new ArrayList<NodeInfo>(insertedNodes.size());
-            for (Node insertedNode : insertedNodes)
-                insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
+            for (Node insertedNode : insertedNodes) {
+                final NodeInfo wrappedInsertedNode =
+                    documentWrapper == null ?
+                    DocumentWrapper.makeWrapper(insertedNode) :
+                    documentWrapper.wrap(insertedNode);
+                insertedNodeInfos.add(wrappedInsertedNode);
+            }
         } else {
             insertedNodeInfos = Collections.emptyList();
         }

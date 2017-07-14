@@ -30,17 +30,17 @@ object Dragula {
 // https://www.scala-js.org/news/2016/12/21/announcing-scalajs-0.6.14/
 @ScalaJSDefined
 abstract class DragulaOptions extends js.Object {
-  def isContainer(el: Element)                                                 = false
-  def moves  (el: Element, source: Element, handle: Element, sibling: Element) = true
-  def accepts(el: Element, target: Element, source: Element, sibling: Element) = true
-  def invalid(el: Element, handle: Element)                                    = false
-  def direction                                                                = "vertical"
-  def copy                                                                     = false
-  def copySortSource                                                           = false
-  def revertOnSpill                                                            = false
-  def removeOnSpill                                                            = false
-  def mirrorContainer                                                          = dom.document.body
-  def ignoreInputTextSelection                                                 = true
+  def isContainer (el: Element)                                                     = false
+  def moves       (el: Element, source: Element, handle: Element, sibling: Element) = true
+  def accepts     (el: Element, target: Element, source: Element, sibling: Element) = true
+  def invalid     (el: Element, handle: Element)                                    = false
+  def copy        (el: Element, source: Element)                                    = false
+  def direction                                                                     = "vertical"
+  def copySortSource                                                                = false
+  def revertOnSpill                                                                 = false
+  def removeOnSpill                                                                 = false
+  def mirrorContainer                                                               = dom.document.body
+  def ignoreInputTextSelection                                                      = true
 }
 
 @js.native

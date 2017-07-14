@@ -24,7 +24,9 @@ import scala.scalajs.js
 
 object ControlDnD {
 
-  var shiftPressed = false
+  private val CopyClass = "fb-dnd-copy"
+  private val MoveClass = "fb-dnd-move"
+  private var shiftPressed = false
 
   $(document).on("keyup keydown", {event: JQueryEventObject ⇒
     shiftPressed = event.asInstanceOf[js.Dynamic].shiftKey.asInstanceOf[Boolean]
@@ -47,13 +49,18 @@ object ControlDnD {
       override def mirrorContainer: HTMLElement =
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
         $(".fr-body .fr-grid-td").get(0).asInstanceOf[HTMLElement]
+      override def copy(el: Element, source: Element): Boolean = {
+        val cursorClass = if (shiftPressed) CopyClass else MoveClass
+        $(el).addClass(cursorClass)
+        shiftPressed
+      }
     }
   )
 
   drake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
     DocumentAPI.dispatchEvent(target.id, "DOMActivate")
     DocumentAPI.dispatchEvent(source.id, "fb-dnd-control-from", properties = new js.Object {
-      val `fb-do-copy` = shiftPressed
+      val `fb-do-copy` = $(el).hasClass(CopyClass)
     })
   })
 

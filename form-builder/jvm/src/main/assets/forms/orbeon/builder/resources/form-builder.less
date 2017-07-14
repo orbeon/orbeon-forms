@@ -162,12 +162,9 @@ div.orbeon.orbeon-portlet-div {
         }
     }
 
-    // While moving, just keep the "move" icon, and use the "closed hand" for the mouse pointer
-    .gu-mirror .fb-grid-cell-icons .fb-control-handle {
-        display: inline-block;
-        cursor: grabbing;
-        cursor: -webkit-grabbing; // See note above on `-webkit-grab;`
-    }
+    // Use copy or move cursor during D&D
+    .gu-mirror.fb-dnd-copy { cursor: copy; cursor: -webkit-copy }
+    .gu-mirror.fb-dnd-move { cursor: move; cursor: -webkit-move }
 
     // ***** Toolbox ***************************************************************************************************
 

@@ -3944,7 +3944,10 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         if (! foundDojoContentPane) {
             ORBEON.xforms.Globals.pageLoadedRegistered = true;
             YAHOO.util.Event.throwErrors = true;
-            YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
+            if (_.isUndefined(Liferay))
+                YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
+            else
+                Liferay.on("allPortletsReady", ORBEON.xforms.Init.document);
             ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
             ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
         }

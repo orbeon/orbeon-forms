@@ -174,11 +174,12 @@ object XFormsAPI {
     if (oldName != newName) {
       val newNodeInfo = nodeInfo.getNodeKind match {
         case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
-        case ATTRIBUTE_NODE ⇒ attributeInfo(newName, nodeInfo.stringValue)
         case _              ⇒ throw new IllegalArgumentException
       }
 
-      val result = insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo).head
+      insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo)
+      // Don't rely on the value returned by `insert()` for `result` as it is `Nil` if not inserting into an instance
+      val result = nodeInfo.followingSibling(*).head
       delete(nodeInfo)
       result
     } else {

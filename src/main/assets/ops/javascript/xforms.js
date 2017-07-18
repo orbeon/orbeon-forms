@@ -3944,7 +3944,7 @@ var XFORMS_REGEXP_INVALID_XML_CHAR = new RegExp("[\x00-\x08\x0B\x0C\x0E-\x1F]", 
         if (! foundDojoContentPane) {
             ORBEON.xforms.Globals.pageLoadedRegistered = true;
             YAHOO.util.Event.throwErrors = true;
-            if (_.isUndefined(Liferay))
+            if (_.isUndefined(window.Liferay))
                 YAHOO.util.Event.onDOMReady(ORBEON.xforms.Init.document);
             else
                 Liferay.on("allPortletsReady", ORBEON.xforms.Init.document);

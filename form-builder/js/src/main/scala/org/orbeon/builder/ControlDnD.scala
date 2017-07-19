@@ -42,7 +42,7 @@ object ControlDnD {
       override def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean = {
         // Can only drop into an empty cell
         $(target)
-          .find("> .fb-hover:not(.gu-mirror) > .fr-grid-content > *, " +
+          .find("> .fb-hover:not(.gu-mirror, .gu-transit) > .fr-grid-content > *, " +
                 "> .fr-grid-content > *")
           .length == 0
       }
@@ -58,10 +58,13 @@ object ControlDnD {
   )
 
   drake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
-    DocumentAPI.dispatchEvent(target.id, "DOMActivate")
-    DocumentAPI.dispatchEvent(source.id, "fb-dnd-control-from", properties = new js.Object {
-      val `fb-do-copy` = $(el).hasClass(CopyClass)
-    })
+    // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
+    if (target != null) {
+      DocumentAPI.dispatchEvent(target.id, "DOMActivate")
+      DocumentAPI.dispatchEvent(source.id, "fb-dnd-control-from", properties = new js.Object {
+        val `fb-do-copy` = $(el).hasClass(CopyClass)
+      })
+    }
   })
 
 }

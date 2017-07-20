@@ -578,7 +578,11 @@
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
                                 <!-- Delete section -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="delete-section-trigger" class="delete-section-trigger">
-                                    <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-section-icon/label}" title="{$fb-resources/delete-section-icon/label}"/></xf:label>
+                                    <xf:label>
+                                        <xh:i
+                                            class="icon-minus-sign"
+                                            title="{$fb-resources/delete-section-icon/label}"/>
+                                    </xf:label>
                                     <!-- Ask confirmation -->
                                     <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
                                         <xf:property name="message"
@@ -641,7 +645,11 @@
                             <xh:div class="fb-grid-repeat-editor">
                                 <!-- Delete grid -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger">
-                                    <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-grid-icon/label}" title="{$fb-resources/delete-grid-icon/label}"/></xf:label>
+                                    <xf:label>
+                                        <xh:i
+                                            class="icon-minus-sign"
+                                            title="{$fb-resources/delete-grid-icon/label}"/>
+                                    </xf:label>
                                     <!--<xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>-->
                                     <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">-->
                                         <!--<xf:property name="container" value="fbf:containerById(event('grid-id'))"/>-->

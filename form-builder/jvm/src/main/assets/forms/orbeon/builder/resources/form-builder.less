@@ -166,6 +166,10 @@ div.orbeon.orbeon-portlet-div {
     .gu-mirror.fb-dnd-copy { cursor: copy; cursor: -webkit-copy }
     .gu-mirror.fb-dnd-move { cursor: move; cursor: -webkit-move }
 
+    // Hide empty grid content, otherwise since it has padding, and the element Dragula shows
+    // in an empty cell shows lower than it should be
+    .fr-grid-content:empty { display: none }
+
     // ***** Toolbox ***************************************************************************************************
 
     .fb-toolbox {

@@ -70,7 +70,7 @@
                     <xf:value/>
                 </xf:item>
                 <xf:itemset ref="instance()/state" xxbl:scope="inner">
-                    <xf:label ref="@name"/>
+                    <xf:label ref="if (xxf:lang() = 'fr') then @name-fr else @name"/>
                     <xf:value ref="@abbreviation"/>
                 </xf:itemset>
             </xf:select1>

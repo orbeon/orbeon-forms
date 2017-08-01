@@ -39,7 +39,7 @@ class RollbackTest
         "must rollback to the original value including save status to `clean`",
         s"""
           xf:setvalue(ref = "my-section/my-name", value = "'Sam'")
-          then rollback
+          then rollback(changes = "in-memory-form-data")
         """,
         <form>
           <my-section>

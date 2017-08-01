@@ -294,7 +294,15 @@ trait ProcessInterpreter extends Logging {
 
   // Rollback the current transaction
   def tryRollback(params: ActionParams): Try[Any] =
-    Try(transactionRollback())
+    Try {
+
+      val tokens = paramByNameOrDefault(params, "changes") map stringToSet getOrElse Set.empty
+
+      if (tokens != Set("in-memory-form-data"))
+        throw new IllegalArgumentException(s"""`rollback` action must have a `changes = "in-memory-form-data"` parameter""")
+
+      transactionRollback()
+    }
 
   // Don't do anything
   def tryNop(params: ActionParams): Try[Any] =

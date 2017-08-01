@@ -32,6 +32,8 @@ trait Node extends Cloneable {
   def detach(): Node
 
   def accept(visitor: Visitor): Unit
+
+  // TODO: We don't like `Cloneable`. Instead use custom `copy` or `deepCopy` method.
   override def clone(): AnyRef = super.clone()
 }
 

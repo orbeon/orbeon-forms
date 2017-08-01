@@ -139,10 +139,10 @@ class XFormsInstance(
   def model = parent
 
   // The instance root node
-  def root = _documentInfo
+  def root: DocumentInfo = _documentInfo
 
-  // The instance root element as with the instance() function
-  def rootElement = DataModel.firstChildElement(_documentInfo)
+  // The instance root element as with the `instance()` function
+  def rootElement: NodeInfo = DataModel.firstChildElement(_documentInfo)
 
   def getId = instance.staticId
   def getPrefixedId = XFormsId.getPrefixedId(getEffectiveId)
@@ -388,7 +388,7 @@ trait XFormsInstanceIndex {
     if (idIndex ne null) idIndex.keysIterator else Iterator.empty
   }
 
-  def requireNewIndex() = {
+  def requireNewIndex(): Unit = {
     idIndex = null
     if (instance.indexIds && self.documentInfo.isInstanceOf[DocumentWrapper]) {
       val wrapper = self.documentInfo.asInstanceOf[DocumentWrapper]
@@ -492,7 +492,7 @@ object XFormsInstance extends Logging {
   import Instance._
 
   // Create an initial instance without caching information
-  def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentInfo) =
+  def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentInfo): XFormsInstance =
     new XFormsInstance(
       model,
       instance,
@@ -503,25 +503,25 @@ object XFormsInstance extends Logging {
       true
     )
 
-  def createDocumentInfo(doc: Document Either DocumentInfo, exposeXPathTypes: Boolean) = doc match {
+  def createDocumentInfo(doc: Document Either DocumentInfo, exposeXPathTypes: Boolean): DocumentInfo = doc match {
     case Left(dom4jDocument) ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
     case Right(documentInfo) ⇒ documentInfo
   }
 
-  def createDocumentInfoJava(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean) = documentOrDocumentInfo match {
+  def createDocumentInfoJava(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean): DocumentInfo = documentOrDocumentInfo match {
     case dom4jDocument: Document    ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
     case documentInfo: DocumentInfo ⇒ documentInfo
     case _ ⇒ throw new OXFException("Invalid type for instance document: " + documentOrDocumentInfo.getClass.getName)
   }
 
-  def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean) =
+  def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo =
     if (readonly)
       TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
       wrapDocument(Dom4jUtils.readDom4j(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
-  def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean) = {
+  def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
     assert(
       ! documentInfo.isInstanceOf[VirtualNode],
       "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree"

@@ -84,10 +84,10 @@
         <p:output name="data"    id="after-components"/>
 
         <!-- This is here just so that we can reload the form when the properties or the resources change -->
-        <p:input name="properties-xforms"      href="oxf:/config/properties-xforms.xml"/>
-        <p:input name="properties-form-runner" href="oxf:/config/properties-form-runner.xml"/>
-        <p:input name="properties-form-runner" href="oxf:/config/properties-form-builder.xml"/>
-        <p:input name="properties-local"       href="oxf:/config/properties-local.xml"/>
+        <p:input name="properties-xforms"       href="oxf:/config/properties-xforms.xml"/>
+        <p:input name="properties-form-runner"  href="oxf:/config/properties-form-runner.xml"/>
+        <p:input name="properties-form-builder" href="oxf:/config/properties-form-builder.xml"/>
+        <p:input name="properties-local"        href="oxf:/config/properties-local.xml"/>
     </p:processor>
 
     <!-- Handle XInclude -->

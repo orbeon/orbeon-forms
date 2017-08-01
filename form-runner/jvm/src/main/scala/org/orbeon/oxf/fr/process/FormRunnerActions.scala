@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.SimpleProcess._
-import org.orbeon.oxf.fr.{DataMigration, FormRunner}
+import org.orbeon.oxf.fr.{DataMigration, DataStatus, FormRunner}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -173,13 +173,15 @@ trait FormRunnerActions {
   }
 
   def trySetDataStatus(params: ActionParams): Try[Any] = Try {
+
     val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true
     val isDraft = booleanParamByName(params, "draft", default = false)
 
     val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
     val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
 
-    (saveStatus ++ autoSaveStatus) foreach (setvalue(_, if (isSafe) "clean" else "dirty"))
+    (saveStatus ++ autoSaveStatus) foreach
+      (setvalue(_, if (isSafe) DataStatus.Clean.entryName else DataStatus.Dirty.entryName))
   }
 
   private def messageFromResourceOrParam(params: ActionParams) = {

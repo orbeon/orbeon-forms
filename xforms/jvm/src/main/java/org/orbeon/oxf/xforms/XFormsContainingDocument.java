@@ -430,6 +430,7 @@ public class XFormsContainingDocument extends XFormsContainingDocumentSupport {
         this.serverErrors = null;
 
         clearRequestStats();
+        clearTransientState();
 
         if (this.controlsStructuralChanges != null)
             this.controlsStructuralChanges.clear();

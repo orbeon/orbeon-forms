@@ -51,6 +51,7 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.reflect.ClassTag
 
 object XFormsContainingDocumentSupport {
 
@@ -124,6 +125,7 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
     associatedControlOpt = None,
     innerScope           = null
   ) with ContainingDocumentLogging
+    with ContainingDocumentTransientState
     with ContainingDocumentMisc
     with ContainingDocumentUpload
     with ContainingDocumentEvent
@@ -135,6 +137,26 @@ abstract class XFormsContainingDocumentSupport(var disableUpdates: Boolean)
     with XFormsDocumentLifecycle
     with Cacheable
     with XFormsObject
+
+
+trait ContainingDocumentTransientState {
+
+  import CollectionUtils._
+
+  private var transientState = Map.empty[String, Any]
+
+  def setTransientState[T](name: String, value: T): Unit =
+    transientState += name → value
+
+  def getTransientState[T: ClassTag](name: String): Option[T] =
+    transientState.get(name) flatMap collectByErasedType[T]
+
+  def removeTransientState(name: String): Unit =
+    transientState -= name
+
+  def clearTransientState(): Unit =
+    transientState = Map.empty
+}
 
 trait ContainingDocumentUpload {
 

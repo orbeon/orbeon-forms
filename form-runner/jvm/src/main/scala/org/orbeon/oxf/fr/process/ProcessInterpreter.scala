@@ -51,6 +51,8 @@ trait ProcessInterpreter extends Logging {
   def writeSuspendedProcess(process: String): Unit
   def readSuspendedProcess: String
   def createUniqueProcessId: String = SecureUtils.randomHexId
+  def transactionStart(): Unit
+  def transactionRollback(): Unit
   implicit def logger: IndentedLogger
 
   // May be overridden by implementation
@@ -79,13 +81,14 @@ trait ProcessInterpreter extends Logging {
     import org.orbeon.oxf.util.DynamicVariable
 
     val StandardActions = Map[String, Action](
-      "success" → trySuccess,
-      "failure" → tryFailure,
-      "process" → tryProcess,
-      "suspend" → trySuspend,
-      "resume"  → tryResume,
-      "abort"   → tryAbort,
-      "nop"     → tryNop
+      "success"  → trySuccess,
+      "failure"  → tryFailure,
+      "process"  → tryProcess,
+      "suspend"  → trySuspend,
+      "resume"   → tryResume,
+      "abort"    → tryAbort,
+      "rollback" → tryRollback,
+      "nop"      → tryNop
     )
 
     val AllAllowedActions = StandardActions ++ extensionActions
@@ -229,8 +232,9 @@ trait ProcessInterpreter extends Logging {
 
   // Main entry point for starting a literal process
   //@XPathFunction
-  def runProcess(scope: String, process: String): Try[Any] = {
+  def runProcess(scope: String, process: String): Try[Any] =
     withDebug("process: running", Seq("process" → process)) {
+      transactionStart()
       // Scope the process (for suspend/resume)
       withEmptyStack(scope) {
         beforeProcess() flatMap { _ ⇒
@@ -249,7 +253,6 @@ trait ProcessInterpreter extends Logging {
         }
       }
     }
-  }
 
   // Id of the currently running process
   def runningProcessId: Option[String] = processStackDyn.value map (_.processId)
@@ -288,6 +291,10 @@ trait ProcessInterpreter extends Logging {
   // Abort a suspended process
   def tryAbort(params: ActionParams): Try[Any] =
     Try(writeSuspendedProcess(""))
+
+  // Rollback the current transaction
+  def tryRollback(params: ActionParams): Try[Any] =
+    Try(transactionRollback())
 
   // Don't do anything
   def tryNop(params: ActionParams): Try[Any] =

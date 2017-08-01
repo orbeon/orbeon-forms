@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.fr.process
 
+import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
+import org.orbeon.oxf.fr.{DataStatus, Names}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -43,7 +46,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
   def currentXFormsDocumentId = XFormsAPI.inScopeContainingDocument.getUUID
 
   // All XPath runs in the context of the main form instance's root element
-  def xpathContext = topLevelInstance(Names.FormModel, Names.FormInstance) map (_.rootElement) orNull
+  def xpathContext = formInstance.rootElement
   def xpathFunctionLibrary = inScopeContainingDocument.getFunctionLibrary
   def xpathFunctionContext = XPath.functionContext.orNull
 
@@ -70,6 +73,40 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
   def readSuspendedProcess =
     topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
+
+  case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
+
+  // Store information about what we need to potential rollback
+  // Currently, assume we don't need to persist this information between client requests, and assume that
+  // the instance is mutable.
+  // See https://github.com/orbeon/orbeon-forms/issues/3301
+  def transactionStart(): Unit =
+    inScopeContainingDocument.setTransientState(
+      RollbackContent.getClass.getName,
+      RollbackContent(
+        data           = XFormsUtils.getNodeFromNodeInfoConvert(formInstance.root).clone().asInstanceOf[Document], // ugly way to copy
+        saveStatus     = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement elemValue "data-status"),
+        autoSaveStatus = DataStatus.withNameInsensitiveOption(persistenceInstance.rootElement / "autosave" / "status" stringValue)
+      )
+    )
+
+  def transactionRollback(): Unit =
+    inScopeContainingDocument.getTransientState[RollbackContent](RollbackContent.getClass.getName) foreach { rollbackContent ⇒
+
+      // Q: Should we also store `instanceCaching` and `readonly` into `RollbackContent`? As of now,
+      // these won't change over time for `fr-form-instance` so we can safely read their latest version
+      // on `update`.
+      formInstance.update(
+        instanceCaching = formInstance.instanceCaching,
+        documentInfo    = Instance.wrapDocument(rollbackContent.data, formInstance.exposeXPathTypes),
+        readonly        = formInstance.readonly
+      )
+
+      setvalue(persistenceInstance.rootElement / "data-status",         rollbackContent.saveStatus.map(_.entryName).getOrElse(""))
+      setvalue(persistenceInstance.rootElement / "autosave" / "status", rollbackContent.autoSaveStatus.map(_.entryName).getOrElse(""))
+
+      inScopeContainingDocument.removeTransientState(RollbackContent.getClass.getName)
+    }
 
   // Search first in properties, then try legacy workflow-send
   // The scope is interpreted as a property prefix.

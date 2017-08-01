@@ -1,0 +1,99 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:external-events="my-run-process">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <my-section>
+                        <my-name/>
+                    </my-section>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                    <xf:bind id="my-name-bind" name="my-name" ref="my-name"
+                             xxf:whitespace="trim"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>process-rollback</form-name>
+                    <title xml:lang="en">Untitled Form</title>
+                    <description xml:lang="en"/>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-section>
+                            <label>Section 1</label>
+                        </my-section>
+                        <my-name>
+                            <label>Control 1.1</label>
+                            <hint/>
+                        </my-name>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <!-- Hook for `RollbackTest` -->
+            <xf:action event="my-run-process">
+                <xf:action type="xpath">
+                    fr:run-process('oxf.fr.detail.process', event('process'))
+                </xf:action>
+            </xf:action>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="my-section-control" bind="my-section-bind">
+                    <xf:label ref="$form-resources/my-section/label"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="my-name-control" bind="my-name-bind">
+                                    <xf:label ref="$form-resources/my-name/label"/>
+                                    <xf:hint ref="$form-resources/my-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -49,6 +49,9 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
     // Constant so that we can test properly
     override def createUniqueProcessId = ConstantProcessId
 
+    def transactionStart()    = ()
+    def transactionRollback() = ()
+
     private var _suspendedProcess: Option[String] = None
     def savedProcess = _suspendedProcess
 

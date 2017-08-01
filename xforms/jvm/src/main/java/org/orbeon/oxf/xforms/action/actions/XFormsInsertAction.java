@@ -261,7 +261,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
                 // node of the Node Set Binding node-set."
-                final Node singleSourceNode = org.orbeon.oxf.xforms.XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1));
+                final Node singleSourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1));
                 // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
                 final Node singleClonedNode = Dom4jUtils.createCopy(singleSourceNode);
 

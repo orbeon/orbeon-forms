@@ -19,7 +19,7 @@ import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
@@ -78,7 +78,7 @@ class ServletExternalContext(
     def getContentType             = nativeRequest.getContentType
     def getServerName              = nativeRequest.getServerName
     def getServerPort              = nativeRequest.getServerPort
-    def getMethod                  = nativeRequest.getMethod
+    def getMethod                  = HttpMethod.withNameInsensitive(nativeRequest.getMethod)
     def getProtocol                = nativeRequest.getProtocol
     def getRemoteHost              = nativeRequest.getRemoteHost
     def getScheme                  = nativeRequest.getScheme

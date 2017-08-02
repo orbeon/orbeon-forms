@@ -361,7 +361,7 @@ public class RequestGenerator extends ProcessorImpl {
         addTextElement(requestElement, "context-path", request.getContextPath());
         addHeaders(requestElement, request);
         addAttributes(requestElement, request);
-        addTextElement(requestElement, "method", request.getMethod());
+        addTextElement(requestElement, "method", request.getMethod().entryName().toUpperCase());
         addTextElement(requestElement, "path-info", request.getPathInfo());
         addTextElement(requestElement, "path-translated", request.getPathTranslated());
         addTextElement(requestElement, "query-string", request.getQueryString());

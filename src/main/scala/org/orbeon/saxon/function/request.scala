@@ -23,7 +23,7 @@ import org.orbeon.saxon.value.{BooleanValue, StringValue}
 
 class GetRequestMethod extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    NetUtils.getExternalContext.getRequest.getMethod
+    NetUtils.getExternalContext.getRequest.getMethod.entryName.toUpperCase
 }
 
 class GetPortletMode extends DefaultFunctionSupport with RuntimeDependentFunction {

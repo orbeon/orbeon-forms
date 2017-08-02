@@ -17,7 +17,7 @@ import java.io._
 import java.{util ⇒ ju}
 
 import enumeratum.values.{IntEnum, IntEnumEntry}
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.NumericUtils
 
 import scala.collection.JavaConverters._
@@ -59,7 +59,7 @@ object ExternalContext {
     def getRemoteHost: String
     def getRemoteAddr: String
     def getScheme: String
-    def getMethod: String
+    def getMethod: HttpMethod
     def getServerName: String
     def getServerPort: Int
 

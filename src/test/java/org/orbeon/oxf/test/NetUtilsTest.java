@@ -20,6 +20,7 @@ import org.orbeon.dom.Document;
 import org.orbeon.oxf.externalcontext.RequestAdapter;
 import org.orbeon.oxf.externalcontext.TestExternalContext;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.DateUtils;
@@ -58,8 +59,8 @@ public class NetUtilsTest extends ResourceManagerTestBase {
 
         final ExternalContext.Request request = new RequestAdapter() {
             @Override
-            public String getMethod() {
-                return "GET";
+            public HttpMethod getMethod() {
+                return HttpMethod.GET$.MODULE$;
             }
 
             private final Map<String, String[]> headers = new HashMap<String, String[]>();

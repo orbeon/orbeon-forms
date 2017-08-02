@@ -13,8 +13,10 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import java.io.{InputStream, Reader}
+import java.io.InputStream
 import java.{util ⇒ ju}
+
+import org.orbeon.oxf.http.HttpMethod
 
 class RequestAdapter extends ExternalContext.Request {
   def getContainerType: String = null
@@ -35,7 +37,7 @@ class RequestAdapter extends ExternalContext.Request {
   def getRemoteHost: String = null
   def getRemoteAddr: String = null
   def getScheme: String = null
-  def getMethod: String = null
+  def getMethod: HttpMethod = null
   def getServerName: String = null
   def getServerPort: Int = 0
   def getSession(create: Boolean): ExternalContext.Session = null

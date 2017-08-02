@@ -19,7 +19,6 @@ import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.{Application, Local}
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, SessionScope}
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletPortletRequest, WSRPURLRewriter, WebAppContext}
 import org.orbeon.oxf.http._
@@ -189,7 +188,7 @@ class Portlet2ExternalContext(
     def getCharacterEncoding      : String            = clientDataRequestOpt map (_.getCharacterEncoding)  orNull
     def getContentLength          : Int               = clientDataRequestOpt map (_.getContentLength)      getOrElse -1
     def getContentType            : String            = clientDataRequestOpt map (_.getContentType)        orNull
-    def getMethod                 : String            = clientDataRequestOpt map (_.getMethod)             getOrElse "GET"
+    def getMethod                 : HttpMethod        = clientDataRequestOpt map (c ⇒ HttpMethod.withNameInsensitive(c.getMethod)) getOrElse HttpMethod.GET
     def getInputStream            : InputStream       = clientDataRequestOpt map (_.getPortletInputStream) orNull
 
     // Not available or not implemented

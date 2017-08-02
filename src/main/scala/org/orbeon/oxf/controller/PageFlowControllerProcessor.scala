@@ -21,7 +21,7 @@ import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.http.{HttpRedirectException, HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{HttpMethod, HttpRedirectException, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor._
@@ -68,7 +68,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val path    = request.getRequestPath
     val method  = request.getMethod
 
-    lazy val logParams = Seq("controller" → pageFlow.file.orNull, "method" → method, "path" → path)
+    lazy val logParams = Seq("controller" → pageFlow.file.orNull, "method" → method.entryName, "path" → path)
 
     // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g.
     // by oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
@@ -230,7 +230,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
           Some(PagePublicMethods mkString " "),
           allowEmpty = true
         )
-      )
+      ) map
+        HttpMethod.withNameInsensitive
 
     val defaultServicePublicMethods =
       stringOptionToSet(
@@ -239,7 +240,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
           Some(ServicePublicMethods mkString " "),
           allowEmpty = true
         )
-      )
+      ) map
+        HttpMethod.withNameInsensitive
 
     // NOTE: We use a global property, not an oxf:page-flow scoped one
     val defaultVersioned =
@@ -432,7 +434,7 @@ object PageFlowControllerProcessor {
 
   val PagePublicMethods            = Set("GET", "HEAD")
   val ServicePublicMethods         = Set.empty[String]
-  val SubmissionPublicMethods      = Set("GET", "POST") // Q: do we need GET? PUT?
+  val SubmissionPublicMethods      = Set(HttpMethod.GET, HttpMethod.POST): Set[HttpMethod] // Q: do we need GET? PUT?
   val AllPublicMethods             = "#all"
 
   // Route elements
@@ -454,7 +456,7 @@ object PageFlowControllerProcessor {
     model             : Option[String],
     view              : Option[String],
     element           : Element,
-    publicMethods     : String ⇒ Boolean,
+    publicMethods     : HttpMethod ⇒ Boolean,
     isPage            : Boolean
   ) extends RouteElement
 
@@ -477,15 +479,15 @@ object PageFlowControllerProcessor {
     def apply(
       e                           : Element,
       defaultMatcher              : QName,
-      defaultPagePublicMethods    : Set[String],
-      defaultServicePublicMethods : Set[String]
+      defaultPagePublicMethods    : Set[HttpMethod],
+      defaultServicePublicMethods : Set[HttpMethod]
     ): PageOrServiceElement = {
 
       val isPage = e.getName == "page"
 
       def localPublicMethods = att(e, "public-methods") map {
-        case att if att == AllPublicMethods ⇒ (_: String) ⇒ true
-        case att                            ⇒ stringToSet(att)
+        case att if att == AllPublicMethods ⇒ (_: HttpMethod) ⇒ true
+        case att                            ⇒ stringToSet(att) map HttpMethod.withNameInsensitive
       }
 
       def defaultPublicMethods = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods
@@ -527,7 +529,7 @@ object PageFlowControllerProcessor {
       logger        : IndentedLogger
     ) = {
       debug("processing route", Seq("route" → this.toString))
-      if (ec.getRequest.getMethod == "GET")
+      if (ec.getRequest.getMethod == HttpMethod.GET)
         ResourceServer.serveResource(ec.getRequest.getRequestPath, routeElement.versioned)
       else
         unauthorized()

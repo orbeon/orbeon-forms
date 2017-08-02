@@ -18,6 +18,7 @@ import java.{util ⇒ ju}
 
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope.Application
 import org.orbeon.oxf.externalcontext.ExternalContext._
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, StringBuilderWriter}
 
 import scala.collection.{immutable ⇒ i, mutable ⇒ m}
@@ -61,7 +62,7 @@ abstract class SimpleExternalContext extends ExternalContext {
     def getContentType                                                                = ""
     def getServerName                                                                 = ""
     def getServerPort                                                                 = 0
-    def getMethod                                                                     = "GET"
+    def getMethod                                                                     = HttpMethod.GET
     def getProtocol                                                                   = "http"
     def getRemoteHost                                                                 = ""
     def getScheme                                                                     = ""

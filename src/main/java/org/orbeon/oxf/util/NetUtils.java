@@ -62,7 +62,7 @@ public class NetUtils {
      */
     public static boolean checkIfModifiedSince(ExternalContext.Request request, long lastModified, Logger logger) {
         // Do the check only for the GET method
-        if (!"GET".equals(request.getMethod()) || lastModified <= 0)
+        if (!"GET".equals(request.getMethod().entryName().toUpperCase()) || lastModified <= 0)
             return true;
         // Check dates
         final String ifModifiedHeader = StringConversions.getFirstValueFromStringArray(request.getHeaderValuesMap().get("if-modified-since"));

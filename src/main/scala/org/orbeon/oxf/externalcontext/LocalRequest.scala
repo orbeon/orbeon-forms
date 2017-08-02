@@ -101,7 +101,7 @@ class LocalRequest(
 
   /* SUPPORTED: methods called by ExternalContextToHttpServletRequestWrapper */
 
-  def getMethod            = method.entryName
+  def getMethod            = method
   def getParameterMap      = _queryAndBodyParameters
   def getQueryString       = _queryString.orNull
   def getCharacterEncoding = null;//TODO? // not used by our code

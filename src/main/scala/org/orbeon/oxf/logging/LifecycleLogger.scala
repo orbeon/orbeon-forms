@@ -18,6 +18,7 @@ import javax.servlet.http.{HttpServletRequest, HttpSession}
 
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session, SessionListener, SessionScope}
 import org.orbeon.oxf.externalcontext.RequestAdapter
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{JSON, NetUtils}
@@ -47,7 +48,7 @@ private class MinimalRequest(req: HttpServletRequest) extends RequestAdapter {
 
   override lazy val getAttributesMap = new InitUtils.RequestMap(req)
   override def getRequestPath        = NetUtils.getRequestPathInfo(req)
-  override def getMethod             = req.getMethod
+  override def getMethod             = HttpMethod.withNameInsensitive(req.getMethod)
 
   private lazy val sessionWrapper = new MinimalSession(req.getSession(true))
 
@@ -110,7 +111,7 @@ object LifecycleLogger {
   def basicRequestDetails(req: Request) =
     List(
       "path"   → req.getRequestPath,
-      "method" → req.getMethod
+      "method" → req.getMethod.entryName
     )
 
   def withEventAssumingRequest[T](source: String, message: String, params: Seq[(String, String)])(body: ⇒ T): T =

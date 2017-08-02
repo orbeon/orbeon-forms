@@ -132,7 +132,7 @@ private object FormRunnerPersistenceProxy {
     form       : String,
     formOrData : FormOrData
   ): Unit =
-    if (formOrData == FormOrData.Data && GetOrPutMethods(HttpMethod.withNameInsensitive(request.getMethod))) {
+    if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod)) {
 
       val incomingVersion =
         request.getFirstParamAsString(DataFormatVersionName) getOrElse
@@ -223,7 +223,7 @@ private object FormRunnerPersistenceProxy {
         getHeader        = Connection.getHeaderFromRequest(request)
       )
 
-    val method = HttpMethod.withNameInsensitive(request.getMethod)
+    val method = request.getMethod
 
     if (! SupportedMethods(method))
       throw new OXFException(s"Unsupported method: $method")
@@ -340,7 +340,7 @@ private object FormRunnerPersistenceProxy {
   }
 
   def findRequestedRelevanceHandlingForGet(request: Request, formOrData: FormOrData): Option[RelevanceHandling] =
-    if (formOrData == FormOrData.Data && HttpMethod.withNameInsensitive(request.getMethod) == HttpMethod.GET)
+    if (formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET)
       request.getFirstParamAsString(NonRelevantName) flatMap RelevanceHandling.withNameLowercaseOnlyOption
     else
       None

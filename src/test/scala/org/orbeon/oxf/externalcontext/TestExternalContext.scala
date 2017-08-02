@@ -19,7 +19,7 @@ import java.{util ⇒ ju}
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext._
-import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.CoreUtils._
@@ -192,8 +192,8 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
     def getLocale: ju.Locale          = null
     def getLocales: ju.Enumeration[_] = null
 
-    def getMethod: String =
-      XPathUtils.selectStringValueNormalize(requestDocument, "/*/method")
+    def getMethod: HttpMethod =
+      HttpMethod.withNameInsensitive(XPathUtils.selectStringValueNormalize(requestDocument, "/*/method"))
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] = {
 

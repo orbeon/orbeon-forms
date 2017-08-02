@@ -105,7 +105,7 @@ object Authorizer extends Logging {
         // do, there is the issue of the first incoming request which doesn't have incoming cookies. So at this
         // point, we just follow the header proxying method we use in other places and remove Cookie/Set-Cookie.
 
-        val method  = HttpMethod.withNameInsensitive(request.getMethod)
+        val method  = request.getMethod
         val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString))
 
         // Add remote address to help authorizer filter

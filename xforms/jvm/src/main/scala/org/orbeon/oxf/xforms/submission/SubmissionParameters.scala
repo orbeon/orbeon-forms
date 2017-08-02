@@ -192,7 +192,7 @@ object SubmissionParameters {
     val incomingMethod = NetUtils.getExternalContext.getRequest.getMethod
 
     val isNoscript                     = containingDocument.noscript
-    val isAllowDeferredSubmission      = ! isNoscript && incomingMethod != HttpMethod.GET.entryName
+    val isAllowDeferredSubmission      = ! isNoscript && incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.isInitializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
     val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventNameOrNull

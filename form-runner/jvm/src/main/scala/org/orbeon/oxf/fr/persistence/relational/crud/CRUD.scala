@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.crud
 
-import org.orbeon.oxf.http.HttpStatusCodeException
+import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 
@@ -30,10 +30,10 @@ class CRUD
       val req = request
 
       httpRequest.getMethod match {
-        case "GET"    ⇒ get(req)
-        case "PUT"    ⇒ change(req, delete = false)
-        case "DELETE" ⇒ change(req, delete = true)
-        case _        ⇒ httpResponse.setStatus(405)
+        case HttpMethod.GET    ⇒ get(req)
+        case HttpMethod.PUT    ⇒ change(req, delete = false)
+        case HttpMethod.DELETE ⇒ change(req, delete = true)
+        case _                 ⇒ httpResponse.setStatus(405)
       }
     } catch {
       case e: HttpStatusCodeException ⇒

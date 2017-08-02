@@ -53,7 +53,7 @@ class ExternalContextToHttpServletRequestWrapper(
    * An obvious one: we want the recipient to see a GET or a POST, for example.
    */
 
-  override def getMethod: String = request.getMethod
+  override def getMethod: String = request.getMethod.entryName.toUpperCase
 
   /*
    * SPECIAL: derived path information

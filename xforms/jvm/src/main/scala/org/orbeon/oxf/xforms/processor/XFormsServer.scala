@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
-import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
+import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
@@ -646,8 +646,7 @@ class XFormsServer extends ProcessorImpl {
       }
 
     val isAjaxRequest =
-      (request.getMethod ne null) &&
-      request.getMethod == "POST" &&
+      request.getMethod == HttpMethod.POST &&
       ContentTypes.isXMLContentType(request.getContentType)
 
     val ignoreSequence = ! isAjaxRequest

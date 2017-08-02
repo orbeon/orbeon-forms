@@ -387,6 +387,7 @@ trait FormRunnerPersistence {
           //
           // - https://github.com/orbeon/orbeon-forms/issues/606
           // - https://github.com/orbeon/orbeon-forms/issues/3084
+          // - https://github.com/orbeon/orbeon-forms/issues/3301
           rollbackAttachmentPaths()
           throw e
       }

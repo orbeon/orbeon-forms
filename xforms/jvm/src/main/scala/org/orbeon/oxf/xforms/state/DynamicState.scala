@@ -247,18 +247,14 @@ object DynamicState {
     //   controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
     //   more information might be serialized.
     // - VisitableTrait controls serialize state if `visited == true`
-    def controlsToSerialize = {
-      val iterator =
-        for {
-          start        ← startOpt.toList
-          control      ← ControlsIterator(start, includeSelf = false)
-          if control.isRelevant
-          controlState ← control.controlState
-        } yield
-          controlState
-
-      iterator.toList
-    }
+    def controlsToSerialize =
+      for {
+        start        ← startOpt.toList
+        control      ← ControlsIterator(start, includeSelf = false)
+        if control.isRelevant
+        controlState ← control.controlState
+      } yield
+        controlState
 
     // Create the dynamic state object. A snapshot of the state is taken, whereby mutable parts of the state, such
     // as instances, controls, HTML template, Ajax response, are first serialized to Seq[Byte]. A couple of notes:

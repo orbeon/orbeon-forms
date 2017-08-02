@@ -42,7 +42,7 @@ class XXFormsResource extends XFormsFunction {
     def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }
 
     def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String) = {
-      val availableLangs = resourcesElement \ "resource" \@ "lang"
+      val availableLangs = resourcesElement / "resource" /@ "lang"
       availableLangs find (_ === requestedLang) orElse availableLangs.headOption flatMap (_.parentOption)
     }
 

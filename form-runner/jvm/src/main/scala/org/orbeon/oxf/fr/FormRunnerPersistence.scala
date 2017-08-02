@@ -265,15 +265,15 @@ trait FormRunnerPersistence {
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
   // reflected with the use of XBL components.
   def dataValid =
-    errorSummaryInstance.rootElement \ "valid" === "true"
+    errorSummaryInstance.rootElement / "valid" === "true"
 
   // Return the number of failed validations captured by the error summary for the given level
   def countValidationsByLevel(level: ValidationLevel) =
-    (errorSummaryInstance.rootElement \ "counts" \@ level.entryName stringValue).toInt
+    (errorSummaryInstance.rootElement / "counts" /@ level.entryName stringValue).toInt
 
   // Return whether the data is saved
   def isFormDataSaved =
-    persistenceInstance.rootElement \ "data-status" === "clean"
+    persistenceInstance.rootElement / "data-status" === "clean"
 
   // Return all nodes which refer to data attachments
   //@XPathFunction
@@ -287,7 +287,7 @@ trait FormRunnerPersistence {
     forceAttachments : Boolean
   ): (Seq[NodeInfo], Seq[String], Seq[String]) = (
     for {
-      holder        ← data \\ Node
+      holder        ← data descendant Node
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)

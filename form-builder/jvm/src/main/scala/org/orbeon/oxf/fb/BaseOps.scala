@@ -73,12 +73,12 @@ trait BaseOps extends Logging {
       val fbInstance = fbFormInstance
 
       def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
-      def elementIdsFromXPath = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix)) iterator
+      def elementIdsFromXPath = (root descendant *) /@ "id" map (_.stringValue) filter (_.endsWith(suffix)) iterator
 
       def canUseIndex = fbInstance.documentInfo == root
 
       val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-      val instanceIds = formInstanceRoot(root) \\ * map (_.localname + suffix)
+      val instanceIds = formInstanceRoot(root) descendant * map (_.localname + suffix)
 
       elementIds ++ instanceIds
     }

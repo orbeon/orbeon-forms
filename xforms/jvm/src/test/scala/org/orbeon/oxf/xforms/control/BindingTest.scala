@@ -62,7 +62,7 @@ class BindingTest extends DocumentTestBase with AssertionsForJUnit {
     val tests = Seq(*, Text, Comment, PI)
 
     tests foreach { test ⇒
-      assert(instanceRoot \ test nonEmpty)
+      assert(instanceRoot / test nonEmpty)
     }
 
     // Check relevance and reading control bindings

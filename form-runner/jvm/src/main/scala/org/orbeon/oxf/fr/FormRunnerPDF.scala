@@ -72,7 +72,7 @@ trait FormRunnerPDF {
 
     def isContainer(e: NodeInfo) = {
       val classes = e.attClasses
-      classes("xbl-fr-section") || (classes("xbl-fr-grid") && (e \\ "table" exists (_.attClasses("fr-repeat"))))
+      classes("xbl-fr-section") || (classes("xbl-fr-grid") && (e descendant "table" exists (_.attClasses("fr-repeat"))))
     }
 
     def findControlName(e: NodeInfo) =

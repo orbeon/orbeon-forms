@@ -173,7 +173,7 @@ object XFormsAPI {
     val oldName: QName = nodeInfo.uriQualifiedName
     if (oldName != newName) {
       val newNodeInfo = nodeInfo.getNodeKind match {
-        case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
+        case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo /@ @*) ++ (nodeInfo / Node))
         case _              ⇒ throw new IllegalArgumentException
       }
 
@@ -203,7 +203,7 @@ object XFormsAPI {
 
   // Move the given element into another element as the last element
   def moveElementIntoAsLast(element: NodeInfo, other: NodeInfo) = {
-    val inserted = insert(into = other, after = other \ *, origin = element)
+    val inserted = insert(into = other, after = other / *, origin = element)
     delete(element)
     inserted.head
   }
@@ -214,7 +214,7 @@ object XFormsAPI {
   // NOTE: Would be nice to return attribute (new or existing), but doInsert() is not always able to wrap the inserted
   // nodes.
   def ensureAttribute(element: NodeInfo, attName: QName, value: String): Unit =
-    element \@ attName match {
+    element /@ attName match {
       case Seq()        ⇒ insert(into = element, origin = attributeInfo(attName, value))
       case Seq(att, _*) ⇒ setvalue(att, value)
     }
@@ -224,7 +224,7 @@ object XFormsAPI {
     if (set)
       ensureAttribute(element, attName, value)
     else
-      delete(element \@ attName)
+      delete(element /@ attName)
 
   def toggleAttribute(element: NodeInfo, attName: QName, value: Option[String]): Unit =
     toggleAttribute(element, attName, value.get, value.isDefined)

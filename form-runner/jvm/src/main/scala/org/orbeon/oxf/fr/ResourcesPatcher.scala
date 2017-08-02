@@ -38,10 +38,10 @@ class ResourcesPatcher extends SimpleProcessor  {
 
     // Read inputs
     val resourcesDocument = readInputAsOrbeonDom(pipelineContext, "data")
-    val instanceElement   = new DocumentWrapper(readInputAsOrbeonDom(pipelineContext, "instance"), null, XPath.GlobalConfiguration) \ *
+    val instanceElement   = new DocumentWrapper(readInputAsOrbeonDom(pipelineContext, "instance"), null, XPath.GlobalConfiguration) / *
 
-    val app  = instanceElement \ "app"  stringValue
-    val form = instanceElement \ "form" stringValue
+    val app  = instanceElement / "app"  stringValue
+    val form = instanceElement / "form" stringValue
 
     // Transform and write out the document
     ResourcesPatcher.transform(resourcesDocument, app, form)(Properties.instance.getPropertySet)

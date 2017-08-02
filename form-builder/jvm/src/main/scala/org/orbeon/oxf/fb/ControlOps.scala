@@ -66,7 +66,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val precedingInGrid = preceding intersect (grid descendant "*:td")
 
     val nameInGridOption = precedingInGrid :+ grid flatMap
-      { case td if td.localname == "td" ⇒ td \ *; case other ⇒ other } flatMap
+      { case td if td.localname == "td" ⇒ td / *; case other ⇒ other } flatMap
         (getControlNameOpt(_).toSeq) headOption
 
     // Return that if found, otherwise find before the current grid
@@ -82,7 +82,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // with a name (there might not be one).
     val controlsWithName =
       precedingOrSelfContainers flatMap {
-        case grid if getControlNameOpt(grid).isEmpty ⇒ grid \\ "*:td" \ * filter hasName lastOption
+        case grid if getControlNameOpt(grid).isEmpty ⇒ grid descendant "*:td" child * filter hasName lastOption
         case other ⇒ Some(other)
       }
 
@@ -101,7 +101,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       case None ⇒
         insert(
           into   = model,
-          after  = model \ "*:instance" filter (_.hasIdValue("fr-form-instance")),
+          after  = model / "*:instance" filter (_.hasIdValue("fr-form-instance")),
           origin = topLevelBindTemplate
         ).head
     }
@@ -110,7 +110,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     @tailrec def ensureBind(container: NodeInfo, names: Iterator[String]): NodeInfo = {
       if (names.hasNext) {
         val bindName = names.next()
-        val bind = container \ "*:bind" filter (isBindForName(_, bindName)) match {
+        val bind = container / "*:bind" filter (isBindForName(_, bindName)) match {
           case Seq(bind: NodeInfo, _*) ⇒ bind
           case _ ⇒
 
@@ -120,7 +120,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                      name={bindName}
                      xmlns:xf="http://www.w3.org/2002/xforms"/>
 
-            insert(into = container, after = container \ "*:bind", origin = newBind).head
+            insert(into = container, after = container / "*:bind", origin = newBind).head
         }
         ensureBind(bind, names)
       } else
@@ -138,7 +138,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   // Delete the controls in the given grid cell, if any
   // @XPathFunction
   def deleteCellContent(td: NodeInfo, updateTemplates: Boolean = false): Unit = {
-    td \ * flatMap controlElementsToDelete foreach (delete(_))
+    td / * flatMap controlElementsToDelete foreach (delete(_))
     if (updateTemplates)
       self.updateTemplatesCheckContainers(td, findAncestorRepeatNames(td).to[Set])
   }
@@ -218,7 +218,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Make the control point to its template if @template (or legacy @origin) is present
     for (attName ← List("template", "origin"))
-      setvalue(controlElement \@ attName, makeInstanceExpression(templateId(newName)))
+      setvalue(controlElement /@ attName, makeInstanceExpression(templateId(newName)))
 
     // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
     for {
@@ -236,7 +236,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // If using a static itemset editor, set xf:itemset/@ref xf:itemset/@nodeset value
     if (hasEditor(controlElement, "static-itemset"))
       for (attName ← Seq("ref", "nodeset"))
-        setvalue(controlElement \ "*:itemset" \@ attName, s"$$form-resources/$newName/item")
+        setvalue(controlElement / "*:itemset" /@ attName, s"$$form-resources/$newName/item")
   }
 
   // Rename a bind
@@ -244,7 +244,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     ensureAttribute(bindElement, "id",   bindId(newName))
     ensureAttribute(bindElement, "name", newName)
     ensureAttribute(bindElement, "ref",  newName)
-    delete(bindElement \@ "nodeset") // sanitize
+    delete(bindElement /@ "nodeset") // sanitize
   }
 
   // Rename a bind
@@ -263,12 +263,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
           for {
             parent ← parents
           } yield
-            parent \ * filter (_.name == holder.name) match {
+            parent / * filter (_.name == holder.name) match {
               case Seq() ⇒
                 // No holder exists so insert one
                 insert(
                   into   = parent,
-                  after  = parent \ * filter (_.name == precedingHolderName.getOrElse("")),
+                  after  = parent / * filter (_.name == precedingHolderName.getOrElse("")),
                   origin = holder
                 )
               case existing ⇒
@@ -293,7 +293,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   ): Unit = {
 
     // Create one holder per existing language
-    val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map (_.stringValue → resourceHolder)
+    val resourceHolders = (formResourcesRoot / "resource" /@ "*:lang") map (_.stringValue → resourceHolder)
     insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
   }
 
@@ -320,12 +320,12 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Insert resources placeholders for all languages
     if (resourceHolders.nonEmpty) {
       val resourceHoldersMap = resourceHolders.toMap
-      formResourcesRoot \ "resource" foreach (resource ⇒ {
-        val lang = (resource \@ "*:lang").stringValue
+      formResourcesRoot / "resource" foreach (resource ⇒ {
+        val lang = (resource /@ "*:lang").stringValue
         val holder = resourceHoldersMap.getOrElse(lang, resourceHolders.head._2)
         insert(
           into   = resource,
-          after  = resource \ * filter (_.name == precedingControlName.getOrElse("")),
+          after  = resource / * filter (_.name == precedingControlName.getOrElse("")),
           origin = holder
         )
       })
@@ -428,7 +428,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo) =
-    findFRBodyElement(inDoc) \\ * filter
+    findFRBodyElement(inDoc) descendant * filter
       (e ⇒ isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
@@ -508,7 +508,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       if (isHTML)
         insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
       else
-        delete(lhhaElement \@ "mediatype")
+        delete(lhhaElement /@ "mediatype")
     }
 
   def ensureCleanLHHAElements(
@@ -595,7 +595,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
   def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String) = {
 
     val allHelpElements =
-      inDoc.root \\ ((if (lhha=="text") FR else XF) → lhha) map
+      inDoc.root descendant ((if (lhha=="text") FR else XF) → lhha) map
       (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
       { case (lhhaElement, HelpRefMatcher(controlName)) ⇒ lhhaElement → controlName }
 

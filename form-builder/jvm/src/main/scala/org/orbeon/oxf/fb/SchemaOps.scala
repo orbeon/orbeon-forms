@@ -21,7 +21,7 @@ import org.orbeon.scaxon.SimplePath._
 trait SchemaOps {
 
   def findSchema(inDoc: NodeInfo) =
-    findModelElement(inDoc) \ (XS → "schema") headOption
+    findModelElement(inDoc) / (XS → "schema") headOption
 
   def findSchemaOrEmpty(inDoc: NodeInfo) =
     findSchema(inDoc).orNull
@@ -29,7 +29,7 @@ trait SchemaOps {
   def findSchemaNamespace(inDoc: NodeInfo) =
     for {
       schema          ← findSchema(inDoc)
-      targetNamespace ← (schema \@ "targetNamespace" map (_.stringValue)).headOption
+      targetNamespace ← (schema /@ "targetNamespace" map (_.stringValue)).headOption
     } yield
       targetNamespace
 

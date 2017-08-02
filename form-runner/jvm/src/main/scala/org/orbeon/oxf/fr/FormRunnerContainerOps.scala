@@ -71,7 +71,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
 
   def findSectionsWithTemplates(view: NodeInfo) =
-    view descendant * filter IsSection filter (_ \ * exists isSectionTemplateContent)
+    view descendant * filter IsSection filter (_ / * exists isSectionTemplateContent)
 
   // Find the binding's first URI qualified name
   // For now takes the first CSS rule and assume the form foo|bar.
@@ -129,11 +129,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   // A container's children containers
   def childrenContainers(container: NodeInfo) =
-    container \ * filter IsContainer
+    container / * filter IsContainer
 
   // A container's children grids (including repeated grids)
   def childrenGrids(container: NodeInfo) =
-    container \ * filter IsGrid
+    container / * filter IsGrid
 
   // Find all ancestor repeats from leaf to root
   def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =

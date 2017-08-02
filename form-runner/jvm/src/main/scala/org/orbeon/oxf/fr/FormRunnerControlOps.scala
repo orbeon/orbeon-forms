@@ -89,14 +89,14 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   // Get the control's name based on the control element
   def getControlNameOpt(control: NodeInfo) =
-    (control \@ "id" headOption) flatMap
+    (control /@ "id" headOption) flatMap
       (id ⇒ Option(controlNameFromId(id.stringValue)))
 
   def hasName(control: NodeInfo) = getControlNameOpt(control).isDefined
 
   // Return a bind ref or nodeset attribute value if present
   def bindRefOrNodeset(bind: NodeInfo): Option[String] =
-    bind \@ ("ref" || "nodeset") map (_.stringValue) headOption
+    bind /@ ("ref" || "nodeset") map (_.stringValue) headOption
 
   // Find a bind by name
   def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
@@ -217,7 +217,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     // Find a bind by predicate
     def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
-      findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
+      findTopLevelBind(inDoc).toSeq descendant "*:bind" find p
 
     // 2017-04-25: Don't use enclosing parentheses anymore. This now ensures that the `ref` is a single
     // reference to an XML element. See https://github.com/orbeon/orbeon-forms/issues/3174.

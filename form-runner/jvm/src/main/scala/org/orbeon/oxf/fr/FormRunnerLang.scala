@@ -49,7 +49,7 @@ trait FormRunnerLang {
 
   def formResourcesInLang(lang: String): NodeInfo = {
     val formResources = topLevelModel(FormModel).get.getInstance(FormResources).documentInfo.rootElement
-    (formResources \ *).find(_.attValue("*:lang") == lang).getOrElse(currentFormResources)
+    (formResources / *).find(_.attValue("*:lang") == lang).getOrElse(currentFormResources)
   }
 
   // List of available languages for the given form

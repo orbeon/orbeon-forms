@@ -92,7 +92,7 @@ trait GridOps extends ContainerOps {
   }
 
   // Width of the grid in columns
-  def getGridSize(grid: NodeInfo) = (grid \ "*:tr").headOption.to[List] \ "*:td" size
+  def getGridSize(grid: NodeInfo) = (grid / "*:tr").headOption.to[List] / "*:td" size
 
   def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
     case Some(rowspan) ⇒
@@ -103,7 +103,7 @@ trait GridOps extends ContainerOps {
 
   private def trAtRowPos(gridId: String, rowPos: Int): NodeInfo = {
     val grid = containerById(gridId)
-    val trs = grid \ "*:tr"
+    val trs = grid / "*:tr"
     // Reason for the modulo: the value of rowPos sent by client is on the flatten iterations / rows;
     // it is not just row position in the first iteration.
     trs(rowPos % trs.length)
@@ -174,7 +174,7 @@ trait GridOps extends ContainerOps {
     val nextRowCells = if (allRowCells.size > posy + 1) Some(allRowCells(posy + 1)) else None
 
     // Find all tds to delete
-    val tdsToDelete = tr \\ "*:td"
+    val tdsToDelete = tr descendant "*:td"
 
     // Find the new td to select if we are removing the currently selected td
     val newTdToSelect = findNewTdToSelect(tr, tdsToDelete)
@@ -268,7 +268,7 @@ trait GridOps extends ContainerOps {
         insertColRight(firstRowTd precedingSibling "*:td" head)
       } else {
         // First column: just insert plain tds as the first row
-        val trs = grid \ "*:tr"
+        val trs = grid / "*:tr"
         val ids = nextIds(grid, "tmp", trs.size).toIterator
 
         trs foreach { tr ⇒
@@ -282,10 +282,10 @@ trait GridOps extends ContainerOps {
 
   // Find a column's tds
   def getColTds(td: NodeInfo) = {
-    val rows = getContainingGrid(td) \ "*:tr"
+    val rows = getContainingGrid(td) / "*:tr"
     val (x, _) = tdCoordinates(td)
 
-    rows map (row ⇒ (row \ "*:td")(x))
+    rows map (row ⇒ (row / "*:td")(x))
   }
 
   // Delete a column and contained controls if possible
@@ -337,7 +337,7 @@ trait GridOps extends ContainerOps {
 
   def controlsInRow(gridId: String, rowPos: Int): Int = {
     val row = trAtRowPos(gridId, rowPos)
-    (row \ "*:td" \ *).length
+    (row / "*:td" / *).length
   }
 
   private def selectedCellVar =
@@ -359,9 +359,9 @@ trait GridOps extends ContainerOps {
   def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
     findSelectedTd(inDoc) match {
       case Some(currentTd) ⇒
-        if (currentTd \ * nonEmpty)
+        if (currentTd / * nonEmpty)
           currentTd followingSibling "*:td" match {
-            case Seq(followingTd, _*) if followingTd \ * nonEmpty  ⇒ false
+            case Seq(followingTd, _*) if followingTd / * nonEmpty ⇒ false
             case _ ⇒ true
           }
         else
@@ -374,11 +374,11 @@ trait GridOps extends ContainerOps {
 
     findSelectedTd(inDoc) flatMap { currentTd ⇒
 
-      if (currentTd \ * nonEmpty) {
+      if (currentTd / * nonEmpty) {
         // There is an element in the current td, figure out what to do
 
         currentTd followingSibling "*:td" match {
-          case Seq(followingTd, _*) if followingTd \ * isEmpty  ⇒
+          case Seq(followingTd, _*) if followingTd / * isEmpty  ⇒
             // Next td exists is empty: move to that one
             selectTd(followingTd)
             Some(followingTd)
@@ -388,12 +388,12 @@ trait GridOps extends ContainerOps {
           case _ ⇒
             // We are the last cell of the row
             val nextTr = currentTd.getParent followingSibling "*:tr" take 1
-            val nextTrFirstTd = nextTr \ "*:td" take 1
+            val nextTrFirstTd = nextTr / "*:td" take 1
 
             val newTd =
-              if (nextTr.isEmpty || (nextTrFirstTd \ *).nonEmpty)
+              if (nextTr.isEmpty || (nextTrFirstTd / *).nonEmpty)
                 // The first cell of the next row is occupied, or there is no next row: insert new row
-                insertRowBelow(currentTd.getParent) \ "*:td" head
+                insertRowBelow(currentTd.getParent) / "*:td" head
               else
                 // There is a next row, and its first cell is empty: move to that one
                 nextTrFirstTd.head
@@ -539,7 +539,7 @@ trait GridOps extends ContainerOps {
       val posyToInsertInto = y + cell.rowspan - 1
       val rowBelow = allRowCells(posyToInsertInto)
 
-      val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
+      val trToInsertInto = grid / "*:tr" apply posyToInsertInto
       val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
 
       insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
@@ -562,11 +562,11 @@ trait GridOps extends ContainerOps {
 
     // All grids and grid tds with no existing id
     val bodyElement = findFRBodyElement(doc)
-    annotate("tmp", bodyElement \\ "*:grid" \\ "*:td" filterNot (_.hasId))
-    annotate("tmp", bodyElement \\ "*:grid" filterNot (_.hasId))
+    annotate("tmp", bodyElement descendant "*:grid" descendant "*:td" filterNot (_.hasId))
+    annotate("tmp", bodyElement descendant "*:grid" filterNot (_.hasId))
 
     // 2. Select the first td if any
-    bodyElement \\ "*:grid" \\ "*:td" take 1 foreach selectTd
+    bodyElement descendant "*:grid" descendant "*:td" take 1 foreach selectTd
   }
 
   def canDeleteGrid(grid: NodeInfo): Boolean =
@@ -575,8 +575,8 @@ trait GridOps extends ContainerOps {
   def deleteGridById(gridId: String) =
     deleteContainerById(canDeleteGrid, gridId)
 
-  def canDeleteRow(grid: NodeInfo): Boolean = (grid \ "*:tr").length > 1
-  def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").headOption.to[List] \ "*:td").length > 1
+  def canDeleteRow(grid: NodeInfo): Boolean = (grid / "*:tr").length > 1
+  def canDeleteCol(grid: NodeInfo): Boolean = ((grid / "*:tr").headOption.to[List] / "*:td").length > 1
 
   private val DeleteTests = List(
     "grid" → canDeleteGrid _,

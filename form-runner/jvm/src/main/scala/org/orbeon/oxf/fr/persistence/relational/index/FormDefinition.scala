@@ -97,7 +97,7 @@ trait FormDefinition {
         xpath     = adjustedBindPathElems map (_.value) mkString "/",
         xsType    = (bind /@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
         control   = control.localname,
-        htmlLabel = FormRunner.hasHTMLMediatype(control \ (XF → "label")),
+        htmlLabel = FormRunner.hasHTMLMediatype(control / (XF → "label")),
         resources = resources
       )
     }

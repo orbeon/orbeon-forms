@@ -39,7 +39,7 @@ trait ContainerOps extends ControlOps {
     findInViewTryIndex(fbFormInstance.rootElement, staticId) filter IsContainer head
   }
 
-  def controlsInContainer(containerId: String): Int = (containerById(containerId) \\ "*:td" \ *).length
+  def controlsInContainer(containerId: String): Int = (containerById(containerId) descendant "*:td" child *).length
 
   // Find all siblings of the given element with the given name, excepting the given element
   def findSiblingsWithName(element: NodeInfo, siblingName: String) =
@@ -82,7 +82,7 @@ trait ContainerOps extends ControlOps {
     val doc = container.getDocumentRoot
 
     // Find the new td to select if we are removing the currently selected td
-    val newTdToSelect = findNewTdToSelect(container, container \\ "*:td")
+    val newTdToSelect = findNewTdToSelect(container, container descendant "*:td")
 
     def recurse(container: NodeInfo): Seq[NodeInfo] = {
 
@@ -96,7 +96,7 @@ trait ContainerOps extends ControlOps {
 
       val gridContent =
         if (IsGrid(container))
-          container \\ "*:tr" \\ "*:td" \ * filter IsControl reverse
+          container descendant "*:tr" descendant "*:td" child * filter IsControl reverse
         else
           Seq.empty
 
@@ -177,7 +177,7 @@ trait ContainerOps extends ControlOps {
   // Currently: must be a section without section template content
   // Later: fr:tab (maybe fr:tabview), wizard
   def canMoveInto(container: NodeInfo) =
-    IsSection(container) && ! (container \ * exists isSectionTemplateContent)
+    IsSection(container) && ! (container / * exists isSectionTemplateContent)
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
   def deleteSectionTemplateContentHolders(inDoc: NodeInfo) = {
@@ -193,7 +193,7 @@ trait ContainerOps extends ControlOps {
 
     // Delete all elements underneath those holders
     holders foreach { holder ⇒
-      delete(holder \ *)
+      delete(holder / *)
     }
   }
 
@@ -318,10 +318,10 @@ trait ContainerOps extends ControlOps {
 
     val templateInstanceId = templateId(controlName)
     val modelElement = findModelElement(inDoc)
-    modelElement \ "*:instance" find (_.hasIdValue(templateInstanceId)) match {
+    modelElement / "*:instance" find (_.hasIdValue(templateInstanceId)) match {
       case Some(templateInstance) ⇒
         // clear existing template instance content
-        delete(templateInstance \ *)
+        delete(templateInstance / *)
         insert(into = templateInstance , origin = content)
 
       case None ⇒
@@ -335,7 +335,7 @@ trait ContainerOps extends ControlOps {
             fb:readonly="true"
             xxf:exclude-result-prefixes="#all">{nodeInfoToElem(content)}</xf:instance>
 
-        insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
+        insert(into = modelElement, after = modelElement / "*:instance" takeRight 1, origin = template)
     }
   }
 

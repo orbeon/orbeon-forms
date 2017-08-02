@@ -38,12 +38,12 @@ trait ResourcesOps extends BaseOps {
   // Get the control's resource value or blank
   def getControlResourceOrEmpty(controlName: String, resourceName: String) =
     findCurrentResourceHolder(controlName) flatMap
-      (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse ""
+      (n ⇒ n / resourceName map (_.stringValue) headOption) getOrElse ""
 
   // Get the control's resource holders (e.g. in the case of alerts there will be multiple of those
   def getControlResources(controlName: String, resourceName: String) =
     findCurrentResourceHolder(controlName).toList flatMap
-      (n ⇒ n \ resourceName)
+      (n ⇒ n / resourceName)
 
   // NOTE: Doesn't enforce that the same number of e.g. <alert> elements are present per lang
   def getControlResourcesWithLang(controlName: String, resourceName: String, langs: Seq[String] = allLangs(resourcesRoot)) = {

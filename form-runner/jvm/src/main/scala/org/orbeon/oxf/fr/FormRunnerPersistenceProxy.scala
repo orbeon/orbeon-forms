@@ -295,7 +295,7 @@ private object FormRunnerPersistenceProxy {
 
         ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is ⇒
           val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
-          forms \\ "forms" \\ "form"
+          forms descendant "forms" descendant "form"
         }
       }
 

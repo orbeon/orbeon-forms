@@ -18,10 +18,8 @@ import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunnerLang, FormRunnerResourcesOps}
-import org.orbeon.oxf.processor.scope.ScopeProcessorBase.Scope.findValues
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.XMLConstants.XML_URI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -51,7 +49,7 @@ object ToolboxOps {
               // There is a specific template available
               val controlElement = insert(into = gridTd, origin = viewTemplate).head
               // xf:help might be in the template, but we don't need it as it is created on demand
-              delete(controlElement \ "help")
+              delete(controlElement / "help")
               controlElement
             case _ ⇒
               // No specific, create simple element with LHHA
@@ -63,14 +61,14 @@ object ToolboxOps {
 
               insert(
                 into   = controlElement,
-                origin = lhhaTemplate \ *
+                origin = lhhaTemplate / *
               )
 
               controlElement
           }
 
         // Set default pointer to resources if there is an xf:alert
-        setvalue(newControlElement \ "*:alert" \@ "ref", OldStandardAlertRef)
+        setvalue(newControlElement / "*:alert" /@ "ref", OldStandardAlertRef)
 
         // Data holder may contain file attributes
         val dataHolder = newDataHolder(newControlName, binding)
@@ -82,7 +80,7 @@ object ToolboxOps {
 
             // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
             val lhhaResourceEls = {
-              val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
+              val lhhaNames = newControlElement / * map (_.localname) filter LHHAResourceNamesToInsert
               lhhaNames map (elementInfo(_))
             }
 
@@ -93,7 +91,7 @@ object ToolboxOps {
             val itemsResourceEls =
               if (hasEditor(newControlElement, "static-itemset")) {
                 val fbResourceInFormLang = FormRunnerLang.formResourcesInLang(formLang)
-                val originalTemplateItems = fbResourceInFormLang \ "template" \ "items" \ "item"
+                val originalTemplateItems = fbResourceInFormLang / "template" / "items" / "item"
                 if (hasEditor(newControlElement, "item-hint")) {
                   // Supports hint: keep hint we have in the resources.xml
                   originalTemplateItems
@@ -129,8 +127,8 @@ object ToolboxOps {
         val bind = ensureBinds(doc, findContainerNamesForModel(gridTd) :+ newControlName)
 
         // Make sure there is a @bind instead of a @ref on the control
-        delete(newControlElement \@ "ref")
-        ensureAttribute(newControlElement, "bind", bind \@ "id" stringValue)
+        delete(newControlElement /@ "ref")
+        ensureAttribute(newControlElement, "bind", bind /@ "id" stringValue)
 
         // Set bind attributes if any
         insert(into = bind, origin = findBindAttributesTemplate(binding))
@@ -181,7 +179,7 @@ object ToolboxOps {
     updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
     // Select first grid cell
-    selectTd(newGridElement \\ "*:td" head)
+    selectTd(newGridElement descendant "*:td" head)
 
     debugDumpDocumentForGrids("insert new grid", inDoc)
   }
@@ -238,7 +236,7 @@ object ToolboxOps {
 
     // Select first grid cell
     if (withGrid)
-      selectTd(newSectionElement \\ "*:td" head)
+      selectTd(newSectionElement descendant "*:td" head)
 
     // TODO: Open label editor for newly inserted section
 
@@ -293,7 +291,7 @@ object ToolboxOps {
     )
 
     // Select new td
-    selectTd(newGridElement \\ "*:td" head)
+    selectTd(newGridElement descendant "*:td" head)
 
     debugDumpDocumentForGrids("insert new repeat", inDoc)
 
@@ -306,19 +304,19 @@ object ToolboxOps {
     // Insert new section first
     insertNewSection(inDoc, withGrid = false) foreach { section ⇒
 
-      val selector = binding \@ "element" stringValue
+      val selector = binding /@ "element" stringValue
 
       val model = findModelElement(inDoc)
       val xbl = model followingSibling (XBL → "xbl")
       val existingBindings = xbl child (XBL → "binding")
 
       // Insert binding into form if needed
-      if (! (existingBindings \@ "element" === selector))
+      if (! (existingBindings /@ "element" === selector))
         insert(after = Seq(model) ++ xbl, origin = binding parent * )
 
       // Insert template into section
       findViewTemplate(binding) foreach
-        (template ⇒ insert(into = section, after = section \ *, origin = template))
+        (template ⇒ insert(into = section, after = section / *, origin = template))
     }
 
   /* Example layout:
@@ -360,7 +358,7 @@ object ToolboxOps {
   private def controlElementsInCellToXvc(td: NodeInfo): Option[NodeInfo] = {
 
     val doc  = td.getDocumentRoot
-    val name = getControlName(td \ * head)
+    val name = getControlName(td / * head)
 
     findControlByName(doc, name).map { controlElement ⇒
 
@@ -401,7 +399,7 @@ object ToolboxOps {
   def readXvcFromClipboard: NodeInfo = {
     val clipboard = clipboardXvc
     val clone = elementInfo("xvc", Nil)
-    insert(into = clone, origin = clipboard \ *)
+    insert(into = clone, origin = clipboard / *)
     clone
   }
 
@@ -409,8 +407,8 @@ object ToolboxOps {
     val clipboard = clipboardXvc
     XvcEntry.values
         .map(_.entryName)
-        .foreach(entryName ⇒ delete(clipboard \ entryName))
-    insert(into = clipboard, origin = xvc\ *)
+        .foreach(entryName ⇒ delete(clipboard / entryName))
+    insert(into = clipboard, origin = xvc/ *)
   }
 
   //@XPathFunction
@@ -429,10 +427,10 @@ object ToolboxOps {
   private def pasteFromXvc(td: NodeInfo, xvc: NodeInfo): Unit = {
     ensureEmptyTd(td) foreach { gridTd ⇒
 
-      (xvc \ "control" \ * headOption) foreach { control ⇒
+      (xvc / "control" / * headOption) foreach { control ⇒
 
-        def holders   = xvc \ "holder" \ *
-        def resources = xvc \ "resources" \ "resource" \ *
+        def holders   = xvc / "holder" / *
+        def resources = xvc / "resources" / "resource" / *
 
         val name = {
           val requestedName = getControlName(control)
@@ -443,12 +441,12 @@ object ToolboxOps {
             val newName = controlNameFromId(nextId(td, "control"))
 
             // Rename everything
-            renameControlByElement(control, newName, resources \ * map (_.localname) toSet)
+            renameControlByElement(control, newName, resources / * map (_.localname) toSet)
 
             holders ++ resources foreach
               (rename(_, newName))
 
-            (xvc \ "bind" \ * headOption) foreach
+            (xvc / "bind" / * headOption) foreach
               (renameBindElement(_, newName))
 
             newName
@@ -461,14 +459,14 @@ object ToolboxOps {
         insertHolders(
           newControlElement,
           holders.head,
-          xvc \ "resources" \ "resource" map (r ⇒ (r attValue "*:lang", r \ * head)),
+          xvc / "resources" / "resource" map (r ⇒ (r attValue "*:lang", r / * head)),
           precedingControlNameInSectionForControl(newControlElement)
         )
 
         // Create the bind and copy all attributes and content
         val bind = ensureBinds(gridTd, findContainerNamesForModel(gridTd) :+ name)
-        (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
-          insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
+        (xvc / "bind" / * headOption) foreach { xvcBind ⇒
+          insert(into = bind, origin = (xvcBind /@ @*) ++ (xvcBind / *))
         }
 
         import org.orbeon.oxf.fr.Names._
@@ -562,7 +560,7 @@ object ToolboxOps {
 
           greatGrandParentContainerOption match {
             case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
-            case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
+            case None ⇒ (grandParentContainer, grandParentContainer / * headOption)
           }
 
         case _ ⇒ // No td is selected, add top-level section

@@ -96,9 +96,9 @@ trait FormRunnerBaseOps {
   def findFRBodyElement(inDoc: NodeInfo) = {
 
     def fromGroupById = Option(inDoc.getDocumentRoot.selectID("fb-body"))
-    def fromGroup     = inDoc.rootElement \ "*:body" \\ XFGroupTest find (_.id == "fb-body")
-    def fromFRBody    = inDoc.rootElement \ "*:body" \\ FRBodyTest headOption
-    def fromTemplate  = inDoc.rootElement \ XBLTemplateTest headOption
+    def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
+    def fromFRBody    = inDoc.rootElement / "*:body" descendant FRBodyTest headOption
+    def fromTemplate  = inDoc.rootElement / XBLTemplateTest headOption
 
     fromGroupById orElse fromGroup orElse fromFRBody orElse fromTemplate get
   }
@@ -106,23 +106,23 @@ trait FormRunnerBaseOps {
   // Get the form model
   def findModelElement(inDoc: NodeInfo): NodeInfo = {
 
-    def fromHead           = inDoc.rootElement \ "*:head" \ XFModelTest find (_.hasIdValue(FormModel))
-    def fromImplementation = inDoc.rootElement \ XBLImplementationTest \ XFModelTest headOption
+    def fromHead           = inDoc.rootElement / "*:head" / XFModelTest find (_.hasIdValue(FormModel))
+    def fromImplementation = inDoc.rootElement / XBLImplementationTest / XFModelTest headOption
 
     fromHead orElse fromImplementation head
   }
 
   // Find an xf:instance element
   def instanceElement(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findModelElement(inDoc) \ "*:instance" find (_.hasIdValue(id))
+    findModelElement(inDoc) / "*:instance" find (_.hasIdValue(id))
 
   // Find an inline instance's root element
   def inlineInstanceRootElement(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    instanceElement(inDoc, id).toList \ * headOption
+    instanceElement(inDoc, id).toList / * headOption
 
   // Find all template instances
   def templateInstanceElements(inDoc: NodeInfo) =
-    findModelElement(inDoc) \ "*:instance" filter (_.id endsWith TemplateSuffix)
+    findModelElement(inDoc) / "*:instance" filter (_.id endsWith TemplateSuffix)
 
   // Get the root element of instances
   def formInstanceRoot(inDoc: NodeInfo)        = inlineInstanceRootElement(inDoc, FormInstance).get
@@ -134,7 +134,7 @@ trait FormRunnerBaseOps {
 
   // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
   def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
-    findModelElement(inDoc) \ "*:bind" find {
+    findModelElement(inDoc) / "*:bind" find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
       bind ⇒ TopLevelBindIds(bind.id) || bindRefOrNodeset(bind).contains("instance('fr-form-instance')")
     }
@@ -231,7 +231,7 @@ trait FormRunnerBaseOps {
   // Display a success message
   //@XPathFunction
   def successMessage(message: String): Unit = {
-    setvalue(persistenceInstance.rootElement \ "message", message)
+    setvalue(persistenceInstance.rootElement / "message", message)
     toggle("fr-message-success")
   }
 

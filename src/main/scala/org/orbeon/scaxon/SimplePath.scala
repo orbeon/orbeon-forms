@@ -121,29 +121,23 @@ object SimplePath {
     def !==(s: String) = ! ===(s)
 
     def /(test: Test) = find(Axis.CHILD, test)
-    def \(test: Test) = /(test)
-    def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
     def firstChild(test: Test) = /(test).headOption
 
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
     def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-    def \@(attName: String): Seq[NodeInfo] = /@(attName)
     def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
-    def \@(attName: QName): Seq[NodeInfo] = /@(attName)
-    def /@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
-    def \@(attName: (String, String)): Seq[NodeInfo] = /@(attName)
+    def /@(attName: (String, String)): Seq[NodeInfo] = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
     def /@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
-    def \@(test: Test): Seq[NodeInfo] = /@(test)
 
     def namespaceNodes: Seq[NodeInfo] = find(Axis.NAMESPACE, AnyTest)
 
     // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
-//        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-//        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
-//        def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
-//        def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
+//        def //@(attName: String): Seq[NodeInfo] = //@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+//        def //@(attName: QName): Seq[NodeInfo] = //@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+//        def //@(attName: (String, String)): Seq[NodeInfo] = //@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
+//        def //@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
     def root = nodeInfo.getDocumentRoot
     def rootElement = root / * head
@@ -151,7 +145,6 @@ object SimplePath {
     def att(attName: String) = /@(attName)
     def att(test: Test) = /@(test)
     def child(test: Test) = /(test)
-    def descendant(test: Test) = \\(test)
 
     def attValue(attName: String)  = /@(attName).stringValue
     def attValue(attName: QName)   = /@(attName).stringValue
@@ -202,6 +195,7 @@ object SimplePath {
 
     def ancestor(test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR, test)
     def ancestorOrSelf (test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR_OR_SELF, test)
+    def descendant(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
     def descendantOrSelf(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT_OR_SELF, test)
 
     def preceding(test: Test): Seq[NodeInfo] = find(Axis.PRECEDING, test) // TODO: use Type/NODE?
@@ -310,31 +304,17 @@ object SimplePath {
     def !==(s: String) = ! ===(s)
 
     def /(test: Test): Seq[NodeInfo] = seq flatMap (_ / test)
-    def \(test: Test): Seq[NodeInfo] = /(test)
-    def \\(test: Test): Seq[NodeInfo] = seq flatMap (_ \\ test)
 
     def /@(attName: String): Seq[NodeInfo] = seq flatMap (_ /@ attName)
     def /@(attName: QName): Seq[NodeInfo] = seq flatMap (_ /@ attName)
     def /@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ /@ attName)
     def /@(test: Test): Seq[NodeInfo] = seq flatMap (_ /@ test)
 
-    def \@(attName: String): Seq[NodeInfo] = /@(attName)
-    def \@(attName: QName): Seq[NodeInfo]  = /@(attName)
-    def \@(attName: (String, String))      = /@(attName)
-    def \@(test: Test): Seq[NodeInfo]      = /@(test)
-
     def namespaceNodes: Seq[NodeInfo] = seq flatMap (_.namespaceNodes)
-
-    // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
-//        def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
-//        def \\@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
-//        def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
-//        def \\@(test: Test): Seq[NodeInfo] = seq flatMap (_ \\@ test)
 
     def att(attName: String)   = /@(attName)
     def att(test: Test)        = /@(test)
     def child(test: Test)      = /(test)
-    def descendant(test: Test) = \\(test)
 
     def attValue(attName: String) = /@(attName) map (_.stringValue)
     def attValue(attName: QName)  = /@(attName) map (_.stringValue)
@@ -344,6 +324,7 @@ object SimplePath {
 
     def ancestor(test: Test): Seq[NodeInfo] = seq flatMap (_ ancestor test)
     def ancestorOrSelf (test: Test): Seq[NodeInfo] = seq flatMap (_ ancestorOrSelf test)
+    def descendant(test: Test): Seq[NodeInfo] = seq flatMap (_ descendant test)
     def descendantOrSelf(test: Test): Seq[NodeInfo] = seq flatMap (_ descendantOrSelf test)
 
     def preceding(test: Test): Seq[NodeInfo] = seq flatMap (_ preceding test)

@@ -99,7 +99,7 @@ trait FormRunnerPermissionsOps {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
           if currentUsernameOrGroupname == dataUsernameOrGroupname ⇒
             val allPermissions                   = permissionsElOrNull.child("permission").toList
-            val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p \ * forall (_.localname == condition))
+            val permissionsForOwnerOrGroupMember = allPermissions.filter(p ⇒ p / * forall (_.localname == condition))
             permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
         case _ ⇒ Nil
       }

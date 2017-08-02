@@ -111,7 +111,7 @@ trait FormRunnerActions {
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
-      val modeElement = parametersInstance.rootElement \ "mode"
+      val modeElement = parametersInstance.rootElement / "mode"
       val isNew       = modeElement.stringValue == "new"
 
       import DataMigration._
@@ -177,15 +177,15 @@ trait FormRunnerActions {
     val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true
     val isDraft = booleanParamByName(params, "draft", default = false)
 
-    val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement \ "data-status"
-    val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
+    val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement / "data-status"
+    val autoSaveStatus = persistenceInstance.rootElement / "autosave" / "status"
 
     (saveStatus ++ autoSaveStatus) foreach
       (setvalue(_, if (isSafe) DataStatus.Clean.entryName else DataStatus.Dirty.entryName))
   }
 
   private def messageFromResourceOrParam(params: ActionParams) = {
-    def fromResource = paramByNameOrDefault(params, "resource") map (k ⇒ currentFRResources \ "detail" \ "messages" \ k stringValue)
+    def fromResource = paramByNameOrDefault(params, "resource") map (k ⇒ currentFRResources / "detail" / "messages" / k stringValue)
     def fromParam    = paramByName(params, "message")
 
     fromResource orElse fromParam
@@ -199,7 +199,7 @@ trait FormRunnerActions {
 
   def tryConfirm(params: ActionParams): Try[Any] =
     Try {
-      def defaultMessage = currentFRResources \ "detail" \ "messages" \ "confirmation-dialog-message" stringValue
+      def defaultMessage = currentFRResources / "detail" / "messages" / "confirmation-dialog-message" stringValue
       def message        = messageFromResourceOrParam(params).map(evaluateValueTemplate) getOrElse defaultMessage
 
       show("fr-confirmation-dialog", Map("message" → Some(message)))
@@ -362,7 +362,7 @@ trait FormRunnerActions {
       // - with changing mode (tryChangeMode)
       // - when navigating away using the "send" action
       if (evaluatedSendProperties.get("replace").flatten.contains(XFORMS_SUBMIT_REPLACE_ALL))
-        setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
+        setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
 
       sendThrowOnError(s"fr-send-submission", evaluatedSendProperties)
     }

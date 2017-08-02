@@ -193,7 +193,7 @@ object XFormsError {
 
       // Find insertion point and insert list of errors
       // NOTE: This is a poor man's template system. Ideally, we would use XForms or XSLT for this.
-      template \\ * find (_.attClasses("xforms-error-panel-details")) foreach { div ⇒
+      template descendant * find (_.attClasses("xforms-error-panel-details")) foreach { div ⇒
         insert(into = div, origin = ServerError.errorsAsXHTMLElem(errors): NodeInfo)
       }
 

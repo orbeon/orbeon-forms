@@ -29,10 +29,10 @@ import scala.util.control.NonFatal
 object DataModel {
 
   private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
-    { case bind if (bind \@ "name").nonEmpty ⇒ bind }
+    { case bind if (bind /@ "name").nonEmpty ⇒ bind }
 
   private def childrenBindsWithNames(bind: NodeInfo) =
-    bind \ (XF → "bind") collect bindWithName
+    bind / (XF → "bind") collect bindWithName
 
   private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any): Unit = {
     def update(bind: NodeInfo): Unit = {
@@ -48,7 +48,7 @@ object DataModel {
   // Update binds for automatic mode
   def updateBindsForAutomatic(inDoc: NodeInfo) =
     foreachBindWithName(inDoc) { child ⇒
-      delete(child \@ "nodeset")
+      delete(child /@ "nodeset")
       ensureAttribute(child, "ref", child attValue "name")
     }
 

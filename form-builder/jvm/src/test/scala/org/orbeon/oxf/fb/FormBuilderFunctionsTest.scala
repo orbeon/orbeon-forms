@@ -83,7 +83,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
   @Test def sectionName(): Unit =
     withActionAndFBDoc(TemplateDoc) { doc ⇒
       assert(findSectionName(doc, Control1).get === Section1)
-      assert(getControlNameOpt(doc \\ "*:section" head).get === Section1)
+      assert(getControlNameOpt(doc descendant "*:section" head).get === Section1)
     }
 
   @Test def newBinds(): Unit =
@@ -109,7 +109,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
   @Test def containers(): Unit =
     withActionAndFBDoc(TemplateDoc) { doc ⇒
-      val firstTd = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head
+      val firstTd = findFRBodyElement(doc) descendant "*:grid" descendant "*:td" head
 
       val containers = findAncestorContainers(firstTd)
 
@@ -121,7 +121,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
   // Select the first grid td (assume there is one)
   def selectFirstTd(doc: NodeInfo): Unit =
-    selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
+    selectTd(findFRBodyElement(doc) descendant "*:grid" descendant "*:td" head)
 
   @Test def insertControl(): Unit =
     withActionAndFBDoc(TemplateDoc) { doc ⇒
@@ -141,7 +141,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
       val newlySelectedTd = findSelectedTd(doc)
       assert(newlySelectedTd.isDefined)
-      assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
+      assert(newlySelectedTd.get / * /@ "id" === controlId(newControlName))
 
       val containerNames = findContainerNamesForModel(newlySelectedTd.get)
       assert(containerNames == Seq("section-1"))
@@ -154,7 +154,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
       assert(controlBind.hasIdValue(bindId(newControlName)))
       assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-      assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
+      assert(formResourcesRoot / "resource" / newControlName nonEmpty)
     }
 
   @Test def insertExplanation(): Unit =
@@ -200,7 +200,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
         val newlySelectedTd = findSelectedTd(doc)
         assert(newlySelectedTd.isDefined)
-        assert((newlySelectedTd flatMap (_ parent * headOption) flatMap (_ parent * headOption) head) \@ "id" === gridId(newRepeatName))
+        assert((newlySelectedTd flatMap (_ parent * headOption) flatMap (_ parent * headOption) head) /@ "id" === gridId(newRepeatName))
 
         val containerNames = findContainerNamesForModel(newlySelectedTd.get)
         assert(containerNames === Seq("section-1", newRepeatName, newRepeatIterationName))
@@ -213,7 +213,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         assert(controlBind.hasIdValue(bindId(newRepeatName)))
         assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-        assert(findModelElement(doc) \ "*:instance" exists (_.hasIdValue("grid-3-template")))
+        assert(findModelElement(doc) / "*:instance" exists (_.hasIdValue("grid-3-template")))
       }
 
       // Insert a new control
@@ -228,7 +228,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
         val newlySelectedTd = findSelectedTd(doc)
         assert(newlySelectedTd.isDefined)
-        assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
+        assert(newlySelectedTd.get / * /@ "id" === controlId(newControlName))
 
         val containerNames = findContainerNamesForModel(newlySelectedTd.get)
         assert(containerNames === Seq("section-1", newRepeatName, newRepeatIterationName))
@@ -244,9 +244,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         assert(controlBind.hasIdValue(bindId(newControlName)))
         assert((controlBind parent * head).hasIdValue(bindId(newRepeatIterationName)))
 
-        assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
+        assert(formResourcesRoot / "resource" / newControlName nonEmpty)
 
-        val templateHolder = templateRoot(doc, newRepeatName).get \ newControlName headOption
+        val templateHolder = templateRoot(doc, newRepeatName).get / newControlName headOption
 
         assert(templateHolder.isDefined)
         assert(templateHolder.get precedingSibling * isEmpty)
@@ -255,7 +255,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
   def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell]]): Unit = {
-    val trs = grid \ "tr"
+    val trs = grid / "tr"
     for ((expected, index) ← expected.zipWithIndex)
       yield assert(getRowCells(trs(index)) === expected)
   }
@@ -263,9 +263,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
   @Test def rowspanGetRowCells(): Unit =
     withActionAndFBDoc(RowspansDoc) { doc ⇒
 
-      val grid = doc \\ "grid" head
+      val grid = doc descendant "grid" head
 
-      def td(id: String) = grid \\ * filter (_.hasIdValue(id)) head
+      def td(id: String) = grid descendant * filter (_.hasIdValue(id)) head
 
       val expected = Seq(
         Seq(Cell(td("11"), 1, false), Cell(td("12"), 2, false), Cell(td("13"), 1, false)),
@@ -285,13 +285,13 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
   @Test def rowspanInsertRowBelow(): Unit =
     withActionAndFBDoc(RowspansDoc) { doc ⇒
 
-      val grid = doc \\ "grid" head
+      val grid = doc descendant "grid" head
 
       // Insert one row below each existing row
-      for (tr ← grid \ "tr" toList)
+      for (tr ← grid / "tr" toList)
         insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
 
-      def td(id: String) = grid \\ * filter (_.hasIdValue(id)) head
+      def td(id: String) = grid descendant * filter (_.hasIdValue(id)) head
 
       val expected = Seq(
         Seq(Cell(td("11"),        1, false), Cell(td("12"),        3, false), Cell(td("13"),        1, false)),
@@ -324,7 +324,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
     val section = sectionWithGridAndControls
 
-    val controls = section \\ "*:td" \ * filter (_ \@ "id" nonEmpty)
+    val controls = section descendant "*:td" child * filter (_ /@ "id" nonEmpty)
 
     val expected = Seq(None, Some("grid-2"), Some("grid-2"))
     val actual = controls map precedingControlNameInSectionForControl
@@ -336,7 +336,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
     val section = sectionWithGridAndControls
 
-    val grids = section \\ "*:grid"
+    val grids = section descendant "*:grid"
 
     val expected = Seq(Some("control-11"), Some("grid-2"), Some("control-31"))
     val actual = grids map (precedingControlNameInSectionForGrid(_, includeSelf = true))
@@ -350,13 +350,13 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
       withActionAndFBDoc(SectionsGridsDoc) { doc ⇒
 
-        def getTd(id: String) = doc \\ "*:td" find (_.hasIdValue(id)) head
+        def getTd(id: String) = doc descendant "*:td" find (_.hasIdValue(id)) head
 
         val beforeTd = getTd(beforeTdId)
         selectTd(beforeTd)
         delete(beforeTd)
 
-        val actualSelectedId = findSelectedTd(doc) map (_ \@ "id" stringValue)
+        val actualSelectedId = findSelectedTd(doc) map (_ /@ "id" stringValue)
 
         assert(actualSelectedId === Some(afterTdId))
       }

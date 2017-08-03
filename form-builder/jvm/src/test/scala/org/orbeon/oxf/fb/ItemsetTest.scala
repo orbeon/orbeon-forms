@@ -149,7 +149,7 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
 
         for ((controlName, expected) ← controlNameExpected) {
           FormBuilder.setControlItems(controlName, expected)
-          assertControl(controlName, (expected \ "item").toSeq collect { case e: scala.xml.Elem ⇒ e })
+          assertControl(controlName, expected \ "item" collect { case e: scala.xml.Elem ⇒ e })
         }
       }
     }
@@ -207,21 +207,21 @@ class ItemsetTest extends DocumentTestBase with FormBuilderSupport with Assertio
       }
 
       // Editing a form in English; English placeholders are added
-      XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "en")
+      XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "en")
       assertNewControlResources(Seq("en" → itemTemplates("en")))
 
       // Switch language to Japanese; since we don't have FB resources, English is used
-      XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "jp")
+      XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "jp")
       assertNewControlResources(Seq("jp" → itemTemplates("en")))
 
       // Switch language to French; French placeholders are added
-      XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "fr")
+      XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "fr")
       assertNewControlResources(Seq("fr" → itemTemplates("fr")))
 
       // Add English, in addition to French
       XFormsAPI.insert(into = FormBuilder.currentResources.getParent,
                origin = FormBuilder.currentResources)
-      XFormsAPI.setvalue(FormBuilder.currentResources \@ "lang", "en")
+      XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "en")
       assertNewControlResources(Seq("fr" → itemTemplates("fr"), "en" → itemTemplates("en")))
     }
   }

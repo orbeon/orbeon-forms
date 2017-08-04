@@ -104,9 +104,10 @@ trait FormRunnerActions {
     Try {
       val FormRunnerParams(app, form, formVersion, Some(document), _) = FormRunnerParams()
 
-      val isDraft     = booleanParamByName(params, "draft", default = false)
-      val queryXVT    = paramByName(params, "query")
-      val querySuffix = queryXVT map evaluateValueTemplate map ('&' +) getOrElse ""
+      val isDraft       = booleanParamByName(params, "draft", default = false)
+      val pruneMetadata = booleanParamByName(params, "prune-metadata", default = false)
+      val queryXVT      = paramByName(params, "query")
+      val querySuffix   = queryXVT map evaluateValueTemplate map ('&' +) getOrElse ""
 
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
@@ -122,7 +123,7 @@ trait FormRunnerActions {
           form,
           formInstance.root,
           metadataInstance map (_.root),
-          pruneMetadata = false
+          pruneMetadata
         )
 
       // Save

@@ -24,6 +24,9 @@ import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.{Loggers, XFormsConstants, XFormsContainingDocument, XFormsProperties}
 
 object XFormsStateManager extends XFormsStateLifecycle {
@@ -407,10 +410,23 @@ object XFormsStateManager extends XFormsStateLifecycle {
         }
 
       // Create document
-      new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document ⇒
-        (isServerState && document.getStaticState.isServerStateHandling) ||
-          document.getStaticState.isClientStateHandling
+      val documentFromStore =
+        new XFormsContainingDocument(xformsState, disableUpdates, ! isServerState) ensuring { document ⇒
+          (isServerState && document.getStaticState.isServerStateHandling) ||
+            document.getStaticState.isClientStateHandling
+        }
+
+      // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
+      // possible right now.
+      documentFromStore.getControls.getCurrentControlTree.rootOpt foreach { rootContainerControl ⇒
+        XFormsAPI.withContainingDocument(documentFromStore) {
+          documentFromStore.startOutermostActionHandler()
+          Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
+          documentFromStore.endOutermostActionHandler()
+        }
       }
+
+      documentFromStore
     }
 
     def addCacheSessionListener(uuid: String): Unit = {

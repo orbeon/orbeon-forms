@@ -29,6 +29,7 @@ public class XFormsEvents {
     public static final String XXFORMS_READY = "xxforms-ready";
 
     // Other custom events
+    public static final String XXFORMS_STATE_RESTORED = "xxforms-state-restored";
     public static final String XXFORMS_SESSION_HEARTBEAT = "xxforms-session-heartbeat";
     public static final String XXFORMS_SERVER_EVENTS = "xxforms-server-events";
     public static final String XXFORMS_POLL = "xxforms-poll";

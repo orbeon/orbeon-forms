@@ -42,6 +42,7 @@ object XFormsEventFactory {
     XFORMS_OPTIONAL             → (new XFormsOptionalEvent(_, _)),
     XFORMS_VALUE_CHANGED        → (new XFormsValueChangeEvent(_, _)),
     // Other events
+    XXFORMS_STATE_RESTORED      → (new XXFormsStateRestoredEvent(_, _)),
     XXFORMS_BINDING_ERROR       → (new XXFormsBindingErrorEvent(_, _)),
     XXFORMS_XPATH_ERROR         → (new XXFormsXPathErrorEvent(_, _)),
     XXFORMS_INSTANCE_INVALIDATE → (new XXFormsInstanceInvalidate(_, _)),

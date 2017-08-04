@@ -22,6 +22,11 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xml.dom4j.LocationData
 
+class XXFormsStateRestoredEvent(target: XFormsEventTarget, properties: PropertyGetter)
+  extends XFormsEvent(XXFORMS_STATE_RESTORED, target, properties, bubbles = false, cancelable = false) {
+  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = false) {
 

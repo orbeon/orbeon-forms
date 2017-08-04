@@ -54,6 +54,10 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   private var _required = Model.DEFAULT_REQUIRED
   final def isRequired = _required
 
+  // TODO: maybe represent as case class
+  //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind#MIP])
+  //private var _validationStatus: Option[ValidationStatus] = None
+
   private var _valid = Model.DEFAULT_VALID
   def isValid = _valid
 
@@ -183,7 +187,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     this._valueType         = null
     this._customMIPs        = Map.empty[String, String]
 
-    this._alertLevel   = None
+    this._alertLevel        = None
     this._failedValidations = Nil
   }
 

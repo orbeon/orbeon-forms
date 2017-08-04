@@ -72,7 +72,7 @@ object XFormsServerSharedInstancesCache {
       // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
       debug("loading instance into cache", instanceCaching.debugPairs)
 
-      val instanceContent = loader.load(instanceCaching.sourceURI, instanceCaching.handleXInclude)
+      val instanceContent = loader.load(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude)
       // NOTE: load() must always returns a TinyTree because we don't want to put in cache a mutable document
       assert(! instanceContent.isInstanceOf[VirtualNode], "load() must return a TinyTree")
 
@@ -145,7 +145,7 @@ object XFormsServerSharedInstancesCache {
 
     // Make key also depend on handleXInclude and on request body hash if present
     def createCacheKey(instanceCaching: InstanceCaching): InternalCacheKey =
-      createCacheKey(instanceCaching.sourceURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
+      createCacheKey(instanceCaching.pathOrAbsoluteURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
 
     def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: Option[String]): InternalCacheKey =
       new InternalCacheKey(

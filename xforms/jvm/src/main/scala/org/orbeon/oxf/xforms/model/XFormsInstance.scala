@@ -37,21 +37,21 @@ import scala.collection.JavaConverters._
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
-  timeToLive      : Long,
-  handleXInclude  : Boolean,
-  sourceURI       : String,
-  requestBodyHash : Option[String]
+  timeToLive        : Long,
+  handleXInclude    : Boolean,
+  pathOrAbsoluteURI : String, // for internal requests must be an internal path so that replication works
+  requestBodyHash   : Option[String]
 ) {
 
   require(
-    sourceURI ne null,
+    pathOrAbsoluteURI ne null,
     """Only XForms instances externally loaded through the src attribute may have xxf:cache="true"."""
   )
 
   def debugPairs = Seq(
     "timeToLive"      → timeToLive.toString,
     "handleXInclude"  → handleXInclude.toString,
-    "sourceURI"       → sourceURI,
+    "sourceURI"       → pathOrAbsoluteURI,
     "requestBodyHash" → requestBodyHash.orNull
   )
 
@@ -59,7 +59,7 @@ case class InstanceCaching(
     att("cache", "true")
     if (timeToLive >= 0) att("ttl", timeToLive.toString)
     if (handleXInclude)  att("xinclude", "true")
-    att("source-uri", sourceURI)
+    att("source-uri", pathOrAbsoluteURI)
     requestBodyHash foreach (att("request-body-hash", _))
   }
 }
@@ -67,12 +67,18 @@ case class InstanceCaching(
 object InstanceCaching {
 
   // Not using "apply" as that causes issues for Java callers
-  def fromValues(timeToLive: Long, handleXInclude: Boolean, sourceURI: String, requestBodyHash: String): InstanceCaching =
-    InstanceCaching(timeToLive, handleXInclude, sourceURI, Option(requestBodyHash))
-
-  // Not using "apply" as that causes issues for Java callers
-  def fromInstance(instance: Instance, sourceURI: String, requestBodyHash: String): InstanceCaching =
-    InstanceCaching(instance.timeToLive, instance.handleXInclude, sourceURI, Option(requestBodyHash))
+  def fromValues(
+    timeToLive            : Long,
+    handleXInclude        : Boolean,
+    sourceURI             : String,
+    requestBodyHashOrNull : String
+  ): InstanceCaching =
+    InstanceCaching(
+      timeToLive        = timeToLive,
+      handleXInclude    = handleXInclude,
+      pathOrAbsoluteURI = Connection.findInternalURL(sourceURI) getOrElse sourceURI, // adjust for internal path so replication works
+      requestBodyHash   = Option(requestBodyHashOrNull)
+    )
 }
 
 /**
@@ -159,14 +165,14 @@ class XFormsInstance(
 
   def parentEventObserver: XFormsEventObserver = model
 
-  def performDefaultAction(event: XFormsEvent) =
+  def performDefaultAction(event: XFormsEvent): Unit =
     event match {
       case ev: XXFormsInstanceInvalidate ⇒
         implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
         _instanceCaching match {
           case Some(instanceCaching) ⇒
             XFormsServerSharedInstancesCache.remove(
-              instanceCaching.sourceURI,
+              instanceCaching.pathOrAbsoluteURI,
               null,
               instanceCaching.handleXInclude
             )

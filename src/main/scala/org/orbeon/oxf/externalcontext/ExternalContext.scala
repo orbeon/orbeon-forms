@@ -157,7 +157,7 @@ object ExternalContext {
     case object Local       extends SessionScope(2)
   }
 
-  trait SessionListener {
+  trait SessionListener extends java.io.Serializable {
     def sessionDestroyed()
   }
 

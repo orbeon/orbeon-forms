@@ -61,11 +61,11 @@ public class CacheableSubmission extends BaseSubmission {
         final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource(), sp.queryString(), p.urlNorewrite(), p.urlType());
 
         // Compute a hash of the body if needed
-        final String requestBodyHash;
+        final String requestBodyHashOrNull;
         if (sp.messageBody() != null) {
-            requestBodyHash = SecureUtils.digestBytes(sp.messageBody(), "hex");
+            requestBodyHashOrNull = SecureUtils.digestBytes(sp.messageBody(), "hex");
         } else {
-            requestBodyHash = null;
+            requestBodyHashOrNull = null;
         }
 
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -76,7 +76,7 @@ public class CacheableSubmission extends BaseSubmission {
         // Find and check replacement location
         final XFormsInstance instanceToUpdate = checkInstanceToUpdate(detailsLogger, p);
         final Instance staticInstance = instanceToUpdate.instance();
-        final InstanceCaching instanceCaching = InstanceCaching.fromValues(p2.timeToLive(), p2.isHandleXInclude(), absoluteResolvedURLString, requestBodyHash);
+        final InstanceCaching instanceCaching = InstanceCaching.fromValues(p2.timeToLive(), p2.isHandleXInclude(), absoluteResolvedURLString, requestBodyHashOrNull);
         final String instanceStaticId = staticInstance.staticId();
 
         // Obtain replacer
@@ -102,7 +102,7 @@ public class CacheableSubmission extends BaseSubmission {
             // NOTE: technically, somebody else could put an instance in cache between now and the Callable execution
             if (detailsLogger.isDebugEnabled())
                 detailsLogger.logDebug("", "did not find instance in cache",
-                        "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash);
+                        "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHashOrNull);
 
             final IndentedLogger timingLogger = getTimingLogger(p, p2);
 

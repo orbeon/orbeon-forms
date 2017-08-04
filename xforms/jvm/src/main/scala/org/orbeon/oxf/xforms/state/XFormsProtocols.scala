@@ -92,7 +92,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     def writes(output: Output, instance: InstanceCaching): Unit = {
       write(output, instance.timeToLive)
       write(output, instance.handleXInclude)
-      write(output, instance.sourceURI)
+      write(output, instance.pathOrAbsoluteURI)
       write(output, instance.requestBodyHash)
     }
 

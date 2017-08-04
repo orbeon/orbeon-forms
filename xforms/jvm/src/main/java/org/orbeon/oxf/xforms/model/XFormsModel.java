@@ -564,7 +564,9 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 // TODO: This doesn't handle optimized submissions.
 
                 // NOTE: No XInclude supported to read instances with @src for now
-                final InstanceCaching caching = InstanceCaching.fromInstance(instance, resolveInstanceURL(instance), null);
+                final InstanceCaching caching =
+                    InstanceCaching.fromValues(instance.timeToLive(), instance.handleXInclude(), resolveInstanceURL(instance), null);
+
                 final DocumentInfo documentInfo =
                     XFormsServerSharedInstancesCache.findContentOrLoad(
                             instance,
@@ -607,7 +609,15 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
     private final InstanceLoader INSTANCE_LOADER = new InstanceLoader();
 
     private class InstanceLoader implements XFormsServerSharedInstancesCache.Loader {
-        public DocumentInfo load(String resolvedURL, boolean handleXInclude) {
+        public DocumentInfo load(String pathOrAbsoluteURI, boolean handleXInclude) {
+
+            final String resolvedURL =
+                URLRewriterUtils.rewriteServiceURL(
+                    NetUtils.getExternalContext().getRequest(),
+                    pathOrAbsoluteURI,
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE
+                );
+
             return SubmissionUtils.readTinyTree(XFormsModel.this, resolvedURL, handleXInclude);
         }
     }

@@ -645,4 +645,25 @@
             xxf:show-progress="false"/>
     </xf:action>
 
+    <!-- Handler for missing attachments, see https://github.com/orbeon/orbeon-forms/issues/1529 -->
+    <xf:action
+        event="xxforms-state-restored"
+        observer="#document"
+        target="#document">
+
+        <xf:var
+            name="filenames"
+            value="frf:clearMissingUnsavedDataAttachmentReturnFilenamesJava(instance('fr-form-instance'))"/>
+
+        <xf:action if="exists($filenames)">
+            <!-- TODO: i18n -->
+            <xf:message>
+                Some file attachments were lost due to a server issue. Please check all your attachments
+                and upload them again if needed.
+            </xf:message>
+        </xf:action>
+
+
+    </xf:action>
+
 </xf:model>

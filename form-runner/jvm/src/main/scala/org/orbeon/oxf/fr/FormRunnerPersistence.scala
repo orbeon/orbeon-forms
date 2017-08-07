@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.fr
 
+import java.io.File
 import java.net.URI
+import java.{util ⇒ ju}
 
 import enumeratum._
 import org.orbeon.oxf.common.OXFException
@@ -22,6 +24,7 @@ import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
@@ -277,8 +280,45 @@ trait FormRunnerPersistence {
 
   // Return all nodes which refer to data attachments
   //@XPathFunction
-  def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String) =
+  def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
     collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true)._1.asJava
+
+  //@XPathFunction
+  def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
+
+    val FormRunnerParams(app, form, _, documentIdOpt, mode) = FormRunnerParams()
+
+    val unsavedAttachmentHolders =
+      documentIdOpt match {
+        case Some(documentId) if Set("new", "edit")(mode) ⇒
+          // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
+          // we don't just want to pass a magic string in. So we still compute `basePath`.
+          val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
+          collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false)._1
+        case _ ⇒
+          Nil
+      }
+
+    val attributeNames = List("filename", "mediatype", "size")
+
+    val filenames =
+      for {
+        holder   ← unsavedAttachmentHolders
+        filename = holder attValue "filename"
+        if ! new File(URLFactory.createURL(splitQuery(holder.stringValue)._1).getFile).exists()
+      } yield {
+
+        setvalue(holder, "")
+
+        attributeNames foreach { attName ⇒
+          setvalue(holder /@ attName, "")
+        }
+
+        filename
+      }
+
+    filenames flatMap (_.trimAllToOpt) asJava
+  }
 
   def collectAttachments(
     data             : DocumentInfo,

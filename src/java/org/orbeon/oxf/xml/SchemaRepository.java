@@ -72,8 +72,8 @@ public class SchemaRepository {
 
         SCHEMAS.put(RedirectProcessor.REDIRECT_SCHEMA_URI, "schemas/redirect.rng");
         SCHEMAS.put(RequestGenerator.REQUEST_CONFIG_NAMESPACE_URI, "schemas/request-config.rng");
-        SCHEMAS.put(ImageServer.IMAGE_SERVER_CONFIG_NAMESPACE_URI, "schemas/image-server-config.rng");
-        SCHEMAS.put(ImageServer.IMAGE_SERVER_IMAGE_NAMESPACE_URI, "schemas/image-server-image.rng");
+	//        SCHEMAS.put(ImageServer.IMAGE_SERVER_CONFIG_NAMESPACE_URI, "schemas/image-server-config.rng");
+	//        SCHEMAS.put(ImageServer.IMAGE_SERVER_IMAGE_NAMESPACE_URI, "schemas/image-server-image.rng");
         SCHEMAS.put(RequestSecurityGenerator.REQUEST_SECURITY_NAMESPACE_URI, "schemas/request-security.rng");
         SCHEMAS.put(SignatureVerifierProcessor.SIGNATURE_DATA_URI, "schemas/signature.rng");
         SCHEMAS.put(SignatureVerifierProcessor.SIGNATURE_PUBLIC_KEY_URI, "schemas/public-key.rng");

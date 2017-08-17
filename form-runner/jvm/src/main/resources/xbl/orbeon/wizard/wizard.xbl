@@ -265,7 +265,22 @@
                                             targetid="fr-wizard-unvisit-following"
                                             delay="0"/>
 
+                                        <!-- Subsection nav enabled AND the top-level section is not part of the nav, which
+                                             means we navigate it's subsections/grids. -->
+                                        <xsl:variable
+                                            name="has-subsection-nav"
+                                            select="$static-subsections-nav and not($static-nav-section-or-grid-ids = @id)"/>
+
                                         <xf:action event="xforms-select" target="#observer">
+
+                                            <xsl:if test="not($has-subsection-nav)">
+                                                <!-- Keep `current-case-id` up to date in case switch happened via toggling. -->
+                                                <!-- Q: Could we use `caseref`? -->
+                                                <xf:setvalue
+                                                    ref="xxf:instance('local')/current-case-id"
+                                                    value="event('xxf:targetid')"/>
+                                            </xsl:if>
+
                                             <xf:dispatch name="fr-section-scroll" targetid="switch"/>
 
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
@@ -281,9 +296,7 @@
                                                 <xsl:attribute name="collapse">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @open)"/>
                                                 <xsl:choose>
-                                                    <xsl:when test="$static-subsections-nav and not($static-nav-section-or-grid-ids = @id)">
-                                                        <!-- Subsection nav enabled AND the top-level section is not part of the nav, which
-                                                             means we navigate it's subsections/grids. -->
+                                                    <xsl:when test="$has-subsection-nav">
 
                                                         <!-- Don't forget the enclosing section lHHA -->
                                                         <xsl:apply-templates select="xf:label | xf:help | xf:hint | xf:alert"/>
@@ -301,6 +314,11 @@
                                                                         visited="true"
                                                                         recurse="true"/>
                                                                     <xf:action event="xforms-select" target="#observer">
+                                                                        <!-- Keep `current-case-id` up to date in case switch happened via toggling. -->
+                                                                        <!-- Q: Could we use `caseref`? -->
+                                                                        <xf:setvalue
+                                                                            ref="xxf:instance('local')/current-case-id"
+                                                                            value="event('xxf:targetid')"/>
                                                                         <xf:dispatch name="fr-section-scroll" targetid="switch"/>
                                                                     </xf:action>
                                                                     <xf:group appearance="xxf:internal">

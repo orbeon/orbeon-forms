@@ -14,7 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.fr.ControlOps
-import org.orbeon.xforms.{$, Support, XFormsId}
+import org.orbeon.xforms.{$, DocumentAPI, Support, XFormsId}
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -26,12 +26,12 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 object FormRunnerAPI {
 
   def findControlsByName(
-    name     : String,
-    formElem : js.UndefOr[html.Element] = js.undefined
+    controlName : String,
+    formElem    : js.UndefOr[html.Element] = js.undefined
   ): js.Array[html.Element] = {
 
     $(Support.formElemOrDefaultForm(formElem))
-      .find(s".xforms-control[id *= '$name-control'], .xbl-component[id *= '$name-control']")
+      .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
       .toArray() collect {
       // The result must be an `html.Element` already
       case e: html.Element ⇒ e
@@ -40,8 +40,23 @@ object FormRunnerAPI {
       e ⇒ $(e).parents(".xforms-repeat-template").length == 0
     } filter {
       // Check the id matches the requested name
-      e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains name)
+      e ⇒ (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
     } toJSArray
   }
+}
+
+@JSExportTopLevel("ORBEON.fr.API.wizard")
+@JSExportAll
+object FormRunnerWizardAPI {
+
+  def focus(controlName: String): Unit =
+    DocumentAPI.dispatchEvent(new js.Object {
+      val targetId  = "fr-view-component"
+      val eventName = "fr-wizard-focus"
+
+      val properties = new js.Object {
+        val `control-name` = controlName
+      }
+    })
 
 }

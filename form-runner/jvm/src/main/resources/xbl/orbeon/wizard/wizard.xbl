@@ -25,7 +25,11 @@
     xmlns:ErrorSummary="java:org.orbeon.xbl.ErrorSummary"
     xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
-    <xbl:binding id="fr-wizard" element="fr|wizard">
+    <xbl:binding
+        id="fr-wizard"
+        element="fr|wizard"
+        xxf:external-events="fr-wizard-focus">
+
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/wizard/wizard.css"/>
         </xbl:resources>
@@ -76,6 +80,19 @@
                     name="fr-wizard-visit-all-to-current"
                     targetid="fr-wizard-visit-all-to-current"
                     xxbl:scope="outer"/>
+            </xbl:handler>
+            <!-- For client-side API -->
+            <xbl:handler event="fr-wizard-focus" phase="target">
+
+                <!-- TODO: Support `lax` and `strict` modes. -->
+                <xf:action if="xxf:instance('local')/validate/data(.) = 'free'">
+
+                    <xf:setfocus
+                        control="{event('control-name')}-control"
+                        xxbl:scope="outer"/>
+
+                </xf:action>
+
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -253,6 +270,9 @@
                                             control="{{event('xxf:targetid')}}"
                                             visited="true"
                                             recurse="true"/>
+
+                                        <!-- Check that incoming `xforms-focus` is allowed -->
+                                        <!-- TODO: See https://github.com/orbeon/orbeon-forms/issues/3323. -->
 
                                         <!-- Un-visit all subsequent sections upon error in current section in `strict` mode -->
                                         <!-- Use `delay="0"`, so we dispatch all the `fr-wizard-unvisit-following` after all the

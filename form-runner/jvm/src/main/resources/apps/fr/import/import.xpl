@@ -51,14 +51,19 @@
 
                 <xf:submission id="fr-send-stats" ref="instance('fr-import-stats')" method="post" action="echo:" replace="all"/>
 
-                <xf:action ev:event="xforms-ready">
+                <xf:action event="xforms-ready">
+
+                    <xf:var
+                        name="import-invalid-data"
+                        value="xs:boolean((xxf:get-request-parameter('import-invalid-data')[. castable as xs:boolean], false())[1])"/>
 
                     <!-- Get precomputed list of invalid rows from session -->
-                    <xf:var name="invalid-rows"  as="xs:integer*"
-                             value="for $t in xxf:split(xxf:get-session-attribute('org.orbeon.fr.import.invalid-rows')) return xs:integer($t)"/>
-
-                    <!--<xf:message level="xxf:log-info">xxx <xf:output value="$invalid-rows"/></xf:message>-->
-                    <!--<xf:message level="xxf:log-info">xxx <xf:output value="xxf:serialize(instance(), 'xml')"/></xf:message>-->
+                    <xf:var
+                        name="invalid-rows"
+                        as="xs:integer*"
+                        value="
+                            for $t in xxf:split(xxf:get-session-attribute('org.orbeon.fr.import.invalid-rows'))
+                                return xs:integer($t)"/>
 
                     <!-- Remember original empty data -->
                     <xf:insert ref="instance('fr-empty-data')" origin="xxf:instance('fr-form-instance')"/>
@@ -79,8 +84,8 @@
                         <!-- Check at each iteration whether to stop -->
                         <xf:action if="not(xxf:get-session-attribute('org.orbeon.fr.import.cancel'))">
 
-                            <!-- Only consider valid rows -->
-                            <xf:action if="empty(index-of($invalid-rows, $p))">
+                            <!-- Only consider valid rows unless importing invalid ones is explicitly allowed -->
+                            <xf:action if="$import-invalid-data or empty(index-of($invalid-rows, $p))">
                                 <!-- Start with empty data -->
                                 <xf:var name="new" value="xxf:create-document()"/>
                                 <xf:insert context="$new" origin="instance('fr-empty-data')"/>
@@ -117,7 +122,6 @@
 
                         </xf:action>
 
-                        <!--<xf:message level="xxf:log-info" value="concat('xxx', $p)"/>-->
                     </xf:action>
 
                     <!-- Output resulting instance -->

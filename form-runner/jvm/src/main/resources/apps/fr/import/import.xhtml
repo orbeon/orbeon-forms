@@ -36,20 +36,25 @@
             xxf:submission-poll-delay="2000"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
 
+            <xf:var
+                name="allow-invalid-documents"
+                value="xxf:property(string-join(('oxf.fr.import.allow-invalid-documents', fr:app-name(), fr:form-name()), '.')) = true()"/>
+
             <xf:action
-                    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-                    xmlns:version="java:org.orbeon.oxf.common.Version"
-                    event="xforms-model-construct-done"
-                    if="not(version:isPE())"
-                    type="xpath">
+                xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                xmlns:version="java:org.orbeon.oxf.common.Version"
+                event="xforms-model-construct-done"
+                if="not(version:isPE())"
+                type="xpath">
+
                 frf:sendError(404)
             </xf:action>
 
-            <xf:action ev:event="xforms-ready" type="xpath">
-                xxf:set-session-attribute('org.orbeon.fr.import.total', ()),
+            <xf:action event="xforms-ready" type="xpath">
+                xxf:set-session-attribute('org.orbeon.fr.import.total',     ()),
                 xxf:set-session-attribute('org.orbeon.fr.import.processed', ()),
-                xxf:set-session-attribute('org.orbeon.fr.import.skipped', ()),
-                xxf:set-session-attribute('org.orbeon.fr.import.cancel', ())
+                xxf:set-session-attribute('org.orbeon.fr.import.skipped',   ()),
+                xxf:set-session-attribute('org.orbeon.fr.import.cancel',    ())
             </xf:action>
 
             <!-- Main data -->
@@ -61,6 +66,8 @@
                     </upload>
                     <import>
                         <importing>false</importing>
+                        <keep-existing-records>true</keep-existing-records>
+                        <import-invalid-data>false</import-invalid-data>
                     </import>
                 </wizard>
             </xf:instance>
@@ -70,16 +77,17 @@
                     <xf:bind ref="file"/>
                 </xf:bind>
                 <xf:bind ref="import">
-                    <xf:bind ref="@import-button" readonly="../importing = 'true'" relevant="not($import-done)"/>
+                    <xf:bind id="keep-existing-records-bind" ref="keep-existing-records"/>
+                    <xf:bind id="import-invalid-data-bind"   ref="import-invalid-data"/>
                 </xf:bind>
             </xf:bind>
 
             <!-- Validation and import status -->
-            <xf:var name="validation-done" context="instance('import-validation-result')" value="exists(*)"/>
+            <xf:var name="validation-done"     context="instance('import-validation-result')" value="exists(*)"/>
             <xf:var name="validation-canceled" context="instance('import-validation-result')" value="$validation-done and total != processed"/>
 
-            <xf:var name="import-done" context="instance('import-result')" value="exists(*)"/>
-            <xf:var name="import-canceled" context="instance('import-result')" value="$import-done and total != processed"/>
+            <xf:var name="import-done"         context="instance('import-result')" value="exists(*)"/>
+            <xf:var name="import-canceled"     context="instance('import-result')" value="$import-done and total != processed"/>
 
             <xf:instance id="import-validation-result">
                 <dummy/>
@@ -90,58 +98,93 @@
             </xf:instance>
 
             <!-- Validate data to import -->
-            <xf:submission id="import-validate-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
-                           action="/fr/service/{fr:app-name()}/{fr:form-name()}/validate" replace="instance" instance="import-validation-result">
+            <xf:submission
+                id="import-validate-submission"
+                ref="instance()/upload/file"
+                method="post"
+                mode="asynchronous"
+                action="/fr/service/{fr:app-name()}/{fr:form-name()}/validate"
+                replace="instance"
+                instance="import-validation-result">
+
                 <!-- Reset stats -->
-                <xf:action ev:event="xforms-submit" context="instance('import-batch-stats')">
+                <xf:action event="xforms-submit" context="instance('import-batch-stats')">
                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
-                    <xf:setvalue iterate="progress, start-time, eta" ref="."/>
+                    <xf:setvalue iterate="progress, start-time, eta"   ref="."/>
                 </xf:action>
 
                 <!-- Flag indicating we are validating -->
-                <xf:setvalue ev:event="xforms-submit" ref="instance()/upload/validating">true</xf:setvalue>
-                <xf:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="instance()/upload/validating">false</xf:setvalue>
-                <xf:message ev:event="xforms-submit-error">An error occurred while validating the data.</xf:message>
+                <xf:setvalue event="xforms-submit"                          ref="instance()/upload/validating">true</xf:setvalue>
+                <xf:setvalue event="xforms-submit-done xforms-submit-error" ref="instance()/upload/validating">false</xf:setvalue>
+                <xf:message  event="xforms-submit-error">An error occurred while validating the data.</xf:message>
 
-                <xf:send ev:event="xforms-submit-done" context="instance('import-validation-result')" if="total = processed" submission="search-submission"/>
+                <xf:setvalue
+                    event="xforms-submit-done"
+                    context="instance('import-batch-stats')"
+                    iterate="total, processed, succeeded"
+                    ref="."
+                    value="
+                        (
+                            xxf:get-session-attribute(concat('org.orbeon.fr.import.', name(.)))[
+                                . castable as xs:integer
+                            ],
+                            0
+                        )[1]"/>
+
+                <xf:send
+                    event="xforms-submit-done"
+                    context="instance('import-validation-result')"
+                    if="total = processed"
+                    submission="search-submission"/>
+
             </xf:submission>
 
             <!-- Import data -->
-            <xf:submission id="import-import-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
-                           action="/fr/service/{fr:app-name()}/{fr:form-name()}/import" replace="instance" instance="import-result">
+            <xf:submission
+                id="import-import-submission"
+                ref="instance()/upload/file"
+                method="post"
+                mode="asynchronous"
+                action="/fr/service/{fr:app-name()}/{fr:form-name()}/import?import-invalid-data={bind('import-invalid-data-bind')}"
+                replace="instance"
+                instance="import-result">
+
                 <!-- Reset stats -->
-                <xf:action ev:event="xforms-submit" context="instance('import-batch-stats')">
+                <xf:action event="xforms-submit" context="instance('import-batch-stats')">
                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
-                    <xf:setvalue iterate="progress, start-time, eta" ref="."/>
+                    <xf:setvalue iterate="progress, start-time, eta"   ref="."/>
                 </xf:action>
 
                 <!-- Import start/end flag -->
-                <xf:setvalue ev:event="xforms-submit" ref="instance()/import/importing">true</xf:setvalue>
-                <xf:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="instance()/import/importing">false</xf:setvalue>
+                <xf:setvalue event="xforms-submit"                          ref="instance()/import/importing">true</xf:setvalue>
+                <xf:setvalue event="xforms-submit-done xforms-submit-error" ref="instance()/import/importing">false</xf:setvalue>
 
                 <!-- Error -->
-                <xf:message ev:event="xforms-submit-error">An error occurred while importing the data.</xf:message>
+                <xf:message event="xforms-submit-error">An error occurred while importing the data.</xf:message>
             </xf:submission>
 
             <!-- Delete all data in the given form -->
-            <xf:submission id="import-delete-data-submission" method="delete" serialization="none"
-                           action="/fr/service/persistence/crud/{fr:app-name()}/{fr:form-name()}/data/" replace="none">
+            <xf:submission
+                id="import-delete-data-submission"
+                method="delete"
+                serialization="none"
+                action="/fr/service/persistence/crud/{fr:app-name()}/{fr:form-name()}/data/"
+                replace="none">
 
-                <!-- Flag indicating we are importing -->
-                <xf:message ev:event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
+                <!-- Start import once data is successfully deleted -->
+                <xf:send event="xforms-submit-done" submission="import-import-submission"/>
+
+                <!-- Error -->
+                <xf:message event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
             </xf:submission>
 
-            <!-- Start import once data is deleted -->
-            <xf:action ev:event="xforms-submit-done" ev:observer="import-delete-data-submission">
-                <xf:send submission="import-import-submission"/>
-            </xf:action>
-
             <!-- Statistics gathered upon polling event -->
-            <xf:instance id="import-batch-stats">
+            <xf:instance id="import-batch-stats" xxf:expose-xpath-types="true">
                 <stats>
                     <total>0</total>
                     <processed>0</processed>
                     <succeeded>0</succeeded>
+                    <invalid-count>0</invalid-count>
                     <progress/>
                     <start-time/>
                     <eta/>
@@ -149,19 +192,43 @@
             </xf:instance>
 
             <xf:bind ref="instance('import-batch-stats')">
-                <xf:bind ref="progress" calculate="if (../total != 0) then xs:decimal(../processed) div xs:decimal(../total) else 0"/>
-                <xf:bind ref="start-time" calculate="if (. = '' and ../total != 0) then current-dateTime() else ."/>
-                <xf:bind ref="eta" calculate="if (../start-time != '' and ../processed != 0 and xs:decimal(../progress) != 0) then
-                    (current-dateTime() - xs:dateTime(../start-time)) * ((1.0 - ../progress) div ../progress) else ''"/>
+                <xf:bind
+                    ref="invalid-count"
+                    type="xs:integer"
+                    calculate="../processed - ../succeeded"
+                    id="invalid-count-bind"/>
+                <xf:bind
+                    ref="progress"
+                    calculate="if (../total != 0) then xs:decimal(../processed) div xs:decimal(../total) else 0"/>
+                <xf:bind
+                    ref="start-time"
+                    calculate="if (. = '' and ../total != 0) then current-dateTime() else ."/>
+                <xf:bind
+                    ref="eta"
+                    calculate="
+                        if (../start-time != '' and ../processed != 0 and xs:decimal(../progress) != 0) then
+                            (current-dateTime() - xs:dateTime(../start-time)) * ((1.0 - ../progress) div ../progress)
+                        else
+                            ''"/>
             </xf:bind>
 
             <!-- Update progress upon poll event -->
-            <xf:action context="instance('import-batch-stats')"
-                       if="xs:boolean(instance()/upload/validating) or xs:boolean(instance()/import/importing)"
-                       ev:event="xxforms-poll" ev:observer="#document">
-                <xf:setvalue ref="total" value="(xxf:get-session-attribute('org.orbeon.fr.import.total'), 0)[1]"/>
-                <xf:setvalue ref="processed" value="(xxf:get-session-attribute('org.orbeon.fr.import.processed'), 0)[1]"/>
-                <xf:setvalue ref="succeeded" value="(xxf:get-session-attribute('org.orbeon.fr.import.succeeded'), 0)[1]"/>
+            <xf:action
+                if="xs:boolean(instance()/upload/validating) or xs:boolean(instance()/import/importing)"
+                event="xxforms-poll"
+                observer="#document">
+
+                <xf:setvalue
+                    context="instance('import-batch-stats')"
+                    iterate="total, processed, succeeded"
+                    ref="."
+                    value="
+                        (
+                            xxf:get-session-attribute(concat('org.orbeon.fr.import.', name(.)))[
+                                . castable as xs:integer
+                            ],
+                            0
+                        )[1]"/>
             </xf:action>
 
             <!-- Search request -->
@@ -186,10 +253,10 @@
                     method="post" resource="/fr/service/persistence/search/{fr:app-name()}/{fr:form-name()}"
                     replace="instance" instance="import-search-response">
                 <!-- Set language upon submitting -->
-                <xf:action ev:event="xforms-submit">
+                <xf:action event="xforms-submit">
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
-                <xf:message ev:event="xforms-submit-error">An error occurred while retrieving the data.</xf:message>
+                <xf:message event="xforms-submit-error">An error occurred while retrieving the data.</xf:message>
             </xf:submission>
 
             <!-- Metadata -->
@@ -215,19 +282,19 @@
             <!--<xf:label>Orbeon Form Runner - Import</xf:label>-->
             <fr:body>
 
-                <xf:action ev:event="DOMActivate" ev:observer="next-button">
+                <xf:action event="DOMActivate" observer="next-button">
                     <xf:setvalue ref="instance()/@current" value="xs:integer(instance()/@current) + 1"/>
                     <xf:refresh/>
                     <xf:dispatch name="fr-toggle" targetid="import-step-{instance()/@current}"/>
                 </xf:action>
 
-                <xf:action ev:event="DOMActivate" ev:observer="previous-button">
+                <xf:action event="DOMActivate" observer="previous-button">
                     <xf:setvalue ref="instance()/@current" value="xs:integer(instance()/@current) - 1"/>
                     <xf:refresh/>
                     <xf:dispatch name="fr-toggle" targetid="import-step-{instance()/@current}"/>
                 </xf:action>
 
-                <xf:action ev:event="DOMActivate" ev:observer="next-button" if="instance()/@current = 1">
+                <xf:action event="DOMActivate" observer="next-button" if="instance()/@current = 1">
                     <xf:action type="application/xpath">
                         xxf:set-session-attribute('org.orbeon.fr.import.total', ()),
                         xxf:set-session-attribute('org.orbeon.fr.import.processed', ()),
@@ -257,7 +324,7 @@
                                         <xxf:size ref="@size"/>
 
                                         <!-- Start validation once the file is uploaded -->
-                                        <xf:send ev:event="xxforms-upload-done" submission="import-validate-submission"/>
+                                        <xf:send event="xxforms-upload-done" submission="import-validate-submission"/>
 
                                     </xf:upload>
 
@@ -293,12 +360,23 @@
                                     </xf:group>
                                 </xh:td>
                                 <xh:td>
-                                    <xf:output value="for $ds in instance('import-batch-stats')/eta return
-                                                      if ($ds castable as xs:dayTimeDuration)
-                                                        then for $d in xs:dayTimeDuration($ds) return
-                                                          xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
-                                                                             (hours-from-duration($d), minutes-from-duration($d), round(seconds-from-duration($d))))
-                                                        else '-'">
+                                    <xf:output
+                                        value="
+                                            for $ds in instance('import-batch-stats')/eta
+                                            return
+                                                if ($ds castable as xs:dayTimeDuration) then
+                                                    for $d in xs:dayTimeDuration($ds)
+                                                    return
+                                                        xxf:format-message(
+                                                            '{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
+                                                            (
+                                                                hours-from-duration($d),
+                                                                minutes-from-duration($d),
+                                                                round(seconds-from-duration($d))
+                                                            )
+                                                        )
+                                                else
+                                                    '-'">
                                         <xf:label>ETA:</xf:label>
                                     </xf:output>
                                 </xh:td>
@@ -306,7 +384,7 @@
                                     <!-- Cancel validation -->
                                     <xf:trigger>
                                         <xf:label>Cancel</xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                        <xf:action event="DOMActivate" type="xpath">
                                             xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
                                         </xf:action>
                                     </xf:trigger>
@@ -319,18 +397,19 @@
                         <xf:group context="instance('import-validation-result')" ref=".[$validation-done]">
                             <!-- Validation results -->
 
-                            <xf:var name="invalid" value="xs:integer(processed) - succeeded"/>
-                            <xf:var name="some-invalid" value="$invalid gt 0"/>
+                            <xf:var name="some-invalid" value="bind('invalid-count-bind') gt 0"/>
 
                             <!-- No invalid documents -->
                             <xf:group ref=".[not($some-invalid) and not($validation-canceled)]">
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xh:span class="fb-import-success">
-                                            <xf:output value="xxf:format-message(
-                                                                '{0,number,integer} {0,choice,1#document|1&lt;documents}  {0,choice,1#has|1&lt;have} been validated and will be imported.',
-                                                                xs:integer(processed)
-                                                              )"/>
+                                            <xf:output
+                                                value="
+                                                    xxf:format-message(
+                                                        '{0,number,integer} {0,choice,1#document|1&lt;documents}  {0,choice,1#has|1&lt;have} been validated and will be imported.',
+                                                        xs:integer(processed)
+                                                    )"/>
                                         </xh:span>
                                     </xh:td>
                                 </xh:tr>
@@ -340,10 +419,13 @@
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xh:span class="fb-import-warning">
-                                            <xf:output value="xxf:format-message(
-                                                                'NOTE: {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid. Only valid documents will be imported.',
-                                                                for $n in ($invalid, processed) return xs:integer($n)
-                                                              )"/>
+                                            <xf:output
+                                                value="
+                                                    xxf:format-message(
+                                                        'NOTE: {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.',
+                                                        for $n in (bind('invalid-count-bind'), processed)
+                                                            return xs:integer($n)
+                                                    )"/>
                                         </xh:span>
                                     </xh:td>
                                 </xh:tr>
@@ -357,11 +439,11 @@
                                         </xh:span>
                                         <xf:trigger>
                                             <xf:label>Start Over</xf:label>
-                                            <xf:action ev:event="DOMActivate">
+                                            <xf:action event="DOMActivate">
                                                 <!-- Clear stats -->
                                                 <xf:action context="instance('import-batch-stats')">
                                                     <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
-                                                    <xf:setvalue iterate="progress, start-time, eta" ref="."/>
+                                                    <xf:setvalue iterate="progress, start-time, eta"   ref="."/>
                                                 </xf:action>
                                                 <!-- Reload page (xf:reset would help instead!) -->
                                                 <xf:load resource="import"/>
@@ -389,45 +471,74 @@
                             <xf:var name="existing" value="xs:integer(instance('import-search-response')/@search-total)"/>
 
                             <xf:group ref=".[not($importing or $import-done)]">
-                                <xf:group ref=".[$existing gt 0]">
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:output value="xxf:format-message(
-                                                                'There {0,choice,1#is|1&lt;are} {0,number,integer}
-                                                                 existing {0,choice,1#document|1&lt;documents} in the database for form
-                                                                 {1}/{2}.',
-                                                                ($existing, fr:app-name(), fr:form-name())
-                                                              )"/>
-                                            Please choose whether to add to existing data, or to delete existing data first.
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:trigger>
-                                                <xf:label>Add</xf:label>
-                                                <!-- Start import -->
-                                                <xf:send ev:event="DOMActivate" submission="import-import-submission"/>
-                                            </xf:trigger>
-                                            <xf:trigger>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output
+                                            value="
+                                                xxf:format-message(
+                                                    'There {0,choice,1#is|1&lt;are} {0,number,integer}
+                                                     existing {0,choice,1#document|1&lt;documents} in the database for form
+                                                     {1}/{2}.',
+                                                    (
+                                                        $existing,
+                                                        fr:app-name(),
+                                                        fr:form-name()
+                                                    )
+                                                )"/>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select1 appearance="full" ref="bind('keep-existing-records-bind')[$existing gt 0]">
+                                            <xf:label>Existing database records</xf:label>
+                                            <xf:item>
+                                                <xf:label>Keep</xf:label>
+                                                <xf:value>true</xf:value>
+                                            </xf:item>
+                                            <xf:item>
                                                 <xf:label>Delete</xf:label>
-                                                <!-- Delete data first -->
-                                                <xf:send ev:event="DOMActivate" submission="import-delete-data-submission"/>
-                                            </xf:trigger>
-                                        </xh:td>
-                                    </xh:tr>
-                                </xf:group>
-                                <xf:group ref=".[$existing le 0]">
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:trigger>
-                                                <xf:label>Import</xf:label>
-                                                <xf:action ev:event="DOMActivate">
-                                                    <xf:send submission="import-import-submission"/>
-                                                </xf:action>
-                                            </xf:trigger>
-                                        </xh:td>
-                                    </xh:tr>
-                                </xf:group>
+                                                <xf:value>false</xf:value>
+                                            </xf:item>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select1
+                                            appearance="full"
+                                            ref="
+                                                bind('import-invalid-data-bind')[
+                                                    $allow-invalid-documents and
+                                                    bind('invalid-count-bind') gt 0
+                                                ]">
+                                            <xf:label>Invalid data</xf:label>
+                                            <xf:item>
+                                                <xf:label>Skip</xf:label>
+                                                <xf:value>false</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>Keep</xf:label>
+                                                <xf:value>true</xf:value>
+                                            </xf:item>
+                                        </xf:select1>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:trigger>
+                                            <xf:label>Import</xf:label>
+                                            <!-- Start import -->
+                                            <xf:action event="DOMActivate">
+
+                                                <xf:send
+                                                    if="bind('keep-existing-records-bind') = true()"
+                                                    submission="import-import-submission"/>
+                                                <xf:send
+                                                    if="bind('keep-existing-records-bind') = false()"
+                                                    submission="import-delete-data-submission"/>
+
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </xh:td>
+                                </xh:tr>
                             </xf:group>
 
                             <xf:group ref=".[$importing]">
@@ -437,19 +548,39 @@
                                         <xf:group>
                                             <xf:label>Importing:</xf:label>
                                             <xh:div class="progress progress-striped">
-                                                <xh:div class="bar" style="width: {format-number(if (instance('import-batch-stats')/total != 0)
-                                                                                                 then xs:decimal(instance('import-batch-stats')/processed) div xs:decimal(instance('import-batch-stats')/total)
-                                                                                                 else 0, '###%')}"/>
+                                                <xh:div
+                                                    class="bar"
+                                                    style="width: {
+                                                        format-number(
+                                                            if (instance('import-batch-stats')/total != 0) then
+                                                                xs:decimal(instance('import-batch-stats')/processed) div
+                                                                        xs:decimal(instance('import-batch-stats')/total)
+                                                             else
+                                                                0,
+                                                            '###%'
+                                                        )
+                                                }"/>
                                             </xh:div>
                                         </xf:group>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:output value="for $ds in instance('import-batch-stats')/eta return
-                                                          if ($ds castable as xs:dayTimeDuration)
-                                                            then for $d in xs:dayTimeDuration($ds) return
-                                                              xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
-                                                                                 (hours-from-duration($d), minutes-from-duration($d), round(seconds-from-duration($d))))
-                                                            else '-'">
+                                        <xf:output
+                                            value="
+                                                for $ds in instance('import-batch-stats')/eta
+                                                return
+                                                    if ($ds castable as xs:dayTimeDuration) then
+                                                        for $d in xs:dayTimeDuration($ds)
+                                                        return
+                                                            xxf:format-message(
+                                                                '{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
+                                                                (
+                                                                    hours-from-duration($d),
+                                                                    minutes-from-duration($d),
+                                                                    round(seconds-from-duration($d))
+                                                                )
+                                                            )
+                                                    else
+                                                        '-'">
                                             <xf:label>ETA:</xf:label>
                                         </xf:output>
                                     </xh:td>
@@ -457,7 +588,7 @@
                                         <!-- Cancel import -->
                                         <xf:trigger>
                                             <xf:label>Cancel</xf:label>
-                                            <xf:action ev:event="DOMActivate" type="xpath">
+                                            <xf:action event="DOMActivate" type="xpath">
                                                 xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
                                             </xf:action>
                                         </xf:trigger>
@@ -475,11 +606,16 @@
                                     <xh:tr>
                                         <xh:td colspan="2">
                                             <xh:span class="fb-import-success">
-                                                <xf:output value="xxf:format-message(
-                                                                    'Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete.
-                                                                     {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.',
-                                                                    (xs:integer(succeeded), $skipped)
-                                                                  )"/>
+                                                <xf:output
+                                                    value="
+                                                        xxf:format-message(
+                                                            'Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete.
+                                                             {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.',
+                                                            (
+                                                                xs:integer(succeeded),
+                                                                $skipped
+                                                            )
+                                                        )"/>
                                             </xh:span>
                                         </xh:td>
                                     </xh:tr>
@@ -493,11 +629,11 @@
                                             </xh:span>
                                             <xf:trigger>
                                                 <xf:label>Start Over</xf:label>
-                                                <xf:action ev:event="DOMActivate">
+                                                <xf:action event="DOMActivate">
                                                     <!-- Clear stats -->
                                                     <xf:action context="instance('import-batch-stats')">
                                                         <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
-                                                        <xf:setvalue iterate="progress, start-time, eta" ref="."/>
+                                                        <xf:setvalue iterate="progress, start-time, eta"   ref="."/>
                                                     </xf:action>
                                                     <!-- Reload page (xf:reset would help instead!) -->
                                                     <xf:load resource="import"/>

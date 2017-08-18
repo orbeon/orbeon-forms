@@ -661,6 +661,9 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
+  .settings(
+    exportJars := false
+  )
 
 
 lazy val orbeonWarJS = orbeonWar.js

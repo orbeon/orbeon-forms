@@ -88,7 +88,8 @@
                 <xf:action if="xxf:instance('local')/validate/data(.) = 'free'">
 
                     <xf:setfocus
-                        control="{event('control-name')}-control"
+                        control="{event('fr-control-name')}-control"
+                        xxf:repeat-indexes="{event('fr-repeat-indexes')}"
                         xxbl:scope="outer"/>
 
                 </xf:action>

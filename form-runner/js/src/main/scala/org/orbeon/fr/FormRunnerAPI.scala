@@ -49,13 +49,17 @@ object FormRunnerAPI {
 @JSExportAll
 object FormRunnerWizardAPI {
 
-  def focus(controlName: String): Unit =
+  def focus(
+    controlName   : String,
+    repeatIndexes : js.UndefOr[js.Array[Int]] = js.undefined
+  ): Unit =
     DocumentAPI.dispatchEvent(new js.Object {
       val targetId  = "fr-view-component"
       val eventName = "fr-wizard-focus"
 
       val properties = new js.Object {
-        val `control-name` = controlName
+        val `fr-control-name`  : String = controlName
+        val `fr-repeat-indexes`: String = repeatIndexes map (_.mkString(" ")) getOrElse ""
       }
     })
 

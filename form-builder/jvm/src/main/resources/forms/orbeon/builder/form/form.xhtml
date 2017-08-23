@@ -122,7 +122,7 @@
 
                             <!-- Form settings -->
                             <xf:trigger appearance="minimal" class="fb-navbar-trigger pull-right" id="open-form-settings-trigger">
-                                <xf:label><xh:i class="icon-wrench icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
+                                <xf:label><xh:i class="icon-cog icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Open the dialog in "edit" mode -->
                                     <xxf:show dialog="dialog-form-settings">
@@ -508,7 +508,11 @@
                                 <xh:span class="fb-grid-control-icons">
                                     <!-- Edit details for any control -->
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-details-trigger">
-                                        <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>
+                                        <xf:label>
+                                            <xh:i
+                                                class="icon-cog"
+                                                title="{$fb-resources/control-details-icon/label}"/>
+                                        </xf:label>
                                         <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
                                             <xf:property name="control-id" value="$control/@id"/>
                                         </xf:dispatch>

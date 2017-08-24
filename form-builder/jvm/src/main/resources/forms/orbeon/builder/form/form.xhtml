@@ -527,7 +527,11 @@
                                     </xf:trigger>
                                     <!-- Itemset editor -->
                                     <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
-                                        <xf:label><xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" title="{$fb-resources/edit-items/label}"/></xf:label>
+                                        <xf:label>
+                                            <xh:i
+                                                class="icon-th-list"
+                                                title="{$fb-resources/edit-items/label}"/>
+                                        </xf:label>
                                         <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
                                             <xf:property name="control-element" value="$control"/>
                                         </xf:dispatch>

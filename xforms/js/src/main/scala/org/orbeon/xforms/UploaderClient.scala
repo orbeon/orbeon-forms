@@ -168,15 +168,20 @@ object UploaderClient {
 
         val newlyDisabledElems = {
 
-          def isUuidInput (e: html.Input) = e.name == "$uuid"                   // `id` might be prefixed when embedding
-          def isFieldset  (e: html.Input) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
-          def isThisUpload(e: html.Input) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
+          def isUuidInput (e: html.Input)   = e.name == "$uuid"
+          def isThisUpload(e: html.Element) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
+          def isFieldset  (e: html.Element) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
+          def isDisabled  (e: html.Element) = e.disabled.toOption.contains(true)
 
-          currentEvent.form.elements.iterator collect {
-            case e: html.Input ⇒ e
-          } filterNot { e ⇒
-            e.disabled.toOption.contains(true) || isUuidInput(e) || isFieldset(e) || isThisUpload(e)
-          } toList
+          def mustDisableElem (e: html.Element) = ! isThisUpload(e) && ! isFieldset(e) && ! isDisabled(e)
+          def mustDisableInput(e: html.Input)   = ! isUuidInput(e) && mustDisableElem(e)
+
+          def mustDisableFilter(e: html.Element) = e match {
+            case e: html.Input   ⇒ mustDisableInput(e)
+            case e               ⇒ mustDisableElem(e)
+          }
+
+          currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter
         }
 
         newlyDisabledElems foreach (_.disabled = true)

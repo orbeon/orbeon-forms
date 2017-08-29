@@ -441,9 +441,10 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         Dispatch.dispatchEvent(event)
 
     implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
-    val target = event.targetObject
+
+    val target            = event.targetObject
     val targetEffectiveId = target.getEffectiveId
-    val eventName = event.name
+    val eventName         = event.name
 
     withDebug("handling external event", Seq("target id" → targetEffectiveId, "event name" → eventName)) {
 

@@ -306,10 +306,10 @@ class XFormsInstance(
   // This includes marking the structural change as well as dispatching events
   def replace(
     newDocumentInfo : DocumentInfo,
-    dispatch        : Boolean = true,
+    dispatch        : Boolean                 = true,
     instanceCaching : Option[InstanceCaching] = instanceCaching,
-    isReadonly      : Boolean = readonly,
-    applyDefaults   : Boolean = false
+    isReadonly      : Boolean                 = readonly,
+    applyDefaults   : Boolean                 = false
   ): Unit = {
 
     val formerRoot = rootElement

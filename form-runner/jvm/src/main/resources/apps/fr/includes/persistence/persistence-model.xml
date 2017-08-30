@@ -653,7 +653,7 @@
 
         <xf:var
             name="filenames"
-            value="frf:clearMissingUnsavedDataAttachmentReturnFilenamesJava(instance('fr-form-instance'))"/>
+            value="frf:clearMissingUnsavedDataAttachmentReturnFilenamesJava(xxf:instance('fr-form-instance'))"/>
 
         <xf:action if="exists($filenames)">
             <!-- TODO: i18n -->

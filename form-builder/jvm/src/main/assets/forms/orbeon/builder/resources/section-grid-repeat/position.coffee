@@ -19,12 +19,15 @@ $ ->
         $(window).on('resize', f)
 
     # Finds the container, if any, based on a vertical position
-    Builder.findInCache = (containerCache, top) ->
+    Builder.findInCache = (containerCache, top, left) ->
         _.find containerCache, (container) ->
-            container.offset.top <= top <= container.offset.top + container.height
+            verticalPosInside   = container.offset.top  <= top  <= container.offset.top  + container.height
+            horizontalPosInside = container.offset.left <= left <= container.offset.left + container.width
+            verticalPosInside and horizontalPosInside
 
     # How much we need to add to offset to account for the form having been scrolled
-    Builder.scrollTop = -> f$.scrollTop $ '.fb-main'
+    Builder.scrollTop  = -> f$.scrollTop  $ '.fb-main'
+    Builder.scrollLeft = -> f$.scrollLeft $ '.fb-main'
 
     # Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
     Builder.adjustedOffset = (jQueryObject) ->
@@ -32,35 +35,28 @@ $ ->
 
     # Container is either a section or grid; calls listeners passing old/new container
     Builder.currentContainerChanged = (containerCache, {wasCurrent, becomesCurrent}) ->
-        notifyChange = notifyOnChange wasCurrent, becomesCurrent
+        notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
         onUnderPointerChange ->
-            if viewPos.left <= pointerPos.left <= viewPos.right
-                top = pointerPos.top + Builder.scrollTop()
-                newContainer = Builder.findInCache containerCache, top
-            notifyChange newContainer
+            top  = pointerPos.top  + Builder.scrollTop()
+            left = pointerPos.left + Builder.scrollLeft()
+            newContainer = Builder.findInCache containerCache, top, left
+            notifyChange(newContainer)
 
     # Calls listeners when, in a grid, the pointer moves out of or in a new row/cell
     Builder.currentRowColChanged = (gridsCache, {wasCurrentRow, becomesCurrentRow, wasCurrentCol, becomesCurrentCol}) ->
         currentGrid = null; do ->
             Builder.currentContainerChanged gridsCache,
                 wasCurrent: -> currentGrid = null
-                becomesCurrent: (g) -> currentGrid = g
-        notifyRowChange = notifyOnChange wasCurrentRow, becomesCurrentRow
-        notifyColChange = notifyOnChange wasCurrentCol, becomesCurrentCol
+                becomesCurrent: (g) ->
+                    currentGrid = g
+        notifyRowChange = notifyOnChange(wasCurrentRow, becomesCurrentRow)
+        notifyColChange = notifyOnChange(wasCurrentCol, becomesCurrentCol)
         onUnderPointerChange ->
             if currentGrid?
                 newRow = _.find currentGrid.rows, (r) -> r.offset.top  <= pointerPos.top + Builder.scrollTop() <= r.offset.top + r.height
                 newCol = _.find currentGrid.cols, (c) -> c.offset.left <= pointerPos.left <= c.offset.left + c.width
             notifyRowChange newRow
             notifyColChange newCol
-
-    # Keep track of FB's main area left/right, as we don't want to show icons when pointer is over the toolbar
-    viewPos = left: 0, right: 0; do ->
-        updateViewPos = ->
-            fbMain = $ '.fb-main'
-            viewPos.left = (f$.offset fbMain).left
-            viewPos.right = viewPos.left + (f$.width fbMain)
-        f$.on 'load resize', updateViewPos, $ window
 
     # Keeps track of pointer position
     pointerPos = left: 0, top: 0; do ->
@@ -84,9 +80,9 @@ $ ->
                     # reposition relative icons, so we don't consider the value to be the "same"
                     not(_.isEqual(newValue.offset, currentValue.offset))
                 if firstTime() or domElementChanged() or elementPositionChanged()
-                    was currentValue if currentValue?
+                    was(currentValue) if currentValue?
                     currentValue = newValue
-                    becomes newValue
+                    becomes(newValue)
             else
-                was currentValue if currentValue?
+                was(currentValue) if currentValue?
                 currentValue = null

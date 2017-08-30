@@ -15,6 +15,7 @@ $ ->
                     el: grid
                     offset: Builder.adjustedOffset grid
                     height: f$.outerHeight grid                                                                         # Include grid padding
+                    width : f$.outerWidth  grid
                 if f$.is '.fr-repeat', table
                     head = f$.find '.fr-grid-head', table
                     gridInfo.head =

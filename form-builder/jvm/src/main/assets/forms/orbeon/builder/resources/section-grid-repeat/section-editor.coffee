@@ -11,6 +11,7 @@ $ ->
     sectionEditor = $ '.fb-section-editor'
     currentSection = null
     sectionsCache = []
+    fbMainCache = []
     frBodyLeft = 0;
     pageX = 0; pageY = 0
     SectionTitleSelector = '.fr-section-title:first'
@@ -31,17 +32,31 @@ $ ->
         frBodyLeft = (f$.offset $ '.fr-body').left
         sectionsCache.length = 0                                        # Don't recreate array, as other parts of the code keep a reference to it
         _.each ($ '.xbl-fr-section:visible'), (section) ->
-            section = $ section
+            section = $(section)
+            mostOuterSection = section.parents(".xbl-fr-section").last()
+            if not mostOuterSection.is("*")
+                # If we haven't found a parent section, `section` is already most outer section
+                mostOuterSection = section
             sectionsCache.unshift
                 el: section
-                offset: Builder.adjustedOffset section
-                height: f$.height section
+                offset:
+                    top:  Builder.adjustedOffset(section).top
+                    left: Builder.adjustedOffset(mostOuterSection).left
+                height: section.height()
+                width : mostOuterSection.width()
                 titleOffset: f$.offset f$.find 'a', section
+        fbMainCache.length = 0
+        fbMain = $(".fb-main-inner")
+        fbMainCache.unshift({
+            el         : fbMain
+            offset     : Builder.adjustedOffset fbMain
+            height     : f$.height fbMain
+            width      : f$.width  fbMain
+        })
 
     Builder.currentContainerChanged sectionsCache,
         wasCurrent: ->
-            sectionEditor.hide()
-            currentSection = null
+            # NOP, instead we hide the section editor when the pointer leaves `.fb-main`
         becomesCurrent: (section) ->
             currentSection = section.el
             # Position the editor
@@ -62,6 +77,12 @@ $ ->
                 deleteTrigger = f$.children '.delete-section-trigger', sectionEditor
                 if f$.is '.fb-can-delete', container then f$.show deleteTrigger else f$.hide deleteTrigger
 
+    Builder.currentContainerChanged fbMainCache,
+        wasCurrent: ->
+            sectionEditor.hide()
+            currentSection = null
+        becomesCurrent: -> # NOP
+
     do setupLabelEditor = ->
 
         labelInput = null
@@ -75,7 +96,8 @@ $ ->
 
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
-            section = Builder.findInCache sectionsCache, (Builder.adjustedOffset labelInput).top
+            labelInputOffset = Builder.adjustedOffset(labelInput)
+            section = Builder.findInCache(sectionsCache, labelInputOffset.top, labelInputOffset.left)
             f$.text newLabelValue, f$.find SectionLabelSelector, section.el
             sectionId = f$.attr 'id', section.el
             ORBEON.xforms.Document.dispatchEvent
@@ -100,7 +122,7 @@ $ ->
                 interceptorOffset = Builder.adjustedOffset clickInterceptor
                 # From the section title, get the anchor element, which contains the title
                 labelAnchor = do ->
-                    section = Builder.findInCache sectionsCache, interceptorOffset.top
+                    section = Builder.findInCache(sectionsCache, interceptorOffset.top, interceptorOffset.left)
                     f$.find SectionLabelSelector, section.el
                 # Set placeholder, done every time to account for a value change when changing current language
                 do ->
@@ -126,14 +148,14 @@ $ ->
         # Update highlight of section title, as a hint users can click to edit
         updateHighlight = (updateClass, clickInterceptor) ->
             offset = Builder.adjustedOffset clickInterceptor
-            section = Builder.findInCache sectionsCache, offset.top
+            section = Builder.findInCache(sectionsCache, offset.top, offset.left)
             sectionTitle = f$.find '.fr-section-title:first', section.el
             updateClass 'hover', sectionTitle
 
         # Show textual indication user can click on empty section title
         showClickHintIfTitleEmpty = (clickInterceptor) ->
             interceptorOffset = Builder.adjustedOffset clickInterceptor
-            section = Builder.findInCache sectionsCache, interceptorOffset.top
+            section = Builder.findInCache(sectionsCache, interceptorOffset.top, interceptorOffset.left)
             labelAnchor = f$.find SectionLabelSelector, section.el
             if (f$.text labelAnchor) == ''
                 outputWithHintMessage = sectionEditor.children('.fb-enter-section-title-label')

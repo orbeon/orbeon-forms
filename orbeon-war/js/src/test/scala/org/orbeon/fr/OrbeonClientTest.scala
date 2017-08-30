@@ -261,7 +261,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   describe("The replication setup") {
 
-    it("can connect to Orbeon Forms via the HAProxy container") {
+    ignore("can connect to Orbeon Forms via the HAProxy container") {
       async {
 
         await(createNetworkIfNeeded())

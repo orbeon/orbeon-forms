@@ -70,7 +70,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
       // Obtain WebAppContext as that will initialize the resource manager if needed, which is required by
       // Version
       val webAppContext = WebAppContext(getPortletContext)
-      Version.instance.requirePEFeature("Orbeon Forms portlet") // this is a PE feature
+      Version.instance.requirePEFeature("Orbeon Forms portlet")
       init(webAppContext, Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
     }
 

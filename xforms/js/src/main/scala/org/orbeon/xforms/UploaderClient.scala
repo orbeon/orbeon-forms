@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.facade.{AjaxServer, ConnectCallbackArgument, Globals, Properties}
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.XMLHttpRequest
 

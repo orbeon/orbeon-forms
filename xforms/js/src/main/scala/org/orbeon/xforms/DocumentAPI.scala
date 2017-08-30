@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms.facade.{AjaxServer, Controls, Globals}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element

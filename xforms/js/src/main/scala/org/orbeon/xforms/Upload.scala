@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
+import org.orbeon.xforms.facade.{Control, Events, Properties}
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
 

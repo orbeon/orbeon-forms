@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.facade.Control
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLElement

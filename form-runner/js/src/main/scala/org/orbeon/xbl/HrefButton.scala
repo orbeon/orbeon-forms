@@ -15,12 +15,13 @@ package org.orbeon.xbl
 
 import org.orbeon.xforms
 import org.orbeon.xforms.$
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 
 object HrefButton {
 
-  xforms.XBL.declareCompanion(
+  XBL.declareCompanion(
     "fr|href-button",
-    new xforms.XBLCompanion {
+    new XBLCompanion {
       override def init(): Unit = {
         $(containerElem).find("button").on("click", onClick _)
       }

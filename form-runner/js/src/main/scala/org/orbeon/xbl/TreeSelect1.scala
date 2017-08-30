@@ -15,15 +15,16 @@ package org.orbeon.xbl
 
 import org.orbeon.xforms
 import org.orbeon.xforms.$
+import org.orbeon.xforms.facade.{Item, XBL, XBLCompanion}
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 
 object TreeSelect1 {
 
-  xforms.XBL.declareCompanion(
+  XBL.declareCompanion(
     "fr|tree-select1",
-    new xforms.XBLCompanion {
+    new XBLCompanion {
 
       def findTreeContainer         = $(containerElem).find(".xbl-fr-tree-select1-container")
       def removeListeners()         = findTreeContainer.off()
@@ -77,13 +78,13 @@ object TreeSelect1 {
 
           logDebug(s"itemset = `$itemset`")
 
-          def itemOpen(item: xforms.Item) =
+          def itemOpen(item: Item) =
             item.attributes flatMap (_.`xxforms-open`) exists (_ == "true")
 
           def itemChildrenOpen(nodesOrUndef: js.UndefOr[js.Array[FancytreeJsonNode]]) =
             nodesOrUndef exists (_ exists (_.expanded exists identity))
 
-          def convertItems(items: js.Array[xforms.Item]): js.Array[FancytreeJsonNode] =
+          def convertItems(items: js.Array[Item]): js.Array[FancytreeJsonNode] =
             for {
               item            ← items
               childrenOrUndef = item.children map convertItems
@@ -99,7 +100,7 @@ object TreeSelect1 {
           val jTreeContainer        = findTreeContainer
           val jTreeContainerDynamic = jTreeContainer.asInstanceOf[js.Dynamic]
 
-          val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[xforms.Item]])
+          val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[Item]])
 
           this.treeConfiguration match {
             case Some(tree) ⇒

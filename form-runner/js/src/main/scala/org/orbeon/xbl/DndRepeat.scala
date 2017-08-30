@@ -15,7 +15,8 @@ package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms
-import org.orbeon.xforms.{$, AjaxServer, XBL, XBLCompanion}
+import org.orbeon.xforms.facade.{AjaxServer, XBL, XBLCompanion}
+import org.orbeon.xforms.$
 import org.scalajs.dom.html.Element
 
 import scala.scalajs.js

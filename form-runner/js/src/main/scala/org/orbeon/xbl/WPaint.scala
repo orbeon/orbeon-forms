@@ -14,6 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.xforms
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI}
 import org.scalajs.jquery.JQuery
 import org.scalajs.dom.document
@@ -23,9 +24,9 @@ import scala.scalajs.js.Dynamic
 
 object WPaint {
 
-  xforms.XBL.declareCompanion(
+  XBL.declareCompanion(
     "fr|wpaint",
-    new xforms.XBLCompanion {
+    new XBLCompanion {
 
       def annotationEl : JQuery = $(containerElem).find(".fr-wpaint-annotation img")
       def imageEl      : JQuery = $(containerElem).find(".fr-wpaint-image img")

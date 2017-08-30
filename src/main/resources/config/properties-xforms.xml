@@ -21,6 +21,8 @@
             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
+    <property as="xs:boolean" name="oxf.xforms.replication"                             value="false"/>
+
     <!-- Whether to encrypt (encode) item values by default -->
     <property as="xs:boolean" name="oxf.xforms.encrypt-item-values"                     value="true"/>
 

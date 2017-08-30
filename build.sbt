@@ -1,6 +1,8 @@
 import sbt.Keys._
+import org.orbeon.sbt.OrbeonSupport
 import org.orbeon.sbt.OrbeonSupport._
 import org.orbeon.sbt.OrbeonWebappPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 //import sbtcross.{crossProject, CrossType} // until Scala.js 1.0.0 is released
 
 val DefaultOrbeonFormsVersion     = "2016.3-SNAPSHOT"
@@ -147,7 +149,7 @@ val JarFilesToExcludeFromLiferayWar = Set(
 
 val TestResourceManagerPaths = List(
   "src/test/resources", // so that Java processor tests work
-  "orbeon-war/src/main/webapp/WEB-INF/resources"
+  "orbeon-war/jvm/src/main/webapp/WEB-INF/resources"
 )
 
 def resourceManagerProperties(buildBaseDirectory: File): List[String] = {
@@ -246,7 +248,7 @@ lazy val unmanagedJarsSettings = Seq(
 
 lazy val commonSettings = Seq(
 
-  jsEnv                         := JSDOMNodeJSEnv().value,
+  jsEnv                         := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
   javacOptions                  ++= Seq(
     "-encoding", "utf8",
@@ -340,6 +342,7 @@ lazy val common = (crossProject.crossType(CrossType.Full) in file("common"))
     )
   )
   .jsSettings(
+    libraryDependencies += "org.scala-lang.modules" %%  "scala-async" % "0.9.7" % "provided"
   )
 
 lazy val commonJVM = common.jvm
@@ -492,7 +495,7 @@ lazy val formBuilderJVM = formBuilder.jvm
 lazy val formBuilderJS: Project = formBuilder.js
   .dependsOn(
     commonJS,
-    xformsJS  % "test->test;compile->compile",
+    xformsJS % "test->test;compile->compile",
     formRunnerJS
   )
   .settings(
@@ -507,11 +510,8 @@ lazy val formBuilderJS: Project = formBuilder.js
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
-    scalaJSUseMainModuleInitializer in Compile := true,
-    scalaJSUseMainModuleInitializer in Test    := false,
-
-    testOptions         in Test    += Tests.Setup(() ⇒ println("Setup")),
-    testOptions         in Test    += Tests.Cleanup(() ⇒ println("Cleanup")),
+    scalaJSUseMainModuleInitializer in Compile := false,
+    scalaJSUseMainModuleInitializer in Test := false,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,
@@ -589,6 +589,19 @@ lazy val xformsJS: Project = xforms.js
     )
   )
 
+lazy val nodeFacades = (project in file("node-facades"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-node-facades",
+
+    parallelExecution               in Test := false,
+    scalaJSUseMainModuleInitializer in Test := false,
+    jsEnv                           in Test := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+
+    scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
+  )
+
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin, SbtCoffeeScript, SbtWeb)
   .dependsOn(commonJVM, dom, xupdate)
@@ -615,10 +628,13 @@ lazy val core = (project in file("src"))
     libraryDependencies                ++= CoreLibraryDependencies
   )
 
-lazy val orbeonWar = (project in file("orbeon-war"))
+lazy val orbeonWar = (crossProject.crossType(CrossType.Dummy) in file("orbeon-war"))
   .settings(
-    name := "orbeon-war"
+    name := "orbeon-war",
+    exportJars := false
   )
+
+lazy val orbeonWarJVM = orbeonWar.jvm
   .dependsOn(
     commonJVM,
     dom,
@@ -634,6 +650,41 @@ lazy val orbeonWar = (project in file("orbeon-war"))
   )
   .settings(OrbeonWebappPlugin.projectSettings: _*)
   .settings(commonSettings: _*)
+
+
+lazy val orbeonWarJS = orbeonWar.js
+  .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings: _*)
+  .dependsOn(
+    commonJS,
+    xformsJS,
+    nodeFacades
+  )
+  .settings(
+
+    // Poor man's way to pass parameters to the test suite
+    buildInfoPackage               := "org.orbeon.fr",
+    buildInfoObject                := "TestParametersFromSbt",
+    buildInfoKeys                  := Seq[BuildInfoKey](
+      "baseDirectory" → (baseDirectory  in ThisBuild).value.getAbsolutePath
+    ),
+
+    libraryDependencies            ++= Seq(
+      "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
+      "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
+      "fr.hmil"                %%% "roshttp"        % "2.0.2" % Test,
+      "org.scala-lang.modules" %%  "scala-async"    % "0.9.7" % "provided"
+    ),
+
+    parallelExecution               in Test := false,
+    scalaJSUseMainModuleInitializer in Test := false,
+    jsEnv                           in Test := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+    scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
+
+    testOptions                     in Test +=
+      Tests.Setup(() ⇒ OrbeonSupport.dummyDependency((Keys.`package` in orbeonWarJVM).value))
+  )
+
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -652,7 +703,8 @@ lazy val root = (project in file("."))
     portletSupport,
     formRunnerProxyPortlet,
     fullPortlet,
-    orbeonWar
+    orbeonWarJVM,
+    orbeonWarJS
   )
   .settings(
     // TEMP: override so that root project doesn't search under src

@@ -14,6 +14,10 @@
         different technologies, such as XForms and Ajax, with no need for
         client-side software or plug-ins.
     </description>
+    <!-- "A web application that is written so that it can be deployed in a web container distributed
+         across multiple Java virtual machines running on the same host or different hosts." -->
+    <!--Distributable when replication is enabled-->
+    <distributable/>
     <!--Initialize main resource manager-->
     <context-param>
         <param-name>oxf.resources.factory</param-name>
@@ -170,6 +174,10 @@
     <!--Orbeon context listener-->
     <listener>
         <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListener</listener-class>
+    </listener>
+    <!--Context listener for deployment with replication-->
+    <listener>
+        <listener-class>org.orbeon.oxf.xforms.ReplicationServletContextListener</listener-class>
     </listener>
     <!--Orbeon session listener-->
     <listener>

@@ -157,12 +157,12 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
             -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -206,12 +206,12 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
             -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -257,12 +257,12 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars orbeon-war/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
 
             -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -295,8 +295,8 @@
         </exec>
 
         <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
-        <delete file="orbeon-war/target/webapp/WEB-INF/lib/${saxon.jar}"/>
-        <jar destfile="orbeon-war/target/webapp/WEB-INF/lib/${saxon.jar}">
+        <delete file="orbeon-war/jvm/target/webapp/WEB-INF/lib/${saxon.jar}"/>
+        <jar destfile="orbeon-war/jvm/target/webapp/WEB-INF/lib/${saxon.jar}">
             <zipfileset src="lib/runtime/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
         </jar>
 
@@ -327,7 +327,7 @@
 
     <target name="orbeon-dev-war" depends="war-common" description="Create exploded WAR">
         <copy todir="build/orbeon-war">
-            <fileset dir="orbeon-war/target/webapp">
+            <fileset dir="orbeon-war/jvm/target/webapp">
                 <!-- Filter local eXist that that might (but shouldn't) be in there -->
                 <exclude name="WEB-INF/exist-data/**"/>
             </fileset>
@@ -339,7 +339,7 @@
         <mkdir dir="build/distrib"/>
 
         <zip zipfile="build/distrib/${versioned-name}.war">
-            <zipfileset dir="orbeon-war/target/webapp">
+            <zipfileset dir="orbeon-war/jvm/target/webapp">
                 <!-- Filter local eXist that that might (but shouldn't) be in there -->
                 <exclude name="WEB-INF/exist-data/**"/>
             </zipfileset>
@@ -723,7 +723,7 @@
         <!-- http://exist-db.org/ant-tasks.html -->
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
-                <fileset dir="orbeon-war/target/webapp/WEB-INF/lib">
+                <fileset dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
                     <include name="**/*.jar"/>
                 </fileset>
             </classpath>

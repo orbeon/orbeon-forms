@@ -26,6 +26,8 @@ object Caches {
 
   import Private._
 
+  val Logger = LoggerFactory.getLogger("org.orbeon.caches")
+
   def getOrElseThrow(cacheName: String): ehcache.Cache =
     cacheManager.getCache(cacheName) match {
       case cache: ehcache.Cache ⇒
@@ -37,8 +39,6 @@ object Caches {
   private object Private {
 
     val EhcachePath = "oxf:/config/ehcache.xml"
-
-    val Logger = LoggerFactory.getLogger("org.orbeon.caches")
 
     val cacheManager =
       withMessage(

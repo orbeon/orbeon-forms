@@ -40,6 +40,11 @@ before_cache:
 # Tricks to avoid unnecessary cache updates
 - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
 - find $HOME/.sbt -name "*.lock" -delete
+before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y install docker-ce
 install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
@@ -51,5 +56,8 @@ before_script:
 - mysql --protocol=TCP --host=localhost --user root -e "GRANT ALL PRIVILEGES ON *.* TO 'orbeon'@'localhost' WITH GRANT OPTION"
 - createuser --superuser orbeon
 - createdb --owner=orbeon orbeon
+# Download other Docker images
+- if [ "$TARGET" == "test-unit" ]; then docker pull tomcat:8.0; fi
+- if [ "$TARGET" == "test-unit" ]; then docker pull haproxy:1.7; fi
 script:
 - "ant $TARGET"

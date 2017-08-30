@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.state
 import net.sf.ehcache.{Element ⇒ EhElement}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
-import org.orbeon.oxf.util.SecureUtils
+import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.util.Logging._
 
 object EhcacheStateStore extends XFormsStateStore {
 
@@ -34,24 +35,27 @@ object EhcacheStateStore extends XFormsStateStore {
     if (! isInitialState)
       LifecycleLogger.eventAssumingRequest("xforms", "save state", List("uuid" → document.getUUID))
 
-    if (isDebugEnabled)
-      debug(s"store size before storing: $getCurrentSize entries.")
+    val documentUUID = document.getUUID
 
-    val documentUUID      = document.getUUID
-    val sequence          = document.getSequence
-    val staticStateDigest = document.getStaticState.digest
-    val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)
+    withDebug("storing document state", List(
+      "document UUID"             → documentUUID,
+      "store size before storing" → getCurrentSize.toString,
+      "replication"               → XFormsProperties.isReplication.toString
+    )) {
+      val staticStateDigest = document.getStaticState.digest
+      val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)
+      val sequence          = document.getSequence
 
-    def addOrReplaceOne(key: String, value: java.io.Serializable) =
-      Caches.stateCache.put(new EhElement(key, value, sequence))
+      def addOrReplaceOne(key: String, value: java.io.Serializable): Unit =
+        Caches.stateCache.put(new EhElement(key, value, sequence))
 
-    // Mapping (UUID → static state key : dynamic state key
-    addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
+      // Mapping (UUID → static state key : dynamic state key
+      addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
-    // Static and dynamic states
-    // XXX Q: is there a cost to replacing static state? value will be the same!
-    addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState)
-    addOrReplaceOne(dynamicStateKey, DynamicState(document))
+      // Static and dynamic states
+      addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
+      addOrReplaceOne(dynamicStateKey, DynamicState(document))
+    }
   }
 
   def findSequence(documentUUID: String): Option[Long] =
@@ -71,8 +75,7 @@ object EhcacheStateStore extends XFormsStateStore {
       )
     ) {
 
-      if (isDebugEnabled)
-        debug(s"store size before finding: $getCurrentSize entries.")
+      debug(s"store size before finding: $getCurrentSize entries.")
 
       def findOne(key: String) = Option(Caches.stateCache.get(key)) map (_.getObjectValue)
 
@@ -106,15 +109,9 @@ object EhcacheStateStore extends XFormsStateStore {
 
   private object Private {
 
-    val StoreDebugName = "Ehcache"
+    implicit val logger: IndentedLogger = XFormsStateManager.Logger
 
     def createDynamicStateKey(documentUUID: String, isInitialState: Boolean) =
       documentUUID + (if (isInitialState) "-I" else "-C") // key is different for initial vs. subsequent state
-
-    def isDebugEnabled =
-      XFormsStateManager.indentedLogger.isDebugEnabled
-
-    def debug(message: String) =
-      XFormsStateManager.indentedLogger.logDebug("", s"$StoreDebugName store: $message")
   }
 }

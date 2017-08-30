@@ -315,6 +315,9 @@ public class XFormsProperties {
     public static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.javascript-at-bottom";
     public static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
 
+    public static final String REPLICATION_PROPERTY = XFORMS_PROPERTY_PREFIX + "replication";
+    public static final boolean REPLICATION_PROPERTY_DEFAULT = false;
+
     public static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     public static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
@@ -385,6 +388,11 @@ public class XFormsProperties {
     public static boolean isJavaScriptAtBottom() {
         return Properties.instance().getPropertySet().getBoolean
                 (JAVASCRIPT_AT_BOTTOM_PROPERTY, JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT);
+    }
+
+    public static boolean isReplication() {
+        return Properties.instance().getPropertySet().getBoolean
+                (REPLICATION_PROPERTY, REPLICATION_PROPERTY_DEFAULT);
     }
 
     public static boolean getDebugLogXPathAnalysis() {

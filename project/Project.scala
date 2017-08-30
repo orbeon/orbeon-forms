@@ -11,6 +11,8 @@ object OrbeonSupport {
   val MatchJarNameRE               = """(.+)\.jar""".r
   val MatchRawJarNameRE            = """([^_]+)(?:_.*)?\.jar""".r
 
+  def dummyDependency(value: Any) = ()
+
   // This is copied from the sbt source but doesn't seem to be exported publicly
   def myFindUnmanagedJars(config: Configuration, base: File, filter: FileFilter, excl: FileFilter): Classpath = {
     (base * (filter -- excl) +++ (base / config.name).descendantsExcept(filter, excl)).classpath

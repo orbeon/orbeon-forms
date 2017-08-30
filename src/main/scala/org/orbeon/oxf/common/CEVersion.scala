@@ -23,12 +23,12 @@ class CEVersion extends Version {
 
   // Feature is disallowed
   def requirePEFeature(featureName: String): Unit =
-    throw new OXFException("Feature is not enabled in this version of the product: " + featureName)
+    throw new OXFException(featureMessage(featureName))
 
   def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = {
     // Just warn the first time
     if (featureRequested && ! WarnedFeatures.containsKey(featureName)) {
-      logger.warn("Feature is not enabled in this version of the product: " + featureName)
+      logger.warn(featureMessage(featureName))
       WarnedFeatures.put(featureName, ())
     }
     false
@@ -37,4 +37,6 @@ class CEVersion extends Version {
 
 private object CEVersion {
   val WarnedFeatures: ju.Map[String, Unit] = new ConcurrentHashMap[String, Unit]
+  def featureMessage(featureName: String) =
+    s"Feature is not enabled in this version of the product: $featureName"
 }

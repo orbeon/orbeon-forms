@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.{Lock, ReentrantLock}
 
 import org.orbeon.dom.Document
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -25,17 +25,30 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsConstants, XFormsContainingDocument, XFormsProperties}
+
+// Put as separate static class to avoid reference to `XFormsStateManager.this`
+class RemoveDocumentSessionListener(uuid: String) extends ExternalContext.SessionListener {
+  def sessionDestroyed(): Unit = {
+    XFormsStateManager.Logger.logDebug(XFormsStateManager.LogType, "Removing document from cache following session expiration.")
+    // NOTE: This will call `onRemoved()` on the document, and `onRemovedFromCache()` on `XFormsStateManager`.
+    XFormsDocumentCache.remove(uuid)
+  }
+}
 
 object XFormsStateManager extends XFormsStateLifecycle {
 
   import Private._
 
-  private val ReplicationEnabled = false
+  private val ReplicationEnabled = XFormsProperties.isReplication
 
-  def indentedLogger: IndentedLogger = Logger
+  if (ReplicationEnabled)
+     Version.instance.requirePEFeature("State replication")
+
+  val LogType = "state manager"
+  val Logger  = Loggers.getIndentedLogger("state")
 
   // For Java callers
   def instance = XFormsStateManager
@@ -299,9 +312,6 @@ object XFormsStateManager extends XFormsStateLifecycle {
     // strategy without session.
     val ForceSessionCreation = true
 
-    val LogType = "state manager"
-    val Logger = Loggers.getIndentedLogger("state")
-
     val XFormsStateManagerUuidKeyPrefix          = "oxf.xforms.state.manager.uuid-key."
     val XFormsStateManagerListenerStateKeyPrefix = "oxf.xforms.state.manager.session-listeners-key."
 
@@ -348,7 +358,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         Logger.logDebug(LogType, "Document cache enabled. Putting document in cache.")
         XFormsDocumentCache.put(containingDocument)
         if ((isInitialState || ReplicationEnabled) && containingDocument.getStaticState.isServerStateHandling) {
-          // Also store document state (used by browser soft reload, browser back and <xf:reset>)
+          // Also store document state (used by browser soft reload, browser back, `<xf:reset>` and replication)
           Logger.logDebug(LogType, "Storing initial document state.")
           storeDocumentState(containingDocument, isInitialState)
         }
@@ -435,13 +445,8 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
       if (session.getAttribute(listenerSessionKey, ExternalContext.SessionScope.Application).isEmpty) {
         // Remove from cache when session expires
-        val listener = new ExternalContext.SessionListener {
-          def sessionDestroyed(): Unit = {
-            Logger.logDebug(LogType, "Removing document from cache following session expiration.")
-            // NOTE: This will call onRemoved() on the document, and onRemovedFromCache() on XFormsStateManager
-            XFormsDocumentCache.remove(uuid)
-          }
-        }
+        val listener = new RemoveDocumentSessionListener(uuid)
+
         // Add listener
         try {
           session.addListener(listener)

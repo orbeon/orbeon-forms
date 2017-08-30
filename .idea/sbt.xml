@@ -29,8 +29,12 @@
             <option value="$PROJECT_DIR$/form-runner/shared" />
             <option value="$PROJECT_DIR$/full-portlet" />
             <option value="$PROJECT_DIR$/full-portlet/project" />
-            <option value="$PROJECT_DIR$/orbeon-war" />
-            <option value="$PROJECT_DIR$/orbeon-war/project" />
+            <option value="$PROJECT_DIR$/node-facades" />
+            <option value="$PROJECT_DIR$/node-facades/project" />
+            <option value="$PROJECT_DIR$/orbeon-war/js" />
+            <option value="$PROJECT_DIR$/orbeon-war/js/project" />
+            <option value="$PROJECT_DIR$/orbeon-war/jvm" />
+            <option value="$PROJECT_DIR$/orbeon-war/jvm/project" />
             <option value="$PROJECT_DIR$/portlet-support" />
             <option value="$PROJECT_DIR$/portlet-support/project" />
             <option value="$PROJECT_DIR$/project" />

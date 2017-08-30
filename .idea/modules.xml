@@ -27,8 +27,12 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet-build.iml" filepath="$PROJECT_DIR$/.idea/modules/formRunnerProxyPortlet-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/fullPortlet.iml" filepath="$PROJECT_DIR$/.idea/modules/fullPortlet.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/fullPortlet-build.iml" filepath="$PROJECT_DIR$/.idea/modules/fullPortlet-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orbeonWar.iml" filepath="$PROJECT_DIR$/.idea/modules/orbeonWar.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orbeonWar-build.iml" filepath="$PROJECT_DIR$/.idea/modules/orbeonWar-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nodeFacades.iml" filepath="$PROJECT_DIR$/.idea/modules/nodeFacades.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nodeFacades-build.iml" filepath="$PROJECT_DIR$/.idea/modules/nodeFacades-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orbeonWarJS.iml" filepath="$PROJECT_DIR$/.idea/modules/orbeonWarJS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orbeonWarJS-build.iml" filepath="$PROJECT_DIR$/.idea/modules/orbeonWarJS-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orbeonWarJVM.iml" filepath="$PROJECT_DIR$/.idea/modules/orbeonWarJVM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/orbeonWarJVM-build.iml" filepath="$PROJECT_DIR$/.idea/modules/orbeonWarJVM-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/portletSupport.iml" filepath="$PROJECT_DIR$/.idea/modules/portletSupport.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/portletSupport-build.iml" filepath="$PROJECT_DIR$/.idea/modules/portletSupport-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/root.iml" filepath="$PROJECT_DIR$/.idea/modules/root.iml" />

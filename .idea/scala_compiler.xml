@@ -55,7 +55,7 @@
         <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.13.jar" />
       </plugins>
     </profile>
-    <profile name="SBT 5" modules="clientServerSharedJVM,commonSharedJVM,formBuilderSharedJVM,formBuilder,formBuilderSharedJVM,formRunner,commonJVM,dom,embedding,formBuilderJVM,fullPortlet,orbeonWar,portletSupport,formRunnerProxyPortlet,core,xformsJVM,xupdate">
+    <profile name="SBT 5" modules="clientServerSharedJVM,commonSharedJVM,formBuilderSharedJVM,formBuilder,formBuilderSharedJVM,formRunner,orbeonWar,commonJVM,dom,embedding,formBuilderJVM,fullPortlet,orbeonWarJVM,portletSupport,formRunnerProxyPortlet,core,xformsJVM,xupdate">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />
@@ -81,7 +81,7 @@
         <parameter value="utf8" />
       </parameters>
     </profile>
-    <profile name="SBT 8" modules="commonJS,formBuilderJS,formRunnerJS,xformsJS">
+    <profile name="SBT 7" modules="commonJS,formBuilderJS,formRunnerJS,nodeFacades,orbeonWarJS,xformsJS">
       <option name="postfixOps" value="true" />
       <option name="reflectiveCalls" value="true" />
       <option name="implicitConversions" value="true" />
@@ -93,7 +93,7 @@
         <parameter value="utf8" />
       </parameters>
       <plugins>
-        <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.15.jar" />
+        <plugin path="$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-compiler_2.11.8/jars/scalajs-compiler_2.11.8-0.6.19.jar" />
       </plugins>
     </profile>
   </component>

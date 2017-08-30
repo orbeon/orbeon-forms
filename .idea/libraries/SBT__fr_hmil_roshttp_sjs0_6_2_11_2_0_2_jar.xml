@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: fr.hmil:roshttp_sjs0.6_2.11:2.0.2:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/fr.hmil/roshttp_sjs0.6_2.11/jars/roshttp_sjs0.6_2.11-2.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/fr.hmil/roshttp_sjs0.6_2.11/srcs/roshttp_sjs0.6_2.11-2.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

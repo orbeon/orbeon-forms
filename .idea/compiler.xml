@@ -46,7 +46,10 @@
       <module name="formRunnerJVM" target="1.6" />
       <module name="formRunnerProxyPortlet" target="1.6" />
       <module name="fullPortlet" target="1.6" />
+      <module name="nodeFacades" target="1.6" />
       <module name="orbeonWar" target="1.6" />
+      <module name="orbeonWarJS" target="1.6" />
+      <module name="orbeonWarJVM" target="1.6" />
       <module name="portletSupport" target="1.6" />
       <module name="root" target="1.6" />
       <module name="xformsJS" target="1.6" />

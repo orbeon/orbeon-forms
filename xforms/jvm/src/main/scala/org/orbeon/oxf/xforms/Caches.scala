@@ -18,5 +18,4 @@ package org.orbeon.oxf.xforms
 object Caches {
   val stateCache     = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.state")
   val resourcesCache = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.resources")
-  val xblCache       = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.xbl")
 }

@@ -76,15 +76,6 @@
 
     </cache>
 
-    <!-- XForms XBL cache. Only modify if you know what you are doing! -->
-    <cache name="xforms.xbl"
-           maxElementsInMemory="200"
-           memoryStoreEvictionPolicy="LFU"
-           overflowToDisk="false"
-           eternal="false"
-           timeToLiveSeconds="0"
-           timeToIdleSeconds="0"/>
-
     <cacheManagerPeerProviderFactory
         class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
         properties="

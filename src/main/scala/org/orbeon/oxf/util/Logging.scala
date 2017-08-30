@@ -71,3 +71,24 @@ trait Logging {
 }
 
 object Logging extends Logging
+
+trait SLF4JLogging {
+
+  def withDebug[T](message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(body: ⇒ T)(implicit logger: org.slf4j.Logger): T =
+    try {
+      if (logger.isDebugEnabled)
+        logger.debug(
+          s"start $message",
+          parameters collect {
+            case (k, v) if (k ne null) && (v ne null) ⇒ s"""$k: "$v""""
+          } mkString ("{", ", ", "}")
+        )
+
+      body
+    } finally {
+      if (logger.isDebugEnabled)
+        logger.debug(s"end $message")
+    }
+}
+
+object SLF4JLogging extends SLF4JLogging

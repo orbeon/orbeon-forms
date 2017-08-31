@@ -169,25 +169,23 @@ object UploaderClient {
 
         val newlyDisabledElems: List[html.Element] = {
 
-          def isUuidInput (e: html.Input)   = e.name == "$uuid"
-          def isThisUpload(e: html.Element) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
-          def isFieldset  (e: html.Element) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
-          def isDisabled  (e: html.Element) = e.disabled.toOption.contains(true)
+          def isUuidInput      (e: html.Input)   = e.name == "$uuid"
+          def isThisUpload     (e: html.Element) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
+          def isFieldset       (e: html.Element) = e.tagName.toLowerCase == "fieldset" // disabling fieldsets disables nested controls
+          def isDisabled       (e: html.Element) = e.disabled.toOption.contains(true)
 
-          def mustDisableElem (e: html.Element) = ! isThisUpload(e) && ! isFieldset(e) && ! isDisabled(e)
-          def mustDisableInput(e: html.Input)   = ! isUuidInput(e) && mustDisableElem(e)
+          def mustDisableElem  (e: html.Element) = ! isThisUpload(e) && ! isFieldset(e) && ! isDisabled(e)
+          def mustDisableInput (e: html.Input)   = ! isUuidInput(e) && mustDisableElem(e)
 
           def mustDisableFilter(e: html.Element) = e match {
-            case e: html.Input   ⇒ mustDisableInput(e)
-            case e               ⇒ mustDisableElem(e)
+            case e: html.Input ⇒ mustDisableInput(e)
+            case e             ⇒ mustDisableElem(e)
           }
 
           currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter toList
         }
 
         newlyDisabledElems foreach (_.disabled = true)
-
-
 
         // Trigger actual upload through a form POST and start asking server for progress
         YUIConnect.setForm(currentEvent.form, isUpload = true, secureUri = true)

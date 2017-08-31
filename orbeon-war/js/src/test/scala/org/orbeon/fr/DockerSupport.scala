@@ -66,7 +66,6 @@ object DockerSupport {
       Future.successful(runProcessSync(cmd, params))
     } catch {
       case t: Throwable ⇒
-        println(s"xxxx runProcessSyncF failed $t")
         Future.failed(t)
     }
   }

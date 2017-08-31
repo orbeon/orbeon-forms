@@ -166,7 +166,7 @@ object UploaderClient {
 
         import org.scalajs.dom.ext._
 
-        val newlyDisabledElems = {
+        val newlyDisabledElems: List[html.Element] = {
 
           def isUuidInput (e: html.Input)   = e.name == "$uuid"
           def isThisUpload(e: html.Element) = $(e).hasClass(controls.Upload.UploadSelectClass) && $.contains(currentEvent.upload.container, e)
@@ -181,10 +181,12 @@ object UploaderClient {
             case e               ⇒ mustDisableElem(e)
           }
 
-          currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter
+          currentEvent.form.elements.iterator collect { case e: html.Element ⇒ e } filter mustDisableFilter toList
         }
 
         newlyDisabledElems foreach (_.disabled = true)
+
+
 
         // Trigger actual upload through a form POST and start asking server for progress
         YUIConnect.setForm(currentEvent.form, isUpload = true, secureUri = true)

@@ -54,6 +54,7 @@ object FormRunnerWizardAPI {
     repeatIndexes : js.UndefOr[js.Array[Int]] = js.undefined
   ): Unit =
     DocumentAPI.dispatchEvent(new js.Object {
+
       val targetId  = "fr-view-component"
       val eventName = "fr-wizard-focus"
 

@@ -70,14 +70,15 @@ object FormRunnerPersistence {
   val DefaultDataFormatVersion                   = DataFormatVersion400
   val FormRunnerCurrentInternalDataFormatVersion = DataFormatVersion480
 
-  val AllowedDataFormatVersions = Set(DataFormatVersion400, DataFormatVersion480)
+  val AllowedDataFormatVersions                  = Set(DataFormatVersion400, DataFormatVersion480)
 
   val CRUDBasePath                               = "/fr/service/persistence/crud"
   val FormMetadataBasePath                       = "/fr/service/persistence/form"
   val PersistencePropertyPrefix                  = "oxf.fr.persistence"
   val PersistenceProviderPropertyPrefix          = PersistencePropertyPrefix + ".provider"
 
-  val StandardProviderProperties = Set("uri", "autosave", "active", "permissions")
+  val StandardProviderProperties                 = Set("uri", "autosave", "active", "permissions")
+  val AttachmentAttributeNames                   = List("filename", "mediatype", "size")
 
   def findProvider(app: String, form: String, formOrData: FormOrData): Option[String] = {
     val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData.entryName :: Nil mkString "."
@@ -299,8 +300,6 @@ trait FormRunnerPersistence {
           Nil
       }
 
-    val attributeNames = List("filename", "mediatype", "size")
-
     val filenames =
       for {
         holder   ← unsavedAttachmentHolders
@@ -310,7 +309,7 @@ trait FormRunnerPersistence {
 
         setvalue(holder, "")
 
-        attributeNames foreach { attName ⇒
+        AttachmentAttributeNames foreach { attName ⇒
           setvalue(holder /@ attName, "")
         }
 

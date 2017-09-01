@@ -19,7 +19,7 @@ class TestSession(sessionId: String) extends Session {
 
   def expireSession(): Unit = {
     for (listener ← sessionListeners.asScala)
-      listener.sessionDestroyed()
+      listener.sessionDestroyed(this)
     expired = true
   }
 

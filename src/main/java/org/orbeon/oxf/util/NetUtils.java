@@ -634,7 +634,7 @@ public class NetUtils {
         if (session != null) {
             try {
                 session.addListener(new ExternalContext.SessionListener() {
-                    public void sessionDestroyed() {
+                    public void sessionDestroyed(ExternalContext.Session session) {
                         deleteFileItem(fileItem, SESSION_SCOPE, logger);
                     }
                 });
@@ -870,7 +870,7 @@ public class NetUtils {
                 if (session != null) {
                     try {
                         session.addListener(new ExternalContext.SessionListener() {
-                            public void sessionDestroyed() {
+                            public void sessionDestroyed(ExternalContext.Session session) {
                                 deleteFile(newFile, logger);
                             }
                         });

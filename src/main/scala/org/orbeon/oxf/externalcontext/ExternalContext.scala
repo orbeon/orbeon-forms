@@ -158,7 +158,7 @@ object ExternalContext {
   }
 
   trait SessionListener extends java.io.Serializable {
-    def sessionDestroyed()
+    def sessionDestroyed(session: Session)
   }
 
   trait Session {

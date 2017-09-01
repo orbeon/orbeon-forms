@@ -17,6 +17,7 @@ import javax.servlet.ServletException
 import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
 
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
+import org.orbeon.oxf.servlet.ServletSessionImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
 
 import scala.util.control.NonFatal
@@ -81,7 +82,7 @@ class OrbeonSessionListener extends HttpSessionListener {
           listener  ← listeners.iterateRemoveAndClose()
         } locally {
           try {
-            listener.sessionDestroyed()
+            listener.sessionDestroyed(new ServletSessionImpl(httpSession))
           } catch {
             case NonFatal(t) ⇒
               // Catch so we can continue running the remaining listeners

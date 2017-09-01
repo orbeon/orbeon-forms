@@ -656,11 +656,7 @@
             value="frf:clearMissingUnsavedDataAttachmentReturnFilenamesJava(xxf:instance('fr-form-instance'))"/>
 
         <xf:action if="exists($filenames)">
-            <!-- TODO: i18n -->
-            <xf:message>
-                Some file attachments were lost due to a server issue. Please check all your attachments
-                and upload them again if needed.
-            </xf:message>
+            <xf:message ref="xxf:r('detail.messages.lost-attachments', '|fr-fr-resources|')"/>
         </xf:action>
 
 

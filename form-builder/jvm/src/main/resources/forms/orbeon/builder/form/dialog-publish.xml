@@ -41,6 +41,7 @@
         <xf:setvalue ref="instance()/selected-comment"/>
 
         <xf:send submission="fb-read-form-metadata"/>
+        <xf:setfocus control="fb-publish-publish"/>
     </xf:action>
 
     <!-- Switch to display initial / success / error cases -->
@@ -93,6 +94,7 @@
                         <xh:tr>
                             <xh:td>
                                 <xf:select1 ref="instance()/selected-version">
+                                    <xf:label value="$form-resources/dialog-publish/version"/>
                                     <xf:item>
                                         <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, $latest-version + 1)"/>
                                         <xf:value>next</xf:value>
@@ -124,7 +126,6 @@
                                         <xf:setvalue
                                             if="event('xxf:item-value')[. = 'next']"
                                             ref="instance()/selected-comment"/>
-
                                     </xf:action>
 
                                 </xf:select1>
@@ -140,6 +141,13 @@
                             </xh:td>
                         </xh:tr>
                     </xf:group>
+                    <xh:tr>
+                        <xh:td>
+                            <fr:yesno-input ref="instance()/available">
+                                <xf:label value="$form-resources/dialog-publish/available"/>
+                            </fr:yesno-input>
+                        </xh:td>
+                    </xh:tr>
                     <xh:tr>
                         <xh:td>
                             <xf:output
@@ -173,6 +181,13 @@
 
                             <xf:delete
                                 ref="$metadata/version-comment"/>
+                            <xf:delete
+                                ref="$metadata/available"/>
+                            <xf:insert
+                                if="instance()/available = 'false'"
+                                context="$metadata"
+                                ref="*"
+                                origin="xf:element('available', 'false')"/>
 
                             <xf:insert
                                 context="$metadata"
@@ -218,11 +233,24 @@
                     </xh:div>
                 </xf:group>
                 <xf:var name="buttons" value="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]"/>
-                <xf:group ref=".[xxf:is-blank($response) and exists($buttons)]" class="fb-publish-message">
+                <xf:group
+                    ref=".[
+                        xxf:is-blank($response) and
+                        exists($buttons) and
+                        instance()/available = 'true'
+                    ]"
+                    class="fb-publish-message"
+                >
                     <xh:ul>
                         <xf:repeat ref="$buttons">
                             <xh:li>
-                                <xh:a href="/fr/{$app}/{$form}/{.}" target="_blank" id="fb-publish-open-{.}">
+                                <xf:var
+                                    name="version-param"
+                                    value="
+                                        if (instance()/selected-version != 'next')
+                                        then concat('?form-version=', instance()/published-version)
+                                        else ''"/>
+                                <xh:a href="/fr/{$app}/{$form}/{.}{$version-param}" target="_blank">
                                     <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
                                 </xh:a>
                             </xh:li>
@@ -281,6 +309,7 @@
 
                 <latest-version>-1</latest-version>
 
+                <available>true</available>
                 <selected-version>next</selected-version>
                 <selected-comment/>
             </publish>
@@ -357,10 +386,15 @@
                                $version
                            else
                                 1"/>
-
+                <xf:var
+                    name="response-metadata"
+                    value="frf:metadataInstanceRootOpt(event('response-body'))"/>
                 <xf:setvalue
                     ref="instance()/existing-comment"
-                    value="frf:metadataInstanceRootOpt(event('response-body'))/version-comment/string()"/>
+                    value="$response-metadata/version-comment/string()"/>
+                <xf:setvalue
+                    ref="instance()/available"
+                    value="not($response-metadata/available = 'false')"/>
             </xf:action>
 
             <xf:action event="xforms-submit-error" if="event('response-status-code') = (404, 410)">

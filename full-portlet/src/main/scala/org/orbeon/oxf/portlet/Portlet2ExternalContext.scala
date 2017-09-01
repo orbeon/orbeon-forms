@@ -19,7 +19,7 @@ import java.{util ⇒ ju}
 import javax.portlet._
 
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext.{Request, SessionScope}
+import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletPortletRequest, WSRPURLRewriter, WebAppContext}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -27,7 +27,6 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp._
 
 import scala.collection.JavaConverters._
 
@@ -272,58 +271,19 @@ class Portlet2ExternalContext(
       new RequestMap(portletRequest)
   }
 
-  private class SessionImpl(portletSession: PortletSession)
-    extends ExternalContext.Session {
 
-    import PortletSession._
-
-    import SessionListeners._
-
-    // Delegate
-    def getCreationTime                       = portletSession.getCreationTime
-    def getId                                 = portletSession.getId
-    def getLastAccessedTime                   = portletSession.getLastAccessedTime
-    def getMaxInactiveInterval                = portletSession.getMaxInactiveInterval
-    def invalidate()                          = portletSession.invalidate()
-    def isNew                                 = portletSession.isNew
-    def setMaxInactiveInterval(interval: Int) = portletSession.setMaxInactiveInterval(interval)
-
-    def getAttribute(name: String, scope: SessionScope): Option[AnyRef] =
-      Option(portletSession.getAttribute(name, scope.value))
-
-    def setAttribute(name: String, value: AnyRef, scope: SessionScope): Unit =
-      portletSession.setAttribute(name, value, scope.value)
-
-    def removeAttribute(name: String, scope: SessionScope): Unit =
-      portletSession.removeAttribute(name, scope.value)
-
-    def addListener(sessionListener: ExternalContext.SessionListener): Unit =
-      portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
-        case listeners: SessionListeners ⇒ listeners.addListener(sessionListener)
-        case _ ⇒
-          throw new IllegalStateException(
-            "`SessionListeners` object not found in session. `OrbeonSessionListener` might be missing from web.xml."
-          )
-      }
-
-    def removeListener(sessionListener: ExternalContext.SessionListener): Unit =
-      portletSession.getAttribute(SessionListenersKey, APPLICATION_SCOPE) match {
-        case listeners: SessionListeners ⇒ listeners.removeListener(sessionListener)
-        case _ ⇒
-      }
-  }
 
   lazy val getRequest  : ExternalContext.Request  = new RequestImpl
   lazy val getResponse : BufferedResponseImpl     = new BufferedResponseImpl(getRequest)
 
-  private var sessionImplOpt: Option[SessionImpl] = None
+  private var sessionImplOpt: Option[PortletSessionImpl] = None
 
   def getSession(create: Boolean): ExternalContext.Session =
     sessionImplOpt getOrElse {
       val nativeSession = portletRequest.getPortletSession(create)
 
       if (nativeSession ne null) {
-        val newSessionImpl = new SessionImpl(nativeSession)
+        val newSessionImpl = new PortletSessionImpl(nativeSession)
         sessionImplOpt = Some(newSessionImpl)
         newSessionImpl
       } else

@@ -5,7 +5,7 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 //import sbtcross.{crossProject, CrossType} // until Scala.js 1.0.0 is released
 
-val DefaultOrbeonFormsVersion     = "2016.3-SNAPSHOT"
+val DefaultOrbeonFormsVersion     = "2017.2-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 val ScalaJsDomVersion             = "0.9.0"

@@ -69,9 +69,6 @@ case class DynamicState(
 
   def decodeInstancesControls      = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
 
-  // For tests only
-  def copyUpdateSequence(sequence: Int) = copy(sequence = sequence)
-
   // Encode to a string representation
   def encodeToString(compress: Boolean, isForceEncryption: Boolean): String =
     EncodeDecode.encodeBytes(

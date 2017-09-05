@@ -50,7 +50,7 @@ trait XFormsStateStore {
 
 trait XFormsStateLifecycle {
 
-  def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): String
+  def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): Option[String]
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String]
   def afterInitialResponse(containingDocument: XFormsContainingDocument, template: AnnotatedTemplate, disableDocumentCache: Boolean): Unit
 
@@ -71,7 +71,4 @@ trait XFormsStateLifecycle {
   def onAddedToCache(uuid: String): Unit
   def onRemovedFromCache(uuid: String): Unit
   def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit
-
-  def getClientEncodedDynamicStateJava(containingDocument: XFormsContainingDocument): String =
-    getClientEncodedDynamicState(containingDocument).orNull
 }

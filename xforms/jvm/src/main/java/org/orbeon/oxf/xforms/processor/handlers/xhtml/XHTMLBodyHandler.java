@@ -142,20 +142,16 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             // - noscript mode: we don't (and can't) retry
             //
             // NOTE: Keep empty static state and dynamic state until client is able to deal without them
-            final String clientEncodedStaticState = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
-//            if (clientEncodedStaticState != null) {
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                        "type", "hidden", "name", "$static-state",
-                        "value", clientEncodedStaticState
-                });
-//            }
+            final Option<String> clientEncodedStaticStateOpt = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                    "type", "hidden", "name", "$static-state",
+                    "value", clientEncodedStaticStateOpt.isDefined() ? clientEncodedStaticStateOpt.get() : null
+            });
             final Option<String> clientEncodedDynamicStateOpt = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
-//            if (clientEncodedDynamicState != null) {
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                        "type", "hidden", "name", "$dynamic-state",
-                        "value", clientEncodedDynamicStateOpt.isDefined() ? clientEncodedDynamicStateOpt.get() : null
-                });
-//            }
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                    "type", "hidden", "name", "$dynamic-state",
+                    "value", clientEncodedDynamicStateOpt.isDefined() ? clientEncodedDynamicStateOpt.get() : null
+            });
         }
 
         if (!xformsHandlerContext.isNoScript()) {

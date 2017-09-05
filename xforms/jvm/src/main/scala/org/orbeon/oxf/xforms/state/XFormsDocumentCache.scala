@@ -29,6 +29,9 @@ object XFormsDocumentCache {
   def take(uuid: String): Option[XFormsContainingDocument] =
     Option(cache.takeValid(createCacheKey(uuid), ConstantValidity).asInstanceOf[XFormsContainingDocument])
 
+  def peekForTests(uuid: String): Option[XFormsContainingDocument] =
+    Option(cache.findValid(createCacheKey(uuid), ConstantValidity).asInstanceOf[XFormsContainingDocument])
+
   // Remove a document from the cache. This does NOT cause the document state to be serialized to store.
   def remove(uuid: String): Unit =
     cache.remove(createCacheKey(uuid))

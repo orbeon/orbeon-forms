@@ -13,11 +13,14 @@
   */
 package org.orbeon.oxf.xforms
 
+import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
 import javax.servlet.{ServletContextEvent, ServletContextListener}
 
 import org.orbeon.oxf.cache
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.servlet.ServletSessionImpl
 import org.orbeon.oxf.util.SLF4JLogging._
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 class ReplicationServletContextListener extends ServletContextListener {
 
@@ -28,4 +31,13 @@ class ReplicationServletContextListener extends ServletContextListener {
     }
 
   def contextDestroyed(servletContextEvent: ServletContextEvent) = ()
+}
+
+class XFormsServletContextListener extends HttpSessionListener {
+
+  def sessionCreated(httpSessionEvent: HttpSessionEvent): Unit =
+    XFormsStateManager.sessionCreated(new ServletSessionImpl(httpSessionEvent.getSession))
+
+  def sessionDestroyed(httpSessionEvent: HttpSessionEvent): Unit =
+    XFormsStateManager.sessionDestroyed(new ServletSessionImpl(httpSessionEvent.getSession))
 }

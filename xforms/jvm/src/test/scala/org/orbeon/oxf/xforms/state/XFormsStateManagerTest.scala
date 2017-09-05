@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.oxf.externalcontext.TestSession
+import org.orbeon.oxf.externalcontext.{ExternalContext, TestSession}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, SecureUtils}
@@ -43,26 +43,49 @@ class XFormsStateManagerTest
       }
   }
 
+  def ensureExternalContextAndSession(): ExternalContext.Session = {
+    setupResourceManagerTestPipelineContext()
+    Option(NetUtils.getSession(false)) getOrElse {
+      val newSession = NetUtils.getSession(true)
+      XFormsStateManager.sessionCreated(newSession) // simulate listener
+      newSession
+    }
+  }
+
   describe("Session listener") {
     it("must remove the UUID when the session expires") {
-      // Create document
-      val session     = NetUtils.getSession(true)
-      val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml")
-      val document    = new XFormsContainingDocument(staticState, null, null, true)
 
-      XFormsStateManager.afterInitialResponse(document, null, disableDocumentCache = false)
+      val session = ensureExternalContextAndSession()
 
-      // Check the UUID is present in the UUID list in the session
-      assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(document.getUUID))
+      def createDoc() = {
 
-      // Test that the document is in cache
-      assert(document eq XFormsDocumentCache.take(document.getUUID).get)
+        val doc =
+          new XFormsContainingDocument(
+            XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml"),
+            null,
+            null,
+            true
+          )
+
+        XFormsStateManager.afterInitialResponse(doc, null, disableDocumentCache = false)
+
+        doc
+      }
+
+      val docs = List(createDoc(), createDoc())
+
+      docs foreach { doc ⇒
+        assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.getUUID))
+        assert(doc eq XFormsDocumentCache.peekForTests(doc.getUUID).get)
+      }
 
       // Expire session
-      session.asInstanceOf[TestSession].expireSession()
+      XFormsStateManager.sessionDestroyed(session)
 
       // Test that the document is no longer in cache
-      assert(XFormsDocumentCache.take(document.getUUID).isEmpty)
+      docs foreach { doc ⇒
+        assert(XFormsDocumentCache.take(doc.getUUID).isEmpty)
+      }
     }
   }
 
@@ -87,7 +110,7 @@ class XFormsStateManagerTest
 
     def testClient(isCache: Boolean, formFile: String): Unit = {
 
-      setupResourceManagerTestPipelineContext()
+      ensureExternalContextAndSession()
 
       val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
@@ -95,7 +118,6 @@ class XFormsStateManagerTest
       val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
 
       locally {
-        NetUtils.getSession(true) // make sure a session is in place as it is used by the state manager
 
         assert(state1.uuid.length === SecureUtils.HexIdLength)
         assertNonEmptyClientState(state1)
@@ -149,11 +171,9 @@ class XFormsStateManagerTest
 
     def testServer(isCache: Boolean, formFile: String): Unit = {
 
-      setupResourceManagerTestPipelineContext()
+      ensureExternalContextAndSession()
 
       val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
-
-      NetUtils.getSession(true)
 
       val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
 

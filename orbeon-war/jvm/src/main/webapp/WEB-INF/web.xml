@@ -179,7 +179,11 @@
     <listener>
         <listener-class>org.orbeon.oxf.xforms.ReplicationServletContextListener</listener-class>
     </listener>
-    <!--Orbeon session listener-->
+    <!--XForms session listener-->
+    <listener>
+        <listener-class>org.orbeon.oxf.xforms.XFormsServletContextListener</listener-class>
+    </listener>
+    <!--General-purpose session listener-->
     <listener>
         <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListener</listener-class>
     </listener>

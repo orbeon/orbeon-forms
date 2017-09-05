@@ -40,9 +40,14 @@ case class RequestParameters(
 
 trait XFormsStateLifecycle {
 
-  def getClientEncodedStaticState(containingDocument: XFormsContainingDocument): Option[String]
+  def getClientEncodedStaticState (containingDocument: XFormsContainingDocument): Option[String]
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String]
-  def afterInitialResponse(containingDocument: XFormsContainingDocument, template: AnnotatedTemplate, disableDocumentCache: Boolean): Unit
+
+  def afterInitialResponse(
+    containingDocument   : XFormsContainingDocument,
+    template             : AnnotatedTemplate,
+    disableDocumentCache : Boolean
+  ): Unit
 
   def findOrRestoreDocument(
     parameters           : RequestParameters,
@@ -51,14 +56,16 @@ trait XFormsStateLifecycle {
     disableDocumentCache : Boolean
   ): XFormsContainingDocument
 
-  def acquireDocumentLock(uuid: String, timeout: Long): Option[Lock]
-  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument
-  def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit
-  def afterUpdateResponse(containingDocument: XFormsContainingDocument): Unit
-  def afterUpdate(containingDocument: XFormsContainingDocument, keepDocument: Boolean, disableDocumentCache: Boolean): Unit
-  def releaseDocumentLock(lock: Lock): Unit
+  def acquireDocumentLock (uuid: String, timeout: Long): Option[Lock]
+  def beforeUpdate        (parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument
 
-  def onAddedToCache(uuid: String): Unit
-  def onRemovedFromCache(uuid: String): Unit
-  def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit
+  def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit
+  def afterUpdateResponse (containingDocument: XFormsContainingDocument): Unit
+  def afterUpdate         (containingDocument: XFormsContainingDocument, keepDocument: Boolean, disableDocumentCache: Boolean): Unit
+
+  def releaseDocumentLock (lock: Lock): Unit
+
+  def onAddedToCache      (uuid: String): Unit
+  def onRemovedFromCache  (uuid: String): Unit
+  def onEvictedFromCache  (containingDocument: XFormsContainingDocument): Unit
 }

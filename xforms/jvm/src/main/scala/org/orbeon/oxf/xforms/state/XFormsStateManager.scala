@@ -50,6 +50,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
   def sessionDestroyed(session: ExternalContext.Session): Unit = {
     XFormsStateManager.getOrCreateUuidListInSession(session).iterator.asScala foreach { uuid ⇒
       XFormsDocumentCache.remove(uuid)
+      EhcacheStateStore.removeDynamicState(uuid)
     }
   }
 

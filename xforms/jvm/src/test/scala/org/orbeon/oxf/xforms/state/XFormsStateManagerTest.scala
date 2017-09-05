@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.oxf.externalcontext.{ExternalContext, TestSession}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, SecureUtils}

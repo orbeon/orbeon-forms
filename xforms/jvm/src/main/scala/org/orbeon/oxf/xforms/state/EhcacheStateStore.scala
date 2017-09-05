@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.util.Logging._
 
-object EhcacheStateStore extends XFormsStateStore {
+object EhcacheStateStore {
 
   import Private._
 
@@ -103,6 +103,13 @@ object EhcacheStateStore extends XFormsStateStore {
           None
       }
     }
+
+  // NOTE: Don't remove the static state as it might be in use by other form sessions.
+  def removeDynamicState(documentUUID: String): Unit = {
+    Caches.stateCache.remove(documentUUID)
+    Caches.stateCache.remove(createDynamicStateKey(documentUUID, isInitialState = true))
+    Caches.stateCache.remove(createDynamicStateKey(documentUUID, isInitialState = false))
+  }
 
   def getMaxSize     : Long = Caches.stateCache.getCacheConfiguration.getMaxEntriesLocalHeap
   def getCurrentSize : Long = Caches.stateCache.getMemoryStoreSize

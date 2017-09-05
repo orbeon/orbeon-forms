@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.state
 
 import java.util.concurrent.locks.Lock
 
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 // Encoded combination of static an dynamic state that fully represents an XForms document's current state
@@ -37,15 +36,6 @@ case class RequestParameters(
     (encodedClientStaticStateOpt.isDefined && encodedClientDynamicStateOpt.isDefined) ||
       (encodedClientStaticStateOpt.isEmpty && encodedClientDynamicStateOpt.isEmpty)
   )
-}
-
-trait XFormsStateStore {
-
-  def storeDocumentState(containingDocument: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean): Unit
-  def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): Option[XFormsState]
-
-  def getMaxSize     : Long
-  def getCurrentSize : Long
 }
 
 trait XFormsStateLifecycle {

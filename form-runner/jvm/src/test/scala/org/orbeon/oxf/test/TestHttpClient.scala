@@ -138,7 +138,7 @@ object TestHttpClient {
             override def getSession(create: Boolean): Session =
               session getOrElse {
                 if (create) {
-                  val newSession = new TestSession(SecureUtils.randomHexId)
+                  val newSession = new SimpleSession(SecureUtils.randomHexId)
                   session = Some(newSession)
                   newSession
                 } else {

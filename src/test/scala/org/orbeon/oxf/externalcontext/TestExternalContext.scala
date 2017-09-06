@@ -351,7 +351,7 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
 
   def getSession(create: Boolean): Session = {
     if ((session eq null) && create)
-      session = new TestSession(SecureUtils.randomHexId)
+      session = new SimpleSession(SecureUtils.randomHexId)
     session
   }
 

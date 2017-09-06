@@ -20,7 +20,7 @@ import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
-import org.orbeon.oxf.externalcontext.{ExternalContext, TestSession}
+import org.orbeon.oxf.externalcontext.{ExternalContext, SimpleSession}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.orbeon.oxf.util.Multipart._
@@ -104,7 +104,7 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
     for (limit ← MustSucceedWithLimits) {
       describe(s"with limit $limit") {
 
-        val session = new TestSession(SecureUtils.randomHexId)
+        val session = new SimpleSession(SecureUtils.randomHexId)
 
         it("must return UUID and file result") {
           assert((expectedPairs, None) === newRead(session, limit))
@@ -131,7 +131,7 @@ class MultipartTest extends ResourceManagerSupport with FunSpecLike {
     for (limit ← MustFailWithLimits) {
       describe(s"with limit $limit") {
 
-        val session = new TestSession(SecureUtils.randomHexId)
+        val session = new SimpleSession(SecureUtils.randomHexId)
 
         it("must return just the UUID") {
           assert(

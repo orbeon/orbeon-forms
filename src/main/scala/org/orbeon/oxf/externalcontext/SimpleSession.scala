@@ -8,8 +8,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Session, SessionListener,
 import scala.collection.JavaConverters._
 import scala.collection.{immutable ⇒ i}
 
-// TODO: Check if different from SimpleExternalContext.SessionImpl!
-class TestSession(sessionId: String) extends Session {
+class SimpleSession(sessionId: String) extends Session {
 
   private val creationTime     = System.currentTimeMillis
   private val sessionListeners = new ju.LinkedHashSet[SessionListener]
@@ -71,8 +70,8 @@ class TestSession(sessionId: String) extends Session {
     0
   }
 
-// TODO
-    def invalidate(): Unit = {
+  // TODO
+  def invalidate(): Unit = {
     checkExpired()
   }
 

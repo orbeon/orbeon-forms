@@ -37,7 +37,7 @@ abstract class SimpleExternalContext extends ExternalContext {
   private   val webAppContext = new TestWebAppContext(SimpleExternalContext.Logger, m.LinkedHashMap[String, AnyRef]())
   protected var request       = new RequestImpl
   protected var response      = new ResponseImpl
-  protected val session       = new SessionImpl
+  protected val session       = new SimpleSession(SecureUtils.randomHexId)
 
   protected class RequestImpl extends Request {
 
@@ -124,26 +124,6 @@ abstract class SimpleExternalContext extends ExternalContext {
     def setTitle(title: String)                                                       = ()
 
     def getNativeResponse: AnyRef                                                     = null
-  }
-
-  protected class SessionImpl extends Session {
-
-    protected var sessionAtts = i.HashMap[String, AnyRef]()
-
-    val getCreationTime                                                               = System.currentTimeMillis
-    val getId                                                                         = SecureUtils.randomHexId
-    val getLastAccessedTime                                                           = 0L
-    val getMaxInactiveInterval                                                        = 0
-    def invalidate(): Unit                                                            = sessionAtts = i.HashMap[String, AnyRef]()
-    val isNew                                                                         = false
-    def setMaxInactiveInterval(interval: Int)                                         = ()
-
-    def addListener(sessionListener: SessionListener)                                 = ()
-    def removeListener(sessionListener: SessionListener)                              = ()
-
-    def getAttribute(name: String, scope: SessionScope): Option[AnyRef]               = sessionAtts.get(name)
-    def setAttribute(name: String, value: AnyRef, scope: SessionScope): Unit          = sessionAtts += name → value
-    def removeAttribute(name: String, scope: SessionScope): Unit                      = sessionAtts -= name
   }
 
   def getWebAppContext: WebAppContext                                                 = webAppContext

@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.SimplePath._
 import org.scalatest.junit.AssertionsForJUnit
 
 // NOTE: Test this in the `form-builder` module as we depend on Form Builder's `resources.xml`.
@@ -100,8 +101,6 @@ class ResourcesPatcherTest extends DocumentTestBase with AssertionsForJUnit {
   }
 
   @Test def testResourcesConsistency(): Unit = {
-
-    import org.orbeon.scaxon.SimplePath._
 
     def hasLang(lang: String)(e: NodeInfo) = (e attValue "*:lang") == "en"
 

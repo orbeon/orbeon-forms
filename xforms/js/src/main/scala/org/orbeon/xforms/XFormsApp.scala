@@ -13,12 +13,10 @@
  */
 package org.orbeon.xforms
 
-import scala.scalajs.js.JSApp
-
 // Scala.js starting point for XForms
-object XFormsApp extends JSApp {
+object XFormsApp {
 
-  override def main(): Unit = {
+  def main(args: Array[String]): Unit = {
 
     def initializeOnDomReady(): Unit = {
       Upload

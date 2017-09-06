@@ -16,19 +16,17 @@ package org.orbeon.fr
 import org.orbeon.xbl.{DndRepeat, HrefButton, TreeSelect1, WPaint}
 import org.orbeon.xforms.{$, XFormsApp}
 
-import scala.scalajs.js.JSApp
-
 // Scala.js starting point for Form Runner
-object FormRunnerApp extends JSApp {
+object FormRunnerApp {
 
-  override def main(): Unit = {
+  def main(args: Array[String]): Unit = {
 
     def initializeOnDomReady(): Unit = {
       DndRepeat
       TreeSelect1
       WPaint
       HrefButton
-      XFormsApp.main()
+      XFormsApp.main(Array.empty)
     }
 
     $(initializeOnDomReady _)

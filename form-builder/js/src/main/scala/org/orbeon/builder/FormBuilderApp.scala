@@ -16,15 +16,13 @@ package org.orbeon.builder
 import org.orbeon.fr._
 import org.orbeon.xforms.$
 
-import scala.scalajs.js.JSApp
-
 // Scala.js starting point for Form Builder
-object FormBuilderApp extends JSApp {
+object FormBuilderApp {
 
-  override def main(): Unit = {
+  def main(args: Array[String]): Unit = {
 
     def initializeOnDomReady(): Unit = {
-      FormRunnerApp.main()
+      FormRunnerApp.main(Array.empty)
       StaticUpload
       DialogItemset
       ControlDnD

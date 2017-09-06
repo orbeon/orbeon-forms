@@ -21,6 +21,14 @@
         /forms/orbeon/builder/resources/form-builder.css
     </property>
 
+    <!-- Override this so that `orbeon-form-runner.js` is not included -->
+    <property as="xs:string"  name="oxf.fr.js.uri.orbeon.builder"/>
+
+    <!-- Re-add `orbeon-form-runner.js` for the Form Builder Summary page -->
+    <property as="xs:string"  name="oxf.fr.summary.js.uri.orbeon.builder">
+        /apps/fr/resources/scalajs/orbeon-form-runner.js
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.js.uri.orbeon.builder">
         /forms/orbeon/builder/resources/cell/events.min.js
         /forms/orbeon/builder/resources/cell/action-icons.min.js

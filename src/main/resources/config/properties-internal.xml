@@ -154,6 +154,7 @@
         /apps/fr/style/form-runner-base.css
         /apps/fr/style/form-runner-orbeon.css
     </property>
+    <!-- WARNING: Check `properties-form-builder.xml` for overrides when changing this. -->
     <property as="xs:string"  name="oxf.fr.js.uri.*.*">
         /apps/fr/resources/scalajs/orbeon-form-runner.js
     </property>
@@ -165,6 +166,10 @@
     <property as="xs:string"  name="oxf.fr.detail.js.uri.*.*">
         /apps/fr/script/form-runner.min.js
     </property>
+
+    <!-- Additional CSS/JavaScript for the summary page -->
+    <property as="xs:string"  name="oxf.fr.summary.css.uri.*.*"/>
+    <property as="xs:string"  name="oxf.fr.summary.js.uri.*.*"/>
 
     <!-- PDF template formatting -->
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->

@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{NetUtils, SecureUtils}
@@ -43,48 +42,41 @@ class XFormsStateManagerTest
       }
   }
 
-  def ensureExternalContextAndSession(): ExternalContext.Session = {
-    setupResourceManagerTestPipelineContext()
-    Option(NetUtils.getSession(false)) getOrElse {
-      val newSession = NetUtils.getSession(true)
-      XFormsStateManager.sessionCreated(newSession) // simulate listener
-      newSession
-    }
-  }
-
   describe("Session listener") {
     it("must remove the UUID when the session expires") {
+      withTestExternalContext {
 
-      val session = ensureExternalContextAndSession()
+        val session = NetUtils.getSession(true)
 
-      def createDoc() = {
+        def createDoc() = {
 
-        val doc =
-          new XFormsContainingDocument(
-            XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml"),
-            null,
-            null,
-            true
-          )
+          val doc =
+            new XFormsContainingDocument(
+              XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml"),
+              null,
+              null,
+              true
+            )
 
-        XFormsStateManager.afterInitialResponse(doc, null, disableDocumentCache = false)
+          XFormsStateManager.afterInitialResponse(doc, null, disableDocumentCache = false)
 
-        doc
-      }
+          doc
+        }
 
-      val docs = List(createDoc(), createDoc())
+        val docs = List(createDoc(), createDoc())
 
-      docs foreach { doc ⇒
-        assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.getUUID))
-        assert(doc eq XFormsDocumentCache.peekForTests(doc.getUUID).get)
-      }
+        docs foreach { doc ⇒
+          assert(XFormsStateManager.getOrCreateUuidListInSession(session).contains(doc.getUUID))
+          assert(doc eq XFormsDocumentCache.peekForTests(doc.getUUID).get)
+        }
 
-      // Expire session
-      XFormsStateManager.sessionDestroyed(session)
+        // Expire session
+        XFormsStateManager.sessionDestroyed(session)
 
-      // Test that the document is no longer in cache
-      docs foreach { doc ⇒
-        assert(XFormsDocumentCache.take(doc.getUUID).isEmpty)
+        // Test that the document is no longer in cache
+        docs foreach { doc ⇒
+          assert(XFormsDocumentCache.take(doc.getUUID).isEmpty)
+        }
       }
     }
   }
@@ -109,116 +101,120 @@ class XFormsStateManagerTest
     }
 
     def testClient(isCache: Boolean, formFile: String): Unit = {
+      withTestExternalContext {
 
-      ensureExternalContextAndSession()
+        NetUtils.getSession(true)
 
-      val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
+        val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
-      // Initialize document and get initial document state
-      val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
+        // Initialize document and get initial document state
+        val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
 
-      locally {
+        locally {
 
-        assert(state1.uuid.length === SecureUtils.HexIdLength)
-        assertNonEmptyClientState(state1)
+          assert(state1.uuid.length === SecureUtils.HexIdLength)
+          assertNonEmptyClientState(state1)
 
-        // Initial response sent
-        state1.document.afterInitialResponse()
-        XFormsStateManager.afterInitialResponse(state1.document, null, ! isCache)
-      }
+          // Initial response sent
+          state1.document.afterInitialResponse()
+          XFormsStateManager.afterInitialResponse(state1.document, null, ! isCache)
+        }
 
-      assert(state1.dynamicStateString map getSequenceNumber contains 1)
+        assert(state1.dynamicStateString map getSequenceNumber contains 1)
 
-      // Run update
-      val state2 = doUpdate(isCache, state1, doc ⇒
-        List(
-          new XXFormsValueEvent(
-            doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
-            "gaga"
+        // Run update
+        val state2 = doUpdate(isCache, state1, doc ⇒
+          List(
+            new XXFormsValueEvent(
+              doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
+              "gaga"
+            )
           )
         )
-      )
 
-      // UUID and static state can't change
-      assert(state1.uuid === state2.uuid)
-      assert(state1.staticStateString === state2.staticStateString)
+        // UUID and static state can't change
+        assert(state1.uuid === state2.uuid)
+        assert(state1.staticStateString === state2.staticStateString)
 
-      // Sequence must be updated
-      assert(state2.dynamicStateString map getSequenceNumber contains 2)
+        // Sequence must be updated
+        assert(state2.dynamicStateString map getSequenceNumber contains 2)
 
-      // Dynamic state must have changed
-      assert((state1.dynamicStateString map stripSequenceNumber) != (state2.dynamicStateString map stripSequenceNumber))
+        // Dynamic state must have changed
+        assert((state1.dynamicStateString map stripSequenceNumber) != (state2.dynamicStateString map stripSequenceNumber))
 
-      val state3 = doUpdate(isCache, state2, _ ⇒ Nil)
+        val state3 = doUpdate(isCache, state2, _ ⇒ Nil)
 
-      assert(state1.uuid === state3.uuid)
-      assert(state1.staticStateString === state3.staticStateString)
-      assert(state3.dynamicStateString map getSequenceNumber contains 3)
+        assert(state1.uuid === state3.uuid)
+        assert(state1.staticStateString === state3.staticStateString)
+        assert(state3.dynamicStateString map getSequenceNumber contains 3)
 
-      // Dynamic state must NOT have changed because no event was dispatched
-      assert((state2.dynamicStateString map stripSequenceNumber) === (state3.dynamicStateString map stripSequenceNumber))
+        // Dynamic state must NOT have changed because no event was dispatched
+        assert((state2.dynamicStateString map stripSequenceNumber) === (state3.dynamicStateString map stripSequenceNumber))
 
-      // Get back to initial state
-      val state4 = getInitialState(state1, isCache)
+        // Get back to initial state
+        val state4 = getInitialState(state1, isCache)
 
-      assert(state1.uuid === state4.uuid)
-      assert(state1.staticStateString === state4.staticStateString)
-      assert(state4.dynamicStateString map getSequenceNumber contains 1)
+        assert(state1.uuid === state4.uuid)
+        assert(state1.staticStateString === state4.staticStateString)
+        assert(state4.dynamicStateString map getSequenceNumber contains 1)
 
-      // Make sure we found the initial dynamic state
-      assert((state1.dynamicStateString map stripSequenceNumber) === (state4.dynamicStateString map stripSequenceNumber))
+        // Make sure we found the initial dynamic state
+        assert((state1.dynamicStateString map stripSequenceNumber) === (state4.dynamicStateString map stripSequenceNumber))
+      }
     }
 
     def testServer(isCache: Boolean, formFile: String): Unit = {
+      withTestExternalContext {
 
-      ensureExternalContextAndSession()
+        NetUtils.getSession(true)
 
-      val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
+        val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
-      val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
+        val state1 = TestState(new XFormsContainingDocument(staticState, null, null, true))
 
-      val initialDynamicStateString = {
-        assert(state1.uuid.length === SecureUtils.HexIdLength)
-        assertEmptyClientState(state1)
+        val initialDynamicStateString = {
+          assert(state1.uuid.length === SecureUtils.HexIdLength)
+          assertEmptyClientState(state1)
 
-        state1.document.afterInitialResponse()
-        XFormsStateManager.afterInitialResponse(state1.document, null, ! isCache)
+          state1.document.afterInitialResponse()
+          XFormsStateManager.afterInitialResponse(state1.document, null, ! isCache)
 
-        DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState, isForceEncryption = false)
-      }
+          DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState, isForceEncryption = false)
+        }
 
-      assert(1 === state1.document.getSequence)
+        assert(1 === state1.document.getSequence)
 
-      val state2 = doUpdate(isCache, state1, doc ⇒
-        List(
-          new XXFormsValueEvent(
-            doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
-            "gaga"
+        val state2 = doUpdate(isCache, state1, doc ⇒
+          List(
+            new XXFormsValueEvent(
+              doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
+              "gaga"
+            )
           )
         )
-      )
 
-      // UUID can't change
-      assert(state1.uuid === state2.uuid)
-      assert(2 === state2.document.getSequence)
+        // UUID can't change
+        assert(state1.uuid === state2.uuid)
+        assert(2 === state2.document.getSequence)
 
-      assertEmptyClientState(state2)
+        assertEmptyClientState(state2)
 
-      val state3 = doUpdate(isCache, state2, _ ⇒ Nil)
+        val state3 = doUpdate(isCache, state2, _ ⇒ Nil)
 
-      assert(state1.uuid === state3.uuid)
-      assert(3 === state3.document.getSequence)
-      assertEmptyClientState(state3)
+        assert(state1.uuid === state3.uuid)
+        assert(3 === state3.document.getSequence)
+        assertEmptyClientState(state3)
 
-      val state4 = getInitialState(state1, isCache)
+        val state4 = getInitialState(state1, isCache)
 
-      assert(state1.uuid === state4.uuid)
-      assert(1 === state4.document.getSequence)
-      assertEmptyClientState(state4)
-      assert(
-        stripSequenceNumber(initialDynamicStateString) ===
-          stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState, isForceEncryption = false))
-      )
+        assert(state1.uuid === state4.uuid)
+        assert(1 === state4.document.getSequence)
+        assertEmptyClientState(state4)
+        assert(
+          stripSequenceNumber(initialDynamicStateString) ===
+            stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState, isForceEncryption = false))
+        )
+      }
     }
 
     def doUpdate(isCache: Boolean, state1: TestState, callback: XFormsContainingDocument ⇒ List[XFormsEvent]) = {

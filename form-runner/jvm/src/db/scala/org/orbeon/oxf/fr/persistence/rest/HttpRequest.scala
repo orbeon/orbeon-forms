@@ -80,7 +80,7 @@ private object HttpRequest {
     val content = messageBody map
       (StreamedContent.fromBytes(_, contentType))
 
-    val (_, httpResponse, _) =
+    val (_, httpResponse, _, _) =
       TestHttpClient.connect(
         url          = documentURL,
         method       = method,

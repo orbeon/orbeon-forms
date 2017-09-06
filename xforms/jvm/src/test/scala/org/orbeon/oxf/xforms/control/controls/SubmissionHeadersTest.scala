@@ -13,20 +13,21 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.common.Version
 import org.junit._
-import org.scalatest.junit._
+import org.orbeon.dom
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.DocumentTestBase
-import collection.mutable.LinkedHashMap
-import collection.JavaConverters._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.scalatest.junit._
+
+import scala.collection.mutable.LinkedHashMap
 
 class SubmissionHeadersTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def outputHeaders() {
+  @Test def outputHeaders(): Unit = {
     Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
-    this setupDocument
+    val doc: dom.Document =
       <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
            xmlns:xh="http://www.w3.org/1999/xhtml"
            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -107,13 +108,17 @@ class SubmissionHeadersTest extends DocumentTestBase with AssertionsForJUnit {
       )
     )
 
-    // Test that everything matches
-    for {
-      (controlId, expectedHeaders) ← expected
-      control = getValueControl(controlId).asInstanceOf[XFormsOutputControl]
-      actualHeaders = control.evaluatedHeaders
-      (expectedHeaderName, expectedHeaderValues) ← expectedHeaders
-    } yield
-      assert(expectedHeaderValues === actualHeaders(expectedHeaderName).toSeq)
+    withXFormsDocument(doc) { xfcd ⇒
+
+      // Test that everything matches
+      for {
+        (controlId, expectedHeaders) ← expected
+        control = getValueControl(controlId).asInstanceOf[XFormsOutputControl]
+        actualHeaders = control.evaluatedHeaders
+        (expectedHeaderName, expectedHeaderValues) ← expectedHeaders
+      } locally {
+        assert(expectedHeaderValues === actualHeaders(expectedHeaderName).toSeq)
+      }
+    }
   }
 }

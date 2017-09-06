@@ -45,74 +45,21 @@ public abstract class ResourceManagerTestBase {
 
     public ResourceManagerTestBase() {}
 
-    private static boolean staticSetupDone;
-
     @BeforeClass
     public static void staticSetup() throws Exception {
-        if (! staticSetupDone) {
-
-            // Avoid Log4j warning telling us no appender could be found
-            LoggerFactory.initBasicLogger();
-
-            // Setup resource manager
-            final Map<String, Object> props = new HashMap<String, Object>();
-            final java.util.Properties properties = System.getProperties();
-            for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
-                final String name = (String) e.nextElement();
-                if (name.startsWith("oxf.resources."))
-                    props.put(name, properties.getProperty(name));
-            }
-
-            logger.info("Initializing Resource Manager with: " + ResourceManagerWrapper.propertiesAsJson(props));
-            ResourceManagerWrapper.init(props);
-            // Initialize properties
-            org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
-
-            // Initialize logger
-            LoggerFactory.initLogger();
-
-            // Run processor registry so we can use XPL
-            final XMLProcessorRegistry registry = new XMLProcessorRegistry();
-            final String processorsXML = "processors.xml";
-            final Document doc = ResourceManagerWrapper.instance().getContentAsDOM4J(processorsXML, XMLParsing.ParserConfiguration.XINCLUDE_ONLY, true);
-            final DOMGenerator config = PipelineUtils.createDOMGenerator(doc, processorsXML, DOMGenerator.ZeroValidity, processorsXML);
-            PipelineUtils.connect(config, "data", registry, "config");
-            registry.start(new PipelineContext());
-
-            staticSetupDone  = true;
-        }
+        ResourceManagerSupport$.MODULE$.initializeJava();
 	}
 
     private PipelineContext pipelineContext;
 
     @Before
     public void setupResourceManagerTestPipelineContext() {
-        this.pipelineContext = createPipelineContextWithExternalContext();
+        this.pipelineContext = PipelineSupport.createPipelineContextWithExternalContextJava();
     }
 
     @After
     public void tearDownResourceManagerTestPipelineContext() {
         if (pipelineContext != null)
             pipelineContext.destroy(true);
-    }
-
-    public static PipelineContext createPipelineContextWithExternalContext() {
-        return createPipelineContextWithExternalContext("oxf:/org/orbeon/oxf/default-request.xml");
-    }
-
-    public static PipelineContext createPipelineContextWithExternalContext(String requestURL) {
-        final PipelineContext pipelineContext = new PipelineContext();
-        setExternalContext(pipelineContext, requestURL);
-        return pipelineContext;
-    }
-
-    public static void setExternalContext(PipelineContext pipelineContext) {
-        setExternalContext(pipelineContext, "oxf:/org/orbeon/oxf/default-request.xml");
-    }
-
-    public static void setExternalContext(PipelineContext pipelineContext, String requestURL) {
-        final Document requestDocument = ProcessorUtils.createDocumentFromURL(requestURL, null);
-        final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
-        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
     }
 }

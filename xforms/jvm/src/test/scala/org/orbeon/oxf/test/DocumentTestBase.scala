@@ -17,7 +17,7 @@ import org.junit.After
 import org.orbeon.dom
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
@@ -30,7 +30,9 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
   def setupDocument(xhtml: dom.Document): XFormsContainingDocument = {
-    ResourceManagerTestBase.staticSetup()
+
+    // Initialize once
+    ResourceManagerSupport
 
     val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
     val doc = new XFormsContainingDocument(staticState, null, null, true)
@@ -60,14 +62,19 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     }
   }
 
-  def disposeDocument(doc: XFormsContainingDocument): Unit = {
+  private def disposeDocument(doc: XFormsContainingDocument): Unit = {
     doc.afterExternalEvents()
     doc.afterUpdateResponse()
   }
 
-  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument ⇒ T): T = {
+  def withXFormsDocument[T](xhtml: dom.Document)(thunk: XFormsContainingDocument ⇒ T): T =
     InitUtils.withPipelineContext { pipelineContext ⇒
-      ResourceManagerTestBase.setExternalContext(pipelineContext)
+      PipelineSupport.setExternalContext(
+        pipelineContext,
+        PipelineSupport.DefaultRequestUrl,
+        XFormsStateManager.sessionCreated,
+        XFormsStateManager.sessionDestroyed
+      )
       val doc = setupDocument(xhtml)
       try {
         thunk(doc)
@@ -75,5 +82,4 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
         disposeDocument(doc)
       }
     }
-  }
 }

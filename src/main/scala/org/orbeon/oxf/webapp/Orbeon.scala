@@ -59,10 +59,10 @@ object Orbeon {
     // 1. Initialize the Resource Manager
     val properties = context.initParameters filter
       { case (name, value) ⇒ name.startsWith("oxf.resources.")} updated
-        (WebAppResourceManagerImpl.WEB_APP_CONTEXT_KEY, context) asJava
+        (WebAppResourceManagerImpl.WEB_APP_CONTEXT_KEY, context)
 
     logger.info(s"Initializing Resource Manager with: ${ResourceManagerWrapper.propertiesAsJson(properties)}")
-    ResourceManagerWrapper.init(properties)
+    ResourceManagerWrapper.init(properties.asJava)
 
     // 2. Initialize properties
     val propertiesURL = {

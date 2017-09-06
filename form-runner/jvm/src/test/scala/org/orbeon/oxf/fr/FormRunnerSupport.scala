@@ -66,7 +66,7 @@ trait FormRunnerSupport extends DocumentTestBase {
     initialize  : Boolean = true
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent]) = {
 
-    val (processorService, response, events) =
+    val (processorService, response, _, events) =
       TestHttpClient.connect(
         url         = s"/fr/$app/$form/$mode${if (noscript) "?fr-noscript=true" else ""}",
         method      = GET,
@@ -77,7 +77,7 @@ trait FormRunnerSupport extends DocumentTestBase {
     val responseContent = BufferedContent(response.content)
     val uuidOpt = FindUUIDInHTMLBodyRE.findFirstMatchIn(new String(responseContent.body, "utf-8")) map (_.group(1))
 
-    val docOpt = uuidOpt flatMap XFormsDocumentCache.take
+    val docOpt = uuidOpt flatMap XFormsDocumentCache.peekForTests
 
     (processorService, docOpt, events)
   }

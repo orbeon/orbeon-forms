@@ -38,7 +38,19 @@ object TestExternalContext {
   private val Logger = LoggerFactory.createLogger(classOf[TestExternalContext])
 }
 
-class TestExternalContext(var pipelineContext: PipelineContext, var requestDocument: Document) extends ExternalContext {
+class TestExternalContext(
+  var pipelineContext : PipelineContext,
+  var requestDocument : Document,
+  sessionCreated      : Session ⇒ Any = _ ⇒ (),
+  sessionDestroyed    : Session ⇒ Any = _ ⇒ ()
+) extends ExternalContext {
+
+  // For Java callers
+  def this(
+    pipelineContext : PipelineContext,
+    requestDocument : Document
+  ) =
+    this(pipelineContext, requestDocument, _ ⇒ (), _ ⇒ ())
 
   private val webAppContext: WebAppContext = new TestWebAppContext(TestExternalContext.Logger, mutable.LinkedHashMap[String, AnyRef]())
 
@@ -350,8 +362,10 @@ class TestExternalContext(var pipelineContext: PipelineContext, var requestDocum
   private var session: Session = null
 
   def getSession(create: Boolean): Session = {
-    if ((session eq null) && create)
+    if ((session eq null) && create) {
       session = new SimpleSession(SecureUtils.randomHexId)
+      sessionCreated(session)
+    }
     session
   }
 

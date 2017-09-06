@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
+import org.orbeon.oxf.test._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -154,32 +154,32 @@ class SendTest
         val (processorService, docOpt, _) =
           runFormRunner("tests", "send-action", "new", document = "", noscript = false, initialize = true)
 
-        setupResourceManagerTestPipelineContext()
+        withTestExternalContext {
+          withFormRunnerDocument(processorService, docOpt.get) {
 
-        withFormRunnerDocument(processorService, docOpt.get) {
-
-          XFormsAPI.dispatch(
-            name       = "my-run-process",
-            targetId   = Names.FormModel,
-            properties = Map(
-              "process" → Some(
-                s"""
-                  send(
-                    uri                    = "/fr/service/custom/orbeon/echo",
-                    $DataFormatVersionName = "$dataFormatVersion",
-                    content                = "xml",
-                    method                 = "post",
-                    replace                = "instance",
-                    prune                  = "$prune",
-                    $PruneMetadataName     = "$pruneMetadata"
-                  )
-                """
+            XFormsAPI.dispatch(
+              name       = "my-run-process",
+              targetId   = Names.FormModel,
+              properties = Map(
+                "process" → Some(
+                  s"""
+                    send(
+                      uri                    = "/fr/service/custom/orbeon/echo",
+                      $DataFormatVersionName = "$dataFormatVersion",
+                      content                = "xml",
+                      method                 = "post",
+                      replace                = "instance",
+                      prune                  = "$prune",
+                      $PruneMetadataName     = "$pruneMetadata"
+                    )
+                  """
+                )
               )
             )
-          )
 
-          val result = instance("fr-send-submission-response").get.root
-          assertXMLDocumentsIgnoreNamespacesInScope((expected: NodeInfo).root, result)
+            val result = instance("fr-send-submission-response").get.root
+            assertXMLDocumentsIgnoreNamespacesInScope((expected: NodeInfo).root, result)
+          }
         }
 
       }
@@ -213,29 +213,29 @@ class SendTest
       val (processorService, docOpt, _) =
         runFormRunner("tests", "send-action", "new", document = "", noscript = false, initialize = true)
 
-      setupResourceManagerTestPipelineContext()
+      withTestExternalContext {
+        withFormRunnerDocument(processorService, docOpt.get) {
 
-      withFormRunnerDocument(processorService, docOpt.get) {
-
-        XFormsAPI.dispatch(
-          name       = "my-run-process",
-          targetId   = Names.FormModel,
-          properties = Map(
-            "process" → Some(
-              s"""
-                send(
-                  uri     = "/fr/service/custom/orbeon/echo",
-                  content = "metadata",
-                  method  = "post",
-                  replace = "instance"
-                )
-              """
+          XFormsAPI.dispatch(
+            name       = "my-run-process",
+            targetId   = Names.FormModel,
+            properties = Map(
+              "process" → Some(
+                s"""
+                  send(
+                    uri     = "/fr/service/custom/orbeon/echo",
+                    content = "metadata",
+                    method  = "post",
+                    replace = "instance"
+                  )
+                """
+              )
             )
           )
-        )
 
-        val result = instance("fr-send-submission-response").get.root
-        assertXMLDocumentsIgnoreNamespacesInScope(ExpectedMetadata.root, result)
+          val result = instance("fr-send-submission-response").get.root
+          assertXMLDocumentsIgnoreNamespacesInScope(ExpectedMetadata.root, result)
+        }
       }
 
     }

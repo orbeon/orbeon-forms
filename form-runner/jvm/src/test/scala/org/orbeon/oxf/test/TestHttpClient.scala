@@ -16,6 +16,7 @@ package org.orbeon.oxf.test
 import java.{util ⇒ ju}
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.{Credentials, LocalExternalContext, _}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
@@ -23,8 +24,8 @@ import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{LoggerFactory, SecureUtils, URLRewriterUtils}
-import ExternalContext.Session
 import org.orbeon.oxf.webapp.ProcessorService
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
 import org.orbeon.oxf.xml.XMLConstants._
 
@@ -69,7 +70,7 @@ object TestHttpClient {
     headers     : Map[String, List[String]],
     content     : Option[StreamedContent],
     credentials : Option[Credentials] = None
-  ): (ProcessorService, HttpResponse, List[CacheEvent]) = {
+  ): (ProcessorService, HttpResponse, Option[Session], List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
 
@@ -91,7 +92,7 @@ object TestHttpClient {
       override def staticStateStatus(found: Boolean, digest: String)      = events += StaticState(found, digest)
     }
 
-    val response =
+    val (response, sessionOpt) =
       withPipelineContext { pipelineContext ⇒
 
         val (externalContext, response) = {
@@ -137,13 +138,12 @@ object TestHttpClient {
 
             override def getSession(create: Boolean): Session =
               session getOrElse {
-                if (create) {
-                  val newSession = new SimpleSession(SecureUtils.randomHexId)
-                  session = Some(newSession)
-                  newSession
-                } else {
+                if (create)
+                  new SimpleSession(SecureUtils.randomHexId) |!>
+                    XFormsStateManager.sessionCreated        |!>
+                    (newSession ⇒ session = Some(newSession))
+                else
                   null
-                }
               }
           }
 
@@ -176,7 +176,7 @@ object TestHttpClient {
           processorService.service(pipelineContext, externalContext)
         }
 
-        response
+        (response, Option(externalContext.getRequest.getSession(false)))
       }
 
     val httpResponse =
@@ -188,6 +188,6 @@ object TestHttpClient {
         def disconnect()      = content.close()
       }
 
-    (processorService, httpResponse, events.toList)
+    (processorService, httpResponse, sessionOpt, events.toList)
   }
 }

@@ -302,7 +302,9 @@ object XFormsStateManager extends XFormsStateLifecycle {
     // Tricky: if `onRemove()` is called upon session expiration, there might not be an `ExternalContext`. But it's fine,
     // because the session goes away → all of its attributes go away so we don't have to remove them below.
     def removeUuidFromSession(uuid: String): Unit =
-      getOrCreateUuidListInSession(NetUtils.getSession(ForceSessionCreation)).remove(uuid)
+      Option(NetUtils.getSession(ForceSessionCreation)) map // support missing session for tests
+        getOrCreateUuidListInSession                    foreach
+        (_.remove(uuid))
 
     def cacheOrStore(
       containingDocument   : XFormsContainingDocument,

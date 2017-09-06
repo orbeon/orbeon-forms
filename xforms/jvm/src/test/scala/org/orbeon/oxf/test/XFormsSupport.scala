@@ -16,6 +16,7 @@ package org.orbeon.oxf.test
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
@@ -28,6 +29,7 @@ import org.orbeon.oxf.xforms.event.{ClientEvents, Dispatch, XFormsCustomEvent, X
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
 import org.orbeon.oxf.xml.TransformerUtils
@@ -39,6 +41,17 @@ import scala.reflect.ClassTag
 trait XFormsSupport extends MockitoSugar {
 
   self: DocumentTestBase ⇒
+
+  def withTestExternalContext[T](body: ⇒ T): T =
+    InitUtils.withPipelineContext { pipelineContext ⇒
+      PipelineSupport.setExternalContext(
+        pipelineContext,
+        PipelineSupport.DefaultRequestUrl,
+        XFormsStateManager.sessionCreated,
+        XFormsStateManager.sessionDestroyed
+      )
+      body
+    }
 
   def withActionAndDoc[T](url: String)(body: ⇒ T): T =
     withActionAndDoc(setupDocument(url))(body)

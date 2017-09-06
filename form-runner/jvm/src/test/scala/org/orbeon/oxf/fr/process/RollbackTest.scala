@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.FormRunner.{formInstance, persistenceInstance}
 import org.orbeon.oxf.fr.{FormRunnerSupport, Names}
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
+import org.orbeon.oxf.test._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -68,19 +68,19 @@ class RollbackTest
         val (processorService, docOpt, _) =
           runFormRunner("tests", "process-rollback", "new", document = "", noscript = false, initialize = true)
 
-        setupResourceManagerTestPipelineContext()
+        withTestExternalContext {
+          withFormRunnerDocument(processorService, docOpt.get) {
 
-        withFormRunnerDocument(processorService, docOpt.get) {
+            XFormsAPI.dispatch(
+              name       = "my-run-process",
+              targetId   = Names.FormModel,
+              properties = Map("process" → Some(process))
+            )
 
-          XFormsAPI.dispatch(
-            name       = "my-run-process",
-            targetId   = Names.FormModel,
-            properties = Map("process" → Some(process))
-          )
+            assertXMLDocumentsIgnoreNamespacesInScope((expected: NodeInfo).root, formInstance.root)
 
-          assertXMLDocumentsIgnoreNamespacesInScope((expected: NodeInfo).root, formInstance.root)
-
-          assert(saveStatus === (persistenceInstance.rootElement elemValue "data-status"))
+            assert(saveStatus === (persistenceInstance.rootElement elemValue "data-status"))
+          }
         }
       }
   }

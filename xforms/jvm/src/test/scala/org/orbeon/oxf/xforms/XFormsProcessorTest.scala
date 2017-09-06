@@ -14,7 +14,12 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.test.ProcessorTestBase
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 
 class XFormsProcessorTest
-  extends ProcessorTestBase("oxf:/org/orbeon/oxf/xforms/tests-xforms.xml")
+  extends ProcessorTestBase(
+    "oxf:/org/orbeon/oxf/xforms/tests-xforms.xml",
+    XFormsStateManager.sessionCreated,
+    XFormsStateManager.sessionDestroyed
+  )

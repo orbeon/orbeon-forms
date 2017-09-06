@@ -17,6 +17,8 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.externalcontext.ExternalContext.Session
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils._
 import org.orbeon.oxf.processor.generator.URLGenerator
@@ -34,7 +36,13 @@ import org.scalatest.{FunSpec, FunSpecLike}
 
 import scala.util.control.NonFatal
 
-abstract class ProcessorTestBase(testsDocUrl: String)
+
+
+abstract class ProcessorTestBase(
+  testsDocUrl      : String,
+  sessionCreated   : Session ⇒ Any = _ ⇒ (),
+  sessionDestroyed : Session ⇒ Any = _ ⇒ ()
+)
   extends FunSpec
      with ResourceManagerSupport
      with FunSpecLike
@@ -71,36 +79,40 @@ abstract class ProcessorTestBase(testsDocUrl: String)
     }
   }
 
-  private def runOneTest(d: TestDescriptor): TestResult =
+  private def runOneTest(d: TestDescriptor) =
     try {
       // Create pipeline context
-      val pipelineContext =
-        d.requestUrlOpt match {
-          case Some(requestURL) ⇒ ResourceManagerTestBase.createPipelineContextWithExternalContext(requestURL)
-          case None             ⇒ ResourceManagerTestBase.createPipelineContextWithExternalContext
+      InitUtils.withPipelineContext { pipelineContext ⇒
+
+         PipelineSupport.setExternalContext(
+           pipelineContext,
+           d.requestUrlOpt getOrElse PipelineSupport.DefaultRequestUrl,
+           sessionCreated,
+           sessionDestroyed
+         )
+
+        d.processor.reset(pipelineContext)
+
+        if (d.docsAndSerializers.isEmpty) {
+          // Just run (start) a processor with no output
+          d.processor.start(pipelineContext)
+          SuccessTestResult
+        } else {
+
+          val resultsIt =
+            for {
+              (doc, serializer) ← d.docsAndSerializers.iterator
+              actualDoc         = serializer.runGetDocument(pipelineContext)
+            } yield {
+              // NOTE: We could make the comparison more configurable, for example to not collapse white space
+              if (Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(doc, actualDoc))
+                SuccessTestResult
+              else
+                FailedTestResult(doc, actualDoc)
+            }
+
+          resultsIt collectFirst { case f: FailedTestResult ⇒ f } getOrElse SuccessTestResult
         }
-
-      d.processor.reset(pipelineContext)
-
-      if (d.docsAndSerializers.isEmpty) {
-        // Just run (start) a processor with no output
-        d.processor.start(pipelineContext)
-        SuccessTestResult
-      } else {
-
-        val resultsIt =
-          for {
-            (doc, serializer) ← d.docsAndSerializers.iterator
-            actualDoc         = serializer.runGetDocument(pipelineContext)
-          } yield {
-            // NOTE: We could make the comparison more configurable, for example to not collapse white space
-            if (Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(doc, actualDoc))
-              SuccessTestResult
-            else
-              FailedTestResult(doc, actualDoc)
-          }
-
-        resultsIt collectFirst { case f: FailedTestResult ⇒ f } getOrElse SuccessTestResult
       }
     } catch {
       case NonFatal(t) ⇒ ErrorTestResult(t)

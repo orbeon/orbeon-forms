@@ -56,14 +56,18 @@ object ResourceManagerWrapper {
     _factory.makeInstance
   }
 
-  def propertiesAsJson(props: ju.Map[String, AnyRef]): String = {
+  def propertiesAsJsonJava(props: ju.Map[String, AnyRef]): String =
+    propertiesAsJson(props.asScala)
 
-    val propsAsScala = props.asScala
+  def propertiesAsJson(props: collection.Map[String, AnyRef]): String = {
 
     val maxKeyLength =
-      if (propsAsScala.nonEmpty) propsAsScala.keysIterator.maxBy(_.length).length else 0
+      if (props.nonEmpty)
+        props.keysIterator.maxBy(_.length).length
+      else
+        0
 
-    propsAsScala.to[List].sortBy(_._1).collect{
+    props.to[List].sortBy(_._1).collect{
       case (key, value: String) ⇒ s""" "$key":${" " * (maxKeyLength + 1 - key.length)}"$value" """.trim
     }.mkString("{\n  ", ",\n  ", "\n}")
   }

@@ -510,8 +510,8 @@ lazy val formBuilderJS: Project = formBuilder.js
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
-    scalaJSUseMainModuleInitializer in Compile := false,
-    scalaJSUseMainModuleInitializer in Test := false,
+    scalaJSUseMainModuleInitializer in Compile := true,
+    scalaJSUseMainModuleInitializer in Test    := false,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (fastOptJS in Compile).value.data,

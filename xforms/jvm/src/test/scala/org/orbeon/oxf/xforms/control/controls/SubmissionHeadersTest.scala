@@ -13,24 +13,26 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.junit._
 import org.orbeon.dom
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
-import org.scalatest.junit._
+import org.scalatest.FunSpecLike
 
-import scala.collection.mutable.LinkedHashMap
+class SubmissionHeadersTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
 
-class SubmissionHeadersTest extends DocumentTestBase with AssertionsForJUnit {
+  describe("Submission headers") {
 
-  @Test def outputHeaders(): Unit = {
-    Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
+    assume(Version.isPE) // because of `xxf:xpath-analysis="true"`
 
     val doc: dom.Document =
-      <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+      <xh:html
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
         <xh:head>
           <xf:model xxf:xpath-analysis="true">
             <xf:instance id="instance">
@@ -93,31 +95,31 @@ class SubmissionHeadersTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>
 
-    // Expected results per control
-    val expected = LinkedHashMap(
-      "output1" → LinkedHashMap(
-        "Header1" → Seq("value1"),
-        "Header2" → Seq("value2"),
-        "Header3" → Seq("value3")
-      ),
-      "output2" → LinkedHashMap(
-        "Header1" → Seq("prepend2", "prepend1", "value1", "append2"),
-        "Header2" → Seq("prepend2", "value2", "append2", "append2"),
-        "Header3" → Seq("prepend2", "replace3", "append2"),
-        "Header4" → Seq("value4")
+      // Expected results per control
+      val expected = List(
+        "output1" → List(
+          "Header1" → List("value1"),
+          "Header2" → List("value2"),
+          "Header3" → List("value3")
+        ),
+        "output2" → List(
+          "Header1" → List("prepend2", "prepend1", "value1", "append2"),
+          "Header2" → List("prepend2", "value2", "append2", "append2"),
+          "Header3" → List("prepend2", "replace3", "append2"),
+          "Header4" → List("value4")
+        )
       )
-    )
 
-    withXFormsDocument(doc) { xfcd ⇒
-
-      // Test that everything matches
-      for {
-        (controlId, expectedHeaders) ← expected
-        control = getValueControl(controlId).asInstanceOf[XFormsOutputControl]
-        actualHeaders = control.evaluatedHeaders
-        (expectedHeaderName, expectedHeaderValues) ← expectedHeaders
-      } locally {
-        assert(expectedHeaderValues === actualHeaders(expectedHeaderName).toSeq)
+    it("must be evaluated following prepend/append/replace rules") {
+      withXFormsDocument(doc) { xfcd ⇒
+        for {
+          (controlId, expectedHeaders) ← expected
+          control       = xfcd.getObjectByEffectiveId(controlId).asInstanceOf[XFormsOutputControl]
+          actualHeaders = control.evaluatedHeaders
+          (expectedHeaderName, expectedHeaderValues) ← expectedHeaders
+        } locally {
+          assert(expectedHeaderValues === actualHeaders(expectedHeaderName))
+        }
       }
     }
   }

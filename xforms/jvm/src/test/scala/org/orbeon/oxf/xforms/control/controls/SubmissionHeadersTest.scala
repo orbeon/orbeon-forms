@@ -26,8 +26,6 @@ class SubmissionHeadersTest
 
   describe("Submission headers") {
 
-    assume(Version.isPE) // because of `xxf:xpath-analysis="true"`
-
     val doc: dom.Document =
       <xh:html
         xmlns:xf="http://www.w3.org/2002/xforms"
@@ -111,6 +109,7 @@ class SubmissionHeadersTest
       )
 
     it("must be evaluated following prepend/append/replace rules") {
+      assume(Version.isPE) // because of `xxf:xpath-analysis="true"`
       withXFormsDocument(doc) { xfcd ⇒
         for {
           (controlId, expectedHeaders) ← expected

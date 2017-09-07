@@ -151,7 +151,8 @@ class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boole
 @JSGlobal("ORBEON.xforms.Events")
 @js.native
 object Events extends js.Object {
-  val ajaxResponseProcessedEvent: YUICustomEvent = js.native
+  val ajaxResponseProcessedEvent : YUICustomEvent = js.native
+  val orbeonLoadedEvent          : YUICustomEvent = js.native
 }
 
 @JSGlobal("ORBEON.util.Property")

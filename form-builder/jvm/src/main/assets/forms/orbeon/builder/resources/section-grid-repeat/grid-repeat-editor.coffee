@@ -2,18 +2,21 @@ $ = ORBEON.jQuery
 $ ->
     AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder
+    Position = ORBEON.builder.Position
     Events = ORBEON.xforms.Events
 
     # Keep track of grids positions, including the position their rows and columns
     gridsCache = []; do ->
-        Builder.onOffsetMayHaveChanged ->
+        Position.onOffsetMayHaveChanged ->
             gridsCache.length = 0                                                                                       # Update gridsCache in-place, as references are kept by other functions
             _.each ($ '.fr-grid.fr-editable:visible'), (table) ->
                 table = $(table)
                 grid = table.closest('.xbl-fr-grid')                                                                    # There might be an intermediate group <span>
+                gridOffset = Builder.adjustedOffset(grid)
                 gridInfo =
                     el: grid
-                    offset: Builder.adjustedOffset grid
+                    top: gridOffset.top
+                    left: gridOffset.left
                     height: f$.outerHeight grid                                                                         # Include grid padding
                     width : f$.outerWidth  grid
                 if f$.is '.fr-repeat', table
@@ -45,15 +48,15 @@ $ ->
                 if f$.is '.fb-can-delete-grid', table
                     f$.show deleteIcon
                     offset =
-                        top:  grid.offset.top - Builder.scrollTop()
-                        left: grid.offset.left
+                        top:  grid.top - Builder.scrollTop()
+                        left: grid.left
                     f$.offset offset, deleteIcon
                 if grid.head?
                     f$.show detailsIcon
                     head = f$.find '.fr-grid-head', table
                     offset =
                         top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Builder.scrollTop()
-                        left: grid.offset.left
+                        left: grid.left
                     f$.offset offset, detailsIcon
 
     # Position icons do add/remove columns/rows
@@ -69,7 +72,7 @@ $ ->
         colIcons = do ->
             colIcon = (selector, colOffset) -> _.tap (icon selector), (icon) ->
                 icon.offset = (col) ->
-                    top: col.grid.offset.top - Builder.scrollTop()
+                    top: col.grid.top - Builder.scrollTop()
                     left: col.offset.left + colOffset col, icon
             [
                 colIcon '.fb-insert-col-left',  -> 0
@@ -82,7 +85,7 @@ $ ->
             rowIcon = (selector, rowOffset) -> _.tap (icon selector), (icon) ->
                 icon.offset = (row) ->
                     top: row.offset.top + (rowOffset row, icon) - Builder.scrollTop()
-                    left: row.grid.offset.left
+                    left: row.grid.left
             [
                 rowIcon '.fb-insert-row-above', -> 0
                 rowIcon '.fb-delete-row',       (row, icon) -> (row.height - icon.height()) / 2

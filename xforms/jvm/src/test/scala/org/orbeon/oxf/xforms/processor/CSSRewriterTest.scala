@@ -14,44 +14,54 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.NetUtils
-import org.junit._
+import org.scalatest.FunSpecLike
 
-class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
+class CSSRewriterTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with FunSpecLike {
 
-  @Test def urls(): Unit = {
+  describe("Rewriting CSS") {
 
-    // Relative and absolute paths
-    assert("""div { background-image: url(/orbeon/styles/a.png) }""" === rewriteCSS("""div { background-image: url(a.png) }"""))
-    assert("""div { background-image: url(/orbeon/styles/common/a.png) }""" === rewriteCSS("""div { background-image: url(common/a.png) }"""))
-    assert("""div { background-image: url(/orbeon/a.png) }""" === rewriteCSS("""div { background-image: url(../a.png) }"""))
-    assert("""div { background-image: url(/orbeon/a.png) }""" === rewriteCSS("""div { background-image: url(/a.png) }"""))
-    assert("""div { background-image: url(http://example.org/a.png) }""" === rewriteCSS("""div { background-image: url(http://example.org/a.png) }"""))
+    it ("rewrites relative and absolute paths") {
+      assert("""div { background-image: url(/orbeon/styles/a.png) }"""        === rewriteCSS("""div { background-image: url(a.png) }"""))
+      assert("""div { background-image: url(/orbeon/styles/common/a.png) }""" === rewriteCSS("""div { background-image: url(common/a.png) }"""))
+      assert("""div { background-image: url(/orbeon/a.png) }"""               === rewriteCSS("""div { background-image: url(../a.png) }"""))
+      assert("""div { background-image: url(/orbeon/a.png) }"""               === rewriteCSS("""div { background-image: url(/a.png) }"""))
+      assert("""div { background-image: url(http://example.org/a.png) }"""    === rewriteCSS("""div { background-image: url(http://example.org/a.png) }"""))
+    }
 
-    // With and without quotes around URL
-    val rewritten = "div { background-image: url(/orbeon/styles/a.png) }"
+    it("rewrites with and without quotes around URL") {
 
-    assert(rewritten === rewriteCSS("""div { background-image: url(a.png) }"""))
-    assert(rewritten === rewriteCSS("""div { background-image: url("a.png") }"""))
-    assert(rewritten === rewriteCSS("""div { background-image: url('a.png') }"""))
+      val rewritten = "div { background-image: url(/orbeon/styles/a.png) }"
+
+      assert(rewritten === rewriteCSS("""div { background-image: url(a.png) }"""))
+      assert(rewritten === rewriteCSS("""div { background-image: url("a.png") }"""))
+      assert(rewritten === rewriteCSS("""div { background-image: url('a.png') }"""))
+    }
   }
 
-  @Test def namespaces(): Unit = {
-    // Multiple id rewrites
-    assert("""div #_ns_foo.bar div #_ns_gaga.toto div {}""" === rewriteCSS("""div #foo.bar div #gaga.toto div {}"""))
+  describe("Namespaces") {
 
-    // Multiple pairs
-    assert("""#_ns_foo.bar {} #_ns_gaga.toto {}""" === rewriteCSS("""#foo.bar {} #gaga.toto {}"""))
+    it("handles multiple id rewrites") {
+      assert("""div #_ns_foo.bar div #_ns_gaga.toto div {}""" === rewriteCSS("""div #foo.bar div #gaga.toto div {}"""))
+    }
+
+    it("handles multiple pairs") {
+      assert("""#_ns_foo.bar {} #_ns_gaga.toto {}""" === rewriteCSS("""#foo.bar {} #gaga.toto {}"""))
+    }
   }
 
-  @Test def both(): Unit = {
-    assert("div #_ns_foo.bar { background-image: url(/orbeon/styles/a.png) }" ===
-      rewriteCSS("""div #foo.bar { background-image: url(a.png) }"""))
+  describe("Both") {
+    it("rewrites ids and URLs in the same CSS") {
+      assert("div #_ns_foo.bar { background-image: url(/orbeon/styles/a.png) }" ===
+        rewriteCSS("""div #foo.bar { background-image: url(a.png) }"""))
+    }
   }
 
-  @Test def keepBackslashes(): Unit = {
+  describe("Backslashes") {
 
     val rule = """input[type="radio"],
            |input[type="checkbox"] {
@@ -63,9 +73,13 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
            |}
            |""".stripMargin
 
-    assert(rule === rewriteCSS(rule).stripMargin)
+    it("keeps them") {
+      assert(rule === rewriteCSS(rule).stripMargin)
+    }
   }
 
   private def rewriteCSS(css: String) =
-    XFormsResourceRewriter.rewriteCSS(css, "/styles/style.css", Some("_ns_"), NetUtils.getExternalContext.getResponse)(null)
+    withTestExternalContext {
+      XFormsResourceRewriter.rewriteCSS(css, "/styles/style.css", Some("_ns_"), NetUtils.getExternalContext.getResponse)(null)
+    }
 }

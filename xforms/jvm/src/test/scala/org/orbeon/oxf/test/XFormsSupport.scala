@@ -16,6 +16,7 @@ package org.orbeon.oxf.test
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.{Matchers, Mockito}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -42,15 +43,16 @@ trait XFormsSupport extends MockitoSugar {
 
   self: DocumentTestBase ⇒
 
-  def withTestExternalContext[T](body: ⇒ T): T =
+  def withTestExternalContext[T](body: ExternalContext ⇒ T): T =
     InitUtils.withPipelineContext { pipelineContext ⇒
-      PipelineSupport.setExternalContext(
-        pipelineContext,
-        PipelineSupport.DefaultRequestUrl,
-        XFormsStateManager.sessionCreated,
-        XFormsStateManager.sessionDestroyed
+      body(
+        PipelineSupport.setExternalContext(
+          pipelineContext,
+          PipelineSupport.DefaultRequestUrl,
+          XFormsStateManager.sessionCreated,
+          XFormsStateManager.sessionDestroyed
+        )
       )
-      body
     }
 
   def withActionAndDoc[T](url: String)(body: ⇒ T): T =

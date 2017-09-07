@@ -14,7 +14,7 @@
 package org.orbeon.oxf.test
 
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
-import org.orbeon.oxf.externalcontext.TestExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.CoreUtils._
@@ -38,14 +38,17 @@ object PipelineSupport {
     requestURL       : String = DefaultRequestUrl,
     sessionCreated   : Session ⇒ Any = _ ⇒ (),
     sessionDestroyed : Session ⇒ Any = _ ⇒ ()
-  ): Unit =
-    pipelineContext.setAttribute(
-      PipelineContext.EXTERNAL_CONTEXT,
-      new TestExternalContext(
+  ): ExternalContext =
+    new TestExternalContext(
         pipelineContext,
         ProcessorUtils.createDocumentFromURL(requestURL, null),
         sessionCreated,
         sessionDestroyed
-      )
+      ) |!> (
+        pipelineContext.setAttribute(
+          PipelineContext.EXTERNAL_CONTEXT,
+          _
+        )
     )
+
 }

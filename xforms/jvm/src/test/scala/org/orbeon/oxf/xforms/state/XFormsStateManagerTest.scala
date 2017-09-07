@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.SecureUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{NetUtils, SecureUtils}
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
@@ -44,9 +44,9 @@ class XFormsStateManagerTest
 
   describe("Session listener") {
     it("must remove the UUID when the session expires") {
-      withTestExternalContext {
+      withTestExternalContext { ec ⇒
 
-        val session = NetUtils.getSession(true)
+        val session = ec.getSession(true)
 
         def createDoc() = {
 
@@ -101,9 +101,9 @@ class XFormsStateManagerTest
     }
 
     def testClient(isCache: Boolean, formFile: String): Unit = {
-      withTestExternalContext {
+      withTestExternalContext { ec ⇒
 
-        NetUtils.getSession(true)
+        ec.getSession(true)
 
         val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 
@@ -164,9 +164,9 @@ class XFormsStateManagerTest
     }
 
     def testServer(isCache: Boolean, formFile: String): Unit = {
-      withTestExternalContext {
+      withTestExternalContext { ec ⇒
 
-        NetUtils.getSession(true)
+        ec.getSession(true)
 
         val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile)
 

@@ -154,7 +154,7 @@ class SendTest
         val (processorService, docOpt, _) =
           runFormRunner("tests", "send-action", "new", document = "", noscript = false, initialize = true)
 
-        withTestExternalContext {
+        withTestExternalContext { _ ⇒
           withFormRunnerDocument(processorService, docOpt.get) {
 
             XFormsAPI.dispatch(
@@ -213,7 +213,7 @@ class SendTest
       val (processorService, docOpt, _) =
         runFormRunner("tests", "send-action", "new", document = "", noscript = false, initialize = true)
 
-      withTestExternalContext {
+      withTestExternalContext { _ ⇒
         withFormRunnerDocument(processorService, docOpt.get) {
 
           XFormsAPI.dispatch(

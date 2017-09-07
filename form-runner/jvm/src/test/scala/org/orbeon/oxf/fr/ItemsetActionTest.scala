@@ -29,7 +29,7 @@ class ItemsetActionTest extends DocumentTestBase with FormRunnerSupport with XFo
 
     val doc = docOpt.get
 
-    withTestExternalContext {
+    withTestExternalContext { _ ⇒
       withFormRunnerDocument(processorService, doc) {
 
         def resolveCityAndZipControls(indexes: List[Int]) = {

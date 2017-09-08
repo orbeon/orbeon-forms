@@ -46,23 +46,23 @@ class PropertyStore(propertiesDocument: Document) {
 
       val propertyElement = unsafeUnwrapElement(node)
 
-      if (Option(propertyElement.attributeValue("as")).isDefined) {
+      if (propertyElement.attributeValueOpt("as").isDefined) {
 
         val typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as")
 
         if (! PropertyStore.SupportedTypes.contains(typeQName))
-          throw new ValidationException(s"Invalid as attribute: ${typeQName.getQualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
+          throw new ValidationException(s"Invalid `as` attribute: ${typeQName.getQualifiedName}", propertyElement.getData.asInstanceOf[LocationData])
 
         val name = propertyElement.attributeValue("name")
 
         val value =
-          Option(propertyElement.attributeValue("value")) match {
-            case Some(valueFromAttribute) ⇒valueFromAttribute
+          propertyElement.attributeValueOpt("value") match {
+            case Some(valueFromAttribute) ⇒ valueFromAttribute
             case None                     ⇒ trimAllToEmpty(propertyElement.getText)
           }
 
-        Option(propertyElement.attributeValue("processor-name")) match {
-          case Some(processorName) ⇒
+        propertyElement.attributeValueOpt("processor-name") match {
+          case Some(_) ⇒
             val processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name")
             getProcessorPropertySet(processorQName).setProperty(propertyElement, name, typeQName, value)
           case None ⇒

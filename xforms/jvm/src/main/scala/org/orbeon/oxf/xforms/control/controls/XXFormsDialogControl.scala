@@ -54,7 +54,7 @@ class XXFormsDialogControl(
   // private val close                    = ! ("false" == element.attributeValue("close"))
   // private val draggable                = ! ("false" == element.attributeValue("draggable"))
 
-  private val defaultNeighborControlId = Option(element.attributeValue("neighbor"))
+  private val defaultNeighborControlId = element.attributeValueOpt("neighbor")
   private val initiallyVisible         = element.attributeValue("visible") == "true"
 
   // Initial local state

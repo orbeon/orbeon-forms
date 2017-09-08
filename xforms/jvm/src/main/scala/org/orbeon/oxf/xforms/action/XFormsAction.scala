@@ -91,7 +91,7 @@ abstract class XFormsAction extends Logging {
   // Resolve an optional boolean AVT
   // Return None if there is no attribute or if the AVT cannot be evaluated
   def resolveStringAVT(att: String)(implicit context: DynamicActionContext) =
-    Option(context.element.attributeValue(att)) flatMap
+    context.element.attributeValueOpt(att) flatMap
       (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
 
   // Resolve an optional boolean AVT

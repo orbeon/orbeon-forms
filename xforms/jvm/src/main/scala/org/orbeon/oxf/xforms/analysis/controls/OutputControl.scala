@@ -35,15 +35,13 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
   override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
 
   override protected val allowedExtensionAttributes = {
-    val altSet = {
-      val mediatype = element.attributeValue("mediatype")
-      val isImage = mediatype != null && mediatype.startsWith("image/")
-      isImage set XXFORMS_ALT_QNAME
-    }
-    val targetSet = {
-      val isDownload = appearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)
-      isDownload set XXFORMS_TARGET_QNAME
-    }
+
+    val altSet =
+      element.attributeValueOpt("mediatype") exists (_.startsWith("image/")) set XXFORMS_ALT_QNAME
+
+    val targetSet =
+      appearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) set XXFORMS_TARGET_QNAME
+
     altSet ++ targetSet
   }
 

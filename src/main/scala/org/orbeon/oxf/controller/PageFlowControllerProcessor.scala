@@ -606,7 +606,7 @@ object PageFlowControllerProcessor {
     file              : Option[String]
   )
 
-  def att(e: Element, name: String) = Option(e.attributeValue(name))
+  def att(e: Element, name: String) = e.attributeValueOpt(name)
   def idAtt(e: Element) = att(e, "id")
 
   // @path-info for backward compatibility

@@ -504,7 +504,7 @@ object ElementAnalysis {
     stringOptionToSet(Option(element.attributeValue(qName)))
 
   def attSet(element: Element, name: String) =
-    stringOptionToSet(Option(element.attributeValue(name)))
+    stringOptionToSet(element.attributeValueOpt(name))
 
   /**
    * Get the value of an attribute containing a space-separated list of QNames as a set.

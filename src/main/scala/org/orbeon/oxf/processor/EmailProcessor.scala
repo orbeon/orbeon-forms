@@ -222,7 +222,7 @@ class EmailProcessor extends ProcessorImpl {
       val parts = bodyElement.elementIterator("part")
       val multipartOption =
         if (bodyElement.getName == "body") {
-          val bodyMultipart = Option(bodyElement.attributeValue("mime-multipart"))
+          val bodyMultipart = bodyElement.attributeValueOpt("mime-multipart")
 
           if (parts.hasNext)
             bodyMultipart orElse Some("mixed")
@@ -265,7 +265,7 @@ class EmailProcessor extends ProcessorImpl {
 
       // Either a String or a FileItem
       val content =
-        Option(partOrBodyElement.attributeValue("src")) match {
+        partOrBodyElement.attributeValueOpt("src") match {
           case Some(src) ⇒
             // Content of the part is not inline
 
@@ -317,11 +317,11 @@ class EmailProcessor extends ProcessorImpl {
       }
 
       // Set content-disposition header
-      Option(partOrBodyElement.attributeValue("content-disposition")) foreach
+      partOrBodyElement.attributeValueOpt("content-disposition") foreach
         (contentDisposition ⇒ parentPart.setDisposition(contentDisposition))
 
       // Set content-id header
-      Option(partOrBodyElement.attributeValue("content-id")) foreach
+      partOrBodyElement.attributeValueOpt("content-id") foreach
         (contentId ⇒ parentPart.setHeader("content-id", "<" + contentId + ">"))
       //part.setContentID(contentId);
     }

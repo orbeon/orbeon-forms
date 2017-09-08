@@ -31,7 +31,7 @@ object XBLAssets {
       val href    = e.attributeValue("href")
       val src     = e.attributeValue("src")
       val resType = e.attributeValue("type")
-      val rel     = Option(e.attributeValue("rel")) getOrElse "" toLowerCase
+      val rel     = e.attributeValueOpt("rel") getOrElse "" toLowerCase
 
       e.getName match {
         case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" ⇒

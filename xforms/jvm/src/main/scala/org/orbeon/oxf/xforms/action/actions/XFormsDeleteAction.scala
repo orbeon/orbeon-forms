@@ -37,7 +37,7 @@ class XFormsDeleteAction extends XFormsAction {
 
     implicit val indentedLogger = actionContext.logger
 
-    val atAttributeOpt     = Option(actionContext.element.attributeValue("at"))
+    val atAttributeOpt     = actionContext.element.attributeValueOpt("at")
     val collectionToUpdate = actionContext.interpreter.actionXPathContext.getCurrentBindingContext.nodeset.asScala
 
     // NOTE: XForms says "Otherwise, the Sequence Binding is not expressed, so the Sequence Binding node-sequence

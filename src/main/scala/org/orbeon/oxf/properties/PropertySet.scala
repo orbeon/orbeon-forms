@@ -90,6 +90,25 @@ class PropertySet {
   /**
    * an unmodifiable Map<String, Boolean> of all Boolean properties.
    */
+  def allPropertiesAsJson: String = {
+
+    def escapeJavaScript(value: String): String =
+      value
+        .replaceAllLiterally("\\", "\\\\")
+        .replaceAllLiterally("\"", "\\\"")
+        .replaceAllLiterally("\n", "\\n")
+
+    val jsonProperties =
+      for ((name, prop) ← exactProperties.to[List].sortBy(_._1))
+        yield
+          s"""|  "$name": {
+              |    "type": "${escapeJavaScript(prop.typ.toString)}",
+              |    "value": "${escapeJavaScript(prop.value.toString)}"
+              |  }""".stripMargin
+
+    jsonProperties mkString ("{\n", ",\n", "\n}")
+  }
+
   def getBooleanProperties: ju.Map[String, jl.Boolean] = {
     val tuples =
       for {

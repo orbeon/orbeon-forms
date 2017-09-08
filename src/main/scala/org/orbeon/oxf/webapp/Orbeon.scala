@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
+import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.InitUtils
@@ -22,13 +23,13 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 // Orbeon web app initialization
 object Orbeon {
 
   private val PropertiesProperty = "oxf.properties"
   private val LoggingProperty    = "oxf.initialize-logging"
-  private val logger             = LoggerFactory.createLogger(Orbeon.getClass)
 
   val OrbeonFormsAscii =
     """
@@ -53,6 +54,8 @@ object Orbeon {
       LoggerFactory.initBasicLogger()
 
     // 0. Say hello
+    val logger = LoggerFactory.createLogger("org.orbeon.init")
+
     logger.info(OrbeonFormsAscii)
     logger.info("Starting " + Version.VersionString)
 
@@ -90,7 +93,16 @@ object Orbeon {
     if (initializeLogging)
       LoggerFactory.initLogger()
 
-    // 5. Register processor definitions with the default XML Processor Registry
+    // 5. Log properties in debug mode *after* updated logger configuration
+    try {
+      val json = Properties.instance.getPropertySet.allPropertiesAsJson
+      logger.debug(s"All properties read: $json")
+    } catch {
+      case NonFatal(t) ⇒
+        logger.error(OrbeonFormatter.format(t))
+    }
+
+    // 6. Register processor definitions with the default XML Processor Registry
     InitUtils.processorDefinitions
   }
 }

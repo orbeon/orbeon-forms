@@ -18,8 +18,8 @@ import java.{lang ⇒ jl, util ⇒ ju}
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CollectionUtils
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -53,7 +53,7 @@ private class PropertyNode {
  */
 class PropertySet {
 
-  private var exactProperties = Map[String, Property]()
+  private var exactProperties    = Map[String, Property]()
   private val wildcardProperties = new PropertyNode
 
   /**
@@ -65,7 +65,8 @@ class PropertySet {
    * @param stringValue     property string value
    */
   def setProperty(element: Element, name: String, typ: QName, stringValue: String): Unit = {
-    val value = PropertyStore.getObjectFromStringValue(stringValue, typ, element)
+
+    val value    = PropertyStore.getObjectFromStringValue(stringValue, typ, element)
     val property = Property(typ, value, Dom4jUtils.getNamespaceContext(element).asScala.toMap)
 
     // Store exact property name anyway
@@ -87,9 +88,6 @@ class PropertySet {
   def keySet: ju.Set[String] = exactProperties.keySet.asJava
   def size = exactProperties.size
 
-  /**
-   * an unmodifiable Map<String, Boolean> of all Boolean properties.
-   */
   def allPropertiesAsJson: String = {
 
     def escapeJavaScript(value: String): String =
@@ -109,6 +107,7 @@ class PropertySet {
     jsonProperties mkString ("{\n", ",\n", "\n}")
   }
 
+  // Return an unmodifiable `Map[String, Boolean]` of all exact Boolean properties
   def getBooleanProperties: ju.Map[String, jl.Boolean] = {
     val tuples =
       for {
@@ -228,7 +227,7 @@ class PropertySet {
       case p: String ⇒ if (allowEmpty) p.trimAllToEmpty else p.trimAllToNull
       case p: URI    ⇒ if (allowEmpty) p.toString.trimAllToEmpty else p.toString.trimAllToNull
       case null      ⇒ null
-      case _         ⇒ throw new OXFException("Invalid attribute type requested for property '" + name + "': expected " + XMLConstants.XS_STRING_QNAME.getQualifiedName + " or " + XMLConstants.XS_ANYURI_QNAME.getQualifiedName)
+      case _         ⇒ throw new OXFException(s"Invalid attribute type requested for property `$name`: expected `${XMLConstants.XS_STRING_QNAME.getQualifiedName}` or `${XMLConstants.XS_ANYURI_QNAME.getQualifiedName}`")
     }
 
   def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =

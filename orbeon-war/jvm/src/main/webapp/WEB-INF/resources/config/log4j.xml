@@ -78,7 +78,7 @@
         <priority value="debug"/>
     </category>
 
-    <category name="org.orbeon.oxf.properties.Properties">
+    <category name="org.orbeon.properties">
         <priority value="debug"/>
     </category>
 

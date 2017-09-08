@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class Properties {
 
-    private static final Logger logger = LoggerFactory.createLogger(Properties.class);
+    public static final Logger logger = LoggerFactory.createLogger("org.orbeon.properties");
 
     public static final String DEFAULT_PROPERTIES_URI = "oxf:/properties.xml";
     public static final String PROPERTIES_SCHEMA_URI = "http://www.orbeon.com/oxf/properties";

@@ -97,7 +97,7 @@ object Orbeon {
     // 5. Log properties in debug mode *after* updated logger configuration
     try {
       val json = Properties.instance.getPropertySet.allPropertiesAsJson
-      logger.debug(s"All properties read: $json")
+      Properties.logger.debug(s"All properties read: $json")
     } catch {
       case NonFatal(t) ⇒
         logger.error(OrbeonFormatter.format(t))

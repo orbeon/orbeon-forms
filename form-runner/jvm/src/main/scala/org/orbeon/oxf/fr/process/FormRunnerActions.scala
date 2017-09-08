@@ -365,6 +365,8 @@ trait FormRunnerActions {
       if (evaluatedSendProperties.get("replace").flatten.contains(XFORMS_SUBMIT_REPLACE_ALL))
         setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
 
+      debug(s"`send` action sending submission", evaluatedSendProperties.iterator collect { case (k, Some(v)) ⇒ k → v } toList)
+
       sendThrowOnError(s"fr-send-submission", evaluatedSendProperties)
     }
 

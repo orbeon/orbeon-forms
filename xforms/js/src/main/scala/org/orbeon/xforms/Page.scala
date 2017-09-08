@@ -16,7 +16,6 @@ package org.orbeon.xforms
 import org.orbeon.xforms.facade.Control
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
@@ -38,7 +37,7 @@ object Page {
       case Some(form) ⇒
         form
       case None ⇒
-        val newForm = new Form(dom.document.getElementById(id).asInstanceOf[HTMLElement])
+        val newForm = new Form(dom.document.getElementById(id).asInstanceOf[html.Element])
         forms += id → newForm
         newForm
     }

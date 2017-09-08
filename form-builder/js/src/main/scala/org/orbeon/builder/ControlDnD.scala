@@ -15,9 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.xbl.{Dragula, DragulaOptions}
 import org.orbeon.xforms.{$, DocumentAPI}
-import org.scalajs.dom.document
-import org.scalajs.dom.html.Element
-import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
@@ -35,21 +33,21 @@ object ControlDnD {
   val drake = Dragula(
     js.Array(),
     new DragulaOptions {
-      override def isContainer(el: Element): Boolean =
+      override def isContainer(el: html.Element): Boolean =
         el.classList.contains("fr-grid-td")
-      override def moves(el: Element, source: Element, handle: Element, sibling: Element): Boolean =
+      override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): Boolean =
         handle.classList.contains("fb-control-handle")
-      override def accepts(el: Element, target: Element, source: Element, sibling: Element): Boolean = {
+      override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): Boolean = {
         // Can only drop into an empty cell
         $(target)
           .find("> .fb-hover:not(.gu-mirror, .gu-transit) > .fr-grid-content > *, " +
                 "> .fr-grid-content > *")
           .length == 0
       }
-      override def mirrorContainer: HTMLElement =
+      override def mirrorContainer: html.Element =
         // Create the mirror inside the first container, so the proper CSS applies to the mirror
-        $(".fr-body .fr-grid-td").get(0).asInstanceOf[HTMLElement]
-      override def copy(el: Element, source: Element): Boolean = {
+        $(".fr-body .fr-grid-td").get(0).asInstanceOf[html.Element]
+      override def copy(el: html.Element, source: html.Element): Boolean = {
         val cursorClass = if (shiftPressed) CopyClass else MoveClass
         $(el).addClass(cursorClass)
         shiftPressed
@@ -57,7 +55,7 @@ object ControlDnD {
     }
   )
 
-  drake.onDrop((el: Element, target: Element, source: Element, sibling: Element) ⇒ {
+  drake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) ⇒ {
     // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
     if (target != null) {
       DocumentAPI.dispatchEvent(target.id, "DOMActivate")

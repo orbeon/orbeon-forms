@@ -14,8 +14,7 @@
 package org.orbeon.xforms.facade
 
 import org.orbeon.xforms.YUICustomEvent
-import org.scalajs.dom.html.Element
-import org.scalajs.dom.raw.{HTMLElement, XMLHttpRequest}
+import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
 import org.scalajs.jquery.JQueryCallback
 
@@ -127,7 +126,7 @@ class XBLCompanion extends js.Object {
 
   // Helpers
 
-  def containerElem: Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[Element]
+  def containerElem: html.Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[html.Element]
 }
 
 @JSGlobal("ORBEON.xforms.XBL")
@@ -181,11 +180,11 @@ object Utils extends js.Object {
 @js.native
 class Control extends js.Object {
 
-  val container: HTMLElement = js.native
+  val container: html.Element = js.native
 
-  def init(container: Element) : Unit      = js.native
-  def getForm()                : html.Form = js.native
-  def change()                 : Unit      = js.native
+  def init(container: html.Element) : Unit      = js.native
+  def getForm()                     : html.Form = js.native
+  def change()                      : Unit      = js.native
 
   // Provide a new itemset for a control, if the control supports this.
   def setItemset(itemset: js.Any): Unit = js.native
@@ -197,5 +196,5 @@ class Control extends js.Object {
   def getValue(): String = js.native
 
   // Returns the first element with the given class name that are inside this control
-  def getElementByClassName(className: String): js.UndefOr[Element] = js.native
+  def getElementByClassName(className: String): js.UndefOr[html.Element] = js.native
 }

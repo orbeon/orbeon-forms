@@ -16,18 +16,17 @@ package org.orbeon.xforms
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
 import org.orbeon.xforms.facade.{Control, Events, Properties}
-import org.scalajs.dom.html.Element
-import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
+import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSName, ScalaJSDefined}
+import scala.scalajs.js.annotation.ScalaJSDefined
 
 object Upload {
 
   def log(s: String) = () // println(s"Upload: $s")
 
   log(s"init object")
-  Page.registerControlConstructor(() ⇒ new Upload, (e: HTMLElement) ⇒ $(e).hasClass("xforms-upload"))
+  Page.registerControlConstructor(() ⇒ new Upload, (e: html.Element) ⇒ $(e).hasClass("xforms-upload"))
 }
 
 // Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
@@ -41,7 +40,7 @@ class Upload extends Control {
   private var yuiProgressBar: ProgressBar = null
 
   // Creates markup for loading progress indicator element, if necessary
-  override def init(container: Element): Unit = {
+  override def init(container: html.Element): Unit = {
 
     super.init(container)
 
@@ -150,7 +149,7 @@ class Upload extends Control {
 
     log(s"clear")
 
-    val oldInputElement = getElementByClassName(UploadSelectClass).get.asInstanceOf[HTMLInputElement]
+    val oldInputElement = getElementByClassName(UploadSelectClass).get.asInstanceOf[html.Input]
 
     // TODO: Would be good to copy attributes generically.
     val newInputElement =

@@ -57,7 +57,7 @@ object Orbeon {
     val logger = LoggerFactory.createLogger("org.orbeon.init")
 
     logger.info(OrbeonFormsAscii)
-    logger.info("Starting " + Version.VersionString)
+    logger.info(s"Starting ${Version.VersionString}")
 
     // 1. Initialize the Resource Manager
     val properties = context.initParameters filter
@@ -74,15 +74,16 @@ object Orbeon {
       val rawPropertiesURL =
         context.initParameters.getOrElse(
           PropertiesProperty,
-          throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")
+          throw new OXFException("Properties file URL must be specified via `oxf.properties` in `web.xml`.")
         ).trimAllToNull
 
       val runMode = RunMode.getRunMode(context.initParameters)
-      logger.info("Using run mode: " + runMode)
+      logger.info(s"Using run mode: $runMode")
 
       rawPropertiesURL.replaceAllLiterally("${" + RunMode.RunModeProperty + "}", runMode)
     }
-    logger.info("Using properties file: " + propertiesURL)
+
+    logger.info(s"Using root properties file: $propertiesURL")
     Properties.init(propertiesURL)
 
     // 3. Initialize Version object (depends on resource manager)

@@ -305,7 +305,14 @@
                                                                        or $is-submit and $ops = 'create')) or
                 ($mode = ('view', 'pdf', 'controls', 'email')  and not($ops = ('*', 'read')
                                                                        or $is-submit and $ops = 'create')) or
-                not($mode = ('new', 'import', 'validate', 'edit', 'view', 'pdf', 'controls', 'email', 'schema', 'test'))"/>
+                not(
+                    $mode = (
+                        'new',      'import',    'validate',
+                        'edit',     'view',      'pdf',
+                        'controls', 'email',     'schema',
+                        'test'
+                    )
+                )"/>
 
             <!-- Send an "Unauthorized" error if the user is unauthorized -->
             <xf:action if="$unauthorized-access" type="xpath">frf:sendError(403)</xf:action>

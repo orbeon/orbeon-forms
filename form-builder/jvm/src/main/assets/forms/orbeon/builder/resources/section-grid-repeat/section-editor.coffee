@@ -3,17 +3,14 @@ $ ->
     AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder
     Position = ORBEON.builder.Position
+    SideEditor = ORBEON.builder.SideEditor
     Controls = ORBEON.xforms.Controls
     Events = ORBEON.xforms.Events
     FSM = ORBEON.util.FiniteStateMachine
-
     Properties = ORBEON.util.Properties
 
     sectionEditor = $ '.fb-section-editor'
     currentSection = null
-    sectionsCache = []
-    fbMainCache = []
-    frBodyLeft = 0;
     pageX = 0; pageY = 0
     SectionTitleSelector = '.fr-section-title:first'
     SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first .xforms-output-output'
@@ -29,35 +26,7 @@ $ ->
                 pageX = event.pageX
                 pageY = event.pageY
 
-    Position.onOffsetMayHaveChanged ->
-        frBodyLeft = (f$.offset $ '.fr-body').left
-        sectionsCache.length = 0                                        # Don't recreate array, as other parts of the code keep a reference to it
-        _.each ($ '.xbl-fr-section:visible'), (section) ->
-            section = $(section)
-            mostOuterSection = section.parents(".xbl-fr-section").last()
-            titleAnchor = section.find("a")
-            if not mostOuterSection.is("*")
-                # If we haven't found a parent section, `section` is already most outer section
-                mostOuterSection = section
-            sectionsCache.unshift
-                el: section
-                top:  Builder.adjustedOffset(section).top
-                left: Builder.adjustedOffset(mostOuterSection).left
-                height: titleAnchor.height()
-                width : mostOuterSection.width()
-                titleOffset: titleAnchor.offset()
-        fbMainCache.length = 0
-        fbMain = $(".fb-main-inner")
-        fbMainOffset = Builder.adjustedOffset(fbMain)
-        fbMainCache.unshift({
-            el         : fbMain
-            top        : fbMainOffset.top
-            left       : fbMainOffset.left
-            height     : f$.height fbMain
-            width      : f$.width  fbMain
-        })
-
-    Builder.currentContainerChanged sectionsCache,
+    Builder.currentContainerChanged SideEditor.gridSectionCache,
         wasCurrent: ->
             # NOP, instead we hide the section editor when the pointer leaves `.fb-main`
         becomesCurrent: (section) ->
@@ -66,8 +35,8 @@ $ ->
             do ->
                 sectionEditor.show()
                 sectionEditor.offset
-                    top: section.top - Builder.scrollTop()
-                    left: frBodyLeft - f$.outerWidth sectionEditor      # Use `.fr-body` left rather than the section left to account for sub-sections indentation
+                    top: section.top - Position.scrollTop()
+                    left: $(".fr-body").offset().left - f$.outerWidth sectionEditor      # Use `.fr-body` left rather than the section left to account for sub-sections indentation
             # Update trigger relevance
             do ->
                 container = section.el.children '.fr-section-container'
@@ -80,7 +49,7 @@ $ ->
                 deleteTrigger = f$.children '.delete-section-trigger', sectionEditor
                 if f$.is '.fb-can-delete', container then f$.show deleteTrigger else f$.hide deleteTrigger
 
-    Builder.currentContainerChanged fbMainCache,
+    Builder.currentContainerChanged SideEditor.fbMainCache,
         wasCurrent: ->
             sectionEditor.hide()
             currentSection = null
@@ -99,8 +68,8 @@ $ ->
 
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
-            labelInputOffset = Builder.adjustedOffset(labelInput)
-            section = Position.findInCache(sectionsCache, labelInputOffset.top, labelInputOffset.left)
+            labelInputOffset = Position.adjustedOffset(labelInput)
+            section = Position.findInCache(SideEditor.gridSectionCache, labelInputOffset.top, labelInputOffset.left)
             f$.text newLabelValue, f$.find SectionLabelSelector, section.el
             sectionId = f$.attr 'id', section.el
             ORBEON.xforms.Document.dispatchEvent
@@ -122,10 +91,10 @@ $ ->
                     labelInput.on 'blur', -> if f$.is ':visible', labelInput then sendNewLabelValue()
                     labelInput.on 'keypress', (e) -> if e.which == 13 then sendNewLabelValue()
                     Events.ajaxResponseProcessedEvent.subscribe -> f$.hide labelInput
-                interceptorOffset = Builder.adjustedOffset clickInterceptor
+                interceptorOffset = Position.adjustedOffset clickInterceptor
                 # From the section title, get the anchor element, which contains the title
                 labelAnchor = do ->
-                    section = Position.findInCache(sectionsCache, interceptorOffset.top, interceptorOffset.left)
+                    section = Position.findInCache(SideEditor.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
                     f$.find SectionLabelSelector, section.el
                 # Set placeholder, done every time to account for a value change when changing current language
                 do ->
@@ -139,7 +108,7 @@ $ ->
                 inputOffset =
                     top: interceptorOffset.top -
                         # Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
-                        Builder.scrollTop() +
+                        Position.scrollTop() +
                         # Vertically center input inside click interceptor
                         ((f$.height clickInterceptor) - (f$.outerHeight labelInput)) / 2
                     left: interceptorOffset.left
@@ -150,18 +119,18 @@ $ ->
 
         # Update highlight of section title, as a hint users can click to edit
         updateHighlight = (updateClass, clickInterceptor) ->
-            offset = Builder.adjustedOffset clickInterceptor
-            section = Position.findInCache(sectionsCache, offset.top, offset.left)
+            offset = Position.adjustedOffset clickInterceptor
+            section = Position.findInCache(SideEditor.gridSectionCache, offset.top, offset.left)
             if _.isUndefined(section)
                 debugger
-                Position.findInCache(sectionsCache, offset.top, offset.left)
+                Position.findInCache(SideEditor.gridSectionCache, offset.top, offset.left)
             sectionTitle = f$.find '.fr-section-title:first', section.el
             updateClass 'hover', sectionTitle
 
         # Show textual indication user can click on empty section title
         showClickHintIfTitleEmpty = (clickInterceptor) ->
-            interceptorOffset = Builder.adjustedOffset clickInterceptor
-            section = Position.findInCache(sectionsCache, interceptorOffset.top, interceptorOffset.left)
+            interceptorOffset = Position.adjustedOffset clickInterceptor
+            section = Position.findInCache(SideEditor.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
             labelAnchor = f$.find SectionLabelSelector, section.el
             if (f$.text labelAnchor) == ''
                 outputWithHintMessage = sectionEditor.children('.fb-enter-section-title-label')

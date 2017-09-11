@@ -12,7 +12,7 @@ $ ->
             _.each ($ '.fr-grid.fr-editable:visible'), (table) ->
                 table = $(table)
                 grid = table.closest('.xbl-fr-grid')                                                                    # There might be an intermediate group <span>
-                gridOffset = Builder.adjustedOffset(grid)
+                gridOffset = Position.adjustedOffset(grid)
                 gridInfo =
                     el: grid
                     top: gridOffset.top
@@ -22,17 +22,21 @@ $ ->
                 if f$.is '.fr-repeat', table
                     head = f$.find '.fr-grid-head', table
                     gridInfo.head =
-                        offset: Builder.adjustedOffset head
+                        offset: Position.adjustedOffset head
                         height: f$.height head
                 gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                            # .fr-grid-tr leaves out the header row in the repeat
+                    offset = Position.adjustedOffset $ tr
                     grid: gridInfo
                     el: $ tr
-                    offset: Builder.adjustedOffset $ tr
+                    left: offset.left
+                    top: offset.top
                     height: f$.height $ tr
                 gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', grid), (td) ->
+                    offset = Position.adjustedOffset $ td
                     grid: gridInfo
                     el: $ td
-                    offset: Builder.adjustedOffset $ td
+                    left: offset.left
+                    top: offset.top
                     width: f$.width $ td
                 gridsCache.unshift gridInfo
 
@@ -48,14 +52,14 @@ $ ->
                 if f$.is '.fb-can-delete-grid', table
                     f$.show deleteIcon
                     offset =
-                        top:  grid.top - Builder.scrollTop()
+                        top:  grid.top - Position.scrollTop()
                         left: grid.left
                     f$.offset offset, deleteIcon
                 if grid.head?
                     f$.show detailsIcon
                     head = f$.find '.fr-grid-head', table
                     offset =
-                        top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Builder.scrollTop()
+                        top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Position.scrollTop()
                         left: grid.left
                     f$.offset offset, detailsIcon
 
@@ -72,8 +76,8 @@ $ ->
         colIcons = do ->
             colIcon = (selector, colOffset) -> _.tap (icon selector), (icon) ->
                 icon.offset = (col) ->
-                    top: col.grid.top - Builder.scrollTop()
-                    left: col.offset.left + colOffset col, icon
+                    top: col.grid.top - Position.scrollTop()
+                    left: col.left + colOffset col, icon
             [
                 colIcon '.fb-insert-col-left',  -> 0
                 colIcon '.fb-delete-col',       (col, icon) -> (col.width - icon.width()) / 2
@@ -84,7 +88,7 @@ $ ->
         rowIcons = do ->
             rowIcon = (selector, rowOffset) -> _.tap (icon selector), (icon) ->
                 icon.offset = (row) ->
-                    top: row.offset.top + (rowOffset row, icon) - Builder.scrollTop()
+                    top: row.top + (rowOffset row, icon) - Position.scrollTop()
                     left: row.grid.left
             [
                 rowIcon '.fb-insert-row-above', -> 0

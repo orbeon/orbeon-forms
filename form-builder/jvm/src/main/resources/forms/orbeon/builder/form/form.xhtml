@@ -681,8 +681,6 @@
                                         fbf:moveSectionLeft(fbf:containerById(event('section-id')))
                                     </xf:action>
                                 </xf:trigger>
-                            </xh:div>
-                            <xh:div class="fb-grid-repeat-editor">
                                 <!-- Grid details -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
                                     <xf:label>
@@ -716,6 +714,8 @@
                                     </xf:dispatch>
                                     <xf:action ev:event="fr-positive" type="xpath">fbf:deleteGridById(event('context'))</xf:action>
                                 </xf:trigger>
+                            </xh:div>
+                            <xh:div class="fb-grid-repeat-editor">
                                 <!-- Insert column to the left -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-col-left">
                                     <xf:label>

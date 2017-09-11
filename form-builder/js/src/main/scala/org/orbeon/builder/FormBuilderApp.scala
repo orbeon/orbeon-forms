@@ -26,6 +26,7 @@ object FormBuilderApp {
       StaticUpload
       DialogItemset
       ControlDnD
+      SideEditor
     }
 
     $(initializeOnDomReady _)

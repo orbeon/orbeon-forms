@@ -100,11 +100,11 @@
             </xf:action>
 
             <xf:message level="xxf:log-debug">
-                $mode: <xf:output value="$mode"/>
-                $is-new-id: <xf:output value="$is-new-id"/>
-                $is-xml-submit: <xf:output value="$is-xml-submit"/>
-                $is-submit: <xf:output value="$is-submit"/>
-                $new-from-service: <xf:output value="$new-from-service"/>
+                $mode:                <xf:output value="$mode"/>
+                $is-new-id:           <xf:output value="$is-new-id"/>
+                $is-xml-submit:       <xf:output value="$is-xml-submit"/>
+                $is-submit:           <xf:output value="$is-submit"/>
+                $new-from-service:    <xf:output value="$new-from-service"/>
                 $data-format-version: <xf:output value="xxf:get-request-parameter('data-format-version')"/>
             </xf:message>
 
@@ -296,7 +296,7 @@
                 same permissions, especially since the POST is protected by other means. For example, a user with
                 `create` permission only is allowed to navigate to the `view` page and `edit` page back. This does not
                 imply that the user need `read` or `update` permissions. Because the current use case is that the user
-                has at least the `create` permission, we currently require that permision, although this restriction
+                has at least the `create` permission, we currently require that permission, although this restriction
                 could be removed in the future if need be.
             -->
             <xf:var name="unauthorized-access" value="

@@ -36,7 +36,6 @@
             <xf:model
                 id="fr-batch-validation-model"
                 xxf:xpath-analysis="true"
-                xxf:no-updates="true"
                 xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
 
                 <xf:instance src="input:data" id="fr-batch-data" xxf:readonly="true"/>

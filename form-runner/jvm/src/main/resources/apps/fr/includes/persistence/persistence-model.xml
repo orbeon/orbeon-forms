@@ -62,6 +62,10 @@
         value="exists(xxf:get-request-attribute('fr-form-data')) or
                exists(xxf:get-request-parameter('fr-form-data'))"/>
 
+    <xf:var
+        name="is-background"
+        value="starts-with(xxf:get-request-path(), '/fr/service/')"/>
+
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
@@ -316,6 +320,99 @@
 
             <!-- Send an "Unauthorized" error if the user is unauthorized -->
             <xf:action if="$unauthorized-access" type="xpath">frf:sendError(403)</xf:action>
+
+        </xf:action>
+
+    </xf:action>
+
+    <!-- Instance for background service response -->
+    <xf:instance id="fr-background-response-instance" xxf:expose-xpath-types="true">
+        <response>
+            <document-id/>
+            <process-success>true</process-success>
+        </response>
+    </xf:instance>
+
+    <xf:bind
+        ref="instance('fr-background-response-instance')/process-success"
+        type="xs:boolean"/>
+
+    <xf:submission
+        id="fr-send-background-response"
+        ref="instance('fr-background-response-instance')"
+        method="post"
+        action="echo:"
+        replace="all"/>
+
+    <!-- Run "form load" processes if they exist, see https://github.com/orbeon/orbeon-forms/issues/3318 -->
+    <xf:action
+        observer="fr-form-model"
+        event="
+            xxforms-instances-ready
+            xforms-model-construct-done
+            xforms-ready">
+
+        <xf:var
+            name="process-property-name"
+            value="
+                string-join(
+                    (
+                        'oxf.fr.detail.process',
+                        for $name in event('xxf:type')
+                        return
+                            if ($name = 'xxforms-instances-ready') then
+                                'before-data'
+                            else if ($name = 'xforms-model-construct-done') then
+                                'after-data'
+                            else if ($name = 'xforms-ready') then
+                                'after-controls'
+                            else
+                                error(
+                                    QName('http://orbeon.org/oxf/xml/form-runner', 'fr:illegal-state'),
+                                    concat('unexpected event received: ', $name)
+                                ),
+                        if ($is-background) then 'background' else 'foreground',
+                        $mode
+                    ),
+                    '.'
+                )"/>
+
+        <xf:var
+            name="process-property-value"
+            value="frf:xpathFormRunnerStringProperty($process-property-name)"/>
+
+        <!-- Run service if defined -->
+        <xf:var
+            name="process-result"
+            value="
+                if (exists($process-property-value)) then
+                    fr:run-process('oxf.fr.detail.process', $process-property-value)
+                else
+                    ()"/>
+
+        <xf:setvalue
+            if="exists($process-result)"
+            ref="instance('fr-background-response-instance')/process-success"
+            value="data(.) and $process-result"/>
+
+        <!-- Log error if any -->
+        <xf:message
+            if="not($process-result)"
+            level="xxf:log-error"
+            value="concat('Process failed with error for property: `', $process-property-name, '`')"/>
+
+        <xf:message
+            level="xxf:log-debug"
+            value="concat('Result of running process with property: `', $process-property-name, '`: ', $process-result)"/>
+
+        <!-- When done in background mode, send out service response -->
+        <xf:action if="$is-background and event('xxf:type') = 'xforms-ready'">
+
+            <xf:setvalue
+                ref="instance('fr-background-response-instance')/document-id"
+                value="fr:document-id()"/>
+
+            <xf:send submission="fr-send-background-response"/>
 
         </xf:action>
 

@@ -418,12 +418,13 @@
                         'xhtml'
             }}"
             xxf:no-updates="{{
-                for $mode in fr:mode()
-                return
-                    if ($mode = ('controls', 'pdf', 'email')) then
-                        'true'
-                    else
-                        'false'
+                (:
+                    This covers at least: 'email', 'pdf', 'tiff', 'controls', 'validate', 'import',
+                    'schema', 'duplicate', 'attachments', but also 'new' and 'edit' when used in
+                    background mode, see https://github.com/orbeon/orbeon-forms/issues/3318. The
+                    idea is that all services are non-interactive.
+                :)
+                starts-with(xxf:get-request-path(), '/fr/service/')
             }}"
             xxf:noscript-support="{$is-noscript-support}"
             xxf:external-events="{@xxf:external-events}"
@@ -463,7 +464,7 @@
             </xsl:if>
             <!-- Override if specified -->
             <xsl:copy-of select="@xxf:xpath-analysis"/>
-            <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests, import, validate -->
+            <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests -->
             <xsl:copy-of select="@xxf:encrypt-item-values"/>
             <xsl:copy-of select="@xxf:label.appearance"/>
             <xsl:copy-of select="@xxf:hint.appearance"/>

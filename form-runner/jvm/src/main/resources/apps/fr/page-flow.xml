@@ -146,6 +146,12 @@
              model="request-parameters.xpl"
              view="services/attachments.xhtml"/>
 
+    <!-- Run form in the background -->
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(new|edit)(/([^/^.]+))?"
+             methods="POST"
+             model="detail/detail-model.xpl"
+             view="html-view.xpl"/>
+
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->

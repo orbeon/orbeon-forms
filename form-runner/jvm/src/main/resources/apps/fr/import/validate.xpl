@@ -35,7 +35,6 @@
             <!-- XForms model that gets inserted into Form Runner to perform validation upon initialization -->
             <xf:model
                 id="fr-batch-validation-model"
-                xxf:no-updates="true"
                 xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
 
                 <xf:instance src="input:data" id="fr-batch-data" xxf:readonly="true"/>

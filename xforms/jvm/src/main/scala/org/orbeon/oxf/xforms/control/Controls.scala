@@ -195,16 +195,19 @@ object Controls {
     val scope            = containingDocument.getStaticOps.scopeForPrefixedId(sourcePrefixedId)
     val targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId)
 
-    val effectiveControlIds =
+    for {
+      controls           ← Option(containingDocument.getControls).toList
+      effectiveControlId ←
       resolveControlsEffectiveIds(
         containingDocument.getStaticOps,
-        containingDocument.getControls.getCurrentControlTree,
+          controls.getCurrentControlTree,
         sourceControlEffectiveId,
         targetPrefixedId,
         followIndexes
       )
-
-    effectiveControlIds flatMap (id ⇒ Option(containingDocument.getControls.getObjectByEffectiveId(id)))
+      control            ← Option(controls.getObjectByEffectiveId(effectiveControlId))
+    } yield
+      control
   }
 
   def resolveObjectByIdJava(
@@ -235,7 +238,7 @@ object Controls {
 
     // Don't do anything if there are no controls
     if (tree.children.isEmpty)
-      return null
+      return Nil
 
     // NOTE: The implementation tries to do a maximum using the static state. One reason is that the source
     // control's effective id might not yet have an associated control during construction. E.g.:

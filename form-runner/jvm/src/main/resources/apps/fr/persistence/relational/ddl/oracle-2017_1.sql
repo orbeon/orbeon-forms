@@ -92,13 +92,11 @@ CREATE TABLE orbeon_i_control_text (
 
 CREATE SEQUENCE orbeon_seq;
 
-CREATE        INDEX orbeon_form_definition_x      ON orbeon_form_definition        (xml) INDEXTYPE IS ctxsys.context PARAMETERS ('sync (on commit)');
-CREATE        INDEX orbeon_form_data_x            ON orbeon_form_data              (xml) INDEXTYPE IS ctxsys.context PARAMETERS ('sync (on commit)');
 CREATE        INDEX orbeon_form_definition_i1     ON orbeon_form_definition        (app, form);
 CREATE        INDEX orbeon_form_definition_att_i1 ON orbeon_form_definition_attach (app, form, file_name);
-CREATE        INDEX orbeon_from_data_i1           ON orbeon_form_data              (app, form, document_id);
-CREATE        INDEX orbeon_from_data_attach_i1    ON orbeon_form_data_attach       (app, form, document_id, file_name);
-CREATE UNIQUE INDEX orbeon_i_current_i1           ON orbeon_i_current              (data_id);
+CREATE        INDEX orbeon_from_data_i1           ON orbeon_form_data              (app, form, document_id, draft);
+CREATE        INDEX orbeon_from_data_attach_i1    ON orbeon_form_data_attach       (app, form, document_id, file_name, draft);
+CREATE UNIQUE INDEX orbeon_i_current_i1           ON orbeon_i_current              (data_id, draft);
 CREATE        INDEX orbeon_i_control_text_i1      ON orbeon_i_control_text         (data_id);
 
 CREATE OR REPLACE TRIGGER orbeon_form_data_xml

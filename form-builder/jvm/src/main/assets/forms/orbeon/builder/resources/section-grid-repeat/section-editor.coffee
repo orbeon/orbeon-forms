@@ -26,10 +26,10 @@ $ ->
                 pageX = event.pageX
                 pageY = event.pageY
 
-    Builder.currentContainerChanged SideEditor.gridSectionCache,
-        wasCurrent: ->
+    do ->
+        wasCurrent = ->
             # NOP, instead we hide the section editor when the pointer leaves `.fb-main`
-        becomesCurrent: (section) ->
+        becomesCurrent = (section) ->
             currentSection = section.el
             # Position the editor
             do ->
@@ -48,12 +48,14 @@ $ ->
                 # Hide/show delete icon
                 deleteTrigger = f$.children '.delete-section-trigger', sectionEditor
                 if f$.is '.fb-can-delete', container then f$.show deleteTrigger else f$.hide deleteTrigger
+        Position.currentContainerChanged SideEditor.gridSectionCache, wasCurrent, becomesCurrent
 
-    Builder.currentContainerChanged SideEditor.fbMainCache,
-        wasCurrent: ->
+    do ->
+        wasCurrent = ->
             sectionEditor.hide()
             currentSection = null
-        becomesCurrent: -> # NOP
+        becomesCurrent = -> # NOP
+        Position.currentContainerChanged SideEditor.fbMainCache, wasCurrent, becomesCurrent
 
     do setupLabelEditor = ->
 

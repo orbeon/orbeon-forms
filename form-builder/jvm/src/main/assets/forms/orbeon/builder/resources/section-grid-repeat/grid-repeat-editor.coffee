@@ -45,23 +45,23 @@ $ ->
         deleteIcon = $ '.fb-delete-grid-trigger'
         detailsIcon = $ '.fb-grid-details-trigger'
         detailsHeight = _.memoize -> f$.height detailsIcon
-        Builder.currentContainerChanged gridsCache,
-            wasCurrent: -> _.each [deleteIcon, detailsIcon], (i) -> f$.hide i
-            becomesCurrent: (grid) ->
-                table = f$.find '.fr-grid', grid.el
-                if f$.is '.fb-can-delete-grid', table
-                    f$.show deleteIcon
-                    offset =
-                        top:  grid.top - Position.scrollTop()
-                        left: grid.left
-                    f$.offset offset, deleteIcon
-                if grid.head?
-                    f$.show detailsIcon
-                    head = f$.find '.fr-grid-head', table
-                    offset =
-                        top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Position.scrollTop()
-                        left: grid.left
-                    f$.offset offset, detailsIcon
+        wasCurrent = -> _.each [deleteIcon, detailsIcon], (i) -> f$.hide i
+        becomesCurrent = (grid) ->
+            table = f$.find '.fr-grid', grid.el
+            if f$.is '.fb-can-delete-grid', table
+                f$.show deleteIcon
+                offset =
+                    top:  grid.top - Position.scrollTop()
+                    left: grid.left
+                f$.offset offset, deleteIcon
+            if grid.head?
+                f$.show detailsIcon
+                head = f$.find '.fr-grid-head', table
+                offset =
+                    top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Position.scrollTop()
+                    left: grid.left
+                f$.offset offset, detailsIcon
+        Position.currentContainerChanged gridsCache, wasCurrent, becomesCurrent
 
     # Position icons do add/remove columns/rows
     do ->
@@ -116,11 +116,11 @@ $ ->
                     f$.show icon.el
                     f$.offset (icon.offset rowOrCol), icon.el
 
-        Builder.currentRowColChanged gridsCache,
-            wasCurrentRow:      hideIcons rowIcons
-            becomesCurrentRow:  showIcons rowIcons
-            wasCurrentCol:      hideIcons colIcons
-            becomesCurrentCol:  showIcons colIcons
+        wasCurrentRow     = hideIcons rowIcons
+        becomesCurrentRow = showIcons rowIcons
+        wasCurrentCol     = hideIcons colIcons
+        becomesCurrentCol = showIcons colIcons
+        Position.currentRowColChanged(gridsCache, wasCurrentRow, becomesCurrentRow, wasCurrentCol, becomesCurrentCol)
 
     # On click on a trigger inside .fb-grid-repeat-editor, send grid/row/column info along with the event
     do ->
@@ -137,15 +137,15 @@ $ ->
             selector = '.fr-grid-' + (if pos == 'rowPos' then 'tr' else 'td')
             current[pos] = f$.length f$.prevAll selector, rowCol.el
 
-        Builder.currentRowColChanged gridsCache,
-            wasCurrentRow:      resetPos 'rowPos'
-            becomesCurrentRow:  setPos   'rowPos'
-            wasCurrentCol:      resetPos 'colPos'
-            becomesCurrentCol:  setPos   'colPos'
+        wasCurrentRow     = resetPos 'rowPos'
+        becomesCurrentRow = setPos   'rowPos'
+        wasCurrentCol     = resetPos 'colPos'
+        becomesCurrentCol = setPos   'colPos'
+        Position.currentRowColChanged(gridsCache, wasCurrentRow, becomesCurrentRow, wasCurrentCol, becomesCurrentCol)
 
-        Builder.currentContainerChanged gridsCache,
-            wasCurrent: -> current.gridId = null
-            becomesCurrent: (grid) -> current.gridId = f$.attr 'id', grid.el
+        wasCurrent = -> current.gridId = null
+        becomesCurrent =  (grid) -> current.gridId = f$.attr 'id', grid.el
+        Position.currentContainerChanged gridsCache, wasCurrent, becomesCurrent
 
         # Provide event context properties on click
         AjaxServer.eventCreated.add (event) ->

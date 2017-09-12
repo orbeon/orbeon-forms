@@ -27,7 +27,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 object SideEditor {
 
   @ScalaJSDefined
-  class GridSectionInfo extends js.Object {
+  class Block extends js.Object {
 
     val el: JQuery = null
     val left: Double = 0
@@ -35,10 +35,12 @@ object SideEditor {
     val width: Double = 0
     val height: Double = 0
     val titleOffset: Position.Offset = null
+    val rows: js.Array[Block] = js.Array()
+    val cols: js.Array[Block] = js.Array()
   }
 
-  val gridSectionCache = js.Array[GridSectionInfo]()
-  val fbMainCache      = js.Array[GridSectionInfo]()
+  val gridSectionCache = js.Array[Block]()
+  val fbMainCache      = js.Array[Block]()
 
   Position.onOffsetMayHaveChanged(() ⇒ {
 
@@ -53,7 +55,7 @@ object SideEditor {
 
       val titleAnchor = section.find("a")
 
-      gridSectionCache.unshift(new GridSectionInfo {
+      gridSectionCache.unshift(new Block {
         override val el          = section
         override val top         = Position.adjustedOffset(section).top
         override val left        = Position.adjustedOffset(mostOuterSection).left
@@ -66,7 +68,7 @@ object SideEditor {
     fbMainCache.length = 0
     val fbMain = $(".fb-main-inner")
     val fbMainOffset = Position.adjustedOffset(fbMain)
-    fbMainCache.unshift(new GridSectionInfo {
+    fbMainCache.unshift(new Block {
       override val el          = fbMain
       override val top         = fbMainOffset.top
       override val left        = fbMainOffset.left

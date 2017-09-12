@@ -13,11 +13,11 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.builder.SideEditor.GridSectionInfo
+import org.orbeon.builder.SideEditor.Block
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}
-import org.scalajs.jquery.JQuery
+import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -26,6 +26,20 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 @JSExportTopLevel("ORBEON.builder.Position")
 @JSExportAll
 object Position {
+
+  // Keeps track of pointer position
+  var pointerPos: Offset = new Offset {
+    override val left: Double = 0
+    override val top : Double = 0
+  }
+
+  $(document).on("mousemove", (event: JQueryEventObject) ⇒ {
+    pointerPos =
+      new Offset {
+        override val left: Double = event.pageX
+        override val top : Double = event.pageY
+      }
+  })
 
   // How much we need to add to offset to account for the form having been scrolled
   def scrollTop() : Double  = $(".fb-main").scrollTop ()
@@ -72,21 +86,12 @@ object Position {
       $(window).on("resize", fn)
   }
 
-  // TODO: move to a case class once all the code creating a Container is in Scala.js
-  @js.native
-  trait Container extends js.Object {
-    val left   : Double
-    val top    : Double
-    val width  : Double
-    val height : Double
-  }
-
   // Finds the container, if any, based on a vertical position
   def findInCache(
-    containerCache : js.Array[Container],
+    containerCache : js.Array[Block],
     top            : Double,
     left           : Double
-  )                : js.UndefOr[Container] = {
+  )                : js.UndefOr[Block] = {
 
     containerCache.find { container ⇒
       val horizontalPosInside = container.left <= left && left <= container.left + container.width
@@ -96,26 +101,75 @@ object Position {
   }
 
   // Container is either a section or grid; calls listeners passing old/new container
-//  def currentContainerChanged(
-//    containerCache : js.Array[GridSectionInfo],
-//    wasCurrent     : js.Function,
-//    becomesCurrent : js.Function)
-//                   : Unit = {
-//
-//
-//  }
+  def currentContainerChanged[T](
+    containerCache : js.Array[Block],
+    wasCurrent     : js.Function1[Block, T],
+    becomesCurrent : js.Function1[Block, T])
+                   : Unit = {
+
+    val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
+    onUnderPointerChange(() ⇒ {
+      val top  = pointerPos.top  + Position.scrollTop()
+      val left = pointerPos.left + Position.scrollLeft()
+      val newContainer = findInCache(containerCache, top, left)
+      notifyChange(newContainer)
+    })
+  }
+
+  // Calls listeners when, in a grid, the pointer moves out of or in a new row/cell
+  def currentRowColChanged[T](
+    gridsCache        : js.Array[Block],
+    wasCurrentRow     : js.Function1[Block, T],
+    becomesCurrentRow : js.Function1[Block, T],
+    wasCurrentCol     : js.Function1[Block, T],
+    becomesCurrentCol : js.Function1[Block, T])
+                      : Unit = {
+
+    var currentGridOpt: js.UndefOr[Block] = js.undefined
+    currentContainerChanged(
+      gridsCache,
+      wasCurrent     = (g: Block) ⇒ currentGridOpt = js.undefined,
+      becomesCurrent = (g: Block) ⇒ currentGridOpt = g
+    )
+
+    val notifyRowChange = Position.notifyOnChange(wasCurrentRow, becomesCurrentRow)
+    val notifyColChange = Position.notifyOnChange(wasCurrentCol, becomesCurrentCol)
+
+    Position.onUnderPointerChange(() ⇒ {
+
+      val (newRow, newCol) =
+        currentGridOpt
+          .map((currentGrid) ⇒
+            {
+              val newRow =
+                currentGrid.rows.toList.find((r) ⇒ {
+                  val pointerTop = pointerPos.top + Position.scrollTop()
+                  r.top  <= pointerTop && pointerTop <= r.top + r.height
+                })
+              val newCol =
+                currentGrid.cols.toList.find((c) ⇒
+                  c.left <= pointerPos.left && pointerPos.left <= c.left + c.width
+                )
+              (newRow, newCol)
+            })
+          .getOrElse((None, None))
+
+      notifyRowChange(newRow.orUndefined)
+      notifyColChange(newCol.orUndefined)
+    })
+  }
 
   // Returns a function, which is expected to be called every time the value changes passing the new value, and which
   // will when appropriate notify the listeners `was` and `becomes` of the old and new value
   // TODO: replace `Any` by `Unit` once callers are all in Scala
   def notifyOnChange[T](
-    was     : js.Function1[GridSectionInfo, js.Any],
-    becomes : js.Function1[GridSectionInfo, js.Any])
-            : js.Function1[js.UndefOr[GridSectionInfo], Any] = {
+    was     : js.Function1[Block, T],
+    becomes : js.Function1[Block, T])
+            : js.Function1[js.UndefOr[Block], Any] = {
 
-    var currentValueOpt: js.UndefOr[GridSectionInfo] = js.undefined
+    var currentValueOpt: js.UndefOr[Block] = js.undefined
 
-    (newValueOpt: js.UndefOr[GridSectionInfo]) ⇒ {
+    (newValueOpt: js.UndefOr[Block]) ⇒ {
       newValueOpt.toOption match {
         case Some(newValue) ⇒
           val notify =
@@ -124,7 +178,7 @@ object Position {
               case Some(currentValue) ⇒
                 // Typically after an Ajax request, maybe a column/row was added/removed, so we might consequently
                 // need to update the icon position
-                newValue.el.is(currentValue.el) ||
+                ! newValue.el.is(currentValue.el) ||
                 // The elements could be the same, but their position could have changed, in which case want to
                 // reposition relative icons, so we don't consider the value to be the "same"
                 newValue.left != currentValue.left ||

@@ -109,7 +109,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     def sendUnauthorized(e: HttpStatusCodeException) = { logUnauthorized(e); ec.getResponse.setStatus(e.code) }
 
     // For pages: log and try to run routes
-    def runErrorRoute(t: Throwable, log: Boolean = true) = {
+    def runErrorRoute(t: Throwable, log: Boolean = true): Unit = {
 
       if (log) logError(t)
 
@@ -126,7 +126,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       }
     }
 
-    def runNotFoundRoute(t: Option[Throwable]) = {
+    def runNotFoundRoute(t: Option[Throwable]): Unit = {
 
       logNotFound(t)
 
@@ -143,7 +143,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       }
     }
 
-    def runUnauthorizedRoute(e: HttpStatusCodeException) = {
+    def runUnauthorizedRoute(e: HttpStatusCodeException): Unit = {
 
       logUnauthorized(e)
 
@@ -197,7 +197,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
   }
 
   // Compile a controller file
-  def compile(configRoot: Element, controllerValidity: AnyRef)(implicit logger: IndentedLogger) = {
+  def compile(configRoot: Element, controllerValidity: AnyRef)(implicit logger: IndentedLogger): PageFlow = {
     // Controller format:
     //
     // - config: files*, page*, epilogue?, not-found-handler?, unauthorized-handler?, error-handler?
@@ -205,8 +205,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     // - page:   @id?, (@path|@path-info), @matcher?, @default-submission?, @model?, @view?
 
     val stepProcessorContext = new StepProcessorContext(controllerValidity)
-    val locationData = configRoot.getData.asInstanceOf[LocationData]
-    val urlBase = Option(locationData) map (_.file) orNull
+    val locationData         = configRoot.getData.asInstanceOf[LocationData]
+    val urlBase              = Option(locationData) map (_.file) orNull
 
     // Gather properties
     implicit val properties = getPropertySet
@@ -555,7 +555,7 @@ object PageFlowControllerProcessor {
       matchResult   : MatchResult,
       mustAuthorize : Boolean = true)(implicit
       logger        : IndentedLogger
-    ) = {
+    ): Unit = {
 
       debug("processing route", Seq("route" → this.toString))
 
@@ -590,7 +590,7 @@ object PageFlowControllerProcessor {
 
     // Authorize the incoming request. Throw an HttpStatusCodeException if the request requires authorization
     // based on the request method, and is not authorized (with a token or via an authorizer service).
-    def authorize(ec: ExternalContext)(implicit logger: IndentedLogger) =
+    def authorize(ec: ExternalContext)(implicit logger: IndentedLogger): Unit =
       if (requireAuthorization(ec.getRequest) && ! Authorizer.authorized(ec))
         unauthorized()
   }

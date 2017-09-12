@@ -52,6 +52,7 @@ object Position {
   }
 
   // Typed version of JQuery's offset()
+  def offset(el: JQuery, offset: Offset): Unit = el.offset(offset)
   def offset(el: JQuery): Offset = {
     val jOffset = el.offset().asInstanceOf[js.Dynamic]
     new Offset {

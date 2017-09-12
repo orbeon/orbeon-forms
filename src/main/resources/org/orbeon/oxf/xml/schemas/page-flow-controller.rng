@@ -49,6 +49,9 @@
                         </choice>
                         <ref name="route-attributes"/>
                         <optional>
+                            <attribute name="methods"/>
+                        </optional>
+                        <optional>
                             <attribute name="public-methods"/>
                         </optional>
                         <optional>

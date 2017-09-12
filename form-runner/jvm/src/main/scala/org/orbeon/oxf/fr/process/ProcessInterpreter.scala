@@ -225,14 +225,14 @@ trait ProcessInterpreter extends Logging {
 
   // Main entry point for starting a process associated with a named button
   //@XPathFunction
-  def runProcessByName(scope: String, name: String): Unit =
+  def runProcessByName(scope: String, name: String): Try[Any] =
     LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" → currentXFormsDocumentId, "scope" → scope, "name" → name)) {
       runProcess(scope, rawProcessByName(scope, name))
     }
 
   // Main entry point for starting a literal process
   //@XPathFunction
-  def runProcess(scope: String, process: String): Try[Any] =
+  def runProcess(scope: String, process: String): Try[Any] = {
     withDebug("process: running", Seq("process" → process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
@@ -250,6 +250,8 @@ trait ProcessInterpreter extends Logging {
           // NOTE: In the future, it would be good to provide the user with an error id.
           error(OrbeonFormatter.format(t))
           Try(processError(t))
+          Failure(t)
+        }
         }
       }
     }

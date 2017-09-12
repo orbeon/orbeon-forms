@@ -76,12 +76,12 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("run-process-by-name", classOf[FRRunProcessByName], op = 0, min = 2, Type.ITEM_TYPE, EMPTY,
+    Fun("run-process-by-name", classOf[FRRunProcessByName], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("run-process", classOf[FRRunProcess], op = 0, min = 2, Type.ITEM_TYPE, EMPTY,
+    Fun("run-process", classOf[FRRunProcess], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
@@ -182,17 +182,13 @@ private object FormRunnerFunctions {
   }
 
   class FRRunProcessByName extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(context: XPathContext): Item = {
-      SimpleProcess.runProcessByName(stringArgument(0)(context), stringArgument(1)(context))
-      null
-    }
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      SimpleProcess.runProcessByName(stringArgument(0)(context), stringArgument(1)(context)).isSuccess
   }
 
   class FRRunProcess extends FunctionSupport with RuntimeDependentFunction {
-    override def evaluateItem(context: XPathContext): Item = {
-      SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context))
-      null
-    }
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      SimpleProcess.runProcess(stringArgument(0)(context), stringArgument(1)(context)).isSuccess
   }
 
   class FRDataset extends SystemFunction {

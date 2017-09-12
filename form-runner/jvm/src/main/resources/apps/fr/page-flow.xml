@@ -138,6 +138,7 @@
 
     <!-- Duplicate form data -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(duplicate)"
+             methods="POST"
              model="request-parameters.xpl"
              view="services/duplicate.xhtml"/>
 

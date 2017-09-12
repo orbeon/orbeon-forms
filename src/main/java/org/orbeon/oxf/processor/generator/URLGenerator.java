@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.http.HttpStatusCodeException;
 import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.json.Symbols;
@@ -997,7 +998,7 @@ public class URLGenerator extends ProcessorImpl {
                     );
 
                 connectionResult =
-                    Connection.jApply("GET", url, credentials, null, headers, true, false, indentedLogger).connect(true);
+                    Connection.jApply(HttpMethod.GET$.MODULE$, url, credentials, null, headers, true, false, indentedLogger).connect(true);
 
                 inputStream = connectionResult.content().inputStream();
 

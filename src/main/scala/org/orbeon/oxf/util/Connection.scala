@@ -339,7 +339,7 @@ object Connection extends Logging {
 
   // For Java callers
   def jApply(
-    httpMethodUpper   : String,
+    httpMethod        : HttpMethod,
     url               : URI,
     credentialsOrNull : Credentials,
     messageBodyOrNull : Array[Byte],
@@ -349,10 +349,9 @@ object Connection extends Logging {
     logger            : IndentedLogger
   ): Connection = {
 
-    val httpMethod = HttpMethod.withNameInsensitive(httpMethodUpper)
 
     val messageBody: Option[Array[Byte]] =
-      if (requiresRequestBody(httpMethodUpper)) Option(messageBodyOrNull) orElse Some(Array()) else None
+      if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
     val content = messageBody map
       (StreamedContent.fromBytes(_, firstHeaderIgnoreCase(headers, ContentType)))
@@ -393,9 +392,6 @@ object Connection extends Logging {
     } yield
       pathQuery
   }
-
-  // Whether the given method requires a request body
-  def requiresRequestBody(httpMethodUpper: String): Boolean = Set("POST", "PUT")(httpMethodUpper)
 
   private val HttpMethodsWithRequestBody = Set[HttpMethod](POST, PUT)
   def requiresRequestBody(httpMethod: HttpMethod) = HttpMethodsWithRequestBody(httpMethod)

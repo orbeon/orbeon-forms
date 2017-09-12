@@ -433,7 +433,7 @@ object PageFlowControllerProcessor {
 
   val PathMatchers                 = "path-matchers"
 
-  val PagePublicMethods            = Set("GET", "HEAD")
+  val PagePublicMethods            = Set(HttpMethod.GET, HttpMethod.POST): Set[HttpMethod]
   val ServicePublicMethods         = Set.empty[String]
   val SubmissionPublicMethods      = Set(HttpMethod.GET, HttpMethod.POST): Set[HttpMethod] // Q: do we need GET? PUT?
   val AllPublicMethods             = "#all"

@@ -18,6 +18,7 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Credentials;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -394,7 +395,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                     );
 
                 final ConnectionResult connectionResult
-                    = Connection.jApply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
+                    = Connection.jApply(HttpMethod.GET$.MODULE$, submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode() != 200)

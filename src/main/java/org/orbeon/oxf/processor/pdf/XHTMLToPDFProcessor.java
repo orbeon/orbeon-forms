@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -145,7 +146,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                         );
 
                     final ConnectionResult cxr =
-                        Connection.jApply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);
+                        Connection.jApply(HttpMethod.GET$.MODULE$, url, null, null, headers, true, false, indentedLogger).connect(true);
 
                     final InputStream is =
                         ConnectionResult.withSuccessConnection(cxr, false, new Function1Adapter<InputStream, InputStream>() {

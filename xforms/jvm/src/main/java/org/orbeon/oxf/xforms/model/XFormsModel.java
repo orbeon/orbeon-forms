@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -659,7 +660,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 );
 
             final ConnectionResult connectionResult = Connection.jApply(
-                "GET", absoluteResolvedURL, instance.credentialsOrNull(), null,
+                HttpMethod.GET$.MODULE$, absoluteResolvedURL, instance.credentialsOrNull(), null,
                 headers, true, BaseSubmission.isLogBody(), indentedLogger()).connect(true);
 
             instanceDocument =

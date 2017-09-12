@@ -469,7 +469,7 @@ object XFormsServer {
         localName = "submission",
         prefix    = "xxf",
         uri       = XFormsConstants.XXFORMS_NAMESPACE_URI,
-        atts      = ("method" → "POST") :: showProgressAtt ::: targetAtt ::: actionAtt
+        atts      = ("method" → HttpMethod.POST.entryName) :: showProgressAtt ::: targetAtt ::: actionAtt
       )
     }
 

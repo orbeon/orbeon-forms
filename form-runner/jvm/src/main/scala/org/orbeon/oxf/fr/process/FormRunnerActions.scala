@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.fr.{DataMigration, DataStatus, FormRunner}
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -240,7 +241,7 @@ trait FormRunnerActions {
 
   // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
-    "method"              → "post",
+    "method"              → HttpMethod.POST.entryName.toLowerCase,
     NonRelevantName       → RelevanceHandling.Remove.entryName.toLowerCase,
     "annotate"            → "",
     "replace"             → XFORMS_SUBMIT_REPLACE_NONE,
@@ -435,7 +436,7 @@ trait FormRunnerActions {
       val params: List[Option[(Option[String], String)]] =
         List(
           Some(             Some("uri")                   → prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, optimize = false))),
-          Some(             Some("method")                → "post"),
+          Some(             Some("method")                → HttpMethod.POST.entryName.toLowerCase),
           Some(             Some("nonrelevant")           → "keep"),
           Some(             Some("replace")               → replace),
           Some(             Some(ShowProgressName)        → showProgress.toString),

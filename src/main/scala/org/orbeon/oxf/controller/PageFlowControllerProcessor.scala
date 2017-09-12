@@ -487,12 +487,7 @@ object PageFlowControllerProcessor {
 
       val isPage = e.getName == "page"
 
-      def localSupportedMethods = att(e, "methods") map {
-        case att if att == AllPublicMethods ⇒ (_: HttpMethod) ⇒ true
-        case att                            ⇒ stringToSet(att) map HttpMethod.withNameInsensitive
-      }
-
-      def localPublicMethods = att(e, "public-methods") map {
+      def methodAttributeFn(attName: String) = att(e, attName) map {
         case att if att == AllPublicMethods ⇒ (_: HttpMethod) ⇒ true
         case att                            ⇒ stringToSet(att) map HttpMethod.withNameInsensitive
       }
@@ -508,8 +503,8 @@ object PageFlowControllerProcessor {
         model             = att(e, "model"),
         view              = att(e, "view"),
         element           = e,
-        supportedMethods  = localSupportedMethods getOrElse (_ ⇒ true),
-        publicMethods     = localPublicMethods getOrElse defaultPublicMethods,
+        supportedMethods  = methodAttributeFn("methods")        getOrElse (_ ⇒ true),
+        publicMethods     = methodAttributeFn("public-methods") getOrElse defaultPublicMethods,
         isPage            = isPage
       )
     }

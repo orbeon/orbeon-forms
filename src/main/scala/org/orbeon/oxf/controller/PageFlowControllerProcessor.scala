@@ -269,7 +269,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
               model             = submissionModel,
               view              = None,
               element           = configRoot,
-              supportedMethods  = Set("POST"),
+              supportedMethods  = Set(HttpMethod.POST),
               publicMethods     = SubmissionPublicMethods,
               isPage            = true
             )
@@ -457,7 +457,7 @@ object PageFlowControllerProcessor {
     model             : Option[String],
     view              : Option[String],
     element           : Element,
-    supportedMethods  : String ⇒ Boolean,
+    supportedMethods  : HttpMethod ⇒ Boolean,
     publicMethods     : HttpMethod ⇒ Boolean,
     isPage            : Boolean
   ) extends RouteElement
@@ -488,8 +488,8 @@ object PageFlowControllerProcessor {
       val isPage = e.getName == "page"
 
       def localSupportedMethods = att(e, "methods") map {
-        case att if att == AllPublicMethods ⇒ (_: String) ⇒ true
-        case att                            ⇒ stringToSet(att)
+        case att if att == AllPublicMethods ⇒ (_: HttpMethod) ⇒ true
+        case att                            ⇒ stringToSet(att) map HttpMethod.withNameInsensitive
       }
 
       def localPublicMethods = att(e, "public-methods") map {

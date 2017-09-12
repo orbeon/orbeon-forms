@@ -326,7 +326,10 @@
     </xf:action>
 
     <!-- Instance for background service response -->
-    <xf:instance id="fr-background-response-instance" xxf:expose-xpath-types="true">
+    <xf:instance
+        id="fr-background-response-instance"
+        xxf:expose-xpath-types="true"
+        xxf:exclude-result-prefixes="#all">
         <response>
             <document-id/>
             <process-success>true</process-success>

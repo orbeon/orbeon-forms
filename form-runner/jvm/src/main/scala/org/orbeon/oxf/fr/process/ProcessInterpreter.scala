@@ -31,7 +31,7 @@ import org.orbeon.scaxon.XPath._
 
 import scala.annotation.tailrec
 import scala.util.control.{Breaks, ControlThrowable, NonFatal}
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {

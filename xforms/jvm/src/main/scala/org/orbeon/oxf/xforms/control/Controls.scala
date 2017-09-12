@@ -200,7 +200,7 @@ object Controls {
       effectiveControlId ←
       resolveControlsEffectiveIds(
         containingDocument.getStaticOps,
-          controls.getCurrentControlTree,
+        controls.getCurrentControlTree,
         sourceControlEffectiveId,
         targetPrefixedId,
         followIndexes

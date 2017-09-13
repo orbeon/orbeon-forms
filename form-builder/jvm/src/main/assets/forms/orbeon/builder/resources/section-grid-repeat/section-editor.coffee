@@ -3,26 +3,15 @@ $ ->
     AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder
     Position = ORBEON.builder.Position
+    BlockCache = ORBEON.builder.BlockCache
     SideEditor = ORBEON.builder.SideEditor
     Controls = ORBEON.xforms.Controls
     Events = ORBEON.xforms.Events
     FSM = ORBEON.util.FiniteStateMachine
     Properties = ORBEON.util.Properties
 
-    pageX = 0; pageY = 0
     SectionTitleSelector = '.fr-section-title:first'
     SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first .xforms-output-output'
-
-    FSM.create
-        transitions : [
-            { events: [ 'mouseMove'], actions: [ 'mouseMoved' ] }
-        ]
-        events:
-            mouseMove: (f) -> ($ document).on 'mousemove', (e) -> f e
-        actions:
-            mouseMoved: (event) ->
-                pageX = event.pageX
-                pageY = event.pageY
 
     do setupLabelEditor = ->
 
@@ -38,7 +27,7 @@ $ ->
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
             labelInputOffset = Position.adjustedOffset(labelInput)
-            section = Position.findInCache(SideEditor.gridSectionCache, labelInputOffset.top, labelInputOffset.left)
+            section = Position.findInCache(BlockCache.gridSectionCache, labelInputOffset.top, labelInputOffset.left)
             f$.text newLabelValue, f$.find SectionLabelSelector, section.el
             sectionId = f$.attr 'id', section.el
             ORBEON.xforms.Document.dispatchEvent
@@ -63,7 +52,7 @@ $ ->
                 interceptorOffset = Position.adjustedOffset clickInterceptor
                 # From the section title, get the anchor element, which contains the title
                 labelAnchor = do ->
-                    section = Position.findInCache(SideEditor.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
+                    section = Position.findInCache(BlockCache.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
                     f$.find SectionLabelSelector, section.el
                 # Set placeholder, done every time to account for a value change when changing current language
                 do ->
@@ -89,17 +78,17 @@ $ ->
         # Update highlight of section title, as a hint users can click to edit
         updateHighlight = (updateClass, clickInterceptor) ->
             offset = Position.adjustedOffset clickInterceptor
-            section = Position.findInCache(SideEditor.gridSectionCache, offset.top, offset.left)
+            section = Position.findInCache(BlockCache.gridSectionCache, offset.top, offset.left)
             if _.isUndefined(section)
                 debugger
-                Position.findInCache(SideEditor.gridSectionCache, offset.top, offset.left)
+                Position.findInCache(BlockCache.gridSectionCache, offset.top, offset.left)
             sectionTitle = f$.find '.fr-section-title:first', section.el
             updateClass 'hover', sectionTitle
 
         # Show textual indication user can click on empty section title
         showClickHintIfTitleEmpty = (clickInterceptor) ->
             interceptorOffset = Position.adjustedOffset clickInterceptor
-            section = Position.findInCache(SideEditor.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
+            section = Position.findInCache(BlockCache.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
             labelAnchor = f$.find SectionLabelSelector, section.el
             if (f$.text labelAnchor) == ''
                 outputWithHintMessage = SideEditor.sectionEditor.children('.fb-enter-section-title-label')

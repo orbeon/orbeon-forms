@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Orbeon, Inc.
+ * Copyright (C) 2017 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,24 +13,8 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.fr._
-import org.orbeon.xforms.$
+object LabelEditor {
 
-// Scala.js starting point for Form Builder
-object FormBuilderApp {
 
-  def main(args: Array[String]): Unit = {
 
-    def initializeOnDomReady(): Unit = {
-      FormRunnerApp.main(Array.empty)
-      StaticUpload
-      DialogItemset
-      ControlDnD
-      BlockCache
-      SideEditor
-      LabelEditor
-    }
-
-    $(initializeOnDomReady _)
-  }
 }

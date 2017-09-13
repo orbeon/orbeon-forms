@@ -13,6 +13,7 @@
  */
 package org.orbeon.builder
 
+import org.orbeon.builder.BlockCache.Block
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 
@@ -26,66 +27,12 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 @JSExportAll
 object SideEditor {
 
-  @ScalaJSDefined
-  class Block extends js.Object {
-
-    val el: JQuery = null
-    val left: Double = 0
-    val top: Double = 0
-    val width: Double = 0
-    val height: Double = 0
-    val titleOffset: Position.Offset = null
-    val rows: js.Array[Block] = js.Array()
-    val cols: js.Array[Block] = js.Array()
-  }
-
-  val gridSectionCache = js.Array[Block]()
-  val fbMainCache      = js.Array[Block]()
-
-  // Keep `gridSectionCache` and `fbMainCache` current
-  Position.onOffsetMayHaveChanged(() ⇒ {
-
-    gridSectionCache.length = 0
-    $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
-      val section = $(domSection)
-
-      val mostOuterSection =
-        section.parents(".xbl-fr-section").last()
-          .pipe(Option(_)).filter(_.is("*"))
-          .getOrElse(section)
-
-      val titleAnchor = section.find("a")
-
-      gridSectionCache.unshift(new Block {
-        override val el          = section
-        override val top         = Position.adjustedOffset(section).top
-        override val left        = Position.adjustedOffset(mostOuterSection).left
-        override val height      = titleAnchor.height()
-        override val width       = mostOuterSection.width()
-        override val titleOffset = Position.offset(titleAnchor)
-      })
-    })
-
-    fbMainCache.length = 0
-    val fbMain = $(".fb-main-inner")
-    val fbMainOffset = Position.adjustedOffset(fbMain)
-    fbMainCache.unshift(new Block {
-      override val el          = fbMain
-      override val top         = fbMainOffset.top
-      override val left        = fbMainOffset.left
-      override val height      = fbMain.height()
-      override val width       = fbMain.width()
-      override val titleOffset = null
-    })
-
-  })
-
   lazy val sectionEditor = $(".fb-section-editor")
   var currentSectionOpt: js.UndefOr[JQuery] = js.undefined
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
-    containerCache = SideEditor.gridSectionCache,
+    containerCache = BlockCache.gridSectionCache,
     wasCurrent = (section: Block) ⇒
       // NOP, instead we hide the section editor when the pointer leaves `.fb-main`
       (),
@@ -93,7 +40,6 @@ object SideEditor {
       currentSectionOpt = section.el
 
       // Position the editor
-      scala.scalajs.js.Dynamic.global.console.log("becomes current")
       sectionEditor.show()
       Position.offset(sectionEditor, new Position.Offset {
         // Use `.fr-body` left rather than the section left to account for sub-sections indentation
@@ -118,7 +64,7 @@ object SideEditor {
 
   // Hide editor when the pointer gets out of the Form Builder main area
   Position.currentContainerChanged(
-    containerCache = fbMainCache,
+    containerCache = BlockCache.fbMainCache,
     wasCurrent = (section: Block) ⇒ {
       sectionEditor.hide()
       currentSectionOpt = js.undefined

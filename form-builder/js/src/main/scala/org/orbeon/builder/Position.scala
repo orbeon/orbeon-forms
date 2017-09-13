@@ -13,7 +13,7 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.builder.SideEditor.Block
+import org.orbeon.builder.BlockCache.Block
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom.{document, window}

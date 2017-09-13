@@ -9,8 +9,6 @@ $ ->
     FSM = ORBEON.util.FiniteStateMachine
     Properties = ORBEON.util.Properties
 
-    sectionEditor = $ '.fb-section-editor'
-    currentSection = null
     pageX = 0; pageY = 0
     SectionTitleSelector = '.fr-section-title:first'
     SectionLabelSelector = '.fr-section-label:first a, .fr-section-label:first .xforms-output-output'
@@ -26,37 +24,6 @@ $ ->
                 pageX = event.pageX
                 pageY = event.pageY
 
-    do ->
-        wasCurrent = ->
-            # NOP, instead we hide the section editor when the pointer leaves `.fb-main`
-        becomesCurrent = (section) ->
-            currentSection = section.el
-            # Position the editor
-            do ->
-                sectionEditor.show()
-                sectionEditor.offset
-                    top: section.top - Position.scrollTop()
-                    left: $(".fr-body").offset().left - f$.outerWidth sectionEditor      # Use `.fr-body` left rather than the section left to account for sub-sections indentation
-            # Update trigger relevance
-            do ->
-                container = section.el.children '.fr-section-container'
-                # Hide/show section move icons
-                _.each (['up', 'right', 'down', 'left']), (direction) ->
-                    relevant = container.hasClass ("fb-can-move-" + direction)
-                    trigger = sectionEditor.children ('.fb-section-move-' + direction)
-                    if relevant then trigger.show() else trigger.hide()
-                # Hide/show delete icon
-                deleteTrigger = f$.children '.delete-section-trigger', sectionEditor
-                if f$.is '.fb-can-delete', container then f$.show deleteTrigger else f$.hide deleteTrigger
-        Position.currentContainerChanged SideEditor.gridSectionCache, wasCurrent, becomesCurrent
-
-    do ->
-        wasCurrent = ->
-            sectionEditor.hide()
-            currentSection = null
-        becomesCurrent = -> # NOP
-        Position.currentContainerChanged SideEditor.fbMainCache, wasCurrent, becomesCurrent
-
     do setupLabelEditor = ->
 
         labelInput = null
@@ -66,7 +33,7 @@ $ ->
             target = $ document.getElementById event.targetId
             inSectionEditor = f$.is '*', f$.closest '.fb-section-editor', target
             if event.eventName == 'DOMActivate' && inSectionEditor
-                addProperties 'section-id': f$.attr 'id', currentSection
+                addProperties 'section-id': f$.attr 'id', SideEditor.currentSectionOpt
 
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
@@ -100,7 +67,7 @@ $ ->
                     f$.find SectionLabelSelector, section.el
                 # Set placeholder, done every time to account for a value change when changing current language
                 do ->
-                    placeholderOutput = f$.children '.fb-type-section-title-label', sectionEditor
+                    placeholderOutput = f$.children '.fb-type-section-title-label', SideEditor.sectionEditor
                     placeholderValue = Controls.getCurrentValue placeholderOutput[0]
                     f$.attr 'placeholder', placeholderValue, labelInput
                 # Populate and show input
@@ -135,7 +102,7 @@ $ ->
             section = Position.findInCache(SideEditor.gridSectionCache, interceptorOffset.top, interceptorOffset.left)
             labelAnchor = f$.find SectionLabelSelector, section.el
             if (f$.text labelAnchor) == ''
-                outputWithHintMessage = sectionEditor.children('.fb-enter-section-title-label')
+                outputWithHintMessage = SideEditor.sectionEditor.children('.fb-enter-section-title-label')
                 hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0))
                 clickInterceptor.text(hintMessage)
 

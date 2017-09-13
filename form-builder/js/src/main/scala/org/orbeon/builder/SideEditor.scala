@@ -80,7 +80,7 @@ object SideEditor {
 
   })
 
-  val sectionEditor = $(".fb-section-editor")
+  lazy val sectionEditor = $(".fb-section-editor")
   var currentSectionOpt: js.UndefOr[JQuery] = js.undefined
 
   // Position editor when block becomes current
@@ -93,6 +93,7 @@ object SideEditor {
       currentSectionOpt = section.el
 
       // Position the editor
+      scala.scalajs.js.Dynamic.global.console.log("becomes current")
       sectionEditor.show()
       Position.offset(sectionEditor, new Position.Offset {
         // Use `.fr-body` left rather than the section left to account for sub-sections indentation
@@ -113,6 +114,16 @@ object SideEditor {
       val deleteTrigger = sectionEditor.children(".delete-section-trigger")
       if (container.is(".fb-can-delete")) deleteTrigger.show() else deleteTrigger.hide()
     }
+  )
+
+  // Hide editor when the pointer gets out of the Form Builder main area
+  Position.currentContainerChanged(
+    containerCache = fbMainCache,
+    wasCurrent = (section: Block) ⇒ {
+      sectionEditor.hide()
+      currentSectionOpt = js.undefined
+    },
+    becomesCurrent = (section: Block) ⇒ ( /* NOP */ )
   )
 
 }

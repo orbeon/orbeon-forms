@@ -110,17 +110,12 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
-        refresh summary clear pdf save-final review
+        summary clear pdf save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-draft.*.*"             value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-final.*.*"             value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.submit.*.*"                 value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
-
-    <!-- Buttons visible / enabled -->
-    <property as="xs:string"  name="oxf.fr.detail.button.refresh.visible.*.*">
-        fr:is-noscript()
-    </property>
 
     <!-- Wizard buttons visible / enabled -->
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.visible.*.*">
@@ -205,13 +200,13 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="resource"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
-        refresh pdf tiff wizard-prev wizard-next review
+        pdf tiff wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
-        refresh summary clear pdf tiff save-final review
+        summary clear pdf tiff save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state.*"                 value="select-value"/>
@@ -223,10 +218,10 @@
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w9">
-        refresh wizard-prev wizard-next review
+        wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.w9">
-        refresh edit pdf save
+        edit pdf save
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
@@ -240,7 +235,6 @@
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.refresh.*.*"                          value='visit-all'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >
         if ("not(property('xxf:noscript'))")

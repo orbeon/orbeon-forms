@@ -7,6 +7,7 @@ build-local.properties
 .idea/modules/
 .idea/kotlinc.xml
 .idea/workspace.xml
+.idea/libraries
 # SBT command history
 .target/.history
 src/resources-packaged-target/

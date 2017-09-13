@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="SBT: xalan:serializer:2.7.1:jar">
-    <CLASSES>
-      <root url="jar://$USER_HOME$/.ivy2/cache/xalan/serializer/jars/serializer-2.7.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

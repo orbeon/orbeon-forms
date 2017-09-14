@@ -25,7 +25,7 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]" as="element(fr:view)?"/>
+    <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"       as="element(fr:view)?"/>
     <xsl:variable name="fluid"          select="$view/@fluid = 'true'"/>
     <xsl:variable name="body"           select="($view/fr:body, $view)[1]"           as="element()?"/>
     <xsl:variable name="custom-buttons" select="$view/fr:buttons"                    as="element()*"/>
@@ -280,21 +280,18 @@
                     <xf:revalidate model="fr-persistence-model"/>
                     <xf:refresh/>
                 </xf:action>
-                <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
+                <!-- Failure: load another challenge -->
                 <xf:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
-                <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
-                <xsl:if test="$captcha-type = 'reCAPTCHA'">
-                    <fr:recaptcha id="captcha" theme="clean" ref="$captcha">
-                        <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
-                        <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
-                    </fr:recaptcha>
-                </xsl:if>
-                <xsl:if test="$captcha-type = 'SimpleCaptcha'">
-                    <fr:simple-captcha id="captcha" ref="$captcha">
-                        <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
-                        <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
-                    </fr:simple-captcha>
-                </xsl:if>
+                <!-- Captcha component -->
+                <xsl:element
+                    namespace="{$captcha-uri-name[1]}"
+                    name     ="{$captcha-uri-name[2]}"
+                >
+                    <xsl:attribute name="id">captcha</xsl:attribute>
+                    <xsl:attribute name="ref">$captcha</xsl:attribute>
+                    <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
+                    <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
+                </xsl:element>
             </xf:group>
         </xsl:if>
     </xsl:template>

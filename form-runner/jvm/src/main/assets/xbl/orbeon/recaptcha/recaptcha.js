@@ -43,6 +43,9 @@
             var langElement      = $(this.container).find('.xbl-fr-recaptcha-lang').get(0);
             var lang             = ORBEON.xforms.Document.getValue(langElement.id);
 
+            // Default theme is `clean`
+            if (theme == "") theme = "clean";
+
             Recaptcha.create(publicKey, recaptchaDiv.id, {
                theme: theme,
                lang: lang,

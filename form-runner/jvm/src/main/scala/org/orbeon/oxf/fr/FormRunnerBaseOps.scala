@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
+import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{DateUtils, NetUtils}
@@ -198,10 +199,39 @@ trait FormRunnerBaseOps {
   def documentModifiedDate = documentMetadataDate(Headers.LastModified)
 
   // Captcha support
-  def hasCaptcha    = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
   def captchaPassed = persistenceInstance.rootElement / "captcha" === "true"
   //@XPathFunction
-  def showCaptcha   = hasCaptcha && Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
+  def showCaptcha   = Set("new", "edit")(FormRunnerParams().mode) && ! captchaPassed && ! isNoscript
+
+  //@XPathFunction
+  def captchaComponent(app: String, form: String): Array[String] = {
+    val logger              = ProcessorImpl.logger
+    val captchaPropertyName = "oxf.fr.detail.captcha":: app :: form :: Nil mkString "."
+    val captchaPropertyOpt  = properties.getPropertyOpt(captchaPropertyName)
+    captchaPropertyOpt match {
+      case None ⇒ Array.empty
+      case Some(captchaProperty) ⇒
+        val propertyValue = captchaProperty.value.asInstanceOf[String]
+        propertyValue match {
+          case "reCAPTCHA"     ⇒ Array(XMLNames.FR, "fr:recaptcha")
+          case "SimpleCaptcha" ⇒ Array(XMLNames.FR, "fr:simple-captcha")
+          case captchaName     ⇒
+            captchaName.splitTo[List](":") match {
+              case List(prefix, localName) ⇒
+                captchaProperty.namespaces.get(prefix) match {
+                  case Some(namespaceURI) ⇒
+                    Array(namespaceURI, captchaName)
+                  case None ⇒
+                    logger.error(s"No namespace for captcha `$captchaName`")
+                    Array.empty
+                }
+              case _ ⇒
+                logger.error(s"Invalid reference to captcha component `$captchaName`")
+                Array.empty
+            }
+        }
+    }
+  }
 
   private val ReadonlyModes = Set("view", "pdf", "email", "controls")
 
@@ -239,6 +269,7 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   def errorMessage(message: String): Unit =
     dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" → Some(message)))
+
 }
 
 object FormRunnerBaseOps extends FormRunnerBaseOps

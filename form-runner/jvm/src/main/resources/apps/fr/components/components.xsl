@@ -22,7 +22,8 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:p="http://www.orbeon.com/oxf/pipeline">
+        xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="actions.xsl"/>
@@ -79,8 +80,8 @@
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
 
     <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
-    <xsl:variable name="captcha-type"         select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"                            as="xs:string"/>
-    <xsl:variable name="has-captcha"          select="$captcha-type = ('reCAPTCHA', 'SimpleCaptcha')"                                                  as="xs:boolean"/>
+    <xsl:variable name="captcha-uri-name"     select="frf:captchaComponent($app, $form)"                                                               as="xs:string*"/>
+    <xsl:variable name="has-captcha"          select="exists($captcha-uri-name)"                                                                       as="xs:boolean"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>

@@ -53,6 +53,26 @@ private object FlatView {
       TablePrefix + joinParts(List(appXML, formXML), MaxNameLength - TablePrefix.length)
     }
 
+    // Delete view if it exists
+    // - Only for DB2 and postgresql; on Oracle we can use "OR REPLACE" when creating the view.
+    if (req.provider == PostgreSQL) {
+      val viewExists = {
+        val sqlQuery =
+          s"""|SELECT *
+              |  FROM information_schema.views
+              | WHERE table_name = ?
+              |""".stripMargin
+
+        useAndClose(connection.prepareStatement(sqlQuery)) { ps ⇒
+          // On PostgreSQL, the name is stored in lower case in `information_schema.views`
+          ps.setString(1, if (req.provider == PostgreSQL) viewName.toLowerCase else viewName)
+          useAndClose(ps.executeQuery())(_.next())
+        }
+      }
+      if (viewExists)
+        useAndClose(connection.prepareStatement(s"DROP VIEW $viewName"))(_.executeUpdate())
+    }
+
     // Compute columns in the view
     val cols = {
       val userCols  = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) ⇒
@@ -69,7 +89,7 @@ private object FlatView {
     // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
     locally {
       val query =
-        s"""|CREATE  OR REPLACE VIEW $viewName AS
+        s"""|CREATE VIEW $viewName AS
             |SELECT  ${cols map { case Col(col, name) ⇒ col + " " + name} mkString ", "}
             |  FROM  orbeon_form_data d,
             |        (

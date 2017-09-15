@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.junit.Test
 import org.orbeon.dom.saxon
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fb.Cell._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner
@@ -268,9 +269,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
       def td(id: String) = grid descendant * filter (_.hasIdValue(id)) head
 
       val expected = Seq(
-        Seq(Cell(td("11"), 1, false), Cell(td("12"), 2, false), Cell(td("13"), 1, false)),
-        Seq(Cell(td("21"), 2, false), Cell(td("12"), 1, true),  Cell(td("23"), 1, false)),
-        Seq(Cell(td("21"), 1, true),  Cell(td("32"), 1, false), Cell(td("33"), 1, false))
+        Seq(Cell(td("11"), 1, 1, false), Cell(td("12"), 2, 1, false), Cell(td("13"), 1, 1, false)),
+        Seq(Cell(td("21"), 2, 1, false), Cell(td("12"), 1, 1, true),  Cell(td("23"), 1, 1, false)),
+        Seq(Cell(td("21"), 1, 1, true),  Cell(td("32"), 1, 1, false), Cell(td("33"), 1, 1, false))
       )
 
       compareExpectedCells(grid, expected)
@@ -294,12 +295,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
       def td(id: String) = grid descendant * filter (_.hasIdValue(id)) head
 
       val expected = Seq(
-        Seq(Cell(td("11"),        1, false), Cell(td("12"),        3, false), Cell(td("13"),        1, false)),
-        Seq(Cell(td("tmp-2-tmp"), 1, false), Cell(td("12"),        2, true),  Cell(td("tmp-3-tmp"), 1, false)),
-        Seq(Cell(td("21"),        3, false), Cell(td("12"),        1, true),  Cell(td("23"),        1, false)),
-        Seq(Cell(td("21"),        2, true),  Cell(td("tmp-4-tmp"), 1, false), Cell(td("tmp-5-tmp"), 1, false)),
-        Seq(Cell(td("21"),        1, true),  Cell(td("32"),        1, false), Cell(td("33"),        1, false)),
-        Seq(Cell(td("tmp-6-tmp"), 1, false), Cell(td("tmp-7-tmp"), 1, false), Cell(td("tmp-8-tmp"), 1, false))
+        Seq(Cell(td("11"),        1, 1, false), Cell(td("12"),        3, 1, false), Cell(td("13"),        1, 1, false)),
+        Seq(Cell(td("tmp-2-tmp"), 1, 1, false), Cell(td("12"),        2, 1, true),  Cell(td("tmp-3-tmp"), 1, 1, false)),
+        Seq(Cell(td("21"),        3, 1, false), Cell(td("12"),        1, 1, true),  Cell(td("23"),        1, 1, false)),
+        Seq(Cell(td("21"),        2, 1, true),  Cell(td("tmp-4-tmp"), 1, 1, false), Cell(td("tmp-5-tmp"), 1, 1, false)),
+        Seq(Cell(td("21"),        1, 1, true),  Cell(td("32"),        1, 1, false), Cell(td("33"),        1, 1, false)),
+        Seq(Cell(td("tmp-6-tmp"), 1, 1, false), Cell(td("tmp-7-tmp"), 1, 1, false), Cell(td("tmp-8-tmp"), 1, 1, false))
       )
 
       compareExpectedCells(grid, expected)

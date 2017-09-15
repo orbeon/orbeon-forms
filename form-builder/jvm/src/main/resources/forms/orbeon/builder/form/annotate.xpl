@@ -33,6 +33,7 @@
                 xmlns:xbl="http://www.w3.org/ns/xbl">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+                <xsl:import href="annotate-migrate-to-12-columns.xsl"/>
 
                 <xsl:variable name="model"    select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
                 <xsl:variable name="instance" select="$model/xf:instance [@id = 'fr-form-instance']"/>
@@ -232,14 +233,6 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- fr:grid → fr:grid/@edit-ref -->
-                <xsl:template match="fr:grid" mode="within-body">
-                    <xsl:copy>
-                        <xsl:attribute name="edit-ref"/>
-                        <xsl:apply-templates select="@* | node()" mode="#current"/>
-                    </xsl:copy>
-                </xsl:template>
-
                 <!-- Convert MIP names (attributes and nested elements) -->
                 <!-- NOTE: We leave custom MIPs as they are. The user must not use fb:* custom MIPs. -->
                 <xsl:template match="xf:bind/@relevant
@@ -310,7 +303,7 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- ======== Upgrading form ========-->
+                <!-- ======== Upgrading form ======== -->
 
                 <!--
                     Remove actions implementations as they are unneeded (and can be out of date). See also:

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fb.Cell._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
@@ -23,73 +24,14 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
-import scala.collection.mutable
-
 /*
  * Form Builder: operations on grids.
  */
 trait GridOps extends ContainerOps {
 
-  case class Cell(td: NodeInfo, rowspan: Int, missing: Boolean) {
-    def underlyingRowspan = getNormalizedRowspan(td)
-    def underlyingRowspan_= (newRowSpan: Int): Unit = toggleAttribute(td, "rowspan", newRowSpan.toString, newRowSpan > 1)
-  }
-
   // Get the first enclosing repeated grid or legacy repeat
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
     findAncestorContainers(descendantOrSelf, includeSelf) filter IsGrid head
-
-  // Extract the rowspan of a td (default is 1 if there is no attribute)
-  private def getNormalizedRowspan(td: NodeInfo) =  td attValueOpt "rowspan" map (_.toInt) getOrElse 1
-
-  // For the previous row of prepared cells, and a new row of tds, return the new row of prepared cells
-  private def newCellsRow(previousRow: List[Cell], tds: List[NodeInfo]): List[Cell] = previousRow match {
-    case Nil ⇒
-      // First row: start with initial rowspans
-      tds map (td ⇒ Cell(td, getNormalizedRowspan(td), missing = false))
-    case _ ⇒
-      // Subsequent rows
-      val tdsIterator = tds.toIterator
-      previousRow map {
-        case Cell(_, 1, _) ⇒
-          val td = tdsIterator.next()
-          Cell(td, getNormalizedRowspan(td), missing = false)
-        case Cell(td, rowspan, _) ⇒
-          Cell(td, rowspan - 1, missing = true)
-      }
-  }
-
-  // Get cell/rowspan information for the given grid row
-  def getRowCells(tr: NodeInfo): Seq[Cell] = {
-
-    // All trs up to and including the current tr
-    val trs = (tr precedingSibling "*:tr").reverse.to[List] ::: tr :: Nil
-    // For each row, the Seq of tds
-    val rows = trs map (_ / "*:td" toList)
-
-    // Return the final row of prepared cells
-    rows.foldLeft(List[Cell]())(newCellsRow)
-  }
-
-  // Get cell/rowspan information for all the rows in the grid
-  def getAllRowCells(grid: NodeInfo): List[List[Cell]] = {
-
-    // All trs up to and including the current tr
-    val trs = grid / "*:tr" toList
-    // For each row, the Seq of tds
-    val rows = trs map (_ / "*:td" toList)
-
-    // Accumulate the result for each row as we go
-    val result = mutable.ListBuffer[List[Cell]]()
-
-    rows.foldLeft(List[Cell]()) { (previousRow, tds) ⇒
-      val newRow = newCellsRow(previousRow, tds)
-      result += newRow
-      newRow
-    }
-
-    result.result()
-  }
 
   // Width of the grid in columns
   def getGridSize(grid: NodeInfo) = (grid / "*:tr").headOption.to[List] / "*:td" size
@@ -330,7 +272,7 @@ trait GridOps extends ContainerOps {
     val grid = getContainingGrid(firstRowTd)
     val allRowCells = getAllRowCells(grid)
 
-    val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
+    val (x, _) = Cell.tdCoordinates(firstRowTd: NodeInfo, allRowCells)
 
     allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ cell.td.hasChildElement)
   }
@@ -450,24 +392,12 @@ trait GridOps extends ContainerOps {
   }
 
   // Get the x/y position of a td given Cell information
-  private def tdCoordinates(td: NodeInfo, cells: Seq[Seq[Cell]]): (Int, Int) = {
-
-    // Search rows first, then cols
-    // Another solution would be to store the position directly into Cell
-
-    val y = td parent * precedingSibling "*:tr" size
-    val x = cells(y) indexWhere (_.td == td)
-
-    (x, y)
-  }
-
-  // Get the x/y position of a td given Cell information
   def tdCoordinates(td: NodeInfo): (Int, Int) =
-    tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
+    Cell.tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
 
   private def canExpandCell(td: NodeInfo): Boolean = {
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = tdCoordinates(td, allRowCells)
+    val (x, y) = Cell.tdCoordinates(td, allRowCells)
     val cell = allRowCells(y)(x)
 
     (y + cell.rowspan) < allRowCells.size
@@ -475,7 +405,7 @@ trait GridOps extends ContainerOps {
 
   private def canShrinkCell(td: NodeInfo): Boolean = {
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = tdCoordinates(td, allRowCells)
+    val (x, y) = Cell.tdCoordinates(td, allRowCells)
     val cell = allRowCells(y)(x)
 
     cell.rowspan > 1
@@ -489,7 +419,7 @@ trait GridOps extends ContainerOps {
     debugDumpDocumentForGrids("expandCellTouchesControl", td)
 
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = tdCoordinates(td, allRowCells)
+    val (x, y) = Cell.tdCoordinates(td, allRowCells)
 
     val cell = allRowCells(y)(x)
 
@@ -505,7 +435,7 @@ trait GridOps extends ContainerOps {
       debugDumpDocumentForGrids("expandCell before", td)
 
       val allRowCells = getAllRowCells(getContainingGrid(td))
-      val (x, y) = tdCoordinates(td, allRowCells)
+      val (x, y) = Cell.tdCoordinates(td, allRowCells)
 
       val cell = allRowCells(y)(x)
       val cellBelow = allRowCells(y + cell.rowspan)(x)
@@ -528,7 +458,7 @@ trait GridOps extends ContainerOps {
       val grid = getContainingGrid(td)
       val allRowCells  = getAllRowCells(grid)
 
-      val (x, y) = tdCoordinates(td, allRowCells)
+      val (x, y) = Cell.tdCoordinates(td, allRowCells)
 
       val cell = allRowCells(y)(x)
 

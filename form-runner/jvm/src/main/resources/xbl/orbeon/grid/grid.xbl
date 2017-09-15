@@ -84,8 +84,16 @@
                 <xsl:variable name="root" select="/*[1]"/>
 
                 <!-- Point to the source element for this grid -->
+                <!-- TODO: Remove this once we no longer need `fbf:hasEditor($control, 'static-itemset'))` -->
                 <xsl:variable name="edit-ref"                 select="$root/@edit-ref"/>
+
                 <xsl:variable name="is-editable"              select="exists($edit-ref)"/>
+
+                <!-- Determine whether we use the 12-column layout by the presence of a nested `<fr:c>` -->
+                <xsl:variable name="is-12col"                 select="exists($root/fr:c)"/>
+
+                <!-- NOTE: Later, CSS grids can be used at runtime too -->
+                <xsl:variable name="use-css-grids"            select="$is-12col and $is-editable"/>
 
                 <!-- Support legacy repeat for backward compatibility -->
                 <xsl:variable name="is-content-repeat"        select="frf:isContentRepeat($root)"/>
@@ -100,13 +108,16 @@
                 <xsl:variable
                     name="static-col-count"
                     select="
-                        max(
-                            for $row in $grid-rows
-                            return sum(
-                                for $td in $row/*:td
-                                return ($td/@colspan[. castable as xs:integer and xs:integer(.) ge 1]/xs:integer(.), 1)[1]
+                        if ($is-12col) then
+                            12
+                        else
+                            max(
+                                for $row in $grid-rows
+                                return sum(
+                                    for $td in $row/*:td
+                                    return ($td/@colspan[. castable as xs:integer and xs:integer(.) ge 1]/xs:integer(.), 1)[1]
+                                )
                             )
-                        )
                     "/>
 
                 <!-- Show LHH in header only if repeating over a row group containing only one row -->
@@ -126,9 +137,10 @@
                 <xsl:variable name="right-column"             select="$is-repeat and $appearance = 'minimal' and not($readonly)"/>
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
 
-
                 <xsl:variable name="has-rowspan-or-colspan"   select="exists($root//(@rowspan | @colspan))"/>
-                <xsl:variable name="is-table"                 select="$is-repeat or $has-rowspan-or-colspan or exists($root/(xf:group | xf:repeat))"/>
+
+                <!-- TODO: refine, repeats? -->
+                <xsl:variable name="is-table"                 select="not($use-css-grids) and ($has-rowspan-or-colspan or $is-repeat or exists($root/(xf:group | xf:repeat)))"/>
 
                 <xsl:variable name="table-elem"               select="if ($is-table) then 'xh:table' else 'xh:div'"/>
                 <xsl:variable name="thead-elem"               select="if ($is-table) then 'xh:thead' else 'xh:div'"/>
@@ -687,91 +699,111 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="*:tr" mode="grid-content">
-                    <xsl:element name="{$tr-elem}">
-                        <xsl:copy-of select="@* except @class"/>
+                <!-- Process row, deciding whether to output an enclosing row element -->
+                <xsl:template match="*:tr" mode="grid-content" priority="2">
 
-                        <xsl:variable name="static-row-pos" select="count(preceding::*:tr) + 1"/>
+                    <xsl:variable name="static-row-pos" select="count(preceding::*:tr) + 1"/>
 
-                        <xsl:choose>
-                            <xsl:when test="$is-repeat and $static-row-pos = 1">
-                                <xsl:attribute name="class" select="'fr-grid-tr', @class, '{$can-classes}'"/>
-                                <xsl:attribute name="id">fr-tr</xsl:attribute>
-                            </xsl:when>
-                            <xsl:when test="$is-editable">
-                                <xsl:attribute name="class" select="'fr-grid-tr', @class"/>
-                                <xsl:attribute name="id">fr-tr</xsl:attribute>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:attribute name="class" select="'fr-grid-tr', @class"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="not($use-css-grids)">
+                            <xsl:element name="{$tr-elem}">
+                                <xsl:choose>
+                                    <xsl:when test="$is-repeat and $static-row-pos = 1">
+                                        <xsl:attribute name="class" select="'fr-grid-tr', @class, '{$can-classes}'"/>
+                                                    <!--<xsl:attribute name="id">fr-tr</xsl:attribute>-->
+                                    </xsl:when>
+                                    <xsl:when test="$is-editable">
+                                        <xsl:attribute name="class" select="'fr-grid-tr', @class"/>
+                                                    <!--<xsl:attribute name="id">fr-tr</xsl:attribute>-->
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="class" select="'fr-grid-tr', @class"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
 
-                        <!-- Repeat buttons/menu -->
-                        <xsl:if test="$left-column and $static-row-pos = 1">
-                            <xsl:element name="{$td-elem}"><!-- NOTE: Always <td> for now as this implies it's a repeat. -->
-                                <xsl:attribute name="class">fr-repeat-column-left</xsl:attribute>
-                                <xsl:if test="$is-repeat and $static-row-count gt 1">
-                                    <xsl:attribute name="rowspan" select="$static-row-count"/>
-                                </xsl:if>
-                                <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
+                                <xsl:copy-of select="@* except @class"/>
 
-                                <xh:div class="dropdown">
-                                    <xh:button
-                                        class="btn btn-mini fr-grid-dropdown-button"
-                                        aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
-                                        aria-expanded="false">
-                                        <xh:span class="caret"/>
-                                    </xh:button>
-                                </xh:div>
+                                <xsl:next-match>
+                                    <xsl:with-param name="static-row-pos" tunnel="yes" select="$static-row-pos"/>
+                                </xsl:next-match>
                             </xsl:element>
-                        </xsl:if>
-
-                        <xsl:apply-templates select="*" mode="grid-content">
-                            <xsl:with-param name="static-row-pos" tunnel="yes" select="count(preceding::*:tr) + 1"/>
-                        </xsl:apply-templates>
-
-                        <!-- Repeat buttons/menu -->
-                        <xsl:if test="$right-column and $static-row-pos = 1">
-                            <xsl:element name="{$td-elem}"><!-- NOTE: Always <td> for now as this implies it's a repeat. -->
-                                <xsl:attribute name="class">fr-repeat-column-right</xsl:attribute>
-                                <xsl:if test="$is-repeat and $static-row-count gt 1">
-                                    <xsl:attribute name="rowspan" select="$static-row-count"/>
-                                </xsl:if>
-                                <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
-
-                                <xf:trigger
-                                    appearance="minimal"
-                                    ref="$repeat-context[$can-remove]"
-                                    id="fr-grid-remove"
-                                    tabindex="-1"
-                                    xxf:title="{{xxf:r('components.grid.remove', '|fr-fr-resources|')}}">
-
-                                    <xf:label><xh:i class="icon-minus-sign"/></xf:label>
-                                    <xf:dispatch
-                                        event="DOMActivate"
-                                        name="fr-remove"
-                                        targetid="repeat-group"/>
-                                </xf:trigger>
-                                <xf:group ref="$repeat-context[not($can-remove)]">
-                                    <xh:i class="icon-minus-sign disabled"/>
-                                </xf:group>
-                            </xsl:element>
-                        </xsl:if>
-                    </xsl:element>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:next-match>
+                                <xsl:with-param name="static-row-pos" tunnel="yes" select="$static-row-pos"/>
+                            </xsl:next-match>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:template>
 
-                <xsl:template match="*:td" mode="grid-content">
+                <xsl:template match="*:tr" mode="grid-content" priority="1">
                     <xsl:param name="static-row-pos" tunnel="yes" select="0"/>
 
-                    <xsl:variable name="static-col-pos" select="count(preceding::*:td intersect ancestor::*:tr[1]//*:td) + 1"/>
+                    <!-- Optional left repeat buttons/menu -->
+                    <xsl:if test="$left-column and $static-row-pos = 1">
+                        <xsl:element name="{$td-elem}"><!-- NOTE: Always <td> for now as this implies it's a repeat. -->
+                            <xsl:attribute name="class">fr-repeat-column-left</xsl:attribute>
+                            <xsl:if test="$is-repeat and $static-row-count gt 1">
+                                <xsl:attribute name="rowspan" select="$static-row-count"/>
+                            </xsl:if>
+                            <xsl:attribute name="xxf:control">true</xsl:attribute>
+                            <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
+
+                            <xh:div class="dropdown">
+                                <xh:button
+                                    class="btn btn-mini fr-grid-dropdown-button"
+                                    aria-label="{{xxf:r('components.grid.menu', '|fr-fr-resources|')}}"
+                                    aria-expanded="false">
+                                    <xh:span class="caret"/>
+                                </xh:button>
+                            </xh:div>
+                        </xsl:element>
+                    </xsl:if>
+
+                    <!-- Process nested vars and cells -->
+                    <!-- NOTE: `$static-row-pos` tunnel parameter will go through too -->
+                    <xsl:apply-templates select="*" mode="grid-content"/>
+
+                    <!-- Optional right repeat buttons/menu -->
+                    <xsl:if test="$right-column and $static-row-pos = 1">
+                        <xsl:element name="{$td-elem}"><!-- NOTE: Always <td> for now as this implies it's a repeat. -->
+                            <xsl:attribute name="class">fr-repeat-column-right</xsl:attribute>
+                            <xsl:if test="$is-repeat and $static-row-count gt 1">
+                                <xsl:attribute name="rowspan" select="$static-row-count"/>
+                            </xsl:if>
+                            <xsl:attribute name="xxf:control">true</xsl:attribute>
+                            <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
+
+                            <xf:trigger
+                                appearance="minimal"
+                                ref="$repeat-context[$can-remove]"
+                                id="fr-grid-remove"
+                                tabindex="-1"
+                                xxf:title="{{xxf:r('components.grid.remove', '|fr-fr-resources|')}}">
+
+                                <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                <xf:dispatch
+                                    event="DOMActivate"
+                                    name="fr-remove"
+                                    targetid="repeat-group"/>
+                            </xf:trigger>
+                            <xf:group ref="$repeat-context[not($can-remove)]">
+                                <xh:i class="icon-minus-sign disabled"/>
+                            </xf:group>
+                        </xsl:element>
+                    </xsl:if>
+                </xsl:template>
+
+                <xsl:template match="*:td | fr:c" mode="grid-content">
+
+                    <xsl:param name="static-row-pos" tunnel="yes" select="(@y, 0)[1]"/>
+
+                    <xsl:variable name="static-col-pos" select="(@x, count(preceding::*:td intersect ancestor::*:tr[1]//*:td) + 1)[1]"/>
                     <xsl:variable name="controls"       select="*" as="element()*"/>
                     <xsl:variable name="control"        select="$controls[1]" as="element()?"/>
                     <xsl:variable name="has-control"    select="exists($control)"/>
 
-                    <xsl:if test="$is-editable">
+                    <xsl:if test="$is-editable and not ($use-css-grids)">
                         <!-- Point to this td -->
                         <!-- Used by $control below and $td/@id -->
                         <xf:var name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
@@ -785,7 +817,7 @@
                         <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
                     </xsl:if>
                     <xsl:element name="{$td-elem}">
-                        <xsl:copy-of select="@* except @class"/>
+                        <xsl:copy-of select="@* except (@class, @x, @y, @w, @h, @colspan, @rowspan)"/>
                         <xsl:copy-of select="fr:th-td-classes-attr('td', @class)"/>
 
                         <xsl:choose>
@@ -816,12 +848,18 @@
 
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                <!--<xsl:attribute name="xxf:control">true</xsl:attribute>-->
+
+                                <!-- Propagate position/size attributes as `data-*` attributes -->
+                                <xsl:for-each select="@x, @y, @w, @h">
+                                    <xsl:attribute name="data-{name(.)}" select="."/>
+                                </xsl:for-each>
 
                                 <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or
                                      the upload button. -->
-                                <xh:div class="fr-grid-content{
-                                        '{if (exists($control) and fbf:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}'}">
+                                <!-- TODO: See if we remove `fr-grid-content`. -->
+                                <!--<xh:div class="fr-grid-content{-->
+                                        <!--'{if (exists($control) and fbf:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}'}">-->
                                     <!-- Optimization: don't generate a group for empty cells -->
                                     <xsl:for-each select="$control">
                                         <xf:group xxbl:scope="outer" appearance="xxf:internal">
@@ -837,7 +875,7 @@
                                             </xsl:copy>
                                         </xf:group>
                                     </xsl:for-each>
-                                </xh:div>
+                                <!--</xh:div>-->
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:element>
@@ -855,7 +893,9 @@
                 <xsl:function name="fr:th-td-classes-attr">
                     <xsl:param name="th-td"       as="xs:string"/> <!-- Either 'th' or 'td' -->
                     <xsl:param name="input-class" as="attribute(class)?"/>
-                    <xsl:variable name="fb-selected-avt">{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:variable>
+                    <!-- TODO: `selected-cell` -->
+                    <!--<xsl:variable name="fb-selected-avt">{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:variable>-->
+                    <xsl:variable name="fb-selected-avt"/>
                     <xsl:variable
                         name="classes"
                         select="

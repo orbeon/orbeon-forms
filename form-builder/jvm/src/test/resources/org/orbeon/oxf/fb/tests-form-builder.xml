@@ -44,6 +44,30 @@
             <output name="data" href="deannotated.xml"/>
         </test>
 
+        <test description="12-column grid migration" name="oxf:unsafe-xslt">
+            <input name="config">
+                <xsl:stylesheet
+                    version="2.0"
+                    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+                    <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
+                    <xsl:import href="/forms/orbeon/builder/form/annotate-migrate-to-12-columns.xsl"/>
+
+                    <xsl:template match="fr:body">
+                        <xsl:copy>
+                            <xsl:apply-templates select="@* | node()" mode="within-body"/>
+                        </xsl:copy>
+                    </xsl:template>
+
+                </xsl:stylesheet>
+
+            </input>
+            <!--<input name="data" href="/forms/orbeon/builder/form/template.xml"/>-->
+            <input name="data" href="grids-to-migrate.xml"/>
+            <output name="data" href="grids-migrated.xml"/>
+        </test>
+
     </group>
 
 </tests>

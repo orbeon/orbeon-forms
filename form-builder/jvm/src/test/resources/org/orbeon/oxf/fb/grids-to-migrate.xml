@@ -1,0 +1,1049 @@
+<fr:body
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xf="http://www.w3.org/2002/xforms">
+
+    <!-- Create empty rows -->
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-10/label"/>
+                    <xf:hint ref="$form-resources/control-10/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-11/label"/>
+                    <xf:hint ref="$form-resources/control-11/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2"/>
+        </xh:tr>
+        <xh:tr>
+            <xh:td/>
+            <xh:td/>
+        </xh:tr>
+    </fr:grid>
+
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-1/label"/>
+                    <xf:hint ref="$form-resources/control-1/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <fr:dropdown-select1>
+                    <xf:label ref="$form-resources/control-4/label"/>
+                    <xf:hint ref="$form-resources/control-4/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    <xf:itemset ref="$form-resources/control-4/item">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
+                </fr:dropdown-select1>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
+
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-10/label"/>
+                    <xf:hint ref="$form-resources/control-10/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-11/label"/>
+                    <xf:hint ref="$form-resources/control-11/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-18/label"/>
+                    <xf:hint ref="$form-resources/control-18/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <xf:textarea>
+                    <xf:label ref="$form-resources/control-17/label"/>
+                    <xf:hint ref="$form-resources/control-17/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:textarea>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <fr:dropdown-select1>
+                    <xf:label ref="$form-resources/control-16/label"/>
+                    <xf:hint ref="$form-resources/control-16/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    <xf:itemset ref="$form-resources/control-16/item">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
+                </fr:dropdown-select1>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
+
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-19/label"/>
+                    <xf:hint ref="$form-resources/control-19/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-20/label"/>
+                    <xf:hint ref="$form-resources/control-20/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-21/label"/>
+                    <xf:hint ref="$form-resources/control-21/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-28/label"/>
+                    <xf:hint ref="$form-resources/control-28/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-29/label"/>
+                    <xf:hint ref="$form-resources/control-29/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-30/label"/>
+                    <xf:hint ref="$form-resources/control-30/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-31/label"/>
+                    <xf:hint ref="$form-resources/control-31/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-32/label"/>
+                    <xf:hint ref="$form-resources/control-32/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
+
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-33/label"/>
+                    <xf:hint ref="$form-resources/control-33/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-34/label"/>
+                    <xf:hint ref="$form-resources/control-34/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-35/label"/>
+                    <xf:hint ref="$form-resources/control-35/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-36/label"/>
+                    <xf:hint ref="$form-resources/control-36/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-45/label"/>
+                    <xf:hint ref="$form-resources/control-45/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-46/label"/>
+                    <xf:hint ref="$form-resources/control-46/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-47/label"/>
+                    <xf:hint ref="$form-resources/control-47/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-48/label"/>
+                    <xf:hint ref="$form-resources/control-48/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-49/label"/>
+                    <xf:hint ref="$form-resources/control-49/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-50/label"/>
+                    <xf:hint ref="$form-resources/control-50/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-51/label"/>
+                    <xf:hint ref="$form-resources/control-51/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-52/label"/>
+                    <xf:hint ref="$form-resources/control-52/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-53/label"/>
+                    <xf:hint ref="$form-resources/control-53/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-54/label"/>
+                    <xf:hint ref="$form-resources/control-54/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-55/label"/>
+                    <xf:hint ref="$form-resources/control-55/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-56/label"/>
+                    <xf:hint ref="$form-resources/control-56/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-57/label"/>
+                    <xf:hint ref="$form-resources/control-57/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="4">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-58/label"/>
+                    <xf:hint ref="$form-resources/control-58/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
+
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-59/label"/>
+                    <xf:hint ref="$form-resources/control-59/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-60/label"/>
+                    <xf:hint ref="$form-resources/control-60/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-61/label"/>
+                    <xf:hint ref="$form-resources/control-61/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-62/label"/>
+                    <xf:hint ref="$form-resources/control-62/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-63/label"/>
+                    <xf:hint ref="$form-resources/control-63/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-74/label"/>
+                    <xf:hint ref="$form-resources/control-74/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-75/label"/>
+                    <xf:hint ref="$form-resources/control-75/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-76/label"/>
+                    <xf:hint ref="$form-resources/control-76/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-77/label"/>
+                    <xf:hint ref="$form-resources/control-77/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-78/label"/>
+                    <xf:hint ref="$form-resources/control-78/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-79/label"/>
+                    <xf:hint ref="$form-resources/control-79/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-80/label"/>
+                    <xf:hint ref="$form-resources/control-80/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-81/label"/>
+                    <xf:hint ref="$form-resources/control-81/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-82/label"/>
+                    <xf:hint ref="$form-resources/control-82/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-83/label"/>
+                    <xf:hint ref="$form-resources/control-83/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-84/label"/>
+                    <xf:hint ref="$form-resources/control-84/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-85/label"/>
+                    <xf:hint ref="$form-resources/control-85/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-86/label"/>
+                    <xf:hint ref="$form-resources/control-86/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-87/label"/>
+                    <xf:hint ref="$form-resources/control-87/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-88/label"/>
+                    <xf:hint ref="$form-resources/control-88/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-89/label"/>
+                    <xf:hint ref="$form-resources/control-89/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-90/label"/>
+                    <xf:hint ref="$form-resources/control-90/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-91/label"/>
+                    <xf:hint ref="$form-resources/control-91/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-92/label"/>
+                    <xf:hint ref="$form-resources/control-92/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-93/label"/>
+                    <xf:hint ref="$form-resources/control-93/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-94/label"/>
+                    <xf:hint ref="$form-resources/control-94/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-95/label"/>
+                    <xf:hint ref="$form-resources/control-95/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-96/label"/>
+                    <xf:hint ref="$form-resources/control-96/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-97/label"/>
+                    <xf:hint ref="$form-resources/control-97/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-98/label"/>
+                    <xf:hint ref="$form-resources/control-98/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-99/label"/>
+                    <xf:hint ref="$form-resources/control-99/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="4">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-100/label"/>
+                    <xf:hint ref="$form-resources/control-100/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="4">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-101/label"/>
+                    <xf:hint ref="$form-resources/control-101/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-102/label"/>
+                    <xf:hint ref="$form-resources/control-102/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="5">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-103/label"/>
+                    <xf:hint ref="$form-resources/control-103/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
+
+    <fr:grid>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-104/label"/>
+                    <xf:hint ref="$form-resources/control-104/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-105/label"/>
+                    <xf:hint ref="$form-resources/control-105/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-106/label"/>
+                    <xf:hint ref="$form-resources/control-106/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-107/label"/>
+                    <xf:hint ref="$form-resources/control-107/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-108/label"/>
+                    <xf:hint ref="$form-resources/control-108/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-109/label"/>
+                    <xf:hint ref="$form-resources/control-109/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-122/label"/>
+                    <xf:hint ref="$form-resources/control-122/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-123/label"/>
+                    <xf:hint ref="$form-resources/control-123/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-124/label"/>
+                    <xf:hint ref="$form-resources/control-124/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-125/label"/>
+                    <xf:hint ref="$form-resources/control-125/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-126/label"/>
+                    <xf:hint ref="$form-resources/control-126/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-127/label"/>
+                    <xf:hint ref="$form-resources/control-127/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-128/label"/>
+                    <xf:hint ref="$form-resources/control-128/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-129/label"/>
+                    <xf:hint ref="$form-resources/control-129/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-130/label"/>
+                    <xf:hint ref="$form-resources/control-130/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-131/label"/>
+                    <xf:hint ref="$form-resources/control-131/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-132/label"/>
+                    <xf:hint ref="$form-resources/control-132/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-133/label"/>
+                    <xf:hint ref="$form-resources/control-133/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-134/label"/>
+                    <xf:hint ref="$form-resources/control-134/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-136/label"/>
+                    <xf:hint ref="$form-resources/control-136/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-137/label"/>
+                    <xf:hint ref="$form-resources/control-137/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-138/label"/>
+                    <xf:hint ref="$form-resources/control-138/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-139/label"/>
+                    <xf:hint ref="$form-resources/control-139/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-140/label"/>
+                    <xf:hint ref="$form-resources/control-140/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-141/label"/>
+                    <xf:hint ref="$form-resources/control-141/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-142/label"/>
+                    <xf:hint ref="$form-resources/control-142/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="2">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-143/label"/>
+                    <xf:hint ref="$form-resources/control-143/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-144/label"/>
+                    <xf:hint ref="$form-resources/control-144/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-145/label"/>
+                    <xf:hint ref="$form-resources/control-145/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-146/label"/>
+                    <xf:hint ref="$form-resources/control-146/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-147/label"/>
+                    <xf:hint ref="$form-resources/control-147/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-148/label"/>
+                    <xf:hint ref="$form-resources/control-148/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-149/label"/>
+                    <xf:hint ref="$form-resources/control-149/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-150/label"/>
+                    <xf:hint ref="$form-resources/control-150/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-151/label"/>
+                    <xf:hint ref="$form-resources/control-151/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-152/label"/>
+                    <xf:hint ref="$form-resources/control-152/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-153/label"/>
+                    <xf:hint ref="$form-resources/control-153/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-154/label"/>
+                    <xf:hint ref="$form-resources/control-154/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-155/label"/>
+                    <xf:hint ref="$form-resources/control-155/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-156/label"/>
+                    <xf:hint ref="$form-resources/control-156/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-157/label"/>
+                    <xf:hint ref="$form-resources/control-157/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-158/label"/>
+                    <xf:hint ref="$form-resources/control-158/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-159/label"/>
+                    <xf:hint ref="$form-resources/control-159/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="3">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-160/label"/>
+                    <xf:hint ref="$form-resources/control-160/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-161/label"/>
+                    <xf:hint ref="$form-resources/control-161/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-162/label"/>
+                    <xf:hint ref="$form-resources/control-162/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-163/label"/>
+                    <xf:hint ref="$form-resources/control-163/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-164/label"/>
+                    <xf:hint ref="$form-resources/control-164/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-165/label"/>
+                    <xf:hint ref="$form-resources/control-165/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="4">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-166/label"/>
+                    <xf:hint ref="$form-resources/control-166/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-167/label"/>
+                    <xf:hint ref="$form-resources/control-167/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="4">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-168/label"/>
+                    <xf:hint ref="$form-resources/control-168/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-169/label"/>
+                    <xf:hint ref="$form-resources/control-169/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="4">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-170/label"/>
+                    <xf:hint ref="$form-resources/control-170/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-171/label"/>
+                    <xf:hint ref="$form-resources/control-171/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-172/label"/>
+                    <xf:hint ref="$form-resources/control-172/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-173/label"/>
+                    <xf:hint ref="$form-resources/control-173/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td colspan="5">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-174/label"/>
+                    <xf:hint ref="$form-resources/control-174/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="5">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-175/label"/>
+                    <xf:hint ref="$form-resources/control-175/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+            <xh:td>
+                <xf:input>
+                    <xf:label ref="$form-resources/control-176/label"/>
+                    <xf:hint ref="$form-resources/control-176/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+        <xh:tr>
+            <xh:td colspan="6">
+                <xf:input>
+                    <xf:label ref="$form-resources/control-177/label"/>
+                    <xf:hint ref="$form-resources/control-177/hint"/>
+                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                </xf:input>
+            </xh:td>
+        </xh:tr>
+    </fr:grid>
+</fr:body>

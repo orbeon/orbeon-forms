@@ -178,11 +178,8 @@ object LabelEditor {
       }
 
       // Hide interceptors we don't need
-      scala.scalajs.js.Dynamic.global.console.log(sections.length, labelClickInterceptors.length)
-      for (pos ← sections.length until labelClickInterceptors.length) {
-        scala.scalajs.js.Dynamic.global.console.log("Hiding", pos)
+      for (pos ← sections.length until labelClickInterceptors.length)
         labelClickInterceptors(pos).hide()
-      }
       // Position interceptor for each section
       for (pos ← 0 until sections.length) {
         val sectionTitle = $(sections(pos)).find(SectionTitleSelector)

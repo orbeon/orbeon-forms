@@ -19,6 +19,7 @@ import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 
 class GetRequestParameterTryXFormsDocument extends RequestFunction {
 
@@ -48,7 +49,7 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
     implicit val ctx = xpathContext
 
     fromDocument(getContainingDocument, stringArgument(0)) map
-      asIterator                                           getOrElse
+      stringSeqToSequenceIterator                          getOrElse
       EmptyIterator.getInstance
   }
 }

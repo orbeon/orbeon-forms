@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -422,7 +421,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
   // For XForms callers
   def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator =
-    getAllControlNames(inDoc).iterator map SaxonUtils.stringToStringValue
+    getAllControlNames(inDoc).iterator map stringToStringValue
 
   // Return all the controls in the view
   def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =

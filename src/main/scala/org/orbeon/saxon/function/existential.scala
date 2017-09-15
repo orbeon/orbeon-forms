@@ -19,6 +19,7 @@ import org.orbeon.saxon.functions.Evaluate.PreparedExpression
 import org.orbeon.saxon.trace.Location
 import org.orbeon.saxon.trans.{SaxonErrorCode, XPathException}
 import org.orbeon.saxon.value.{BooleanValue, ObjectValue}
+import org.orbeon.scaxon.Implicits._
 
 import scala.util.control.Breaks._
 

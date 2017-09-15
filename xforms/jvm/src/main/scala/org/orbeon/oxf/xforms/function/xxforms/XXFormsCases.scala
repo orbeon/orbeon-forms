@@ -18,13 +18,14 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
+import org.orbeon.scaxon.Implicits._
 
 /**
  * Extension xxf:cases($switch-id as xs:string) as xs:string* function.
  */
 class XXFormsCases extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(
+    stringSeqToSequenceIterator(
       relevantControl(0)(xpathContext)             flatMap
         collectByErasedType[XFormsSwitchControl] map
         (_.getChildrenCases map (_.getId))       getOrElse

@@ -14,8 +14,8 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.{Item, ListIterator, NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om._
+import org.orbeon.saxon.value._
 import org.orbeon.scaxon.SimplePath.URIQualifiedName
 
 import scala.collection.JavaConverters._
@@ -23,25 +23,28 @@ import scala.collection.{Iterator, Seq}
 
 object Implicits {
 
-  implicit def nodeInfoToNodeInfoSeq(node: NodeInfo): Seq[NodeInfo] =
-    List(node ensuring (node ne null))
+  implicit def stringToQName                       (v: String)             : QName            = QName.get(v ensuring ! v.contains(':'))
+  implicit def tupleToQName                        (v: (String, String))   : QName            = QName.get(v._2, "", v._1)
+  implicit def uriQualifiedNameToQName             (v: URIQualifiedName)   : QName            = QName.get(v.localName, "", v.uri)
 
-  implicit def stringSeqToSequenceIterator(seq: Seq[String]): SequenceIterator =
-    new ListIterator(seq map SaxonUtils.stringToStringValue asJava)
+  implicit def intToIntegerValue                   (v: Int)                : IntegerValue     = Int64Value.makeIntegerValue(v)
+  implicit def doubleToDoubleValue                 (v: Double)             : DoubleValue      = new DoubleValue(v)
+  implicit def stringToStringValue                 (v: String)             : StringValue      = StringValue.makeStringValue(v)
+  implicit def booleanToBooleanValue               (v: Boolean)            : BooleanValue     = BooleanValue.get(v)
 
-  implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator =
-    new ListIterator(seq.asJava)
+  implicit def stringIteratorToSequenceIterator    (v: Iterator[String])   : SequenceIterator = v map stringToStringValue
+  implicit def stringSeqToSequenceIterator         (v: Seq[String])        : SequenceIterator = new ListIterator (v map stringToStringValue asJava)
+  implicit def stringArrayToSequenceIterator       (v: Array[String])      : SequenceIterator = new ArrayIterator(v map stringToStringValue)
+  implicit def itemSeqToSequenceIterator[T <: Item](v: Seq[T])             : SequenceIterator = new ListIterator (v.asJava)
+  implicit def itemSeqOptToSequenceIterator        (v: Option[Seq[Item]])  : SequenceIterator = v map itemSeqToSequenceIterator   getOrElse EmptyIterator.getInstance
+  implicit def stringSeqOptToSequenceIterator      (v: Option[Seq[String]]): SequenceIterator = v map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
 
-  implicit def stringToQName(s: String): QName = QName.get(s ensuring ! s.contains(':'))
-  implicit def tupleToQName(name: (String, String)): QName = QName.get(name._2, "", name._1)
-  implicit def uriQualifiedNameToQName(uriQualifiedName: URIQualifiedName): QName = QName.get(uriQualifiedName.localName, "", uriQualifiedName.uri)
+  implicit def stringOptToStringValue              (v: Option[String])     : StringValue      = v map stringToStringValue   orNull
+  implicit def booleanOptToBooleanValue            (v: Option[Boolean])    : BooleanValue     = v map booleanToBooleanValue orNull
 
-  implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
+  implicit def nodeInfoToNodeInfoSeq               (v: NodeInfo)           : Seq[NodeInfo]    = List(v ensuring (v ne null))
 
-  implicit def asStringSequenceIterator(i: Iterator[String]): SequenceIterator =
-    asSequenceIterator(i map SaxonUtils.stringToStringValue)
-
-  implicit def asSequenceIterator(i: Iterator[Item]): SequenceIterator = new SequenceIterator {
+  implicit def asSequenceIterator                  (i: Iterator[Item])     : SequenceIterator = new SequenceIterator {
 
     private var currentItem: Item = _
     private var _position = 0

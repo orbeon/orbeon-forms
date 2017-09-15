@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator}
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 
@@ -34,7 +34,7 @@ class XXFormsListVariables extends XFormsFunction {
         val variables = model.getTopLevelVariables
 
         if (variables.size() > 0)
-          new ListIterator(variables.asScala.map { case (name, _) ⇒ SaxonUtils.stringToStringValue(name) }.toList.asJava)
+          new ListIterator(variables.asScala.map { case (name, _) ⇒ stringToStringValue(name) }.toList.asJava)
         else
           EmptyIterator.getInstance
 

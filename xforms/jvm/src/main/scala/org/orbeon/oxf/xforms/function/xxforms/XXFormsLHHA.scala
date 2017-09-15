@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.RuntimeDependentFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
 

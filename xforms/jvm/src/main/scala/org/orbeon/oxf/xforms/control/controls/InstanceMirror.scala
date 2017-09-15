@@ -221,7 +221,7 @@ object InstanceMirror {
         item       = outerDoc,
         expr       = "//xf:instance[@id = $sourceId]",
         namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
-        variables  = Map("sourceId" → SaxonUtils.stringToStringValue(innerInstance.getId))
+        variables  = Map("sourceId" → stringToStringValue(innerInstance.getId))
       ) match {
         case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
           // Outer xf:instance found

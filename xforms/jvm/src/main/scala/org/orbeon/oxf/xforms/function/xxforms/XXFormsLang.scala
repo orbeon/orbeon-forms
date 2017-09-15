@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsLang extends XFormsFunction {
 

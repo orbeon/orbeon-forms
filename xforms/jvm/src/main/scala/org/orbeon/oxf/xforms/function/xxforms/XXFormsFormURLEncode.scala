@@ -18,7 +18,7 @@ import org.orbeon.oxf.xml.{FunctionSupport, TransformerUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
-
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsFormURLEncode extends FunctionSupport {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {

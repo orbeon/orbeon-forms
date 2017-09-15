@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.function
 import java.{util ⇒ ju}
 
 import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.trans.XPathException
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 
@@ -34,8 +34,8 @@ import scala.collection.JavaConverters._
  * property('xxf:noscript')
  */
 private object Property {
-  val Version                  = SaxonUtils.stringToStringValue("1.1")
-  val ConformanceLevel         = SaxonUtils.stringToStringValue("full")
+  val Version                  = stringToStringValue("1.1")
+  val ConformanceLevel         = stringToStringValue("full")
   val VersionProperty          = "version"
   val ConformanceLevelProperty = "conformance-level"
 }

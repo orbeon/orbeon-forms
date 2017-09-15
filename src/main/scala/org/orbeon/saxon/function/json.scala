@@ -18,6 +18,7 @@ import org.orbeon.oxf.xml.{DependsOnContextItemIfSingleArgumentMissing, Function
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 
 class JsonStringToXml extends FunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(xpathContext: XPathContext): DocumentInfo =

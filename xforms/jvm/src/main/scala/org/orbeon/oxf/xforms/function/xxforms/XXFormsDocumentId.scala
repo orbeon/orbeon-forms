@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsDocumentId extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext) =

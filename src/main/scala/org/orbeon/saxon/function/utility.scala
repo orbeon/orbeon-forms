@@ -14,10 +14,11 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing, FunctionSupport}
+import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
+import org.orbeon.scaxon.Implicits._
 
 class IsBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(context: XPathContext): BooleanValue =

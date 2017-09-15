@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsBinding extends XFormsFunction {
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 
 class XXFormsAbsoluteId extends XFormsFunction {

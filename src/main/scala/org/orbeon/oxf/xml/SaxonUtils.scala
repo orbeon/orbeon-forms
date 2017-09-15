@@ -61,8 +61,6 @@ object SaxonUtils {
     case a       ⇒ anyToItem(a)
   }
 
-  def stringToStringValue(s: String): StringValue = StringValue.makeStringValue(s)
-
   // Effective boolean value of the iterator
   def effectiveBooleanValue(iterator: SequenceIterator): Boolean =
     ExpressionTool.effectiveBooleanValue(iterator)

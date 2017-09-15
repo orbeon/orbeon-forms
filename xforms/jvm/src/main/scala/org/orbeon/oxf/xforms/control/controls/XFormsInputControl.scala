@@ -24,9 +24,9 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.ValueRepresentation
-import org.orbeon.saxon.value.{CalendarValue, DateValue, StringValue, TimeValue}
+import org.orbeon.saxon.value.{CalendarValue, DateValue, TimeValue}
+import org.orbeon.scaxon.Implicits._
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
@@ -54,7 +54,7 @@ class XFormsInputControl(
   private def unformat = Option(staticControl) flatMap (_.unformat)
 
   private def unformatTransform(v: String) = unformat match {
-    case Some(expr) ⇒ evaluateAsString(expr, Seq(SaxonUtils.stringToStringValue(v)), 1) getOrElse ""
+    case Some(expr) ⇒ evaluateAsString(expr, Seq(stringToStringValue(v)), 1) getOrElse ""
     case None       ⇒ v
   }
 
@@ -161,7 +161,7 @@ class XFormsInputControl(
     getValueUseFormat(format) getOrElse getExternalValue
 
   private def formatSubValue(valueType: String, value: String) = {
-    val variables = Map[String, ValueRepresentation]("v" → SaxonUtils.stringToStringValue(value))
+    val variables = Map[String, ValueRepresentation]("v" → stringToStringValue(value))
 
     val boundItem = getBoundItem
     if (boundItem eq null)

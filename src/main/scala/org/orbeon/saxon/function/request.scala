@@ -20,6 +20,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, RuntimeDepen
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
+import org.orbeon.scaxon.Implicits._
 
 class GetRequestMethod extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
@@ -58,7 +59,7 @@ trait RequestFunction extends DefaultFunctionSupport with RuntimeDependentFuncti
     val values =
       fromRequest(NetUtils.getExternalContext.getRequest, name)
 
-    values map asIterator getOrElse EmptyIterator.getInstance
+    values map stringSeqToSequenceIterator getOrElse EmptyIterator.getInstance
   }
 }
 
@@ -74,12 +75,12 @@ class UserGroup extends DefaultFunctionSupport with RuntimeDependentFunction {
 
 class UserRoles extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.roles map (_.roleName)))
+    stringSeqToSequenceIterator(NetUtils.getExternalContext.getRequest.credentials.to[List] flatMap (_.roles map (_.roleName)))
 }
 
 class UserOrganizations extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(
+    stringSeqToSequenceIterator(
       for {
         credentials ← NetUtils.getExternalContext.getRequest.credentials.toList
         org         ← credentials.organizations
@@ -104,7 +105,7 @@ class AncestorOrganizations extends DefaultFunctionSupport with RuntimeDependent
         } yield
           org
 
-    asIterator(
+    stringSeqToSequenceIterator(
       foundOrgs.headOption match {
         case Some(foundOrg) ⇒ foundOrg.levels.init.reverse
         case None           ⇒ Nil

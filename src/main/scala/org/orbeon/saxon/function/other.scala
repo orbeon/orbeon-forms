@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.DefaultFunctionSupport
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
+import org.orbeon.scaxon.Implicits._
 
 class ImageMetadata extends DefaultFunctionSupport {
 

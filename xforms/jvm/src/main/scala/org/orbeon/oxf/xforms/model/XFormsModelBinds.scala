@@ -28,9 +28,9 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.saxon.value.{AtomicValue, BooleanValue, QNameValue}
+import org.orbeon.saxon.value.{AtomicValue, QNameValue}
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.{mutable ⇒ m}
 import scala.language.postfixOps
@@ -81,13 +81,13 @@ class XFormsModelBinds(protected val model: XFormsModel)
     val result =
       mipType match {
         case TYPE_QNAME            ⇒ bind.staticBind.dataType                                            map makeQNameValue
-        case RELEVANT_QNAME        ⇒ evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map BooleanValue.get
-        case READONLY_QNAME        ⇒ evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map BooleanValue.get
-        case REQUIRED_QNAME        ⇒ evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map BooleanValue.get
-        case CONSTRAINT_QNAME      ⇒ hasSuccessfulErrorConstraints                                       map BooleanValue.get
-        case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate, collector)              map SaxonUtils.stringToStringValue
-        case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default, collector)                map SaxonUtils.stringToStringValue
-        case mipType               ⇒ evaluateCustomMIPByName(mipType)                                    map SaxonUtils.stringToStringValue
+        case RELEVANT_QNAME        ⇒ evaluateBooleanMIP(bindNode, Relevant, DEFAULT_RELEVANT, collector) map booleanToBooleanValue
+        case READONLY_QNAME        ⇒ evaluateBooleanMIP(bindNode, Readonly, DEFAULT_READONLY, collector) map booleanToBooleanValue
+        case REQUIRED_QNAME        ⇒ evaluateBooleanMIP(bindNode, Required, DEFAULT_REQUIRED, collector) map booleanToBooleanValue
+        case CONSTRAINT_QNAME      ⇒ hasSuccessfulErrorConstraints                                       map booleanToBooleanValue
+        case CALCULATE_QNAME       ⇒ evaluateCalculatedBind(bindNode, Calculate, collector)              map stringToStringValue
+        case XXFORMS_DEFAULT_QNAME ⇒ evaluateCalculatedBind(bindNode, Default, collector)                map stringToStringValue
+        case mipType               ⇒ evaluateCustomMIPByName(mipType)                                    map stringToStringValue
       }
 
     // Dispatch all events

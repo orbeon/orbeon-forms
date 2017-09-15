@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleA
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 class HasClass extends ClassSupport {
@@ -35,7 +36,7 @@ class HasClass extends ClassSupport {
 
 class Classes extends ClassSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def iterate(xpathContext: XPathContext): SequenceIterator =
-    asIterator(classes(0)(xpathContext).to[List])
+    stringSeqToSequenceIterator(classes(0)(xpathContext).to[List])
 }
 
 protected trait ClassSupport extends DefaultFunctionSupport {

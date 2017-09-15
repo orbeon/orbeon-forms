@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.DependsOnContextItemIfSingleArgumentMissing
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
-
+import org.orbeon.scaxon.Implicits._
 
 /**
  * xxf:invalid-binds()
@@ -37,7 +37,7 @@ class XXFormsInvalidBinds
       case Some(nodeInfo: NodeInfo) ⇒
         Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
           case Some(invalidBindIdsString) ⇒
-            asIterator(invalidBindIdsString.splitTo[Array]())
+            stringArrayToSequenceIterator(invalidBindIdsString.splitTo[Array]())
           case None ⇒
             // No invalid bind ids
             EmptyIterator.getInstance

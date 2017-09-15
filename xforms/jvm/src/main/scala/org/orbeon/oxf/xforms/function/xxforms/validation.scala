@@ -22,6 +22,7 @@ import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.value._
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.JavaConverters._
 import scala.util.Try

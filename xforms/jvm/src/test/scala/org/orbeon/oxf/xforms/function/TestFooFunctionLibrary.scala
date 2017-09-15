@@ -18,6 +18,7 @@ import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 
 object TestFooFunctionLibrary extends OrbeonFunctionLibrary {
 

@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon.Implicits._
 
 /**
  * xxf:custom-mip($item as item()*, $mip-name as xs:string) as xs:string

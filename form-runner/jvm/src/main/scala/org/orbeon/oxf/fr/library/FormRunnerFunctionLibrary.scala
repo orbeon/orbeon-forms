@@ -28,8 +28,9 @@ import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.function.{AncestorOrganizations, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
-import org.orbeon.saxon.om.{Item, StructuredQName}
+import org.orbeon.saxon.om.StructuredQName
 import org.orbeon.saxon.value.{BooleanValue, DateTimeValue, IntegerValue, StringValue}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xbl.Wizard
 

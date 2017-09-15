@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsItemset extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {

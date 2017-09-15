@@ -20,6 +20,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.xforms.XFormsId
+import org.orbeon.scaxon.Implicits._
 
 class XXFormsComponentParam extends XFormsFunction {
 
@@ -40,7 +41,7 @@ class XXFormsComponentParam extends XFormsFunction {
       // level.
 
       def fromElemAlsoTryAvt =
-        concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt map SaxonUtils.stringToStringValue
+        concreteBinding.boundElementAtts.get(paramName) map c.evaluateAvt map stringToStringValue
 
       def propertyName =
         concreteBinding.abstractBinding.directName map { name ⇒

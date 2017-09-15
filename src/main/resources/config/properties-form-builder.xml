@@ -38,7 +38,6 @@
         /forms/orbeon/builder/resources/cell/control-resources-editor/events.min.js
         /forms/orbeon/builder/resources/cell/control-resources-editor/placeholders.min.js
 
-        /forms/orbeon/builder/resources/section-grid-repeat/section-editor.min.js
         /forms/orbeon/builder/resources/section-grid-repeat/grid-repeat-editor.min.js
 
         /forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js

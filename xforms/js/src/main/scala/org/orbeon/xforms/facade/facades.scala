@@ -95,6 +95,8 @@ object Globals extends js.Object {
   val isReloading           : Boolean                   = js.native
   val repeatIndexes         : js.Dictionary[String]     = js.native
   val ns                    : js.Dictionary[String]     = js.native
+  val eventQueue            : js.Array[js.Any]          = js.native
+  val requestInProgress     : Boolean                   = js.native
 }
 
 @js.native
@@ -164,9 +166,10 @@ class Property[T] extends js.Object {
 @JSGlobal("ORBEON.util.Properties")
 @js.native
 object Properties extends js.Object {
-  val delayBeforeIncrementalRequest    : Property[Int] = js.native
-  val delayBeforeUploadProgressRefresh : Property[Int] = js.native
-  val delayBeforeDisplayLoading        : Property[Int] = js.native
+  val delayBeforeIncrementalRequest    : Property[Int]    = js.native
+  val delayBeforeUploadProgressRefresh : Property[Int]    = js.native
+  val delayBeforeDisplayLoading        : Property[Int]    = js.native
+  val internalShortDelay               : Property[Double] = js.native
 }
 
 @JSGlobal("ORBEON.util.Utils")

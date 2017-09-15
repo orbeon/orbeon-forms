@@ -89,13 +89,11 @@ div.orbeon.orbeon-portlet-div {
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
         position: absolute;                                                 // Is left/right set in CoffeeScript relative to the current section label
         cursor: pointer;
-        font-size: 20px;                                                    // Matching the title font size
-        line-height: 40px;                                                  // So text is vertically centered
+        font-size: 18px;                                                    // Matching the title font size
+        line-height: 36px;                                                  // So text is vertically centered
         color: #BBB;                                                        // Light gray denoting hint
         font-family: @baseFontFamily;                                       // Matching font defined by Bootstrap for titles
         z-index: 1;                                                         // Show on top of the page (default is 0)
-        background: white; opacity: 0.01;                                   // For IE9 and IE10, fixing https://github.com/orbeon/orbeon-forms/issues/1402,
-                                                                            // see http://stackoverflow.com/a/6480792/5295
     }
 
     .fb-edit-section-label {                                                // Input created dynamically to edit section label
@@ -105,8 +103,8 @@ div.orbeon.orbeon-portlet-div {
         font-size: @frSectionTitleHeight;
     }
 
-    .fr-section-title.hover {                                               // .hover added by CS on mouse over click interceptor
-        #gradient > .vertical(@grayLighter, @grayLighter);
+    h2.fr-section-title.hover {                                               // .hover added by CS on mouse over click interceptor
+        #gradient > .vertical(#ddd, #ddd);
     }
 
     .fb-delete-grid-trigger {

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -151,7 +151,7 @@ object Cell {
   // - the column-span
   //
   //@XPathFunction
-  def findTdsWithPositionAndSize(grid: NodeInfo): List[Item] = {
+  def findTdsWithPositionAndSize(grid: NodeInfo): SequenceIterator = {
 
     val allRowCells = getAllRowCells(grid)
 
@@ -166,7 +166,7 @@ object Cell {
     def isEmptyRow(row: List[Cell]) =
       (row filter (cell ⇒ cell.rowspan == 1 && ! cell.missing && ! cell.td.hasChildElement) map (_.colspan) sum) == gridWidth
 
-    if (12 % gridWidth == 0){
+    if (12 % gridWidth == 0) {
 
       val ratio = 12 / gridWidth
 
@@ -193,6 +193,6 @@ object Cell {
         }
     }
 
-    result.result()
+    result
   }
 }

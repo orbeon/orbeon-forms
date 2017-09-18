@@ -245,134 +245,117 @@
         <fr:view width="800px" appearance="custom">
             <fr:body>
                 <fr:section id="section-1-control" bind="section-1-bind">
-                    <xf:label ref="$form-resources/section-1/label"/>
-                    <fr:grid>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-1-control" bind="control-1-bind">
-                                    <xf:label ref="$form-resources/control-1/label"/>
-                                    <xf:hint ref="$form-resources/control-1/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td/>
-                        </xh:tr>
-                    </fr:grid>
-                    <fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="content" min="1" template="instance('grid-3-template')">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-5-control" bind="control-5-bind">
-                                    <xf:label ref="$form-resources/control-5/label"/>
-                                    <xf:hint ref="$form-resources/control-5/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <fr:attachment id="control-16-control" bind="control-16-bind" class="fr-attachment">
-                                    <xf:label ref="$form-resources/control-16/label"/>
-                                    <xf:hint ref="$form-resources/control-16/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:filename ref="@filename"/>
-                                    <xf:mediatype ref="@mediatype"/>
-                                    <xxf:size ref="@size"/>
-                                </fr:attachment>
-                            </xh:td>
-                        </xh:tr>
-                    </fr:grid>
-                    <fr:grid id="grid-6-grid" bind="grid-6-bind" repeat="content" min="1" template="instance('grid-6-template')">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-8-control" bind="control-8-bind">
-                                    <xf:label ref="$form-resources/control-8/label"/>
-                                    <xf:hint ref="$form-resources/control-8/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <fr:image-attachment id="control-17-control" bind="control-17-bind" class="fr-attachment">
-                                    <xf:label ref="$form-resources/control-17/label"/>
-                                    <xf:hint ref="$form-resources/control-17/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:filename ref="@filename"/>
-                                    <xf:mediatype ref="@mediatype"/>
-                                    <xxf:size ref="@size"/>
-                                </fr:image-attachment>
-                            </xh:td>
-                        </xh:tr>
-                    </fr:grid>
-                </fr:section>
+                   <xf:label ref="$form-resources/section-1/label"/>
+                   <fr:grid>
+                       <fr:c y="1" x="1" w="6">
+                           <xf:input id="control-1-control" bind="control-1-bind">
+                               <xf:label ref="$form-resources/control-1/label"/>
+                               <xf:hint ref="$form-resources/control-1/hint"/>
+                               <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                           </xf:input>
+                       </fr:c>
+                   </fr:grid>
+                   <fr:grid id="grid-3-grid" bind="grid-3-bind" repeat="content" min="1" template="instance('grid-3-template')">
+                       <fr:c y="1" x="1" w="6">
+                           <xf:input id="control-5-control" bind="control-5-bind">
+                               <xf:label ref="$form-resources/control-5/label"/>
+                               <xf:hint ref="$form-resources/control-5/hint"/>
+                               <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                           </xf:input>
+                       </fr:c>
+                       <fr:c y="1" x="7" w="6">
+                           <fr:attachment id="control-16-control" bind="control-16-bind" class="fr-attachment">
+                               <xf:label ref="$form-resources/control-16/label"/>
+                               <xf:hint ref="$form-resources/control-16/hint"/>
+                               <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                               <xf:filename ref="@filename"/>
+                               <xf:mediatype ref="@mediatype"/>
+                               <xxf:size ref="@size"/>
+                           </fr:attachment>
+                       </fr:c>
+                   </fr:grid>
+                   <fr:grid id="grid-6-grid" bind="grid-6-bind" repeat="content" min="1" template="instance('grid-6-template')">
+                       <fr:c y="1" x="1" w="6">
+                           <xf:input id="control-8-control" bind="control-8-bind">
+                               <xf:label ref="$form-resources/control-8/label"/>
+                               <xf:hint ref="$form-resources/control-8/hint"/>
+                               <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                           </xf:input>
+                       </fr:c>
+                       <fr:c y="1" x="7" w="6">
+                           <fr:image-attachment id="control-17-control" bind="control-17-bind" class="fr-attachment">
+                               <xf:label ref="$form-resources/control-17/label"/>
+                               <xf:hint ref="$form-resources/control-17/hint"/>
+                               <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                               <xf:filename ref="@filename"/>
+                               <xf:mediatype ref="@mediatype"/>
+                               <xxf:size ref="@size"/>
+                           </fr:image-attachment>
+                       </fr:c>
+                   </fr:grid>
+               </fr:section>
                 <fr:section id="section-9-control" bind="section-9-bind" repeat="content" min="1" template="instance('section-9-template')">
                     <xf:label ref="$form-resources/section-9/label"/>
                     <fr:grid>
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-10-control" bind="control-10-bind">
-                                    <xf:label ref="$form-resources/control-10/label"/>
-                                    <xf:hint ref="$form-resources/control-10/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c y="1" x="1" w="12">
+                            <xf:input id="control-10-control" bind="control-10-bind">
+                                <xf:label ref="$form-resources/control-10/label"/>
+                                <xf:hint ref="$form-resources/control-10/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="section-11-control" bind="section-11-bind">
                     <xf:label ref="$form-resources/section-11/label"/>
                     <fr:grid id="grid-12-grid" bind="grid-12-bind" repeat="content" template="instance('grid-12-template')">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-13-control" bind="control-13-bind">
-                                    <xf:label ref="$form-resources/control-13/label"/>
-                                    <xf:hint ref="$form-resources/control-13/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c y="1" x="1" w="12">
+                            <xf:input id="control-13-control" bind="control-13-bind">
+                                <xf:label ref="$form-resources/control-13/label"/>
+                                <xf:hint ref="$form-resources/control-13/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
                     <fr:grid id="grid-14-grid" bind="grid-14-bind" repeat="content" template="instance('grid-14-template')">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-15-control" bind="control-15-bind">
-                                    <xf:label ref="$form-resources/control-15/label"/>
-                                    <xf:hint ref="$form-resources/control-15/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c y="1" x="1" w="12">
+                            <xf:input id="control-15-control" bind="control-15-bind">
+                                <xf:label ref="$form-resources/control-15/label"/>
+                                <xf:hint ref="$form-resources/control-15/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="section-18-control" bind="section-18-bind">
                     <xf:label ref="$form-resources/section-18/label"/>
                     <fr:grid id="grid-19-grid" bind="grid-19-bind" repeat="content" template="instance('grid-19-template')">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-20-control" bind="control-20-bind">
-                                    <xf:label ref="$form-resources/control-20/label"/>
-                                    <xf:hint ref="$form-resources/control-20/hint"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input id="control-21-control" bind="control-21-bind">
-                                    <xf:label ref="$form-resources/control-21/label"/>
-                                    <xf:hint ref="$form-resources/control-21/hint"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="control-20-control" bind="control-20-bind">
+                                <xf:label ref="$form-resources/control-20/label"/>
+                                <xf:hint ref="$form-resources/control-20/hint"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input id="control-21-control" bind="control-21-bind">
+                                <xf:label ref="$form-resources/control-21/label"/>
+                                <xf:hint ref="$form-resources/control-21/hint"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
                     <fr:grid id="grid-22-grid" bind="grid-22-bind" repeat="content" template="instance('grid-22-template')">
-                        <xh:tr>
-                            <xh:td>
-                                <xf:input id="control-23-control" bind="control-23-bind">
-                                    <xf:label ref="$form-resources/control-23/label"/>
-                                    <xf:hint ref="$form-resources/control-23/hint"/>
-                                </xf:input>
-                            </xh:td>
-                            <xh:td>
-                                <xf:input id="control-24-control" bind="control-24-bind">
-                                    <xf:label ref="$form-resources/control-24/label"/>
-                                    <xf:hint ref="$form-resources/control-24/hint"/>
-                                </xf:input>
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="control-23-control" bind="control-23-bind">
+                                <xf:label ref="$form-resources/control-23/label"/>
+                                <xf:hint ref="$form-resources/control-23/hint"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input id="control-24-control" bind="control-24-bind">
+                                <xf:label ref="$form-resources/control-24/label"/>
+                                <xf:hint ref="$form-resources/control-24/hint"/>
+                            </xf:input>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

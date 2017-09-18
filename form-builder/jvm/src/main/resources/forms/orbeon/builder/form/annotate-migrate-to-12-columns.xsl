@@ -41,6 +41,7 @@
 
         <xsl:copy>
             <xsl:attribute name="edit-ref"/>
+            <xsl:apply-templates select="@*" mode="#current"/>
 
             <xsl:variable
                 name="grid-width"

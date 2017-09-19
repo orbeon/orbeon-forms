@@ -21,9 +21,10 @@ import scala.scalajs.js
 
 object ControlEditor {
 
-  val ControlActionNames = List("delete", "edit-details", "edit-items")
-  lazy val controlEditorLeft = $(".fb-control-editor-left")
+  val ControlActionNames            = List("delete", "edit-details", "edit-items")
   var currentCellOpt: Option[Block] = None
+  lazy val controlEditorLeft        = $(".fb-control-editor-left")
+  lazy val controlEditorRight       = $(".fb-control-editor-right")
 
   // Show/hide editor
   Position.currentContainerChanged(
@@ -31,16 +32,22 @@ object ControlEditor {
     wasCurrent = (cell: Block) ⇒ {
       currentCellOpt = None
       controlEditorLeft.hide()
+      controlEditorRight.hide()
     },
 
     becomesCurrent = (cell: Block) ⇒ {
 
       currentCellOpt = Some(cell)
 
-      // Position the editor
+      // Position editors
       controlEditorLeft.show()
       Position.offset(controlEditorLeft, new Position.Offset {
         override val left = cell.left
+        override val top  = cell.top
+      })
+      controlEditorRight.show()
+      Position.offset(controlEditorRight, new Position.Offset {
+        override val left = cell.left + cell.width - controlEditorRight.outerWidth()
         override val top  = cell.top
       })
     }

@@ -80,14 +80,21 @@ div.orbeon.orbeon-portlet-div {
         position: absolute;                                                 // Its left/right set in CoffeeScript relative to the current section
         display: none;                                                      // Shown in CoffeeScript when mouse over section
         padding: 0 10px 20px 20px;                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
-        .xforms-trigger, i { display: block; }                              // Icons shown vertically
+        .xforms-trigger, i {
+            display: block;                                                 // Icons shown vertically
+            cursor: pointer;                                                // Icons are clickable
+        }
     }
     .fb-section-editor {
         padding-right: 20px;                                                // Space between icons and section
     }
     .fb-control-editor-left {
-        padding-top: 5px;                                                   // Space between icons and the cell border
-        padding-left: 5px;
+        padding-top:   8px;                                                 // Space between icons and the cell border
+        padding-left:  8px;
+    }
+    .fb-control-editor-right {
+        padding-top:   8px;                                                 // Space between icons and the cell border
+        padding-right: 8px;
     }
 
     .fb-grid-repeat-editor {                                                // Section that contains the grid/repeat icons that are moved based on pointer position

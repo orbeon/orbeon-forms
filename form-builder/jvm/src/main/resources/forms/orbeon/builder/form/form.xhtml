@@ -458,25 +458,42 @@
                             <!-- Editors -->
                             <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the
                                        binding of the current node, which only works if the control exists -->
-                            <xh:div class="fb-control-editor-left">
 
-                                <!-- Copy/move -->
-                                <!-- draggable: for accessibility, and also used to add this ot the list of "triggers" -->
+                            <xh:div class="fb-control-editor-left">
+                                <xh:i
+                                    class="fb-control- icon-arrow-right"
+                                    role="button"
+                                    title="{$fb-resources/expand-horizontally-icon/label}"/>
+                                <xh:i
+                                    class="icon-arrow-left"
+                                    role="button"
+                                    title="{$fb-resources/shrink-horizontally-icon/label}"/>
+                                <xh:i
+                                    class="icon-arrow-down"
+                                    role="button"
+                                    title="{$fb-resources/expand-vertically-icon/label}"/>
+                                <xh:i
+                                    class="icon-arrow-up"
+                                    role="button"
+                                    title="{$fb-resources/shrink-vertically-icon/label}"/>
+                            </xh:div>
+
+                            <xh:div class="fb-control-editor-right">
                                 <xh:i
                                     class="fb-control-handle icon-move"
                                     draggable="true"
                                     title="{$fb-resources/move-icon/label}"/>
-                                <!-- Delete control -->
-                                <xh:i
-                                    class="fb-control-delete icon-minus-sign"
-                                    title="{$fb-resources/delete-control-icon/label}"/>
-                                <!-- Edit details for any control -->
                                 <xh:i
                                     class="fb-control-edit-details icon-cog"
+                                    role="button"
                                     title="{$fb-resources/control-details-icon/label}"/>
-                                <!-- Itemset editor -->
+                                <xh:i
+                                    class="fb-control-delete icon-minus-sign"
+                                    role="button"
+                                    title="{$fb-resources/delete-control-icon/label}"/>
                                 <xh:i
                                     class="fb-control-edit-items icon-th-list"
+                                    role="button"
                                     title="{$fb-resources/edit-items/label}"/>
 
                                 <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
@@ -521,47 +538,6 @@
                                 </xf:upload>
                                 -->
 
-                            </xh:div>
-
-                            <xh:div class="fb-control-editor-right">
-                                <!-- Expand cell down -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="fb-expand-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-arrow-down"
-                                            title="{$fb-resources/expand-icon/label}"/>
-                                    </xf:label>
-
-                                    <!-- TODO: can we move these handlers up so that they are not duplicated? -->
-                                    <xf:action ev:event="DOMActivate">
-
-                                        <xf:var name="confirm" value="fbf:expandCellTouchesControl($td)"/>
-
-                                        <!-- Ask confirmation -->
-                                        <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">
-                                            <xf:property name="message" value="$fb-resources/messages/expand-cell"/>
-                                            <xf:property name="positive-targetid" value="xxf:absolute-id('fb-expand-trigger')"/>
-                                        </xf:dispatch>
-                                        <xf:action if="not($confirm)">
-                                            <!-- We are automatically confirmed as there is no control to delete -->
-                                            <xf:dispatch name="fr-positive" targetid="fb-expand-trigger"/>
-                                        </xf:action>
-                                    </xf:action>
-                                    <xf:action ev:event="fr-positive" type="xpath">
-                                        fbf:expandCell($td)
-                                    </xf:action>
-                                </xf:trigger>
-                                <!-- Shrink -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="fb-shrink-trigger">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-arrow-up"
-                                            title="{$fb-resources/shrink-icon/label}"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">
-                                        fbf:shrinkCell($td)
-                                    </xf:action>
-                                </xf:trigger>
                             </xh:div>
 
                             <xh:div class="fb-section-editor">

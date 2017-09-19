@@ -152,12 +152,18 @@
         <edit-items>
             <label>Edit Choices</label>
         </edit-items>
-        <expand-icon>
-            <label>Expand</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Shrink</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label>Expand horizontally</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label>Shrink horizontally</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label>Expand vertically</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label>Shrink vertically</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Delete Control</label>
         </delete-control-icon>
@@ -1141,12 +1147,18 @@
         <edit-items>
             <label>Editer les choix</label>
         </edit-items>
-        <expand-icon>
-            <label>Etendre</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Rétrécir</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label>Etendre horizontalement</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label>Rétrécir horizontalement</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label>Etendre verticalement</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label>Rétrécir verticalement</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Supprimer le contrôle</label>
         </delete-control-icon>
@@ -2132,12 +2144,18 @@
         <edit-items>
             <label>Rediger svaralternativer</label>
         </edit-items>
-        <expand-icon>
-            <label>Utvid</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Lukk</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Slett element</label>
         </delete-control-icon>
@@ -3151,12 +3169,18 @@
         <edit-items>
             <label>Редактировать элементы</label>
         </edit-items>
-        <expand-icon>
-            <label>Сделать шире</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Сделать уже</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Удалить элемент</label>
         </delete-control-icon>
@@ -4170,12 +4194,18 @@
         <edit-items>
             <label>Modifica scelte</label>
         </edit-items>
-        <expand-icon>
-            <label>Espandi</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Restringi</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Elimina controllo</label>
         </delete-control-icon>
@@ -5181,12 +5211,18 @@
         <edit-items>
             <label>Auswahlmöglichkeiten bearbeiten</label>
         </edit-items>
-        <expand-icon>
-            <label>Erweitern</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Verkleinern</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Steuerelement löschen</label>
         </delete-control-icon>
@@ -6195,12 +6231,18 @@
         <edit-items>
             <label>Muokkaa kohdetta</label>
         </edit-items>
-        <expand-icon>
-            <label>Laajenna</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Pienennä</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Poista kontrolli</label>
         </delete-control-icon>
@@ -7207,12 +7249,18 @@
         <edit-items>
             <label>Editar Opciones</label>
         </edit-items>
-        <expand-icon>
-            <label>Expandir</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Contraer</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Eliminar Control</label>
         </delete-control-icon>
@@ -8219,12 +8267,18 @@
         <edit-items>
             <label>Alterar escolhas</label>
         </edit-items>
-        <expand-icon>
-            <label>Expandir</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Encolher</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Apagar Controlo</label>
         </delete-control-icon>
@@ -9237,12 +9291,18 @@
         <edit-items>
             <label>Ändra alternativ</label>
         </edit-items>
-        <expand-icon>
-            <label>Utvidga</label>
-        </expand-icon>
-        <shrink-icon>
-            <label>Krymp</label>
-        </shrink-icon>
+        <expand-horizontally-icon>
+            <label todo="true">[Expand horizontally]</label>
+        </expand-horizontally-icon>
+        <shrink-horizontally-icon>
+            <label todo="true">[Shrink horizontally]</label>
+        </shrink-horizontally-icon>
+        <expand-vertically-icon>
+            <label todo="true">[Expand vertically]</label>
+        </expand-vertically-icon>
+        <shrink-vertically-icon>
+            <label todo="true">[Shrink vertically]</label>
+        </shrink-vertically-icon>
         <delete-control-icon>
             <label>Ta bort kontroll</label>
         </delete-control-icon>

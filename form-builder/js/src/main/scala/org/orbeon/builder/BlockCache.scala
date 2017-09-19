@@ -88,8 +88,8 @@ object BlockCache {
       override val el          = elem
       override val top         = elemOffset.top
       override val left        = elemOffset.left
-      override val height      = elem.height()
-      override val width       = elem.width()
+      override val height      = elem.outerHeight()
+      override val width       = elem.outerWidth()
       override val titleOffset = null
     })
   }

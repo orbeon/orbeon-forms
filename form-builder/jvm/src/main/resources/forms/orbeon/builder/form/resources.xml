@@ -975,7 +975,6 @@
             <delete-grid>Are you sure you want to delete the current grid?</delete-grid>
             <delete-column>Are you sure you want to delete the current column?</delete-column>
             <delete-row>Are you sure you want to delete the current row?</delete-row>
-            <expand-cell>Are you sure you want to expand the current cell? One control will be deleted.</expand-cell>
             <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
             <delete-service>Are you sure you want to delete service</delete-service>
             <delete-action>Are you sure you want to delete action</delete-action>
@@ -1971,7 +1970,6 @@
             <delete-grid>Etes-vous sûr de vouloir supprimer la grille courante ?</delete-grid>
             <delete-column>Etes-vous sûr de vouloir supprimer la colonne courante ?</delete-column>
             <delete-row>Etes-vous sûr de vouloir supprimer la rangée courante ?</delete-row>
-            <expand-cell>Etes-vous sûr de vouloir étendre la cellule courante ? Un contrôle sera supprimé.</expand-cell>
             <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
             <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
@@ -2996,7 +2994,6 @@
             <delete-grid>Er du sikker på at du ønsker å slette dette rutenettet?</delete-grid>
             <delete-column>Er du sikker på at du ønsker å slette denne kolonnen?</delete-column>
             <delete-row>Er du sikker på at du ønsker å slette denne raden?</delete-row>
-            <expand-cell>Are you sure you want to expand the current cell? One control will be deleted.</expand-cell>
             <delete-resources>Er du sikker på at du ønsker å slette alle ressursene for språket</delete-resources>
             <delete-service>Er du sikker på at du ønsker å slette sørvisen</delete-service>
             <delete-action>Er du sikker på at du ønsker å slette handlingen</delete-action>
@@ -4020,7 +4017,6 @@
             <delete-grid>Вы уверены, что хотите удалить текущую сетку?</delete-grid>
             <delete-column>Вы уверены, что хотите удалить текущий столбец?</delete-column>
             <delete-row>Вы уверены, что хотите удалить текущую строку?</delete-row>
-            <expand-cell>Вы уверены, что хотите расширить текущую ячейку? Один элемент будет удален.</expand-cell>
             <delete-resources>Вы уверены, что хотите удалить все ресуры для языка</delete-resources>
             <delete-service>Вы уверены, что хотите удалить сервис?</delete-service>
             <delete-action>Вы уверены, что хотите удалить действие?</delete-action>
@@ -5037,7 +5033,6 @@
             <delete-grid>Sei sicuro di voler cancellare la griglia attuale?</delete-grid>
             <delete-column>Sei sicuro di voler cancellare la colonna attuale?</delete-column>
             <delete-row>Sei sicuro di voler cancellare la riga attuale?</delete-row>
-            <expand-cell>Sei sicuro di voler espandere la cella attuale? Un controllo sarà cancellato.</expand-cell>
             <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua</delete-resources>
             <delete-service>Sei sicuro di voler cancellare questo servizio?</delete-service>
             <delete-action>Sei sicuro di voler cancellare questa azione?</delete-action>
@@ -6055,7 +6050,6 @@
             <delete-grid>Sind Sie sicher, dass Sie das aktuelle Raster löschen wollen?</delete-grid>
             <delete-column>Sind Sie sicher, dass Sie die aktuelle Spalte löschen wollen?</delete-column>
             <delete-row>Sind Sie sicher, dass Sie die aktuelle Zeile löschen wollen?</delete-row>
-            <expand-cell>Sind Sie sicher, dass Sie die aktuelle Zelle erweitern wollen? Ein Steuerelement wird gelöscht werden.</expand-cell>
             <delete-resources>Sind Sie sicher, dass Sie alle Ressourcen löschen wollen für die Sprache</delete-resources>
             <delete-service>Sind Sie sicher, dass Sie diesen Dienst löschen wollen?</delete-service>
             <delete-action>Sind Sie sicher, dass Sie diese Aktion löschen wollen?</delete-action>
@@ -7075,7 +7069,6 @@
             <delete-grid>Haluatko varmasti poistaa nykyisen ruudukon?</delete-grid>
             <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
             <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
-            <expand-cell>Haluatko varmasti laajentaa nykyisen solun? Yksi kontrolli deletoidaan.</expand-cell>
             <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
             <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
             <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
@@ -8093,7 +8086,6 @@
             <delete-grid>Está seguro de eliminar la Grilla actual?</delete-grid>
             <delete-column>Está seguro de eliminar la Columna actual?</delete-column>
             <delete-row>Está seguro de eliminar la Fila actual?</delete-row>
-            <expand-cell>Está seguro de eliminar de expandir la celda actual? . Un control será eliminado.</expand-cell>
             <delete-resources>Está seguro de eliminar todos los recursos para los idiomas</delete-resources>
             <delete-service>Está seguro de eliminar el Servicio?</delete-service>
             <delete-action>Está seguro de eliminar la Acción?</delete-action>
@@ -9117,7 +9109,6 @@
             <delete-grid>Tem a certeza que deseja remover a grelha actual?</delete-grid>
             <delete-column>Tem a certeza que deseja remover a coluna actual?</delete-column>
             <delete-row>Tem a certeza que deseja remover a linha actual?</delete-row>
-            <expand-cell>Tem a certeza que deseja expandir a célula existente? Vai ser removido um controlo.</expand-cell>
             <delete-resources>Tem a certeza que deseja remover a todos os recursos para esta língua</delete-resources>
             <delete-service>Tem a certeza que deseja remover o serviço</delete-service>
             <delete-action>Tem a certeza que deseja remover a acção</delete-action>
@@ -10142,7 +10133,6 @@
             <delete-grid>Bekräfta att du vill ta bort detta rutnät</delete-grid>
             <delete-column>Bekräfta att du vill ta bort denna kolumn</delete-column>
             <delete-row>Bekräfta att du vill ta bort denna rad</delete-row>
-            <expand-cell>Bekräfta att du vill utvidga denna cell. En kontroll kommer att tas bort.</expand-cell>
             <delete-resources>Bekräfta att du vill ta bort alla resurser för detta språk</delete-resources>
             <delete-service>Bekräfta att du vill ta bort denna tjänst</delete-service>
             <delete-action>Bekräfta att du vill ta bort detta kommando</delete-action>

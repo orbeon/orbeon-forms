@@ -2937,19 +2937,20 @@
                             </results>
                         </xf:instance>
 
-                        <xf:var
-                            name="map"
-                            value="
-                                map:merge(
-                                    (
-                                        map:entry('number',   42),
-                                        map:entry('string',   'forty-two'),
-                                        map:entry('node',     instance()),
-                                        map:entry('sequence', 1 to 10)
-                                    )
-                                )"/>
-
                         <xf:action event="xforms-ready">
+
+                            <xf:var
+                                name="map"
+                                value="
+                                    map:merge(
+                                        (
+                                            map:entry('number',   42),
+                                            map:entry('string',   'forty-two'),
+                                            map:entry('node',     instance()),
+                                            map:entry('sequence', 1 to 10)
+                                        )
+                                    )"/>
+
                             <xf:setvalue ref="number"    value="map:get($map, 'number')"/>
                             <xf:setvalue ref="string"    value="map:get($map, 'string')"/>
                             <xf:setvalue ref="node-name" value="name(map:get($map, 'node'))"/>
@@ -2968,6 +2969,84 @@
                             <instance id="results" model-id="model">
                                 <results>
                                     <number>42</number>
+                                    <string>forty-two</string>
+                                    <node-name>results</node-name>
+                                    <sequence>1 2 3 4 5 6 7 8 9 10</sequence>
+                                </results>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Array functions" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:array="http://www.w3.org/2005/xpath-functions/array">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="results">
+                            <results>
+                                <size/>
+                                <number/>
+                                <number2/>
+                                <string/>
+                                <node-name/>
+                                <sequence/>
+                            </results>
+                        </xf:instance>
+
+                        <xf:action event="xforms-ready">
+
+                            <xf:var
+                                name="array"
+                                value="
+                                    array:append(
+                                        array:append(
+                                            array:append(
+                                                array:append(
+                                                    array:join(()),
+                                                    42
+                                                ),
+                                            'forty-two'
+                                        ),
+                                        instance()
+                                    ),
+                                    1 to 10
+                                )"/>
+
+                            <xf:setvalue ref="size"      value="array:size($array)"/>
+                            <xf:setvalue ref="number"    value="array:get($array, 1)"/>
+
+                            <xf:var
+                                name="updated"
+                                value="array:put($array, 1, 43)"/>
+
+                            <xf:setvalue ref="string"    value="array:get($updated, 2)"/>
+                            <xf:setvalue ref="node-name" value="name(array:get($updated, 3))"/>
+                            <xf:setvalue ref="number2"   value="array:get($updated, 1)"/>
+                            <xf:setvalue ref="sequence"  value="string-join(for $v in array:get($updated, 4) return string($v), ' ')"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="results" model-id="model">
+                                <results>
+                                    <size>4</size>
+                                    <number>42</number>
+                                    <number2>43</number2>
                                     <string>forty-two</string>
                                     <node-name>results</node-name>
                                     <sequence>1 2 3 4 5 6 7 8 9 10</sequence>

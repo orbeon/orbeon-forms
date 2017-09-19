@@ -94,8 +94,9 @@ public class XMLConstants {
     public static final String XHTML_SHORT_PREFIX = "xh";
     public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
 
-    public static final String XPATH_FUNCTIONS_NAMESPACE_URI     = "http://www.w3.org/2005/xpath-functions";
-    public static final String XPATH_MAP_FUNCTIONS_NAMESPACE_URI = "http://www.w3.org/2005/xpath-functions/map";
+    public static final String XPATH_FUNCTIONS_NAMESPACE_URI       = "http://www.w3.org/2005/xpath-functions";
+    public static final String XPATH_ARRAY_FUNCTIONS_NAMESPACE_URI = "http://www.w3.org/2005/xpath-functions/array";
+    public static final String XPATH_MAP_FUNCTIONS_NAMESPACE_URI   = "http://www.w3.org/2005/xpath-functions/map";
 
     public static final String SAX_LEXICAL_HANDLER = "http://xml.org/sax/properties/lexical-handler";
 

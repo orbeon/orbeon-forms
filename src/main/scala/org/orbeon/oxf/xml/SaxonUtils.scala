@@ -40,7 +40,15 @@ object SaxonUtils {
       // Compare the CharSequence
       other.isInstanceOf[StringValue] && getStringValueCS == other.asInstanceOf[StringValue].getStringValueCS
     }
+
+    override def hashCode(): Int = value.hashCode()
   }
+
+  def fixStringValue[V <: Item](item: V): V =
+    item match {
+      case v: StringValue ⇒ new StringValueWithEquals(v.getStringValueCS).asInstanceOf[V] // we know it's ok...
+      case v              ⇒ v
+    }
 
   // Convert a Java object to a Saxon Item using the Saxon API
   val anyToItem: (Any) ⇒ Item = new StandardObjectConverter(new SaxonXQDataFactory {

@@ -11,30 +11,34 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.oxf.xforms.function.map
+package org.orbeon.saxon
 
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.map.MapFunctions.saxonTypeForMap
-import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals
-import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.`type`.{ExternalObjectType, ItemType, TypeHierarchy}
-import org.orbeon.saxon.expr.{PathMap, XPathContext}
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, SaxonUtils, XMLConstants}
+import org.orbeon.saxon.MapFunctions._
+import org.orbeon.saxon.`type`._
+import org.orbeon.saxon.expr.StaticProperty.{ALLOWS_ZERO_OR_MORE, EXACTLY_ONE}
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
-import org.orbeon.scaxon.Implicits
+import org.orbeon.scaxon.Implicits._
 
-trait MapFunction extends XFormsFunction {
+trait MapFunction extends FunctionSupport {
 
 //  override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
 //    addSubExpressionsToPathMap(pathMap, pathMapNodeSet)
 }
 
+trait ReturnMapFunction extends MapFunction {
+
+  override def getItemType(th: TypeHierarchy): ItemType =
+    saxonTypeForMap(th.getConfiguration)
+}
+
 //
 // `map:entry($key as xs:anyAtomicType, $value as item()*) as map(*)`
 //
-class MapEntry extends MapFunction {
-
-  import MapFunctions._
+class MapEntry extends ReturnMapFunction {
 
   override def evaluateItem(context: XPathContext): ObjectValue = {
 
@@ -43,25 +47,20 @@ class MapEntry extends MapFunction {
     val config  = context.getConfiguration
     val mapType = saxonTypeForMap(config)
 
-    val key   = itemArgument(0)
+    val key   = SaxonUtils.fixStringValue(itemArgument(0).asInstanceOf[AtomicValue]) // enforced by signature
     val value = itemsArgument(1)
 
-    new ObjectValue(
-      Map(fixStringValue(key) → new SequenceExtent(value)),
-      mapType
+    createValue(
+      Map(key → new SequenceExtent(value)),
+      config
     )
   }
-
-  override def getItemType(th: TypeHierarchy): ItemType =
-    saxonTypeForMap(th.getConfiguration)
 }
 
 //
 // `map:merge($maps as map(*)*) as map(*)`
 //
-class MapMerge extends MapFunction {
-
-  import MapFunctions._
+class MapMerge extends ReturnMapFunction {
 
   override def evaluateItem(context: XPathContext): ObjectValue = {
 
@@ -72,14 +71,11 @@ class MapMerge extends MapFunction {
 
     val maps = itemsArgumentOpt(0).iterator flatMap collectMapValues
 
-    new ObjectValue(
+    createValue(
       maps.foldLeft(Map.empty[AtomicValue, ValueRepresentation])(_ ++ _),
-      mapType
+      config
     )
   }
-
-  override def getItemType(th: TypeHierarchy): ItemType =
-    saxonTypeForMap(th.getConfiguration)
 }
 
 //
@@ -87,14 +83,12 @@ class MapMerge extends MapFunction {
 //
 class MapGet extends MapFunction {
 
-  import MapFunctions._
-
   override def iterate(context: XPathContext): SequenceIterator = {
 
     implicit val ctx = context
 
     val map = itemsArgumentOpt(0).iterator flatMap collectMapValues next()
-    val key = fixStringValue(itemArgument(1)).asInstanceOf[AtomicValue]
+    val key = SaxonUtils.fixStringValue(itemArgument(1).asInstanceOf[AtomicValue]) // enforced by signature
 
     map.getOrElse(key, EmptySequence.getInstance) match {
       case v: Value    ⇒ v.iterate()
@@ -104,27 +98,49 @@ class MapGet extends MapFunction {
   }
 }
 
-private object MapFunctions {
+object MapFunctions {
 
-  val UnderlyingClass = classOf[Map[AtomicValue, ValueRepresentation]]
+  type UnderlyingType = Map[AtomicValue, ValueRepresentation]
+
+  val UnderlyingClass = classOf[UnderlyingType]
 
   def saxonTypeForMap(config: Configuration) = new ExternalObjectType(UnderlyingClass, config)
 
-  def collectMapValues(it: SequenceIterator)(implicit xpathContext: XPathContext): Iterator[Map[AtomicValue, ValueRepresentation]] = {
+  def collectMapValues(it: SequenceIterator)(implicit context: XPathContext): Iterator[UnderlyingType] = {
 
-    val config  = xpathContext.getConfiguration
+    val config  = context.getConfiguration
     val mapType = saxonTypeForMap(config)
 
-    Implicits.asScalaIterator(it) collect {
+    asScalaIterator(it) collect {
       case v: ObjectValue if v.getItemType(config.getTypeHierarchy) == mapType ⇒
-        v.getObject.asInstanceOf[Map[AtomicValue, ValueRepresentation]]
+        v.getObject.asInstanceOf[UnderlyingType]
     }
   }
 
-  def fixStringValue(item: Item): Item =
-    item match {
-      case v: StringValue ⇒ new StringValueWithEquals(v.getStringValueCS)
-      case v              ⇒ v
-    }
+  def createValue(value: UnderlyingType, config: Configuration = XPath.GlobalConfiguration): ObjectValue =
+    new ObjectValue(
+      value,
+      saxonTypeForMap(config)
+    )
+}
+
+trait MapFunctions extends OrbeonFunctionLibrary {
+
+  Namespace(XMLConstants.XPATH_MAP_FUNCTIONS_NAMESPACE_URI) {
+
+    Fun("entry", classOf[MapEntry], op = 0, min = 2, BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE,
+      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE),
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("merge", classOf[MapMerge], op = 0, min = 1,  BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE,
+      Arg(BuiltInAtomicType.ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("get", classOf[MapGet], op = 0, min = 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE),
+      Arg(BuiltInAtomicType.ANY_ATOMIC, EXACTLY_ONE)
+    )
+  }
 
 }

@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om.{NamespaceConstant, NodeInfo}
 import org.orbeon.saxon.sxpath.XPathEvaluator
-import org.orbeon.saxon.{CryptoFunctions, IndependentFunctions, IndependentRequestFunctions, XSLTFunctions}
+import org.orbeon.saxon._
 
 // For backward compatibility
 object PipelineFunctionLibrary extends PipelineFunctionLibrary
@@ -45,6 +45,8 @@ class PipelineFunctionLibrary extends {
   with CryptoFunctions
   with IndependentFunctions
   with IndependentRequestFunctions
+  with MapFunctions
+  with ArrayFunctions
   with XSLTFunctions {
 
   // === Functions made accessible to XSLT/XPL via Java calls

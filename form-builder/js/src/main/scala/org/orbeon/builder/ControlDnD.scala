@@ -19,6 +19,7 @@ import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
+import scala.scalajs.js.Dictionary
 
 object ControlDnD {
 
@@ -59,9 +60,11 @@ object ControlDnD {
     // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
     if (target != null) {
       DocumentAPI.dispatchEvent(target.id, "DOMActivate")
-      DocumentAPI.dispatchEvent(source.id, "fb-dnd-control-from", properties = new js.Object {
-        val `fb-do-copy` = $(el).hasClass(CopyClass)
-      })
+      DocumentAPI.dispatchEvent(source.id, "fb-dnd-control-from",
+        properties = js.Dictionary(
+          "fb-do-copy" → $(el).hasClass(CopyClass).toString
+        )
+      )
     }
   })
 

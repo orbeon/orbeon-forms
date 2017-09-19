@@ -40,43 +40,58 @@ object BlockCache {
 
   val gridSectionCache = js.Array[Block]()
   val fbMainCache      = js.Array[Block]()
+  val cellCache        = js.Array[Block]()
 
   // Keep `gridSectionCache` and `fbMainCache` current
   Position.onOffsetMayHaveChanged(() ⇒ {
 
-    gridSectionCache.length = 0
-    $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
-      val section = $(domSection)
+    locally {
+      gridSectionCache.length = 0
+      $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
+        val section = $(domSection)
 
-      val mostOuterSection =
-        section.parents(".xbl-fr-section").last()
-          .pipe(Option(_)).filter(_.is("*"))
-          .getOrElse(section)
+        val mostOuterSection =
+          section.parents(".xbl-fr-section").last()
+            .pipe(Option(_)).filter(_.is("*"))
+            .getOrElse(section)
 
-      val titleAnchor = section.find("a")
+        val titleAnchor = section.find("a")
 
-      gridSectionCache.unshift(new Block {
-        override val el          = section
-        override val top         = Position.adjustedOffset(section).top
-        override val left        = Position.adjustedOffset(mostOuterSection).left
-        override val height      = titleAnchor.height()
-        override val width       = mostOuterSection.width()
-        override val titleOffset = Position.offset(titleAnchor)
+        gridSectionCache.unshift(new Block {
+          override val el          = section
+          override val top         = Position.adjustedOffset(section).top
+          override val left        = Position.adjustedOffset(mostOuterSection).left
+          override val height      = titleAnchor.height()
+          override val width       = mostOuterSection.width()
+          override val titleOffset = Position.offset(titleAnchor)
+        })
       })
-    })
+    }
 
-    fbMainCache.length = 0
-    val fbMain = $(".fb-main-inner")
-    val fbMainOffset = Position.adjustedOffset(fbMain)
-    fbMainCache.unshift(new Block {
-      override val el          = fbMain
-      override val top         = fbMainOffset.top
-      override val left        = fbMainOffset.left
-      override val height      = fbMain.height()
-      override val width       = fbMain.width()
-      override val titleOffset = null
-    })
+    locally {
+      fbMainCache.length = 0
+      val fbMain = $(".fb-main-inner")
+      addToCache(fbMainCache, fbMain)
+    }
+
+    locally {
+      cellCache.length = 0
+      val cells = $(".fr-grid.fr-editable .fr-grid-td")
+      cells.each((cell: dom.Element) ⇒ addToCache(cellCache, $(cell)))
+    }
 
   })
+
+  private def addToCache(cache: js.Array[Block], elem: JQuery): Unit = {
+    val elemOffset = Position.adjustedOffset(elem)
+    cellCache.unshift(new Block {
+      override val el          = elem
+      override val top         = elemOffset.top
+      override val left        = elemOffset.left
+      override val height      = elem.height()
+      override val width       = elem.width()
+      override val titleOffset = null
+    })
+  }
 
 }

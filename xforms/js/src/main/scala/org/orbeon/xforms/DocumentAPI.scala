@@ -36,12 +36,12 @@ object DocumentAPI {
   def dispatchEvent(
     targetId     : String,
     eventName    : String,
-    formElem     : js.UndefOr[html.Element] = js.undefined,
-    bubbles      : js.UndefOr[Boolean]      = js.undefined,
-    cancelable   : js.UndefOr[Boolean]      = js.undefined,
-    incremental  : js.UndefOr[Boolean]      = js.undefined,
-    ignoreErrors : js.UndefOr[Boolean]      = js.undefined,
-    properties   : js.UndefOr[js.Object]    = js.undefined
+    formElem     : js.UndefOr[html.Element]          = js.undefined,
+    bubbles      : js.UndefOr[Boolean]               = js.undefined,
+    cancelable   : js.UndefOr[Boolean]               = js.undefined,
+    incremental  : js.UndefOr[Boolean]               = js.undefined,
+    ignoreErrors : js.UndefOr[Boolean]               = js.undefined,
+    properties   : js.UndefOr[js.Dictionary[String]] = js.undefined
   ): Unit = {
 
     val eventObject  = new js.Object

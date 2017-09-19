@@ -442,102 +442,9 @@
                                 <!--<fr:xforms-inspector/>-->
                             </xf:group>
 
+                            <xf:var name="fb-resources"  value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
 
-                            <!-- Editors -->
-                            <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the binding of the current node,
-                                       which only works if the control exists -->
-                            <xh:div class="fb-cell-editor">
-                                <xf:var name="td"            value="id($selected-cell, instance('fb-form-instance'))"/>
-                                <xf:var name="grid"          value="$td/ancestor::*:grid[1]"/>
-                                <xf:var name="control"       value="$td/*[1]"/><!-- may be empty! -->
-                                <xf:var name="control-id"    value="$control/@id"/>
-                                <xf:var name="has-control"   value="exists($control-id)"/>
-                                <xf:var name="fb-resources"  value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
-
-                                <xh:span class="fb-grid-cell-icons">
-                                    <!-- Copy/move -->
-                                    <!-- draggable: for accessibility, and also used to add to add this ot the list of "triggers" -->
-                                    <!-- class/id: we would only want to have a `class`, but `action-icons.coffee` uses the `id` -->
-                                    <xh:i
-                                        id="fb-control-handle"
-                                        class="fb-control-handle icon-move"
-                                        draggable="true"
-                                        title="{$fb-resources/move-icon/label}"/>
-                                    <!-- Delete control -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-delete-trigger">
-                                        <xf:label>
-                                            <xh:i
-                                                class="icon-minus-sign"
-                                                title="{$fb-resources/delete-control-icon/label}"/>
-                                        </xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                            fbf:deleteCellContent($td, true())
-                                        </xf:action>
-                                    </xf:trigger>
-                                    <!-- Expand cell down -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-expand-trigger">
-                                        <xf:label>
-                                            <xh:i
-                                                class="icon-arrow-down"
-                                                title="{$fb-resources/expand-icon/label}"/>
-                                        </xf:label>
-
-                                        <!-- TODO: can we move these handlers up so that they are not duplicated? -->
-                                        <xf:action ev:event="DOMActivate">
-
-                                            <xf:var name="confirm" value="fbf:expandCellTouchesControl($td)"/>
-
-                                            <!-- Ask confirmation -->
-                                            <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">
-                                                <xf:property name="message" value="$fb-resources/messages/expand-cell"/>
-                                                <xf:property name="positive-targetid" value="xxf:absolute-id('fb-expand-trigger')"/>
-                                            </xf:dispatch>
-                                            <xf:action if="not($confirm)">
-                                                <!-- We are automatically confirmed as there is no control to delete -->
-                                                <xf:dispatch name="fr-positive" targetid="fb-expand-trigger"/>
-                                            </xf:action>
-                                        </xf:action>
-                                        <xf:action ev:event="fr-positive" type="xpath">
-                                            fbf:expandCell($td)
-                                        </xf:action>
-                                    </xf:trigger>
-                                    <!-- Shrink -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-shrink-trigger">
-                                        <xf:label>
-                                            <xh:i
-                                                class="icon-arrow-up"
-                                                title="{$fb-resources/shrink-icon/label}"/>
-                                        </xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                            fbf:shrinkCell($td)
-                                        </xf:action>
-                                    </xf:trigger>
-                                </xh:span>
-                                <xh:span class="fb-grid-control-icons">
-                                    <!-- Edit details for any control -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-details-trigger">
-                                        <xf:label>
-                                            <xh:i
-                                                class="icon-cog"
-                                                title="{$fb-resources/control-details-icon/label}"/>
-                                        </xf:label>
-                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
-                                            <xf:property name="control-id" value="$control/@id"/>
-                                        </xf:dispatch>
-                                    </xf:trigger>
-                                    <!-- Itemset editor -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
-                                        <xf:label>
-                                            <xh:i
-                                                class="icon-th-list"
-                                                title="{$fb-resources/edit-items/label}"/>
-                                        </xf:label>
-                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
-                                            <xf:property name="control-element" value="$control"/>
-                                        </xf:dispatch>
-                                    </xf:trigger>
-                                </xh:span>
-
+                            <xh:div class="fb-messages">
                                 <!-- Resources for control resources editors -->
                                 <xf:output class="fb-message-lhha-checkbox" ref="$form-resources/messages/lhha-checkbox"/>
                                 <xf:output class="fb-message-enter-label"   ref="$form-resources/enter-label/label"/>
@@ -546,6 +453,31 @@
                                 <xf:output class="fb-message-type-hint"     ref="$form-resources/type-hint/label"/>
                                 <xf:output class="fb-message-enter-text"    ref="$form-resources/enter-text/label"/>
                                 <xf:output class="fb-message-type-text"     ref="$form-resources/type-text/label"/>
+                            </xh:div>
+
+                            <!-- Editors -->
+                            <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the
+                                       binding of the current node, which only works if the control exists -->
+                            <xh:div class="fb-control-editor-left">
+
+                                <!-- Copy/move -->
+                                <!-- draggable: for accessibility, and also used to add this ot the list of "triggers" -->
+                                <xh:i
+                                    class="fb-control-handle icon-move"
+                                    draggable="true"
+                                    title="{$fb-resources/move-icon/label}"/>
+                                <!-- Delete control -->
+                                <xh:i
+                                    class="fb-control-delete icon-minus-sign"
+                                    title="{$fb-resources/delete-control-icon/label}"/>
+                                <!-- Edit details for any control -->
+                                <xh:i
+                                    class="fb-control-edit-details icon-cog"
+                                    title="{$fb-resources/control-details-icon/label}"/>
+                                <!-- Itemset editor -->
+                                <xh:i
+                                    class="fb-control-edit-items icon-th-list"
+                                    title="{$fb-resources/edit-items/label}"/>
 
                                 <!-- Used by the button/link editor, see the placeholders.coffee which uses a state machine -->
                                 <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
@@ -570,6 +502,7 @@
                                             current node when user interact with it, but we also need to be able to show empty/non-empty
                                             versions of the upload when user mouse over other cells.
                                 -->
+                                <!--
                                 <xf:var name="control-absolute-id" value="fbf:buildFormBuilderControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
                                 <xf:var name="bound-item" value="if ($control-absolute-id) then xxf:binding($control-absolute-id) else ()"/>
                                 <xf:upload
@@ -586,8 +519,51 @@
                                     <xf:filename  ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                 </xf:upload>
+                                -->
 
                             </xh:div>
+
+                            <xh:div class="fb-control-editor-right">
+                                <!-- Expand cell down -->
+                                <xf:trigger tabindex="-1" appearance="minimal" id="fb-expand-trigger">
+                                    <xf:label>
+                                        <xh:i
+                                            class="icon-arrow-down"
+                                            title="{$fb-resources/expand-icon/label}"/>
+                                    </xf:label>
+
+                                    <!-- TODO: can we move these handlers up so that they are not duplicated? -->
+                                    <xf:action ev:event="DOMActivate">
+
+                                        <xf:var name="confirm" value="fbf:expandCellTouchesControl($td)"/>
+
+                                        <!-- Ask confirmation -->
+                                        <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">
+                                            <xf:property name="message" value="$fb-resources/messages/expand-cell"/>
+                                            <xf:property name="positive-targetid" value="xxf:absolute-id('fb-expand-trigger')"/>
+                                        </xf:dispatch>
+                                        <xf:action if="not($confirm)">
+                                            <!-- We are automatically confirmed as there is no control to delete -->
+                                            <xf:dispatch name="fr-positive" targetid="fb-expand-trigger"/>
+                                        </xf:action>
+                                    </xf:action>
+                                    <xf:action ev:event="fr-positive" type="xpath">
+                                        fbf:expandCell($td)
+                                    </xf:action>
+                                </xf:trigger>
+                                <!-- Shrink -->
+                                <xf:trigger tabindex="-1" appearance="minimal" id="fb-shrink-trigger">
+                                    <xf:label>
+                                        <xh:i
+                                            class="icon-arrow-up"
+                                            title="{$fb-resources/shrink-icon/label}"/>
+                                    </xf:label>
+                                    <xf:action ev:event="DOMActivate" type="xpath">
+                                        fbf:shrinkCell($td)
+                                    </xf:action>
+                                </xf:trigger>
+                            </xh:div>
+
                             <xh:div class="fb-section-editor">
                                 <!-- Resources -->
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>

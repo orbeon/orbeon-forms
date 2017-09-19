@@ -63,9 +63,7 @@ object LabelEditor {
     DocumentAPI.dispatchEvent(
       targetId   = sectionId,
       eventName  = "fb-update-section-label",
-      properties = new js.Object() {
-        val label: String = newLabelValue
-      }
+      properties = js.Dictionary("label" → newLabelValue)
     )
     labelInputOpt.get.hide()
   }

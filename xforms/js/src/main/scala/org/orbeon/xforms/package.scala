@@ -13,7 +13,6 @@
   */
 package org.orbeon
 
-
 import scala.scalajs.js.Dynamic.{global ⇒ g}
 
 package object xforms {

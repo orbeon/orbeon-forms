@@ -29,6 +29,7 @@ object FormBuilderApp {
       BlockCache
       SideEditor
       LabelEditor
+      ControlEditor
     }
 
     $(initializeOnDomReady _)

@@ -35,7 +35,7 @@
     <xsl:template match="*:grid[empty(fr:c)]" mode="within-body">
 
         <xsl:variable
-            xmlns:cell="java:org.orbeon.oxf.fb.Cell"
+            xmlns:cell="java:org.orbeon.oxf.fr.NodeInfoCell"
             name="cells-and-details"
             select="cell:findTdsWithPositionAndSize(.)"/>
 

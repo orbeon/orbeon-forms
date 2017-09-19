@@ -1,0 +1,75 @@
+<!--
+  Copyright (C) 2017 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+
+    description="Form Runner grids" only="true" xmlns:xslL="http://www.w3.org/1999/XSL/Transform">
+
+    <test description="Runtime grids conversions" name="oxf:unsafe-xslt">
+        <input name="config">
+            <xsl:transform
+                version="2.0"
+                xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map">
+
+                <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
+
+                <xsl:template match="fr:grid">
+
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*"/>
+
+                        <xsl:variable
+                            name="rows"
+                            xmlns:cell="java:org.orbeon.oxf.fr.NodeInfoCell"
+                            select="cell:analyze12ColumnGridAndFillHoles(.)"/>
+
+                        <xsl:for-each select="1 to array:size($rows)">
+                            <xsl:variable name="index" select="."/>
+                            <xsl:variable name="cells" select="array:get($rows, $index)"/>
+
+                            <xsl:element name="xh:tr">
+                                <xsl:for-each select="$cells">
+                                    <xsl:variable name="map" select="."/>
+
+                                    <xsl:variable name="c" select="map:get($map, 'c')"/>
+                                    <xsl:variable name="h" select="map:get($map, 'h')"/>
+                                    <xsl:variable name="w" select="map:get($map, 'w')"/>
+
+                                    <xsl:element name="xh:td">
+                                        <xsl:if test="$h > 1"><xsl:attribute name="rowspan" select="$h"/></xsl:if>
+                                        <xsl:if test="$w > 1"><xsl:attribute name="colspan" select="$w"/></xsl:if>
+
+                                        <xsl:apply-templates select="$c/((@* except (@x, @y, @h, @w)) | node())"/>
+                                    </xsl:element>
+                                </xsl:for-each>
+                            </xsl:element>
+                        </xsl:for-each>
+
+                    </xsl:copy>
+
+                </xsl:template>
+
+            </xsl:transform>
+        </input>
+        <input name="data"  href="grids-12-columns.xml"/>
+        <output name="data" href="grids-outputs.xml"/>
+    </test>
+
+</group>

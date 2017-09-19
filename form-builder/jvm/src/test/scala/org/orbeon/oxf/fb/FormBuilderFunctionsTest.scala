@@ -16,11 +16,10 @@ package org.orbeon.oxf.fb
 import org.junit.Test
 import org.orbeon.dom.saxon
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fb.Cell._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
-import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.{Cell, FormRunner, NodeInfoCell}
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -255,10 +254,10 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
       }
     }
 
-  def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell]]): Unit = {
+  def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell[NodeInfo]]]): Unit = {
     val trs = grid / "tr"
     for ((expected, index) ← expected.zipWithIndex)
-      yield assert(getRowCells(trs(index)) === expected)
+      yield assert(NodeInfoCell.getRowCells(trs(index)) === expected)
   }
 
   @Test def rowspanGetRowCells(): Unit =
@@ -266,12 +265,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
       val grid = doc descendant "grid" head
 
-      def td(id: String) = grid descendant * filter (_.hasIdValue(id)) head
+      def td(id: String) = grid descendant * find (_.hasIdValue(id))
 
-      val expected = Seq(
-        Seq(Cell(td("11"), 1, 1, false), Cell(td("12"), 2, 1, false), Cell(td("13"), 1, 1, false)),
-        Seq(Cell(td("21"), 2, 1, false), Cell(td("12"), 1, 1, true),  Cell(td("23"), 1, 1, false)),
-        Seq(Cell(td("21"), 1, 1, true),  Cell(td("32"), 1, 1, false), Cell(td("33"), 1, 1, false))
+      val expected = List(
+        List(Cell(td("11"), 1, 1, 1, 1, missing = false), Cell(td("12"), 2, 1, 2, 1, missing = false), Cell(td("13"), 3, 1, 1, 1, missing = false)),
+        List(Cell(td("21"), 1, 2, 2, 1, missing = false), Cell(td("12"), 2, 2, 1, 1, missing = true),  Cell(td("23"), 3, 2, 1, 1, missing = false)),
+        List(Cell(td("21"), 1, 3, 1, 1, missing = true),  Cell(td("32"), 2, 3, 1, 1, missing = false), Cell(td("33"), 3, 3, 1, 1, missing = false))
       )
 
       compareExpectedCells(grid, expected)
@@ -292,15 +291,15 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
       for (tr ← grid / "tr" toList)
         insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
 
-      def td(id: String) = grid descendant * filter (_.hasIdValue(id)) head
+      def td(id: String) = grid descendant * find (_.hasIdValue(id))
 
-      val expected = Seq(
-        Seq(Cell(td("11"),        1, 1, false), Cell(td("12"),        3, 1, false), Cell(td("13"),        1, 1, false)),
-        Seq(Cell(td("tmp-2-tmp"), 1, 1, false), Cell(td("12"),        2, 1, true),  Cell(td("tmp-3-tmp"), 1, 1, false)),
-        Seq(Cell(td("21"),        3, 1, false), Cell(td("12"),        1, 1, true),  Cell(td("23"),        1, 1, false)),
-        Seq(Cell(td("21"),        2, 1, true),  Cell(td("tmp-4-tmp"), 1, 1, false), Cell(td("tmp-5-tmp"), 1, 1, false)),
-        Seq(Cell(td("21"),        1, 1, true),  Cell(td("32"),        1, 1, false), Cell(td("33"),        1, 1, false)),
-        Seq(Cell(td("tmp-6-tmp"), 1, 1, false), Cell(td("tmp-7-tmp"), 1, 1, false), Cell(td("tmp-8-tmp"), 1, 1, false))
+      val expected = List(
+        List(Cell(td("11"),        1, 1, 1, 1, missing = false), Cell(td("12"),        2, 1, 3, 1, missing = false), Cell(td("13"),        3, 1, 1, 1, missing = false)),
+        List(Cell(td("tmp-2-tmp"), 1, 2, 1, 1, missing = false), Cell(td("12"),        2, 2, 2, 1, missing = true),  Cell(td("tmp-3-tmp"), 3, 2, 1, 1, missing = false)),
+        List(Cell(td("21"),        1, 3, 3, 1, missing = false), Cell(td("12"),        2, 3, 1, 1, missing = true),  Cell(td("23"),        3, 3, 1, 1, missing = false)),
+        List(Cell(td("21"),        1, 4, 2, 1, missing = true),  Cell(td("tmp-4-tmp"), 2, 4, 1, 1, missing = false), Cell(td("tmp-5-tmp"), 3, 4, 1, 1, missing = false)),
+        List(Cell(td("21"),        1, 5, 1, 1, missing = true),  Cell(td("32"),        2, 5, 1, 1, missing = false), Cell(td("33"),        3, 5, 1, 1, missing = false)),
+        List(Cell(td("tmp-6-tmp"), 1, 6, 1, 1, missing = false), Cell(td("tmp-7-tmp"), 2, 6, 1, 1, missing = false), Cell(td("tmp-8-tmp"), 3, 6, 1, 1, missing = false))
       )
 
       compareExpectedCells(grid, expected)

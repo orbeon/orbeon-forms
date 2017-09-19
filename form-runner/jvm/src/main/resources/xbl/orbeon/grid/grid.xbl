@@ -103,7 +103,16 @@
                 <xsl:variable name="apply-defaults"           select="$root/@apply-defaults = 'true'"/>
                 <xsl:variable name="grid-rows"                select="($root/*:body, $root/self::*)[1]/*:tr"/>
 
-                <xsl:variable name="static-row-count"         select="count($grid-rows)"/>
+                <xsl:variable
+                    name="static-row-count"
+                    select="
+                        if ($is-12col) then
+                            max(
+                                for $c in $root/fr:c
+                                return $c/@y + ($c/@h, 1)[1] - 1
+                            )
+                        else
+                            count($grid-rows)"/>
 
                 <xsl:variable
                     name="static-col-count"
@@ -137,7 +146,7 @@
                 <xsl:variable name="right-column"             select="$is-repeat and $appearance = 'minimal' and not($readonly)"/>
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
 
-                <xsl:variable name="has-rowspan-or-colspan"   select="exists($root//(@rowspan | @colspan))"/>
+                <xsl:variable name="has-rowspan-or-colspan"   select="exists($root//(@rowspan | @colspan | @h | @w)[. > 1])"/>
 
                 <!-- TODO: refine, repeats? -->
                 <xsl:variable name="is-table"                 select="not($use-css-grids) and ($has-rowspan-or-colspan or $is-repeat or exists($root/(xf:group | xf:repeat)))"/>
@@ -292,6 +301,7 @@
                                         (
                                             'fr-grid',
                                              concat('fr-grid-', $static-col-count),
+                                            'fr-grid-css'[$use-css-grids],
                                              (: Control name might not be available (unclear why normalize-space() is needed) :)
                                              for $name in frf:controlNameFromId(@id)[normalize-space()] return concat('fr-grid-', $name),
                                              if ($is-repeat) then (
@@ -502,7 +512,46 @@
                                         <xsl:when test="$is-editable">
                                             <xsl:apply-templates select="*" mode="grid-content"/>
                                         </xsl:when>
+                                        <xsl:when test="$is-12col">
+                                            <!-- Runtime with 12-column layout -->
+                                            <!-- TODO: Why this group at runtime only? Add comment. -->
+                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
+
+                                                <xsl:variable
+                                                    name="rows"
+                                                    xmlns:cell="java:org.orbeon.oxf.fr.NodeInfoCell"
+                                                    select="cell:analyze12ColumnGridAndFillHoles(.)"/>
+
+                                                <xsl:for-each
+                                                    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+                                                    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+                                                    select="1 to array:size($rows)">
+
+                                                    <xsl:variable name="index" select="."/>
+                                                    <xsl:variable name="cells" select="array:get($rows, $index)"/>
+
+                                                    <xsl:element name="{$tr-elem}">
+                                                        <xsl:for-each select="$cells">
+                                                            <xsl:variable name="map" select="."/>
+
+                                                            <xsl:variable name="c" select="map:get($map, 'c')"/>
+                                                            <xsl:variable name="h" select="map:get($map, 'h')"/>
+                                                            <xsl:variable name="w" select="map:get($map, 'w')"/>
+
+                                                            <xsl:element name="{$td-elem}">
+                                                                <xsl:if test="$h > 1"><xsl:attribute name="rowspan" select="$h"/></xsl:if>
+                                                                <xsl:if test="$w > 1"><xsl:attribute name="colspan" select="$w"/></xsl:if>
+
+                                                                <xsl:apply-templates select="$c/((@* except (@x, @y, @h, @w)) | node())"/>
+                                                            </xsl:element>
+                                                        </xsl:for-each>
+                                                    </xsl:element>
+                                                </xsl:for-each>
+
+                                            </xf:group>
+                                        </xsl:when>
                                         <xsl:otherwise>
+                                            <!-- TODO: Why this group at runtime only? Add comment. -->
                                             <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                                 <xsl:apply-templates select="*" mode="grid-content"/>
                                             </xf:group>
@@ -848,7 +897,6 @@
 
                             </xsl:when>
                             <xsl:otherwise>
-                                <!--<xsl:attribute name="xxf:control">true</xsl:attribute>-->
 
                                 <!-- Propagate position/size attributes as `data-*` attributes -->
                                 <xsl:for-each select="@x, @y, @w, @h">
@@ -857,25 +905,22 @@
 
                                 <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or
                                      the upload button. -->
-                                <!-- TODO: See if we remove `fr-grid-content`. -->
-                                <!--<xh:div class="fr-grid-content{-->
-                                        <!--'{if (exists($control) and fbf:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}'}">-->
-                                    <!-- Optimization: don't generate a group for empty cells -->
-                                    <xsl:for-each select="$control">
-                                        <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                            <!-- Limitation of the editable mode: only handle the first control -->
-                                            <xsl:copy>
-                                                <xsl:attribute
-                                                    name="class"
-                                                    select="
-                                                        @class,
-                                                        fr:fb-is-html-classes(.)"
-                                                />
-                                                <xsl:copy-of select="@* except @class | node()"/>
-                                            </xsl:copy>
-                                        </xf:group>
-                                    </xsl:for-each>
-                                <!--</xh:div>-->
+                                <!-- TODO: `fb-itemset`. -->
+                                <!-- Optimization: don't generate a group for empty cells -->
+                                <xsl:for-each select="$control">
+                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                        <!-- Limitation of the editable mode: only handle the first control -->
+                                        <xsl:copy>
+                                            <xsl:attribute
+                                                name="class"
+                                                select="
+                                                    @class,
+                                                    fr:fb-is-html-classes(.)"
+                                            />
+                                            <xsl:copy-of select="@* except @class | node()"/>
+                                        </xsl:copy>
+                                    </xf:group>
+                                </xsl:for-each>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:element>

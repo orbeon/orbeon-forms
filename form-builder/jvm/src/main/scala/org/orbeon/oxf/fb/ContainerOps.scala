@@ -94,6 +94,7 @@ trait ContainerOps extends ControlOps {
       // NOTE: Use toList to make sure we are not lazy, otherwise items might be deleted as we go!
       val children = childrenContainers(container).reverse.toList flatMap recurse
 
+      // TODO: FIX: Old layout.
       val gridContent =
         if (IsGrid(container))
           container descendant "*:tr" descendant "*:td" child * filter IsControl reverse

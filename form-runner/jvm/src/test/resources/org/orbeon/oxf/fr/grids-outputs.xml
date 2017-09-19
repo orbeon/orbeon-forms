@@ -1,61 +1,57 @@
-<fr:body
-    xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:xf="http://www.w3.org/2002/xforms">
-
+<fr:body xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
     <!-- Grid with holes -->
     <fr:grid edit-ref="">
         <xh:tr>
-           <xh:td colspan="4">
-               <xf:input/>
-           </xh:td>
-           <xh:td colspan="3"/>
-           <xh:td rowspan="3">
-               <xf:input/>
-           </xh:td>
-           <xh:td colspan="4">
-               <xf:input/>
-           </xh:td>
+            <xh:td colspan="4">
+                <xf:input/>
+            </xh:td>
+            <xh:td colspan="3"/>
+            <xh:td rowspan="3">
+                <xf:input/>
+            </xh:td>
+            <xh:td colspan="4">
+                <xf:input/>
+            </xh:td>
         </xh:tr>
         <xh:tr>
-           <xh:td colspan="2"/>
-           <xh:td rowspan="2" colspan="2">
-               <xf:input/>
-           </xh:td>
-           <xh:td colspan="3">
-               <xf:input/>
-           </xh:td>
-           <xh:td colspan="3">
-               <xf:input/>
-           </xh:td>
-           <xh:td/>
+            <xh:td colspan="2"/>
+            <xh:td rowspan="2" colspan="2">
+                <xf:input/>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input/>
+            </xh:td>
+            <xh:td colspan="3">
+                <xf:input/>
+            </xh:td>
+            <xh:td/>
         </xh:tr>
         <xh:tr>
-           <xh:td colspan="2">
-               <xf:input/>
-           </xh:td>
-           <xh:td rowspan="2" colspan="2">
-               <xf:input/>
-           </xh:td>
-           <xh:td/>
-           <xh:td colspan="4">
-               <xf:input/>
-           </xh:td>
+            <xh:td colspan="2">
+                <xf:input/>
+            </xh:td>
+            <xh:td rowspan="2" colspan="2">
+                <xf:input/>
+            </xh:td>
+            <xh:td/>
+            <xh:td colspan="4">
+                <xf:input/>
+            </xh:td>
         </xh:tr>
         <xh:tr>
-           <xh:td colspan="4"/>
-           <xh:td/>
-           <xh:td>
-               <xf:input/>
-           </xh:td>
-           <xh:td/>
-           <xh:td colspan="3">
-               <xf:input/>
-           </xh:td>
+            <xh:td colspan="4"/>
+            <xh:td/>
+            <xh:td>
+                <xf:input/>
+            </xh:td>
+            <xh:td/>
+            <xh:td colspan="3">
+                <xf:input/>
+            </xh:td>
         </xh:tr>
     </fr:grid>
     <!-- Create empty rows -->
-    <fr:grid>
+    <fr:grid edit-ref="">
         <xh:tr>
             <xh:td>
                 <xf:input>
@@ -76,14 +72,12 @@
             <xh:td colspan="2"/>
         </xh:tr>
         <xh:tr>
-            <xh:td/>
-            <xh:td/>
+            <xh:td colspan="2"/>
         </xh:tr>
     </fr:grid>
-
-    <fr:grid>
+    <fr:grid edit-ref="">
         <xh:tr>
-            <xh:td>
+            <xh:td colspan="2">
                 <xf:input>
                     <xf:label ref="$form-resources/control-1/label"/>
                     <xf:hint ref="$form-resources/control-1/hint"/>
@@ -92,8 +86,8 @@
             </xh:td>
         </xh:tr>
         <xh:tr>
-            <xh:td>
-                <fr:dropdown-select1>
+            <xh:td colspan="2">
+                <fr:dropdown-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-4/label"/>
                     <xf:hint ref="$form-resources/control-4/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -105,8 +99,7 @@
             </xh:td>
         </xh:tr>
     </fr:grid>
-
-    <fr:grid>
+    <fr:grid edit-ref="">
         <xh:tr>
             <xh:td>
                 <xf:input>
@@ -143,7 +136,7 @@
         </xh:tr>
         <xh:tr>
             <xh:td colspan="2">
-                <fr:dropdown-select1>
+                <fr:dropdown-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-16/label"/>
                     <xf:hint ref="$form-resources/control-16/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -155,24 +148,23 @@
             </xh:td>
         </xh:tr>
     </fr:grid>
-
-    <fr:grid>
+    <fr:grid edit-ref="">
         <xh:tr>
-            <xh:td>
+            <xh:td colspan="2">
                 <xf:input>
                     <xf:label ref="$form-resources/control-19/label"/>
                     <xf:hint ref="$form-resources/control-19/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
-            <xh:td>
+            <xh:td colspan="2">
                 <xf:input>
                     <xf:label ref="$form-resources/control-20/label"/>
                     <xf:hint ref="$form-resources/control-20/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
-            <xh:td>
+            <xh:td colspan="2">
                 <xf:input>
                     <xf:label ref="$form-resources/control-21/label"/>
                     <xf:hint ref="$form-resources/control-21/hint"/>
@@ -181,14 +173,14 @@
             </xh:td>
         </xh:tr>
         <xh:tr>
-            <xh:td>
+            <xh:td colspan="2">
                 <xf:input>
                     <xf:label ref="$form-resources/control-28/label"/>
                     <xf:hint ref="$form-resources/control-28/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
-            <xh:td colspan="2">
+            <xh:td colspan="4">
                 <xf:input>
                     <xf:label ref="$form-resources/control-29/label"/>
                     <xf:hint ref="$form-resources/control-29/hint"/>
@@ -197,14 +189,14 @@
             </xh:td>
         </xh:tr>
         <xh:tr>
-            <xh:td colspan="2">
+            <xh:td colspan="4">
                 <xf:input>
                     <xf:label ref="$form-resources/control-30/label"/>
                     <xf:hint ref="$form-resources/control-30/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
-            <xh:td>
+            <xh:td colspan="2">
                 <xf:input>
                     <xf:label ref="$form-resources/control-31/label"/>
                     <xf:hint ref="$form-resources/control-31/hint"/>
@@ -213,7 +205,7 @@
             </xh:td>
         </xh:tr>
         <xh:tr>
-            <xh:td colspan="3">
+            <xh:td colspan="6">
                 <xf:input>
                     <xf:label ref="$form-resources/control-32/label"/>
                     <xf:hint ref="$form-resources/control-32/hint"/>
@@ -222,8 +214,7 @@
             </xh:td>
         </xh:tr>
     </fr:grid>
-
-    <fr:grid>
+    <fr:grid edit-ref="">
         <xh:tr>
             <xh:td>
                 <xf:input>
@@ -256,21 +247,21 @@
         </xh:tr>
         <xh:tr>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-45/label"/>
                     <xf:hint ref="$form-resources/control-45/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-46/label"/>
                     <xf:hint ref="$form-resources/control-46/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td colspan="2">
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-47/label"/>
                     <xf:hint ref="$form-resources/control-47/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -279,21 +270,21 @@
         </xh:tr>
         <xh:tr>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-48/label"/>
                     <xf:hint ref="$form-resources/control-48/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td colspan="2">
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-49/label"/>
                     <xf:hint ref="$form-resources/control-49/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-50/label"/>
                     <xf:hint ref="$form-resources/control-50/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -302,21 +293,21 @@
         </xh:tr>
         <xh:tr>
             <xh:td colspan="2">
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-51/label"/>
                     <xf:hint ref="$form-resources/control-51/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-52/label"/>
                     <xf:hint ref="$form-resources/control-52/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-53/label"/>
                     <xf:hint ref="$form-resources/control-53/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -325,14 +316,14 @@
         </xh:tr>
         <xh:tr>
             <xh:td colspan="3">
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-54/label"/>
                     <xf:hint ref="$form-resources/control-54/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-55/label"/>
                     <xf:hint ref="$form-resources/control-55/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -341,14 +332,14 @@
         </xh:tr>
         <xh:tr>
             <xh:td>
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-56/label"/>
                     <xf:hint ref="$form-resources/control-56/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                 </xf:input>
             </xh:td>
             <xh:td colspan="3">
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-57/label"/>
                     <xf:hint ref="$form-resources/control-57/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -357,7 +348,7 @@
         </xh:tr>
         <xh:tr>
             <xh:td colspan="4">
-                <xf:input>
+                <xf:input xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                     <xf:label ref="$form-resources/control-58/label"/>
                     <xf:hint ref="$form-resources/control-58/hint"/>
                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -365,278 +356,8 @@
             </xh:td>
         </xh:tr>
     </fr:grid>
-
-    <fr:grid>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-59/label"/>
-                    <xf:hint ref="$form-resources/control-59/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-60/label"/>
-                    <xf:hint ref="$form-resources/control-60/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-61/label"/>
-                    <xf:hint ref="$form-resources/control-61/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-62/label"/>
-                    <xf:hint ref="$form-resources/control-62/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-63/label"/>
-                    <xf:hint ref="$form-resources/control-63/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-74/label"/>
-                    <xf:hint ref="$form-resources/control-74/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-75/label"/>
-                    <xf:hint ref="$form-resources/control-75/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-76/label"/>
-                    <xf:hint ref="$form-resources/control-76/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td colspan="2">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-77/label"/>
-                    <xf:hint ref="$form-resources/control-77/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-78/label"/>
-                    <xf:hint ref="$form-resources/control-78/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-79/label"/>
-                    <xf:hint ref="$form-resources/control-79/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td colspan="2">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-80/label"/>
-                    <xf:hint ref="$form-resources/control-80/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-81/label"/>
-                    <xf:hint ref="$form-resources/control-81/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-82/label"/>
-                    <xf:hint ref="$form-resources/control-82/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td colspan="2">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-83/label"/>
-                    <xf:hint ref="$form-resources/control-83/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-84/label"/>
-                    <xf:hint ref="$form-resources/control-84/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-85/label"/>
-                    <xf:hint ref="$form-resources/control-85/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td colspan="2">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-86/label"/>
-                    <xf:hint ref="$form-resources/control-86/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-87/label"/>
-                    <xf:hint ref="$form-resources/control-87/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-88/label"/>
-                    <xf:hint ref="$form-resources/control-88/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-89/label"/>
-                    <xf:hint ref="$form-resources/control-89/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-90/label"/>
-                    <xf:hint ref="$form-resources/control-90/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-91/label"/>
-                    <xf:hint ref="$form-resources/control-91/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td colspan="3">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-92/label"/>
-                    <xf:hint ref="$form-resources/control-92/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-93/label"/>
-                    <xf:hint ref="$form-resources/control-93/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td colspan="3">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-94/label"/>
-                    <xf:hint ref="$form-resources/control-94/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-95/label"/>
-                    <xf:hint ref="$form-resources/control-95/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td colspan="3">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-96/label"/>
-                    <xf:hint ref="$form-resources/control-96/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-97/label"/>
-                    <xf:hint ref="$form-resources/control-97/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-98/label"/>
-                    <xf:hint ref="$form-resources/control-98/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-99/label"/>
-                    <xf:hint ref="$form-resources/control-99/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td colspan="4">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-100/label"/>
-                    <xf:hint ref="$form-resources/control-100/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td colspan="4">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-101/label"/>
-                    <xf:hint ref="$form-resources/control-101/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-            <xh:td>
-                <xf:input>
-                    <xf:label ref="$form-resources/control-102/label"/>
-                    <xf:hint ref="$form-resources/control-102/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-        <xh:tr>
-            <xh:td colspan="5">
-                <xf:input>
-                    <xf:label ref="$form-resources/control-103/label"/>
-                    <xf:hint ref="$form-resources/control-103/hint"/>
-                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                </xf:input>
-            </xh:td>
-        </xh:tr>
-    </fr:grid>
-
-    <fr:grid>
+    <fr:grid edit-ref=""/>
+    <fr:grid edit-ref="">
         <xh:tr>
             <xh:td>
                 <xf:input>

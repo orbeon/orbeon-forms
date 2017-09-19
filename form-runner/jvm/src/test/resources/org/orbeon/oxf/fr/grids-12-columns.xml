@@ -3,6 +3,20 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xf="http://www.w3.org/2002/xforms">
 
+    <!-- Grid with holes -->
+    <fr:grid edit-ref="">
+        <fr:c y="1" x="1"        w="4"><xf:input/></fr:c>
+        <fr:c y="1" x="8"  h="3"      ><xf:input/></fr:c>
+        <fr:c y="1" x="9"        w="4"><xf:input/></fr:c>
+        <fr:c y="2" x="3"  h="2" w="2"><xf:input/></fr:c>
+        <fr:c y="2" x="5"        w="3"><xf:input/></fr:c>
+        <fr:c y="2" x="9"        w="3"><xf:input/></fr:c>
+        <fr:c y="3" x="1"        w="2"><xf:input/></fr:c>
+        <fr:c y="3" x="5"  h="2" w="2"><xf:input/></fr:c>
+        <fr:c y="3" x="9"        w="4"><xf:input/></fr:c>
+        <fr:c y="4" x="8"             ><xf:input/></fr:c>
+        <fr:c y="4" x="10"       w="3"><xf:input/></fr:c>
+    </fr:grid>
     <!-- Create empty rows -->
     <fr:grid edit-ref="">
         <fr:c y="1" x="1" w="6">

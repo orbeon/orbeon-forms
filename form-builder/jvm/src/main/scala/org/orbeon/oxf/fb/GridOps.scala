@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fb.Cell._
+import org.orbeon.oxf.fr.Cell._
+import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.NodeInfoCell
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -29,12 +31,15 @@ import org.orbeon.scaxon.SimplePath._
  */
 trait GridOps extends ContainerOps {
 
+//  import NodeInfoCell.NodeInfoCellOps
+
   // Get the first enclosing repeated grid or legacy repeat
   def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
     findAncestorContainers(descendantOrSelf, includeSelf) filter IsGrid head
 
   // Width of the grid in columns
-  def getGridSize(grid: NodeInfo) = (grid / "*:tr").headOption.to[List] / "*:td" size
+  // TODO: FIX: Old layout.
+  def getGridSize(grid: NodeInfo): Int = (grid / "*:tr").headOption.toList / "*:td" size
 
   def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
     case Some(rowspan) ⇒
@@ -43,6 +48,7 @@ trait GridOps extends ContainerOps {
       <xh:td xmlns:xh="http://www.w3.org/1999/xhtml" id={id}/>
   }
 
+  // TODO: FIX: Old layout.
   private def trAtRowPos(gridId: String, rowPos: Int): NodeInfo = {
     val grid = containerById(gridId)
     val trs = grid / "*:tr"
@@ -61,12 +67,12 @@ trait GridOps extends ContainerOps {
     val rowCells = getRowCells(tr)
 
     // Number of cells that end at the current row
-    val newCellCount = rowCells count (cell ⇒ cell.rowspan == 1)
+    val newCellCount = rowCells count (cell ⇒ cell.h == 1)
 
     // Increment rowspan of cells that don't end at the current row
     rowCells foreach { cell ⇒
-      if (cell.rowspan > 1)
-        cell.underlyingRowspan += 1
+      if (cell.h > 1)
+        NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) + 1)
     }
 
     // Insert the new row
@@ -77,6 +83,7 @@ trait GridOps extends ContainerOps {
 
   // Insert a row above
   def insertRowAbove(gridId: String, rowPos: Int): NodeInfo = insertRowAbove(trAtRowPos(gridId, rowPos))
+  // TODO: FIX: Old layout.
   def insertRowAbove(tr: NodeInfo): NodeInfo =
     tr precedingSibling "*:tr" headOption match {
       case Some(prevRow) ⇒
@@ -111,6 +118,7 @@ trait GridOps extends ContainerOps {
 
     val allRowCells  = getAllRowCells(getContainingGrid(tr))
 
+    // TODO: FIX: Old layout.
     val posy = tr precedingSibling "*:tr" size
     val rowCells = allRowCells(posy)
     val nextRowCells = if (allRowCells.size > posy + 1) Some(allRowCells(posy + 1)) else None
@@ -124,10 +132,10 @@ trait GridOps extends ContainerOps {
     // Decrement rowspans if needed
     rowCells.zipWithIndex foreach {
       case (cell, posx) ⇒
-        if (cell.underlyingRowspan > 1) {
+        if (NodeInfoCellOps.underlyingRowspan(cell.td) > 1) {
           if (cell.missing) {
             // This cell is part of a rowspan that starts in a previous row, so decrement
-            cell.underlyingRowspan -= 1
+            NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) - 1)
           } else if (nextRowCells.isDefined) {
             // This cell is the start of a rowspan, and we are deleting it, so add a td in the next row
             // TODO XXX: issue: as we insert tds, we can't rely on Cell info unless it is updated ⇒
@@ -154,6 +162,7 @@ trait GridOps extends ContainerOps {
   // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
   def isLastGridInSection(grid: NodeInfo) = childrenGrids(findAncestorContainers(grid).head).size == 1
 
+  // TODO: FIX: Old layout.
   private def tdAtColPosOpt(gridId: String, colPos: Int): Option[NodeInfo] = {
 
     require(colPos >= 0)
@@ -186,7 +195,7 @@ trait GridOps extends ContainerOps {
 
         // For now insert same rowspans as previous column, but could also insert full column as an option
         if (! cell.missing) {
-          insert(into = cell.td parent *, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
+          insert(into = cell.td parent *, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.h > 1) Some(cell.h) else None))
         }
       }
 
@@ -210,6 +219,7 @@ trait GridOps extends ContainerOps {
         insertColRight(firstRowTd precedingSibling "*:td" head)
       } else {
         // First column: just insert plain tds as the first row
+        // TODO: FIX: Old layout.
         val trs = grid / "*:tr"
         val ids = nextIds(grid, "tmp", trs.size).toIterator
 
@@ -223,6 +233,7 @@ trait GridOps extends ContainerOps {
   }
 
   // Find a column's tds
+  // TODO: FIX: Old layout.
   def getColTds(td: NodeInfo) = {
     val rows = getContainingGrid(td) / "*:tr"
     val (x, _) = tdCoordinates(td)
@@ -272,7 +283,7 @@ trait GridOps extends ContainerOps {
     val grid = getContainingGrid(firstRowTd)
     val allRowCells = getAllRowCells(grid)
 
-    val (x, _) = Cell.tdCoordinates(firstRowTd: NodeInfo, allRowCells)
+    val (x, _) = NodeInfoCell.tdCoordinates(firstRowTd: NodeInfo, allRowCells)
 
     allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ cell.td.hasChildElement)
   }
@@ -329,6 +340,7 @@ trait GridOps extends ContainerOps {
             None
           case _ ⇒
             // We are the last cell of the row
+            // TODO: FIX: Old layout.
             val nextTr = currentTd.getParent followingSibling "*:tr" take 1
             val nextTrFirstTd = nextTr / "*:td" take 1
 
@@ -393,22 +405,22 @@ trait GridOps extends ContainerOps {
 
   // Get the x/y position of a td given Cell information
   def tdCoordinates(td: NodeInfo): (Int, Int) =
-    Cell.tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
+    NodeInfoCell.tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
 
   private def canExpandCell(td: NodeInfo): Boolean = {
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = Cell.tdCoordinates(td, allRowCells)
+    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
     val cell = allRowCells(y)(x)
 
-    (y + cell.rowspan) < allRowCells.size
+    (y + cell.h) < allRowCells.size
   }
 
   private def canShrinkCell(td: NodeInfo): Boolean = {
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = Cell.tdCoordinates(td, allRowCells)
+    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
     val cell = allRowCells(y)(x)
 
-    cell.rowspan > 1
+    cell.h > 1
   }
 
   // Whether there will be controls to delete if the cell is expanded
@@ -419,11 +431,11 @@ trait GridOps extends ContainerOps {
     debugDumpDocumentForGrids("expandCellTouchesControl", td)
 
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = Cell.tdCoordinates(td, allRowCells)
+    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
 
     val cell = allRowCells(y)(x)
 
-    allRowCells(y + cell.rowspan)(x).td.hasChildElement
+    allRowCells(y + cell.h)(x).td.hasChildElement
   }
 
 
@@ -435,13 +447,13 @@ trait GridOps extends ContainerOps {
       debugDumpDocumentForGrids("expandCell before", td)
 
       val allRowCells = getAllRowCells(getContainingGrid(td))
-      val (x, y) = Cell.tdCoordinates(td, allRowCells)
+      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
 
       val cell = allRowCells(y)(x)
-      val cellBelow = allRowCells(y + cell.rowspan)(x)
+      val cellBelow = allRowCells(y + cell.h)(x)
 
       // Increment rowspan
-      cell.underlyingRowspan += cellBelow.underlyingRowspan
+      NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) + NodeInfoCellOps.underlyingRowspan(cellBelow.td))
 
       // Delete cell below
       delete(cellBelow.td)
@@ -458,17 +470,18 @@ trait GridOps extends ContainerOps {
       val grid = getContainingGrid(td)
       val allRowCells  = getAllRowCells(grid)
 
-      val (x, y) = Cell.tdCoordinates(td, allRowCells)
+      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
 
       val cell = allRowCells(y)(x)
 
       // Decrement rowspan attribute
-      cell.underlyingRowspan -= 1
+      NodeInfoCellOps.underlyingRowspan_(cell.td, NodeInfoCellOps.underlyingRowspan(cell.td) - 1)
 
       // Insert new td
-      val posyToInsertInto = y + cell.rowspan - 1
+      val posyToInsertInto = y + cell.h - 1
       val rowBelow = allRowCells(posyToInsertInto)
 
+      // TODO: FIX: Old layout.
       val trToInsertInto = grid / "*:tr" apply posyToInsertInto
       val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
 
@@ -499,14 +512,13 @@ trait GridOps extends ContainerOps {
     bodyElement descendant "*:grid" descendant "*:td" take 1 foreach selectTd
   }
 
-  def canDeleteGrid(grid: NodeInfo): Boolean =
-    canDeleteContainer(grid)
-
   def deleteGridById(gridId: String) =
     deleteContainerById(canDeleteGrid, gridId)
 
-  def canDeleteRow(grid: NodeInfo): Boolean = (grid / "*:tr").length > 1
-  def canDeleteCol(grid: NodeInfo): Boolean = ((grid / "*:tr").headOption.to[List] / "*:td").length > 1
+  // TODO: FIX: Old layout.
+  def canDeleteGrid(grid: NodeInfo): Boolean = canDeleteContainer(grid)
+  def canDeleteRow (grid: NodeInfo): Boolean = (grid / "*:tr").size > 1
+  def canDeleteCol (grid: NodeInfo): Boolean = ((grid / "*:tr").headOption.toList / "*:td").size > 1
 
   private val DeleteTests = List(
     "grid" → canDeleteGrid _,
@@ -516,6 +528,7 @@ trait GridOps extends ContainerOps {
 
   // Return all classes that need to be added to an editable grid
   def gridCanDoClasses(gridId: String): Seq[String] = {
+
     val grid = containerById(gridId)
 
     val deleteClasses = DeleteTests collect { case (what, test) if test(grid) ⇒ "fb-can-delete-" + what }

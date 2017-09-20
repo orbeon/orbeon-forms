@@ -123,7 +123,7 @@
 
                 <!-- Remove automatic grid and td ids -->
                 <xsl:template match="xh:body//fr:grid/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
-                <xsl:template match="xh:body//fr:grid//(*:c | *:td)/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
+                <xsl:template match="xh:body//fr:grid//*:c/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
 
                 <!-- Remove xbl:xbl containing section templates bindings -->
                 <xsl:template match="xbl:xbl[xbl:binding[p:has-class('fr-section-component')]]"/>

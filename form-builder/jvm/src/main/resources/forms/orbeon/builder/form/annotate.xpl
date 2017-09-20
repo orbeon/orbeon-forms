@@ -196,13 +196,24 @@
 
                         <!-- Listen to activations on grid cells -->
                         <xf:action event="DOMActivate" xxf:phantom="true" class="fb-annotation">
-                            <xf:var name="control-element" value="xxf:control-element(event('xxf:absolute-targetid'))"/>
+                            <xf:var
+                                name="control-element"
+                                value="xxf:control-element(event('xxf:absolute-targetid'))"/>
+
                             <xf:action if="xxf:split($control-element/@class) = 'xforms-activable'">
-                                <xf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxf:element = 'xh:th']) + 1"/>
-                                <xf:var name="new-selected-cell" value="if ($control-element/@xxf:element = 'xh:th') then
-                                    ($control-element/following-sibling::xf:repeat//*[@xxf:element = 'xh:td'])[$th-column]/@id
-                                    else $control-element/@id"/>
-                                <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
+                                <xf:var
+                                    name="new-selected-cell-id"
+                                    value="
+                                        if ($control-element/@xxf:element = 'xh:th') then
+                                            (: Q: Is this still working? What is it trying to do exactly? :)
+                                            ($control-element/following-sibling::xf:repeat//*[@xxf:element = 'xh:td'])[
+                                                count($control-element/preceding-sibling::*[@xxf:element = 'xh:th']) + 1
+                                            ]/@id
+                                        else
+                                            $control-element/@id"/>
+                                <xf:setvalue
+                                    ref="xxf:get-variable('fr-form-model', 'selected-cell')"
+                                    value="$new-selected-cell-id"/>
                             </xf:action>
                         </xf:action>
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import enumeratum._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -41,11 +42,11 @@ case class Cell[Underlying](u: Option[Underlying], x: Int, y: Int, h: Int, w: In
 
 trait CellOps[Underlying] {
 
-  def underlyingRowspan(cell: Underlying): Int
-  def underlyingRowspan_(cell: Underlying, rowspan: Int): Unit
+  def underlyingRowspan (u: Underlying): Int
+  def underlyingRowspan_(u: Underlying, rowspan: Int): Unit
 
-  def attValueOpt(cell: Underlying, name: String): Option[String]
-  def children(u: Underlying, name: String): List[Underlying]
+  def attValueOpt(u: Underlying, name: String): Option[String]
+  def children   (u: Underlying, name: String): List[Underlying]
 }
 
 //trait ClientOps[Repr, E] {
@@ -186,7 +187,11 @@ object Cell {
 //
 //    }
 
-    def analyze12ColumnGridAndFillHoles[Underlying : CellOps](grid: Underlying, mergeHoles: Boolean): List[List[Cell[Underlying]]] = {
+    def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
+      grid       : Underlying,
+      mergeHoles : Boolean,
+      simplify   : Boolean
+    ): List[List[Cell[Underlying]]] = {
 
       val ops = implicitly[CellOps[Underlying]]
       val cs  = ops.children(grid, "*:c")
@@ -265,28 +270,40 @@ object Cell {
 
       }
 
-      // Adjust factors
-      val gcd = {
-
-        val Divisors = List(6, 4, 3, 2)
-
-        def gcd2(v1: Int, v2: Int): Int =
-          Divisors find (d ⇒ v1 % d == 0 && v2 % d == 0) getOrElse 1
-
-        val distinctValues =
-          xy.iterator   flatMap
-          (_.iterator)  filter
-          (! _.missing) flatMap
-          (c ⇒ Iterator(c.x - 1, c.w)) toSet
-
-        distinctValues.fold(Divisors.head)(gcd2)
-      }
-
-      if (gcd > 1)
-        xy map (_ map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList
-      else
+      def xyToList =
         xy map (_.toList) toList
+
+      // Adjust factors
+      if (simplify) {
+        val gcd = {
+
+          val Divisors = List(6, 4, 3, 2)
+
+          def gcd2(v1: Int, v2: Int): Int =
+            Divisors find (d ⇒ v1 % d == 0 && v2 % d == 0) getOrElse 1
+
+          val distinctValues =
+            xy.iterator   flatMap
+            (_.iterator)  filter
+            (! _.missing) flatMap
+            (c ⇒ Iterator(c.x - 1, c.w)) toSet
+
+          distinctValues.fold(Divisors.head)(gcd2)
+        }
+
+        if (gcd > 1)
+          xy map (_ map (c ⇒ c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)) toList) toList
+        else
+          xyToList
+      } else
+          xyToList
   }
+
+  def find[Underlying](td: Underlying, cells: List[List[Cell[Underlying]]]): Option[Cell[Underlying]] =
+    cells.iterator.flatten find (_.td == td)
+
+  def findCoordinates[Underlying](td: Underlying, cells: List[List[Cell[Underlying]]]): Option[(Int, Int)] =
+     find(td, cells) map (c ⇒ c.x → c.y)
 
 
 }

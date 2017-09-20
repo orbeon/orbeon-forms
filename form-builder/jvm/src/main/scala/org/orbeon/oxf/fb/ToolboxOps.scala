@@ -164,12 +164,8 @@ object ToolboxOps {
 
     // The grid template
     val gridTemplate: NodeInfo =
-      <fr:grid edit-ref="" id={ids.next()}
-           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-           xmlns:xh="http://www.w3.org/1999/xhtml">
-        <xh:tr>
-          <xh:td id={ids.next()}/>
-        </xh:tr>
+      <fr:grid edit-ref="" id={ids.next()} xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <fr:c id={ids.next()} x="1" y="1" w="6"/>
       </fr:grid>
 
     // Insert after current level 2 if found, otherwise into level 1
@@ -179,7 +175,7 @@ object ToolboxOps {
     updateTemplatesCheckContainers(inDoc, findAncestorRepeatNames(into, includeSelf = true).to[Set])
 
     // Select first grid cell
-    selectTd(newGridElement descendant "*:td" head)
+    selectFirstCellInContainer(newGridElement)
 
     debugDumpDocumentForGrids("insert new grid", inDoc)
   }
@@ -207,9 +203,7 @@ object ToolboxOps {
         <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
         if (withGrid)
           <fr:grid edit-ref="" id={ids.next()}>
-            <xh:tr>
-              <xh:td id={ids.next()}/>
-            </xh:tr>
+            <fr:c id={ids.next()} x="1" y="1" w="6"/>
           </fr:grid>
       }</fr:section>
 
@@ -236,7 +230,7 @@ object ToolboxOps {
 
     // Select first grid cell
     if (withGrid)
-      selectTd(newSectionElement descendant "*:td" head)
+      selectFirstCellInContainer(newSectionElement)
 
     // TODO: Open label editor for newly inserted section
 
@@ -254,14 +248,12 @@ object ToolboxOps {
 
     // The grid template
     val gridTemplate: NodeInfo =
-      <fr:grid edit-ref=""
-           id={gridId(newGridName)}
-           bind={bindId(newGridName)}
-           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-           xmlns:xh="http://www.w3.org/1999/xhtml">
-        <xh:tr>
-          <xh:td id={nextId(inDoc, "tmp")}/>
-        </xh:tr>
+      <fr:grid
+         edit-ref=""
+         id={gridId(newGridName)}
+         bind={bindId(newGridName)}
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <fr:c id={nextId(inDoc, "tmp")} x="1" y="1" w="6"/>
       </fr:grid>
 
     // Insert grid
@@ -291,12 +283,15 @@ object ToolboxOps {
     )
 
     // Select new td
-    selectTd(newGridElement descendant "*:td" head)
+    selectFirstCellInContainer(newGridElement)
 
     debugDumpDocumentForGrids("insert new repeat", inDoc)
 
     Some(newGridName)
   }
+
+  private def selectFirstCellInContainer(container: NodeInfo): Unit =
+    (container descendant "*:c" headOption) foreach selectTd
 
   // Insert a new section template
   //@XPathFunction

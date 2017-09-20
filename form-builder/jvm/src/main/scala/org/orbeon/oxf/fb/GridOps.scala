@@ -14,10 +14,11 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.Cell._
-import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.NodeInfoCell
+import org.orbeon.oxf.fr.NodeInfoCell._
+import org.orbeon.oxf.fr.{Cell, NodeInfoCell}
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -283,7 +284,7 @@ trait GridOps extends ContainerOps {
     val grid = getContainingGrid(firstRowTd)
     val allRowCells = getAllRowCells(grid)
 
-    val (x, _) = NodeInfoCell.tdCoordinates(firstRowTd: NodeInfo, allRowCells)
+    val (x, _) = NodeInfoCell.tdCoordinates(firstRowTd: NodeInfo, allRowCells).get
 
     allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ cell.td.hasChildElement)
   }
@@ -309,56 +310,69 @@ trait GridOps extends ContainerOps {
     setvalue(selectedCellVar, newTd.id)
 
   // Whether a call to ensureEmptyTd() will succeed
+  // For now say we'll always succeed as we'll fill gaps and insert a row as needed.
+  // TODO: Remove once no longer needed.
   def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
-    findSelectedTd(inDoc) match {
-      case Some(currentTd) ⇒
-        if (currentTd / * nonEmpty)
-          currentTd followingSibling "*:td" match {
-            case Seq(followingTd, _*) if followingTd / * nonEmpty ⇒ false
-            case _ ⇒ true
-          }
-        else
-          true
-      case None ⇒ false
-    }
+    findSelectedTd(inDoc).isDefined
 
   // Try to ensure that there is an empty td after the current location, inserting a new row if possible
-  def ensureEmptyTd(inDoc: NodeInfo): Option[NodeInfo] = {
-
-    findSelectedTd(inDoc) flatMap { currentTd ⇒
-
-      if (currentTd / * nonEmpty) {
+  def ensureEmptyTd(inDoc: NodeInfo): Option[NodeInfo] =
+    findSelectedTd(inDoc) flatMap { currentCellNode ⇒
+      if (currentCellNode.hasChildElement) {
         // There is an element in the current td, figure out what to do
 
-        currentTd followingSibling "*:td" match {
-          case Seq(followingTd, _*) if followingTd / * isEmpty  ⇒
-            // Next td exists is empty: move to that one
-            selectTd(followingTd)
-            Some(followingTd)
-          case Seq(followingTd, _*) ⇒
-            // Next td exists but is not empty: NOP for now
-            None
-          case _ ⇒
-            // We are the last cell of the row
-            // TODO: FIX: Old layout.
-            val nextTr = currentTd.getParent followingSibling "*:tr" take 1
-            val nextTrFirstTd = nextTr / "*:td" take 1
+        // - start with `currentCell`
+        // - find closest following available space with width `MinimumWidth`
+        //   - could be size of `currentCell`, or a fixed value, or dependent on control type
+        // - if found, then insert new cell at the right spot
+        // - if none, then insert new row below OR at end of grid
 
-            val newTd =
-              if (nextTr.isEmpty || (nextTrFirstTd / *).nonEmpty)
-                // The first cell of the next row is occupied, or there is no next row: insert new row
-                insertRowBelow(currentTd.getParent) / "*:td" head
-              else
-                // There is a next row, and its first cell is empty: move to that one
-                nextTrFirstTd.head
+        val grid         = getContainingGrid(currentCellNode)
+        val cells        = Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true, simplify = false)
+        val currentCell  = Cell.find(currentCellNode, cells).get
+        val MinimumWidth = currentCell.w
 
-            selectTd(newTd)
-            Some(newTd)
+        val availableCellOpt = cells.iterator.flatten collectFirst {
+          case c @ Cell(None, _, _, _, w, _) if w >= MinimumWidth ⇒ c
         }
+
+        val newCell =
+          availableCellOpt match {
+            case Some(availableCell) ⇒
+
+              val precedingCellOpt =
+                cells.iterator.flatten filter
+                (! _.missing)          takeWhile
+                (_ != availableCell)   lastOption()
+
+              precedingCellOpt flatMap (_.u) flatMap { precedingCellNode ⇒
+
+                val newCellNode: NodeInfo =
+                  <fr:c
+                    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                    id={nextId(grid, "tmp")}
+                    x={availableCell.x.toString}
+                    y={availableCell.y.toString}
+                    w={MinimumWidth.toString}/>
+
+                insert(into = Nil, after = precedingCellNode, origin = newCellNode).headOption
+              }
+            case None ⇒
+              val newCellNode: NodeInfo =
+                <fr:c
+                  xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                  id={nextId(grid, "tmp")}
+                  x="1"
+                  y={cells.size + 1 toString}
+                  w={MinimumWidth.toString}/>
+
+              insert(into = Nil, after = cells.last.last.u.toList, origin = newCellNode).headOption
+          }
+
+         newCell |!> selectTd
       } else
-        Some(currentTd)
+        Some(currentCellNode)
     }
-  }
 
   // @min/@max can be simple AVTs, i.e. AVTs which cover the whole attribute, e.g. "{my-min}"
   // The main reason to do this instead of making @min/@max plain XPath expressions is that @max also supports the
@@ -405,11 +419,11 @@ trait GridOps extends ContainerOps {
 
   // Get the x/y position of a td given Cell information
   def tdCoordinates(td: NodeInfo): (Int, Int) =
-    NodeInfoCell.tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
+    NodeInfoCell.tdCoordinates(td, getAllRowCells(getContainingGrid(td))).get
 
   private def canExpandCell(td: NodeInfo): Boolean = {
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
+    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
     val cell = allRowCells(y)(x)
 
     (y + cell.h) < allRowCells.size
@@ -417,7 +431,7 @@ trait GridOps extends ContainerOps {
 
   private def canShrinkCell(td: NodeInfo): Boolean = {
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
+    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
     val cell = allRowCells(y)(x)
 
     cell.h > 1
@@ -431,7 +445,7 @@ trait GridOps extends ContainerOps {
     debugDumpDocumentForGrids("expandCellTouchesControl", td)
 
     val allRowCells = getAllRowCells(getContainingGrid(td))
-    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
+    val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
 
     val cell = allRowCells(y)(x)
 
@@ -447,7 +461,7 @@ trait GridOps extends ContainerOps {
       debugDumpDocumentForGrids("expandCell before", td)
 
       val allRowCells = getAllRowCells(getContainingGrid(td))
-      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
+      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
 
       val cell = allRowCells(y)(x)
       val cellBelow = allRowCells(y + cell.h)(x)
@@ -470,7 +484,7 @@ trait GridOps extends ContainerOps {
       val grid = getContainingGrid(td)
       val allRowCells  = getAllRowCells(grid)
 
-      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells)
+      val (x, y) = NodeInfoCell.tdCoordinates(td, allRowCells).get
 
       val cell = allRowCells(y)(x)
 
@@ -511,7 +525,7 @@ trait GridOps extends ContainerOps {
     annotate("tmp", grids filterNot (_.hasId))
 
     // 2. Select the first td if any
-    bodyElement descendant "*:grid" descendant "*:td" take 1 foreach selectTd
+    bodyElement descendant "*:grid" descendant "*:c" take 1 foreach selectTd
   }
 
   def deleteGridById(gridId: String) =

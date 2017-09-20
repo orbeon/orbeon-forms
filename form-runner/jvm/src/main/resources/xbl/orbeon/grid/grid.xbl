@@ -385,7 +385,7 @@
                                                 <xsl:variable name="control" select="*[1]"/>
                                                 <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
                                                 <xh:th>
-                                                    <xsl:copy-of select="fr:th-td-classes-attr('th', @class)"/>
+                                                    <xsl:copy-of select="fr:th-td-classes-attr('th', @class, @id)"/>
                                                     <xsl:if test="$is-editable"><xsl:attribute name="xxf:control" select="'true'"/></xsl:if>
                                                     <xsl:copy-of select="@colspan"/>
                                                     <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger) and exists($control)">
@@ -538,11 +538,18 @@
                                                             <xsl:variable name="h" select="map:get($map, 'h')"/>
                                                             <xsl:variable name="w" select="map:get($map, 'w')"/>
 
+                                                            <!-- Scope AVT vars -->
+                                                            <xsl:if test="$is-editable or $is-repeat">
+                                                                <xsl:copy-of select="fr:scope-outer-avt-class(@class)"/>
+                                                            </xsl:if>
                                                             <xsl:element name="{$td-elem}">
+                                                                <xsl:attribute name="xxf:control">true</xsl:attribute><!-- for cell selection -->
+                                                                <xsl:copy-of select="fr:th-td-classes-attr('td', $c/@class, $c/@id)"/>
+
                                                                 <xsl:if test="$h > 1"><xsl:attribute name="rowspan" select="$h"/></xsl:if>
                                                                 <xsl:if test="$w > 1"><xsl:attribute name="colspan" select="$w"/></xsl:if>
 
-                                                                <xsl:apply-templates select="$c/((@* except (@x, @y, @h, @w)) | node())"/>
+                                                                <xsl:apply-templates select="$c/((@* except (@class, @xxf:control, @x, @y, @h, @w)) | node())"/>
                                                             </xsl:element>
                                                         </xsl:for-each>
                                                     </xsl:element>
@@ -853,12 +860,12 @@
                     <xsl:variable name="has-control"    select="exists($control)"/>
 
                     <xsl:if test="$is-editable and not ($use-css-grids)">
-                        <!-- Point to this td -->
-                        <!-- Used by $control below and $td/@id -->
-                        <xf:var name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
                         <!-- Point to the contained control -->
                         <!-- Used below by fbf:hasEditor() only -->
-                        <xf:var name="control" value="$td/*[1]" as="element()?"/>
+                        <xf:var
+                            name="control"
+                            value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]/*[1]"
+                            as="element()?"/>
                     </xsl:if>
 
                     <!-- Scope AVT vars -->
@@ -867,7 +874,7 @@
                     </xsl:if>
                     <xsl:element name="{$td-elem}">
                         <xsl:copy-of select="@* except (@class, @x, @y, @w, @h, @colspan, @rowspan)"/>
-                        <xsl:copy-of select="fr:th-td-classes-attr('td', @class)"/>
+                        <xsl:copy-of select="fr:th-td-classes-attr('td', @class, @id)"/>
 
                         <xsl:choose>
                             <xsl:when test="not($is-editable)">
@@ -897,6 +904,7 @@
 
                             </xsl:when>
                             <xsl:otherwise>
+                                <!--<xsl:attribute name="xxf:control">true</xsl:attribute>-->
 
                                 <!-- Propagate position/size attributes as `data-*` attributes -->
                                 <xsl:for-each select="@x, @y, @w, @h">
@@ -936,19 +944,19 @@
                 </xsl:function>
 
                 <xsl:function name="fr:th-td-classes-attr">
-                    <xsl:param name="th-td"       as="xs:string"/> <!-- Either 'th' or 'td' -->
-                    <xsl:param name="input-class" as="attribute(class)?"/>
-                    <!-- TODO: `selected-cell` -->
-                    <!--<xsl:variable name="fb-selected-avt">{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:variable>-->
-                    <xsl:variable name="fb-selected-avt"/>
-                    <xsl:variable
-                        name="classes"
+                    <xsl:param name="th-td" as="xs:string"/> <!-- Either 'th' or 'td' -->
+                    <xsl:param name="class" as="xs:string?"/>
+                    <xsl:param name="id"    as="xs:string?"/>
+                    <xsl:attribute
+                        name="class"
                         select="
                             concat('fr-grid-', $th-td),
-                            if (exists($input-class))           then '{$class-value}'                        else (),
-                            if ($is-editable and $th-td = 'td') then ($fb-selected-avt, 'xforms-activable')  else ()"
-                    />
-                    <xsl:if test="exists($classes)"><xsl:attribute name="class" select="$classes"/></xsl:if>
+                            '{$class-value}'[exists($class)],
+                            (
+                                concat('{''fb-selected''[xxf:get-variable(''fr-form-model'', ''selected-cell'') = ''', $id, ''']}'),
+                                'xforms-activable'
+                            )[$is-editable and $th-td = 'td'] (: for cell selection :)
+                        "/>
                 </xsl:function>
 
                 <!-- Classes so the client-side code can populate the checkbox when editing the label -->

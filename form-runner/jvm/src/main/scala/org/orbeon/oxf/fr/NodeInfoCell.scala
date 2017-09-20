@@ -25,10 +25,10 @@ object NodeInfoCell {
 
   implicit object NodeInfoCellOps extends CellOps[NodeInfo] {
 
-    def children(u: NodeInfo, name: String) = (u / name).to[List]
-    def attValueOpt(cell: NodeInfo, name: String) = cell attValueOpt name
+    def children   (u: NodeInfo, name: String): List[NodeInfo] = (u / name).to[List]
+    def attValueOpt(u: NodeInfo, name: String): Option[String] = u attValueOpt name
 
-    def underlyingRowspan(u: NodeInfo): Int = getNormalizedSpan(u, "rowspan")
+    def underlyingRowspan (u: NodeInfo): Int                = getNormalizedSpan(u, "rowspan")
     def underlyingRowspan_(u: NodeInfo, rowspan: Int): Unit = toggleAttribute(u, "rowspan", rowspan.toString, rowspan > 1)
   }
 
@@ -48,16 +48,8 @@ object NodeInfoCell {
   }
 
   // Get the x/y position of a td given Cell information
-  def tdCoordinates(td: NodeInfo, cells: List[List[Cell[NodeInfo]]]): (Int, Int) = {
-
-    // Search rows first, then cols
-    // Another solution would be to store the position directly into Cell
-
-    val y = td parent * precedingSibling "*:tr" size
-    val x = cells(y) indexWhere (_.td == td)
-
-    (x, y)
-  }
+  def tdCoordinates(td: NodeInfo, cells: List[List[Cell[NodeInfo]]]): Option[(Int, Int)] =
+    cells.iterator.flatten find (_.td == td) map (c ⇒ c.x → c.y)
 
   // Find all grid cells which are not empty and return for each:
   //
@@ -155,7 +147,7 @@ object NodeInfoCell {
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo): Item = { // `array(map(xs:string, *)*)`
     ArrayFunctions.createValue(
-      Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true).to[Vector] map { row ⇒
+      Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true, simplify = true).to[Vector] map { row ⇒
         new SequenceExtent(
           row collect {
             case Cell(uOpt, x, y, h, w, false) ⇒

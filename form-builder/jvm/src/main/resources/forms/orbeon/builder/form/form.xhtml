@@ -545,7 +545,7 @@
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
                                 <!-- Delete section -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="delete-section-trigger" class="delete-section-trigger">
+                                <xf:trigger class="fb-section-delete" tabindex="-1" appearance="minimal" id="delete-section-trigger">
                                     <xf:label>
                                         <xh:i
                                             class="icon-minus-sign"
@@ -563,7 +563,7 @@
                                     <xf:action ev:event="fr-positive" type="xpath">fbf:deleteSectionById(event('context'))</xf:action>
                                 </xf:trigger>
                                 <!-- Edit details -->
-                                <xf:trigger tabindex="-1" appearance="minimal">
+                                <xf:trigger class="fb-section-edit-details" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-cog"
@@ -575,7 +575,7 @@
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Edit help for section -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
+                                <xf:trigger class="fb-section-edit-help" tabindex="-1" appearance="minimal" id="fb-edit-section-help-trigger">
                                     <xf:label>
                                         <xh:i
                                             class="icon-info-sign"
@@ -586,7 +586,7 @@
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Move up -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-section-move-up">
+                                <xf:trigger class="fb-section-move-up" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-arrow-up"
@@ -598,7 +598,7 @@
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Move down -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-section-move-down">
+                                <xf:trigger class="fb-section-move-down" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-arrow-down"
@@ -610,7 +610,7 @@
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Move right -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-section-move-right">
+                                <xf:trigger class="fb-section-move-right" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-arrow-right"
@@ -622,7 +622,7 @@
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Move left -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-section-move-left">
+                                <xf:trigger class="fb-section-move-left" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-arrow-left"
@@ -634,7 +634,7 @@
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Grid details -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
+                                <xf:trigger class="fb-grid-edit-details" tabindex="-1" appearance="minimal" id="grid-details-trigger">
                                     <xf:label>
                                         <xh:i
                                             class="icon-cog"
@@ -645,16 +645,12 @@
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Delete grid -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger">
+                                <xf:trigger  class="fb-grid-delete" tabindex="-1" appearance="minimal" id="delete-grid-trigger">
                                     <xf:label>
                                         <xh:i
                                             class="icon-minus-sign"
                                             title="{$fb-resources/delete-grid-icon/label}"/>
                                     </xf:label>
-                                    <!--<xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>-->
-                                    <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-details">-->
-                                        <!--<xf:property name="container" value="fbf:containerById(event('grid-id'))"/>-->
-                                    <!--</xf:dispatch>-->
                                     <!-- Ask confirmation -->
                                     <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
                                         <xf:property name="message"
@@ -667,55 +663,8 @@
                                     <xf:action ev:event="fr-positive" type="xpath">fbf:deleteGridById(event('context'))</xf:action>
                                 </xf:trigger>
                             </xh:div>
+
                             <xh:div class="fb-grid-repeat-editor">
-                                <!-- Insert column to the left -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-col-left">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-chevron-left"
-                                            title="{$fb-resources/insert-column-left-icon/label}"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertColLeft(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
-                                </xf:trigger>
-                                <!-- Delete column -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="delete-col-trigger" class="fb-delete-col">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-minus-sign"
-                                            title="{$fb-resources/delete-column-icon/label}"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate">
-
-                                        <xf:var name="context" value="concat(event('grid-id'), ' ', event('col-pos'))"/>
-                                        <xf:var name="count" value="fbf:controlsInCol(event('grid-id'), xs:integer(event('col-pos')))"/>
-
-                                        <!-- Ask confirmation -->
-                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="dialog-confirmation">
-                                            <xf:property name="message"
-                                                 value="concat($fb-resources/messages/delete-column, ' ',
-                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                             <xf:property name="context" value="$context"/>
-                                             <xf:property name="positive-targetid" value="xxf:absolute-id('delete-col-trigger')"/>
-                                        </xf:dispatch>
-                                        <!-- We are automatically confirmed-->
-                                        <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-col-trigger">
-                                            <xf:property name="context" value="$context"/>
-                                        </xf:dispatch>
-                                    </xf:action>
-                                    <xf:action ev:event="fr-positive">
-                                        <xf:var name="grid-col" value="xxf:split(event('context'))"/>
-                                        <xf:action type="xpath">fbf:deleteCol($grid-col[1], xs:integer($grid-col[2]))</xf:action>
-                                    </xf:action>
-                                </xf:trigger>
-                                <!-- Insert column to the right -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-col-right">
-                                    <xf:label>
-                                        <xh:i
-                                            class="icon-chevron-right"
-                                            title="{$fb-resources/insert-column-right-icon/label}"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertColRight(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
-                                </xf:trigger>
                                 <!-- Insert row above -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-row-above">
                                     <xf:label>

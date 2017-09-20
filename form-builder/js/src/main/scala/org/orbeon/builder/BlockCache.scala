@@ -25,6 +25,9 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 @JSExportAll
 object BlockCache {
 
+  val SectionSelector = ".xbl-fr-section"
+  val GridSelector    = ".xbl-fr-grid"
+
   @ScalaJSDefined
   class Block extends js.Object {
 
@@ -65,7 +68,12 @@ object BlockCache {
           override val width       = mostOuterSection.width()
           override val titleOffset = Position.offset(titleAnchor)
         })
+
       })
+      val gridEls = $(".xbl-fr-grid:has(> .fr-editable)")
+      gridEls.each((grid: dom.Element) ⇒
+        addToCache(sectionGridCache, $(grid))
+      )
     }
 
     locally {
@@ -84,7 +92,7 @@ object BlockCache {
 
   private def addToCache(cache: js.Array[Block], elem: JQuery): Unit = {
     val elemOffset = Position.adjustedOffset(elem)
-    cellCache.unshift(new Block {
+    cache.unshift(new Block {
       override val el          = elem
       override val top         = elemOffset.top
       override val left        = elemOffset.left

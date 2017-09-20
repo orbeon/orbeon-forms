@@ -47,29 +47,43 @@ object SectionGridEditor {
         override val top  = sectionGrid.top - Position.scrollTop()
       })
 
-      // Update triggers relevance
-      val container = sectionGrid.el.children(".fr-section-container")
-      // Hide/show section move icons
-      List("up", "right", "down", "left").foreach((direction) ⇒ {
-          val relevant = container.hasClass("fb-can-move-" + direction)
-          val trigger = sectionGridEditor.children(".fb-section-move-" + direction)
-          if (relevant) trigger.show() else trigger.hide()
-      })
+      // Start by hiding all the icons
+      sectionGridEditor.children().hide()
 
-      // Hide/show delete icon
-      val deleteTrigger = sectionGridEditor.children(".delete-section-trigger")
-      if (container.is(".fb-can-delete")) deleteTrigger.show() else deleteTrigger.hide()
+      // Update triggers relevance for section
+      if (sectionGrid.el.is(BlockCache.SectionSelector)) {
+
+        // Edit details and help are always visible
+        sectionGridEditor.children(".fb-section-edit-details, .fb-section-edit-help").show()
+
+        // Hide/show section move icons
+        val container = sectionGrid.el.children(".fr-section-container")
+        List("up", "right", "down", "left").foreach((direction) ⇒ {
+            val relevant = container.hasClass("fb-can-move-" + direction)
+            val trigger  = sectionGridEditor.children(".fb-section-move-" + direction)
+            if (relevant) trigger.show()
+        })
+
+        // Hide/show delete icon
+        val deleteTrigger = sectionGridEditor.children(".delete-section-trigger")
+        if (container.is(".fb-can-delete")) deleteTrigger.show()
+      }
+
+      // Update triggers relevance for section
+      if (sectionGrid.el.is(BlockCache.GridSelector)) {
+        sectionGridEditor.children(".fb-grid-edit-details, .fb-grid-delete").show()
+      }
     }
   )
 
   // Hide editor when the pointer gets out of the Form Builder main area
   Position.currentContainerChanged(
     containerCache = BlockCache.fbMainCache,
-    wasCurrent = (section: Block) ⇒ {
+    wasCurrent = (_: Block) ⇒ {
       sectionGridEditor.hide()
       currentSectionGridOpt = js.undefined
     },
-    becomesCurrent = (section: Block) ⇒ ( /* NOP */ )
+    becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
   )
 
 }

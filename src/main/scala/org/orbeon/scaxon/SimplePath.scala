@@ -49,14 +49,14 @@ object SimplePath {
     def test(nodeInfo: NodeInfo): NodeTest
 
     // Combinators
-    def or(that: Test) = new OrTest(this, that)
-    def and(that: Test) = new AndTest(this, that)
+    def or(that: Test)     = new OrTest(this, that)
+    def and(that: Test)    = new AndTest(this, that)
     def except(that: Test) = new ExceptTest(this, that)
 
     // Symbolic equivalents
-    def ||(that: Test) = or(that)
-    def &&(that: Test) = and(that)
-    def -(that: Test) = except(that)
+    def ||(that: Test)     = or(that)
+    def &&(that: Test)     = and(that)
+    def -(that: Test)      = except(that)
   }
 
   object AnyTest extends Test {

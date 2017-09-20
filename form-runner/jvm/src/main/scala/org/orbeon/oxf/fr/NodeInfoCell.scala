@@ -15,13 +15,11 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.SaxonUtils
+import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
+import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
-import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator, ValueRepresentation}
-import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent, StringValue}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-
-import scala.collection.mutable.ListBuffer
 
 object NodeInfoCell {
 
@@ -61,7 +59,7 @@ object NodeInfoCell {
     (x, y)
   }
 
-  // Find all grid cells which are not empty and return for each, in order:
+  // Find all grid cells which are not empty and return for each:
   //
   // - the cell element
   // - the row-position
@@ -70,52 +68,90 @@ object NodeInfoCell {
   // - the column-span
   //
   //@XPathFunction
-  def findTdsWithPositionAndSize(grid: NodeInfo): SequenceIterator = {
+  def findTdsWithPositionAndSize(grid: NodeInfo): Item = { // `map(*)`
 
     val allRowCells = Cell.getAllRowCells(grid)
 
     val gridWidth = allRowCells map (_ filterNot (_.missing) map (_.w) sum) max
 
-    val result = ListBuffer[Item]()
-
-    result += gridWidth
-    result += allRowCells.size
-
     // Maybe refine this condition
     def isEmptyRow(row: List[Cell[NodeInfo]]) =
       (row filter (cell ⇒ cell.h == 1 && ! cell.missing && ! cell.td.hasChildElement) map (_.w) sum) == gridWidth
 
-    if (12 % gridWidth == 0) {
+    import org.orbeon.oxf.util.CoreUtils._
 
-      val ratio = 12 / gridWidth
+    val itOpt =
+      12 % gridWidth == 0 option {
 
-      for {
-        (row, rowStart) ← allRowCells.iterator.zipWithIndex
-      } locally {
-        if (isEmptyRow(row)) {
-          result += row.head.td
-          result += rowStart + 1
-          result += 1
-          result += 1
-          result += 12
-        } else
+        val ratio = 12 / gridWidth
+
+        val it =
           for {
-            (cell, columnStart) ← row.zipWithIndex.iterator
-            if ! cell.missing && cell.td.hasChildElement
-          } locally {
-            result += cell.td
-            result += rowStart + 1
-            result += columnStart * ratio + 1
-            result += cell.h
-            result += cell.w * ratio
+            (row, rowStart) ← allRowCells.iterator.zipWithIndex
+          } yield {
+            if (isEmptyRow(row)) {
+              Iterator(
+                Map[AtomicValue, ValueRepresentation](
+                  (SaxonUtils.fixStringValue("c"), row.head.td),
+                  (SaxonUtils.fixStringValue("x"), 1),
+                  (SaxonUtils.fixStringValue("y"), rowStart + 1),
+                  (SaxonUtils.fixStringValue("w"), 12),
+                  (SaxonUtils.fixStringValue("h"), 1)
+                )
+              )
+            } else
+              for {
+                (cell, columnStart) ← row.zipWithIndex.iterator
+                if ! cell.missing && cell.td.hasChildElement
+              } yield {
+                Map[AtomicValue, ValueRepresentation](
+                  (SaxonUtils.fixStringValue("c"), cell.td),
+                  (SaxonUtils.fixStringValue("x"), columnStart * ratio + 1),
+                  (SaxonUtils.fixStringValue("y"), rowStart + 1),
+                  (SaxonUtils.fixStringValue("w"), cell.w * ratio),
+                  (SaxonUtils.fixStringValue("h"), cell.h)
+                )
+            }
           }
-        }
-    }
 
-    result
+        it.flatten
+      }
+
+    // NOTE: Conversions have too much boilerplate, we should improve this at some point.
+    val cells =
+      itOpt                                          map
+      (_ map (MapFunctions.createValue(_)) toVector) map
+      (ArrayFunctions.createValue(_))                getOrElse
+      EmptySequence.getInstance
+
+    MapFunctions.createValue(
+      Map[AtomicValue, ValueRepresentation](
+        (SaxonUtils.fixStringValue("width"),  gridWidth),        // xs:integer
+        (SaxonUtils.fixStringValue("height"), allRowCells.size), // xs:integer
+        (SaxonUtils.fixStringValue("cells"),  cells)             // array(map(*))?
+      )
+    )
   }
 
-  //
+
+  /* How I would like to write the function below with explicit conversions for less boilerplate:
+
+  def testAnalyze12ColumnGridAndFillHoles(grid: NodeInfo): Item = { // `array(map(xs:string, *)*)`
+    Cell.analyze12ColumnGridAndFillHoles(grid, mergeHoles = true) map { row ⇒
+      row collect {
+        case Cell(uOpt, x, y, h, w, false) ⇒
+          Map(
+            "c" → uOpt getOrElse EmptySequence.getInstance,
+            "x" → x,
+            "y" → y,
+            "w" → w,
+            "h" → h
+          ).asXPath // or `toXPath`?
+      } asXPathSeq  // or `toXPathSeq`?
+    } asXPathArray  // or `toXPathArray`?
+  }
+  */
+
   //@XPathFunction
   def analyze12ColumnGridAndFillHoles(grid: NodeInfo): Item = { // `array(map(xs:string, *)*)`
     ArrayFunctions.createValue(

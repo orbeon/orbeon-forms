@@ -16,7 +16,9 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -43,40 +45,39 @@
             <xsl:attribute name="edit-ref"/>
             <xsl:apply-templates select="@*" mode="#current"/>
 
-            <xsl:variable
-                name="grid-width"
-                select="$cells-and-details[1]"/>
+            <!--<xsl:variable-->
+                <!--name="grid-width"-->
+                <!--select="map:get($cells-and-details, 'width')"/>-->
 
-            <xsl:variable
-                name="grid-height"
-                select="$cells-and-details[2]"/>
+            <!--<xsl:variable-->
+                <!--name="grid-height"-->
+                <!--select="map:get($cells-and-details, 'height')"/>-->
 
             <!--<xsl:attribute name="debug-grid-width"  select="$grid-width"/>-->
             <!--<xsl:attribute name="debug-grid-height" select="$grid-height"/>-->
 
+            <xsl:variable name="cells" select="map:get($cells-and-details, 'cells')"/>
             <xsl:choose>
-                <xsl:when test="count($cells-and-details) > 2">
-                    <xsl:for-each select="1 to ((count($cells-and-details) - 1) idiv 5)">
-                        <xsl:variable name="group-index" select="."/>
-                        <xsl:variable name="first-index" select="($group-index - 1) * 5 + 3"/>
-                        <xsl:variable name="td"          select="$cells-and-details[$first-index]"/>
+                <xsl:when test="exists($cells)">
+                    <xsl:for-each select="1 to array:size($cells)">
+                        <xsl:variable name="cell" select="array:get($cells, .)"/>
 
                         <xsl:element name="fr:c">
 
-                            <xsl:apply-templates select="$td/(@* except (@colspan, @rowspan))" mode="#current"/>
+                            <xsl:apply-templates select="map:get($cell, 'c')/(@* except (@colspan, @rowspan))" mode="#current"/>
 
-                            <xsl:attribute name="y" select="$cells-and-details[$first-index + 1]"/>
-                            <xsl:attribute name="x" select="$cells-and-details[$first-index + 2]"/>
+                            <xsl:attribute name="y" select="map:get($cell, 'y')"/>
+                            <xsl:attribute name="x" select="map:get($cell, 'x')"/>
 
-                            <xsl:for-each select="$cells-and-details[$first-index + 3][. != 1]">
+                            <xsl:for-each select="map:get($cell, 'h')[. != 1]">
                                 <xsl:attribute name="h" select="."/>
                             </xsl:for-each>
 
-                            <xsl:for-each select="$cells-and-details[$first-index + 4][. != 1]">
+                            <xsl:for-each select="map:get($cell, 'w')[. != 1]">
                                 <xsl:attribute name="w" select="."/>
                             </xsl:for-each>
 
-                            <xsl:apply-templates select="$td/node()" mode="#current"/>
+                            <xsl:apply-templates select="map:get($cell, 'c')/node()" mode="#current"/>
 
                         </xsl:element>
                     </xsl:for-each>

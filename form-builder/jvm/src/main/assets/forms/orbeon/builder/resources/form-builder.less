@@ -76,7 +76,8 @@ div.orbeon.orbeon-portlet-div {
 
     .fb-section-grid-editor,
     .fb-control-editor-left,
-    .fb-control-editor-right {
+    .fb-control-editor-right,
+    .fb-row-editor {
         position: absolute;                                                 // Its left/right set in CoffeeScript relative to the current section
         display: none;                                                      // Shown in CoffeeScript when mouse over section
         padding: 0 10px 20px 20px;                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
@@ -86,7 +87,7 @@ div.orbeon.orbeon-portlet-div {
         }
     }
     .fb-section-grid-editor {
-        padding-right: 20px;                                                // Space between icons and section
+        padding-right: 10px;                                                // Space between icons and section
     }
     .fb-control-editor-left {
         padding-top:   8px;                                                 // Space between icons and the cell border
@@ -95,13 +96,6 @@ div.orbeon.orbeon-portlet-div {
     .fb-control-editor-right {
         padding-top:   8px;                                                 // Space between icons and the cell border
         padding-right: 8px;
-    }
-
-    .fb-grid-repeat-editor {                                                // Section that contains the grid/repeat icons that are moved based on pointer position
-        .xforms-trigger {
-            display: none;                                                  // Shown in CoffeeScript based on pointer position
-            position: absolute;                                             // Left/right set in CoffeeScript
-        }
     }
 
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
@@ -726,7 +720,7 @@ div.orbeon.orbeon-portlet-div {
         }
     }
 
-    .fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td
+    .fb-cell-editor, .fb-row-editor { display: none } // Contains the editing markup that will be moved inside each grid td
 
     .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
         display: block; width: @fbIconsHeight;

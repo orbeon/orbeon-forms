@@ -664,9 +664,9 @@
                                 </xf:trigger>
                             </xh:div>
 
-                            <xh:div class="fb-grid-repeat-editor">
+                            <xh:div class="fb-row-editor">
                                 <!-- Insert row above -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-row-above">
+                                <xf:trigger class="fb-grid-insert-row-above" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-chevron-up"
@@ -675,7 +675,7 @@
                                     <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowAbove(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                                 </xf:trigger>
                                 <!-- Delete row -->
-                                <xf:trigger tabindex="-1" appearance="minimal" id="delete-row-trigger" class="fb-delete-row">
+                                <xf:trigger class="fb-grid-delete-row" tabindex="-1" appearance="minimal" id="delete-row-trigger">
                                     <xf:label>
                                         <xh:i
                                             class="icon-minus-sign"
@@ -704,7 +704,7 @@
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Insert row below -->
-                                <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-row-below">
+                                <xf:trigger class="fb-grid-insert-row-below" tabindex="-1" appearance="minimal">
                                     <xf:label>
                                         <xh:i
                                             class="icon-chevron-down"
@@ -713,6 +713,7 @@
                                     <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowBelow(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                                 </xf:trigger>
                             </xh:div>
+
                         </xf:group>
                         </xh:div>
                     </xh:div>

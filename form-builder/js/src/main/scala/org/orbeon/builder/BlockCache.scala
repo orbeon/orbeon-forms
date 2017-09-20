@@ -45,7 +45,7 @@ object BlockCache {
   val fbMainCache      = js.Array[Block]()
   val cellCache        = js.Array[Block]()
 
-  // Keep `gridSectionCache` and `fbMainCache` current
+  // Keep caches current
   Position.onOffsetMayHaveChanged(() ⇒ {
 
     locally {
@@ -87,7 +87,6 @@ object BlockCache {
       val cells = $(".fr-grid.fr-editable .fr-grid-td")
       cells.each((cell: dom.Element) ⇒ addToCache(cellCache, $(cell)))
     }
-
   })
 
   private def addToCache(cache: js.Array[Block], elem: JQuery): Unit = {

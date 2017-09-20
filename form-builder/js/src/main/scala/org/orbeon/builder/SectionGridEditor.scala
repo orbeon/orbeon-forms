@@ -27,15 +27,15 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 @JSExportAll
 object SectionGridEditor {
 
-  lazy val sectionGridEditor = $(".fb-section-grid-editor")
+  lazy val sectionGridEditor                    = $(".fb-section-grid-editor")
+  lazy val rowEditor                            = $(".fb-row-editor")
   var currentSectionGridOpt: js.UndefOr[JQuery] = js.undefined
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
     containerCache = BlockCache.sectionGridCache,
     wasCurrent = (_: Block) ⇒
-      // NOP, instead we hide the editor when the pointer leaves `.fb-main`
-      (),
+      rowEditor.hide(),
     becomesCurrent = (sectionGrid: Block) ⇒ {
       currentSectionGridOpt = sectionGrid.el
 
@@ -76,14 +76,44 @@ object SectionGridEditor {
     }
   )
 
+  Position.currentContainerChanged(
+    wasCurrent = (_: Block) ⇒ (),
+    containerCache = BlockCache.cellCache,
+    becomesCurrent = (cellBlock: Block) ⇒ {
+      rowEditor.show()
+      rowEditor.children().hide()
+
+      val frGridEl      = cellBlock.el.closest(".fr-grid")
+      val xblGridEl     = frGridEl.parent()
+      val xblGridOffset = Position.offset(xblGridEl)
+
+      def positionElWithClass(cssClass: String, topOffset: (JQuery) ⇒ Double): Unit = {
+        val elem = rowEditor.children(cssClass)
+        elem.show()
+        scala.scalajs.js.Dynamic.global.console.log("show", elem)
+        Position.offset(
+          el = elem,
+          offset = new Position.Offset {
+            override val left: Double = xblGridOffset.left
+            override val top: Double = topOffset(elem)
+          }
+        )
+      }
+
+      positionElWithClass(".fb-grid-insert-row-above", (_) ⇒ cellBlock.top)
+      positionElWithClass(".fb-grid-delete-row",       (e) ⇒ cellBlock.top + cellBlock.height/2 - e.height()/2)
+      positionElWithClass(".fb-grid-insert-row-below", (e) ⇒ cellBlock.top + cellBlock.height - e.height())
+    }
+  )
+
   // Hide editor when the pointer gets out of the Form Builder main area
   Position.currentContainerChanged(
     containerCache = BlockCache.fbMainCache,
     wasCurrent = (_: Block) ⇒ {
       sectionGridEditor.hide()
+      rowEditor.hide()
       currentSectionGridOpt = js.undefined
     },
     becomesCurrent = (_: Block) ⇒ ( /* NOP */ )
   )
-
 }

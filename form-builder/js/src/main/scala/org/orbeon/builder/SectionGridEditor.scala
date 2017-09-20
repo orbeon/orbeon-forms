@@ -25,39 +25,39 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel, ScalaJSDefine
 
 @JSExportTopLevel("ORBEON.builder.SideEditor")
 @JSExportAll
-object SideEditor {
+object SectionGridEditor {
 
-  lazy val sectionEditor = $(".fb-section-editor")
-  var currentSectionOpt: js.UndefOr[JQuery] = js.undefined
+  lazy val sectionGridEditor = $(".fb-section-grid-editor")
+  var currentSectionGridOpt: js.UndefOr[JQuery] = js.undefined
 
   // Position editor when block becomes current
   Position.currentContainerChanged(
-    containerCache = BlockCache.gridSectionCache,
-    wasCurrent = (section: Block) ⇒
-      // NOP, instead we hide the section editor when the pointer leaves `.fb-main`
+    containerCache = BlockCache.sectionGridCache,
+    wasCurrent = (_: Block) ⇒
+      // NOP, instead we hide the editor when the pointer leaves `.fb-main`
       (),
-    becomesCurrent = (section: Block) ⇒ {
-      currentSectionOpt = section.el
+    becomesCurrent = (sectionGrid: Block) ⇒ {
+      currentSectionGridOpt = sectionGrid.el
 
       // Position the editor
-      sectionEditor.show()
-      Position.offset(sectionEditor, new Position.Offset {
+      sectionGridEditor.show()
+      Position.offset(sectionGridEditor, new Position.Offset {
         // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-        override val left = Position.offset($(".fr-body")).left - sectionEditor.outerWidth()
-        override val top  = section.top - Position.scrollTop()
+        override val left = Position.offset($(".fr-body")).left - sectionGridEditor.outerWidth()
+        override val top  = sectionGrid.top - Position.scrollTop()
       })
 
       // Update triggers relevance
-      val container = section.el.children(".fr-section-container")
+      val container = sectionGrid.el.children(".fr-section-container")
       // Hide/show section move icons
       List("up", "right", "down", "left").foreach((direction) ⇒ {
           val relevant = container.hasClass("fb-can-move-" + direction)
-          val trigger = sectionEditor.children(".fb-section-move-" + direction)
+          val trigger = sectionGridEditor.children(".fb-section-move-" + direction)
           if (relevant) trigger.show() else trigger.hide()
       })
 
       // Hide/show delete icon
-      val deleteTrigger = sectionEditor.children(".delete-section-trigger")
+      val deleteTrigger = sectionGridEditor.children(".delete-section-trigger")
       if (container.is(".fb-can-delete")) deleteTrigger.show() else deleteTrigger.hide()
     }
   )
@@ -66,8 +66,8 @@ object SideEditor {
   Position.currentContainerChanged(
     containerCache = BlockCache.fbMainCache,
     wasCurrent = (section: Block) ⇒ {
-      sectionEditor.hide()
-      currentSectionOpt = js.undefined
+      sectionGridEditor.hide()
+      currentSectionGridOpt = js.undefined
     },
     becomesCurrent = (section: Block) ⇒ ( /* NOP */ )
   )

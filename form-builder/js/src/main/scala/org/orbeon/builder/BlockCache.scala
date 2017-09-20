@@ -38,7 +38,7 @@ object BlockCache {
     val cols: js.Array[Block] = js.Array()
   }
 
-  val gridSectionCache = js.Array[Block]()
+  val sectionGridCache = js.Array[Block]()
   val fbMainCache      = js.Array[Block]()
   val cellCache        = js.Array[Block]()
 
@@ -46,7 +46,7 @@ object BlockCache {
   Position.onOffsetMayHaveChanged(() ⇒ {
 
     locally {
-      gridSectionCache.length = 0
+      sectionGridCache.length = 0
       $(".xbl-fr-section:visible").each((domSection: dom.Element) ⇒ {
         val section = $(domSection)
 
@@ -57,7 +57,7 @@ object BlockCache {
 
         val titleAnchor = section.find("a")
 
-        gridSectionCache.unshift(new Block {
+        sectionGridCache.unshift(new Block {
           override val el          = section
           override val top         = Position.adjustedOffset(section).top
           override val left        = Position.adjustedOffset(mostOuterSection).left

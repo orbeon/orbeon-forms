@@ -35,7 +35,7 @@ object LabelEditor {
 
   var labelInputOpt: js.UndefOr[JQuery] = js.undefined
 
-  // On click on a trigger inside .fb-section-editor, send section id as a property along with the event
+  // On click on a trigger inside .fb-section-grid-editor, send section id as a property along with the event
   AjaxServer.beforeSendingEvent.add((
     event         : js.Dynamic,
     addProperties : js.Function1[js.Dictionary[String], Unit]
@@ -44,11 +44,11 @@ object LabelEditor {
     val eventTargetId    = event.targetId.asInstanceOf[String]
     val eventName        = event.eventName.asInstanceOf[String]
     val targetEl         = $(dom.document.getElementById(eventTargetId))
-    val inSectionEditor  = targetEl.closest(".fb-section-editor").is("*")
+    val inSectionEditor  = targetEl.closest(".fb-section-grid-editor").is("*")
 
     if (eventName == "DOMActivate" && inSectionEditor)
       addProperties(js.Dictionary(
-        "section-id" → SideEditor.currentSectionOpt.get.attr("id").get
+        "section-id" → SectionGridEditor.currentSectionGridOpt.get.attr("id").get
       ))
   })
 
@@ -56,7 +56,7 @@ object LabelEditor {
 
     val newLabelValue    = labelInputOpt.get.value().asInstanceOf[String]
     val labelInputOffset = Position.adjustedOffset(labelInputOpt.get)
-    val section          = Position.findInCache(BlockCache.gridSectionCache, labelInputOffset.top, labelInputOffset.left).get
+    val section          = Position.findInCache(BlockCache.sectionGridCache, labelInputOffset.top, labelInputOffset.left).get
     val sectionId        = section.el.attr("id").get
 
     section.el.find(SectionLabelSelector).text(newLabelValue)
@@ -98,13 +98,13 @@ object LabelEditor {
 
       // From the section title, get the anchor element, which contains the title
       val labelAnchor = {
-          val section = Position.findInCache(BlockCache.gridSectionCache, interceptorOffset.top, interceptorOffset.left).get
+          val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
           section.el.find(SectionLabelSelector)
       }
 
       // Set placeholder, done every time to account for a value change when changing current language
       locally {
-        val placeholderOutput = SideEditor.sectionEditor.children(".fb-type-section-title-label")
+        val placeholderOutput = SectionGridEditor.sectionGridEditor.children(".fb-type-section-title-label")
         val placeholderValue  = Controls.getCurrentValue(placeholderOutput.get(0).asInstanceOf[dom.html.Element])
         labelInput.attr("placeholder", placeholderValue)
       }
@@ -136,7 +136,7 @@ object LabelEditor {
   )                  : Unit = {
 
     val offset  = Position.adjustedOffset(clickInterceptor)
-    val section = Position.findInCache(BlockCache.gridSectionCache, offset.top, offset.left)
+    val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left)
     val sectionTitle = section.get.el.find(".fr-section-title:first")
     updateClass("hover", sectionTitle)
   }
@@ -144,10 +144,10 @@ object LabelEditor {
   // Show textual indication user can click on empty section title
   def showClickHintIfTitleEmpty(clickInterceptor: JQuery): Unit = {
     val interceptorOffset = Position.adjustedOffset(clickInterceptor)
-    val section = Position.findInCache(BlockCache.gridSectionCache, interceptorOffset.top, interceptorOffset.left).get
+    val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
     val labelAnchor = section.el.find(SectionLabelSelector)
     if (labelAnchor.text() == "") {
-      val outputWithHintMessage = SideEditor.sectionEditor.children(".fb-enter-section-title-label")
+      val outputWithHintMessage = SectionGridEditor.sectionGridEditor.children(".fb-enter-section-title-label")
       val hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0).asInstanceOf[dom.html.Element]).get
       clickInterceptor.text(hintMessage)
     }

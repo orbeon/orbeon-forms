@@ -27,7 +27,7 @@ object FormBuilderApp {
       DialogItemset
       ControlDnD
       BlockCache
-      SideEditor
+      SectionGridEditor
       LabelEditor
       ControlEditor
     }

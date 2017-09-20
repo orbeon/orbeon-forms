@@ -495,7 +495,7 @@ trait GridOps extends ContainerOps {
     // We do this so that ids are stable as we move things around, otherwise if the XForms document is recreated
     // new automatic ids are generated for objects without id.
 
-    def annotate(token: String, elements: Seq[NodeInfo]) = {
+    def annotate(token: String, elements: Seq[NodeInfo]): Unit = {
       // Get as many fresh ids as there are tds
       val ids = nextIds(doc, token, elements.size).toIterator
 
@@ -505,8 +505,10 @@ trait GridOps extends ContainerOps {
 
     // All grids and grid tds with no existing id
     val bodyElement = findFRBodyElement(doc)
-    annotate("tmp", bodyElement descendant "*:grid" descendant "*:td" filterNot (_.hasId))
-    annotate("tmp", bodyElement descendant "*:grid" filterNot (_.hasId))
+    val grids       = bodyElement descendant "*:grid"
+
+    annotate("tmp", grids descendant ("*:c" || "*:td") filterNot (_.hasId)) // remove `*:td` annotation once we are sure we only need `*:c`
+    annotate("tmp", grids filterNot (_.hasId))
 
     // 2. Select the first td if any
     bodyElement descendant "*:grid" descendant "*:td" take 1 foreach selectTd

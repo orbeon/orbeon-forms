@@ -20,12 +20,12 @@ import org.scalatest.FunSpec
 
 class GridTest extends FunSpec {
 
-  describe("The spaceToExtendCell function") {
+  describe("The `spaceToExtendCell()` function") {
 
     $(dom.window.document).find("body").append(
       """
         |<div id="fb≡section-1-control≡grid-1-control" class="xbl-component xbl-fr-grid">
-        |    <div class="fr-grid fr-grid-12 fr-grid-css fr-norepeat fr-editable fb-can-add-col">
+        |    <div class="fr-grid fr-grid-12 fr-grid-css fr-norepeat fr-editable">
         |        <div class="fr-grid-body">
         |            <div id="cell-1-1"  class="fr-grid-td  xforms-activable" data-y="1" data-x="1"            data-w="4"></div>
         |            <div id="cell-1-8"  class="fr-grid-td  xforms-activable" data-y="1" data-x="8" data-h="3"           ></div>
@@ -94,7 +94,7 @@ class GridTest extends FunSpec {
       (id, dirValue)     ← expected
       (direction, space) ← dirValue
     } locally {
-      it(s"must pass moving $id ${direction.entryName.toLowerCase}") {
+      it(s"must pass moving `$id` ${direction.entryName.toLowerCase}") {
         assert(space == Grid.spaceToExtendCell($(s"#$id")(0), direction))
       }
     }

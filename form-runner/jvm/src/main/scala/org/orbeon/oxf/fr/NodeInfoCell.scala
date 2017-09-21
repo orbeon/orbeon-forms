@@ -169,15 +169,4 @@ object NodeInfoCell {
       }
     )
   }
-
-
-  trait ClientOps[Repr, E] {
-
-    def findHoles(r: Repr): List[E]
-
-    def canMove(r: Repr, from: Coordinate, to: Coordinate): Boolean
-    def canExpand(r: Repr, from: Coordinate, direction: Direction): Boolean
-
-  }
-
 }

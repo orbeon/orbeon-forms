@@ -35,15 +35,6 @@ trait CellOps[Underlying] {
   def children   (u: Underlying, name: String): List[Underlying]
 }
 
-//trait ClientOps[Repr, E] {
-//
-//  def findHoles(r: Repr): List[E]
-//
-//  def canMove(r: Repr, from: Coordinate, to: Coordinate): Boolean
-//  def canExpand(r: Repr, from: Coordinate, direction: Direction): Boolean
-//
-//}
-
 object Cell {
 
   val StandardGridWidth = 12

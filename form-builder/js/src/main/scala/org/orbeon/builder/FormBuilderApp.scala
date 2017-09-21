@@ -30,6 +30,7 @@ object FormBuilderApp {
       SectionGridEditor
       LabelEditor
       ControlEditor
+      ControlResourceEditor
     }
 
     $(initializeOnDomReady _)

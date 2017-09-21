@@ -14,9 +14,10 @@
 package org.orbeon.xforms.facade
 
 import org.orbeon.xforms.YUICustomEvent
+import org.scalajs.dom
 import org.scalajs.dom.raw.XMLHttpRequest
 import org.scalajs.dom.{html, raw}
-import org.scalajs.jquery.JQueryCallback
+import org.scalajs.jquery.{JQuery, JQueryCallback}
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
@@ -202,3 +203,60 @@ class Control extends js.Object {
   // Returns the first element with the given class name that are inside this control
   def getElementByClassName(className: String): js.UndefOr[html.Element] = js.native
 }
+
+@js.native
+trait JQueryTooltip extends JQuery {
+  def tooltip(config: JQueryTooltipConfig): Unit = js.native
+  def tooltip(operation: String)          : Unit = js.native
+}
+
+object JQueryTooltip {
+  implicit def jq2tooltip(jq: JQuery): JQueryTooltip =
+    jq.asInstanceOf[JQueryTooltip]
+}
+
+@ScalaJSDefined
+abstract class JQueryTooltipConfig extends js.Object {
+  val title: String
+}
+
+@js.native
+@JSGlobal("tinymce.Editor")
+class TinyMceEditor(containerId: String, config: TinyMceConfig) extends js.Object {
+  val initialized            : Boolean       = js.native
+  val onInit                 : TinyMceEvent  = js.native
+  val editorContainer        : String        = js.native
+  val container              : dom.Element   = js.native
+  def render()               : Unit          = js.native
+  def getWin()               : dom.Window    = js.native
+  def getContent()           : String        = js.native
+  def setContent(c: String)  : Unit          = js.native
+  def execCommand(c: String) : Unit          = js.native
+  def show()                 : Unit          = js.native
+  def hide()                 : Unit          = js.native
+  def focus()                : Unit          = js.native
+}
+
+@js.native
+trait TinyMceEvent extends js.Object {
+  def add(f: js.Function1[TinyMceEditor, Unit])
+}
+
+@js.native
+trait TinyMceConfig extends js.Object {
+  var plugins                  : String = js.native
+  var autoresize_min_height    : Double = js.native
+  var autoresize_bottom_margin : Double = js.native
+}
+
+@JSGlobal("YAHOO.xbl.fr.Tinymce.DefaultConfig")
+@js.native
+object TinyMceDefaultConfig extends TinyMceConfig
+
+@JSGlobal("_")
+@js.native
+object Underscore extends js.Object {
+  def uniqueId(): String = js.native
+  def clone[T](o: T): T = js.native
+}
+

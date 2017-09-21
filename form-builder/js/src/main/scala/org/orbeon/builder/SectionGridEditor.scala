@@ -90,7 +90,6 @@ object SectionGridEditor {
       def positionElWithClass(cssClass: String, topOffset: (JQuery) ⇒ Double): Unit = {
         val elem = rowEditor.children(cssClass)
         elem.show()
-        scala.scalajs.js.Dynamic.global.console.log("show", elem)
         Position.offset(
           el = elem,
           offset = new Position.Offset {

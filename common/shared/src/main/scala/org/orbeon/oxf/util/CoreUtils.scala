@@ -38,4 +38,18 @@ object CoreUtils {
     def iterator[A](a: ⇒ A) = if (b) Iterator(a) else Iterator.empty
   }
 
+  // Special case of Underscore.memoize() for functions taking no parameters
+  def memoize0[R](
+    f: () ⇒ R
+  ):   () ⇒ R = {
+
+    var resultOpt: Option[R] = None
+    () ⇒ {
+      resultOpt.getOrElse {
+        val result = f()
+        resultOpt = Some(result)
+        result
+      }
+    }
+  }
 }
